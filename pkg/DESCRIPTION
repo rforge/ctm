@@ -7,5 +7,5 @@ Maintainer: Torsten Hothorn <Torsten.Hothorn@R-project.org>
 Description: An experimental implementation of conditional transformation
   models for the semiparametric estimation of conditional distribution
   functions. Contains example analyses and a simulation study.
-Depends: R (>= 2.10.0), mboost
+Depends: R (>= 2.10.0), mboost (>= 2.1-0), lattice
 License: GPL-2

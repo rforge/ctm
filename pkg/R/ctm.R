@@ -115,9 +115,10 @@ qest <- function(x, prob = c(.1, .5, .9)) {
     sapply(prob, function(p) optimize(zf, interval = range(y), prob = p)$minimum)
 }
 
-plot.ctm <- function(object, which = sort(unique(selected(object))), 
+plot.ctm <- function(x, which = sort(unique(selected(object))), 
                         prob = TRUE, obs = TRUE, ...) {
 
+    object <- x
     pfun <- function(which) {
         stopifnot(length(which) == 1)
         df <- model.frame(object, which = which)[[1]]
