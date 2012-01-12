@@ -1,0 +1,22 @@
+
+\SweaveOpts{engine = R, keep.source = TRUE, prefix.string = figures/fig}
+
+
+<<BostonHousing-data, echo = FALSE, results = hide>>=
+load("ex_BostonHousing.Rda")
+library("mboost")
+source("ctm.R")
+source("setup.R")
+@
+
+\begin{figure}
+\includegraphics[width = \textwidth]{ex_BostonHousing}
+%<<BostonHousing-plotp, echo = FALSE, fig = TRUE>>=
+%print(plot(mod))
+%@
+\caption{Beyond Mean Boston Housing Values. Conditional transformation model
+         with three selected variables. Each panel depicts the data as scatter plots
+         along with the corresponding negative absolute values of the  estimated transformation function
+         at the probit scale. The explanatory variables have been standardised 
+         prior to analysis. \label{BostonHousing-plot}}
+\end{figure}
