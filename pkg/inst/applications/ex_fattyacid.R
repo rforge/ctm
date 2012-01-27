@@ -1,5 +1,5 @@
 
-library("ctm")
+library("ctm")   
 library("np")
 
 set.seed(290875)
@@ -24,7 +24,8 @@ p <- predict(m, newdata = nfa, type = "response")
 fit <- rbind(fit, data.frame(p = p, y = y, x = x, what = "glm",
                              stringsAsFactors = FALSE))
 
-mod <- ctm(bbs(FA, df = 2.1) ~ bols(PE, intercept = FALSE, 
+### df = 6 groups x 3 df each
+mod <- ctm(bbs(FA, df = 18) ~ bols(PE, intercept = FALSE, 
 	                                lambda = 0), data = xdf,
               family = Binomial(link = "probit"), monotone = FALSE,
               control = ctrl)

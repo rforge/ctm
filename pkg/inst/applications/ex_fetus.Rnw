@@ -8,8 +8,6 @@ source("setup.R")
 
 \begin{figure}
 <<fetus-plot, echo = FALSE, fig = TRUE>>=
-plot(1:10, type = "n", main = "no plot")
-if (FALSE) {
 levels(pred$model) <- c("CTM", "LM", "LQR", "AQR")
 pfun <- function(x, y, subscripts, ...) {
     with(pred[subscripts,], panel.polygon(c(1:150, 150:1), c(q10, rev(q90)), col = "lightgrey"))
@@ -19,11 +17,10 @@ pfun <- function(x, y, subscripts, ...) {
 
 print(xyplot(q50 ~ indx | model, data = pred, type = "l", panel = pfun, 
        ylab = "Birth weight (in g)", xlab = "Observation", ylim = range(c(pred$q10, pred$q90))))
-}
 @
-\caption{Birth Weight Prediction. Observed birth weights for 150 small fetuses (dots), ordered with
+\caption{Birth Weight Prediction. Observed birth weights for 150 small foetuses (dots), ordered with
          respect to the estimated mean or median expected birth weight (central black line). The 
-         shaded area represents fetus-specific $80\%$ prediction intervals for the
-         linear model (LM), linear (LRQ) and additive quantile regression (AQR), and 
-         conditional transformation models (CTM). \label{fetus-plot}}
+         shaded area represents foetus specific $80\%$ prediction intervals for the
+         linear model (LM), linear quantile regression model (LRQ), additive quantile 
+         regression model (AQR), and conditional transformation model (CTM). \label{fetus-plot}}
 \end{figure}

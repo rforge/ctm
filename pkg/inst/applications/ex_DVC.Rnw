@@ -9,7 +9,7 @@ library("mboost")
 source("setup.R")
 @
 
-\begin{figure}
+\begin{figure}[t]
 <<DVC-plot, echo = FALSE, fig = TRUE, width = 6, height = 4, pdf = FALSE, png = TRUE>>=
 DVC <- data.frame(number = c(rowSums(x06), rowSums(x09)),
                   days = c(1:365, 1:365),
@@ -30,9 +30,9 @@ pfun <- function(x, y, z, subscripts, at, ...) {
 print(contourplot(p ~ days + number.x | year, data = p, region = FALSE,
             panel = pfun, 
             scales = list(x = list(relation = "free", tick.number = 12, rot = 45)),
-            ylab = "Number of DVCs", xlab = "Time (in months)"))
+            ylab = "Number of DVCs", xlab = "Time (months)"))
 @
-\caption{Deer-vehicle Collisions. Number of deer-vehicle collisions per day in
+\caption{Deer-vehicle Collisions. Number of deer-vehicle collisions (DVCs) per day in
          2006 and 2009 in Bavaria, Germany, with estimated quantile curves for 
          $\tau = 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95$. \label{DVC-plot}}
 \end{figure}

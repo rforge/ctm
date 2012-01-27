@@ -87,13 +87,13 @@ dev.off()
      \put(.7,.2){\includegraphics[width=.35\textwidth]{figures/fig-india-legend.pdf}}
   \end{picture}
 \end{center}
-\caption{Childhood Nutrition in India. Color-coded map of the $10\%$ and $90\%$
-         conditional quantiles of the $Z$ score. The dots in the color legend
-         correspond to one district with the respective color in the map.
+\caption{Childhood Nutrition in India. Colour-coded map of the $10\%$ and $90\%$
+         conditional quantiles of the $Z$ score. Each dot in the colour legend
+         corresponds to one district with the respective colour in the map.
          Blue values in the northern part
          of India correspond to small lower and upper quantiles. Red values,
          especially in the eastern Meghalaya and Assam states, indicate small
-         lower but at the same time large upper quantiles. In the southern part
+         lower quantiles but at the same time large upper quantiles. In the southern part
          of India, the lower quantiles are largest with moderate upper quantiles.
          White parts indicate districts with no observations.
          \label{india_qplot}}

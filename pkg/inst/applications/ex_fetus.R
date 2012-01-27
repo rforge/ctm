@@ -1,10 +1,7 @@
 
-library("ctm")
+library("ctm")   
 library("quantreg")
 
-if (FALSE) {
-
-### sorry, these data are not publically available
 load("fetus.Rda")
 
 ### linear model
@@ -100,7 +97,4 @@ pred4$indx <- 1:nrow(pred4)
 pred <- rbind(pred1, pred2, pred3, pred4)
 pred$model <- factor(pred$model)
 
-}
-
 save(pred, file = "ex_fetus.Rda")
-

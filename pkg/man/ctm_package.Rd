@@ -13,8 +13,8 @@
 \tabular{ll}{
 Package: \tab ctm\cr
 Type: \tab Package\cr
-Version: \tab 0.0-1\cr
-Date: \tab 2012-01-12\cr
+Version: \tab 0.0-2\cr
+Date: \tab 2012-01-27\cr
 License: \tab GPL-2\cr
 }
 
@@ -43,7 +43,7 @@ License: \tab GPL-2\cr
 
 \references{
   Torsten Hothorn, Thomas Kneib, and Peter Buehlmann (2012),
-  Conditional Transformation Models.
+  Conditional Transformation Models. \url{http://arxiv.org/abs/XXX}
 }
 
 \keyword{ package }

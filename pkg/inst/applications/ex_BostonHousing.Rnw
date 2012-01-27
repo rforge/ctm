@@ -4,8 +4,7 @@
 
 <<BostonHousing-data, echo = FALSE, results = hide>>=
 load("ex_BostonHousing.Rda")
-library("mboost")
-source("ctm.R")
+library("ctm")   
 source("setup.R")
 @
 
@@ -15,8 +14,10 @@ source("setup.R")
 %print(plot(mod))
 %@
 \caption{Beyond Mean Boston Housing Values. Conditional transformation model
-         with three selected variables. Each panel depicts the data as scatter plots
+         for the three selected variables per capita crime (CRIM),
+         average numbers of rooms per dwelling (RM) and percentage values of lower status
+         population (LSTAT). Each panel depicts the data as scatter plots
          along with the corresponding negative absolute values of the  estimated transformation function
-         at the probit scale. The explanatory variables have been standardised 
+         at the probit scale. The explanatory variables were standardised 
          prior to analysis. \label{BostonHousing-plot}}
 \end{figure}

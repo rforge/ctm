@@ -13,16 +13,18 @@ levels(fit$what)[1] <- "smooth"
 levels(fit$what)[2] <- "linear"
 levels(fit$what)[3] <- "glm"
 levels(fit$what)[4] <- "kernel"
+legendtext <- levels(fit$what)
+legendtext[3] <- expression(paste("linear ", M == infinity)) ### "linear M = \u221E"
 @
 
-\begin{figure}
+\begin{figure}[t]
 <<fattyacid-plot, echo = FALSE, fig = TRUE, height = 4.5>>=
 
-key.variety <- list(space = "top", columns = 2, text = list(levels(fit$what)), 
+key.variety <- list(space = "top", columns = 2, text = list(legendtext), 
     lines = list(lty = 1:4, col = "black")) 
 
 print(xyplot(g(p) ~ y | x, data = fit, type = "l", groups = what,
-      xlab = "Content of Fatty Acid", ylab = "Distribution Function",
+      xlab = "Fatty acid content", ylab = "Distribution function",
        panel = function(x, y, ...) {
            subscripts <- list(...)$subscripts
            xx <- unique(fit[subscripts, "x"])
@@ -32,10 +34,10 @@ print(xyplot(g(p) ~ y | x, data = fit, type = "l", groups = what,
        key = key.variety))
 @
 \caption{Evolution Canyon Bacteria. Estimated conditional distribution functions
-         (depicted as $pI(p < .5) + (1-p)I(p > .5)$ for probability $p$)
-         of content of fatty acid for bacteria from six different putative
+         (depicted as $pI(p < 0.5) + (1-p)I(p > 0.5)$ for probability $p$)
+         of the fatty acid content of bacteria from six different putative (PE)
          ecotypes. Model (\ref{fattyacid_lin}) was fitted
-         with (``linear'') and without (``glm'') early stopping via the bootstrap
+         with (``linear'') and without (``linear $M = \infty$'') early stopping via the bootstrap
          whereas model (\ref{fattyacid_flex}), here denoted ``smooth'', 
          was stopped early. The observations are given as rugs. \label{fattyacid-plot}}
 \end{figure}

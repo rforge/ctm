@@ -1,5 +1,5 @@
 
-library("ctm")
+library("ctm")   
 library("np")
 set.seed(290875)
 

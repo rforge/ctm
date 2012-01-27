@@ -1,11 +1,11 @@
 Package: ctm
 Title: Conditional Transformation Models
-Version: 0.0-1
-Date: 2012-01-12
+Version: 0.0-2
+Date: 2012-01-27
 Author: Torsten Hothorn
 Maintainer: Torsten Hothorn <Torsten.Hothorn@R-project.org>
 Description: An experimental implementation of conditional transformation
   models for the semiparametric estimation of conditional distribution
   functions. Contains example analyses and a simulation study.
-Depends: R (>= 2.10.0), mboost (>= 2.1-0), lattice
+Depends: R (>= 2.10.0), mboost (>= 2.1-1), lattice
 License: GPL-2
