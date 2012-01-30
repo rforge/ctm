@@ -43,7 +43,7 @@ License: \tab GPL-2\cr
 
 \references{
   Torsten Hothorn, Thomas Kneib, and Peter Buehlmann (2012),
-  Conditional Transformation Models. \url{http://arxiv.org/abs/XXX}
+  Conditional Transformation Models. \url{http://arxiv.org/abs/1201.5786v1}
 }
 
 \keyword{ package }
