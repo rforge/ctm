@@ -1,7 +1,7 @@
 Package: ctm
 Title: Conditional Transformation Models
 Version: 0.0-2
-Date: 2012-01-27
+Date: 2012-06-27
 Author: Torsten Hothorn
 Maintainer: Torsten Hothorn <Torsten.Hothorn@R-project.org>
 Description: An experimental implementation of conditional transformation
