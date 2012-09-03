@@ -10,11 +10,16 @@ ctm <- function(formula, data, weights = NULL, constant = NULL, monotone = FALSE
     uresponse <- sort(unique(response))
     ### make sure that for each observation there is at least
     ### one pseudo response = 0 AND = 1
-    uresponse <- c(uresponse[1] - (uresponse[2] - uresponse[1]), 
-                   uresponse)
-    if (!is.null(ngrid))
-        uresponse <- seq(from = min(uresponse), to = max(uresponse),
-                         length = ngrid)
+    if (is.numeric(uresponse)) {
+        uresponse <- c(uresponse[1] - (uresponse[2] - uresponse[1]), 
+                       uresponse)
+        if (!is.null(ngrid))
+            uresponse <- seq(from = min(uresponse), to = max(uresponse),
+                             length = ngrid)
+    } else {
+        if (!is.ordered(response)) stop(sQuote("response"), " is neither ordered nor numeric")
+        uresponse <- uresponse[-length(uresponse), drop = TRUE]
+    }
     dresponse <- factor(sapply(uresponse, function(r) response <= r))
 
     ### lhs may have multiple terms
