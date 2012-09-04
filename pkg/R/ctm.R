@@ -18,7 +18,7 @@ ctm <- function(formula, data, weights = NULL, constant = NULL, monotone = FALSE
                              length = ngrid)
     } else {
         if (!is.ordered(response)) stop(sQuote("response"), " is neither ordered nor numeric")
-        uresponse <- uresponse[-length(uresponse), drop = TRUE]
+        uresponse <- uresponse[-length(uresponse)]
     }
     dresponse <- factor(sapply(uresponse, function(r) response <= r))
 
@@ -34,7 +34,9 @@ ctm <- function(formula, data, weights = NULL, constant = NULL, monotone = FALSE
     # fm <- paste("dresponse ~ ", paste(xfm, yfm, collapse = "+"))
     fm <- paste("dresponse ~ ", xpart)
     if (!is.null(constant)) {
-        fm <- paste(fm, paste("bols(ONE, intercept = FALSE, df = 1) %O%", constant),
+        constant <- strsplit(constant, "\\+")[[1]]
+        fm <- paste(fm, paste("bols(ONE, intercept = FALSE, df = 1) %O% ", constant, 
+                        collapse = " + "),
                     sep = "+")
     }
     fm <- as.formula(fm)
