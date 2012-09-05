@@ -95,6 +95,7 @@ predict.ctm <- function(object, newdata, y = object$uresponse,
     x <- newdata[, colnames(newdata) != object$ycdf, drop = FALSE]
     nd <- as.list(x)
     nd[[object$ycdf]] <- y
+    nd$ONE <- rep(0, length(y))
     p <- predict(object, newdata = nd, ...)
     if (!annotated) return(p)
     ret <- data.frame(y = rep(y, rep(nrow(newdata), length(y))),

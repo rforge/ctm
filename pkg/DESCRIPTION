@@ -10,3 +10,4 @@ Description: An experimental implementation of conditional transformation
 URL: http://arxiv.org/abs/1201.5786v1
 Depends: R (>= 2.10.0), mboost (>= 2.1-1), lattice
 License: GPL-2
+Packaged: 2012-09-04 18:40:59 UTC; hothorn
