@@ -21,6 +21,7 @@ ctm <- function(formula, data, weights = NULL, constant = NULL, monotone = FALSE
         uresponse <- uresponse[-length(uresponse)]
     }
     dresponse <- factor(sapply(uresponse, function(r) response <= r))
+    if (is.ordered(uresponse)) uresponse <- uresponse[,drop = TRUE]
 
     ### lhs may have multiple terms
     cfm <- paste(deparse(formula), collapse = "")
