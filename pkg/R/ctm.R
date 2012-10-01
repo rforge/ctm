@@ -1,6 +1,7 @@
 
-ctm <- function(formula, data, weights = NULL, constant = NULL, monotone = FALSE, 
-                   ngrid = NULL, ...) {
+ctm <- function(formula, data, weights = NULL, constant = NULL, 
+                varying = NULL, monotone = FALSE, 
+                ngrid = NULL, ...) {
 
     opt <- options(mboost_Xmonotone = monotone)
     yname <- all.vars(formula)[1]
@@ -34,9 +35,17 @@ ctm <- function(formula, data, weights = NULL, constant = NULL, monotone = FALSE
     # yfm <- paste("%O%", as.character(formula)[2], sep = "")
     # fm <- paste("dresponse ~ ", paste(xfm, yfm, collapse = "+"))
     fm <- paste("dresponse ~ ", xpart)
+    ### terms that depend on x only but not on y
     if (!is.null(constant)) {
         constant <- strsplit(constant, "\\+")[[1]]
         fm <- paste(fm, paste("bols(ONE, intercept = FALSE, df = 1) %O% ", constant, 
+                        collapse = " + "),
+                    sep = "+")
+    }
+    ### terms that depend on y only but not on x
+    if (!is.null(varying)) {
+        varying <- strsplit(varying, "\\+")[[1]]
+        fm <- paste(fm, paste("bols(ONEx, intercept = FALSE, df = 1) %O%", varying,
                         collapse = " + "),
                     sep = "+")
     }
@@ -45,6 +54,7 @@ ctm <- function(formula, data, weights = NULL, constant = NULL, monotone = FALSE
     ### ONE is a constant on the lhs; same length as pseudo-response
     ### this is error prone
     assign("ONE", rep(1.0, length(uresponse))) ###, environment(formula))
+    assign("ONEx", rep(1.0, nrow(data))) ###, environment(formula))
     if (is.null(weights)) weights <- rep(1, nrow(data))
     w <- weights
     if (length(w) == nrow(data))
