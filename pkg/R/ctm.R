@@ -82,6 +82,7 @@ tune <- function(object, alpha = 0.05, mstopmax = 1000,
     link <- mboost:::link2dist(fm$link)
     while(mstop(object) < mstopmax) {
         z <- predict(object, newdata = mf, y = NULL)
+        ### <FIXME> link$p is not available for "logit" </FIXME>
         p <- ks.test(z, link$p)$p.value
         if (trace) 
             cat("mstop: ", mstop(object), "; p = ", p, "\n")
