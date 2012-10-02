@@ -38,7 +38,7 @@ ctm <- function(formula, data, weights = NULL, constant = NULL,
     ### terms that depend on x only but not on y
     if (!is.null(constant)) {
         constant <- strsplit(constant, "\\+")[[1]]
-        fm <- paste(fm, paste("bols(ONE, intercept = FALSE, df = 1) %O% ", constant, 
+        fm <- paste(fm, paste(constant, " %O% bols(ONEy, intercept = FALSE, df = 1)",
                         collapse = " + "),
                     sep = "+")
     }
@@ -51,9 +51,9 @@ ctm <- function(formula, data, weights = NULL, constant = NULL,
     }
     fm <- as.formula(fm)
     assign(yname, uresponse)###, environment(formula))
-    ### ONE is a constant on the lhs; same length as pseudo-response
+    ### ONEy is a constant on the lhs; same length as pseudo-response
     ### this is error prone
-    assign("ONE", rep(1.0, length(uresponse))) ###, environment(formula))
+    assign("ONEy", rep(1.0, length(uresponse))) ###, environment(formula))
     assign("ONEx", rep(1.0, nrow(data))) ###, environment(formula))
     if (is.null(weights)) weights <- rep(1, nrow(data))
     w <- weights
@@ -107,7 +107,7 @@ predict.ctm <- function(object, newdata, y = object$uresponse,
     x <- newdata[, colnames(newdata) != object$ycdf, drop = FALSE]
     nd <- as.list(x)
     nd[[object$ycdf]] <- y
-    nd$ONE <- rep(1, length(y))
+    nd$ONEy <- rep(1, length(y))
     nd$ONEx <- rep(1, nrow(x))
     p <- predict(object, newdata = nd, ...)
     if (!annotated) return(p)
