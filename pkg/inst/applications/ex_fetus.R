@@ -9,7 +9,9 @@ lmod <- lm(birthweight ~ volabdo + hccalc +
 	   volos +fe + bip + I(bip^2), data = fetus)
 
 ### predictions
-pred1 <- as.data.frame(predict(lmod, interval = "prediction"))
+### <TH> level = 0.8 was missing and thus 95% prediction intervals
+         were reported in the manuscript for lm </TH>
+pred1 <- as.data.frame(predict(lmod, interval = "prediction", level = 0.8))
 pred1$birthweight <- fetus$birthweight
 pred1 <- pred1[order(pred1$fit),]
 names(pred1) <- c("q50", "q10", "q90", "birthweight")
