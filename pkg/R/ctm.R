@@ -1,6 +1,6 @@
 
 ctm <- function(formula, data, weights = NULL, constant = NULL, 
-                varying = NULL, monotone = FALSE, 
+                varying = NULL, asis = NULL, monotone = FALSE, 
                 ngrid = NULL, ...) {
 
     opt <- options(mboost_Xmonotone = monotone)
@@ -49,6 +49,10 @@ ctm <- function(formula, data, weights = NULL, constant = NULL,
                         collapse = " + "),
                     sep = "+")
     }
+    ### you know what you do, right?
+    if (!is.null(asis)) 
+        fm <- paste(fm, asis, sep = "+")
+
     fm <- as.formula(fm)
     assign(yname, uresponse)###, environment(formula))
     ### ONEy is a constant on the lhs; same length as pseudo-response
