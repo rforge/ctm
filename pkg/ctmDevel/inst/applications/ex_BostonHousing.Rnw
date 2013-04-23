@@ -1,0 +1,23 @@
+
+\SweaveOpts{engine = R, keep.source = TRUE, prefix.string = figures/fig}
+
+
+<<BostonHousing-data, echo = FALSE, results = hide>>=
+load("ex_BostonHousing.Rda")
+library("ctm")   
+source("setup.R")
+@
+
+\begin{figure}
+\includegraphics[width = \textwidth]{ex_BostonHousing}
+%<<BostonHousing-plotp, echo = FALSE, fig = TRUE>>=
+%print(plot(mod))
+%@
+\caption{Beyond Mean Boston Housing Values. Conditional transformation model
+         for the three selected variables per capita crime (CRIM),
+         average numbers of rooms per dwelling (RM) and percentage values of lower status
+         population (LSTAT). Each panel depicts the data as scatter plots
+         along with the corresponding negative absolute values of the  estimated transformation function
+         at the probit scale. The explanatory variables were standardised 
+         prior to analysis. \label{BostonHousing-plot}}
+\end{figure}
