@@ -1,6 +1,4 @@
 
-library("mboost")
-library("lattice")
 library("ctm")
 
 trf <- function(formula, data, grid = 50) {
