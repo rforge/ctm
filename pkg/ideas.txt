@@ -1,7 +1,0 @@
-
- - Survival: 
-                     / 1  T <= y and d == 1
-   I((T, d) <= y) = <  0  T >  y and 
-                     \ NA T <= y and d == 0
-
-   for I = NA, use weights = 0
