@@ -1,5 +1,5 @@
 
-library("ctm")
+library("ctmDevel")
 
 trf <- function(formula, data, grid = 50) {
 
@@ -119,7 +119,7 @@ data("bodyfat", package = "mboost")
 nm <- names(bodyfat)
 nm <- nm[nm != "DEXfat"]
 bl <- paste("bbs(", nm, ", df = 2.5)", collapse = "+")
-fm <- as.formula(paste("bbs(DEXfat, df = 2.5) ~ ", bl))
+fm <- as.formula(paste("bbs(DEXfat, df = 2.5, constraint = \"increasing\") ~ ", bl))
 mod <- ctm(fm, data = bodyfat, family = Binomial())
 
 plot(mod, which = sort(unique(selected(mod))))
