@@ -119,11 +119,25 @@ data("bodyfat", package = "mboost")
 nm <- names(bodyfat)
 nm <- nm[nm != "DEXfat"]
 bl <- paste("bbs(", nm, ", df = 2.5)", collapse = "+")
+
 fm <- as.formula(paste("bbs(DEXfat, df = 2.5, constraint = \"increasing\") ~ ", bl))
 mod <- ctm(fm, data = bodyfat, family = Binomial())
-
 plot(mod, which = sort(unique(selected(mod))))
 
 mod1 <- mboost(DEXfat ~ ., data = bodyfat)
 layout(matrix(1:9, nc = 3))
 plot(mod1, which = sort(unique(selected(mod))))
+
+### without constraint
+fm <- as.formula(paste("bbs(DEXfat, df = 2.5) ~ ", bl))
+moduc <- ctm(fm, data = bodyfat, family = Binomial())
+
+p <- predict(mod, newdata = bodyfat, annotate = TRUE)
+puc <- predict(moduc, newdata = bodyfat, annotate = TRUE)
+
+table(tapply(1:nrow(p), factor(p$ID), function(i) {
+    any(diff(p[i,"p"]) < 0) }))
+
+table(tapply(1:nrow(puc), factor(p$ID), function(i) {
+    any(diff(puc[i,"p"]) < 0) }))
+
