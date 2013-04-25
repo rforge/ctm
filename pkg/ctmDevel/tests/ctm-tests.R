@@ -141,3 +141,27 @@ table(tapply(1:nrow(p), factor(p$ID), function(i) {
 table(tapply(1:nrow(puc), factor(p$ID), function(i) {
     any(diff(puc[i,"p"]) < 0) }))
 
+### multivariate ctm
+tmp <- data.frame(y = runif(10), f = gl(5, 2, ordered = TRUE),
+                  f1 = gl(2, 5), f2 = gl(2, 5), x = runif(10))
+m1 <- mctm(bols(f) ~ bols(x), data = tmp, 
+          family = Binomial(),
+          control = boost_control(mstop = 10))
+m2 <- ctm(bols(f) ~ bols(x), data = tmp,
+          family = Binomial(),
+          control = boost_control(mstop = 10))
+all.equal(m1, m2)
+
+m1 <- mctm(bols(y) ~ bols(x), data = tmp, 
+          family = Binomial(),
+          control = boost_control(mstop = 10))
+m2 <- ctm(bols(y) ~ bols(x), data = tmp, 
+          family = Binomial(),
+          control = boost_control(mstop = 10))
+all.equal(m1, m2)
+
+m1 <- mctm(bols(y, f) ~ bols(x), data = tmp,
+           family = Binomial(), control = boost_control(mstop = 10))
+
+m1 <- mctm(bols(f1, f2) ~ bols(x), data = tmp,
+           family = Binomial(), control = boost_control(mstop = 10))
