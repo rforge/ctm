@@ -19,10 +19,8 @@ upsilon <- function(y, ngrid = NULL) {
 
 ### multivariate ctm
 mctm <- function(formula, data, weights = NULL, constant = NULL,
-                 varying = NULL, asis = NULL, monotone = FALSE,
-                 ngrid = NULL, ...) {
+                 varying = NULL, ngrid = NULL, fit = TRUE, ...) {
 
-    opt <- options(mboost_Xmonotone = monotone)
     yname <- all.vars(formula[[2]])
     response <- data[yname]
     for (y in yname) data[[y]] <- NULL
@@ -72,10 +70,6 @@ mctm <- function(formula, data, weights = NULL, constant = NULL,
                         collapse = " + "),
                     sep = "+")
     }
-    ### you know what you do, right?
-    if (!is.null(asis))
-        fm <- paste(fm, asis, sep = "+")
-
     fm <- formula(fm, env = new.env())
     for (y in yname) assign(y, oresponse[[y]], envir = environment(fm))
     ### ONEy is a constant on the lhs; same length as pseudo-response
@@ -86,17 +80,34 @@ mctm <- function(formula, data, weights = NULL, constant = NULL,
     w <- weights
     if (length(w) == nrow(data))
         w <- rep(w, nrow(uresponse))
-    ret <- mboost(fm, data = data, weights = w, offset = 0, ...)
-    class(ret) <- c("ctm", class(ret))
-    ### reset weights for cvrisk etc., expanding works OK in bl_lin_matrix!
-    ret$"(weights)" <- weights
-    ret$ycdf <- all.vars(formula)[1]
-    ret$originalresponse <- response[,,drop = TRUE]
-    ret$uresponse <- oresponse[,,drop = TRUE]
-    ret$data <- data
-    ret$call <- match.call()
-    options(opt)
+
+    fitfct <- function(formula) {
+        ret <- mboost(formula, data = data, weights = w, offset = 0, ...)
+        class(ret) <- c("ctm", class(ret))
+        ### reset weights for cvrisk etc., expanding works OK in bl_lin_matrix!
+        ret$"(weights)" <- weights
+        ret$ycdf <- yname
+        ret$originalresponse <- response[,,drop = TRUE]
+        ret$uresponse <- oresponse[,,drop = TRUE]
+        ret$data <- data
+        ret$call <- match.call()
+        ret
+    }
+    if (fit) return(fitfct(fm))
+    ret <- list(fitfct = fitfct, formula = fm)
+    class(ret) <- "ctm_unfitted"
     ret
 }
 
+update.ctm_unfitted <- function(object, formula = object$formula) {
+    environment(formula) <- environment(object$formula)
+    return(object$fitfct(formula))
+}
 
+print.ctm_unfitted <- function(x, ...) {
+    cat("\n")
+    cat("Conditional Transformation Model:\n")
+    print(x$formula)
+    cat("\n")
+    return(invisible(x))
+}

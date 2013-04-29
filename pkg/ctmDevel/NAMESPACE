@@ -9,3 +9,7 @@ import(
   mboostDevel,
   lattice
 )
+
+S3method(update, ctm_unfitted)
+S3method(print, ctm_unfitted)
+S3method(predict, ctm)

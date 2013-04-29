@@ -108,17 +108,23 @@ predict.ctm <- function(object, newdata, y = object$uresponse,
             return(p[indx])
         return(p[indx, , drop = FALSE])
     }
-    x <- newdata[, colnames(newdata) != object$ycdf, drop = FALSE]
+    x <- newdata[, !(colnames(newdata) %in% object$ycdf), drop = FALSE]
     nd <- as.list(x)
-    nd[[object$ycdf]] <- y
+    if (NCOL(y) == 1) {
+        y <- data.frame(y)
+        colnames(y) <- object$ycdf
+    }
+    for (yn in object$ycdf)
+        nd[[yn]] <- y[[yn]]
     nd$ONEy <- rep(1, length(y))
     nd$ONEx <- rep(1, nrow(x))
     p <- predict(object, newdata = nd, ...)
     if (!annotated) return(p)
-    ret <- data.frame(y = rep(y, rep(nrow(newdata), length(y))),
-                      ID = rep(1:nrow(newdata), length(y)),
-                      p)
-    names(ret)[1] <- object$ycdf
+    indx <- rep(1:NROW(y), rep(nrow(newdata), NROW(y)))
+    y <- y[indx,,drop = FALSE]
+    ret <- cbind(y, data.frame(
+                      ID = rep(1:nrow(newdata), NROW(y)),
+                      p = as.vector(p)))
     ret
 }
 

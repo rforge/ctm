@@ -165,3 +165,28 @@ m1 <- mctm(bols(y, f) ~ bols(x), data = tmp,
 
 m1 <- mctm(bols(f1, f2) ~ bols(x), data = tmp,
            family = Binomial(), control = boost_control(mstop = 10))
+
+### predictions
+x <- runif(100, max = 3)
+y <- rnorm(length(x), mean = x)
+dd <- data.frame(x, y)
+a <- ctm(bbs(y) ~ bbs(x), data = dd, family = Binomial())
+b <- update(mctm(bbs(y) ~ bbs(x), data = dd, family = Binomial(), fit = FALSE),
+            dresponse ~ bbs(x) %O% bbs(y))
+p1 <- predict(a, newdata = data.frame(x = 1:2))
+p2 <- predict(b, newdata = data.frame(x = 1:2))
+max(abs(p1 - p2))
+
+p1 <- predict(a, newdata = data.frame(x = 1:2), annotate = TRUE)
+p2 <- predict(b, newdata = data.frame(x = 1:2), annotate = TRUE)
+stopifnot(all.equal(p1, p2))
+
+
+
+
+
+
+
+
+
+
