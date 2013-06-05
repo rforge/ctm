@@ -11,8 +11,12 @@ upsilon <- function(y, ngrid = NULL) {
     upsilon <- sort(unique(y))
     upsilon <- c(upsilon[1] - (upsilon[2] - upsilon[1]), upsilon)
     if (!is.null(ngrid) && !is.ordered(y)) {
-        upsilon <- seq(from = min(upsilon), to = max(upsilon),
-                       length = ngrid)
+        if (length(ngrid) > 1) {
+            upsilon <- ngrid
+        } else {
+            upsilon <- seq(from = min(upsilon), to = max(upsilon),
+                           length = ngrid)
+        }
     }
     return(list(y = y, upsilon = upsilon, uorig = upsilon))
 }
@@ -25,7 +29,7 @@ mctm <- function(formula, data, weights = NULL, constant = NULL,
     response <- data[yname]
     for (y in yname) data[[y]] <- NULL
 
-    yu <- lapply(response, upsilon)
+    yu <- lapply(response, upsilon, ngid = ngrid)
     mresponse <- as.matrix(sapply(yu, function(x) x$y))
     uresponse <- do.call("expand.grid", 
                          lapply(yu, function(x) x$upsilon))
