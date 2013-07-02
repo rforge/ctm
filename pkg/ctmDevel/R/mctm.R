@@ -23,18 +23,24 @@ upsilon <- function(y, ngrid = NULL) {
 
 ### multivariate ctm
 mctm <- function(formula, data, weights = NULL, constant = NULL,
-                 varying = NULL, ngrid = NULL, fit = TRUE, offset = 0, ...) {
+                 varying = NULL, ngrid = NULL, fit = TRUE, offset = 0, 
+                 ...) {
 
     yname <- all.vars(formula[[2]])
     response <- data[yname]
+    cdf <- ecdf(response)
     for (y in yname) data[[y]] <- NULL
 
     yu <- lapply(response, upsilon, ngid = ngrid)
+    offset <- cdf(yu$upsilon)
     mresponse <- as.matrix(sapply(yu, function(x) x$y))
     uresponse <- do.call("expand.grid", 
                          lapply(yu, function(x) x$upsilon))
     oresponse <- do.call("expand.grid", 
                          lapply(yu, function(x) x$uorig))
+
+    ### need inverse!
+    ### offset <- family@cdf(uresponse)
 
     if (all(sapply(response, is.factor))) {
         uresponse <- uresponse[-nrow(uresponse),,drop = FALSE]
