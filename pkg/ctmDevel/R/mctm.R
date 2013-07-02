@@ -32,7 +32,6 @@ mctm <- function(formula, data, weights = NULL, constant = NULL,
     for (y in yname) data[[y]] <- NULL
 
     yu <- lapply(response, upsilon, ngid = ngrid)
-    offset <- cdf(yu$upsilon)
     mresponse <- as.matrix(sapply(yu, function(x) x$y))
     uresponse <- do.call("expand.grid", 
                          lapply(yu, function(x) x$upsilon))
