@@ -23,7 +23,7 @@ upsilon <- function(y, ngrid = NULL) {
 
 ### multivariate ctm
 mctm <- function(formula, data, weights = NULL, constant = NULL,
-                 varying = NULL, ngrid = NULL, fit = TRUE, ...) {
+                 varying = NULL, ngrid = NULL, fit = TRUE, offset = 0, ...) {
 
     yname <- all.vars(formula[[2]])
     response <- data[yname]
@@ -86,7 +86,7 @@ mctm <- function(formula, data, weights = NULL, constant = NULL,
         w <- rep(w, nrow(uresponse))
 
     fitfct <- function(formula) {
-        ret <- mboost(formula, data = data, weights = w, offset = 0, ...)
+        ret <- mboost(formula, data = data, weights = w, ...)
         class(ret) <- c("ctm", class(ret))
         ### reset weights for cvrisk etc., expanding works OK in bl_lin_matrix!
         ret$"(weights)" <- weights
