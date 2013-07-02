@@ -1,4 +1,4 @@
-
+	
 upsilon <- function(y, ngrid = NULL) {
 
     if (is.factor(y)) {
@@ -28,10 +28,10 @@ mctm <- function(formula, data, weights = NULL, constant = NULL,
 
     yname <- all.vars(formula[[2]])
     response <- data[yname]
-    cdf <- ecdf(response)
+    ### cdf <- ecdf(response)
     for (y in yname) data[[y]] <- NULL
 
-    yu <- lapply(response, upsilon, ngid = ngrid)
+    yu <- lapply(response, upsilon, ngrid = ngrid)
     mresponse <- as.matrix(sapply(yu, function(x) x$y))
     uresponse <- do.call("expand.grid", 
                          lapply(yu, function(x) x$upsilon))
