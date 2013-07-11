@@ -91,7 +91,7 @@ mctm <- function(formula, data, weights = NULL, constant = NULL,
         w <- rep(w, nrow(uresponse))
 
     fitfct <- function(formula) {
-        ret <- mboost(formula, data = data, weights = w, ...)
+        ret <- mboost(formula, data = data, weights = w, offset = offset, ...)
         class(ret) <- c("ctm", class(ret))
         ### reset weights for cvrisk etc., expanding works OK in bl_lin_matrix!
         ret$"(weights)" <- weights
