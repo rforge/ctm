@@ -1,6 +1,6 @@
 
-library("ctm")   
 
+source("setup.R")
 data("db", package = "gamlss.data")
 db$lage <- with(db, age^(1/3))
 
