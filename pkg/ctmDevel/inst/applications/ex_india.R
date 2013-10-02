@@ -1,6 +1,5 @@
 
-library("ctm")   
-
+source("setup.R")
 set.seed(29)
 
 load("india.Rda")
@@ -8,7 +7,14 @@ load("india.Rda")
 ### only stunting and district
 kids <- kids[, c("stunting", "distH")]
 
-mod <- ctm(bbs(stunting, lambda = 100) ~ bmrf(distH, bnd = nb, lambda = 100), 
+### extract lambda from univariate baselearners
+### not really what is needed but a good guess
+a <- with(kids, bbs(stunting, df = 4))$dpp(rep(1, nrow(kids)))
+lambda1 <- extract(a, what = "lambda")
+b <- with(kids, bmrf(distH, bnd = nb, df = 4))$dpp(rep(1, nrow(kids)))
+lambda2 <- extract(b, what = "lambda")
+
+mod <- ctm(bbs(stunting, lambda = lambda1) ~ bmrf(distH, bnd = nb, lambda = lambda2), 
               data = kids,
               family = Binomial(link = "probit"), control = boost_control(nu = 0.4, 
               mstop = 100, trace = TRUE), ngrid = 50)
