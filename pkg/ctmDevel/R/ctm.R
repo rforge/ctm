@@ -83,7 +83,7 @@ tune <- function(object, alpha = 0.05, mstopmax = 1000,
     mf$y <- object$originalresponse
     names(mf)[names(mf) == "y"] <- object$ycdf
     fm <- object$call$family
-    link <- mboost:::link2dist(fm$link)
+    link <- link2dist(fm$link)
     while(mstop(object) < mstopmax) {
         z <- predict(object, newdata = mf, y = NULL)
         ### <FIXME> link$p is not available for "logit" </FIXME>
@@ -121,8 +121,8 @@ predict.ctm <- function(object, newdata, y = object$uresponse,
     p <- predict(object, newdata = nd, ...)
     if (!annotated) return(p)
     indx <- rep(1:NROW(y), rep(nrow(newdata), NROW(y)))
-    y <- y[indx,,drop = FALSE]
-    ret <- cbind(y, data.frame(
+    ytmp <- y[indx,,drop = FALSE]
+    ret <- cbind(ytmp, data.frame(
                       ID = rep(1:nrow(newdata), NROW(y)),
                       p = as.vector(p)))
     ret
@@ -186,10 +186,28 @@ plot.ctm <- function(x, which = sort(unique(selected(object))),
               at = at, col.regions = grey.colors(length(at)), ...)
 }
 
+### not exported from mboost
+link2dist <- function(link, choices = c("logit", "probit"), ...) {
+    i <- pmatch(link, choices, nomatch = 0L, duplicates.ok = TRUE)
+    if (i[1] == 1) return("logit")
+    if (i[1] == 2) {
+        ret <- list(p = pnorm, d = dnorm, q = qnorm)
+        attr(ret, "link") <- link
+        return(ret)
+    }
+    p <- get(paste("p", link, sep = ""))
+    d <- get(paste("d", link, sep = ""))
+    q <- get(paste("q", link, sep = ""))
+    ret <- list(p = function(x) p(x, ...),
+                d = function(x) d(x, ...),
+                q = function(x) q(x, ...))
+    attr(ret, "link") <- link
+    ret
+}
     
 ### rho(y, f) = (y - link(f))^2
 ClassL2 <- function(link = c("norm", "logis", "t"), ...) {
-    link <- mboost:::link2dist(link, ...)
+    link <- link2dist(link, ...)
     biny <- function(y) {
         if (!is.factor(y))
             stop("response is not a factor but ",
@@ -231,7 +249,7 @@ ClassL2 <- function(link = c("norm", "logis", "t"), ...) {
 
 ### rho(y, f) = |y - link(f)|
 ClassL1 <- function(link = c("norm", "logis", "t"), ...) {
-    link <- mboost:::link2dist(link, ...)
+    link <- link2dist(link, ...)
     biny <- function(y) {
         if (!is.factor(y))
             stop("response is not a factor but ",
