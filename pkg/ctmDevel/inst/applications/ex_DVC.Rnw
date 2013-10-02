@@ -5,7 +5,6 @@
 <<DVC-data, echo = FALSE, results = hide>>=
 load("ex_DVC.Rda")
 load("DVC.Rda")
-library("mboost")
 source("setup.R")
 @
 

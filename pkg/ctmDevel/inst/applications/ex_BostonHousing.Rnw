@@ -4,7 +4,6 @@
 
 <<BostonHousing-data, echo = FALSE, results = hide>>=
 load("ex_BostonHousing.Rda")
-library("ctm")   
 source("setup.R")
 @
 
