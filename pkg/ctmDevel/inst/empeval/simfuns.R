@@ -1,5 +1,5 @@
 
-library("ctm")
+library("ctmDevel")
 library("np")
 library("gamboostLSS")
 library("lattice")
@@ -75,7 +75,7 @@ Fboost <- function(xydf, monotone = FALSE, ylin = FALSE, ngrid = 50) {
     }
 
     if (ylin) {
-        yfm <- "bols(y, lambda = 0)"
+        yfm <- "bols(y, df = 2)"
         ### df  = 8
         xfm <- paste("bbs(", varn, ", df = 8)", collapse = "+")
     } else {
