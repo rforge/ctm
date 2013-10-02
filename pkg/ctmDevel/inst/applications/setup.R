@@ -9,3 +9,5 @@ ltheme$strip.background$col <- "transparent" ## change strip bg
 lattice.options(default.theme = ltheme)
 
 if (!file.exists("figures")) dir.create("figures")
+
+library("ctmDevel")
