@@ -1,5 +1,5 @@
 
-library("ctm")   
+source("setup.R")
 library("np")
 set.seed(290875)
 
