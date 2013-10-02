@@ -9,4 +9,5 @@ Description: An experimental implementation of conditional transformation
   functions. Contains example analyses and a simulation study.
 URL: http://arxiv.org/abs/1201.5786v1
 Depends: R (>= 2.10.0), mboostDevel (>= 2.3-0), lattice
+Suggests: TH.data
 License: GPL-2
