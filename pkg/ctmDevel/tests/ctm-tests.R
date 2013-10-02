@@ -114,7 +114,7 @@ levelplot(pp ~ x + y, data = nd)
 
 plot(m1)
 
-data("bodyfat", package = "mboost")
+data("bodyfat", package = "TH.data")
 
 nm <- names(bodyfat)
 nm <- nm[nm != "DEXfat"]
