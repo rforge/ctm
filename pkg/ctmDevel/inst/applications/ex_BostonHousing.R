@@ -1,6 +1,5 @@
 
-library("ctm")
-
+source("setup.R")
 set.seed(290875)
 
 library("spdep")
@@ -21,13 +20,14 @@ for (n in nm) boston.c[[n]] <- as.vector(scale(boston.c[[n]]))
 
 bk <- range(boston.c$CMEDV) - sd(boston.c$CMEDV) * c(1, -1)
 
-boston.c$EINS <- 1.0
+boston.c$EINS <- boston.c$ONE <- 1.0
 
-BH <- boston.c[c(nm, "CMEDV", "EINS")]
+BH <- boston.c[c(nm, "ONE", "CMEDV", "EINS")]
 BH$ID <- factor(1:nrow(BH))
 
+if (FALSE) {
 fm <- paste("bols(CMEDV, intercept = FALSE, df = 1) + 
-             bols(ONE, intercept = FALSE, df = 1) + 
+###             bols(ONE, intercept = FALSE, df = 1) + 
              bbs(CMEDV, df = 1, boundary.knots = bk, center = TRUE) ~ ", 
              paste(c("bols(EINS, intercept = FALSE, df = 1)", 
                     paste("bols(", nm, ", df = 1, intercept = FALSE)"), 
@@ -44,6 +44,7 @@ mod <- ctm(fm, data = BH,
               constant = "bmrf(ID, bnd = nb, df = 1)")
 
 ss <- stabsel(mod, q = 50)
+}
 
 ### selected:
 fm <- paste("bbs(CMEDV, boundary.knots = bk, df = 2.1) ~",
@@ -59,7 +60,7 @@ mod <- ctm(fm, data = BH,
 
 cv <- cvrisk(mod)
 
-save(ss, cv, file = "ex_BostonHousing.Rda")
+save(cv, file = "ex_BostonHousing.Rda")
 
 library("lattice")
 library("lattice")
