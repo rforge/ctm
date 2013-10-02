@@ -1,16 +1,15 @@
 
-library("ctm")   
-
+source("setup.R")
 load("DVC.Rda")
 
 DVC <- data.frame(number = c(rowSums(x06), rowSums(x09)),
                   days = c(1:365, 1:365),
                   year = factor(c(rep("2006", 365), rep("2009", 365))))
 
-mod <- ctm(bbs(number, df = 3, differences = 1) ~ 
+mod <- mctm(bbs(number, df = 3, differences = 1) ~ 
                 bbs(days, df = 3, differences = 1, cyclic = TRUE)
               + bbs(days, by = year, differences = 1, df = 3, cyclic = TRUE),
-              data = DVC, family = Binomial(link = "probit"),
+              data = DVC, family = Binomial(link = "probit"), ngrid = 0:20 * 10,
               control = boost_control(nu = 0.5, mstop = 250))
 
 folds <- cv(model.weights(mod), strata = DVC$year)
