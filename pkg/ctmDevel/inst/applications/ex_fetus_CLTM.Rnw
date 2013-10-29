@@ -1,0 +1,752 @@
+\documentclass[nojss,onepage]{jss}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% declarations for jss.cls %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Wenn man das jss-Format abdrehen will: setzte in jss.cls bei den Optionen
+%% nojssfalse zu nojsstrue!
+
+%\usepackage{geometry}
+\usepackage{endfloat}
+%% math
+\usepackage{amsfonts,amstext,amsmath}
+%% needed for sidewaysfigure
+\usepackage{rotating}
+%% LM: package for math symbols
+\usepackage{amssymb}
+\usepackage{amsmath,units}
+
+\usepackage{graphicx}
+
+\usepackage{hyperref}
+\def\sectionautorefname{Section}
+\def\subsectionautorefname{Subsection}
+\def\subsubsectionautorefname{Subsubsection}
+%\usepackage[pdftex]{graphicx}
+\usepackage{color}
+
+%\input{defs}
+%\newcommand{\ie}{\textit{i.e.}~}
+%\newcommand{\eg}{\textit{e.g.}~}
+\newcommand{\TODO}[1]{{\color{red} #1}}
+
+
+%% almost as usual
+\author{Lisa M\"ost\\LMU M\"unchen \And 
+        Matthias Schmid\\LMU M\"unchen \AND
+        Florian Faschingbauer\\ Universit\"atsklinikum Erlangen \And
+        Torsten Hothorn\\Universit\"at Z\"urich}
+\title{Tutorial \textsf{R} code for: Predicting birth weight with conditionally linear transformation models}
+
+%% for pretty printing and a nice hypersummary also set:
+\Plainauthor{Lisa M\"ost, Matthias Schmid, Florian Faschingbauer, Torsten Hothorn} %% comma-separated
+\Plaintitle{Predicting birth weight with conditionally linear transformation models} %% without formatting
+\Shorttitle{Predicting birth weight} %% a short title (if necessary)
+
+%% an abstract and keywords
+\Abstract{ 
+The \textsf{R} code given below enables the reader to follow some of the results given in the main paper. Since we are not able to provide the original data set, we created a modified data set which has the same structure as the original data set and, of course, contains the same ultrasound parameters and birth weights as response variable. It is important to note, that we reduced the number of observations to $n = 4356$ which corresponds to half of the observations in the original data set. We modified the data such that any relationship between the ultrasound parameters and the birth weights has been distroyed. Hence, the subsequent analyses serve only as a tutorial example (or as a user's guide) and the associated results are of no use and do not correspond to the results given in the main paper. This data set is denoted by \texttt{fetus\_example} in the following.
+}
+\Keywords{Tutorial \textsf{R} code example, Conditional transformation models, component-wise boosting, birth weight, prediction intervals}
+\Plainkeywords{Tutorial \textsf{R} code example, Conditional transformation models, component-wise boosting, birth weight, prediction intervals}
+
+\Address{
+  Lisa M\"ost\\
+  Institut f\"ur Statistik\\
+  Ludwig-Maximilians-Universit\"at\\
+  Ludwigstra{\ss}e 33, DE-80539 M\"unchen, Germany\\
+  %E-mail: \email{Lisa.Moest@stat.uni-muenchen.de} \\
+
+  Matthias Schmid \\
+  Institut f\"ur Statistik\\
+  Ludwig-Maximilians-Universit\"at\\
+  Ludwigstra{\ss}e 33, DE-80539 M\"unchen, Germany\\
+  %E-mail: \email{m.schmid@stat.uni-muenchen.de} \\
+
+  Florian Faschingbauer\\
+  Frauenklinik\\
+  Geburtshilfe und Pr\"anataldiagnostik\\
+  Universit\"atsklinikum Erlangen\\
+  Universit\"atsstra{\ss}e 21-23, DE-91054 Erlangen, Germany\\ 
+
+  Torsten Hothorn\\
+  IFSPM, Abteilung Biostatistik \\
+  Universit\"at Z\"urich \\
+  Hirschengraben 84, CH-8001 Z\"urich, Switzerland \\
+  E-mail: \email{Torsten.Hothorn@uzh.ch}
+}
+
+\begin{document}
+
+All analyses were carried out in the \textsf{R} system for statistical computing \citep[version 2.15.3,][]{R}. Linear regression models are estimated using the \textbf{stats} package which is readily available after installing \textsf{R}. Moreover, one needs to install the following add-on packages:
+\begin{itemize}
+\item Package \textbf{ctm} for estimating conditional transformation models \citep{ctm}.
+\item Package \textbf{quantreg} to perform linear quantile regression \citep{quantreg_2012}.
+\item Package \textbf{mboost} to perform additive quantile regression using a component-wise boosting algorithm \citep{mboost_2013}. 
+\end{itemize} 
+
+\section{Necessary function}
+The \textbf{ctm} package was designed to estimate interactions between the response and the explanatory variables. Hence, the model equations of CLTM 0 (linear) and CLTM 0 are not supported by the \texttt{ctm}-function so far, since no interactions between the response and the explanatory variables are intended. This is why we introduce the function \texttt{myctm}, here. Thereby, we introduced a new logical parameter \texttt{no.variance}. If \texttt{no.variance = TRUE}, no interaction terms between the response and the explanatory variables are considered, but terms depending only on the response or only on the explanatory variables are considered instead. We simply introduced a further line of \textsf{R} code that ensures a valid model formula in these cases:
+<<functions, echo = TRUE, eval = TRUE, keep.source = TRUE>>=
+
+myctm <- function(formula, data, weights = NULL, constant = NULL, 
+                  varying = NULL, asis = NULL, monotone = FALSE, 
+                  ngrid = NULL, no.variance = FALSE, ...){
+
+    opt <- options(mboost_Xmonotone = monotone)
+    yname <- all.vars(formula)[1]
+    response <- data[[yname]]
+    data[[yname]] <- NULL
+
+    uresponse <- sort(unique(response))
+    ### make sure that for each observation there is at least
+    ### one pseudo response = 0 AND = 1
+    if (is.numeric(uresponse)) {
+        uresponse <- c(uresponse[1] - (uresponse[2] - uresponse[1]), 
+                       uresponse)
+        if (!is.null(ngrid))
+            uresponse <- seq(from = min(uresponse), to = max(uresponse),
+                             length = ngrid)
+    } else {
+        if (!is.ordered(response)) stop(sQuote("response"), " is neither 
+            ordered nor numeric")
+        uresponse <- uresponse[-length(uresponse)]
+    }
+    dresponse <- factor(sapply(uresponse, function(r) response <= r))
+    if (is.ordered(uresponse)) uresponse <- uresponse[,drop = TRUE]
+
+    ### lhs may have multiple terms
+    cfm <- paste(deparse(formula), collapse = "")
+    cfm <- strsplit(cfm, "~")[[1]]
+    xfm <- strsplit(cfm[2], "\\+")[[1]]
+    yfm <- strsplit(cfm[1], "\\+")[[1]]
+    tmp <- outer(xfm, yfm, function(x, y) paste(x, y, sep = "%O%"))
+    xpart <- paste(as.vector(tmp), collapse = " + ")
+
+    # yfm <- paste("%O%", as.character(formula)[2], sep = "")
+    # fm <- paste("dresponse ~ ", paste(xfm, yfm, collapse = "+"))
+    fm <- paste("dresponse ~ ", xpart)
+
+    ## << new >>
+    ## We included the no.variance decision for models CLTM 0 (linear) and
+    ## CLTM 0!
+    ## no terms depending on x AND y
+    if(no.variance) fm <- "dresponse ~ "
+    ##<< end new >>
+
+    ### terms that depend on x only but not on y
+    if (!is.null(constant)) {
+        constant <- strsplit(constant, "\\+")[[1]]
+        if(no.variance)
+        fm <- paste(fm, paste(constant, " %O% bols(ONEy, intercept = FALSE, 
+                    df = 1)", collapse = " + "))
+        else{
+        fm <- paste(fm, paste(constant, " %O% bols(ONEy, intercept = FALSE, 
+                    df = 1)", collapse = " + "), sep = "+")}
+
+    }
+    ### terms that depend on y only but not on x
+    if (!is.null(varying)) {
+        varying <- strsplit(varying, "\\+")[[1]]
+        fm <- paste(fm, paste("bols(ONEx, intercept = FALSE, df = 1) %O%",
+                    varying, collapse = " + "), sep = "+")
+    }
+
+    ### you know what you do, right?
+    if (!is.null(asis)) 
+        fm <- paste(fm, asis, sep = "+")
+
+    fm <- as.formula(fm)
+    assign(yname, uresponse)###, environment(formula))
+    ### ONEy is a constant on the lhs; same length as pseudo-response
+    ### this is error prone
+    assign("ONEy", rep(1.0, length(uresponse))) ###, environment(formula))
+    assign("ONEx", rep(1.0, nrow(data))) ###, environment(formula))
+    if (is.null(weights)) weights <- rep(1, nrow(data))
+    w <- weights
+    if (length(w) == nrow(data))
+        w <- rep(w, length(uresponse))
+    ret <- mboost(fm, data = data, weights = w, offset = 0, ...)
+    class(ret) <- c("ctm", class(ret))
+    ### reset weights for cvrisk etc., expanding works OK in bl_lin_matrix!
+    ret$"(weights)" <- weights
+    ret$ycdf <- all.vars(formula)[1]
+    ret$originalresponse <- response
+    ret$uresponse <- uresponse
+    ret$data <- data
+    ret$call <- match.call()
+    options(opt)
+    ret
+}
+@  
+
+\section{Estimating transformation and regression models}
+In this section, we present the model estimations for the modified birth weight data set. Thereby, the conditionally linear transformation models CLTM 0 (linear), CLTM 0, CLTM 1, CLTM 2, CLTM 3, and CLTM 4 are considered. Moreover, we estimate a standard conditional transformation model CTM, an ordinary linear regression model LM, a linear quantile regression model LQR, and an additive quantile regression model AQR.\\
+For each model, we save the estimated median birth weight, as well as the $\nicefrac{\alpha}{2}$ and the $1 - \nicefrac{\alpha}{2}$ quantile for each baby in the data set. For the linear regression model the expected birth weight is estimated instead of the median birth weight. \\
+Moreover, one should note, that CLTMs are slow to converge. That's why we needed an immense amount of boosting iterations $\text{mstop} = 20,000$ for all CLTMs, what was only operable on a server and not on a standard laptop. Hence, we limited the number of boosting iterations to $\text{mstop} = 1000$ for this tutorial example. Additionally, we set the step length to $\nu = 0.5$.
+
+Before we start, we give a short introduction into the main arguments of the \texttt{ctm} and the \texttt{myctm} function:
+\begin{itemize}
+\item {\texttt{fm}: model formula defining the interactions between the response and the explanatory variables. All explanatory variables included in \texttt{fm} may have an influence on the conditional mean and on the conditional variance (or even higher moments) of the response transformation. The user can choose among a linear or a more flexible response transformation and how this response transformation is influenced by the explanatory variables by specifying base-learners. To give an example, a typical CLTM model formula is:\\ bols(response) $\sim$ bbs(covariate 1) $+$ bbs(covariate 2) $+ \ldots$.}
+\item \texttt{data}: data set
+\item \texttt{family}: Family-Object defined in the \texttt{mboost} package. This is the Binomial Family with probit-link for all CLTMs and CTMs.
+\item \texttt{constant}: This is a no-interaction-term of the model equation. \texttt{Constant}-terms depend only on the explanatory variables and thus only influence the conditional mean of the response transformation. 
+\item \texttt{varying}: This is a no-interaction-term of the model equation. \texttt{Varying}-terms depend only on the response variable. We use the \texttt{varying}-term for defining the unconditional \textbf{linear} response transformation.
+\item \texttt{asis}: A special term, where you exactly know what to do. The given term is included in the model formula just as it is defined without any modifications. We use this term for defining the unconditional \textbf{monotone} transformation function that depends only on the response variable.  
+\item \texttt{ngrid}: includes the grid points where the conditional distribution functions are estimated. E.~g. \texttt{ngrid} $= 50$ means an equidistant grid of length $50$ covering the response's range.
+\item \texttt{boost\_control}: includes hyper parameters of the boosting algorithm.   
+\item \texttt{no.variance}: is only defined in the function \texttt{myctm} and guarantees a feasible model formula setup for CLTM 0 (linear) and CLTM 0. 
+\end{itemize}   
+
+A thorough introduction into available base-learners can be found in the \textbf{mboost} package. For estimating CLTMs and CTMs for the birth weight data we need the following base-learners:
+\begin{itemize}
+\item \texttt{bols}: linear base-learner.
+\item \texttt{bbs}: flexible B-spline base-learner.
+\item \texttt{bmono}: flexible B-spline base-learner with monotone constraints.
+\end{itemize}
+
+<<model estimation, echo = TRUE, eval = TRUE, keep.source = TRUE>>=
+
+library("ctm") 
+
+## load data set
+load("fetus_example.Rda")
+fetus_example <- fetus_example[, c("birthweight", "BPD", "FL", "AC", "HC", "FOD", 
+                           "ATD", "APD", "BMI")]
+## xvar includes all relevant ultrasound parameters
+xvar <- colnames(fetus_example)[-1] 
+#
+#
+##************************* CLTM 0 (linear) ************************************
+
+
+## switch off the Matrix-package  
+options(mboost_useMatrix = FALSE)  
+#
+## set up model formula
+## set up a pseudo model formula
+fm <- "bols(birthweight, intercept = FALSE) ~ null"                
+fm <- as.formula(fm)  
+#
+## Estimate model CLTM 0 (linear):
+## In CLTM 0 (linear) no response - ultrasound parameter - interactions are 
+## considered. That is why all ultrasound parameters (and the AC-FL interaction) ## are defined as constant-terms influencing only the conditional mean of the 
+## transformed response.
+## All ultrasound parameters have a linear influence on the conditional mean.
+## The unconditional flexible monotone response transformation is defined in
+## the asis-term. 
+## Warnings with respect to mean-centering covariates when using 'intercept =
+## FALSE' can be ignored. 
+
+cltm0_lin <- myctm(fm, data = fetus_example, family = Binomial(link = "probit"),
+                   constant = paste(paste("bols(", xvar, ", intercept = FALSE, 
+                              df = 1)", collapse = "+"), 
+                              "bols(AC, FL, intercept = FALSE, df = 1)", 
+                              sep = "+"),
+                   asis = "bmono(birthweight, df = 2.5, index = rep(1:50, 
+                          each = nrow(fetus_example)))", 
+                   no.variance = TRUE,
+                   ngrid = 50, control = boost_control(nu = 0.5, mstop = 1000, 
+                   trace = TRUE))
+#
+#
+##************** Predictions
+
+## Prediction for the unconditional flexible monotone response transformation
+pred_bmono <- mboost:::predict.mboost(cltm0_lin, which = "bmono", 
+              newdata = data.frame(birthweight = cltm0_lin$uresponse))[,1]
+## Prediction of the remaining model terms:
+vn <- names(variable.names(cltm0_lin))
+vn <- vn[-grep("bmono", vn)]
+pred <- predict(cltm0_lin, newdata = fetus_example, which = vn, anno = TRUE)
+pred <- cbind(pred, rep(pred_bmono, each = nrow(fetus_example)))
+#
+## Calculate predicted response values:
+p <- Binomial("probit")@response(rowSums(pred[,-c(1,2)]))
+#
+## Calculate 10%-, 50%- and 90%-quantile of the conditional distribution
+## functions (function qest()):
+p <- data.frame(birthweight = pred$birthweight, ID = pred$ID, p = p)
+p <- p[order(p$birthweight),]
+p_quant <- tapply(1:NROW(p), p$ID, function(i) qest(p[i,]))
+p_quant <- matrix(unlist(p_quant), ncol = 3, byrow = TRUE)
+p_quant <- data.frame(p_quant)
+colnames(p_quant) <- c("q10", "q50", "q90")
+#
+p_quant_cltm0_lin <- p_quant
+#
+#
+## *********************************** CLTM 0 ********************************
+
+options(mboost_useMatrix = FALSE)
+#
+fm <- "bols(birthweight, intercept = FALSE) ~ null"                
+fm <- as.formula(fm)
+#
+## Estimate CLTM 0:
+## In CLTM 0 no response - ultrasound parameter - interactions are 
+## considered. That is why all ultrasound parameters are defined as constant-
+## terms influencing only the conditional mean of the transformed response.
+## All ultrasound parameters have a flexible influence on the conditional mean.
+## Therefore bbs-base-learners are used.
+## The unconditional flexible monotone response transformation is defined in
+## the asis-term. 
+## The only difference between CLTM 0 (linear) and CLTM 0 is the flexibility
+## of the explanatory variables' influence on the conditional mean. 
+
+cltm0 <- myctm(fm, data = fetus_example, family = Binomial(link = "probit"),
+               constant = paste("bbs(", xvar, ", df = 2.5)", collapse = "+"),
+               asis = "bmono(birthweight, df = 2.5, index = rep(1:50, 
+                       each = nrow(fetus_example)))", 
+               no.variance = TRUE,
+               ngrid = 50, control = boost_control(nu = 0.5, mstop = 1000, 
+               trace = TRUE))
+#
+#
+##*************** Predictions
+
+## Predict unconditional flexible monotone response transformation:
+pred_bmono <- mboost:::predict.mboost(cltm0, which = "bmono", 
+              newdata = data.frame(birthweight = cltm0$uresponse))[,1]
+## Predict remaining model terms:
+vn <- names(variable.names(cltm0))
+vn <- vn[-grep("bmono", vn)]
+pred <- predict(cltm0, newdata = fetus_example, which = vn, anno = TRUE)
+pred <- cbind(pred, rep(pred_bmono, each = nrow(fetus_example)))
+#
+## Calculate predicted response values:
+p <- Binomial("probit")@response(rowSums(pred[,-c(1,2)]))
+#
+## Calculate 10%-, 50%- and 90%-quantile of the conditional distribution
+## functions using qest():
+p <- data.frame(birthweight = pred$birthweight, ID = pred$ID, p = p)
+p <- p[order(p$birthweight),]
+p_quant <- tapply(1:NROW(p), p$ID, function(i) qest(p[i,]))
+p_quant <- matrix(unlist(p_quant), ncol = 3, byrow = TRUE)
+p_quant <- data.frame(p_quant)
+colnames(p_quant) <- c("q10", "q50", "q90")
+#
+p_quant_cltm0 <- p_quant
+#
+#
+## ************************** CLTM 1 *************************************
+
+options(mboost_useMatrix = FALSE)
+#
+## In the model formula fm one defines the interaction terms between the 
+## response and the explanatory variables. Hence, the explanatory variables
+## influence the conditional mean and the conditional variance of the 
+## response transformation. 
+## In CLTM 1 the influence of the explanatory variables is linear and thus
+## the bols-base-learner is used.
+fm <- paste("bols(birthweight, intercept = FALSE) ~ ", 
+      paste("bols(", xvar, ", intercept = FALSE, df = 1)", collapse = "+"), 
+      sep = "")
+fm <- as.formula(fm)
+#
+## Estimate CLTM 1:
+## The explanatory variables (and the AC-FL interaction) have an additional 
+## linear effect on the conditional mean defined as constant-terms.
+## The unconditional linear response transformation is defined in the varying-
+## term.
+## Warnings concerning the mean-centering of covariates when using 'intercept = 
+## FALSE' can be ignored.
+cltm1 <- ctm(fm, data = fetus_example, family = Binomial(link = "probit"),
+             constant = paste(paste("bols(", xvar, ", intercept = FALSE, 
+                        df = 1)", collapse = "+"), 
+                        "bols(AC, FL, intercept = FALSE, df = 1)", sep = "+"),
+             varying = "bols(birthweight, df = 1)", 
+             ngrid = 50, control = boost_control(nu = 0.5, mstop = 1000, 
+             trace = TRUE))
+#
+#
+##*************** Predictions
+
+## Predict the 10%-, 50%- and 90%-quantile of the conditional distribution
+## functions:
+p <- predict(cltm1, newdata = fetus_example, anno = TRUE, type = "response")
+p_quant <- tapply(1:NROW(p), p$ID, function(i) qest(p[i,]))
+p_quant <- matrix(unlist(p_quant), ncol = 3, byrow = TRUE)
+p_quant <- data.frame(p_quant)
+colnames(p_quant) <- c("q10", "q50", "q90")
+#
+p_quant_cltm1 <- p_quant
+#
+#
+##*************************** CLTM 2 **************************************
+
+options(mboost_useMatrix = FALSE)
+#
+## All response - explanatory variable - interactions are defined in the 
+## model formula fm.
+## The explanatory variables have a linear influence on the conditional mean
+## and the conditional variance of the response transformation, thus bols-
+## base-learners are used.
+fm <- paste("bols(birthweight, intercept = FALSE) ~ ", 
+      paste("bols(", xvar, ", intercept = FALSE, df = 1)", collapse = "+"), 
+      sep = "")
+fm <- as.formula(fm)
+#
+## Estimate CLTM 2:
+## The explanatory variables (and the AC-FL interaction) have an additional 
+## linear effect on the conditional mean of the response transformation defined
+## as constant-terms.
+## The unconditional monotone response transformation is defined in the asis-
+## term.
+## The only difference between CLTM 1 and CLTM 2 is the definition of the 
+## unconditional response transformation as a linear or as a monotone flexible
+## function.
+## Warnings concerning the mean-centering of covariates when using 'intercept =
+## FALSE can be ignored'.
+
+cltm2 <- ctm(fm, data = fetus_example, family = Binomial(link = "probit"),
+             constant = paste(paste("bols(", xvar, ", intercept = FALSE, 
+                        df = 1)", collapse = "+"), 
+                        "bols(AC, FL, intercept = FALSE, df = 1)", sep = "+"),
+             asis = "bmono(birthweight, df = 2.5, index = rep(1:50, 
+                    each = nrow(fetus_example)))", 
+             ngrid = 50, control = boost_control(nu = 0.5, mstop = 1000, 
+             trace = TRUE))
+#
+#
+##******************* Predictions
+
+## Predict the unconditional monotone response transformation:
+pred_bmono <- mboost:::predict.mboost(cltm2, which = "bmono", 
+              newdata = data.frame(birthweight = cltm2$uresponse))[,1]
+## Predict the remaining model terms:
+vn <- names(variable.names(cltm2))
+vn <- vn[-grep("bmono", vn)]
+pred <- predict(cltm2, newdata = fetus_example, which = vn, anno = TRUE)
+pred <- cbind(pred, rep(pred_bmono, each = nrow(fetus_example)))
+#
+## Calculate the predicted response values:
+p <- Binomial("probit")@response(rowSums(pred[,-c(1,2)]))
+#
+## Calculate the 10%-, 50%- and 90%-quantile of the conditional distribution
+## functions:
+p <- data.frame(birthweight = pred$birthweight, ID = pred$ID, p = p)
+p <- p[order(p$birthweight),]
+p_quant <- tapply(1:NROW(p), p$ID, function(i) qest(p[i,]))
+p_quant <- matrix(unlist(p_quant), ncol = 3, byrow = TRUE)
+p_quant <- data.frame(p_quant)
+colnames(p_quant) <- c("q10", "q50", "q90")
+#
+p_quant_cltm2 <- p_quant
+#
+#
+##********************************* CLTM 3 ***********************************
+
+options(mboost_useMatrix = FALSE)
+#
+## Define all response - explanatory variable - interactions in the model formula
+## fm. The explanatory variables have a flexible influence on the response
+## transformation, thus bbs-base-learners are used.
+fm <- paste("bols(birthweight, intercept = FALSE) ~ ", 
+      paste("bbs(", xvar, ", df = 2.5)", collapse = "+"), sep = "")
+fm <- as.formula(fm)
+#
+## Estimate CLTM 3:
+## All explanatory variables have an additional flexible effect on the conditonal
+## mean of the response transformation defined as constant-terms.
+## The unconditional linear response transformation is defined in the varying-
+## term.
+## The only difference between CLTM 1 and CLTM 3 is that the explanatory 
+## variables' influence on the conditional mean and the conditional variance are
+## estimated linear and flexible, respectively.
+## Warnings concerning the mean-centering of covariates when using 'intercept =
+## FALSE' can be ignored.
+
+cltm3 <- ctm(fm, data = fetus_example, family = Binomial(link = "probit"),
+             constant = paste("bbs(", xvar, ", df = 2.5)", collapse = "+"),
+             varying = "bols(birthweight, df = 2.5)",
+             ngrid = 50, control = boost_control(nu = 0.5, mstop = 1000, 
+             trace = TRUE))
+
+##***************** Predictions
+#
+## Calculate the 10%-, 50%- and 90%-quantile of the conditional distribution
+## functions:
+p <- predict(cltm3, newdata = fetus_example, anno = TRUE, type = "response")
+p_quant <- tapply(1:NROW(p), p$ID, function(i) qest(p[i,]))
+p_quant <- matrix(unlist(p_quant), ncol = 3, byrow = TRUE)
+p_quant <- data.frame(p_quant)
+colnames(p_quant) <- c("q10", "q50", "q90")
+#
+p_quant_cltm3 <- p_quant
+
+
+##************************* CLTM 4 ***************************************
+#
+options(mboost_useMatrix = FALSE)
+#
+## Define all response - explanatory variable - interactions in the model formula
+## fm. The explanatory variables have a flexible influence on the conditional
+## mean and the conditional variance of the response transformation, thus bbs-
+## base-learners are used.
+fm <- paste("bols(birthweight, intercept = FALSE) ~ ", 
+      paste("bbs(", xvar, ", df = 2.5)", collapse = "+"), sep = "")
+fm <- as.formula(fm)
+#
+## Estimate CLTM 4:
+## The explanatory variables have an additional flexible influence on the 
+## conditional mean of the response transformation defined as constant-terms.
+## The unconditional flexible monotone response transformation is defined in 
+## the asis-term.
+## Warnings concerning the mean-centering of covariates when using 'intercept =
+## FALSE' can be ignored.
+
+cltm4 <- ctm(fm, data = fetus_example, family = Binomial(link = "probit"),
+             constant = paste("bbs(", xvar, ", df = 2.5)", collapse = "+"),
+             asis = "bmono(birthweight, df = 2.5, index = rep(1:50, 
+                    each = nrow(fetus_example)))", 
+             ngrid = 50, control = boost_control(nu = 0.5, mstop = 1000, 
+             trace = TRUE))
+#
+## *************** Predictions
+#
+## Predict the unconditional response transformation
+pred_bmono <- mboost:::predict.mboost(cltm4, which = "bmono", 
+              newdata = data.frame(birthweight = cltm4$uresponse))[,1]
+## Predict the remaining model terms:
+vn <- names(variable.names(cltm4))
+vn <- vn[-grep("bmono", vn)]
+pred <- predict(cltm4, newdata = fetus_example, which = vn, anno = TRUE)
+pred <- cbind(pred, rep(pred_bmono, each = nrow(fetus_example)))
+#
+## Calculate the estimated response values:
+p <- Binomial("probit")@response(rowSums(pred[,-c(1,2)]))
+#
+## Calculate the 10%-, 50%- and 90%-quantiles of the conditional distribution
+## functions:
+p <- data.frame(birthweight = pred$birthweight, ID = pred$ID, p = p)
+p <- p[order(p$birthweight),]
+p_quant <- tapply(1:NROW(p), p$ID, function(i) qest(p[i,]))
+p_quant <- matrix(unlist(p_quant), ncol = 3, byrow = TRUE)
+p_quant <- data.frame(p_quant)
+colnames(p_quant) <- c("q10", "q50", "q90") 
+#
+p_quant_cltm4 <- p_quant
+#
+#
+## *********************** CTM ***************************************
+#
+#
+## In CTMs, the influence of all explanatory variables on all higher moments
+## of the response transformation is modelled flexibly, thus only bbs-base-
+## learners are used:
+fm <- paste("bbs(birthweight, df = 2.05) ~ ", paste("bbs(", xvar, ", 
+            df = 2.05)", collapse = "+"))
+#
+## Estimate CTM:
+## The unconditional flexible response transformation is modelled
+## using the varying-term:
+
+ctm <- ctm(as.formula(fm), data = fetus_example, family = Binomial(link = "probit"),
+               control = boost_control(nu = 0.2, mstop = 1000, trace = TRUE), 
+               varying = "bbs(birthweight, df = 2.05^2)",
+               ngrid = 50)
+
+#
+## ******************* Predictions
+#
+p <- predict(ctm, newdata = fetus_example, anno = TRUE, type = "response")
+## Calculate the 10%-, 50%- and 90%-quantile of the conditional distribution
+## function for each observation:
+p_quant <- tapply(1:NROW(p), p$ID, function(i) qest(p[i,]))
+p_quant <- matrix(unlist(p_quant), ncol = 3, byrow = TRUE)
+p_quant <- data.frame(p_quant)
+colnames(p_quant) <- c("q10", "q50", "q90")
+#
+p_quant_ctm <- p_quant
+
+
+## *********************** LM ****************************************
+
+fm <- paste("birthweight ~ ", paste(xvar, collapse = "+"))
+lmod <- lm(as.formula(fm), data = fetus_example)
+#
+##***************** Predictions
+#
+## Calculate symmetric prediction intervals around the conditional mean of
+## birth weights with 80% coverage probability:
+p_quant <- as.data.frame(predict(lmod, newdata = fetus_example, 
+                         interval = "prediction", level = 0.8)) 
+p_quant$birthweight <- fetus_example$birthweight
+p_quant <- p_quant[order(p_quant$fit),]
+names(p_quant) <- c("q50", "q10", "q90", "birthweight")
+p_quant <- p_quant[, c("q10", "q50", "q90", "birthweight")]
+#
+p_quant_lmod <- p_quant
+
+
+## ************************** LQR ****************************************
+#
+## load library
+library("quantreg")
+#
+fm <- paste("birthweight ~ ", paste(xvar, collapse = "+"))
+#
+## Estimate linear quantile regression for the 10%-, 50%- and 90%-quantile:
+rq10 <- rq(as.formula(fm), data = fetus_example, tau = .1)
+rq50 <- rq(as.formula(fm), data = fetus_example, tau = .5)
+rq90 <- rq(as.formula(fm), data = fetus_example, tau = .9)
+
+## Predict relevant quantiles:
+p_quant <- data.frame(q10 = predict(rq10, newdata = fetus_example), 
+                      q50 = predict(rq50, newdata = fetus_example), 
+                      q90 = predict(rq90, newdata = fetus_example), 
+                      birthweight = fetus_example$birthweight)
+
+p_quant_lqr <- p_quant
+#
+#
+## ************************ AQR *********************************************
+#
+## load libraries
+library("mboost")
+library("multicore")
+mcc <- 25
+#
+## The explanatory variables have a flexible influence on each quantile, thus
+## the bbs-base-learner is used:
+fm <- paste("birthweight ~ ", paste("bbs(", xvar, ", df = 5)", collapse = "+"))
+#
+## Define boosting control parameters:
+ctrl <- boost_control(nu = .5, trace = TRUE)
+#
+## Estimate additive quantile regression models for the 10%-, 50%- and 90%-
+## quantile with mstop = 1000 iterations:
+rqss10 <- mboost(as.formula(fm), data = fetus_example, family = QuantReg(tau = .1),
+                 control = ctrl)[1000]
+rqss50 <- mboost(as.formula(fm), data = fetus_example, family = QuantReg(tau = .5),
+                 control = ctrl)[1000]
+rqss90 <- mboost(as.formula(fm), data = fetus_example, family = QuantReg(tau = .9),
+                 control = ctrl)[1000]
+#
+## Determine the optimal value for mstop via a bootstrap approach:
+cv10 <- cvrisk(rqss10, mc.cores = mcc)
+cv50 <- cvrisk(rqss50, mc.cores = mcc)
+cv90 <- cvrisk(rqss90, mc.cores = mcc)
+#
+## Evaluate the models at the optimal mstop-value:
+rqss10[mstop(cv10)]
+rqss50[mstop(cv50)]
+rqss90[mstop(cv90)]
+#
+p_quant <- data.frame(q10 = predict(rqss10, newdata = fetus_example), 
+                      q50 = predict(rqss50, newdata = fetus_example), 
+                      q90 = predict(rqss90, newdata = fetus_example), 
+                      birthweight = fetus_example$birthweight)
+#
+p_quant_aqr <- p_quant
+@
+
+\section{Plot estimated intervals}
+Now that we fitted all regression and transformation models on the modified data set and calculated the corresponding intervals with a coverage probability of $80\%$, we generate a plot similar to Figure $1$ in the main paper:
+
+<<plot-models, echo = TRUE, eval = TRUE, keep.source = TRUE>>=
+
+## Rearrange the interval estimates for a lattice graphic: 
+#
+pred_cltm0_lin <- p_quant_cltm0_lin
+pred_cltm0_lin$birthweight <- fetus_example$birthweight
+pred_cltm0_lin <- pred_cltm0_lin[order(pred_cltm0_lin$q50),]
+pred_cltm0_lin$model <- "CLTM 0 (linear)"
+pred_cltm0_lin$indx <- 1:nrow(pred_cltm0_lin)
+#
+pred_cltm0 <- p_quant_cltm0
+pred_cltm0$birthweight <- fetus_example$birthweight
+pred_cltm0 <- pred_cltm0[order(pred_cltm0$q50),]
+pred_cltm0$model <- "CLTM 0"
+pred_cltm0$indx <- 1:nrow(pred_cltm0)
+#
+pred_cltm1 <- p_quant_cltm1
+pred_cltm1$birthweight <- fetus_example$birthweight
+pred_cltm1 <- pred_cltm1[order(pred_cltm1$q50),]
+pred_cltm1$model <- "CLTM 1"
+pred_cltm1$indx <- 1:nrow(pred_cltm1)
+#
+pred_cltm2 <- p_quant_cltm2
+pred_cltm2$birthweight <- fetus_example$birthweight
+pred_cltm2 <- pred_cltm2[order(pred_cltm2$q50),]
+pred_cltm2$model <- "CLTM 2"
+pred_cltm2$indx <- 1:nrow(pred_cltm2)
+#
+pred_cltm3 <- p_quant_cltm3
+pred_cltm3$birthweight <- fetus_example$birthweight
+pred_cltm3 <- pred_cltm3[order(pred_cltm3$q50),]
+pred_cltm3$model <- "CLTM 3"
+pred_cltm3$indx <- 1:nrow(pred_cltm3)
+#
+pred_cltm4 <- p_quant_cltm4
+pred_cltm4$birthweight <- fetus_example$birthweight
+pred_cltm4 <- pred_cltm4[order(pred_cltm4$q50),]
+pred_cltm4$model <- "CLTM 4"
+pred_cltm4$indx <- 1:nrow(pred_cltm4)
+#
+pred_ctm <- p_quant_ctm
+pred_ctm$birthweight <- fetus_example$birthweight
+pred_ctm <- pred_ctm[order(pred_ctm$q50),]
+pred_ctm$model <- "CTM"
+pred_ctm$indx <- 1:nrow(pred_ctm)
+#
+pred_lmod <- p_quant_lmod
+pred_lmod <- pred_lmod[order(pred_lmod$q50),]
+pred_lmod$model <- "LM"
+pred_lmod$indx <- 1:nrow(pred_lmod)
+#
+pred_lq <- p_quant_lqr
+pred_lq <- pred_lq[order(pred_lq$q50),]
+pred_lq$model <- "LQR"
+pred_lq$indx <- 1:nrow(pred_lq)
+#
+pred_aq <- p_quant_aqr
+pred_aq <- pred_aq[order(pred_aq$q50),]
+pred_aq$model <- "AQR"
+pred_aq$indx <- 1:nrow(pred_aq)
+#
+pred <- rbind(pred_cltm0_lin, pred_cltm0, pred_cltm1, pred_cltm2, pred_cltm3,
+              pred_cltm4, pred_ctm, pred_lmod, pred_lq, pred_aq)
+pred$model <- factor(pred$model, levels = c("CLTM 0 (linear)", "CLTM 0", 
+                     "CLTM 1", "CLTM 2", "CLTM 3", "CLTM 4", "CTM", "LM", 
+                     "LQR", "AQR"))
+#
+library("lattice")
+trellis.par.set(list(plot.symbol = list(col=1,pch=20, cex=0.7),
+                     box.rectangle = list(col=1),
+                     box.umbrella = list(lty=1, col=1),
+                     strip.background = list(col = "white")))
+ltheme <- canonical.theme(color = FALSE)     ## in-built B&W theme  
+ltheme$strip.background$col <- "transparent" ## change strip bg  
+lattice.options(default.theme = ltheme)
+indx <- 1:table(pred$model)[1]
+#
+pfun <- function(x, y, subscripts, ...) {
+    with(pred[subscripts,], panel.polygon(c(indx, rev(indx)), c(q10, rev(q90)), col = "white"))
+    panel.xyplot(x, y, col = "black", ...)
+    panel.xyplot(x, pred[subscripts, "birthweight"], pch = 20, 
+    col = rgb(.1, .1, .1, .01))
+}
+skip <- c(F,F,F,F,F,F,F,T,F,F,F,T) 
+#
+#
+print(xyplot(q50 ~ indx | model, data = pred, type = "l", panel = pfun, 
+       ylab = "Birth weight (in kg)", xlab = "Observation", 
+       ylim = c(range(pred$q10, pred$q90)), 
+       scales = list(x = list(labels = rep("", length = length(indx)))), 
+       skip = skip, layout = c(4,3)
+))
+
+
+@
+
+
+
+
+%\end{appendix}
+%\bibliographystyle{apalike}
+\bibliography{../cltm.bib}
+\end{document}
+
