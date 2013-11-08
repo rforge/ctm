@@ -37,7 +37,7 @@
         Matthias Schmid\\LMU M\"unchen \AND
         Florian Faschingbauer\\ Universit\"atsklinikum Erlangen \And
         Torsten Hothorn\\Universit\"at Z\"urich}
-\title{Tutorial \textsf{R} code for: Predicting birth weight with conditionally linear transformation models}
+\title{Tutorial \textsf{R} code for predicting birth weight with conditionally linear transformation models}
 
 %% for pretty printing and a nice hypersummary also set:
 \Plainauthor{Lisa M\"ost, Matthias Schmid, Florian Faschingbauer, Torsten Hothorn} %% comma-separated
@@ -46,9 +46,9 @@
 
 %% an abstract and keywords
 \Abstract{ 
-The \textsf{R} code given below enables the reader to follow some of the results given in the main paper. Since we are not able to provide the original data set, we created a modified data set which has the same structure as the original data set and, of course, contains the same ultrasound parameters and birth weights as response variable. It is important to note, that we reduced the number of observations to $n = 4356$ which corresponds to half of the observations in the original data set. We modified the data such that any relationship between the ultrasound parameters and the birth weights has been distroyed. Hence, the subsequent analyses serve only as a tutorial example (or as a user's guide) and the associated results are of no use and do not correspond to the results given in the main paper. This data set is denoted by \texttt{fetus\_example} in the following.
+The \textsf{R} code given below enables the reader to follow some of the results given in the main paper. As we are not able to provide the original data set, we created a modified data set that has the same structure as the original data set and contains the same ultrasound parameters and birth weights as response variable. It is important to note that we reduced the number of observations to $n = 4,356$, which corresponds to half of the observations in the original data set. We modified the data such that any relationship between the ultrasound parameters and the birth weights has been destroyed. Hence, the subsequent analyses serve only as a tutorial example (or as a user's guide), and the associated results are of no use and do not correspond to the results given in the main paper. This data set is denoted by \texttt{fetus\_example} in the following.
 }
-\Keywords{Tutorial \textsf{R} code example, Conditional transformation models, component-wise boosting, birth weight, prediction intervals}
+\Keywords{Tutorial \textsf{R} code example, conditional transformation models, component-wise boosting, birth weight, prediction intervals}
 \Plainkeywords{Tutorial \textsf{R} code example, Conditional transformation models, component-wise boosting, birth weight, prediction intervals}
 
 \Address{
@@ -79,7 +79,7 @@ The \textsf{R} code given below enables the reader to follow some of the results
 
 \begin{document}
 
-All analyses were carried out in the \textsf{R} system for statistical computing \citep[version 2.15.3,][]{R}. Linear regression models are estimated using the \textbf{stats} package which is readily available after installing \textsf{R}. Moreover, one needs to install the following add-on packages:
+All analyses were carried out in the \textsf{R} system for statistical computing \citep[version 2.15.3,][]{R}. Linear regression models are estimated using the \textbf{stats} package, which is readily available after installing \textsf{R}. The following add-on packages are required:
 \begin{itemize}
 \item Package \textbf{ctm} for estimating conditional transformation models \citep{ctm}.
 \item Package \textbf{quantreg} to perform linear quantile regression \citep{quantreg_2012}.
@@ -87,7 +87,7 @@ All analyses were carried out in the \textsf{R} system for statistical computing
 \end{itemize} 
 
 \section{Necessary function}
-The \textbf{ctm} package was designed to estimate interactions between the response and the explanatory variables. Hence, the model equations of CLTM 0 (linear) and CLTM 0 are not supported by the \texttt{ctm}-function so far, since no interactions between the response and the explanatory variables are intended. This is why we introduce the function \texttt{myctm}, here. Thereby, we introduced a new logical parameter \texttt{no.variance}. If \texttt{no.variance = TRUE}, no interaction terms between the response and the explanatory variables are considered, but terms depending only on the response or only on the explanatory variables are considered instead. We simply introduced a further line of \textsf{R} code that ensures a valid model formula in these cases:
+The \textbf{ctm} package was designed to estimate interactions between the response and explanatory variables. Hence, the model equations of CLTM 0 (linear) and CLTM 0 are not yet supported by the \texttt{ctm}-function as no interactions between the response and the explanatory variables are intended. This is why we introduce the function \texttt{myctm} here and introduce the new logical parameter \texttt{no.variance}. If \texttt{no.variance = TRUE}, no interaction terms between the response and explanatory variables are considered, but terms depending only on the response or only on the explanatory variables are considered instead. We simply introduced a further line of \textsf{R} code that ensures a valid model formula in these cases:
 <<functions, echo = TRUE, eval = TRUE, keep.source = TRUE>>=
 
 myctm <- function(formula, data, weights = NULL, constant = NULL, 
@@ -182,20 +182,20 @@ myctm <- function(formula, data, weights = NULL, constant = NULL,
 @  
 
 \section{Estimating transformation and regression models}
-In this section, we present the model estimations for the modified birth weight data set. Thereby, the conditionally linear transformation models CLTM 0 (linear), CLTM 0, CLTM 1, CLTM 2, CLTM 3, and CLTM 4 are considered. Moreover, we estimate a standard conditional transformation model CTM, an ordinary linear regression model LM, a linear quantile regression model LQR, and an additive quantile regression model AQR.\\
+In this section, we present the model estimations for the modified birth weight data set. The conditionally linear transformation models CLTM 0 (linear), CLTM 0, CLTM 1, CLTM 2, CLTM 3 and CLTM 4 are considered. We also estimate a standard conditional transformation model (CTM), an ordinary linear regression model (LM), a linear quantile regression model (LQR) and an additive quantile regression model (AQR).\\
 For each model, we save the estimated median birth weight, as well as the $\nicefrac{\alpha}{2}$ and the $1 - \nicefrac{\alpha}{2}$ quantile for each baby in the data set. For the linear regression model the expected birth weight is estimated instead of the median birth weight. \\
-Moreover, one should note, that CLTMs are slow to converge. That's why we needed an immense amount of boosting iterations $\text{mstop} = 20,000$ for all CLTMs, what was only operable on a server and not on a standard laptop. Hence, we limited the number of boosting iterations to $\text{mstop} = 1000$ for this tutorial example. Additionally, we set the step length to $\nu = 0.5$.
+CLTMs are slow to converge. Therefore, we needed an immense amount of boosting iterations $\text{mstop} = 20,000$ for all CLTMs, which is only operable on a server and not on a standard laptop. Hence, we limited the number of boosting iterations to $\text{mstop} = 1,000$ for this tutorial example. Additionally, we set the step length to $\nu = 0.5$.
 
-Before we start, we give a short introduction into the main arguments of the \texttt{ctm} and the \texttt{myctm} function:
+Before we begin, we will briefly introduce the main arguments of the \texttt{ctm} and the \texttt{myctm} function:
 \begin{itemize}
-\item {\texttt{fm}: model formula defining the interactions between the response and the explanatory variables. All explanatory variables included in \texttt{fm} may have an influence on the conditional mean and on the conditional variance (or even higher moments) of the response transformation. The user can choose among a linear or a more flexible response transformation and how this response transformation is influenced by the explanatory variables by specifying base-learners. To give an example, a typical CLTM model formula is:\\ bols(response) $\sim$ bbs(covariate 1) $+$ bbs(covariate 2) $+ \ldots$.}
+\item {\texttt{fm}: model formula defining the interactions between the response and explanatory variables. All explanatory variables included in \texttt{fm} may have an influence on the conditional mean and on the conditional variance (or even higher moments) of the response transformation. The user can choose between a linear or a more flexible response transformation and how this response transformation is influenced by the explanatory variables by specifying base-learners. To give an example, a typical CLTM model formula is:\\ bols(response) $\sim$ bbs(covariate 1) $+$ bbs(covariate 2) $+ \ldots$.}
 \item \texttt{data}: data set
-\item \texttt{family}: Family-Object defined in the \texttt{mboost} package. This is the Binomial Family with probit-link for all CLTMs and CTMs.
-\item \texttt{constant}: This is a no-interaction-term of the model equation. \texttt{Constant}-terms depend only on the explanatory variables and thus only influence the conditional mean of the response transformation. 
-\item \texttt{varying}: This is a no-interaction-term of the model equation. \texttt{Varying}-terms depend only on the response variable. We use the \texttt{varying}-term for defining the unconditional \textbf{linear} response transformation.
-\item \texttt{asis}: A special term, where you exactly know what to do. The given term is included in the model formula just as it is defined without any modifications. We use this term for defining the unconditional \textbf{monotone} transformation function that depends only on the response variable.  
-\item \texttt{ngrid}: includes the grid points where the conditional distribution functions are estimated. E.~g. \texttt{ngrid} $= 50$ means an equidistant grid of length $50$ covering the response's range.
-\item \texttt{boost\_control}: includes hyper parameters of the boosting algorithm.   
+\item \texttt{family}: Family-object defined in the \texttt{mboost} package. This is the Binomial Family with probit-link for all CLTMs and CTMs.
+\item \texttt{constant}: a no-interaction term of the model equation. \texttt{Constant}-terms depend only on explanatory variables and thus only influence the conditional mean of the response transformation. 
+\item \texttt{varying}: a no-interaction term of the model equation. \texttt{Varying}-terms depend only on the response variable. We use the \texttt{varying}-term for defining the unconditional \textbf{linear} response transformation.
+\item \texttt{asis}: The given term is included in the model formula just as defined without any modifications. We use this term for defining the unconditional \textbf{monotone} transformation function that depends only on the response variable.   
+\item \texttt{ngrid}: includes the grid points where the conditional distribution functions are estimated. For example, \texttt{ngrid} $= 50$ means an equidistant grid of length $50$ covering the range of the response.
+\item \texttt{boost\_control}: includes hyperparameters of the boosting algorithm.   
 \item \texttt{no.variance}: is only defined in the function \texttt{myctm} and guarantees a feasible model formula setup for CLTM 0 (linear) and CLTM 0. 
 \end{itemize}   
 
