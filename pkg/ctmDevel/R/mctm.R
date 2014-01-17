@@ -26,7 +26,8 @@ mctm <- function(formula, data, weights = NULL, constant = NULL,
                  varying = NULL, ngrid = NULL, fit = TRUE, offset = 0, 
                  ...) {
 
-    yname <- all.vars(formula[[2]])
+    bl <- eval(formula[[2]], envir = data)
+    yname <- bl$get_names()
     response <- data[yname]
     ### cdf <- ecdf(response)
     for (y in yname) data[[y]] <- NULL
