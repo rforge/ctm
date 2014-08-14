@@ -625,7 +625,8 @@ for(i in 1:nboot){
 }
 ## Box-plot of the censored log scores:
 dat <- data.frame(log_score = c(log_score[,1], log_score[,2]),
-                  model = c(rep("CTM", nrow(log_score)), rep("Cox", nrow(log_score))))
+                  model = c(rep("CTM", nrow(log_score)), rep("Cox", 
+                            nrow(log_score))))
 boxplot(log_score ~ model, data = dat)
 
 
