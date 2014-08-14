@@ -375,7 +375,7 @@ MADs_10 <- MADs(ctm_G1 = pred_G1_mat_10, ctm_G2 = pred_G2_mat_10,
                 S_cox = S_cox10, km = km10, ngrid = ngrid10, 
                 n = 200, df = df_10, b1 = 1, c1 = 3, b2 = 1.5, 
                 c2 = 3)
-## 5% censored observations
+## 25% censored observations
 MADs_25 <- MADs(ctm_G1 = pred_G1_mat_25, ctm_G2 = pred_G2_mat_25, 
                 S_cox = S_cox25, km = km25, ngrid = ngrid25, 
                 n = 200, df = df_25, b1 = 1, c1 = 3, b2 = 1.5, 
