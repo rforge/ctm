@@ -1,0 +1,55 @@
+
+library("basefun")
+n <- 100
+set.seed(29)
+
+### one-dim problem
+## set-up simple regression problem
+x <- sort(runif(100))
+y <- x^2 + rnorm(length(x), sd = .1) 
+## set-up monotone Bernstein polynom basis
+Bb <- Bernstein_basis(order = 5, constraint = "increasing", varname = "x")
+## evaluate basis
+X1 <- model.matrix(Bb, data = data.frame(x = x))
+X2 <- Bb(x)
+stopifnot(all.equal(X1, X2))
+## fit model
+m1 <- lm(y ~  X1 - 1)
+m2 <- lm(y ~  Bb(x) - 1, data = data.frame(y = y, x = x))
+stopifnot(all.equal(coef(m1), coef(m2), check.attributes = FALSE))
+## generate new data from support of basis
+xn <- generate(Bb, n = 100)
+## compute estimated regression function
+p1 <- predict(Bb, newdata = data.frame(x = xn), coef = coef(m1))
+p2 <- predict(m2, newdata = data.frame(x = xn)) 
+stopifnot(all.equal(c(p1), p2, check.attributes = FALSE))
+## compute derivative of estimated regression function
+dp1 <- predict(Bb, newdata = data.frame(x = xn), coef = coef(m1), deriv = 1)
+dp12 <- predict(Bb, newdata = data.frame(x = xn), coef = coef(m1), deriv = 1, integrate = TRUE)
+p1 - dp12 ### should be the same
+
+### two-dim (ANCOVA) problem
+gf <- gl(3, 1)
+g <- sample(gf, length(x), replace = TRUE)
+y <- x^2 + (g == "2") * sin(x) + (g == "3") * cos(x) + rnorm(length(x), sd = .05)
+## generate a basis for a factor (treatment contrasts)
+## this is equal to model.matrix(~ gf)
+gb <- factor_basis(gf, varname = "g", remove_intercept = FALSE)
+## join the two bases by the kronecker product
+b <- c(b1 = Bb, b2 = gb)
+## evaluate new two-dim basis
+X1 <- model.matrix(b, data = data.frame(x = x, g = g))
+X2 <- b(data.frame(x = x, g = g))
+stopifnot(all.equal(X1, X2))
+## fit model
+m1 <- lm(y ~  X1 - 1)
+m2 <- lm(y ~  b(data.frame(x = x, g = g)) - 1, data = data.frame(y = y, x = x, g = g))
+stopifnot(all.equal(coef(m1), coef(m2), check.attributes = FALSE))
+## compute estimated regression functions
+p1 <- sapply(gf, function(l) predict(b, newdata = data.frame(x = x, g = l), coef = coef(m1)))
+d <- generate(b, n = 100)
+p2 <- predict(b, newdata = d, coef(m1))
+p3 <- matrix(predict(b, newdata = do.call(expand.grid, d), coef(m1)), ncol = nlevels(gf))
+p4 <- matrix(predict(m2, newdata = do.call(expand.grid, d)), ncol = nlevels(gf))
+## compute derivative wrt the first element
+dp2 <- predict(b, newdata = d, coef(m1), b1 = list(deriv = 1))
