@@ -26,7 +26,7 @@ stopifnot(all.equal(c(p1), p2, check.attributes = FALSE))
 ## compute derivative of estimated regression function
 dp1 <- predict(Bb, newdata = data.frame(x = xn), coef = coef(m1), deriv = 1)
 dp12 <- predict(Bb, newdata = data.frame(x = xn), coef = coef(m1), deriv = 1, integrate = TRUE)
-p1 - dp12 ### should be the same
+unique(c(p1 - dp12)) ### the same up to a constant
 
 ### two-dim (ANCOVA) problem
 gf <- gl(3, 1)
@@ -46,10 +46,16 @@ m1 <- lm(y ~  X1 - 1)
 m2 <- lm(y ~  b(data.frame(x = x, g = g)) - 1, data = data.frame(y = y, x = x, g = g))
 stopifnot(all.equal(coef(m1), coef(m2), check.attributes = FALSE))
 ## compute estimated regression functions
-p1 <- sapply(gf, function(l) predict(b, newdata = data.frame(x = x, g = l), coef = coef(m1)))
 d <- generate(b, n = 100)
+## for each group
+p1 <- sapply(gf, function(l) predict(b, newdata = data.frame(x = d$x, g = l), coef = coef(m1)))
+## the same via _linear array_ approach
 p2 <- predict(b, newdata = d, coef(m1))
+## brute force; 2 times
 p3 <- matrix(predict(b, newdata = do.call(expand.grid, d), coef(m1)), ncol = nlevels(gf))
 p4 <- matrix(predict(m2, newdata = do.call(expand.grid, d)), ncol = nlevels(gf))
+stopifnot(all.equal(p1, p2))
+stopifnot(all.equal(p2, p3))
+stopifnot(all.equal(p3, p4))
 ## compute derivative wrt the first element
 dp2 <- predict(b, newdata = d, coef(m1), b1 = list(deriv = 1))
