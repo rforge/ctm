@@ -24,7 +24,7 @@ Bernstein_basis <- function(order = 2, support = c(0, 1),
             function(m) fun(x, shape1 = m + 1, 
                             shape2 = (order - deriv) - m + 1) / ((order - deriv) + 1)))
         if (deriv > 0L) {
-            fact <- prod(order:(order - deriv + 1)) * (1 / support[2]^deriv)
+            fact <- prod(order:(order - deriv + 1)) * (1 / diff(support)^deriv)
             X <- X %*% diff(diag(order + 1), differences = deriv) * fact
         }
         attr(X, "constraint") <- constr
