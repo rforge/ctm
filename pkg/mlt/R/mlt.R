@@ -1,7 +1,9 @@
 
-.mlt_fit <- function(response, data, bresponse, binter = NULL, bshift = NULL, distr) {
+.mlt_fit <- function(data, bresponse, binter = NULL, bshift = NULL, distr) {
 #, offsetfun, offset, trunc = c(-Inf, Inf)) {
 
+    response <- varnames(bresponse)
+    stopifnot(length(response) == 1)
     y <- data[[response]]
     tmpdata <- data
     if (!is.null(binter)) {
@@ -9,9 +11,48 @@
     } else {
         by <- c(bresponse = bresponse)
     }
-    if (!is.Surv(y)) {
-        Y <- model.matrix(by, data = data)
-        Yprime <- model.matrix(by, data = data, bresponse = list(deriv = 1))
+
+    if (is.null(dim(y)) & (storage.mode(y) == "double")) {
+        exact <- rep(TRUE, nrow(data))
+        edata <- data
+    } else if (is.Surv(y)) {
+        sy <- .Surv2matrix(y)
+        lna <- is.na(sy[, "left"])
+        rna <- is.na(sy[, "right"])
+        exact <- lna | rna
+        if (any(exact)) {
+            edata <- data[exact,]
+            ct <- ifelse(all(lna[exact]), "right", "left")
+            edata[[response]] <- sy[exact, ct]
+        }
+        ldata <- data[!exact,]
+        ldata[[response]] <- sy[!exact, "left"]
+        lfinite <- is.finite(ldata[[response]])
+        rdata <- data[!exact,]
+        rdata[[response]] <- sy[!exact, "right"]
+        rfinite <- is.finite(rdata[[response]])
+    } else if (is.ordered(y)) {
+        exact <- rep(FALSE, nrow(data))
+        ldata <- rdata <- data
+        ldata[[response]] <- y
+        ldata[[response]][] <- levels(y)[pmax(unclass(y) - 1, 1)]
+        lfinite <- (ldata[[response]] != levels(y)[1])
+        rdata[[response]] <- y
+        rfinite <- rdata[[response]] != rev(levels(y))[1]
+    } else if (is.integer(y)) {
+        exact <- rep(FALSE, nrow(data))
+        ldata <- rdata <- data
+        ldata[[response]] <- y - 1
+        lfinite <- (ldata[[response]] >= 0)
+        rdata[[response]] <- y
+        rfinite <- rep(TRUE, nrow(rdata))
+    } else {
+        stop("cannot deal with response class", class(y))
+    }
+
+    if (any(exact)) {    
+        Y <- model.matrix(by, data = edata)
+        Yprime <- model.matrix(by, data = edata, bresponse = list(deriv = 1))
         ui <- attr(Y, "constraint")$ui
         ci <- attr(Y, "constraint")$ci
         stopifnot(any(is.finite(ci)))
@@ -19,22 +60,62 @@
         ci <- ci[is.finite(ci)]
         ci[ci == 0] <- sqrt(.Machine$double.eps)
         if (!is.null(bshift)) {
-            X <- model.matrix(bshift, data = data) ### remove intercept
+            X <- model.matrix(bshift, data = edata) ### remove intercept
             if ("(Intercept)" %in% colnames(X))
                 X <- X[, colnames(X) != "(Intercept)", drop = FALSE]
             Y <- cbind(Y, -X)
             Yprime <- cbind(Yprime, matrix(0, nrow = nrow(Yprime), ncol = ncol(X)))
             ui <- cbind(ui, matrix(0, nrow = nrow(ui), ncol = ncol(X)))
         }
-        ll <- function(beta) -sum(.mlt_loglik(distr, Y, Yprime)(beta))
-        sc <- function(beta) -colSums(.mlt_score(distr, Y, Yprime)(beta))
-        z <- scale(y)
-        theta <- coef(lm(z ~ Y - 1))
-        ret <- constrOptim(theta = theta, f = ll, 
-                           grad = sc, ui = ui,
-                           ci = ci, hessian = TRUE)
     }
-    ret$scores <- .mlt_score(distr, Y, Yprime)(ret$par)
+
+    if (all(exact)) { 
+        ll <- function(beta) .mlt_loglik_exact(distr, Y, Yprime)(beta)
+        sc <- function(beta) .mlt_score_exact(distr, Y, Yprime)(beta)
+    } else {
+        lY <- model.matrix(by, data = ldata)
+        lY[!lfinite,] <- -Inf
+        rY <- model.matrix(by, data = rdata)
+        lY[!rfinite,] <- Inf
+        if (all(!exact)) {
+            ui <- attr(lY, "constraint")$ui
+            ci <- attr(lY, "constraint")$ci
+            stopifnot(any(is.finite(ci)))
+            ui <- as(ui[is.finite(ci),,drop = FALSE], "matrix")
+            ci <- ci[is.finite(ci)]
+            ci[ci == 0] <- sqrt(.Machine$double.eps)
+        }
+        if (!is.null(bshift)) {
+            X <- model.matrix(bshift, data = ldata) ### remove intercept
+            if ("(Intercept)" %in% colnames(X))
+                X <- X[, colnames(X) != "(Intercept)", drop = FALSE]
+            lY <- cbind(lY, -X)
+            X <- model.matrix(bshift, data = rdata) ### remove intercept
+            if ("(Intercept)" %in% colnames(X))
+                X <- X[, colnames(X) != "(Intercept)", drop = FALSE]
+            rY <- cbind(rY, -X)
+        }
+        ll <- function(beta) {
+            ret <- numeric(nrow(data))
+            ret[exact] <- .mlt_loglik_exact(distr, Y, Yprime)(beta)
+            ret[!exact] <- .mlt_loglik_interval(distr, lY, rY)(beta)
+            ret
+        }
+        sc <- function(beta) {
+            ret <- matrix(0, nrow = nrow(data), ncol = ncol(Y))
+            ret[exact,] <- .mlt_score_exact(distr, Y, Yprime)(beta)
+            ret[!exact,] <- .mlt_score_interval(distr, lY, rY)(beta)
+            ret
+        }
+    }
+
+
+    z <- scale(edata[[response]])
+    theta <- coef(lm(z ~ Y - 1))
+
+    ret <- constrOptim(theta = theta, f = function(beta) -sum(ll(beta)),
+                           grad = function(beta) -colSums(sc(beta)), ui = ui,
+                           ci = ci, hessian = TRUE)
     ret$by <- by
     ret$bshift <- bshift
     ret$response <- response

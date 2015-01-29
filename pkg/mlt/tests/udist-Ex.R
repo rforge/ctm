@@ -11,10 +11,10 @@ dY <- function(x) dgamma(x, shape = 5)
 ### generate y and set-up basis
 y <- sort(rY(100))
 Bb <- Bernstein_basis(order = 10, support = c(0, max(y) + .1),
-                      constraint = "increasing")
+                      constraint = "increasing", "y")
 
 mydata <- data.frame(y = y)
-opt <- mlt(response = "y", data = mydata, bresponse = Bb, distr = d <- Distr())
+opt <- mlt(data = mydata, bresponse = Bb, distr = d <- Distr())
 
 ### evaluate on grid
 yn <- generate(Bb, n = 50)
