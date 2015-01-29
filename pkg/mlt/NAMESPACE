@@ -1,0 +1,7 @@
+
+import(basefun)
+importFrom(miscTools, ddnorm)
+importFrom(survival, Surv, is.Surv)
+
+exportPattern("^[^\\.]")
+
