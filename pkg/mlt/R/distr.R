@@ -16,7 +16,7 @@
          dd = function(x)
              exp(x - exp(x)) * (1 - exp(x)))
 
-Distr <- function(which = c("Normal", "Logistic", "MinExtrVal")) {
+.distr <- function(which = c("Normal", "Logistic", "MinExtrVal")) {
     which <- match.arg(which)
     do.call(paste(".", which, sep = ""), list())
 }

@@ -1,16 +1,51 @@
 
-.mlt_fit <- function(data, bresponse, binter = NULL, bshift = NULL, distr) {
-#, offsetfun, offset, trunc = c(-Inf, Inf)) {
+.is.formula <- function(x) {
+    if (is.null(x)) return(FALSE)
+    inherits(x, "formula")
+}
 
-    response <- varnames(bresponse)
+model <- function(response = NULL, interacting = NULL, shifting = NULL) {
+
+    if (.is.formula(response)) 
+        response <- as.bases(response)
+    if (.is.formula(interacting)) 
+        interacting <- as.bases(interacting)
+    if (.is.formula(shifting)) 
+        shifting <- as.bases(shifting, remove_intercept = TRUE)
+
+    if (is.null(shifting)) {
+        if (!is.null(interacting)) {
+            ret <- b(bresponse = response, binteracting = interacting)
+        } else {
+            ret <- c(bresponse = response)
+        }   
+    } else {
+        if (!is.null(interacting)) {
+            ret <- c(b(bresponse = response, binteracting = interacting), 
+                    bshifting = shifting)
+        } else {
+            ret <- c(bresponse = response, bshifting = shifting)
+        }
+    }
+    attr(ret, "response") <- varnames(response)
+    return(ret)
+}
+
+.mlt_fit <- function(model, data, todistr = c("Normal", "Logistic", "MinExtrVal"),
+                     weights = NULL, offset = NULL, trunc = c(-Inf, Inf)) {
+
+    if (is.null(weights)) weights <- rep(1, nrow(data))
+    if (is.null(offset)) offset <- rep(0, nrow(data))
+    stopifnot(nrow(data) == length(weights))
+    stopifnot(nrow(data) == length(offset))
+
+    response <- attr(model, "response")
     stopifnot(length(response) == 1)
     y <- data[[response]]
     tmpdata <- data
-    if (!is.null(binter)) {
-        by <- b(bresponse = bresponse, binter = binter)
-    } else {
-        by <- c(bresponse = bresponse)
-    }
+
+    by <- model
+    distr <- .distr(todistr)
 
     if (is.null(dim(y)) & (storage.mode(y) == "double")) {
         exact <- rep(TRUE, nrow(data))
@@ -55,25 +90,20 @@
         Y <- model.matrix(by, data = edata)
         nbeta <- ncol(Y)
         Yprime <- model.matrix(by, data = edata, bresponse = list(deriv = 1))
+        ### <FIXME> handle deriv better!!!
+        Yprime[abs(Yprime - Y) == 0] <- 0 
+        ### </FIXME>
         ui <- attr(Y, "constraint")$ui
         ci <- attr(Y, "constraint")$ci
         stopifnot(any(is.finite(ci)))
         ui <- as(ui[is.finite(ci),,drop = FALSE], "matrix")
         ci <- ci[is.finite(ci)]
         ci[ci == 0] <- sqrt(.Machine$double.eps)
-        if (!is.null(bshift)) {
-            X <- model.matrix(bshift, data = edata) ### remove intercept
-            if ("(Intercept)" %in% colnames(X))
-                X <- X[, colnames(X) != "(Intercept)", drop = FALSE]
-            Y <- cbind(Y, -X)
-            Yprime <- cbind(Yprime, matrix(0, nrow = nrow(Yprime), ncol = ncol(X)))
-            ui <- cbind(ui, matrix(0, nrow = nrow(ui), ncol = ncol(X)))
-        }
     } 
 
     if (all(exact)) { 
-        ll <- function(beta) .mlt_loglik_exact(distr, Y, Yprime)(beta)
-        sc <- function(beta) .mlt_score_exact(distr, Y, Yprime)(beta)
+        ll <- function(beta) .mlt_loglik_exact(distr, Y, Yprime, offset)(beta)
+        sc <- function(beta) .mlt_score_exact(distr, Y, Yprime, offset)(beta)
     } else {
         .makeY <- function(data, finite, nc = NULL) {
             if (any(finite)) {
@@ -106,20 +136,10 @@
             ci <- ci[is.finite(ci)]
             ci[ci == 0] <- sqrt(.Machine$double.eps)
         }
-        if (!is.null(bshift)) {
-            X <- model.matrix(bshift, data = ldata) ### remove intercept
-            if ("(Intercept)" %in% colnames(X))
-                X <- X[, colnames(X) != "(Intercept)", drop = FALSE]
-            lY <- cbind(lY, -X)
-            X <- model.matrix(bshift, data = rdata) ### remove intercept
-            if ("(Intercept)" %in% colnames(X))
-                X <- X[, colnames(X) != "(Intercept)", drop = FALSE]
-            rY <- cbind(rY, -X)
-        }
         ll <- function(beta) {
             ret <- numeric(nrow(data))
-            ret[exact] <- .mlt_loglik_exact(distr, Y, Yprime)(beta)
-            ret[!exact] <- .mlt_loglik_interval(distr, lY, rY)(beta)
+            ret[exact] <- .mlt_loglik_exact(distr, Y, Yprime, offset[exact])(beta)
+            ret[!exact] <- .mlt_loglik_interval(distr, lY, rY, offset[!exact])(beta)
             ret
         }
         sc <- function(beta) {
@@ -134,16 +154,22 @@
     z <- scale(edata[[response]])
     theta <- coef(lm(z ~ Y - 1))
 
-    ret <- constrOptim(theta = theta, f = function(beta) -sum(ll(beta)),
-                           grad = function(beta) -colSums(sc(beta)), ui = ui,
+    ret <- constrOptim(theta = theta, f = function(beta) -sum(weights * ll(beta)),
+                           grad = function(beta) -colSums(weights * sc(beta)), ui = ui,
                            ci = ci, hessian = TRUE)
     ret$by <- by
-    ret$bshift <- bshift
     ret$response <- response
     ret$distr <- distr
+    ret$loglik <- ll(ret$par)
     class(ret) <- "mlt"
     return(ret)
 }
+
+coef.mlt <- function(object)
+    object$par
+
+logLik.mlt <- function(object)
+    object$loglik
 
 mlt <- .mlt_fit
 
@@ -161,18 +187,11 @@ predict.mlt <- function(object, newdata = NULL,
             newdata[[object$response]] <- tmp$y
         }
         Y <- model.matrix(object$by, data = newdata)
-        if (!is.null(object$bshift)) {
-            X <- model.matrix(object$bshift, data = newdata) ### remove intercept
-            if ("(Intercept)" %in% colnames(X))
-                X <- X[, colnames(X) != "(Intercept)", drop = FALSE]
-            Y <- cbind(Y, -X)
-        }
         ret <- drop(Y %*% object$par)
         ret <- switch(type, 
-                  "trafo" = ret,
-                  "prob" = object$distr$p(ret))
+                      "trafo" = ret,
+                      "prob" = object$distr$p(ret))
         ret
     }
-
     ret
 }

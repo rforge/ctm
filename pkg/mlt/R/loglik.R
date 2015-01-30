@@ -36,7 +36,7 @@
     OK <- is.finite(X[,1])
     tmp <- X[OK,] %*% beta
     ret <- numeric(nrow(X))
-    ret[OK] <- fun(offset + tmp)
+    ret[OK] <- fun(offset[OK] + tmp)
     ret[!OK] <- value
     if (Xmult) {
         X[!OK,] <- 0

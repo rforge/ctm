@@ -17,12 +17,8 @@ boxplot(y ~ g, data = mydata)
 Bb <- Bernstein_basis(order = 5, support = c(0, max(y) + .1),
                       constraint = "increasing", var = "y")
 
-opt <- mlt(data = mydata,
-           bresponse = Bb,
-           bshift = ~ g,
-           dist = Distr("MinExtrVal"))
-
-opt$par
+coef(opt <- mlt(model(response = Bb, shifting = ~ g), data = mydata,
+                todist = "MinExtrVal"))
 
 coef(cph <- coxph(Surv(y, rep(TRUE, nrow(mydata))) ~ g, data = mydata))
 
@@ -43,33 +39,22 @@ plot(yn, 1 - a3(yn, type = "prob"), type = "l", col = "red", ylim = c(0, 1))
 lines(survfit(cph, newdata = data.frame(g = gf[3])))
 
 mydata <- data.frame(y = Surv(y, sample(0:1, length(y), replace = TRUE)), g = g)
-opt <- mlt(data = mydata,
-           bresponse = Bb,
-           bshift = ~ g,
-           dist = Distr("MinExtrVal"))
-
-opt$par
+coef(opt <- mlt(model(response = Bb, shifting = ~ g), data = mydata,
+                todist = "MinExtrVal"))
 
 coef(cph <- coxph(y ~ g, data = mydata))
 
 mydata <- data.frame(y = Surv(y, sample(0:1, length(y), replace = TRUE), type = "left"), g = g)
-opt <- mlt(data = mydata,
-           bresponse = Bb,
-           bshift = ~ g,
-           dist = Distr("MinExtrVal"))
-
-opt$par
+coef(opt <- mlt(model(response = Bb, shifting = ~ g), data = mydata,
+                todist = "MinExtrVal"))
 
 Bb <- Bernstein_basis(order = 5, support = c(0, max(y + 1) + .1),
                       constraint = "increasing", var = "y")
 
 mydata <- data.frame(y = Surv(y, y + 1, sample(0:3, length(y), replace = TRUE), type = "interval"), 
                      g = g)
-opt <- mlt(data = mydata,
-           bresponse = Bb,
-           bshift = ~ g,
-           dist = Distr("MinExtrVal"))
+coef(opt <- mlt(model(response = Bb, shifting = ~ g), data = mydata,
+                todist = "MinExtrVal"))
 
-opt$par
 
 
