@@ -75,16 +75,14 @@ b <- function(...) {
             do.call("model.matrix", thisargs)
         })
         if (!model.matrix) return(ret)
-        ui <- do.call(".box_ui", lapply(ret, function(r)
-                      attr(r, "constraint")$ui))
-        ci <- do.call(".box_ci", lapply(ret, function(r)
-                      attr(r, "constraint")$ci))
+        constr <- do.call(".box_ui_ci", lapply(ret, function(r)
+                          attr(r, "constraint")))
         if (length(bases) > 1) {
             ret <- do.call(".box", ret)
         } else {
             ret <- ret[[1]]
         }
-        attr(ret, "constraint") <- list(ui = ui, ci = ci)
+        attr(ret, "constraint") <- constr
         return(ret )
     }
     attr(ret, "length") <- length

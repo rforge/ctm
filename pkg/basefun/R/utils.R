@@ -15,24 +15,23 @@
 }
 
 ### of linear functions for constraints
-.box_ui <- function(...) {
+.box_ui_ci <- function(...) {
     args <- list(...)
     ret <- args[[1]]
     if (length(args) == 1) return(ret)
-    for (i in 2:length(args))
-        ret <- rBind(kronecker(Diagonal(ncol(args[[i]])), ret),
-                     kronecker(args[[i]], Diagonal(ncol(ret))))
-    ret
-}
-
-### of constraints
-.box_ci <- function(...) {
-    args <- list(...)
-    ret <- args[[1]]
-    if (length(args) == 1) return(ret)
-    for (i in 2:length(args))
-        ret <- c(rep(ret, length(args[[i]])), 
-                 rep(args[[i]], rep(length(ret), length(args[[i]]))))
+    for (i in 2:length(args)) {
+        nci <- ncol(args[[i]]$ui)
+        ncr <- ncol(ret$ui)
+        ret$ui <- rBind(kronecker(Diagonal(nci), ret$ui),
+                        kronecker(args[[i]]$ui, Diagonal(ncr)))
+        ret$ci <- c(as(kronecker(Diagonal(nci), 
+                                 matrix(ret$ci, ncol = 1)) %*% rep(1, nci), 
+                       "vector"),
+                    as(kronecker(matrix(args[[i]]$ci, ncol = 1), 
+                                 Diagonal(ncr)) %*% rep(1, ncr), 
+                       "vector"))
+    }
+    ret$ci <- 
     ret
 }
 

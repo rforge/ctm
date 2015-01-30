@@ -56,5 +56,21 @@ mydata <- data.frame(y = Surv(y, y + 1, sample(0:3, length(y), replace = TRUE), 
 coef(opt <- mlt(model(response = Bb, shifting = ~ g), data = mydata,
                 todist = "MinExtrVal"))
 
+if (FALSE) {
+### abweichungen muessen auch konstant 0 sein duerfen !!!
+mydata <- data.frame(y = y, g = g)
+coef(opt <- mlt(model(response = Bb, interacting = ~ g), data = mydata,
+                todist = "MinExtrVal"))
 
+coef(cph <- coxph(Surv(y, rep(TRUE, nrow(mydata))) ~ g, data = mydata))
 
+layout(matrix(1:4, ncol = 2))
+plot(yn, a1(yn), type = "l", col = "red")
+lines(yn, log(yn))
+plot(yn, 1 - a1(yn, type = "prob"), type = "l", col = "red", ylim = c(0, 1))
+lines(survfit(cph, newdata = data.frame(g = gf[1])))
+plot(yn, 1 - a2(yn, type = "prob"), type = "l", col = "red", ylim = c(0, 1))
+lines(survfit(cph, newdata = data.frame(g = gf[2])))
+plot(yn, 1 - a3(yn, type = "prob"), type = "l", col = "red", ylim = c(0, 1))
+lines(survfit(cph, newdata = data.frame(g = gf[3])))
+}
