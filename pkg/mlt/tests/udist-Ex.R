@@ -14,7 +14,8 @@ Bb <- Bernstein_basis(order = 10, support = c(0, max(y) + .1),
                       constraint = "increasing", "y")
 
 mydata <- data.frame(y = y)
-opt <- mlt(data = mydata, bresponse = Bb, distr = d <- Distr())
+opt <- mlt(model(response = Bb), data = mydata)
+d <- opt$distr
 
 ### evaluate on grid
 yn <- generate(Bb, n = 50)

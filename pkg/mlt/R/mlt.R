@@ -165,10 +165,10 @@ model <- function(response = NULL, interacting = NULL, shifting = NULL) {
     return(ret)
 }
 
-coef.mlt <- function(object)
+coef.mlt <- function(object, ...)
     object$par
 
-logLik.mlt <- function(object)
+logLik.mlt <- function(object, ...)
     object$loglik
 
 mlt <- .mlt_fit
