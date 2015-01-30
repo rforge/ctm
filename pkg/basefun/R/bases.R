@@ -16,7 +16,7 @@ predict.basis <- function(object, newdata, coef, ...) {
     X %*% coef
 }
 
-predict.bases <- function(object, newdata, coef, ...) {
+predict.bbases <- function(object, newdata, coef, ...) {
     if (is.data.frame(newdata)) 
         return(predict.basis(object = object, newdata = newdata, 
                              coef = coef, ...))
@@ -24,6 +24,12 @@ predict.bases <- function(object, newdata, coef, ...) {
     X <- lapply(X, function(x) as(x, "matrix"))
     X$beta <- array(coef, dim(object))
     do.call("cXb", X)
+}
+
+predict.cbases <- function(object, newdata, coef, ...) {
+    stopifnot(is.data.frame(newdata)) 
+    predict.basis(object = object, newdata = newdata, 
+                  coef = coef, ...)
 }
 
 varnames <- function(x)
@@ -44,10 +50,8 @@ length.basis <- function(x)
 dim.basis <- function(x)
     attr(x, "dimension")
 
-### concatenate multiple _named_ basis objects
-c.basis <- function(..., recursive = FALSE) {
-
-    stopifnot(!recursive)
+### box product of multiple _named_ basi(e)s objects
+b <- function(...) {
 
     bases <- list(...)
     stopifnot(all(sapply(bases, inherits, what = "basis")))
@@ -56,7 +60,8 @@ c.basis <- function(..., recursive = FALSE) {
 
     varnames <- sapply(bases, varnames)
     stopifnot(all(!is.null(varnames)))
-    support <- lapply(bases, support)
+    support <- .rec2flat(lapply(bases, support))
+    names(support) <- varnames ### is this safe???
     length <- prod(sapply(bases, length))
     dim <- sapply(bases, length)
 
@@ -86,15 +91,61 @@ c.basis <- function(..., recursive = FALSE) {
     attr(ret, "varnames") <- varnames
     attr(ret, "dimension") <- dim
     attr(ret, "support") <- support
-    class(ret) <- c("bases", "basis", class(ret))
+    class(ret) <- c("bbases", "bases", "basis", class(ret))
+    ret
+}
+
+### cbind of multiple _named_ basi(e)s objects
+c.basis <- function(..., recursive = FALSE) {
+
+    stopifnot(!recursive)
+
+    bases <- list(...)
+    stopifnot(all(sapply(bases, inherits, what = "basis")))
+    bnames <- names(bases)
+    stopifnot(length(unique(bnames)) == length(bnames))
+
+    varnames <- sapply(bases, varnames)
+    stopifnot(all(!is.null(varnames)))
+    support <- .rec2flat(lapply(bases, support))
+    names(support) <- varnames ### is this safe???
+    length <- prod(sapply(bases, length))
+    dim <- sapply(bases, length)
+
+    ret <- function(data, model.matrix = TRUE, ...) {
+        args <- list(...)
+        stopifnot(all(names(args) %in% bnames))
+        ret <- lapply(bnames, function(b) {
+            thisargs <- args[[b]]
+            thisargs$object <- bases[[b]]
+            thisargs$data <- data
+            do.call("model.matrix", thisargs)
+        })
+        if (!model.matrix) return(ret)
+        ui <- do.call("bdiag", lapply(ret, function(r)
+                      attr(r, "constraint")$ui))
+        ci <- do.call("c", lapply(ret, function(r)
+                      attr(r, "constraint")$ci))
+        if (length(bases) > 1) {
+            ret <- do.call("cbind", ret)
+        } else {
+            ret <- ret[[1]]
+        }
+        attr(ret, "constraint") <- list(ui = ui, ci = ci)
+        return(ret )
+    }
+    attr(ret, "length") <- length
+    attr(ret, "varnames") <- varnames
+    attr(ret, "dimension") <- dim
+    attr(ret, "support") <- support
+    class(ret) <- c("cbases", "bases", "basis", class(ret))
     ret
 }
 
 generate <- function(object, n)
     UseMethod("generate")
 
-generate.basis <- function(object, n) {
-    s <- support(object)
+.generate <- function(s, n) {
     if ((length(s) == 2) && (storage.mode(s) == "double")) {
         x <- seq(from = s[1], to = s[2], length.out = n)
     } else if (is.factor(s)) {
@@ -104,11 +155,14 @@ generate.basis <- function(object, n) {
     }
     return(x)
 }
+
+generate.basis <- function(object, n) {
+    .generate(support(object), n = n)
+}
  
 generate.bases <- function(object, n) {
-    ret <- lapply(get("bases", environment(object)), generate, n = n)
-    v <- varnames(object)
-    names(ret) <- v
-    ret[!duplicated(v)]
+    s <- support(object)
+    ret <- lapply(s, .generate, n = n)
+    ret[!duplicated(names(ret))]
 }
 

@@ -35,3 +35,22 @@
                  rep(args[[i]], rep(length(ret), length(args[[i]]))))
     ret
 }
+
+.rec2flat <- function(x) {
+
+    ret <- c()
+    foo <- function(x) {
+        a <- sapply(x, is.atomic)
+        if (any(a))
+            ret <<- c(ret, x[a])
+        if (all(a)) {
+            return(NULL)
+        } else {
+            sapply(x[!a], foo)
+        }
+    }
+    foo(x)
+    return(ret)
+}
+
+
