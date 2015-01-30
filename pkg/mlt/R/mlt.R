@@ -154,13 +154,17 @@ model <- function(response = NULL, interacting = NULL, shifting = NULL) {
     z <- scale(edata[[response]])
     theta <- coef(lm(z ~ Y - 1))
 
-    ret <- constrOptim(theta = theta, f = function(beta) -sum(weights * ll(beta)),
+    loglik <- function(beta) -sum(weights * ll(beta))
+    ret <- constrOptim(theta = theta, f = loglik,
                            grad = function(beta) -colSums(weights * sc(beta)), ui = ui,
                            ci = ci, hessian = TRUE)
+    if (ret$convergence != 0)
+        warning("algorithm did not converge")
     ret$by <- by
     ret$response <- response
     ret$distr <- distr
-    ret$loglik <- ll(ret$par)
+    ret$loglik <- loglik
+    ret$score <- function(beta) weights * sc(beta)
     class(ret) <- "mlt"
     return(ret)
 }
@@ -168,8 +172,11 @@ model <- function(response = NULL, interacting = NULL, shifting = NULL) {
 coef.mlt <- function(object, ...)
     object$par
 
+vcov.mlt <- function(object, ...)
+    solve(object$hessian)
+
 logLik.mlt <- function(object, ...)
-    object$loglik
+    object$loglik(coef(object))
 
 mlt <- .mlt_fit
 
