@@ -7,7 +7,7 @@
     y <- data[[response]]
     tmpdata <- data
     if (!is.null(binter)) {
-        by <- c(bresponse = bresponse, binter = binter)
+        by <- b(bresponse = bresponse, binter = binter)
     } else {
         by <- c(bresponse = bresponse)
     }
