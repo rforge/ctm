@@ -50,8 +50,10 @@
         stop("cannot deal with response class", class(y))
     }
 
+    nbeta <- NULL
     if (any(exact)) {    
         Y <- model.matrix(by, data = edata)
+        nbeta <- ncol(Y)
         Yprime <- model.matrix(by, data = edata, bresponse = list(deriv = 1))
         ui <- attr(Y, "constraint")$ui
         ci <- attr(Y, "constraint")$ci
@@ -67,16 +69,35 @@
             Yprime <- cbind(Yprime, matrix(0, nrow = nrow(Yprime), ncol = ncol(X)))
             ui <- cbind(ui, matrix(0, nrow = nrow(ui), ncol = ncol(X)))
         }
-    }
+    } 
 
     if (all(exact)) { 
         ll <- function(beta) .mlt_loglik_exact(distr, Y, Yprime)(beta)
         sc <- function(beta) .mlt_score_exact(distr, Y, Yprime)(beta)
     } else {
-        lY <- model.matrix(by, data = ldata)
-        lY[!lfinite,] <- -Inf
-        rY <- model.matrix(by, data = rdata)
-        lY[!rfinite,] <- Inf
+        .makeY <- function(data, finite, nc = NULL) {
+            if (any(finite)) {
+                tmp <- model.matrix(by, data = data[finite,,drop = FALSE])
+                nc <- ncol(tmp)
+            } else {
+                tmp <- -Inf
+            }
+            ret <- matrix(-Inf, nrow = nrow(data), ncol = nc)
+            ret[finite,] <- tmp
+            ret
+        }
+        if (!is.null(nbeta)) {
+            lY <- .makeY(ldata, lfinite, nbeta)
+            rY <- .makeY(rdata, rfinite, nbeta)
+        } else {
+            if (any(lfinite)) {
+                lY <- .makeY(ldata, lfinite)
+                rY <- .makeY(rdata, rfinite, ncol(lY))
+            } else {
+                rY <- .makeY(rdata, rfinite)
+                lY <- .makeY(ldata, lfinite, ncol(rY))
+            }
+        }
         if (all(!exact)) {
             ui <- attr(lY, "constraint")$ui
             ci <- attr(lY, "constraint")$ci

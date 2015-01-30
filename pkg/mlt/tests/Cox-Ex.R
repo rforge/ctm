@@ -60,6 +60,8 @@ opt <- mlt(data = mydata,
 
 opt$par
 
+Bb <- Bernstein_basis(order = 5, support = c(0, max(y + 1) + .1),
+                      constraint = "increasing", var = "y")
 
 mydata <- data.frame(y = Surv(y, y + 1, sample(0:3, length(y), replace = TRUE), type = "interval"), 
                      g = g)
