@@ -19,6 +19,7 @@ Bernstein_basis <- function(order = 2, support = c(0, 1),
     basis <- function(x, deriv = 0L, integrate = FALSE) {
         stopifnot(order > deriv)
         x <- (x - support[1]) / diff(support)
+        stopifnot(all(x >= 0 && x <= 1))
         fun <- ifelse(isTRUE(integrate), pbeta, dbeta)
         X <- do.call("cbind", lapply(0:(order - deriv), 
             function(m) fun(x, shape1 = m + 1, 
