@@ -7,11 +7,11 @@
 model <- function(response = NULL, interacting = NULL, shifting = NULL) {
 
     if (.is.formula(response)) 
-        response <- as.bases(response)
+        response <- as.basis(response)
     if (.is.formula(interacting)) 
-        interacting <- as.bases(interacting)
+        interacting <- as.basis(interacting)
     if (.is.formula(shifting)) 
-        shifting <- as.bases(shifting, remove_intercept = TRUE)
+        shifting <- as.basis(shifting, remove_intercept = TRUE)
 
     if (is.null(shifting)) {
         if (!is.null(interacting)) {
