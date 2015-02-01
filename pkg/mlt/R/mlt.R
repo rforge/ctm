@@ -89,10 +89,9 @@ model <- function(response = NULL, interacting = NULL, shifting = NULL) {
     if (any(exact)) {    
         Y <- model.matrix(by, data = edata)
         nbeta <- ncol(Y)
-        Yprime <- model.matrix(by, data = edata, bresponse = list(deriv = 1))
-        ### <FIXME> handle deriv better!!!
-        Yprime[abs(Yprime - Y) == 0] <- 0 
-        ### </FIXME>
+        deriv <- 1
+        names(deriv) <- response
+        Yprime <- model.matrix(by, data = edata, deriv = deriv)
         ui <- attr(Y, "constraint")$ui
         ci <- attr(Y, "constraint")$ci
         stopifnot(any(is.finite(ci)))
