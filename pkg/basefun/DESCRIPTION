@@ -5,5 +5,5 @@ Date: 2015-02-01
 Author: Torsten Hothorn
 Maintainer: Torsten Hothorn <Torsten.Hothorn@R-project.org>
 Description: Some very simple infrastructure for basis functions.
-Depends: Matrix
+Depends: Matrix, polynom
 License: GPL-2

@@ -34,7 +34,7 @@ g <- sample(gf, length(x), replace = TRUE)
 y <- x^2 + (g == "2") * sin(x) + (g == "3") * cos(x) + rnorm(length(x), sd = .05)
 ## generate a basis for a factor (treatment contrasts)
 ## this is equal to model.matrix(~ gf)
-gb <- as.bases(~ g, remove_intercept = FALSE, data = data.frame(g = gf))
+gb <- as.basis(~ g, remove_intercept = FALSE, data = data.frame(g = gf))
 ## join the two bases by the kronecker product
 bb <- b(b1 = Bb, b2 = gb)
 ## evaluate new two-dim basis
