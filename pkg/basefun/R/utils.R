@@ -1,3 +1,4 @@
+
 ### Box product of two matrices
 .boxprod <- function(x, y) {
     x[, rep(1:ncol(x), ncol(y)), drop = FALSE] * 
@@ -34,22 +35,3 @@
     ret$ci <- 
     ret
 }
-
-.rec2flat <- function(x) {
-
-    ret <- c()
-    foo <- function(x) {
-        a <- sapply(x, is.atomic)
-        if (any(a))
-            ret <<- c(ret, x[a])
-        if (all(a)) {
-            return(NULL)
-        } else {
-            sapply(x[!a], foo)
-        }
-    }
-    foo(x)
-    return(ret)
-}
-
-

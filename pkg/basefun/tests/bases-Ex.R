@@ -8,7 +8,7 @@ set.seed(29)
 x <- sort(runif(100))
 y <- x^2 + rnorm(length(x), sd = .1) 
 ## set-up monotone Bernstein polynom basis
-Bb <- Bernstein_basis(order = 5, constraint = "increasing", varname = "x")
+Bb <- Bernstein_basis(order = 5, ui = "increasing", varname = "x")
 ## evaluate basis
 X1 <- model.matrix(Bb, data = data.frame(x = x))
 X2 <- Bb(x)
@@ -34,7 +34,7 @@ g <- sample(gf, length(x), replace = TRUE)
 y <- x^2 + (g == "2") * sin(x) + (g == "3") * cos(x) + rnorm(length(x), sd = .05)
 ## generate a basis for a factor (treatment contrasts)
 ## this is equal to model.matrix(~ gf)
-gb <- as.bases(~ g, remove_intercept = FALSE, vars = data.frame(g = gf))
+gb <- as.bases(~ g, remove_intercept = FALSE, data = data.frame(g = gf))
 ## join the two bases by the kronecker product
 bb <- b(b1 = Bb, b2 = gb)
 ## evaluate new two-dim basis
@@ -58,4 +58,4 @@ stopifnot(all.equal(p1, p2))
 stopifnot(all.equal(p2, p3))
 stopifnot(all.equal(p3, p4))
 ## compute derivative wrt the first element
-dp2 <- predict(bb, newdata = d, coef(m1), b1 = list(deriv = 1))
+dp2 <- predict(bb, newdata = d, coef(m1), deriv = c(x = 1))

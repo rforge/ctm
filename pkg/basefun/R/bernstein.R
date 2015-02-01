@@ -4,19 +4,26 @@
 ### http://en.wikipedia.org/wiki/Bernstein_polynomial
 ### http://dx.doi.org/10.1080/02664761003692423
 Bernstein_basis <- function(order = 2, support = c(0, 1),
-                            constraint = c("none", "increasing", "decreasing"),
+                            ui = c("none", "increasing", "decreasing", "cyclic"), 
+                            ci = 0,
                             varname = NULL) {
 
-    constraint <- match.arg(constraint)
-    constr <- switch(constraint,
+    ui <- match.arg(ui)
+    constr <- switch(ui,
         "none" = list(ui = Diagonal(order + 1), 
                       ci = rep(-Inf, order + 1)),
         "increasing" = list(ui = diff(Diagonal(order + 1), differences = 1), 
-                            ci = rep(0, order)),
+                            ci = rep(ci, order)),
         "decreasing" = list(ui = diff(Diagonal(order + 1), differences = 1) * -1,
-                            ci = rep(0, order)))
+                            ci = rep(ci, order)))
 
-    basis <- function(x, deriv = 0L, integrate = FALSE) {
+    basis <- function(data, deriv = 0L, integrate = FALSE) {
+        if (is.atomic(data)) {
+            x <- data
+        } else {
+            if (is.null(varname)) varname <- 1
+            x <- data[[varname]]
+        }
         stopifnot(order > deriv)
         x <- (x - support[1]) / diff(support)
         stopifnot(all(x >= 0 && x <= 1))
@@ -32,9 +39,9 @@ Bernstein_basis <- function(order = 2, support = c(0, 1),
         return(X)
     }
 
-    attr(basis, "length") <- order + 1L
-    attr(basis, "dimension") <- NULL
-    attr(basis, "support") <- support
+    s <- list(support)
+    names(s) <- varname
+    attr(basis, "support") <- s
     attr(basis, "varnames") <- varname
 
     class(basis) <- c("Bernstein_basis", "basis", class(basis))

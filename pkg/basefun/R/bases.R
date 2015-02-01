@@ -1,14 +1,7 @@
 
 ### evaluate model.matrix of multiple basis objects
-model.matrix.bases <- function(object, data, ...)
+model.matrix.basis <- function(object, data, ...)
     object(data, ...)
-
-### evaluate model.matrix of single basis object
-model.matrix.basis <- function(object, data, ...) {
-    vars <- varnames(object)
-    if (is.null(vars)) vars <- 1
-    object(data[[vars]], ...)
-}
 
 ### compute predicted values of (multiple) basis objects
 predict.basis <- function(object, newdata, coef, ...) {
@@ -22,7 +15,7 @@ predict.bbases <- function(object, newdata, coef, ...) {
                              coef = coef, ...))
     X <- model.matrix(object = object, data = newdata, model.matrix = FALSE, ...)
     X <- lapply(X, function(x) as(x, "matrix"))
-    X$beta <- array(coef, dim(object))
+    X$beta <- array(coef, sapply(X, NCOL))
     do.call("cXb", X)
 }
 
@@ -44,12 +37,6 @@ support <- function(x)
 support.default <- function(x)
     attr(x, "support")
 
-length.basis <- function(x)
-    attr(x, "length")
-
-dim.basis <- function(x)
-    attr(x, "dimension")
-
 ### box product of multiple _named_ basi(e)s objects
 b <- function(...) {
 
@@ -60,16 +47,27 @@ b <- function(...) {
 
     varnames <- sapply(bases, varnames)
     stopifnot(all(!is.null(varnames)))
-    support <- .rec2flat(lapply(bases, support))
-    names(support) <- varnames ### is this safe???
-    length <- prod(sapply(bases, length))
-    dim <- sapply(bases, length)
+    support <- lapply(bases, support)
 
-    ret <- function(data, model.matrix = TRUE, ...) {
-        args <- list(...)
-        stopifnot(all(names(args) %in% bnames))
+    ret <- function(data, model.matrix = TRUE, deriv = NULL, integrate = NULL) {
+        if (!is.null(deriv)) {
+            stopifnot(length(deriv) == 1)
+            if (!names(deriv) %in% varnames) deriv <- NULL
+        }
+        if (!is.null(integrate)) {
+            stopifnot(length(integrate) == 1)
+            if (!names(integrate) %in% varnames) integrate <- NULL
+        }
         ret <- lapply(bnames, function(b) {
-            thisargs <- args[[b]]
+            thisargs <- list()
+            if (!is.null(deriv)) {
+                if (names(deriv) %in% varnames(bases[[b]]))
+                    thisargs$deriv <- deriv
+            }
+            if (!is.null(integrate)) {
+                if (names(integrate) %in% varnames(bases[[b]]))
+                    thisargs$integrate <- integrate
+            }
             thisargs$object <- bases[[b]]
             thisargs$data <- data
             do.call("model.matrix", thisargs)
@@ -85,9 +83,7 @@ b <- function(...) {
         attr(ret, "constraint") <- constr
         return(ret )
     }
-    attr(ret, "length") <- length
     attr(ret, "varnames") <- varnames
-    attr(ret, "dimension") <- dim
     attr(ret, "support") <- support
     class(ret) <- c("bbases", "bases", "basis", class(ret))
     ret
@@ -105,16 +101,32 @@ c.basis <- function(..., recursive = FALSE) {
 
     varnames <- sapply(bases, varnames)
     stopifnot(all(!is.null(varnames)))
-    support <- .rec2flat(lapply(bases, support))
-    names(support) <- varnames ### is this safe???
-    length <- prod(sapply(bases, length))
-    dim <- sapply(bases, length)
+    support <- lapply(bases, support)
 
-    ret <- function(data, model.matrix = TRUE, ...) {
-        args <- list(...)
-        stopifnot(all(names(args) %in% bnames))
+    ret <- function(data, model.matrix = TRUE, deriv = NULL, integrate = NULL) {
+        if (!is.null(deriv)) {
+            stopifnot(length(deriv) == 1)
+            if (!names(deriv) %in% varnames) deriv <- NULL
+        }
+        if (!is.null(integrate)) {
+            stopifnot(length(integrate) == 1)
+            if (!names(integrate) %in% varnames) integrate <- NULL
+        }
         ret <- lapply(bnames, function(b) {
-            thisargs <- args[[b]]
+            thisargs <- list()
+            if (!is.null(deriv)) {
+                if (names(deriv) %in% varnames(bases[[b]])) {
+                    thisargs$deriv <- deriv
+                } else {
+                    X <- model.matrix(bases[[b]], data)
+                    X[] <- 0
+                    return(X)
+                }
+            }
+            if (!is.null(integrate)) {
+                if (names(integrate) %in% varnames(bases[[b]]))
+                    thisargs$integrate <- integrate
+            }
             thisargs$object <- bases[[b]]
             thisargs$data <- data
             do.call("model.matrix", thisargs)
@@ -132,9 +144,7 @@ c.basis <- function(..., recursive = FALSE) {
         attr(ret, "constraint") <- list(ui = ui, ci = ci)
         return(ret )
     }
-    attr(ret, "length") <- length
     attr(ret, "varnames") <- varnames
-    attr(ret, "dimension") <- dim
     attr(ret, "support") <- support
     class(ret) <- c("cbases", "bases", "basis", class(ret))
     ret
@@ -143,24 +153,26 @@ c.basis <- function(..., recursive = FALSE) {
 generate <- function(object, n)
     UseMethod("generate")
 
-.generate <- function(s, n) {
-    if ((length(s) == 2) && (storage.mode(s) == "double")) {
-        x <- seq(from = s[1], to = s[2], length.out = n)
-    } else if (is.factor(s)) {
-        x <- s
-    } else {
-        x <- NA
-    }
-    return(x)
-}
 
 generate.basis <- function(object, n) {
-    .generate(support(object), n = n)
-}
- 
-generate.bases <- function(object, n) {
-    s <- support(object)
-    ret <- lapply(s, .generate, n = n)
-    ret[!duplicated(names(ret))]
+    ret <- list()
+    .generate <- function(s, n) {
+        if (!is.atomic(s)) {
+            tmp <- lapply(s, .generate, n = n)
+            if (all(sapply(s, is.atomic)))
+                ret[names(tmp)] <<- tmp
+        }
+        if ((length(s) == 2) && (storage.mode(s) == "double")) {
+            x <- seq(from = s[1], to = s[2], length.out = n)
+        } else if (is.factor(s)) {
+            x <- s
+        } else {
+            x <- NULL
+        }
+        return(x)
+    }
+    ret2 <- .generate(support(object), n = n)
+    if (length(ret) == 0) return(ret2)
+    ret
 }
 
