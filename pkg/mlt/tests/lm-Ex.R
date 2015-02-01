@@ -5,8 +5,8 @@ n <- 1000
 y <- rnorm(n, 2, 1.5)
 d <- data.frame(y = y)
 
-m <- model(as.bases(~ 1 + y, vars = d, ui = Diagonal(2), ci = c(-Inf, 0)))
-m(d)
+lin <- polynomial_basis(2, var = "y", support = range(y), ci = c(-Inf, 0))
+m <- model(lin)
 
 o <- mlt(m, data = d)
 
@@ -21,7 +21,9 @@ d <- data.frame(y = y, x = x)
 
 plot(x, y)
 
-m <- model(as.bases(~ y - 1, vars = d, ui = Diagonal(1), ci = 0), 
+if (FALSE) {
+
+m <- model(lin,
            shift = Bernstein_basis(order = 10, support = c(0, 2*pi), var = "x"))
 
 o <- mlt(m, data = d)
@@ -38,9 +40,9 @@ d <- data.frame(y = y, x = x)
 
 plot(x, y)
 
-m <- model(Bernstein_basis(order = 1, var = "y", support = range(y), 
-                           ui = "increasing"),
+m <- model(lin,
            Bernstein_basis(order = 5, support = c(0, 2*pi), var = "x"))
 
 o <- mlt(m, data = d)
 
+}
