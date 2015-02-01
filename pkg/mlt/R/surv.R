@@ -2,6 +2,7 @@
 .Surv2matrix <- function(object) {
 
     type <- attr(object, "type")
+    stopifnot(type %in% c("left", "right", "interval"))
     status <- object[, "status"]
 
     ret <- switch(type,
