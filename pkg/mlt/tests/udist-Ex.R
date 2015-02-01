@@ -11,14 +11,14 @@ dY <- function(x) dgamma(x, shape = 5)
 ### generate y and set-up basis
 y <- sort(rY(100))
 Bb <- Bernstein_basis(order = 10, support = c(0, max(y) + .1),
-                      constraint = "increasing", "y")
+                      ui = "increasing", varname = "y")
 
 mydata <- data.frame(y = y)
 opt <- mlt(model(response = Bb), data = mydata)
 d <- opt$distr
 
 ### evaluate on grid
-yn <- generate(Bb, n = 50)
+yn <- generate(Bb, n = 50)$y
 ### eval estimated h and h'
 h <- predict(Bb, newdata = data.frame(y = yn), coef = opt$par)
 h1 <- predict(Bb, newdata = data.frame(y = yn), deriv = 1, coef = opt$par)

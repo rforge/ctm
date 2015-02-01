@@ -15,14 +15,14 @@ mydata <- data.frame(y = y, g = g)
 boxplot(y ~ g, data = mydata)
 
 Bb <- Bernstein_basis(order = 5, support = c(0, max(y) + .1),
-                      constraint = "increasing", var = "y")
+                      ui = "increasing", var = "y")
 
 coef(opt <- mlt(model(response = Bb, shifting = ~ g), data = mydata,
                 todist = "MinExtrVal"))
 
 coef(cph <- coxph(Surv(y, rep(TRUE, nrow(mydata))) ~ g, data = mydata))
 
-yn <- generate(Bb, 50)
+yn <- generate(Bb, 50)$y
 
 a1 <- predict(opt, newdata = data.frame(g = gf[1]), type = "trafo")
 a2 <- predict(opt, newdata = data.frame(g = gf[2]), type = "trafo")
@@ -49,7 +49,7 @@ coef(opt <- mlt(model(response = Bb, shifting = ~ g), data = mydata,
                 todist = "MinExtrVal"))
 
 Bb <- Bernstein_basis(order = 5, support = c(0, max(y + 1) + .1),
-                      constraint = "increasing", var = "y")
+                      ui = "increasing", var = "y")
 
 mydata <- data.frame(y = Surv(y, y + 1, sample(0:3, length(y), replace = TRUE), type = "interval"), 
                      g = g)

@@ -5,10 +5,8 @@ n <- 1000
 y <- rnorm(n, 2, 1.5)
 d <- data.frame(y = y)
 
-cnst <- list(ui = Diagonal(2), ci = c(-Inf, 0))
-m <- model(as.bases(~ 1 + y, vars = d, constraint = cnst))
+m <- model(as.bases(~ 1 + y, vars = d, ui = Diagonal(2), ci = c(-Inf, 0)))
 m(d)
-m(d, bresponse = list(deriv = 1))
 
 o <- mlt(m, data = d)
 
@@ -23,7 +21,7 @@ d <- data.frame(y = y, x = x)
 
 plot(x, y)
 
-m <- model(as.bases(~ y - 1, vars = d, constraint = list(ui = Diagonal(1), ci = 0)), 
+m <- model(as.bases(~ y - 1, vars = d, ui = Diagonal(1), ci = 0), 
            shift = Bernstein_basis(order = 10, support = c(0, 2*pi), var = "x"))
 
 o <- mlt(m, data = d)
@@ -40,8 +38,9 @@ d <- data.frame(y = y, x = x)
 
 plot(x, y)
 
-m <- model(as.bases(~ 1 + y, vars = d, constraint = cnst), 
-           Bernstein_basis(order = 10, support = c(0, 2*pi), var = "x"))
+m <- model(Bernstein_basis(order = 1, var = "y", support = range(y), 
+                           ui = "increasing"),
+           Bernstein_basis(order = 5, support = c(0, 2*pi), var = "x"))
 
 o <- mlt(m, data = d)
 
