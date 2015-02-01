@@ -1,8 +1,8 @@
 
-as.bases <- function(object, ...)
-    UseMethod("as.bases")
+as.basis <- function(object, ...)
+    UseMethod("as.basis")
 
-as.bases.formula <- function(object, remove_intercept = FALSE, 
+as.basis.formula <- function(object, remove_intercept = FALSE, 
                              data = NULL, 
                              ci = NULL, ui = NULL, ...) {
 
@@ -30,6 +30,6 @@ as.bases.formula <- function(object, remove_intercept = FALSE,
     }
     attr(ret, "varnames") <- varnames
     attr(ret, "support") <- s
-    class(ret) <- c("bases", "basis", class(ret))
+    class(ret) <- c("basis", class(ret))
     ret
 }
