@@ -21,8 +21,8 @@
             mmtb <- mmtrunc$right %*% beta + offset
             return(1 / d$p(mmtb) * d$d(mmtb) * mmtrunc)
         }
-        mmtbl <- mmtrunc$left %*% beta + offset
-        mmtbr <- mmtrunc$right %*% beta + offset
+        mmtbl <- drop(mmtrunc$left %*% beta) + offset
+        mmtbr <- drop(mmtrunc$right %*% beta) + offset
         return(1 / (d$p(mmtr) - d$p(mmtl)) * 
                (d$d(mmtbr) * mmtrunc$right - d$d(mmtbl) * mmtrunc$left))
     }
@@ -73,8 +73,8 @@
             mmtb <- mmtrunc$right %*% beta
             return(1 / d$p(mmtb) * d$d(mmtb) * mmtrunc)
         }
-        mmtbl <- mmtrunc$left %*% beta + offset
-        mmtbr <- mmtrunc$right %*% beta + offset
+        mmtbl <- drop(mmtrunc$left %*% beta) + offset
+        mmtbr <- drop(mmtrunc$right %*% beta) + offset
         return(1 / (d$p(mmtr) - d$p(mmtl)) * 
                (d$d(mmtbr) * mmtrunc$right - d$d(mmtbl) * mmtrunc$left))
     }
