@@ -3,7 +3,7 @@
     trunc <- function(beta) {
         if (is.null(mmtrunc)) return(0)
         if (is.null(mmtrunc$right)) return(.log(1 - d$p(mmtrunc$left %*% beta)))
-        if (is.null(mmtrunc$left))return(.log(d$p(mmtrunc$right %*% beta)))
+        if (is.null(mmtrunc$left)) return(.log(d$p(mmtrunc$right %*% beta)))
         return(.log(d$p(mmtrunc$right %*% beta) - d$p(mmtrunc$left %*% beta)))
     }
     function(beta)
@@ -14,15 +14,17 @@
     trunc <- function(beta) {
         if (is.null(mmtrunc)) return(0)
         if (is.null(mmtrunc$right)) {
-            mmtb <- mmtrunc$left %*% beta
+            mmtb <- mmtrunc$left %*% beta + offset
             return(- 1 / (1 - d$p(mmtb)) * d$d(mmtb) * mmtrunc)
         }
         if (is.null(mmtrunc$left)) {
-            mmtb <- mmtrunc$right %*% beta
+            mmtb <- mmtrunc$right %*% beta + offset
             return(1 / d$p(mmtb) * d$d(mmtb) * mmtrunc)
         }
-        mmtbr <- mmtrunc$right %*% beta
-
+        mmtbl <- mmtrunc$left %*% beta + offset
+        mmtbr <- mmtrunc$right %*% beta + offset
+        return(1 / (d$p(mmtr) - d$p(mmtl)) * 
+               (d$d(mmtbr) * mmtrunc$right - d$d(mmtbl) * mmtrunc$left))
     }
     function(beta) {
         mmb <- drop(mm %*% beta) + offset
@@ -71,7 +73,10 @@
             mmtb <- mmtrunc$right %*% beta
             return(1 / d$p(mmtb) * d$d(mmtb) * mmtrunc)
         }
-        mmtbr <- mmtrunc$right %*% beta
+        mmtbl <- mmtrunc$left %*% beta + offset
+        mmtbr <- mmtrunc$right %*% beta + offset
+        return(1 / (d$p(mmtr) - d$p(mmtl)) * 
+               (d$d(mmtbr) * mmtrunc$right - d$d(mmtbl) * mmtrunc$left))
     }
     function(beta) {
         1 / (.dealinf(mmr, beta, 0, d$p, 1) - 
