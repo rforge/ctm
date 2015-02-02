@@ -85,10 +85,9 @@ model <- function(response = NULL, interacting = NULL, shifting = NULL) {
         stop("cannot deal with response class", class(y))
     }
 
-    nbeta <- NULL
+    Y <- NULL
     if (any(exact)) {    
         Y <- model.matrix(by, data = edata)
-        nbeta <- ncol(Y)
         deriv <- 1
         names(deriv) <- response
         Yprime <- model.matrix(by, data = edata, deriv = deriv)
@@ -122,24 +121,25 @@ model <- function(response = NULL, interacting = NULL, shifting = NULL) {
         .makeY <- function(data, finite, nc = NULL) {
             if (any(finite)) {
                 tmp <- model.matrix(by, data = data[finite,,drop = FALSE])
-                nc <- ncol(tmp)
+                nc <- colnames(tmp)
             } else {
                 tmp <- -Inf
             }
-            ret <- matrix(-Inf, nrow = nrow(data), ncol = nc)
+            ret <- matrix(-Inf, nrow = nrow(data), ncol = length(nc))
             ret[finite,] <- tmp
+            colnames(ret) <- nc
             ret
         }
-        if (!is.null(nbeta)) {
-            lY <- .makeY(ldata, lfinite, nbeta)
-            rY <- .makeY(rdata, rfinite, nbeta)
+        if (!is.null(Y)) {
+            lY <- .makeY(ldata, lfinite, colnames(Y))
+            rY <- .makeY(rdata, rfinite, colnames(Y))
         } else {
             if (any(lfinite)) {
                 lY <- .makeY(ldata, lfinite)
-                rY <- .makeY(rdata, rfinite, ncol(lY))
+                rY <- .makeY(rdata, rfinite, colnames(lY))
             } else {
                 rY <- .makeY(rdata, rfinite)
-                lY <- .makeY(ldata, lfinite, ncol(rY))
+                lY <- .makeY(ldata, lfinite, colnames(rY))
             }
         }
         if (all(!exact)) {

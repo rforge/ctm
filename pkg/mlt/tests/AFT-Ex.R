@@ -38,11 +38,19 @@ coef(opt <- mlt(m, data = mydata, fixed = c("log(y)" = 1),
 coef(aft <- survreg(y ~ g, data = mydata, dist = "expo"))
 
 mydata <- data.frame(y = Surv(y, sample(0:1, length(y), replace = TRUE), type = "left"), g = g)
-coef(opt <- mlt(m, data = mydata,
+coef(opt <- mlt(m, data = mydata,  fixed = c("log(y)" = 1),
                 todist = "MinExtrVal"))
+
+coef(aft <- survreg(y ~ g, data = mydata, dist = "expo"))
+
 
 mydata <- data.frame(y = Surv(y, y + 1, sample(0:3, length(y), replace = TRUE), type = "interval"), 
                      g = g)
-coef(aft <- mlt(m, data = mydata,
+coef(aft <- mlt(m, data = mydata, fixed = c("log(y)" = 1),
                 todist = "MinExtrVal"))
 
+coef(aft <- survreg(y ~ g, data = mydata, dist = "expo"))
+
+cf <- coef(aft <- mlt(m, data = mydata, 
+                todist = "MinExtrVal"))
+cf[-1] * cf[1]

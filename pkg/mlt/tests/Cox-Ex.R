@@ -56,10 +56,14 @@ mydata <- data.frame(y = Surv(y, y + 1, sample(0:3, length(y), replace = TRUE), 
 coef(opt <- mlt(model(response = Bb, shifting = ~ g), data = mydata,
                 todist = "MinExtrVal"))
 
-if (FALSE) {
-### abweichungen muessen auch konstant 0 sein duerfen !!!
 mydata <- data.frame(y = y, g = g)
-coef(opt <- mlt(model(response = Bb, interacting = ~ g), data = mydata,
+
+Bb2 <- Bernstein_basis(order = 5, support = c(0, max(y) + .1), var = "y",
+                       ui = "increasing", ci = -sqrt(.Machine$double.eps))
+m <- c(b4 = Bb, b3 = b(b1 = Bb2, b2 = as.basis(~ g, remove_intercept = TRUE)))
+attr(m, "response") <- "y"
+
+coef(opt <- mlt(m, data = mydata,
                 todist = "MinExtrVal"))
 
 coef(cph <- coxph(Surv(y, rep(TRUE, nrow(mydata))) ~ g, data = mydata))
@@ -73,4 +77,3 @@ plot(yn, 1 - a2(yn, type = "prob"), type = "l", col = "red", ylim = c(0, 1))
 lines(survfit(cph, newdata = data.frame(g = gf[2])))
 plot(yn, 1 - a3(yn, type = "prob"), type = "l", col = "red", ylim = c(0, 1))
 lines(survfit(cph, newdata = data.frame(g = gf[3])))
-}

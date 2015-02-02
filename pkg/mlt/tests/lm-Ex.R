@@ -23,6 +23,7 @@ plot(x, y)
 
 if (FALSE) {
 
+### shift also contains intercept!
 m <- model(lin,
            shift = Bernstein_basis(order = 10, support = c(0, 2*pi), var = "x"))
 
