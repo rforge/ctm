@@ -18,6 +18,7 @@ as.basis.formula <- function(object, remove_intercept = FALSE,
         if (is.null(ui)) ui <- Diagonal(ncol(X))
         if (is.null(ci)) ci <- rep(-Inf, ncol(X))
         attr(X, "constraint") <- list(ui = ui, ci = ci)
+        attr(X, "Assign") <- c("(Intercept)", varnames)[attr(X, "assign") + 1]
         return(X)
     }
     if (!is.null(data)) {

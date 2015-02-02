@@ -35,7 +35,9 @@ Bernstein_basis <- function(order = 2, support = c(0, 1),
             fact <- prod(order:(order - deriv + 1)) * (1 / diff(support)^deriv)
             X <- X %*% diff(diag(order + 1), differences = deriv) * fact
         }
+        colnames(X) <- paste("bern", 1:ncol(X), sep = "_")
         attr(X, "constraint") <- constr
+        attr(X, "Assign") <- matrix(varname, ncol = ncol(X))
         return(X)
     }
 

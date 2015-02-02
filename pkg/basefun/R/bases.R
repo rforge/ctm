@@ -70,13 +70,17 @@ b <- function(...) {
             }
             thisargs$object <- bases[[b]]
             thisargs$data <- data
-            do.call("model.matrix", thisargs)
+            X <- do.call("model.matrix", thisargs)
+            attr(X, "Assign") <- rbind(attr(X, "Assign"), b)
+            X
         })
         if (!model.matrix) return(ret)
         constr <- do.call(".box_ui_ci", lapply(ret, function(r)
                           attr(r, "constraint")))
         if (length(bases) > 1) {
+            a <- do.call(".box_char", lapply(ret, function(r) attr(r, "Assign")))
             ret <- do.call(".box", ret)
+            attr(ret, "Assign") <- a
         } else {
             ret <- ret[[1]]
         }
@@ -129,7 +133,10 @@ c.basis <- function(..., recursive = FALSE) {
             }
             thisargs$object <- bases[[b]]
             thisargs$data <- data
-            do.call("model.matrix", thisargs)
+            X <- do.call("model.matrix", thisargs)
+            X <- do.call("model.matrix", thisargs)
+            attr(X, "Assign") <- rbind(attr(X, "Assign"), b)
+            X
         })
         if (!model.matrix) return(ret)
         ui <- do.call("bdiag", lapply(ret, function(r)
@@ -137,7 +144,11 @@ c.basis <- function(..., recursive = FALSE) {
         ci <- do.call("c", lapply(ret, function(r)
                       attr(r, "constraint")$ci))
         if (length(bases) > 1) {
+            a <- lapply(ret, function(r) matrix(attr(r, "Assign"), ncol = ncol(r)))
+            mr <- max(sapply(a, NROW))
+            for (i in 1:length(a)) a[[i]] <- a[[i]][rep(1:nrow(a[[i]]), length = mr),,drop = FALSE]
             ret <- do.call("cbind", ret)
+            attr(ret, "Assign") <- do.call("cbind", a)
         } else {
             ret <- ret[[1]]
         }
