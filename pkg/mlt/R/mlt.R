@@ -32,7 +32,7 @@ model <- function(response = NULL, interacting = NULL, shifting = NULL) {
 }
 
 .mlt_fit <- function(model, data, todistr = c("Normal", "Logistic", "MinExtrVal"),
-                     weights = NULL, offset = NULL, trunc = c(-Inf, Inf)) {
+                     weights = NULL, offset = NULL, fixed = NULL, trunc = c(-Inf, Inf)) {
 
     if (is.null(weights)) weights <- rep(1, nrow(data))
     if (is.null(offset)) offset <- rep(0, nrow(data))
@@ -97,12 +97,27 @@ model <- function(response = NULL, interacting = NULL, shifting = NULL) {
         stopifnot(any(is.finite(ci)))
         ui <- as(ui[is.finite(ci),,drop = FALSE], "matrix")
         ci <- ci[is.finite(ci)]
-        ci[ci == 0] <- sqrt(.Machine$double.eps)
     } 
 
     if (all(exact)) { 
-        ll <- function(beta) .mlt_loglik_exact(distr, Y, Yprime, offset)(beta)
-        sc <- function(beta) .mlt_score_exact(distr, Y, Yprime, offset)(beta)
+        if (!is.null(fixed)) {
+            stopifnot(all(names(fixed) %in% colnames(Y)))
+            fix <- colnames(Y) %in% names(fixed)
+            ui <- ui[,!fix,drop = FALSE]
+            .parm <- function(beta) {
+                ret <- numeric(ncol(Y))
+                ret[fix] <- fixed
+                ret[!fix] <- beta
+                ret
+            }
+        } else {
+            .parm <- function(beta) beta
+            fix <- rep(FALSE, ncol(Y))
+        } 
+        ll <- function(beta)
+            .mlt_loglik_exact(distr, Y, Yprime, offset)(.parm(beta))
+        sc <- function(beta)
+            .mlt_score_exact(distr, Y, Yprime, offset)(.parm(beta))[, !fix, drop = FALSE]
     } else {
         .makeY <- function(data, finite, nc = NULL) {
             if (any(finite)) {
@@ -133,30 +148,50 @@ model <- function(response = NULL, interacting = NULL, shifting = NULL) {
             stopifnot(any(is.finite(ci)))
             ui <- as(ui[is.finite(ci),,drop = FALSE], "matrix")
             ci <- ci[is.finite(ci)]
-            ci[ci == 0] <- sqrt(.Machine$double.eps)
         }
+        if (!is.null(fixed)) {
+            stopifnot(all(names(fixed) %in% colnames(lY)))
+            fix <- colnames(lY) %in% names(fixed)
+            ui <- ui[,!fix,drop = FALSE]
+            .parm <- function(beta) {
+                ret <- numeric(ncol(lY))
+                ret[fix] <- fixed
+                ret[!fix] <- beta
+                ret
+            }
+        } else {
+            .parm <- function(beta) beta
+            fix <- rep(FALSE, ncol(lY))
+        } 
         ll <- function(beta) {
             ret <- numeric(nrow(data))
-            ret[exact] <- .mlt_loglik_exact(distr, Y, Yprime, offset[exact])(beta)
-            ret[!exact] <- .mlt_loglik_interval(distr, lY, rY, offset[!exact])(beta)
+            ret[exact] <- .mlt_loglik_exact(distr, Y, Yprime, offset[exact])(.parm(beta))
+            ret[!exact] <- .mlt_loglik_interval(distr, lY, rY, offset[!exact])(.parm(beta))
             ret
         }
         sc <- function(beta) {
             ret <- matrix(0, nrow = nrow(data), ncol = ncol(Y))
-            ret[exact,] <- .mlt_score_exact(distr, Y, Yprime)(beta)
-            ret[!exact,] <- .mlt_score_interval(distr, lY, rY)(beta)
-            ret
+            ret[exact,] <- .mlt_score_exact(distr, Y, Yprime)(.parm(beta))
+            ret[!exact,] <- .mlt_score_interval(distr, lY, rY)(.parm(beta))
+            ret[, !fix, drop = FALSE]
         }
     }
 
 
     z <- scale(edata[[response]])
     theta <- coef(lm(z ~ Y - 1))
+    if (!is.null(fixed)) theta <- theta[!fix]
 
     loglik <- function(beta) -sum(weights * ll(beta))
-    ret <- constrOptim(theta = theta, f = loglik,
-                           grad = function(beta) -colSums(weights * sc(beta)), ui = ui,
-                           ci = ci, hessian = TRUE)
+    if (sum(abs(ui)) > 0) {
+        ret <- constrOptim(theta = theta, f = loglik,
+                           grad = function(beta) -colSums(weights * sc(beta)), 
+                           ui = ui,ci = ci, hessian = TRUE)
+    } else {
+        ret <- optim(par = theta, fn = loglik, 
+                     gr = function(beta) -colSums(weights * sc(beta)),
+                     hessian = TRUE)
+    } ### refit for hessian in vcov?
     if (ret$convergence != 0)
         warning("algorithm did not converge")
     ret$by <- by

@@ -15,12 +15,11 @@ mydata <- data.frame(y = y, g = g)
 boxplot(y ~ g, data = mydata)
 
 Bb <- log_basis(var = "y", support = range(y))
-###, ui = matrix(c(1, -1), nr = 2), ci = c(.99, 1.01))
 
 Bx <- as.basis(~ g, remove_intercept = FALSE)
 m <- model(Bb, shifting = Bx)
 
-coef(opt <- mlt(m, data = mydata,
+coef(opt <- mlt(m, data = mydata, fixed = c("log(y)" = 1),
                 todist = "MinExtrVal"))
 
 coef(aft <- survreg(Surv(y, rep(TRUE, nrow(mydata))) ~ g, data = mydata,
@@ -33,7 +32,7 @@ a2 <- predict(opt, newdata = data.frame(g = gf[2]), type = "trafo")
 a3 <- predict(opt, newdata = data.frame(g = gf[3]), type = "trafo")
 
 mydata <- data.frame(y = Surv(y, sample(0:1, length(y), replace = TRUE)), g = g)
-coef(opt <- mlt(m, data = mydata,
+coef(opt <- mlt(m, data = mydata, fixed = c("log(y)" = 1),
                 todist = "MinExtrVal"))
 
 coef(aft <- survreg(y ~ g, data = mydata, dist = "expo"))
