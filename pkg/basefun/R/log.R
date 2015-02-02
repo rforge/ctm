@@ -1,14 +1,12 @@
 
 log_basis <- function(support = c(.Machine$double.eps, Inf),
-                      ui = 1,
-                      ci = 0,
-                      varname = NULL, ...) {
+                      ui = 1, ci = 0, varname = NULL) {
 
     basis <- function(data, deriv = 0L) {
         if (is.atomic(data)) {
             x <- data
         } else {
-            if (is.null(varname)) varname <- 1
+            if (is.null(varname)) varname <- colnames(data)[1]
             x <- data[[varname]]
         }
         if (deriv == 0) {

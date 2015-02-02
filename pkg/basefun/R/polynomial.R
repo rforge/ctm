@@ -1,9 +1,8 @@
 
-
 polynomial_basis <- function(order, support = c(0, 1),
                              ui = Diagonal(length(object)), 
                              ci = rep(-Inf, length(object)),
-                             varname = NULL, ...) {
+                             varname = NULL) {
 
     object <- polynomial(rep(1, order))
 
@@ -11,7 +10,7 @@ polynomial_basis <- function(order, support = c(0, 1),
         if (is.atomic(data)) {
             x <- data
         } else {
-            if (is.null(varname)) varname <- 1
+            if (is.null(varname)) varname <- colnames(data)[1]
             x <- data[[varname]]
         }
         tmp <- object
@@ -20,7 +19,8 @@ polynomial_basis <- function(order, support = c(0, 1),
                 tmp <- deriv(tmp)
             zero <- matrix(0, nrow = length(x), ncol = deriv)
         }
-        X <- do.call("cbind", lapply(1:length(tmp), function(i) x^(i - 1) * coef(tmp)[i]))
+        X <- do.call("cbind", 
+            lapply(1:length(tmp), function(i) x^(i - 1) * coef(tmp)[i]))
         if (deriv > 0)
             X <- cbind(zero, X)
         colnames(X) <- 1:ncol(X)

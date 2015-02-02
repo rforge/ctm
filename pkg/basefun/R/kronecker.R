@@ -42,10 +42,11 @@
 }
 
 ### X = X3 %x% X2 %x% X1
-cXb <- function(..., beta) {
+.cXb <- function(..., beta) {
     X <- list(...)
     ret <- .RH(X[[1]], A = beta, G = FALSE, crossp = FALSE)  
-    for (i in 2:length(X)) ret <- .RH(X[[i]], A = ret, G = FALSE, crossp = FALSE)
+    for (i in 2:length(X)) 
+        ret <- .RH(X[[i]], A = ret, G = FALSE, crossp = FALSE)
     ret
 }
 

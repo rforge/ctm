@@ -1,17 +1,13 @@
 
-as.basis <- function(object, ...)
-    UseMethod("as.basis")
-
 as.basis.formula <- function(object, remove_intercept = FALSE, 
-                             data = NULL, 
-                             ci = NULL, ui = NULL, ...) {
+                             data = NULL, ci = NULL, ui = NULL, ...) {
 
     varnames <- all.vars(object)
 
-    ret <- function(data, ...) {
+    ret <- function(data) {
         data <- data[varnames]
         data <- as.data.frame(data)
-        mf <- model.frame(object, data, ...)
+        mf <- model.frame(object, data)
         X <- model.matrix(object, data = mf, ...)
         if (remove_intercept) {
             a <- attr(X, "assign")
@@ -27,7 +23,7 @@ as.basis.formula <- function(object, remove_intercept = FALSE,
     if (!is.null(data)) {
         s <- lapply(data, function(v) {
             if (is.factor(v)) return(unique(v))
-            range(v)
+            range(v, na.rm = TRUE)
         })
     } else {
         s <- NULL
