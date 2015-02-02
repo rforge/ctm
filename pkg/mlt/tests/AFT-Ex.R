@@ -25,6 +25,18 @@ coef(opt <- mlt(m, data = mydata, fixed = c("log(y)" = 1),
 coef(aft <- survreg(Surv(y, rep(TRUE, nrow(mydata))) ~ g, data = mydata,
                     dist = "exponential"))
 
+(cf <- coef(aft <- mlt(m, data = mydata, todist = "MinExtrVal")))
+
+1 / cf[1]
+cf[-1] * cf[1]
+
+logLik(aft)
+
+coef(aft <- survreg(Surv(y, rep(TRUE, nrow(mydata))) ~ g, data = mydata,
+                    dist = "weibull"))
+aft
+
+
 yn <- generate(Bb, 50)$y
 
 a1 <- predict(opt, newdata = data.frame(g = gf[1]), type = "trafo")
@@ -53,4 +65,8 @@ coef(aft <- survreg(y ~ g, data = mydata, dist = "expo"))
 
 cf <- coef(aft <- mlt(m, data = mydata, 
                 todist = "MinExtrVal"))
+1 / cf[1]
 cf[-1] * cf[1]
+
+coef(aft <- survreg(y ~ g, data = mydata, dist = "weib"))
+aft
