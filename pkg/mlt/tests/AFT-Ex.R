@@ -14,7 +14,8 @@ mydata <- data.frame(y = y, g = g)
 
 boxplot(y ~ g, data = mydata)
 
-Bb <- log_basis(var = "y", support = range(y), ui = matrix(c(1, -1), nr = 2), ci = c(.99, 1.01))
+Bb <- log_basis(var = "y", support = range(y))
+###, ui = matrix(c(1, -1), nr = 2), ci = c(.99, 1.01))
 
 Bx <- as.basis(~ g, remove_intercept = FALSE)
 m <- model(Bb, shifting = Bx)
