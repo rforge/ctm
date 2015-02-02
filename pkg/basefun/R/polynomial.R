@@ -20,13 +20,13 @@ polynomial_basis <- function(order, support = c(0, 1),
                 tmp <- deriv(tmp)
             zero <- matrix(0, nrow = length(x), ncol = deriv)
         }
-        ret <- do.call("cbind", lapply(1:length(tmp), function(i) x^(i - 1) * coef(tmp)[i]))
+        X <- do.call("cbind", lapply(1:length(tmp), function(i) x^(i - 1) * coef(tmp)[i]))
         if (deriv > 0)
-            ret <- cbind(zero, ret)
-        colnames(ret) <- 1:ncol(X)
-        attr(ret, "constraint") <- list(ui = ui, ci = ci)
+            X <- cbind(zero, X)
+        colnames(X) <- 1:ncol(X)
+        attr(X, "constraint") <- list(ui = ui, ci = ci)
         attr(X, "Assign") <- matrix(varname, ncol = ncol(X))
-        ret
+        X
     }
 
     s <- list(support)

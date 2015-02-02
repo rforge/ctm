@@ -13,8 +13,11 @@ as.basis.formula <- function(object, remove_intercept = FALSE,
         data <- as.data.frame(data)
         mf <- model.frame(object, data, ...)
         X <- model.matrix(object, data = mf, ...)
-        if (remove_intercept)
+        if (remove_intercept) {
+            a <- attr(X, "assign")
             X <- X[, colnames(X) != "(Intercept)", drop = FALSE]
+            attr(X, "assign") <- a[-1]
+        }
         if (is.null(ui)) ui <- Diagonal(ncol(X))
         if (is.null(ci)) ci <- rep(-Inf, ncol(X))
         attr(X, "constraint") <- list(ui = ui, ci = ci)
