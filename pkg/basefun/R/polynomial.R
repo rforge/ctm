@@ -1,10 +1,20 @@
 
-polynomial_basis <- function(order, support = c(0, 1),
+polynomial_basis <- function(coef, support = c(0, 1),
                              ui = Diagonal(length(object)), 
                              ci = rep(-Inf, length(object)),
-                             varname = NULL) {
+                             varname = NULL, orthogonal = NULL) {
 
-    object <- polynomial(rep(1, order))
+    if (!is.null(orthogonal)) {
+        stopifnot(is.atomic(orthogonal))
+        object <- poly.orth(orthogonal, degree = length(coef))
+    } else {
+        stopifnot(all(coef %in% c(0, 1)))
+        object <- do.call("polylist", lapply(1:length(coef), function(i) {
+            cf <- coef[1:i]
+            cf[1:i < i] <- 0
+            return(polynomial(cf))
+        }))
+    }
 
     basis <- function(data, deriv = 0L) {
         if (is.atomic(data)) {
@@ -13,16 +23,12 @@ polynomial_basis <- function(order, support = c(0, 1),
             if (is.null(varname)) varname <- colnames(data)[1]
             x <- data[[varname]]
         }
-        tmp <- object
+        dobject <- object
         if (deriv > 0) {
             for (i in 1:deriv)
-                tmp <- deriv(tmp)
-            zero <- matrix(0, nrow = length(x), ncol = deriv)
+                dobject <- deriv(dobject)
         }
-        X <- do.call("cbind", 
-            lapply(1:length(tmp), function(i) x^(i - 1) * coef(tmp)[i]))
-        if (deriv > 0)
-            X <- cbind(zero, X)
+        X <- sapply(dobject, predict, x)
         colnames(X) <- 1:ncol(X)
         attr(X, "constraint") <- list(ui = ui, ci = ci)
         attr(X, "Assign") <- matrix(varname, ncol = ncol(X))

@@ -5,7 +5,7 @@ n <- 1000
 y <- rnorm(n, 2, 1.5)
 d <- data.frame(y = y)
 
-lin <- polynomial_basis(2, var = "y", support = range(y), ci = c(-Inf, 0))
+lin <- polynomial_basis(c(1, 1), var = "y", support = range(y), ci = c(-Inf, 0))
 m <- model(lin)
 
 o <- mlt(m, data = d)
