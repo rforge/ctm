@@ -6,5 +6,5 @@ Author: Torsten Hothorn
 Maintainer: Torsten Hothorn <Torsten.Hothorn@R-project.org>
 Description: Estimation via transformation.
 Depends: basefun (>= 0.0-2), miscTools, survival
-Suggests: np
+Suggests: np, eha
 License: GPL-2
