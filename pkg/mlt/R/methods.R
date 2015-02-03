@@ -6,7 +6,10 @@ vcov.mlt <- function(object, ...)
     solve(object$optim(coef(object), hessian = TRUE)$hessian)
 
 logLik.mlt <- function(object, ...)
-    object$loglik(coef(object))
+    -object$loglik(coef(object))
+
+estfun.mlt <- function(object, ...)
+    -object$score(coef(object))
 
 predict.mlt <- function(object, newdata = NULL, 
                         ...) {
