@@ -7,10 +7,12 @@ Bernstein_basis <- function(order = 2, support = c(0, 1),
                             ci = 0, varname = NULL) {
 
     zeroint <- FALSE
-    ui <- match.arg(ui)
-    if (ui == "zerointegral") {
+    ui <- match.arg(ui, several.ok = TRUE)
+    if (length(ui) > 1) 
+        stopifnot(length(ui == 2) && "zerointegral" %in% ui)
+    if ("zerointegral" %in% ui) {
         zeroint <- TRUE
-        ui <- "none"
+        ui <- ifelse(length(ui) == 2, ui[ui != "zerointegral"], "none")
     }
     constr <- switch(ui,
         "none" = list(ui = Diagonal(order + 1), 
