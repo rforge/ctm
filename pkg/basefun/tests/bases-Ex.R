@@ -16,6 +16,12 @@ stopifnot(all.equal(X1, X2))
 ## fit model
 m1 <- lm(y ~  X1 - 1)
 m2 <- lm(y ~  Bb(x) - 1, data = data.frame(y = y, x = x))
+Bb0 <- Bernstein_basis(order = 5, ui = "zeroint", varname = "x")
+X0 <- model.matrix(Bb0, data = data.frame(x = x))
+m0 <- lm(y ~  X0)
+stopifnot(all.equal(fitted(m1), fitted(m2)))
+stopifnot(all.equal(fitted(m1), fitted(m0)))
+
 stopifnot(all.equal(coef(m1), coef(m2), check.attributes = FALSE))
 ## generate new data from support of basis
 xn <- generate(Bb, n = 100)
@@ -25,6 +31,8 @@ p2 <- predict(m2, newdata = data.frame(x = xn))
 stopifnot(all.equal(c(p1), p2, check.attributes = FALSE))
 ## compute derivative of estimated regression function
 dp1 <- predict(Bb, newdata = data.frame(x = xn), coef = coef(m1), deriv = 1)
+dp0 <- predict(Bb0, newdata = data.frame(x = xn), coef = coef(m0)[-1], deriv = 1)
+stopifnot(all.equal(dp1, dp0))
 dp12 <- predict(Bb, newdata = data.frame(x = xn), coef = coef(m1), deriv = 1, integrate = TRUE)
 unique(c(p1 - dp12)) ### the same up to a constant
 

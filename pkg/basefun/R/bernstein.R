@@ -3,10 +3,15 @@
 ### http://en.wikipedia.org/wiki/Bernstein_polynomial
 ### http://dx.doi.org/10.1080/02664761003692423
 Bernstein_basis <- function(order = 2, support = c(0, 1),
-                            ui = c("none", "increasing", "decreasing", "cyclic"), 
+                            ui = c("none", "increasing", "decreasing", "cyclic", "zerointegral"), 
                             ci = 0, varname = NULL) {
 
+    zeroint <- FALSE
     ui <- match.arg(ui)
+    if (ui == "zerointegral") {
+        zeroint <- TRUE
+        ui <- "none"
+    }
     constr <- switch(ui,
         "none" = list(ui = Diagonal(order + 1), 
                       ci = rep(-Inf, order + 1)),
@@ -35,6 +40,10 @@ Bernstein_basis <- function(order = 2, support = c(0, 1),
             X <- X %*% diff(diag(order + 1), differences = deriv) * fact
         }
         colnames(X) <- 1:ncol(X)
+        if (zeroint) {
+            X <- X[, -ncol(X), drop = FALSE] - X[, ncol(X), drop = TRUE]
+            constr$ui <- constr$ui[, -ncol(constr$ui),drop = FALSE]
+        }
         attr(X, "constraint") <- constr
         attr(X, "Assign") <- matrix(varname, ncol = ncol(X))
         return(X)
