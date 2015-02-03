@@ -79,9 +79,9 @@
                (d$d(mmtbr) * mmtrunc$right - d$d(mmtbl) * mmtrunc$left))
     }
     function(beta) {
-        1 / (.dealinf(mmr, beta, 0, d$p, 1) - 
-             .dealinf(mml, beta, 0, d$p, 0)) *
-        (.dealinf(mmr, beta, 0, d$d, 0, Xmult = TRUE) - 
-         .dealinf(mml, beta, 0, d$d, 0, Xmult = TRUE))
+        1 / (.dealinf(mmr, beta, offset, d$p, 1) - 
+             .dealinf(mml, beta, offset, d$p, 0)) *
+        (.dealinf(mmr, beta, offset, d$d, 0, Xmult = TRUE) - 
+         .dealinf(mml, beta, offset, d$d, 0, Xmult = TRUE))
     }
 }

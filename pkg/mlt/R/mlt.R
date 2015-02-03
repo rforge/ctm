@@ -171,8 +171,8 @@ model <- function(response = NULL, interacting = NULL, shifting = NULL) {
         }
         sc <- function(beta) {
             ret <- matrix(0, nrow = nrow(data), ncol = ncol(Y))
-            ret[exact,] <- .mlt_score_exact(distr, Y, Yprime)(.parm(beta))
-            ret[!exact,] <- .mlt_score_interval(distr, lY, rY)(.parm(beta))
+            ret[exact,] <- .mlt_score_exact(distr, Y, Yprime, offset[exact])(.parm(beta))
+            ret[!exact,] <- .mlt_score_interval(distr, lY, rY, offset[!exact])(.parm(beta))
             ret[, !fix, drop = FALSE]
         }
     }
