@@ -1,38 +1,6 @@
 
-.is.formula <- function(x) {
-    if (is.null(x)) return(FALSE)
-    inherits(x, "formula")
-}
-
-model <- function(response = NULL, interacting = NULL, shifting = NULL) {
-
-    if (.is.formula(response)) 
-        response <- as.basis(response)
-    if (.is.formula(interacting)) 
-        interacting <- as.basis(interacting)
-    if (.is.formula(shifting)) 
-        shifting <- as.basis(shifting, remove_intercept = TRUE)
-
-    if (is.null(shifting)) {
-        if (!is.null(interacting)) {
-            ret <- b(bresponse = response, binteracting = interacting)
-        } else {
-            ret <- c(bresponse = response)
-        }   
-    } else {
-        if (!is.null(interacting)) {
-            ret <- c(b(bresponse = response, binteracting = interacting), 
-                    bshifting = shifting)
-        } else {
-            ret <- c(bresponse = response, bshifting = shifting)
-        }
-    }
-    attr(ret, "response") <- varnames(response)
-    return(ret)
-}
-
 .mlt_fit <- function(model, data, todistr = c("Normal", "Logistic", "MinExtrVal"),
-                     weights = NULL, offset = NULL, fixed = NULL, trunc = c(-Inf, Inf)) {
+                     weights = NULL, offset = NULL, fixed = NULL, trunc = NULL) {
 
     if (is.null(weights)) weights <- rep(1, nrow(data))
     if (is.null(offset)) offset <- rep(0, nrow(data))
@@ -42,10 +10,20 @@ model <- function(response = NULL, interacting = NULL, shifting = NULL) {
     response <- attr(model, "response")
     stopifnot(length(response) == 1)
     y <- data[[response]]
-    tmpdata <- data
 
-    by <- model
-    distr <- .distr(todistr)
+    if (is.character(todistr))
+        todistr <- .distr(todistr)
+
+    if (!is.null(trunc)) {
+        stopifnot(is.character(trunc))
+        stopifnot(all(names(trunc) %in% c("left", "right")))
+        lefttrunc <- righttrunc <- NULL
+        if ("left" %in% names(trunc))
+            lefttrunc <- data[trunc["left"]]
+        if ("right" %in% names(trunc))
+            righttrunc <- data[trunc["right"]]
+        trunc <- list(left = lefttrunc, right = righttrunc)
+    }
 
     if (is.null(dim(y)) & (storage.mode(y) == "double")) {
         exact <- rep(TRUE, nrow(data))
@@ -66,6 +44,8 @@ model <- function(response = NULL, interacting = NULL, shifting = NULL) {
         rdata <- data[!exact,]
         rdata[[response]] <- sy[!exact, "right"]
         rfinite <- is.finite(rdata[[response]])
+        if ("lefttrunc" %in% colnames(sy))
+            trunc$left <- sy[, "lefttrunc"]
     } else if (is.ordered(y)) {
         exact <- rep(FALSE, nrow(data))
         ldata <- rdata <- data
@@ -87,16 +67,26 @@ model <- function(response = NULL, interacting = NULL, shifting = NULL) {
 
     Y <- NULL
     if (any(exact)) {    
-        Y <- model.matrix(by, data = edata)
+        Y <- model.matrix(model, data = edata)
         deriv <- 1
         names(deriv) <- response
-        Yprime <- model.matrix(by, data = edata, deriv = deriv)
+        Yprime <- model.matrix(model, data = edata, deriv = deriv)
         ui <- attr(Y, "constraint")$ui
         ci <- attr(Y, "constraint")$ci
-        stopifnot(any(is.finite(ci)))
-        ui <- as(ui[is.finite(ci),,drop = FALSE], "matrix")
-        ci <- ci[is.finite(ci)]
     } 
+
+    if (!is.null(trunc)) {
+        if (!is.null(trunc$left)) {
+            ltdata <- data
+            ltdata[[response]] <- trunc$left
+            trunc$left <- model.matrix(model, data = ltdata)
+        }
+        if (!is.null(trunc$right)) {
+            rtdata <- data
+            rtdata[[response]] <- trunc$right
+            trunc$right <- model.matrix(model, data = rtdata)
+        }
+    }
 
     if (all(exact)) { 
         if (!is.null(fixed)) {
@@ -114,13 +104,13 @@ model <- function(response = NULL, interacting = NULL, shifting = NULL) {
             fix <- rep(FALSE, ncol(Y))
         } 
         ll <- function(beta)
-            .mlt_loglik_exact(distr, Y, Yprime, offset)(.parm(beta))
+            .mlt_loglik_exact(todistr, Y, Yprime, offset, trunc)(.parm(beta))
         sc <- function(beta)
-            .mlt_score_exact(distr, Y, Yprime, offset)(.parm(beta))[, !fix, drop = FALSE]
+            .mlt_score_exact(todistr, Y, Yprime, offset, trunc)(.parm(beta))[, !fix, drop = FALSE]
     } else {
         .makeY <- function(data, finite, nc = NULL) {
             if (any(finite)) {
-                tmp <- model.matrix(by, data = data[finite,,drop = FALSE])
+                tmp <- model.matrix(model, data = data[finite,,drop = FALSE])
                 nc <- colnames(tmp)
             } else {
                 tmp <- -Inf
@@ -145,9 +135,6 @@ model <- function(response = NULL, interacting = NULL, shifting = NULL) {
         if (all(!exact)) {
             ui <- attr(lY, "constraint")$ui
             ci <- attr(lY, "constraint")$ci
-            stopifnot(any(is.finite(ci)))
-            ui <- as(ui[is.finite(ci),,drop = FALSE], "matrix")
-            ci <- ci[is.finite(ci)]
         }
         if (!is.null(fixed)) {
             stopifnot(all(names(fixed) %in% colnames(lY)))
@@ -165,14 +152,14 @@ model <- function(response = NULL, interacting = NULL, shifting = NULL) {
         } 
         ll <- function(beta) {
             ret <- numeric(nrow(data))
-            ret[exact] <- .mlt_loglik_exact(distr, Y, Yprime, offset[exact])(.parm(beta))
-            ret[!exact] <- .mlt_loglik_interval(distr, lY, rY, offset[!exact])(.parm(beta))
+            ret[exact] <- .mlt_loglik_exact(todistr, Y, Yprime, offset[exact], trunc)(.parm(beta))
+            ret[!exact] <- .mlt_loglik_interval(todistr, lY, rY, offset[!exact], trunc)(.parm(beta))
             ret
         }
         sc <- function(beta) {
             ret <- matrix(0, nrow = nrow(data), ncol = ncol(Y))
-            ret[exact,] <- .mlt_score_exact(distr, Y, Yprime, offset[exact])(.parm(beta))
-            ret[!exact,] <- .mlt_score_interval(distr, lY, rY, offset[!exact])(.parm(beta))
+            ret[exact,] <- .mlt_score_exact(todistr, Y, Yprime, offset[exact], trunc)(.parm(beta))
+            ret[!exact,] <- .mlt_score_interval(todistr, lY, rY, offset[!exact], trunc)(.parm(beta))
             ret[, !fix, drop = FALSE]
         }
     }
@@ -182,57 +169,35 @@ model <- function(response = NULL, interacting = NULL, shifting = NULL) {
     theta <- coef(lm(z ~ Y - 1))
     if (!is.null(fixed)) theta <- theta[!fix]
 
-    loglik <- function(beta) -sum(weights * ll(beta))
+    stopifnot(any(is.finite(ci)))
+    ui <- as(ui[is.finite(ci),,drop = FALSE], "matrix")
+    ci <- ci[is.finite(ci)]
+
+    loglikfct <- function(beta) -sum(weights * ll(beta))
+    scorefct <- function(beta) -colSums(weights * sc(beta))
     if (sum(abs(ui)) > 0) {
-        ret <- constrOptim(theta = theta, f = loglik,
-                           grad = function(beta) -colSums(weights * sc(beta)), 
-                           ui = ui,ci = ci, hessian = TRUE)
+        optimfct <- function(beta, hessian = FALSE) 
+            constrOptim(theta = beta, f = loglikfct,
+                        grad = scorefct, ui = ui,ci = ci, hessian = hessian)
     } else {
-        ret <- optim(par = theta, fn = loglik, 
-                     gr = function(beta) -colSums(weights * sc(beta)),
-                     hessian = TRUE)
+        optimfct <- function(beta, hessian = FALSE) 
+            optim(par = beta, fn = loglikfct, 
+                  gr = scorefct, hessian = hessian)
     } ### refit for hessian in vcov?
+
+    ret <- optimfct(theta, hessian = FALSE)
     if (ret$convergence != 0)
         warning("algorithm did not converge")
-    ret$by <- by
+
+    ret$model <- model
     ret$response <- response
-    ret$distr <- distr
-    ret$loglik <- loglik
-    ret$score <- function(beta) weights * sc(beta)
+    ret$todistr <- todistr
+    ret$loglik <- loglikfct
+    ret$score <- scorefct
+    ret$optim <- optimfct
     class(ret) <- "mlt"
     return(ret)
 }
 
-coef.mlt <- function(object, ...)
-    object$par
-
-vcov.mlt <- function(object, ...)
-    solve(object$hessian)
-
-logLik.mlt <- function(object, ...)
-    object$loglik(coef(object))
-
 mlt <- .mlt_fit
 
-predict.mlt <- function(object, newdata = NULL, 
-                        ...) {
-    ret <- function(y, type = c("trafo", "prob"),...) {
-        type <- match.arg(type)
-        if (is.null(newdata)) {
-            newdata <- data.frame(y)
-            colnames(newdata) <- object$response
-        } else {
-            idx <- 1:nrow(newdata)
-            tmp <- expand.grid(y = y, idx = idx)
-            newdata <- newdata[tmp$idx,,drop = FALSE]
-            newdata[[object$response]] <- tmp$y
-        }
-        Y <- model.matrix(object$by, data = newdata)
-        ret <- drop(Y %*% object$par)
-        ret <- switch(type, 
-                      "trafo" = ret,
-                      "prob" = object$distr$p(ret))
-        ret
-    }
-    ret
-}
