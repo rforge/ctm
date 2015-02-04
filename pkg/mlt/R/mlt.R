@@ -16,8 +16,8 @@
         z <- numeric(ncol(sy))
         z[lna] <- sy[lna, "right"]
         z[rna] <- sy[rna, "left"]
-        z[interval] <- sy[interval, "right"] - 
-                       sy[interval, "left"]
+        z[interval] <- sy[interval, "left"] + (sy[interval, "right"] - 
+                       sy[interval, "left"]) / 2
         y <- z - min(z) + .1
     } else if (is.ordered(y)) {
         z <- (1:nlevels(y))[y]
@@ -161,6 +161,10 @@
             ret <- matrix(-Inf, nrow = nrow(data), ncol = length(nc))
             ret[finite,] <- tmp
             colnames(ret) <- nc
+            if (!is.null(attr(tmp, "constraint"))) {
+                attr(ret, "constraint") <- attr(tmp, "constraint") ### constraints!
+                attr(ret, "Assign") <- attr(tmp, "Assign")
+            }
             ret
         }
         if (!is.null(Y)) {
@@ -195,13 +199,15 @@
         } 
         ll <- function(beta) {
             ret <- numeric(nrow(data))
-            ret[exact] <- .mlt_loglik_exact(todistr, Y, Yprime, offset[exact], trunc)(.parm(beta))
+            if (any(exact))
+                ret[exact] <- .mlt_loglik_exact(todistr, Y, Yprime, offset[exact], trunc)(.parm(beta))
             ret[!exact] <- .mlt_loglik_interval(todistr, lY, rY, offset[!exact], trunc)(.parm(beta))
             ret
         }
         sc <- function(beta) {
-            ret <- matrix(0, nrow = nrow(data), ncol = ncol(Y))
-            ret[exact,] <- .mlt_score_exact(todistr, Y, Yprime, offset[exact], trunc)(.parm(beta))
+            ret <- matrix(0, nrow = nrow(data), ncol = length(fix))
+            if (any(exact))
+                ret[exact,] <- .mlt_score_exact(todistr, Y, Yprime, offset[exact], trunc)(.parm(beta))
             ret[!exact,] <- .mlt_score_interval(todistr, lY, rY, offset[!exact], trunc)(.parm(beta))
             ret[, !fix, drop = FALSE]
         }
@@ -254,6 +260,7 @@
     ret$loglik <- loglikfct
     ret$score <- scorefct
     ret$optim <- optimfct
+    ret$data <- data
     class(ret) <- "mlt"
     return(ret)
 }

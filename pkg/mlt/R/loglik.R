@@ -36,6 +36,7 @@
 ### if (finite) fun(X %*% beta + offset) else value
 .dealinf <- function(X, beta, offset, fun, value, Xmult = FALSE) {
     OK <- is.finite(X[,1])
+    if (all(!OK)) return(rep(value, nrow(X)))
     tmp <- X[OK,] %*% beta
     ret <- numeric(nrow(X))
     ret[OK] <- fun(offset[OK] + tmp)
