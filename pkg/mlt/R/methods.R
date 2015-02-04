@@ -1,15 +1,18 @@
 
-coef.mlt <- function(object, ...)
-    object$par
+coef.mlt <- function(object, fixed = TRUE, ...) {
+    if (fixed) 
+        return(object$coef)
+    return(object$par)
+}
 
 vcov.mlt <- function(object, ...)
-    solve(object$optim(coef(object), hessian = TRUE)$hessian)
+    solve(object$optim(coef(object, fixed = FALSE), hessian = TRUE)$hessian)
 
 logLik.mlt <- function(object, ...)
-    -object$loglik(coef(object))
+    -object$loglik(coef(object, fixed = FALSE))
 
 estfun.mlt <- function(object, ...)
-    -object$score(coef(object))
+    -object$score(coef(object, fixed = FALSE))
 
 predict.mlt <- function(object, newdata = NULL, 
                         ...) {

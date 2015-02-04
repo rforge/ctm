@@ -1,4 +1,42 @@
 
+.findstart <- function(model, data, ui = NULL, ci = NULL, fix = NULL, fixed = NULL) {
+
+    y <- data[[response <- attr(model, "response")]]
+    if (is.null(dim(y)) & (storage.mode(y) == "double")) {
+        z <- y
+    } else if (is.Surv(y)) {
+        sy <- .Surv2matrix(y)
+        lna <- is.na(sy[, "left"])
+        rna <- is.na(sy[, "right"])
+        interval <- !lna & !rna
+        sy[!is.finite(sy[, "left"]), "left"] <- 
+            min(sy[is.finite(sy)], na.rm = TRUE)
+        sy[!is.finite(sy[, "right"]), "right"] <- 
+            max(sy[is.finite(sy)], na.rm = TRUE)
+        z <- numeric(ncol(sy))
+        z[lna] <- sy[lna, "right"]
+        z[rna] <- sy[rna, "left"]
+        z[interval] <- sy[interval, "right"] - 
+                       sy[interval, "left"]
+        y <- z - min(z) + .1
+    } else if (is.ordered(y)) {
+        z <- (1:nlevels(y))[y]
+    } else if (is.integer(y)) {
+        z <- y
+    } else {
+        stop("cannot deal with response class", class(y))
+    }
+    z <- scale(z)
+    data[[response]] <- y
+    Y <- model.matrix(model, data)
+    if (any(fix)) {
+        z <- z - Y[, fix, drop = FALSE] %*% fixed
+        Y <- Y[, !fix, drop = FALSE]
+    }
+    theta <- lm.fit(y = z, x = Y)$coef
+    theta
+}
+
 .mlt_fit <- function(model, data, todistr = c("Normal", "Logistic", "MinExtrVal"),
                      weights = NULL, offset = NULL, fixed = NULL, trunc = NULL) {
 
@@ -164,18 +202,25 @@
         }
     }
 
-
-    z <- scale(edata[[response]])
-    theta <- coef(lm(z ~ Y - 1))
-    if (!is.null(fixed)) theta <- theta[!fix]
-
-    stopifnot(any(is.finite(ci)))
-    ui <- as(ui[is.finite(ci),,drop = FALSE], "matrix")
-    ci <- ci[is.finite(ci)]
-
     loglikfct <- function(beta) -sum(weights * ll(beta))
     scorefct <- function(beta) -colSums(weights * sc(beta))
-    if (sum(abs(ui)) > 0) {
+
+    if (all(!is.finite(ci))) {
+        ui <- ci <- NULL
+    } else {
+        ui <- as(ui[is.finite(ci),,drop = FALSE], "matrix")
+        ci <- ci[is.finite(ci)]
+        r0 <- rowSums(abs(ui)) == 0
+        ui <- ui[!r0,,drop = FALSE]
+        ci <- ci[!r0]
+        if (nrow(ui) == 0) ui <- ci <- NULL
+    }
+
+    theta <- .findstart(model, data, ui, ci, fix, fixed)
+
+    ### at least one serious constraint
+    if (!is.null(ui)) {
+        stopifnot(all(ui %*% theta - ci >= 0))
         optimfct <- function(beta, hessian = FALSE) 
             constrOptim(theta = beta, f = loglikfct,
                         grad = scorefct, ui = ui,ci = ci, hessian = hessian)
@@ -183,12 +228,21 @@
         optimfct <- function(beta, hessian = FALSE) 
             optim(par = beta, fn = loglikfct, 
                   gr = scorefct, hessian = hessian)
-    } ### refit for hessian in vcov?
+    } 
 
     ret <- optimfct(theta, hessian = FALSE)
     if (ret$convergence != 0)
         warning("algorithm did not converge")
 
+    coef <- numeric(length(fix))
+    coef[fix] <- fixed
+    coef[!fix] <- ret$par
+    if (is.null(Y)) {
+        names(coef) <- colnames(lY)
+    } else {
+        names(coef) <- colnames(Y)
+    }
+    ret$coef <- coef
     ret$model <- model
     ret$response <- response
     ret$todistr <- todistr

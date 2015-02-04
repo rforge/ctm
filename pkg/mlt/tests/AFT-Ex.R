@@ -35,7 +35,7 @@ coef(phreg <- phreg(Surv(y, rep(TRUE, nrow(mydata))) ~ g, data = mydata,
 
 ## Compare standard errors
 ## MLT
-sqrt(diag(vcov(opt)))[c("Yg2", "Yg3")]
+sqrt(diag(vcov(opt)))[c("g2", "g3")]
 ## Cox
 sqrt(diag(vcov(cox)))
 ## phreg
@@ -78,7 +78,7 @@ coef(phreg <- phreg(y ~ g, data = mydata, dist = "weibull", shape = 1))
 
 ## Compare standard errors
 ## MLT
-sqrt(diag(vcov(opt)))[c("Yg2", "Yg3")]
+sqrt(diag(vcov(opt)))[c("g2", "g3")]
 ## Cox
 sqrt(diag(vcov(cox)))
 ## phreg
@@ -163,7 +163,7 @@ coef_phreg[c("g2", "g3")] * aft$scale
 aft$scale
 
 ## Compare standard errors
-sqrt(diag(vcov(opt)))[c("Yg2", "Yg3")]
+sqrt(diag(vcov(opt)))[c("g2", "g3")]
 sqrt(diag(vcov(cox)))
 sqrt(diag(phreg$var))[c("g2", "g3")]
 
@@ -189,7 +189,7 @@ coefs_phreg <- coef(phreg <- phreg(y ~ g, data = mydata, dist = "weibull"))
 coefs_phreg[c("g2", "g3")] * aft$scale
 
 ## Compare standard errors
-sqrt(diag(vcov(opt)))[c("Yg2", "Yg3")]
+sqrt(diag(vcov(opt)))[c("g2", "g3")]
 sqrt(diag(vcov(cox)))
 sqrt(diag(phreg$var))[c("g2", "g3")]
 

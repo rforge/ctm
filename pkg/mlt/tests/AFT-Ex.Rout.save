@@ -20,10 +20,9 @@ Type 'q()' to quit R.
 Loading required package: basefun
 Loading required package: Matrix
 Loading required package: polynom
-Loading required package: miscTools
+> library("eha")
 Loading required package: survival
 Loading required package: splines
-> library("eha")
 > set.seed(29)
 > 
 > ## ************** Exponential - AFT *********************************
@@ -47,8 +46,8 @@ Loading required package: splines
 > ## Estimate coefficients
 > coef(opt <- mlt(m, data = mydata, fixed = c("log(y)" = 1),
 +                 todist = "MinExtrVal"))
-Y(Intercept)          Yg2          Yg3 
--0.002235491  0.702676524  1.095236749 
+      log(y)  (Intercept)           g2           g3 
+ 1.000000000 -0.002128069  0.702730767  1.095145730 
 > 
 > coef(aft <- survreg(Surv(y, rep(TRUE, nrow(mydata))) ~ g, data = mydata,
 +                     dist = "exponential"))
@@ -66,9 +65,9 @@ Y(Intercept)          Yg2          Yg3
 > 
 > ## Compare standard errors
 > ## MLT
-> sqrt(diag(vcov(opt)))[c("Yg2", "Yg3")]
-       Yg2        Yg3 
-0.01414222 0.01414225 
+> sqrt(diag(vcov(opt)))[c("g2", "g3")]
+        g2         g3 
+0.01414280 0.01414241 
 > ## Cox
 > sqrt(diag(vcov(cox)))
         g2         g3 
@@ -89,10 +88,10 @@ Y(Intercept)          Yg2          Yg3
 > 
 > ## Estimate coefficients
 > (cf <- coef(opt2 <- mlt(m, data = mydata, todist = "MinExtrVal")))
-      Ylog(y)  Y(Intercept)           Yg2           Yg3 
+       log(y)   (Intercept)            g2            g3 
  9.950210e-01 -8.287564e-05  6.992524e-01  1.089653e+00 
 > cf[-1] / cf[1]
- Y(Intercept)           Yg2           Yg3 
+  (Intercept)            g2            g3 
 -8.329034e-05  7.027514e-01  1.095105e+00 
 > 
 > coef(aft2 <- survreg(Surv(y, rep(TRUE, nrow(mydata))) ~ g, data = mydata,
@@ -102,7 +101,7 @@ Y(Intercept)          Yg2          Yg3
 > 
 > ## Compare Weibull shape paramters
 > 1 / cf[1]
- Ylog(y) 
+  log(y) 
 1.005004 
 > aft2$scale
 [1] 1.00497
@@ -120,8 +119,8 @@ Y(Intercept)          Yg2          Yg3
 > mydata <- data.frame(y = Surv(y, sample(0:1, length(y), replace = TRUE)), g = g)
 > coef(opt <- mlt(m, data = mydata, fixed = c("log(y)" = 1),
 +                 todist = "MinExtrVal"))
-Y(Intercept)          Yg2          Yg3 
-  -0.7125165    0.7355767    1.1136047 
+     log(y) (Intercept)          g2          g3 
+  1.0000000  -0.7121929   0.7356395   1.1128315 
 > 
 > ## Estimate coefficients 
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "expo"))
@@ -136,9 +135,9 @@ Y(Intercept)          Yg2          Yg3
 > 
 > ## Compare standard errors
 > ## MLT
-> sqrt(diag(vcov(opt)))[c("Yg2", "Yg3")]
-       Yg2        Yg3 
-0.02000708 0.02007994 
+> sqrt(diag(vcov(opt)))[c("g2", "g3")]
+        g2         g3 
+0.02000623 0.02008047 
 > ## Cox
 > sqrt(diag(vcov(cox)))
         g2         g3 
@@ -158,8 +157,8 @@ Y(Intercept)          Yg2          Yg3
 > ## Estimate coefficients
 > coef(opt <- mlt(m, data = mydata,  fixed = c("log(y)" = 1),
 +                 todist = "MinExtrVal"))
-Y(Intercept)          Yg2          Yg3 
-   0.4126855    0.7321094    1.1162824 
+     log(y) (Intercept)          g2          g3 
+  1.0000000   0.4127589   0.7322823   1.1162901 
 > 
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "expo"))
 (Intercept)          g2          g3 
@@ -180,8 +179,8 @@ Error in phreg(y ~ g, data = mydata, dist = "weibull", shape = 1) :
 > 
 > coef(opt<- mlt(m, data = mydata, fixed = c("log(y)" = 1),
 +                 todist = "MinExtrVal"))
-Y(Intercept)          Yg2          Yg3 
-  -0.2386043    0.6133955    0.9435556 
+     log(y) (Intercept)          g2          g3 
+  1.0000000  -0.2382810   0.6130116   0.9431225 
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "expo"))
 (Intercept)          g2          g3 
   0.2384189  -0.6132415  -0.9434967 
@@ -222,7 +221,7 @@ Error in phreg(y ~ g, data = mydata, dist = "weibull", shape = 1) :
 > 
 > ## PH-scale
 > (cf <- coef(opt <- mlt(m, data = mydata, todist = "MinExtrVal")))
-     Ylog(y) Y(Intercept)          Yg2          Yg3 
+      log(y)  (Intercept)           g2           g3 
  2.986818852  0.003444104 -2.100635797 -3.286285112 
 > 
 > (coef_cox <- coef(cox <- coxph(Surv(y, rep(TRUE, nrow(mydata))) ~ g, 
@@ -242,7 +241,7 @@ Error in phreg(y ~ g, data = mydata, dist = "weibull", shape = 1) :
 -0.001171716  0.703298290  1.100256378 
 > 
 > cf[-1] / cf[1]
-Y(Intercept)          Yg2          Yg3 
+ (Intercept)           g2           g3 
  0.001153101 -0.703302042 -1.100262612 
 > coef_cox * aft$scale
         g2         g3 
@@ -253,7 +252,7 @@ Y(Intercept)          Yg2          Yg3
 > 
 > ## Compare shape parameters
 > 1 / cf[1]
-  Ylog(y) 
+   log(y) 
 0.3348044 
 > 1 / exp(coef_phreg[c("log(shape)")])
 log(shape) 
@@ -262,8 +261,8 @@ log(shape)
 [1] 0.3348132
 > 
 > ## Compare standard errors
-> sqrt(diag(vcov(opt)))[c("Yg2", "Yg3")]
-       Yg2        Yg3 
+> sqrt(diag(vcov(opt)))[c("g2", "g3")]
+        g2         g3 
 0.01700984 0.02044020 
 > sqrt(diag(vcov(cox)))
         g2         g3 
@@ -285,11 +284,11 @@ log(shape)
 > 
 > ## Estimate coefficients
 > (cf <- coef(opt <- mlt(m, data = mydata, todist = "MinExtrVal")))
-     Ylog(y) Y(Intercept)          Yg2          Yg3 
-   2.9706917   -0.6810156   -2.1071196   -3.2641813 
+     log(y) (Intercept)          g2          g3 
+  2.9706531  -0.6809458  -2.1071354  -3.2641921 
 > cf[-1] / cf[1]
-Y(Intercept)          Yg2          Yg3 
-  -0.2292448   -0.7093027   -1.0987950 
+(Intercept)          g2          g3 
+ -0.2292243  -0.7093172  -1.0988129 
 > 
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "weibull"))
 (Intercept)          g2          g3 
@@ -306,9 +305,9 @@ Y(Intercept)          Yg2          Yg3
 -0.7093027 -1.0987950 
 > 
 > ## Compare standard errors
-> sqrt(diag(vcov(opt)))[c("Yg2", "Yg3")]
-       Yg2        Yg3 
-0.02404055 0.02877378 
+> sqrt(diag(vcov(opt)))[c("g2", "g3")]
+        g2         g3 
+0.02404044 0.02877363 
 > sqrt(diag(vcov(cox)))
         g2         g3 
 0.02649557 0.03071700 
@@ -330,11 +329,11 @@ Y(Intercept)          Yg2          Yg3
 > 
 > ## Estimate coefficients
 > (cf <- coef(opt <- mlt(m, data = mydata, todist = "MinExtrVal")))
-     Ylog(y) Y(Intercept)          Yg2          Yg3 
-   2.0624103    0.4979348   -1.4474062   -2.2581600 
+     log(y) (Intercept)          g2          g3 
+   2.062409    0.497940   -1.447410   -2.258168 
 > cf[-1] / cf[1]
-Y(Intercept)          Yg2          Yg3 
-   0.2414335   -0.7018032   -1.0949131 
+(Intercept)          g2          g3 
+  0.2414361  -0.7018054  -1.0949175 
 > 
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "weibull"))
 (Intercept)          g2          g3 
@@ -354,11 +353,11 @@ Y(Intercept)          Yg2          Yg3
 > 
 > ## Estimate coefficients
 > (cf <- coef(opt <- mlt(m, data = mydata, todist = "MinExtrVal")))
-     Ylog(y) Y(Intercept)          Yg2          Yg3 
-   2.4233100   -0.3602975   -1.5671690   -2.4639648 
+     log(y) (Intercept)          g2          g3 
+  2.4232549  -0.3601196  -1.5670538  -2.4639873 
 > cf[-1] / cf[1]
-Y(Intercept)          Yg2          Yg3 
-  -0.1486799   -0.6467060   -1.0167766 
+(Intercept)          g2          g3 
+ -0.1486099  -0.6466731  -1.0168089 
 > 
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "weibull"))
 (Intercept)          g2          g3 
@@ -373,4 +372,4 @@ Y(Intercept)          Yg2          Yg3
 > 
 > proc.time()
    user  system elapsed 
- 29.288   0.081  29.378 
+ 27.900   0.068  27.978 

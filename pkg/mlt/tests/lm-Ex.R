@@ -21,19 +21,15 @@ d <- data.frame(y = y, x = x)
 
 plot(x, y)
 
-if (FALSE) {
-
-### shift also contains intercept!
-m <- model(lin,
-           shift = Bernstein_basis(order = 10, support = c(0, 2*pi), var = "x"))
+Bb <- Bernstein_basis(order = 10, support = c(0, 2*pi), var = "x", ui = "zero")
+m <- model(lin, shift = Bb)
 
 o <- mlt(m, data = d)
-1 / coef(o)[1]
-p <- predict(Bernstein_basis(order = 10, support = c(0, 2*pi), var = "x"), 
-             newdata = data.frame(x = x), coef = coef(o)[-1])
+1 / coef(o)[2]
+p <- predict(Bb,
+             newdata = data.frame(x = x), coef = coef(o)[-(1:2)])
 plot(x, y)
-lines(sort(x), -p[order(x)] / coef(o)[1], lwd = 2, col = "red")
-
+lines(sort(x), -p[order(x)] / coef(o)[2], lwd = 2, col = "red")
 
 x <- runif(n, max = 2 * pi)
 y <- rnorm(n, 2, 1.1 + sin(x) / 2)
@@ -41,9 +37,18 @@ d <- data.frame(y = y, x = x)
 
 plot(x, y)
 
-m <- model(lin,
-           Bernstein_basis(order = 5, support = c(0, 2*pi), var = "x"))
+Bb <- Bernstein_basis(order = 10, support = c(0, 2*pi), var = "x")
+m <- model(lin, interacting = Bb)
 
 o <- mlt(m, data = d)
 
-}
+nd <- data.frame(x = sort(x))
+layout(matrix(1:2, nr = 2))
+plot(nd$x, predict(o, newdata = nd)(0))
+plot(nd$x, predict(o, newdata = nd)(1) + predict(o, newdata = nd)(0))
+
+
+tmp <- matrix(coef(o), nrow = 2)
+plot(nd$x, predict(Bb, nd, coef = tmp[1,]))
+plot(nd$x, predict(Bb, nd, coef = tmp[2,]))
+lines(nd$x, 1.1 + sin(nd$x) / 2, col = "red")

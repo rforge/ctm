@@ -1,5 +1,6 @@
 
 library("mlt")
+library("survival")
 set.seed(29)
 
 ### true dgp
