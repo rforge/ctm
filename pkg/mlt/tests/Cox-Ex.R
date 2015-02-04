@@ -17,26 +17,40 @@ boxplot(y ~ g, data = mydata)
 
 Bb <- Bernstein_basis(order = 5, support = c(0, max(y) + .1),
                       ui = "increasing", var = "y")
+s <- as.basis(~ g, data = data.frame(g = gf), remove_intercept = TRUE)
 
-coef(opt <- mlt(model(response = Bb, shifting = ~ g), data = mydata,
-                todist = "MinExtrVal"))
+(cf1 <- coef(opt <- mlt(model(response = Bb, shifting = s), data = mydata,
+                todist = "MinExtrVal")))
 
 coef(cph <- coxph(Surv(y, rep(TRUE, nrow(mydata))) ~ g, data = mydata))
 
+nd <- samplefrom(opt, newdata = data.frame(g = gf), n = 100, ngrid = 10)
+nd$y <- with(nd$y, Surv(left, right, type = "interval2"))
+nd <- subset(nd, is.finite(nd$y[, "time1"]))
+nd2 <- nd
+nd2$y <- nd2$y[, "time2"]
+boxplot(nd$y[, "time1"] ~ g, data = nd)
+
+### check interval censoring!!!
+(cf2 <- coef(opt2 <- mlt(model(response = Bb, shifting = s), data = nd,
+                todist = "MinExtrVal")))
+(cf2 <- coef(opt3 <- mlt(model(response = Bb, shifting = s), data = nd2,
+                todist = "MinExtrVal")))
+
+cf1 - cf2
+
 yn <- generate(Bb, 50)$y
 
-a1 <- predict(opt, newdata = data.frame(g = gf[1]), type = "trafo")
-a2 <- predict(opt, newdata = data.frame(g = gf[2]), type = "trafo")
-a3 <- predict(opt, newdata = data.frame(g = gf[3]), type = "trafo")
+a <- predict(opt, newdata = data.frame(g = gf))
 
 layout(matrix(1:4, ncol = 2))
-plot(yn, a1(yn), type = "l", col = "red")
+plot(yn, a[[1]](yn, type = "trafo"), type = "l", col = "red")
 lines(yn, log(yn))
-plot(yn, 1 - a1(yn, type = "prob"), type = "l", col = "red", ylim = c(0, 1))
+plot(yn, 1 - a[[1]](yn, type = "prob"), type = "l", col = "red", ylim = c(0, 1))
 lines(survfit(cph, newdata = data.frame(g = gf[1])))
-plot(yn, 1 - a2(yn, type = "prob"), type = "l", col = "red", ylim = c(0, 1))
+plot(yn, 1 - a[[2]](yn, type = "prob"), type = "l", col = "red", ylim = c(0, 1))
 lines(survfit(cph, newdata = data.frame(g = gf[2])))
-plot(yn, 1 - a3(yn, type = "prob"), type = "l", col = "red", ylim = c(0, 1))
+plot(yn, 1 - a[[3]](yn, type = "prob"), type = "l", col = "red", ylim = c(0, 1))
 lines(survfit(cph, newdata = data.frame(g = gf[3])))
 
 mydata <- data.frame(y = Surv(y, sample(0:1, length(y), replace = TRUE)), g = g)
@@ -69,12 +83,14 @@ coef(opt <- mlt(m, data = mydata,
 
 coef(cph <- coxph(Surv(y, rep(TRUE, nrow(mydata))) ~ g, data = mydata))
 
+a <- predict(opt, newdata = data.frame(g = gf))
+
 layout(matrix(1:4, ncol = 2))
-plot(yn, a1(yn), type = "l", col = "red")
+plot(yn, a[[1]](yn), type = "l", col = "red")
 lines(yn, log(yn))
-plot(yn, 1 - a1(yn, type = "prob"), type = "l", col = "red", ylim = c(0, 1))
+plot(yn, 1 - a[[1]](yn, type = "prob"), type = "l", col = "red", ylim = c(0, 1))
 lines(survfit(cph, newdata = data.frame(g = gf[1])))
-plot(yn, 1 - a2(yn, type = "prob"), type = "l", col = "red", ylim = c(0, 1))
+plot(yn, 1 - a[[2]](yn, type = "prob"), type = "l", col = "red", ylim = c(0, 1))
 lines(survfit(cph, newdata = data.frame(g = gf[2])))
-plot(yn, 1 - a3(yn, type = "prob"), type = "l", col = "red", ylim = c(0, 1))
+plot(yn, 1 - a[[3]](yn, type = "prob"), type = "l", col = "red", ylim = c(0, 1))
 lines(survfit(cph, newdata = data.frame(g = gf[3])))

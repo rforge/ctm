@@ -44,10 +44,6 @@ o <- mlt(m, data = d)
 
 nd <- data.frame(x = sort(x))
 layout(matrix(1:2, nr = 2))
-plot(nd$x, predict(o, newdata = nd)(0))
-plot(nd$x, predict(o, newdata = nd)(1) + predict(o, newdata = nd)(0))
-
-
 tmp <- matrix(coef(o), nrow = 2)
 plot(nd$x, predict(Bb, nd, coef = tmp[1,]))
 plot(nd$x, predict(Bb, nd, coef = tmp[2,]))
