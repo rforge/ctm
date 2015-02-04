@@ -4,7 +4,7 @@
     y <- data[[response <- attr(model, "response")]]
     if (is.null(dim(y)) & (storage.mode(y) == "double")) {
         z <- y
-    } else if (is.Surv(y)) {
+    } else if (.is.Surv(y)) {
         sy <- .Surv2matrix(y)
         lna <- is.na(sy[, "left"])
         rna <- is.na(sy[, "right"])
@@ -34,6 +34,11 @@
         Y <- Y[, !fix, drop = FALSE]
     }
     theta <- lm.fit(y = z, x = Y)$coef
+    if (is.null(ui)) return(theta)
+    if (any(ui %*% theta - ci <= 0)) {
+        citmp <- ci + .1
+        theta <- MASS::ginv(ui) %*% citmp
+    }
     theta
 }
 
@@ -66,7 +71,7 @@
     if (is.null(dim(y)) & (storage.mode(y) == "double")) {
         exact <- rep(TRUE, nrow(data))
         edata <- data
-    } else if (is.Surv(y)) {
+    } else if (.is.Surv(y)) {
         sy <- .Surv2matrix(y)
         lna <- is.na(sy[, "left"])
         rna <- is.na(sy[, "right"])

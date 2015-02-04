@@ -1,10 +1,13 @@
 
 .Normal <- function()
-    list(p = pnorm, d = dnorm, dd = ddnorm)
+    list(p = pnorm, d = dnorm, 
+         ### see also MiscTools::ddnorm
+         dd = function(x) -dnorm(x = x) * x)
 
 .Logistic <- function()
     list(p = plogis, d = dlogis, dd = function(x)
-         (2 * exp(-x)^2 / (1 + exp(-x))^3) - (exp(-x) / (1 + exp(-x))^2))
+         (2 * exp(-x)^2 / (1 + exp(-x))^3) - 
+          (exp(-x) / (1 + exp(-x))^2))
 
 .MinExtrVal <- function()
     list(p = function(x) 1 - exp(-exp(x)),
@@ -16,8 +19,8 @@
          dd = function(x)
              exp(x - exp(x)) * (1 - exp(x)))
 
-.distr <- function(which = c("Normal", "Logistic", "MinExtrVal")) {
+.distr <- function(which = c("Normal", "Logistic", 
+                             "MinExtrVal")) {
     which <- match.arg(which)
     do.call(paste(".", which, sep = ""), list())
 }
-

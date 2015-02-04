@@ -1,7 +1,6 @@
 
 import(basefun)
-importFrom(miscTools, ddnorm)
-importFrom(survival, Surv, is.Surv)
+importFrom(MASS, ginv)
 
 exportPattern("^[^\\.]")
 
