@@ -48,6 +48,8 @@ generate.basis <- function(object, n) {
             x <- seq(from = s[1], to = s[2], length.out = n)
         } else if (is.factor(s)) {
             x <- s
+        } else if (is.integer(s)) {
+            x <- s
         } else {
             x <- NULL
         }
