@@ -64,7 +64,7 @@ samplefrom.mlt <- function(object, newdata = NULL, n = 1, ngrid = 100,
     }))
     if (is.factor(ygrid)) {
         ret <- ygrid[idx]
-    } else {
+    } else { ### or invert linear interpolation!!!
         ret <- data.frame(left = c(-Inf, ygrid, Inf)[idx],
                           right = c(-Inf, ygrid, Inf)[idx + 1])
     }
