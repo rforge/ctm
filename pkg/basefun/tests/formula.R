@@ -14,8 +14,13 @@ b2 <- Bernstein_basis(order = 4, var = "y", ui = "incre")
 b12 <- b(b1 = b1, b2 = b2)
 c12 <- c(b1 = b1, b2 = b2)
 
-dim(b12(d))
-dim(c12(d))
+dim(model.matrix(b12, d))
+nparm(b12, d)
+dim(model.matrix(c12, d))
+nparm(c12, d)
 
 tmp <- c(b12 = b12, c12 = c12)
-dim(tmp(d))
+class(tmp)
+dim(model.matrix(tmp, d))
+nparm(tmp, d)
+

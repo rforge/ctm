@@ -5,7 +5,7 @@ Date: 2015-02-04
 Author: Torsten Hothorn
 Maintainer: Torsten Hothorn <Torsten.Hothorn@R-project.org>
 Description: Estimation via transformation.
-Depends: basefun (>= 0.0-2)
+Depends: basefun (>= 0.0-3)
 Imports: MASS
 Enhances: np, eha, survival
 License: GPL-2

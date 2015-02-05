@@ -47,11 +47,9 @@ gb <- as.basis(~ g, remove_intercept = FALSE, data = data.frame(g = gf))
 bb <- b(b1 = Bb, b2 = gb)
 ## evaluate new two-dim basis
 X1 <- model.matrix(bb, data = data.frame(x = x, g = g))
-X2 <- bb(data.frame(x = x, g = g))
-stopifnot(all.equal(X1, X2))
 ## fit model
 m1 <- lm(y ~  X1 - 1)
-m2 <- lm(y ~  bb(data.frame(x = x, g = g)) - 1, data = data.frame(y = y, x = x, g = g))
+m2 <- lm(y ~  model.matrix(bb, data.frame(x = x, g = g)) - 1, data = data.frame(y = y, x = x, g = g))
 stopifnot(all.equal(coef(m1), coef(m2), check.attributes = FALSE))
 ## compute estimated regression functions
 d <- generate(bb, n = 100)
@@ -67,3 +65,30 @@ stopifnot(all.equal(p2, p3))
 stopifnot(all.equal(p3, p4))
 ## compute derivative wrt the first element
 dp2 <- predict(bb, newdata = d, coef(m1), deriv = c(x = 1))
+
+
+## join the two bases additively
+gb <- as.basis(~ g, remove_intercept = TRUE, data = data.frame(g = gf))
+bb <- c(b1 = Bb, b2 = gb)
+## evaluate new two-dim basis
+X1 <- model.matrix(bb, data = data.frame(x = x, g = g))
+## fit model
+m1 <- lm(y ~  X1 - 1)
+m2 <- lm(y ~  model.matrix(bb, data.frame(x = x, g = g)) - 1, data = data.frame(y = y, x = x, g = g))
+stopifnot(all.equal(coef(m1), coef(m2), check.attributes = FALSE))
+## compute estimated regression functions
+d <- generate(bb, n = 100)
+## for each group
+p1 <- c(sapply(gf, function(l) predict(bb, newdata = data.frame(x = d$x, g = l), coef = coef(m1))))
+## the same via expand.grid approach
+p2 <- predict(bb, newdata = d, coef(m1))
+## brute force; 2 times
+p3 <- predict(bb, newdata = do.call(expand.grid, d), coef(m1))
+p4 <- predict(m2, newdata = do.call(expand.grid, d))
+stopifnot(all.equal(p1, p2, check.attributes = FALSE))
+stopifnot(all.equal(p2, p3, check.attributes = FALSE))
+stopifnot(all.equal(p3, p4, check.attributes = FALSE))
+## compute derivative wrt the first element
+dp2 <- predict(bb, newdata = d, coef(m1), deriv = c(x = 1))
+
+
