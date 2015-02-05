@@ -92,11 +92,11 @@
     } else if (is.ordered(y)) {
         exact <- rep(FALSE, nrow(data))
         ldata <- rdata <- data
-        ldata[[response]] <- y
-        ldata[[response]][] <- levels(y)[pmax(unclass(y) - 1, 1)]
-        lfinite <- (ldata[[response]] != levels(y)[1])
+        sy <- sort(unique(y))
+        ldata[[response]] <- sy[pmax(1, unclass(y) - 1)]
+        lfinite <- (y > levels(y)[1])
         rdata[[response]] <- y
-        rfinite <- rdata[[response]] != rev(levels(y))[1]
+        rfinite <- (y < levels(y)[nlevels(y)])
     } else if (is.integer(y)) {
         exact <- rep(FALSE, nrow(data))
         ldata <- rdata <- data
@@ -151,14 +151,14 @@
         sc <- function(beta)
             .mlt_score_exact(todistr, Y, Yprime, offset, trunc)(.parm(beta))[, !fix, drop = FALSE]
     } else {
-        .makeY <- function(data, finite, nc = NULL) {
+        .makeY <- function(data, finite, nc = NULL, INF = -Inf) {
             if (any(finite)) {
                 tmp <- model.matrix(model, data = data[finite,,drop = FALSE])
                 nc <- colnames(tmp)
             } else {
-                tmp <- -Inf
+                tmp <- INF
             }
-            ret <- matrix(-Inf, nrow = nrow(data), ncol = length(nc))
+            ret <- matrix(INF, nrow = nrow(data), ncol = length(nc))
             ret[finite,] <- tmp
             colnames(ret) <- nc
             if (!is.null(attr(tmp, "constraint"))) {
@@ -168,15 +168,15 @@
             ret
         }
         if (!is.null(Y)) {
-            lY <- .makeY(ldata, lfinite, colnames(Y))
-            rY <- .makeY(rdata, rfinite, colnames(Y))
+            lY <- .makeY(ldata, lfinite, colnames(Y), INF = -Inf)
+            rY <- .makeY(rdata, rfinite, colnames(Y), INF = Inf)
         } else {
             if (any(lfinite)) {
-                lY <- .makeY(ldata, lfinite)
-                rY <- .makeY(rdata, rfinite, colnames(lY))
+                lY <- .makeY(ldata, lfinite, INF = -Inf)
+                rY <- .makeY(rdata, rfinite, colnames(lY), INF = Inf)
             } else {
-                rY <- .makeY(rdata, rfinite)
-                lY <- .makeY(ldata, lfinite, colnames(rY))
+                rY <- .makeY(rdata, rfinite, INF = Inf)
+                lY <- .makeY(ldata, lfinite, colnames(rY), INF = -Inf)
             }
         }
         if (all(!exact)) {
