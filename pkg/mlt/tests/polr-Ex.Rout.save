@@ -31,9 +31,9 @@ Loading required package: polynom
 +                   contr.treatment(n, base = 3)),
 +               ui = diff(Diagonal(2)), ci = 0)
 > 
-> m <- model(r, shift = s)
+> m <- model(r, shift = s, todist = "Logi")
 > 
-> mod <- mlt(m, housing, weights = housing$Freq, todist = "Logi")
+> mod <- mlt(m, housing, weights = housing$Freq)
 > 
 > logLik(mp)
 'log Lik.' -1771.708 (df=4)
@@ -52,4 +52,4 @@ InflMedium   InflHigh
 > 
 > proc.time()
    user  system elapsed 
-  1.639   0.030   1.664 
+  1.546   0.049   1.584 

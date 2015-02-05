@@ -19,23 +19,16 @@ Bb <- Bernstein_basis(order = 5, support = c(0, max(y) + .1),
                       ui = "increasing", var = "y")
 s <- as.basis(~ g, data = data.frame(g = gf), remove_intercept = TRUE)
 
-(cf1 <- coef(opt <- mlt(model(response = Bb, shifting = s), data = mydata,
-                todist = "MinExtrVal")))
+m <- model(response = Bb, shifting = s, todist = "MinExtrVal")
+
+(cf1 <- coef(opt <- mlt(m, data = mydata)))
 
 coef(cph <- coxph(Surv(y, rep(TRUE, nrow(mydata))) ~ g, data = mydata))
 
-nd <- samplefrom(opt, newdata = data.frame(g = gf), n = 100, ngrid = 10)
-nd$y <- with(nd$y, Surv(left, right, type = "interval2"))
-nd <- subset(nd, is.finite(nd$y[, "time1"]))
-nd2 <- nd
-nd2$y <- nd2$y[, "time2"]
-boxplot(nd$y[, "time1"] ~ g, data = nd)
+nd <- samplefrom(opt, newdata = data.frame(g = gf), n = 100)
 
 ### check interval censoring!!!
-(cf2 <- coef(opt2 <- mlt(model(response = Bb, shifting = s), data = nd,
-                todist = "MinExtrVal")))
-(cf2 <- coef(opt3 <- mlt(model(response = Bb, shifting = s), data = nd2,
-                todist = "MinExtrVal")))
+(cf2 <- coef(opt2 <- mlt(m, data = nd)))
 
 cf1 - cf2
 
@@ -54,32 +47,30 @@ plot(yn, 1 - a[[3]](yn, type = "prob"), type = "l", col = "red", ylim = c(0, 1))
 lines(survfit(cph, newdata = data.frame(g = gf[3])))
 
 mydata <- data.frame(y = Surv(y, sample(0:1, length(y), replace = TRUE)), g = g)
-coef(opt <- mlt(model(response = Bb, shifting = ~ g), data = mydata,
-                todist = "MinExtrVal"))
+coef(opt <- mlt(m, data = mydata))
 
 coef(cph <- coxph(y ~ g, data = mydata))
 
 mydata <- data.frame(y = Surv(y, sample(0:1, length(y), replace = TRUE), type = "left"), g = g)
-coef(opt <- mlt(model(response = Bb, shifting = ~ g), data = mydata,
-                todist = "MinExtrVal"))
+coef(opt <- mlt(m, data = mydata))
 
 Bb <- Bernstein_basis(order = 5, support = c(0, max(y + 1) + .1),
                       ui = "increasing", var = "y")
 
 mydata <- data.frame(y = Surv(y, y + 1, sample(0:3, length(y), replace = TRUE), type = "interval"), 
                      g = g)
-coef(opt <- mlt(model(response = Bb, shifting = ~ g), data = mydata,
-                todist = "MinExtrVal"))
+coef(opt <- mlt(m, data = mydata))
 
 mydata <- data.frame(y = y, g = g)
 
 Bb2 <- Bernstein_basis(order = 5, support = c(0, max(y) + .1), var = "y",
                        ui = "increasing", ci = -sqrt(.Machine$double.eps))
-m <- c(b4 = Bb, b3 = b(b1 = Bb2, b2 = as.basis(~ g, remove_intercept = TRUE)))
-attr(m, "response") <- "y"
+m$model <- c(b4 = Bb, b3 = b(b1 = Bb2, b2 = as.basis(~ g, remove_intercept = TRUE)))
+m$response <- "y"
+m$todist <- mlt:::.distr("MinExtrVal")
+class(m) <- "model"
 
-coef(opt <- mlt(m, data = mydata,
-                todist = "MinExtrVal"))
+coef(opt <- mlt(m, data = mydata))
 
 coef(cph <- coxph(Surv(y, rep(TRUE, nrow(mydata))) ~ g, data = mydata))
 

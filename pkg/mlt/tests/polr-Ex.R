@@ -11,9 +11,9 @@ r <- as.basis(~ Sat, data = housing, remove_intercept = TRUE,
                   contr.treatment(n, base = 3)),
               ui = diff(Diagonal(2)), ci = 0)
 
-m <- model(r, shift = s)
+m <- model(r, shift = s, todist = "Logi")
 
-mod <- mlt(m, housing, weights = housing$Freq, todist = "Logi")
+mod <- mlt(m, housing, weights = housing$Freq)
 
 logLik(mp)
 logLik(mod)
