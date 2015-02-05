@@ -1,7 +1,7 @@
 
 .findstart <- function(model, data, ui = NULL, ci = NULL, fix = NULL, fixed = NULL) {
 
-    y <- data[[response <- attr(model, "response")]]
+    y <- data[[response <- model$response]]
     if (is.null(dim(y)) & (storage.mode(y) == "double")) {
         z <- y
     } else if (.is.Surv(y)) {
@@ -42,20 +42,18 @@
     theta
 }
 
-.mlt_fit <- function(model, data, todistr = c("Normal", "Logistic", "MinExtrVal"),
-                     weights = NULL, offset = NULL, fixed = NULL, trunc = NULL) {
+.mlt_fit <- function(model, data, weights = NULL, offset = NULL, fixed = NULL, trunc = NULL) {
 
     if (is.null(weights)) weights <- rep(1, nrow(data))
     if (is.null(offset)) offset <- rep(0, nrow(data))
     stopifnot(nrow(data) == length(weights))
     stopifnot(nrow(data) == length(offset))
 
-    response <- attr(model, "response")
+    response <- model$response
     stopifnot(length(response) == 1)
     y <- data[[response]]
 
-    if (is.character(todistr))
-        todistr <- .distr(todistr)
+    todistr <- model$todistr
 
     if (!is.null(trunc)) {
         stopifnot(is.character(trunc))

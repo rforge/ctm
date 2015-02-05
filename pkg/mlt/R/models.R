@@ -1,5 +1,6 @@
 
-model <- function(response = NULL, interacting = NULL, shifting = NULL) {
+model <- function(response, interacting = NULL, shifting = NULL, 
+                  todistr = c("Normal", "Logistic", "MinExtrVal")) {
 
     if (.is.formula(response)) 
         response <- as.basis(response)
@@ -8,20 +9,30 @@ model <- function(response = NULL, interacting = NULL, shifting = NULL) {
     if (.is.formula(shifting)) 
         shifting <- as.basis(shifting, remove_intercept = TRUE)
 
+    if (is.character(todistr))
+        todistr <- .distr(todistr)
+
     if (is.null(shifting)) {
         if (!is.null(interacting)) {
-            ret <- b(bresponse = response, binteracting = interacting)
+            mod <- b(bresponse = response, binteracting = interacting)
         } else {
-            ret <- c(bresponse = response)
+            mod <- c(bresponse = response)
         }   
     } else {
         if (!is.null(interacting)) {
-            ret <- c(b(bresponse = response, binteracting = interacting), 
+            mod <- c(b(bresponse = response, binteracting = interacting), 
                     bshifting = shifting)
         } else {
-            ret <- c(bresponse = response, bshifting = shifting)
+            mod <- c(bresponse = response, bshifting = shifting)
         }
     }
-    attr(ret, "response") <- varnames(response)
+    ret <- list(model = mod, response = varnames(response), todistr = todistr)
+    class(ret) <- "model"
     return(ret)
 }
+
+model.matrix.model <- function(object, data, ...)
+    model.matrix(object$model, data = data, ...)
+
+varnames.model <- function(x)
+    varnames(x$model)
