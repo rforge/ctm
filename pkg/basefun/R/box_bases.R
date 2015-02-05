@@ -65,6 +65,9 @@ predict.box_bases <- function(object, newdata, coef, ...) {
     if (is.data.frame(newdata))    
         return(predict.basis(object = object, newdata = newdata,
                              coef = coef, ...))
+    vn <- lapply(object, varnames)
+    stopifnot(all(sapply(vn, length) == 1))
+    stopifnot(all(!duplicated(unlist(vn))))
     X <- model.matrix(object = object, data = newdata, 
                       model.matrix = FALSE, ...)
     X <- lapply(X, function(x) as(x, "matrix"))

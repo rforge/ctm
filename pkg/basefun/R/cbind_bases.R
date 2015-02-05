@@ -77,9 +77,11 @@ model.matrix.cbind_bases <- function(object, data, model.matrix = TRUE,
 }
 
 predict.cbind_bases <- function(object, newdata, coef, deriv = NULL, integrate = NULL, ...) {
+
     if (is.data.frame(newdata))
         return(predict.basis(object = object, newdata = newdata,
                              coef = coef, ...))
+
     np <- sapply(object, nparm, data = newdata)
     ret <- lapply(1:length(object), function(b) {
                   start <- ifelse(b == 1, 1, sum(np[1:(b - 1)]) + 1)
@@ -89,7 +91,7 @@ predict.cbind_bases <- function(object, newdata, coef, deriv = NULL, integrate =
                       if (names(deriv) %in% varnames(object[[b]])) {
                           thisargs$deriv <- deriv
                       } else {
-                          return(rep(0,  nrow(model.matrix(object[[b]], data = newdata))))
+                          return(rep(0, nrow(model.matrix(object[[b]], data = newdata))))
                       }
                   }
                   if (!is.null(integrate)) {
@@ -101,5 +103,9 @@ predict.cbind_bases <- function(object, newdata, coef, deriv = NULL, integrate =
                   thisargs$coef <- cf
                   return(do.call("predict", thisargs))
     })
+    vn <- sapply(object, varnames)
+    if (length(unique(varnames(object))) == 1) return(Reduce("+", ret))
+    stopifnot(all(sapply(vn, length) == 1))
+    stopifnot(all(!duplicated(unlist(vn))))
     return(rowSums(expand.grid(ret))) ### CHECK, outer?
 }
