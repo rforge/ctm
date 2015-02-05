@@ -100,3 +100,21 @@ samplefrom.mlt <- function(object, newdata = NULL, n = 1, ...) {
                coef = coef(object, fixed = TRUE), n = n, ...)
 }
 
+plot.mlt <- function(x, formula, newdata = generate(x, n = 25), 
+                     type = c("trafo", "prob"), plotfun = plot, ...) {
+
+    type <- match.arg(type)
+
+    p <- predict(x$model$model, newdata = newdata, 
+                 coef = coef(x, fixed = TRUE))
+    if (type == "prob") p <- x$model$todist$p(p)
+    nd <- expand.grid(newdata)
+    nd$p <- p
+    plotfun(formula, data = nd, ...)
+}
+
+generate.mlt <- function(object, ...)
+    generate(object$model, ...)
+
+generate.model <- function(object, ...)
+    generate(object$model, ...)
