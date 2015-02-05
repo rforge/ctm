@@ -38,7 +38,7 @@ d <- data.frame(y = y, x = x)
 plot(x, y)
 
 Bb <- Bernstein_basis(order = 10, support = c(0, 2*pi), var = "x")
-m <- model(lin, interacting = Bb)
+m <- model(lin, interacting = Bb, remove_intercept = TRUE)
 
 o <- mlt(m, data = d)
 

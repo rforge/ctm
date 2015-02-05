@@ -25,6 +25,11 @@ m <- model(response = Bb, shifting = s, todist = "MinExtrVal")
 
 coef(cph <- coxph(Surv(y, rep(TRUE, nrow(mydata))) ~ g, data = mydata))
 
+lb <- log_basis(varname = "y", support = c(0, max(y)))
+m <- model(response = c(blog = lb, bBern = Bb), shifting = s, todist = "MinExtrVal")
+
+(cf1 <- coef(opt <- mlt(m, data = mydata)))
+
 nd <- samplefrom(opt, newdata = data.frame(g = gf), n = 100)
 
 ### check interval censoring!!!
@@ -33,6 +38,7 @@ nd <- samplefrom(opt, newdata = data.frame(g = gf), n = 100)
 cf1 - cf2
 
 yn <- generate(Bb, 50)$y
+yn <- yn[yn > 0]
 
 a <- predict(opt, newdata = data.frame(g = gf))
 
@@ -65,10 +71,10 @@ mydata <- data.frame(y = y, g = g)
 
 Bb2 <- Bernstein_basis(order = 5, support = c(0, max(y) + .1), var = "y",
                        ui = "increasing", ci = -sqrt(.Machine$double.eps))
-m$model <- c(b4 = Bb, b3 = b(b1 = Bb2, b2 = as.basis(~ g, remove_intercept = TRUE)))
-m$response <- "y"
-m$todist <- mlt:::.distr("MinExtrVal")
-class(m) <- "model"
+
+m <- model(response = Bb, 
+           interacting = b(b1 = Bb2, b2 = as.basis(~ g, remove_intercept = TRUE)),
+           todist = "MinExtrVal")
 
 coef(opt <- mlt(m, data = mydata))
 

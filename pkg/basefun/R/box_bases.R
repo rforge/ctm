@@ -3,7 +3,7 @@
 b <- function(...) {
 
     bases <- list(...)
-    stopifnot(all(sapply(bases, inherits, what = "basis")))
+    stopifnot(all(sapply(bases, inherits, what = c("basis", "bases"))))
     bnames <- names(bases)
     stopifnot(length(unique(bnames)) == length(bases))
 
