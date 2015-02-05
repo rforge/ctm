@@ -1,0 +1,55 @@
+
+R version 3.1.2 (2014-10-31) -- "Pumpkin Helmet"
+Copyright (C) 2014 The R Foundation for Statistical Computing
+Platform: x86_64-unknown-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library("MASS")
+> 
+> mp <- polr(Sat ~ Infl, weights = Freq, data = housing)
+> 
+> library("mlt")
+Loading required package: basefun
+Loading required package: Matrix
+Loading required package: polynom
+> 
+> s <- as.basis(~ Infl, data = housing, remove_intercept = TRUE)
+> r <- as.basis(~ Sat, data = housing, remove_intercept = TRUE,
++               contrasts.arg = list(Sat = function(n) 
++                   contr.treatment(n, base = 3)),
++               ui = diff(Diagonal(2)), ci = 0)
+> 
+> m <- model(r, shift = s)
+> 
+> mod <- mlt(m, housing, weights = housing$Freq, todist = "Logi")
+> 
+> logLik(mp)
+'log Lik.' -1771.708 (df=4)
+> logLik(mod)
+[1] -1771.708
+> 
+> coef(mp)
+InflMedium   InflHigh 
+ 0.5635756  1.2486832 
+> mp$zeta
+ Low|Medium Medium|High 
+ -0.2013727   0.9484658 
+> coef(mod)
+      Sat1       Sat2 InflMedium   InflHigh 
+-0.2013747  0.9484789 -0.5635813 -1.2486805 
+> 
+> proc.time()
+   user  system elapsed 
+  1.639   0.030   1.664 
