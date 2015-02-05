@@ -59,3 +59,9 @@ Bernstein_basis <- function(order = 2, support = c(0, 1),
     class(basis) <- c("Bernstein_basis", "basis", class(basis))
     return(basis)
 }
+
+### evaluate model.matrix of Bernstein polynom
+model.matrix.Bernstein_basis <- function(object, data,
+                                         deriv = 0L, integrate = FALSE, ...)
+    model.matrix.basis(object = object, data = data, 
+                       deriv = deriv, integrate = integrate, ...)

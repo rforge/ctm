@@ -3,51 +3,35 @@
 model.matrix.basis <- function(object, data, ...)
     object(data, ...)
 
-model.matrix.log_basis <- function(object, data, deriv = 0L, ...)
-    object(data, deriv = deriv, ...)
-
-model.matrix.polynomial_basis <- function(object, data, deriv = 0L, ...)
-    object(data, deriv = deriv, ...)
-
-### evaluate model.matrix of Bernstein polynom
-model.matrix.Bernstein_basis <- function(object, data,
-                                         deriv = 0L, integrate = FALSE, ...)
-    model.matrix.basis(object = object, data = data, 
-                       deriv = deriv, integrate = integrate, ...)
-
 ### compute predicted values of (multiple) basis objects
 predict.basis <- function(object, newdata, coef, ...) {
     X <- model.matrix(object = object, data = newdata, ...)
-    X %*% coef
+    return(drop(X %*% coef))
 }
 
-predict.box_bases <- function(object, newdata, coef, ...) {
-    if (is.data.frame(newdata)) 
-        return(predict.basis(object = object, newdata = newdata, 
-                             coef = coef, ...))
-    X <- model.matrix(object = object, data = newdata, model.matrix = FALSE, ...)
-    X <- lapply(X, function(x) as(x, "matrix"))
-    X$beta <- array(coef, sapply(X, NCOL))
-    do.call(".cXb", X)
-}
+nparm <- function(object, data)
+    UseMethod("nparm")
 
-predict.cbind_bases <- function(object, newdata, coef, ...) {
-    stopifnot(is.data.frame(newdata)) 
-    predict.basis(object = object, newdata = newdata, 
-                  coef = coef, ...)
-}
+nparm.basis <- function(object, data)
+    ncol(object(data))
 
 varnames <- function(x)
     UseMethod("varnames")
 
-varnames.default <- function(x)
+varnames.basis <- function(x)
     attr(x, "varnames")
+
+varnames.bases <- function(x)
+    sapply(x, varnames)
 
 support <- function(x)
     UseMethod("support")
 
-support.default <- function(x)
+support.basis <- function(x)
     attr(x, "support")
+
+support.bases <- function(x)
+    lapply(x, support)
 
 generate <- function(object, n)
     UseMethod("generate")
@@ -73,6 +57,8 @@ generate.basis <- function(object, n) {
     if (length(ret) == 0) return(ret2)
     ret
 }
+
+generate.bases <- generate.basis
 
 as.basis <- function(object, ...)
     UseMethod("as.basis")

@@ -1,6 +1,6 @@
 
 log_basis <- function(support = c(.Machine$double.eps, Inf),
-                      ui = 1, ci = 0, varname = NULL) {
+                      ui = Diagonal(1), ci = 0, varname = NULL) {
 
     basis <- function(data, deriv = 0L) {
         if (is.atomic(data)) {
@@ -10,7 +10,7 @@ log_basis <- function(support = c(.Machine$double.eps, Inf),
             x <- data[[varname]]
         }
         if (deriv == 0) {
-            X <- matrix(log(x), ncol = 1)
+            X <- matrix(log(pmax(x, .Machine$double.eps)), ncol = 1)
         } else if (deriv == 1) {
             X <- matrix(1 / x, ncol = 1)
         } else {
@@ -30,3 +30,6 @@ log_basis <- function(support = c(.Machine$double.eps, Inf),
     class(basis) <- c("log_basis", "basis", class(basis))
     return(basis)
 }
+
+model.matrix.log_basis <- function(object, data, deriv = 0L, ...)
+    object(data, deriv = deriv, ...)

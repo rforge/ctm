@@ -43,3 +43,6 @@ polynomial_basis <- function(coef, support = c(0, 1),
     class(basis) <- c("polynomial_basis", "basis", class(basis))
     return(basis)
 }
+
+model.matrix.polynomial_basis <- function(object, data, deriv = 0L, ...)
+    object(data, deriv = deriv, ...)
