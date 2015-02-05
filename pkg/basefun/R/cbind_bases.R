@@ -7,8 +7,7 @@ c.basis <- function(..., recursive = FALSE) {
     bases <- list(...)
     stopifnot(all(sapply(bases, inherits, what = c("basis", "bases"))))
     bnames <- names(bases)
-    stopifnot(length(unique(bnames)) == length(bnames))
-
+    stopifnot(length(unique(bnames)) == length(bases))
     varnames <- sapply(bases, varnames)
     stopifnot(all(!is.null(varnames)))
  

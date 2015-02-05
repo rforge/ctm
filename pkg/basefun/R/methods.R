@@ -22,7 +22,7 @@ varnames.basis <- function(x)
     attr(x, "varnames")
 
 varnames.bases <- function(x)
-    sapply(x, varnames)
+    unique(sapply(x, varnames))
 
 support <- function(x)
     UseMethod("support")
