@@ -3,10 +3,12 @@ model <- function(response, interacting = NULL, shifting = NULL,
                   remove_intercept = FALSE,
                   todistr = c("Normal", "Logistic", "MinExtrVal")) {
 
+    ### generate() will not work due to missing data
     if (.is.formula(response)) 
         response <- as.basis(response)
     if (.is.formula(interacting)) 
-        interacting <- as.basis(interacting)
+        interacting <- as.basis(interacting, 
+                                remove_intercept = !remove_intercept)
     if (.is.formula(shifting)) 
         shifting <- as.basis(shifting, remove_intercept = TRUE)
 
