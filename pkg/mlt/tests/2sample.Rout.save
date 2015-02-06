@@ -1,0 +1,107 @@
+
+R version 3.1.2 (2014-10-31) -- "Pumpkin Helmet"
+Copyright (C) 2014 The R Foundation for Statistical Computing
+Platform: x86_64-unknown-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> 
+> library("mlt")
+Loading required package: basefun
+Loading required package: Matrix
+Loading required package: polynom
+> 
+> set.seed(28)
+> n <- 100
+> g <- gl(2, n)
+> y <- rnorm(length(g), mean = c(2, 1)[g], sd = c(.5, 1.5)[g])
+> mydata <- data.frame(g = g, y = y)
+> 
+> by <- polynomial_basis(c(1, 1), var = "y", support = range(y), ci = c(-Inf, 0))
+> bg1 <- as.basis(~ g - 1)
+> 
+> m1 <- model(by, inter = bg1, remove_intercept = TRUE)
+> fm1 <- mlt(m1, data = mydata)
+Note: method with signature ‘diagonalMatrix#Matrix’ chosen for function ‘kronecker’,
+ target signature ‘ddiMatrix#ddiMatrix’.
+ "Matrix#diagonalMatrix" would also be valid
+Note: method with signature ‘TsparseMatrix#sparseMatrix’ chosen for function ‘kronecker’,
+ target signature ‘dtTMatrix#ddiMatrix’.
+ "Matrix#diagonalMatrix" would also be valid
+Note: method with signature ‘Matrix#numLike’ chosen for function ‘%*%’,
+ target signature ‘dgTMatrix#numeric’.
+ "TsparseMatrix#ANY" would also be valid
+Note: method with signature ‘Matrix#matrix’ chosen for function ‘%*%’,
+ target signature ‘dgTMatrix#matrix’.
+ "TsparseMatrix#ANY" would also be valid
+> logLik(fm1)
+[1] -259.6152
+> vcov(fm1)
+            1           2            1            2
+1  0.08823081 -0.03935628  0.000000000  0.000000000
+2 -0.03935628  0.01979932  0.000000000  0.000000000
+1  0.00000000  0.00000000  0.010911453 -0.001366128
+2  0.00000000  0.00000000 -0.001366128  0.002047617
+> cf1 <- coef(fm1)
+> 1 / cf1[c(2, 4)] 
+        2         2 
+0.5025272 1.5626455 
+> -cf1[c(1, 3)] / cf1[c(2,4)]
+        1         1 
+1.9877599 0.6671791 
+> 
+> ### no constraints here!
+> by2 <- polynomial_basis(c(1, 1), var = "y", support = range(y))
+> bg2 <- as.basis(~ g, remove_intercept = TRUE)
+> m2 <- model(by, inter = b(b1 = by2, b2 = bg2))
+> fm2 <- mlt(m2, data = mydata)
+Note: method with signature ‘Matrix#numLike’ chosen for function ‘%*%’,
+ target signature ‘dtTMatrix#numeric’.
+ "TsparseMatrix#ANY" would also be valid
+Note: method with signature ‘Matrix#matrix’ chosen for function ‘%*%’,
+ target signature ‘dtTMatrix#matrix’.
+ "TsparseMatrix#ANY" would also be valid
+> logLik(fm2)
+[1] -259.6152
+> vcov(fm2)
+            1           2           1           2
+1  0.08823104 -0.03935640 -0.08823104  0.03935640
+2 -0.03935640  0.01979938  0.03935640 -0.01979938
+1 -0.08823104  0.03935640  0.09914249 -0.04072253
+2  0.03935640 -0.01979938 -0.04072253  0.02184700
+> (cf2 <- coef(fm2))
+        1         2         1         2 
+-3.955539  1.989948  3.528586 -1.350009 
+> c(cf1[1:2], cf1[3:4] - cf1[1:2])
+        1         2         1         2 
+-3.955527  1.989942  3.528572 -1.350001 
+> 
+> 1 / cf2[2]
+        2 
+0.5025257 
+> 1 / sum(cf2[c(2, 4)])
+[1] 1.56265
+> 
+> -cf2[1] / cf2[2]
+      1 
+1.98776 
+> -sum(cf2[c(1, 3)]) / sum(cf2[c(2, 4)])
+[1] 0.6671774
+> 
+> proc.time()
+   user  system elapsed 
+  1.672   0.049   1.707 
