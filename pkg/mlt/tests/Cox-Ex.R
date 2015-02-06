@@ -72,8 +72,9 @@ coef(opt <- mlt(m, data = mydata))
 
 mydata <- data.frame(y = y, g = g)
 
-Bb2 <- Bernstein_basis(order = 5, support = c(0, max(y) + .1), var = "y",
-                       ui = "increasing", ci = -sqrt(.Machine$double.eps))
+Bb2 <- Bernstein_basis(order = 5, support = c(0, max(y) + .1), var = "y")
+### basically works wo constraints (where data are); cf 2sample.R
+#                       ui = "increasing", ci = -sqrt(.Machine$double.eps))
 
 m <- model(response = Bb, 
            interacting = b(b1 = Bb2, b2 = as.basis(~ g, remove_intercept = TRUE)),
