@@ -66,10 +66,14 @@
         trunc <- list(left = lefttrunc, right = righttrunc)
     }
 
-    if (is.null(dim(y)) & (storage.mode(y) == "double")) {
+    ytype <- .type_of_response(y)
+    if (is.na(ytype))
+        stop("cannot deal with response class", class(y))
+
+    if (ytype == "double") {
         exact <- rep(TRUE, nrow(data))
         edata <- data
-    } else if (.is.Surv(y)) {
+    } else if (ytype == "survival") {
         sy <- .Surv2matrix(y)
         lna <- is.na(sy[, "left"])
         rna <- is.na(sy[, "right"])
@@ -87,7 +91,9 @@
         rfinite <- is.finite(rdata[[response]])
         if ("lefttrunc" %in% colnames(sy))
             trunc$left <- sy[, "lefttrunc"]
-    } else if (is.ordered(y)) {
+    } else if (ytype %in% c("ordered", "unordered")) {
+        if (ytype == "unordered") 
+            warning("results may depend on ordering of levels")
         exact <- rep(FALSE, nrow(data))
         ldata <- rdata <- data
         sy <- sort(unique(y))
@@ -95,16 +101,14 @@
         lfinite <- (y > levels(y)[1])
         rdata[[response]] <- y
         rfinite <- (y < levels(y)[nlevels(y)])
-    } else if (is.integer(y)) {
+    } else if (ytype == "integer") {
         exact <- rep(FALSE, nrow(data))
         ldata <- rdata <- data
         ldata[[response]] <- y - 1
         lfinite <- (ldata[[response]] >= 0)
         rdata[[response]] <- y
         rfinite <- rep(TRUE, nrow(rdata))
-    } else {
-        stop("cannot deal with response class", class(y))
-    }
+    } 
 
     Y <- NULL
     if (any(exact)) {    
