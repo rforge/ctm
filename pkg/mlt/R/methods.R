@@ -23,16 +23,54 @@ predict.model <- function(object, newdata, coef, ...) {
 
     stopifnot(is.data.frame(newdata))
     lapply(1:nrow(newdata), function(i) {
-        ret <- function(y, type = c("trafo", "prob"), ...) { ### density, quantile, hazard, cumhaz
+        ret <- function(y, type = c("trafo", "prob", "density", 
+                                    "quantile", "hazard", "cumhaz"), n = 1000, ...) { 
+
             type <- match.arg(type)
-            data <- newdata[rep(i, length(y)),,drop = FALSE]
-            data[[object$response]] <- y
-            Y <- model.matrix(object, data = data, ...)
-            ret <- drop(Y %*% coef)
-            switch(type, 
-                   "trafo" = ret,
-                   "prob" = object$todistr$p(ret))
+
+            tpdfun <- function(y, type = c("trafo", "prob", "density", "cumhaz")) {
+                type <- match.arg(type)
+                yt <- .type_of_response(y)
+            
+                data <- newdata[rep(i, length(y)),,drop = FALSE]
+                data[[object$response]] <- y
+                Y <- model.matrix(object, data = data, ...)
+                trafo <- drop(Y %*% coef) ### <FIXME> offset??? </FIXME>
+                ret <- switch(type, 
+                    "trafo" = trafo,
+                    "prob" = object$todistr$p(trafo),
+                    "density" = {
+                        if (yt %in% c("unordered", "ordered")) 
+                            stop("not yet implemented")
+                        deriv <- 1
+                        names(deriv) <- object$response
+                        Yprime <- model.matrix(object, data = data, deriv = deriv, ...)
+                        object$todistr$d(trafo) * drop(Yprime %*% coef)
+                    },
+                    "cumhaz" = -log(1 - object$todistr$p(trafo))
+                )
+                return(ret)
+            }
+ 
+            if (type == "hazard")
+                return(tpdfun(y, "density") / (1 - tpdfun(y, "prob")))
+            if (type == "quantile") {
+                probs <- y
+                stopifnot(all(probs >= 0 & probs <= 1))
+                y <- generate(object, n = n)[[object$response]]
+                yt <- .type_of_response(y)
+                p <- c(0, tpdfun(y, "prob") , 1)
+                idx <- sapply(probs, function(prob) sum(p <= prob))
+                if (yt %in% c("unordered", "ordered", "integer")) 
+                    return(y[idx]) 
+                ptmp <- cbind(p[idx], p[idx + 1])
+                beta <- (ptmp[,2] - ptmp[,1]) / (y[idx + 1] - y[idx])
+                alpha <- ptmp[,1] - beta * y[idx]
+                return((probs - alpha) / beta)
+            }
+            return(tpdfun(y, type))
         }
+                  
         environment(ret) <- new.env()
         assign("i", i, environment(ret)) ### i changes in parent.frame()!
         ret
@@ -55,7 +93,8 @@ predict.mlt <- function(object, newdata = NULL, ...) {
 samplefrom <- function(object, ...)
     UseMethod("samplefrom")
 
-samplefrom.model <- function(object, newdata = NULL, coef, n = 1, ngrid = 10, ny = 100, ...) {
+samplefrom.model <- function(object, newdata = NULL, coef, 
+                             n = 1, ngrid = 10, ny = 100, interval = FALSE, ...) {
 
     response <- object$response
 
@@ -86,12 +125,19 @@ samplefrom.model <- function(object, newdata = NULL, coef, n = 1, ngrid = 10, ny
         idx <- rowSums(p <= (u <- runif(nobs)))
         if (storage.mode(y) != "double")
             return(y[idx])
+        if (interval)
+            return(data.frame(left = y[idx], right = y[idx + 1]))
         ptmp <- cbind(p[cbind(1:nrow(p), idx)], p[cbind(1:nrow(p), idx + 1)])
         beta <- (ptmp[,2] - ptmp[,1]) / (y[idx + 1] - y[idx])
         alpha <- ptmp[,1] - beta * y[idx]
         return((u - alpha) / beta)
     }
-    ret <- unlist(lapply(1:n, .sample))
+    ret <- lapply(1:n, .sample)
+    if (interval) {
+        ret <- do.call("rbind", ret)
+    } else { 
+        ret <- unlist(ret)
+    }
     newdata <- newdata[rep(1:nrow(newdata), n),,drop = FALSE]
     newdata[[response]] <- ret
     return(newdata)
@@ -105,13 +151,18 @@ samplefrom.mlt <- function(object, newdata = NULL, n = 1, ...) {
 }
 
 plot.mlt <- function(x, formula, newdata = generate(x, n = 25), 
-                     type = c("trafo", "prob"), plotfun = plot, ...) {
+                     what = c("trafo", "prob"), ### density, quantile, ...
+                     plotfun = plot, ...) {
 
-    type <- match.arg(type)
-
-    p <- predict(x$model$model, newdata = newdata, 
-                 coef = coef(x, fixed = TRUE))
-    if (type == "prob") p <- x$model$todist$p(p)
+    what <- match.arg(what)
+    stopifnot(length(formula) == 2)
+    formula[[3]] <- formula[[2]]
+    formula[[2]] <- as.name("p")
+    trafo <- predict(x$model$model, newdata = newdata, 
+                     coef = coef(x, fixed = TRUE))
+    p <- switch(what, 
+        "trafo" = trafo,
+        "prob" = x$model$todistr$p(trafo))
     nd <- expand.grid(newdata)
     nd$p <- p
     plotfun(formula, data = nd, ...)
