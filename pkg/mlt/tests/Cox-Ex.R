@@ -24,7 +24,7 @@ m <- model(response = Bb, shifting = s, todist = "MinExtrVal")
 (cf1 <- coef(opt <- mlt(m, data = mydata)))
 
 library("lattice")
-plot(opt, p ~ y | g, type = "prob", plotfun = xyplot)
+plot(opt, ~ y | g, what = "prob", plotfun = xyplot)
 
 coef(cph <- coxph(Surv(y, rep(TRUE, nrow(mydata))) ~ g, data = mydata))
 
