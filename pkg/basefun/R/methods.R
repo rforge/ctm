@@ -36,6 +36,7 @@ support.bases <- function(x)
 generate <- function(object, n)
     UseMethod("generate")
 
+### <FIXME> can we generate only a subset of variables??? </FIXME>
 generate.basis <- function(object, n) {
     ret <- list()
     .generate <- function(s, n) {
@@ -44,6 +45,7 @@ generate.basis <- function(object, n) {
             if (all(sapply(s, is.atomic)))
                 ret[names(tmp)] <<- tmp
         }
+        ### <FIXME> better type check as in mlt </FIXME>
         if ((length(s) == 2) && (storage.mode(s) == "double")) {
             x <- seq(from = s[1], to = s[2], length.out = n)
         } else if (is.factor(s)) {
