@@ -9,8 +9,12 @@ vcov.mlt <- function(object, ...)
     solve(object$optim(coef(object, fixed = FALSE), 
                        hessian = TRUE)$hessian)
 
-logLik.mlt <- function(object, ...)
-    -object$loglik(coef(object, fixed = FALSE))
+logLik.mlt <- function(object, ...) {
+    ret <- -object$loglik(coef(object, fixed = FALSE))
+    attr(ret, "df") <- length(coef(object, fixed = FALSE))
+    class(ret) <- "logLik"
+    ret
+}
 
 estfun.mlt <- function(object, ...)
     -object$score(coef(object, fixed = FALSE))
