@@ -123,7 +123,7 @@ samplefrom.model <- function(object, newdata = NULL, coef,
 
     .sample <- function(i) {
         idx <- rowSums(p <= (u <- runif(nobs)))
-        if (storage.mode(y) != "double")
+        if (.type_of_response(y) != "double")
             return(y[idx])
         if (interval)
             return(data.frame(left = y[idx], right = y[idx + 1]))
