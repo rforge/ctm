@@ -8,5 +8,5 @@ Description: Estimation via transformation.
 Depends: basefun (>= 0.0-3)
 Imports: MASS
 Enhances: np, eha, survival
-Suggests: lattice
+Suggests: lattice, multcomp
 License: GPL-2
