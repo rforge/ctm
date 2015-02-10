@@ -23,7 +23,6 @@ lines(ecdf(faithful$waiting))
 plot(aic)
 
 o <- which.min(aic) + 1
-o <- 6
 Bs <- Bernstein_basis(order = o, var = "waiting", ui = "incre",
                       support = range(faithful$waiting) + c(-5, 5))
 m <- model(Bs)
@@ -54,16 +53,17 @@ p <- 1:99 / 100
 plot(p, d[[1]](p, type = "quantile"))
 lines(p, quantile(faithful$waiting, p))
 
-o <- 6
-Bs <- Bernstein_basis(order = o, var = "waiting", ui = "incre",
+Bs <- Bernstein_basis(order = o, var = "waiting", ui = "incre", normal = TRUE,
                       support = range(faithful$waiting) + c(-5, 5))
 m <- model(Bs)
 mod <- mlt(m, data = faithful)
 
+cov2cor(vcov(mod))
+
 library("multcomp")
 
 mp <- parm(coef(mod), vcov(mod))
-y <- generate(mod, 50)$waiting
+y <- generate(mod, 25)$waiting
 mc <- confint(glht(mp, linfct = model.matrix(mod$model, 
     data = data.frame(waiting = y))))
 umc <- confint(glht(mp, linfct = model.matrix(mod$model, 
