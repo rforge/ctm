@@ -38,7 +38,7 @@ Loading required package: polynom
 > logLik(mp)
 'log Lik.' -1771.708 (df=4)
 > logLik(mod)
-[1] -1771.708
+'log Lik.' -1771.708 (df=4)
 > 
 > coef(mp)
 InflMedium   InflHigh 
@@ -52,4 +52,4 @@ InflMedium   InflHigh
 > 
 > proc.time()
    user  system elapsed 
-  1.546   0.049   1.584 
+  1.513   0.044   1.542 

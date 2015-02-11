@@ -80,7 +80,7 @@ Loading required package: splines
 > logLik(aft)
 'log Lik.' -145.845 (df=3)
 > logLik(opt)
-[1] -145.845
+'log Lik.' -145.845 (df=3)
 > 
 > 
 > ## Use a Weibull-AFT for estimation (Weibull shape parameter should be nu = 1)
@@ -107,7 +107,7 @@ Loading required package: splines
 > 
 > ## Compare log-Likelihoods
 > logLik(opt2)
-[1] -144.2832
+'log Lik.' -144.2832 (df=4)
 > logLik(aft2)
 'log Lik.' -144.2832 (df=4)
 > 
@@ -271,7 +271,7 @@ log(shape)
 > logLik(aft)
 'log Lik.' -259.0559 (df=4)
 > logLik(opt)
-[1] -259.0559
+'log Lik.' -259.0559 (df=4)
 > 
 > 
 > ## ************************* Right-censored
@@ -313,7 +313,7 @@ log(shape)
 > 
 > ## Compare log-Likelihoods
 > logLik(opt)
-[1] -244.3803
+'log Lik.' -244.3803 (df=4)
 > logLik(aft)
 'log Lik.' -244.3803 (df=4)
 > 
@@ -337,7 +337,7 @@ log(shape)
 > 
 > ## Compare log-Likelihoods
 > logLik(opt)
-[1] -229.4246
+'log Lik.' -229.4246 (df=4)
 > logLik(aft)
 'log Lik.' -229.4246 (df=4)
 > 
@@ -361,11 +361,11 @@ log(shape)
 > 
 > ## Compare log-Likelihoods
 > logLik(opt)
-[1] -270.1913
+'log Lik.' -270.1913 (df=4)
 > logLik(aft)
 'log Lik.' -270.1912 (df=4)
 > 
 > 
 > proc.time()
    user  system elapsed 
-  2.140   0.081   2.211 
+  2.159   0.046   2.193 

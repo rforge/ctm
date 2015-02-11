@@ -2,9 +2,13 @@
 .findstart <- function(model, data, ui = NULL, ci = NULL, fix = NULL, fixed = NULL) {
 
     y <- data[[response <- model$response]]
-    if (is.null(dim(y)) & (storage.mode(y) == "double")) {
+    ytype <- .type_of_response(y)
+    if (is.na(ytype))
+        stop("cannot deal with response class", class(y))
+
+    if (ytype == "double") {
         z <- y
-    } else if (.is.Surv(y)) {
+    } else if (ytype == "survival") {
         sy <- .Surv2matrix(y)
         lna <- is.na(sy[, "left"])
         rna <- is.na(sy[, "right"])
@@ -19,9 +23,9 @@
         z[interval] <- sy[interval, "left"] + (sy[interval, "right"] - 
                        sy[interval, "left"]) / 2
         y <- z - min(z) + .1
-    } else if (is.ordered(y)) {
+    } else if (ytype %in% c("ordered", "unordered")) {
         z <- (1:nlevels(y))[y]
-    } else if (is.integer(y)) {
+    } else if (ytype == "integer") {
         z <- y
     } else {
         stop("cannot deal with response class", class(y))
@@ -92,8 +96,10 @@
         if ("lefttrunc" %in% colnames(sy))
             trunc$left <- sy[, "lefttrunc"]
     } else if (ytype %in% c("ordered", "unordered")) {
-        if (ytype == "unordered") 
+        if (ytype == "unordered") {
             warning("results may depend on ordering of levels")
+            y <- ordered(y)
+        }
         exact <- rep(FALSE, nrow(data))
         ldata <- rdata <- data
         sy <- sort(unique(y))

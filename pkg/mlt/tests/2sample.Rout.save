@@ -7,8 +7,6 @@ R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
 Type 'license()' or 'licence()' for distribution details.
 
-  Natural language support but running in an English locale
-
 R is a collaborative project with many contributors.
 Type 'contributors()' for more information and
 'citation()' on how to cite R or R packages in publications.
@@ -16,8 +14,6 @@ Type 'contributors()' for more information and
 Type 'demo()' for some demos, 'help()' for on-line help, or
 'help.start()' for an HTML browser interface to help.
 Type 'q()' to quit R.
-
-[Previously saved workspace restored]
 
 > 
 > library("mlt")
@@ -36,20 +32,20 @@ Loading required package: polynom
 > 
 > m1 <- model(by, inter = bg1, remove_intercept = TRUE)
 > fm1 <- mlt(m1, data = mydata)
-Note: method with signature ‘diagonalMatrix#Matrix’ chosen for function ‘kronecker’,
- target signature ‘ddiMatrix#ddiMatrix’.
+Note: method with signature 'diagonalMatrix#Matrix' chosen for function 'kronecker',
+ target signature 'ddiMatrix#ddiMatrix'.
  "Matrix#diagonalMatrix" would also be valid
-Note: method with signature ‘TsparseMatrix#sparseMatrix’ chosen for function ‘kronecker’,
- target signature ‘dtTMatrix#ddiMatrix’.
+Note: method with signature 'TsparseMatrix#sparseMatrix' chosen for function 'kronecker',
+ target signature 'dtTMatrix#ddiMatrix'.
  "Matrix#diagonalMatrix" would also be valid
-Note: method with signature ‘Matrix#numLike’ chosen for function ‘%*%’,
- target signature ‘dgTMatrix#numeric’.
+Note: method with signature 'Matrix#numLike' chosen for function '%*%',
+ target signature 'dgTMatrix#numeric'.
  "TsparseMatrix#ANY" would also be valid
-Note: method with signature ‘Matrix#matrix’ chosen for function ‘%*%’,
- target signature ‘dgTMatrix#matrix’.
+Note: method with signature 'Matrix#matrix' chosen for function '%*%',
+ target signature 'dgTMatrix#matrix'.
  "TsparseMatrix#ANY" would also be valid
 > logLik(fm1)
-[1] -259.6152
+'log Lik.' -259.6152 (df=4)
 > vcov(fm1)
             1           2            1            2
 1  0.08823081 -0.03935628  0.000000000  0.000000000
@@ -69,14 +65,14 @@ Note: method with signature ‘Matrix#matrix’ chosen for function ‘%*%’,
 > bg2 <- as.basis(~ g, remove_intercept = TRUE)
 > m2 <- model(by, inter = b(b1 = by2, b2 = bg2))
 > fm2 <- mlt(m2, data = mydata)
-Note: method with signature ‘Matrix#numLike’ chosen for function ‘%*%’,
- target signature ‘dtTMatrix#numeric’.
+Note: method with signature 'Matrix#numLike' chosen for function '%*%',
+ target signature 'dtTMatrix#numeric'.
  "TsparseMatrix#ANY" would also be valid
-Note: method with signature ‘Matrix#matrix’ chosen for function ‘%*%’,
- target signature ‘dtTMatrix#matrix’.
+Note: method with signature 'Matrix#matrix' chosen for function '%*%',
+ target signature 'dtTMatrix#matrix'.
  "TsparseMatrix#ANY" would also be valid
 > logLik(fm2)
-[1] -259.6152
+'log Lik.' -259.6152 (df=4)
 > vcov(fm2)
             1           2           1           2
 1  0.08823104 -0.03935640 -0.08823104  0.03935640
@@ -104,4 +100,4 @@ Note: method with signature ‘Matrix#matrix’ chosen for function ‘%*%’,
 > 
 > proc.time()
    user  system elapsed 
-  1.672   0.049   1.707 
+  1.671   0.045   1.706 
