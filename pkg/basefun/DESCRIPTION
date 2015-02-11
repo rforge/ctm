@@ -7,4 +7,3 @@ Maintainer: Torsten Hothorn <Torsten.Hothorn@R-project.org>
 Description: Some very simple infrastructure for basis functions.
 Depends: Matrix, polynom
 License: GPL-2
-Packaged: 2015-02-05 09:51:37 UTC; hothorn

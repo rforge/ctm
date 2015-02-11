@@ -69,8 +69,28 @@ Bernstein_basis <- function(order = 2, support = c(0, 1), normal = FALSE,
         if (normal) {
             oX <- do.call("cbind", lapply(0:order, function(j) 
                           .oBx(x, j, order, deriv = deriv, integrate = integrate)))
-            if (ui != "none" & (deriv == 0 & !integrate))
-                constr$ui <- constr$ui %*% solve(crossprod(X)) %*% crossprod(X, oX)
+            if (ui != "none" & (deriv == 0 & !integrate)) {
+                ### transform constraint on raw Bernstein bases into
+                ### constraint on orthogonal bases
+                XtX <- crossprod(X)
+                ### did not work well oui <- try(constr$ui %*% chol2inv(chol(XtX)) %*% crossprod(X, oX))
+                oui <- try(constr$ui %*% solve(XtX) %*% crossprod(X, oX))
+                oci <- constr$ci
+                if (inherits(oui, "try-error")) { ### use f'(x) >= 0
+                    #ngrid <- max(c(2 * order, 20))
+                    #xgrid <- 0:ngrid / ngrid
+                    #oui <- do.call("cbind", lapply(0:order, function(j)
+                    #    .oBx(xgrid, j, order, deriv = 1, integrate = FALSE)))
+                    #if (ui == "decreasing") oui <- -oui
+                    #oci <- rep(constr$ci, length = nrow(oui))
+                    warning("cannot obtain constraints for orthogonal Bernstein basis, 
+                            returning unconstraint basis")
+                    oX <- X
+                    oui <- constr$ui
+                }
+                constr$ui <- oui
+                constr$ci <- oci
+            }
             X <- oX
         }
         if (deriv > 0)
