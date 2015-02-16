@@ -38,7 +38,7 @@ Bernstein_basis <- function(order = 2, support = c(0, 1), normal = FALSE,
     zeroint <- FALSE
     ui <- match.arg(ui, several.ok = TRUE)
     if (length(ui) > 1) 
-        stopifnot(length(ui == 2) && "zerointegral" %in% ui)
+        stopifnot((length(ui) == 2) && "zerointegral" %in% ui)
     if ("zerointegral" %in% ui) {
         zeroint <- TRUE
         ui <- ifelse(length(ui) == 2, ui[ui != "zerointegral"], "none")
