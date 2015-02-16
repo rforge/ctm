@@ -249,7 +249,15 @@
                   gr = scorefct, hessian = hessian)
     } 
 
-    ret <- optimfct(theta, hessian = FALSE)
+    ret <- try(optimfct(theta, hessian = FALSE))
+    if (inherits(ret, "try-error")) {
+        cdiff <- 0
+    } else {
+        cdiff <- max(abs(ret$par - theta))
+        if (ret$counts[1] < 10) cdiff <- 0
+    }
+    if (cdiff < sqrt(.Machine$double.eps))
+        ret <- optimfct(theta + 1, hessian = FALSE)
     if (ret$convergence != 0)
         warning("algorithm did not converge")
 
