@@ -158,6 +158,10 @@
             .mlt_loglik_exact(todistr, Y, Yprime, offset, trunc)(.parm(beta))
         sc <- function(beta)
             .mlt_score_exact(todistr, Y, Yprime, offset, trunc)(.parm(beta))[, !fix, drop = FALSE]
+        he <- function(beta) {
+            ret <- .mlt_hessian_exact(todistr, Y, Yprime, offset[exact], trunc, weights)(.parm(beta))
+            return(ret[!fix, !fix, drop = FALSE])
+        }
     } else {
         .makeY <- function(data, finite, nc = NULL, INF = -Inf) {
             if (any(finite)) {
@@ -210,14 +214,21 @@
             if (any(exact))
                 ret[exact] <- .mlt_loglik_exact(todistr, Y, Yprime, offset[exact], trunc)(.parm(beta))
             ret[!exact] <- .mlt_loglik_interval(todistr, lY, rY, offset[!exact], trunc)(.parm(beta))
-            ret
+            return(ret)
         }
         sc <- function(beta) {
             ret <- matrix(0, nrow = nrow(data), ncol = length(fix))
             if (any(exact))
                 ret[exact,] <- .mlt_score_exact(todistr, Y, Yprime, offset[exact], trunc)(.parm(beta))
             ret[!exact,] <- .mlt_score_interval(todistr, lY, rY, offset[!exact], trunc)(.parm(beta))
-            ret[, !fix, drop = FALSE]
+            return(ret[, !fix, drop = FALSE])
+        }
+        he <- function(beta) {
+            ret <- 0
+            if (any(exact))
+                ret <- ret + .mlt_hessian_exact(todistr, Y, Yprime, offset[exact], trunc, weights[exact])(.parm(beta))
+            ret <- ret + .mlt_hessian_interval(todistr, lY, rY, offset[!exact], trunc, weights[!exact])(.parm(beta))
+            return(ret[!fix, !fix, drop = FALSE])
         }
     }
 
@@ -275,6 +286,7 @@
     ret$todistr <- todistr
     ret$loglik <- loglikfct
     ret$score <- scorefct
+    ret$hessian <- he
     ret$optim <- optimfct
     ret$data <- data
     class(ret) <- "mlt"
