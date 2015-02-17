@@ -6,7 +6,7 @@ Author: Torsten Hothorn
 Maintainer: Torsten Hothorn <Torsten.Hothorn@R-project.org>
 Description: Estimation via transformation.
 Depends: basefun (>= 0.0-3)
-Imports: MASS
+Imports: MASS, BB
 Enhances: np, eha, survival, nnet
 Suggests: lattice, multcomp
 License: GPL-2

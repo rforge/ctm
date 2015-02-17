@@ -58,7 +58,7 @@ Bs <- Bernstein_basis(order = 4, var = "waiting", ui = "incre", # normal = TRUE,
 m <- model(Bs)
 mod <- mlt(m, data = faithful)
 
-H1 <- mod$optim(coef(mod), hessian = TRUE)$hessian
+# H1 <- mod$optim(coef(mod), hessian = TRUE)$hessian
 H2 <- mod$hessian(coef(mod))
 
 X <- model.matrix(m, faithful)
@@ -76,7 +76,7 @@ y <- generate(mod, 25)$waiting
 g <- glht(mp, linfct = model.matrix(mod$model,
     data = data.frame(waiting = y)))
 
-mc <- confint(g)
+mc <- confint(g, calpha = qnorm(.975))
 umc <- confint(glht(mp, linfct = model.matrix(mod$model, 
     data = data.frame(waiting = y))), calpha = qnorm(.975))
 p <- mod$model$todistr$p

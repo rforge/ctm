@@ -76,6 +76,7 @@ Bb2 <- Bernstein_basis(order = 5, support = c(0, max(y) + .1), var = "y")
 ### basically works wo constraints (where data are); cf 2sample.R
 #                       ui = "increasing", ci = -sqrt(.Machine$double.eps))
 
+if (FALSE) {
 m <- model(response = Bb, 
            interacting = b(b1 = Bb2, b2 = as.basis(~ g, remove_intercept = TRUE)),
            todist = "MinExtrVal")
@@ -95,3 +96,4 @@ plot(yn, 1 - a[[2]](yn, type = "prob"), type = "l", col = "red", ylim = c(0, 1))
 lines(survfit(cph, newdata = data.frame(g = gf[2])))
 plot(yn, 1 - a[[3]](yn, type = "prob"), type = "l", col = "red", ylim = c(0, 1))
 lines(survfit(cph, newdata = data.frame(g = gf[3])))
+}

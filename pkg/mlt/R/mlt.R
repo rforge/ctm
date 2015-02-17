@@ -251,24 +251,37 @@
     ### at least one serious constraint
     if (!is.null(ui)) {
         stopifnot(all(ui %*% theta - ci >= 0))
-        optimfct <- function(beta, hessian = FALSE) 
-            constrOptim(theta = beta, f = loglikfct,
-                        grad = scorefct, ui = ui,ci = ci, hessian = hessian)
+        optimfct <- function(beta, hessian = FALSE, spg = FALSE, ...) {
+            if (!spg) {
+                ret <- constrOptim(theta = beta, f = loglikfct,
+                                   grad = scorefct, ui = ui,ci = ci, hessian = hessian)
+                ret$gradient <- scorefct(ret$par)
+                return(ret)
+            }
+            control <- list(...)
+            control$checkGrad <- FALSE
+            return(spg(par = beta, fn = loglikfct, gr = scorefct, project = "projectLinear",
+                     projectArgs = list(A = ui, b = ci, meq = 0), control = control))
+        }
     } else {
-        optimfct <- function(beta, hessian = FALSE) 
-            optim(par = beta, fn = loglikfct, 
+        optimfct <- function(beta, hessian = FALSE, ...) {
+            ret <- optim(par = beta, fn = loglikfct, 
                   gr = scorefct, hessian = hessian)
+            ret$gradient <- scorefct(ret$par)
+            ret
+       }
     } 
 
-    ret <- try(optimfct(theta, hessian = FALSE))
-    if (inherits(ret, "try-error")) {
-        cdiff <- 0
-    } else {
-        cdiff <- max(abs(ret$par - theta))
-        if (ret$counts[1] < 10) cdiff <- 0
+    ntry <- 1
+    while(ntry < 5) {
+        ret <- try(optimfct(theta, hessian = FALSE, spg = TRUE))    
+        if (inherits(ret, "try-error") || ret$convergence != 0 || ret$gradient > 1) {
+            theta <- theta + runif(length(theta))
+            ntry <- ntry + 1
+        } else {
+            break()
+        }
     }
-    if (cdiff < sqrt(.Machine$double.eps))
-        ret <- optimfct(theta + 1, hessian = FALSE)
     if (ret$convergence != 0)
         warning("algorithm did not converge")
 
