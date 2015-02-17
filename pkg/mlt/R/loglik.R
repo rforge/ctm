@@ -1,38 +1,4 @@
 
-.mlt_loglik_exact <- function(d, mm, mmprime, offset = 0, mmtrunc = NULL) {
-    trunc <- function(beta) {
-        if (is.null(mmtrunc)) return(0)
-        if (is.null(mmtrunc$right)) return(.log(1 - d$p(mmtrunc$left %*% beta)))
-        if (is.null(mmtrunc$left)) return(.log(d$p(mmtrunc$right %*% beta)))
-        return(.log(d$p(mmtrunc$right %*% beta) - d$p(mmtrunc$left %*% beta)))
-    }
-    function(beta)
-        d$d(offset + mm %*% beta, log = TRUE) + .log(mmprime %*% beta) - trunc(beta)
-}
-
-.mlt_score_exact <- function(d, mm, mmprime, offset = 0, mmtrunc = NULL) {                          
-    trunc <- function(beta) {
-        if (is.null(mmtrunc)) return(0)
-        if (is.null(mmtrunc$right)) {
-            mmtb <- mmtrunc$left %*% beta + offset
-            return(- 1 / (1 - d$p(mmtb)) * d$d(mmtb) * mmtrunc)
-        }
-        if (is.null(mmtrunc$left)) {
-            mmtb <- mmtrunc$right %*% beta + offset
-            return(1 / d$p(mmtb) * d$d(mmtb) * mmtrunc)
-        }
-        mmtbl <- drop(mmtrunc$left %*% beta) + offset
-        mmtbr <- drop(mmtrunc$right %*% beta) + offset
-        return(1 / (d$p(mmtbr) - d$p(mmtbl)) * 
-               (d$d(mmtbr) * mmtrunc$right - d$d(mmtbl) * mmtrunc$left))
-    }
-    function(beta) {
-        mmb <- drop(mm %*% beta) + offset
-        d$dd(mmb) / d$d(mmb) * mm + (1 / drop(mmprime %*% beta)) * mmprime - 
-            trunc(beta)
-    }
-}
-
 ### if (finite) fun(X %*% beta + offset) else value
 .dealinf <- function(X, beta, offset, fun, value, Xmult = FALSE) {
     OK <- is.finite(X[,1])
@@ -45,44 +11,105 @@
         X[!OK,] <- 0
         ret <- ret * X
     }
-    ret
+    return(ret)
 }
 
 .log <- function(x)
     log(pmax(.Machine$double.eps, x))
 
-.mlt_loglik_interval <- function(d, mml, mmr, offset = 0, mmtrunc = NULL) {
-    trunc <- function(beta) {
-        if (is.null(mmtrunc)) return(0)
-        if (is.null(mmtrunc$right)) return(.log(1 - d$p(mmtrunc$left %*% beta)))
-        if (is.null(mmtrunc$left))return(.log(d$p(mmtrunc$right %*% beta)))
-        return(.log(d$p(mmtrunc$right %*% beta) - d$p(mmtrunc$left %*% beta)))
+.trunc_loglik <- function(beta, d, offset = 0, mmtrunc) {
+    if (is.null(mmtrunc)) return(0)
+    return(.log(.dealinf(mmtrunc$right, beta, offset, d$p, 1) - 
+                .dealinf(mmtrunc$left, beta, offset, d$p, 0)))
+}
+
+.trunc_score <- function(beta, d, offset = 0, mmtrunc) {
+    if (is.null(mmtrunc)) return(0)
+    return((.dealinf(mmtrunc$right, beta, offset, d$d, 0, TRUE) - 
+            .dealinf(mmtrunc$left, beta, offset, d$d, 0, TRUE)) / 
+           ((.dealinf(mmtrunc$right, beta, offset, d$p, 1) - 
+            .dealinf(mmtrunc$left, beta, offset, d$p, 1))^2))
+}
+
+.trunc_hessian <- function(beta, d, offset = 0, mmtrunc, w = 1) {
+    if (is.null(mmtrunc)) return(0)
+    Fr <- .dealinf(mmtrunc$right, beta, offset, d$p, 1)
+    Fl <- .dealinf(mmtrunc$left, beta, offset, d$p, 0)
+    fr <- .dealinf(mmtrunc$right, beta, offset, d$d, 0)
+    fl <- .dealinf(mmtrunc$leftl, beta, offset, d$d, 0)
+    dfr <- .dealinf(mmtrunc$right, beta, offset, d$dd, 0)
+    dfl <- .dealinf(mmtrunc$left, beta, offset, d$dd, 0)
+    Frl <- Fr - Fl
+    w1 <- fr / sqrt(Frl^(3 / 2)) * sqrt(w)
+    w2 <- fl / sqrt(Frl^(3 / 2)) * sqrt(w)
+    w3 <- dfr / Frl^2 * w
+    w4 <- dfl / Frl^2 * w
+    return((crossprod(mmtrunc$right * w1) - 
+            2 * crossprod(mmtrunc$right * w1, mmtrunc$left * w2) + 
+            crossprod(mmtrunc$left * w2)) / 2
+           - (crossprod(mmtrunc$right * sqrt(w3)) - 
+              crossprod(mmtrunc$left * sqrt(w4))))
+}
+
+.mlt_loglik_exact <- function(d, mm, mmprime, offset = 0, mmtrunc = NULL) {
+    function(beta)
+        return(d$d(offset + mm %*% beta, log = TRUE) + 
+               .log(mmprime %*% beta) - .trunc_loglik(beta, d, offset, mmtrunc))
+}
+
+.mlt_score_exact <- function(d, mm, mmprime, offset = 0, mmtrunc = NULL) {                          
+    function(beta) {
+        mmb <- drop(mm %*% beta) + offset
+        return(d$dd(mmb) / d$d(mmb) * mm + (1 / drop(mmprime %*% beta)) * mmprime - 
+               .trunc_score(beta, d, offset, mmtrunc))
     }
+}
+
+.mlt_hessian_exact <- function(d, mm, mmprime, offset = 0, mmtrunc = NULL, w = 1) {
+    function(beta) {
+        mmb <- drop(mm %*% beta) + offset
+        if (length(w) != length(mmb)) w <- rep(w, length(mmb))
+        w1 <- -(d$ddd(mmb) / d$d(mmb) - (d$dd(mmb) / d$d(mmb))^2) * w
+        w2 <- drop(mmprime %*% beta)^2 * w
+        return(crossprod(mm * sqrt(w1)) + crossprod(mmprime * sqrt(w2)) 
+               - .trunc_hessian(beta, d, offset, mmtrunc, w)) ### - or + ???
+    }
+}
+
+.mlt_loglik_interval <- function(d, mml, mmr, offset = 0, mmtrunc = NULL) {
     function(beta)
         .log(.dealinf(mmr, beta, offset, d$p, 1) - 
-             .dealinf(mml, beta, offset, d$p, 0)) - trunc(beta)
+             .dealinf(mml, beta, offset, d$p, 0)) - 
+        .trunc_loglik(beta, d, offset, mmtrunc)
 }
 
 .mlt_score_interval <- function(d, mml, mmr, offset = 0, mmtrunc = NULL) {
-    trunc <- function(beta) {
-        if (is.null(mmtrunc)) return(0)
-        if (is.null(mmtrunc$right)) {
-            mmtb <- mmtrunc$left %*% beta
-            return(- 1 / (1 - d$p(mmtb)) * d$d(mmtb) * mmtrunc)
-        }
-        if (is.null(mmtrunc$left)) {
-            mmtb <- mmtrunc$right %*% beta
-            return(1 / d$p(mmtb) * d$d(mmtb) * mmtrunc)
-        }
-        mmtbl <- drop(mmtrunc$left %*% beta) + offset
-        mmtbr <- drop(mmtrunc$right %*% beta) + offset
-        return(1 / (d$p(mmtbr) - d$p(mmtbl)) * 
-               (d$d(mmtbr) * mmtrunc$right - d$d(mmtbl) * mmtrunc$left))
-    }
     function(beta) {
-        1 / (.dealinf(mmr, beta, offset, d$p, 1) - 
-             .dealinf(mml, beta, offset, d$p, 0)) *
-        (.dealinf(mmr, beta, offset, d$d, 0, Xmult = TRUE) - 
-         .dealinf(mml, beta, offset, d$d, 0, Xmult = TRUE))
+        (.dealinf(mmr, beta, offset, d$d, 0, Xmult = TRUE) -
+         .dealinf(mml, beta, offset, d$d, 0, Xmult = TRUE)) / 
+        (.dealinf(mmr, beta, offset, d$p, 1) - 
+         .dealinf(mml, beta, offset, d$p, 0)) 
+    }
+}
+
+.mlt_hessian_interval <- function(d, mml, mmr, offset = 0, mmtrunc = NULL, w = 1) {
+    function(beta) {
+        Fr <- .dealinf(mmr, beta, offset, d$p, 1)
+        Fl <- .dealinf(mml, beta, offset, d$p, 0)
+        fr <- .dealinf(mmr, beta, offset, d$d, 0)
+        fl <- .dealinf(mml, beta, offset, d$d, 0)
+        dfr <- .dealinf(mmr, beta, offset, d$dd, 0)
+        dfl <- .dealinf(mml, beta, offset, d$dd, 0)
+        if (length(w) != length(Fr)) w <- rep(w, length(Fr))
+        Frl <- Fr - Fl
+        w1 <- dfr / Frl * w
+        w2 <- dfl / Frl * w
+        w3 <- fr / Frl * sqrt(w)
+        w4 <- fl / Frl * sqrt(w)
+        W3 <- mmr * w3
+        W4 <- mml * w4
+        return(-(crossprod(mmr * sqrt(w1)) - crossprod(mmr * sqrt(w2)) - 
+                 crossprod(W3) - 2 * crossprod(W3, W4) + crossprod(W4) - 
+                 .trunc_hessian(beta, d, offset, mmtrunc, w)))
     }
 }
