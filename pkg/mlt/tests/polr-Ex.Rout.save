@@ -7,6 +7,8 @@ R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
 Type 'license()' or 'licence()' for distribution details.
 
+  Natural language support but running in an English locale
+
 R is a collaborative project with many contributors.
 Type 'contributors()' for more information and
 'citation()' on how to cite R or R packages in publications.
@@ -50,6 +52,16 @@ InflMedium   InflHigh
       Sat1       Sat2 InflMedium   InflHigh 
 -0.2013747  0.9484789 -0.5635813 -1.2486805 
 > 
+> sqrt(diag(vcov(mp)))
+
+Re-fitting to get Hessian
+
+ InflMedium    InflHigh  Low|Medium Medium|High 
+ 0.10357053  0.12479361  0.07662596  0.08024304 
+> sqrt(diag(vcov(mod)))
+      Sat1       Sat2 InflMedium   InflHigh 
+0.07133855 0.07400443 0.10344960 0.12434913 
+> 
 > proc.time()
    user  system elapsed 
-  1.513   0.044   1.542 
+  1.641   0.038   1.668 

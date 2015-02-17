@@ -110,9 +110,9 @@ Note: method with signature 'Matrix#matrix' chosen for function '%*%',
  "TsparseMatrix#ANY" would also be valid
 > coef(m2)
   Species1   Species2   Species1   Species2   Species1   Species2   Species1 
-  2.923577  42.514888   2.395331   2.463351   6.340664   6.675611  -9.418430 
+  3.447396  41.702660   2.436975   2.462019   5.696380   6.602397  -9.307886 
   Species2   Species1   Species2 
- -9.407884 -18.261442 -18.260244 
+ -9.292973 -17.985234 -17.985233 
 > 
 > s <- sort(unique(oiris$Species))[1:2]
 > p2 <- do.call("rbind", lapply(predict(m2, newdata = oiris), 
@@ -122,9 +122,9 @@ Note: method with signature 'Matrix#matrix' chosen for function '%*%',
 > pp1 <- predict(m1, newdata = iris, type = "prob")
 > 
 > max(abs(pp1 - pp2))
-[1] 0.001021454
+[1] 0.004738816
 > 
 > 
 > proc.time()
    user  system elapsed 
-  5.089   0.032   5.115 
+  5.213   0.052   5.256 

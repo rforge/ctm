@@ -21,3 +21,6 @@ logLik(mod)
 coef(mp)
 mp$zeta
 coef(mod)
+
+sqrt(diag(vcov(mp)))
+sqrt(diag(vcov(mod)))

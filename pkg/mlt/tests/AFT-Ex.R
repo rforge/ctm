@@ -62,6 +62,8 @@ aft2$scale
 logLik(opt2)
 logLik(aft2)
 
+sqrt(diag(vcov(opt2)))[c("g2", "g3")]
+sqrt(diag(vcov(aft2)))[c("g2", "g3")]
 
 
 ## *************** Right-censored
@@ -94,6 +96,13 @@ coef(opt <- mlt(m, data = mydata,  fixed = c("log(y)" = 1)))
 
 coef(aft <- survreg(y ~ g, data = mydata, dist = "expo"))
 
+## Compare standard errors
+## MLT
+sqrt(diag(vcov(opt)))[c("g2", "g3")]
+## phreg
+sqrt(diag(phreg$var))[c("g2", "g3")]
+
+
 try(coef(cox <- coxph(y ~ g, data = mydata)))
 try(coef(phreg <- phreg(y ~ g, data = mydata, dist = "weibull", shape = 1)))
 
@@ -106,6 +115,13 @@ mydata <- data.frame(y = Surv(y, y + 1, sample(0:3, length(y), replace = TRUE),
 coef(opt<- mlt(m, data = mydata, fixed = c("log(y)" = 1)))
 coef(aft <- survreg(y ~ g, data = mydata, dist = "expo"))
 
+## Compare standard errors
+## MLT
+sqrt(diag(vcov(opt)))[c("g2", "g3")]
+## phreg
+sqrt(diag(phreg$var))[c("g2", "g3")]
+
+
 try(coef(cox <- coxph(y ~ g, data = mydata)))
 try(coef(phreg <- phreg(y ~ g, data = mydata, dist = "weibull", shape = 1)))
 
@@ -114,8 +130,6 @@ try(coef(phreg <- phreg(y ~ g, data = mydata, dist = "weibull", shape = 1)))
 
 ## ************** Weibull - AFT *********************************
 
-library("mlt")
-library("eha")
 set.seed(196)
 
 ### true dgp

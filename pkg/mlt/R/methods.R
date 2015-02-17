@@ -6,8 +6,7 @@ coef.mlt <- function(object, fixed = TRUE, ...) {
 }
 
 vcov.mlt <- function(object, ...)
-    solve(object$optim(coef(object, fixed = FALSE), 
-                       hessian = TRUE)$hessian)
+    solve(object$hessian(coef(object, fixed = FALSE)))
 
 logLik.mlt <- function(object, ...) {
     ret <- -object$loglik(coef(object, fixed = FALSE))

@@ -66,7 +66,7 @@ Loading required package: splines
 > ## MLT
 > sqrt(diag(vcov(opt)))[c("g2", "g3")]
        g2        g3 
-0.1414212 0.1414216 
+0.1414197 0.1414235 
 > ## Cox
 > sqrt(diag(vcov(cox)))
        g2        g3 
@@ -111,6 +111,12 @@ Loading required package: splines
 > logLik(aft2)
 'log Lik.' -144.2832 (df=4)
 > 
+> sqrt(diag(vcov(opt2)))[c("g2", "g3")]
+       g2        g3 
+0.1414214 0.1414214 
+> sqrt(diag(vcov(aft2)))[c("g2", "g3")]
+       g2        g3 
+0.1531531 0.1531334 
 > 
 > 
 > ## *************** Right-censored
@@ -135,7 +141,7 @@ Loading required package: splines
 > ## MLT
 > sqrt(diag(vcov(opt)))[c("g2", "g3")]
        g2        g3 
-0.2065972 0.2113015 
+0.2065973 0.2113015 
 > ## Cox
 > sqrt(diag(vcov(cox)))
        g2        g3 
@@ -161,6 +167,17 @@ Loading required package: splines
 (Intercept)          g2          g3 
  -0.2828844  -0.7853477  -1.1284822 
 > 
+> ## Compare standard errors
+> ## MLT
+> sqrt(diag(vcov(opt)))[c("g2", "g3")]
+       g2        g3 
+0.1485616 0.1486445 
+> ## phreg
+> sqrt(diag(phreg$var))[c("g2", "g3")]
+       g2        g3 
+0.2065852 0.2112886 
+> 
+> 
 > try(coef(cox <- coxph(y ~ g, data = mydata)))
 Error in coxph(y ~ g, data = mydata) : 
   Cox model doesn't support "left" survival data
@@ -181,6 +198,17 @@ Error in phreg(y ~ g, data = mydata, dist = "weibull", shape = 1) :
 (Intercept)          g2          g3 
   0.5531934  -0.8600648  -1.2789393 
 > 
+> ## Compare standard errors
+> ## MLT
+> sqrt(diag(vcov(opt)))[c("g2", "g3")]
+       g2        g3 
+0.1740382 0.1726382 
+> ## phreg
+> sqrt(diag(phreg$var))[c("g2", "g3")]
+       g2        g3 
+0.2065852 0.2112886 
+> 
+> 
 > try(coef(cox <- coxph(y ~ g, data = mydata)))
 Error in coxph(y ~ g, data = mydata) : 
   Cox model doesn't support "interval" survival data
@@ -193,8 +221,6 @@ Error in phreg(y ~ g, data = mydata, dist = "weibull", shape = 1) :
 > 
 > ## ************** Weibull - AFT *********************************
 > 
-> library("mlt")
-> library("eha")
 > set.seed(196)
 > 
 > ### true dgp
@@ -259,7 +285,7 @@ log(shape)
 > ## Compare standard errors
 > sqrt(diag(vcov(opt)))[c("g2", "g3")]
        g2        g3 
-0.1695241 0.2038073 
+0.1414573 0.1415119 
 > sqrt(diag(vcov(cox)))
        g2        g3 
 0.1855397 0.2196354 
@@ -303,7 +329,7 @@ log(shape)
 > ## Compare standard errors
 > sqrt(diag(vcov(opt)))[c("g2", "g3")]
        g2        g3 
-0.2245734 0.2703785 
+0.1883650 0.1902991 
 > sqrt(diag(vcov(cox)))
        g2        g3 
 0.2441318 0.2938864 
@@ -368,4 +394,4 @@ log(shape)
 > 
 > proc.time()
    user  system elapsed 
-  2.159   0.046   2.193 
+  2.180   0.065   2.233 

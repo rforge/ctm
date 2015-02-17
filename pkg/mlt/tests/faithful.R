@@ -53,10 +53,19 @@ p <- 1:99 / 100
 plot(p, d[[1]](p, type = "quantile"))
 lines(p, quantile(faithful$waiting, p))
 
-Bs <- Bernstein_basis(order = o, var = "waiting", ui = "incre", normal = TRUE,
+Bs <- Bernstein_basis(order = 4, var = "waiting", ui = "incre", # normal = TRUE,
                       support = range(faithful$waiting) + c(-5, 5))
 m <- model(Bs)
 mod <- mlt(m, data = faithful)
+
+H1 <- mod$optim(coef(mod), hessian = TRUE)$hessian
+H2 <- mod$hessian(coef(mod))
+
+X <- model.matrix(m, faithful)
+Xprime <- model.matrix(m, faithful, deriv = c(waiting = 1))
+w <- drop((Xprime %*% coef(mod))^2)
+H3 <- crossprod(X) + crossprod(Xprime * w, Xprime)
+max(abs(H3 - H2))
 
 cov2cor(vcov(mod))
 
@@ -64,8 +73,10 @@ library("multcomp")
 
 mp <- parm(coef(mod), vcov(mod))
 y <- generate(mod, 25)$waiting
-mc <- confint(glht(mp, linfct = model.matrix(mod$model, 
-    data = data.frame(waiting = y))))
+g <- glht(mp, linfct = model.matrix(mod$model,
+    data = data.frame(waiting = y)))
+
+mc <- confint(g)
 umc <- confint(glht(mp, linfct = model.matrix(mod$model, 
     data = data.frame(waiting = y))), calpha = qnorm(.975))
 p <- mod$model$todistr$p

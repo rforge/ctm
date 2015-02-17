@@ -44,11 +44,13 @@
     w2 <- fl / sqrt(Frl^(3 / 2)) * sqrt(w)
     w3 <- dfr / Frl^2 * w
     w4 <- dfl / Frl^2 * w
+    mmtrunc$left[!is.finite(mmtrunc$right)] <- 0
+    mmtrunc$left[!is.finite(mmtrunc$left)] <- 0
     return((crossprod(mmtrunc$right * w1) - 
             2 * crossprod(mmtrunc$right * w1, mmtrunc$left * w2) + 
             crossprod(mmtrunc$left * w2)) / 2
-           - (crossprod(mmtrunc$right * sqrt(w3)) - 
-              crossprod(mmtrunc$left * sqrt(w4))))
+           - (crossprod(mmtrunc$right * w3, mmtrunc$right) - 
+              crossprod(mmtrunc$left * w4, mmtrunc$left)))
 }
 
 .mlt_loglik_exact <- function(d, mm, mmprime, offset = 0, mmtrunc = NULL) {
@@ -71,7 +73,7 @@
         if (length(w) != length(mmb)) w <- rep(w, length(mmb))
         w1 <- -(d$ddd(mmb) / d$d(mmb) - (d$dd(mmb) / d$d(mmb))^2) * w
         w2 <- drop(mmprime %*% beta)^2 * w
-        return(crossprod(mm * sqrt(w1)) + crossprod(mmprime * sqrt(w2)) 
+        return(crossprod(mm * w1, mm) + crossprod(mmprime * w2, mmprime) 
                - .trunc_hessian(beta, d, offset, mmtrunc, w)) ### - or + ???
     }
 }
@@ -106,10 +108,12 @@
         w2 <- dfl / Frl * w
         w3 <- fr / Frl * sqrt(w)
         w4 <- fl / Frl * sqrt(w)
+        mmr[!is.finite(mmr)] <- 0
+        mml[!is.finite(mml)] <- 0
         W3 <- mmr * w3
         W4 <- mml * w4
-        return(-(crossprod(mmr * sqrt(w1)) - crossprod(mmr * sqrt(w2)) - 
-                 crossprod(W3) - 2 * crossprod(W3, W4) + crossprod(W4) - 
+        return(-(crossprod(mmr * w1, mmr) - crossprod(mml * w2, mml) - 
+                 (crossprod(W3) - 2 * crossprod(W3, W4) + crossprod(W4)) - 
                  .trunc_hessian(beta, d, offset, mmtrunc, w)))
     }
 }
