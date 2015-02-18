@@ -27,8 +27,8 @@
     if (is.null(mmtrunc)) return(0)
     return((.dealinf(mmtrunc$right, beta, offset, d$d, 0, TRUE) - 
             .dealinf(mmtrunc$left, beta, offset, d$d, 0, TRUE)) / 
-           ((.dealinf(mmtrunc$right, beta, offset, d$p, 1) - 
-            .dealinf(mmtrunc$left, beta, offset, d$p, 1))^2))
+           (.dealinf(mmtrunc$right, beta, offset, d$p, 1) - 
+            .dealinf(mmtrunc$left, beta, offset, d$p, 1)))
 }
 
 .trunc_hessian <- function(beta, d, offset = 0, mmtrunc, w = 1) {
@@ -40,15 +40,15 @@
     dfr <- .dealinf(mmtrunc$right, beta, offset, d$dd, 0)
     dfl <- .dealinf(mmtrunc$left, beta, offset, d$dd, 0)
     Frl <- Fr - Fl
-    w1 <- fr / sqrt(Frl^(3 / 2)) * sqrt(w)
-    w2 <- fl / sqrt(Frl^(3 / 2)) * sqrt(w)
-    w3 <- dfr / Frl^2 * w
-    w4 <- dfl / Frl^2 * w
+    w1 <- fr / sqrt(Frl^2) * sqrt(w)
+    w2 <- fl / sqrt(Frl^2) * sqrt(w)
+    w3 <- dfr / Frl * w
+    w4 <- dfl / Frl * w
     mmtrunc$left[!is.finite(mmtrunc$right)] <- 0
     mmtrunc$left[!is.finite(mmtrunc$left)] <- 0
     return((crossprod(mmtrunc$right * w1) - 
             2 * crossprod(mmtrunc$right * w1, mmtrunc$left * w2) + 
-            crossprod(mmtrunc$left * w2)) / 2
+            crossprod(mmtrunc$left * w2))
            - (crossprod(mmtrunc$right * w3, mmtrunc$right) - 
               crossprod(mmtrunc$left * w4, mmtrunc$left)))
 }
