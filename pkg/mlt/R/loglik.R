@@ -28,7 +28,7 @@
     return((.dealinf(mmtrunc$right, beta, offset, d$d, 0, TRUE) - 
             .dealinf(mmtrunc$left, beta, offset, d$d, 0, TRUE)) / 
            (.dealinf(mmtrunc$right, beta, offset, d$p, 1) - 
-            .dealinf(mmtrunc$left, beta, offset, d$p, 1)))
+            .dealinf(mmtrunc$left, beta, offset, d$p, 0)))
 }
 
 .trunc_hessian <- function(beta, d, offset = 0, mmtrunc, w = 1) {
@@ -36,7 +36,7 @@
     Fr <- .dealinf(mmtrunc$right, beta, offset, d$p, 1)
     Fl <- .dealinf(mmtrunc$left, beta, offset, d$p, 0)
     fr <- .dealinf(mmtrunc$right, beta, offset, d$d, 0)
-    fl <- .dealinf(mmtrunc$leftl, beta, offset, d$d, 0)
+    fl <- .dealinf(mmtrunc$left, beta, offset, d$d, 0)
     dfr <- .dealinf(mmtrunc$right, beta, offset, d$dd, 0)
     dfl <- .dealinf(mmtrunc$left, beta, offset, d$dd, 0)
     Frl <- Fr - Fl
