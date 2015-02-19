@@ -7,8 +7,6 @@ R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
 Type 'license()' or 'licence()' for distribution details.
 
-  Natural language support but running in an English locale
-
 R is a collaborative project with many contributors.
 Type 'contributors()' for more information and
 'citation()' on how to cite R or R packages in publications.
@@ -36,6 +34,12 @@ Loading required package: polynom
 > m <- model(r, shift = s, todist = "Logi")
 > 
 > mod <- mlt(m, housing, weights = housing$Freq)
+iter:  0  f-value:  1982.846  pgrad:  114.1486 
+iter:  10  f-value:  1797.974  pgrad:  27.66131 
+iter:  20  f-value:  1772.448  pgrad:  4.781346 
+iter:  30  f-value:  1771.721  pgrad:  3.539247 
+iter:  40  f-value:  1771.708  pgrad:  0.003130046 
+iter:  50  f-value:  1771.708  pgrad:  0.0002264945 
 > 
 > logLik(mp)
 'log Lik.' -1771.708 (df=4)
@@ -50,7 +54,7 @@ InflMedium   InflHigh
  -0.2013727   0.9484658 
 > coef(mod)
       Sat1       Sat2 InflMedium   InflHigh 
--0.2013747  0.9484789 -0.5635813 -1.2486805 
+-0.2013763  0.9484755 -0.5635787 -1.2486723 
 > 
 > sqrt(diag(vcov(mp)))
 
@@ -60,8 +64,8 @@ Re-fitting to get Hessian
  0.10357053  0.12479361  0.07662596  0.08024304 
 > sqrt(diag(vcov(mod)))
       Sat1       Sat2 InflMedium   InflHigh 
-0.07133855 0.07400443 0.10344960 0.12434913 
+0.07133852 0.07400438 0.10344958 0.12434905 
 > 
 > proc.time()
    user  system elapsed 
-  1.641   0.038   1.668 
+  1.652   0.044   1.687 

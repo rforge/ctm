@@ -44,21 +44,26 @@ Note: method with signature 'Matrix#numLike' chosen for function '%*%',
 Note: method with signature 'Matrix#matrix' chosen for function '%*%',
  target signature 'dgTMatrix#matrix'.
  "TsparseMatrix#ANY" would also be valid
+iter:  0  f-value:  341.6287  pgrad:  49.3229 
+iter:  10  f-value:  266.1316  pgrad:  11.37079 
+iter:  20  f-value:  259.79  pgrad:  1.594614 
+iter:  30  f-value:  259.6653  pgrad:  7.093472 
+iter:  40  f-value:  259.6152  pgrad:  0.00423897 
 > logLik(fm1)
 'log Lik.' -259.6152 (df=4)
 > vcov(fm1)
-             1            2            1            2
-1  0.019379887 -0.004718825  0.000000000  0.000000000
-2 -0.004718825  0.002373942  0.000000000  0.000000000
-1  0.000000000  0.000000000  0.011561098 -0.002339846
-2  0.000000000  0.000000000 -0.002339846  0.003507070
+            1           2            1            2
+1  0.08823056 -0.03935616  0.000000000  0.000000000
+2 -0.03935616  0.01979926  0.000000000  0.000000000
+1  0.00000000  0.00000000  0.010911454 -0.001366131
+2  0.00000000  0.00000000 -0.001366131  0.002047620
 > cf1 <- coef(fm1)
 > 1 / cf1[c(2, 4)] 
         2         2 
-0.5025272 1.5626455 
+0.5025293 1.5626449 
 > -cf1[c(1, 3)] / cf1[c(2,4)]
         1         1 
-1.9877599 0.6671791 
+1.9877582 0.6671796 
 > 
 > ### no constraints here!
 > by2 <- polynomial_basis(c(1, 1), var = "y", support = range(y))
@@ -71,33 +76,50 @@ Note: method with signature 'Matrix#numLike' chosen for function '%*%',
 Note: method with signature 'Matrix#matrix' chosen for function '%*%',
  target signature 'dtTMatrix#matrix'.
  "TsparseMatrix#ANY" would also be valid
+iter:  0  f-value:  341.6287  pgrad:  49.3229 
+iter:  10  f-value:  299.8037  pgrad:  16.73734 
+iter:  20  f-value:  274.6798  pgrad:  9.073913 
+iter:  30  f-value:  267.258  pgrad:  12.68914 
+iter:  40  f-value:  262.6286  pgrad:  5.083579 
+iter:  50  f-value:  261.1813  pgrad:  2.863118 
+iter:  60  f-value:  261.4064  pgrad:  47.39497 
+iter:  70  f-value:  259.9329  pgrad:  1.491292 
+iter:  80  f-value:  259.6225  pgrad:  0.1665561 
+iter:  90  f-value:  259.6162  pgrad:  0.2245918 
+iter:  100  f-value:  259.6152  pgrad:  0.02833424 
+iter:  110  f-value:  259.6152  pgrad:  0.005277986 
+iter:  120  f-value:  259.6152  pgrad:  0.004795975 
+iter:  130  f-value:  259.6152  pgrad:  0.002590394 
+iter:  140  f-value:  259.6152  pgrad:  0.0008974235 
+iter:  150  f-value:  259.6152  pgrad:  0.001045656 
+iter:  160  f-value:  259.6152  pgrad:  0.0007343773 
 > logLik(fm2)
 'log Lik.' -259.6152 (df=4)
 > vcov(fm2)
-             1            2            1            2
-1  0.019379832 -0.004718798 -0.019379832  0.004718798
-2 -0.004718798  0.002373928  0.004718798 -0.002373928
-1 -0.019379832  0.004718798  0.030940931 -0.007058645
-2  0.004718798 -0.002373928 -0.007058645  0.005881001
+            1           2           1           2
+1  0.08823006 -0.03935591 -0.08823006  0.03935591
+2 -0.03935591  0.01979914  0.03935591 -0.01979914
+1 -0.08823006  0.03935591  0.09914152 -0.04072204
+2  0.03935591 -0.01979914 -0.04072204  0.02184676
 > (cf2 <- coef(fm2))
         1         2         1         2 
--3.955539  1.989948  3.528586 -1.350009 
+-3.955480  1.989921  3.528522 -1.349980 
 > c(cf1[1:2], cf1[3:4] - cf1[1:2])
         1         2         1         2 
--3.955527  1.989942  3.528572 -1.350001 
+-3.955507  1.989934  3.528552 -1.349993 
 > 
 > 1 / cf2[2]
         2 
-0.5025257 
+0.5025325 
 > 1 / sum(cf2[c(2, 4)])
-[1] 1.56265
+[1] 1.562643
 > 
 > -cf2[1] / cf2[2]
-      1 
-1.98776 
+       1 
+1.987757 
 > -sum(cf2[c(1, 3)]) / sum(cf2[c(2, 4)])
-[1] 0.6671774
+[1] 0.6671834
 > 
 > proc.time()
    user  system elapsed 
-  1.690   0.068   1.749 
+  1.815   0.069   1.873 
