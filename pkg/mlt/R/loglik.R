@@ -1,6 +1,7 @@
 
 ### if (finite) fun(X %*% beta + offset) else value
 .dealinf <- function(X, beta, offset, fun, value, Xmult = FALSE) {
+    if (is.null(X)) return(value)
     OK <- is.finite(X[,1])
     if (all(!OK)) return(rep(value, nrow(X)))
     tmp <- X[OK,] %*% beta
@@ -44,8 +45,12 @@
     w2 <- fl / sqrt(Frl^2) * sqrt(w)
     w3 <- dfr / Frl * w
     w4 <- dfl / Frl * w
-    mmtrunc$left[!is.finite(mmtrunc$right)] <- 0
-    mmtrunc$left[!is.finite(mmtrunc$left)] <- 0
+    if (is.null(mmtrunc$right)) 
+        mmtrunc$right <- matrix(0, nrow = nrow(mmtrunc$left), 
+                                   ncol = ncol(mmtrunc$left))
+    if (is.null(mmtrunc$left)) 
+        mmtrunc$left <- matrix(0, nrow = nrow(mmtrunc$right), 
+                                  ncol = ncol(mmtrunc$right))
     return((crossprod(mmtrunc$right * w1) - 
             2 * crossprod(mmtrunc$right * w1, mmtrunc$left * w2) + 
             crossprod(mmtrunc$left * w2))

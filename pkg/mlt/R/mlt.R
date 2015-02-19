@@ -64,9 +64,9 @@
         stopifnot(all(names(trunc) %in% c("left", "right")))
         lefttrunc <- righttrunc <- NULL
         if ("left" %in% names(trunc))
-            lefttrunc <- data[trunc["left"]]
+            lefttrunc <- data[[trunc["left"]]]
         if ("right" %in% names(trunc))
-            righttrunc <- data[trunc["right"]]
+            righttrunc <- data[[trunc["right"]]]
         trunc <- list(left = lefttrunc, right = righttrunc)
     }
 

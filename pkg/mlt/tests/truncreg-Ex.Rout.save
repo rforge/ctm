@@ -1,0 +1,98 @@
+
+R version 3.1.2 (2014-10-31) -- "Pumpkin Helmet"
+Copyright (C) 2014 The R Foundation for Statistical Computing
+Platform: x86_64-unknown-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library("mlt")
+Loading required package: basefun
+Loading required package: Matrix
+Loading required package: polynom
+> library("truncreg")
+Loading required package: maxLik
+Loading required package: miscTools
+
+Please cite the 'maxLik' package as:
+Henningsen, Arne and Toomet, Ott (2011). maxLik: A package for maximum likelihood estimation in R. Computational Statistics 26(3), 443-458. DOI 10.1007/s00180-010-0217-1.
+
+If you have questions, suggestions, or comments regarding the 'maxLik' package, please use a forum or 'tracker' at maxLik's R-Forge site:
+https://r-forge.r-project.org/projects/maxlik/
+> 
+> set.seed(29)
+> n <- 1000	
+> x <- runif(n, max = 2 * pi)
+> y <- rnorm(n, 2*x + 1, .25)
+> d <- data.frame(y = y, x = x)
+> ## truncated response
+> tr <- 2.5
+> d$yt <- ifelse(d$y > tr, d$y, NA)
+> d$trunc_left <- tr
+> 
+> tmod <- truncreg(yt ~ x, data = d, point = tr, direction = "left")
+> coef(tmod)
+(Intercept)           x       sigma 
+  1.0192835   1.9917670   0.2575485 
+> logLik(tmod)
+'log Lik.' -33.99032 (df=3)
+> vcov(tmod)
+              (Intercept)             x         sigma
+(Intercept)  4.971662e-04 -1.146545e-04 -7.445133e-06
+x           -1.146545e-04  3.145827e-05  1.637489e-06
+sigma       -7.445133e-06  1.637489e-06  3.940881e-05
+> 
+> ## MLT
+> fm <- as.formula("~ x")
+> yb <- polynomial_basis(c(TRUE, TRUE), var = "yt", ci = c(-Inf, 0))
+> m <- model(yb, shifting = fm, todistr = "Normal")
+> mltmod <- mlt(m, data = d[!is.na(d$yt),,drop = FALSE], trunc = c("left" = "trunc_left"))
+iter:  0  f-value:  2187.923  pgrad:  1110.073 
+iter:  10  f-value:  397.3736  pgrad:  164.4466 
+iter:  20  f-value:  50.01984  pgrad:  20.3993 
+iter:  30  f-value:  66.15981  pgrad:  2057.124 
+iter:  40  f-value:  33.99985  pgrad:  0.5886936 
+iter:  50  f-value:  33.99059  pgrad:  0.190836 
+iter:  60  f-value:  33.99035  pgrad:  0.9270303 
+> (cf <- coef(mltmod))
+        1         2         x 
+-3.957637  3.882763 -7.733560 
+> c(-cf[1] / cf[2], -cf[3] / cf[2], 1 / cf[2])
+        1         x         2 
+1.0192835 1.9917670 0.2575485 
+> logLik(mltmod)
+'log Lik.' -33.99032 (df=3)
+> vcov(mltmod)
+             1            2           x
+1  0.017689296 -0.009565421  0.01722587
+2 -0.009565421  0.008956892 -0.01774419
+x  0.017225873 -0.017744189  0.03562564
+> 
+> library("numDeriv")
+
+Attaching package: 'numDeriv'
+
+The following object is masked from 'package:maxLik':
+
+    hessian
+
+> 
+> solve(hessian(mltmod$loglik, coef(mltmod)))
+             [,1]         [,2]        [,3]
+[1,]  0.017689296 -0.009565421  0.01722587
+[2,] -0.009565421  0.008956892 -0.01774419
+[3,]  0.017225874 -0.017744190  0.03562564
+> 
+> proc.time()
+   user  system elapsed 
+  1.768   0.069   1.826 
