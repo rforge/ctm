@@ -255,7 +255,7 @@
             if (!spg) {
                 ret <- constrOptim(theta = beta, f = loglikfct,
                                    grad = scorefct, ui = ui,ci = ci, hessian = hessian)
-                ret$gradient <- scorefct(ret$par)
+                ret$gradient <- max(scorefct(ret$par))
                 return(ret)
             }
             control <- list(...)
@@ -267,7 +267,7 @@
         optimfct <- function(beta, hessian = FALSE, ...) {
             ret <- optim(par = beta, fn = loglikfct, 
                   gr = scorefct, hessian = hessian)
-            ret$gradient <- scorefct(ret$par)
+            ret$gradient <- max(scorefct(ret$par))
             ret
        }
     } 
@@ -276,7 +276,11 @@
     while(ntry < 5) {
         ret <- try(optimfct(theta, hessian = FALSE, spg = TRUE))    
         if (inherits(ret, "try-error") || ret$convergence != 0 || ret$gradient > 1) {
-            theta <- theta + runif(length(theta))
+            if (inherits(ret, "try-error")) {
+                theta <- theta + runif(length(theta))
+            } else {
+                theta <- ret$par
+            }
             ntry <- ntry + 1
         } else {
             break()
