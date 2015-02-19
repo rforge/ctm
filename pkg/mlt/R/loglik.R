@@ -72,7 +72,7 @@
         mmb <- drop(mm %*% beta) + offset
         if (length(w) != length(mmb)) w <- rep(w, length(mmb))
         w1 <- -(d$ddd(mmb) / d$d(mmb) - (d$dd(mmb) / d$d(mmb))^2) * w
-        w2 <- drop(mmprime %*% beta)^2 * w
+        w2 <- w / (drop(mmprime %*% beta)^2)
         return(crossprod(mm * w1, mm) + crossprod(mmprime * w2, mmprime) 
                - .trunc_hessian(beta, d, offset, mmtrunc, w)) ### - or + ???
     }
