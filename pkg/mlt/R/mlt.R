@@ -154,6 +154,16 @@
             .parm <- function(beta) beta
             fix <- rep(FALSE, ncol(Y))
         } 
+        checktheta <- function(theta) {
+            if (all(Yprime %*% .parm(theta) > .Machine$double.eps))
+                return(theta)
+            tmp <- Yprime[, !fix, drop = FALSE]
+            i <- colSums(abs(tmp)) > 0
+            nt <- solve(crossprod(tmp[, i, drop = FALSE]), colSums(tmp[,i]))
+            ret <- numeric(ncol(tmp))
+            ret[i] <- nt
+            ret
+        }
         ll <- function(beta)
             .mlt_loglik_exact(todistr, Y, Yprime, offset, trunc)(.parm(beta))
         sc <- function(beta)
@@ -209,6 +219,28 @@
             .parm <- function(beta) beta
             fix <- rep(FALSE, ncol(lY))
         } 
+        checktheta <- function(theta) {
+            tmp <- NULL
+            if (any(exact))
+                tmp <- Yprime
+            rtmp <- rY
+            if (any(!is.finite(rtmp))) 
+                rtmp[!is.finite(rtmp)] <- lY[!is.finite(rtmp)] + 
+                    seq(from = .1, to = 1, length = length(lY[!is.finite(rtmp)]))
+            ltmp <- lY
+            if (any(!is.finite(ltmp)))
+               ltmp[!is.finite(ltmp)] <- rY[!is.finite(ltmp)] - 1
+#                    rev(seq(from = .1, to = 1, length = length(rY[!is.finite(ltmp)])))
+            tmp <- rbind(tmp, rtmp - ltmp)
+            if (all(tmp %*% .parm(theta) > .Machine$double.eps))
+                return(theta)
+            tmp <- tmp[, !fix, drop = FALSE]
+            i <- colSums(abs(tmp)) > 0
+            nt <- solve(crossprod(tmp[, i, drop = FALSE]), colSums(tmp[,i]))
+            ret <- numeric(ncol(tmp))
+            ret[i] <- nt
+            ret
+        }
         ll <- function(beta) {
             ret <- numeric(nrow(data))
             if (any(exact))
@@ -246,53 +278,41 @@
         if (nrow(ui) == 0) ui <- ci <- NULL
     }
 
+    optimfct <- function(beta, usescore = TRUE, ...) {
+        control <- list(...)
+        if (!is.null(ui)) {
+            if (usescore)
+                return(spg(par = beta, fn = loglikfct, gr = scorefct, project = "projectLinear",
+                           projectArgs = list(A = ui, b = ci, meq = 0), control = control))
+            return(spg(par = beta, fn = loglikfct, project = "projectLinear",
+                       projectArgs = list(A = ui, b = ci, meq = 0), control = control))
+        }
+        if (usescore)
+            return(spg(par = runif(length(beta)), fn = loglikfct, gr = scorefct, control = control))
+        return(spg(par = runif(length(beta)), fn = loglikfct, control = control))
+    }
+
     theta <- .findstart(model, data, ui, ci, fix, fixed)
 
     ### at least one serious constraint
-    if (!is.null(ui)) {
-        stopifnot(all(ui %*% theta - ci >= 0))
-        optimfct <- function(beta, hessian = FALSE, spg = FALSE, ...) {
-            if (!spg) {
-                ret <- constrOptim(theta = beta, f = loglikfct,
-                                   grad = scorefct, ui = ui,ci = ci, hessian = hessian)
-                ret$gradient <- max(abs(scorefct(ret$par)))
-                return(ret)
-            }
-            control <- list(...)
-            control$checkGrad <- FALSE
-            return(spg(par = beta, fn = loglikfct, gr = scorefct, project = "projectLinear",
-                     projectArgs = list(A = ui, b = ci, meq = 0), control = control))
-        }
-    } else {
-        optimfct <- function(beta, hessian = FALSE, ...) {
-            ret <- optim(par = beta, fn = loglikfct, 
-                  gr = scorefct, hessian = hessian)
-            ret$gradient <- max(abs(scorefct(ret$par)))
-            ret
-       }
-    } 
+    if (!is.null(ui))
+        if(all(ui %*% theta - ci >= 0)) warning("NB not met")
+        
 
-    ntry <- 1
-    while(ntry < 5) {
-        ret <- try(optimfct(theta, hessian = FALSE, spg = TRUE))    
-        if (inherits(ret, "try-error") || ret$convergence != 0 || ret$gradient > 1) {
-            if (inherits(ret, "try-error")) {
-                theta <- theta + runif(length(theta))
-            } else {
-                theta <- ret$par
-            }
-            ntry <- ntry + 1
-        } else {
-            break()
-        }
-    }
+    # theta <- checktheta(theta)
+    theta <- optimfct(theta, usescore = FALSE)$par
+
+    ret <- try(optimfct(theta))    
+    if (inherits(ret, "try-error") || ret$convergence != 0 || ret$gradient > 1)
+        ret <- optimfct(theta, usescore = FALSE)
+
     if (ret$convergence != 0)
         warning("algorithm did not converge")
 
     ### check gradient and hessian
     gr <- numDeriv::grad(loglikfct, ret$par)
     s <- scorefct(ret$par)
-    cat("Score:", max(abs(gr / s)))
+    cat("Score:", max(abs(gr / s)), " ")
 
     H1 <- numDeriv::hessian(loglikfct, ret$par)
     H2 <- he(ret$par)
