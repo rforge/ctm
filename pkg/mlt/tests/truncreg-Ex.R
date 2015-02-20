@@ -27,6 +27,6 @@ c(-cf[1] / cf[2], -cf[3] / cf[2], 1 / cf[2])
 logLik(mltmod)
 vcov(mltmod)
 
-library("numDeriv")
+#library("numDeriv")
 
-solve(hessian(mltmod$loglik, coef(mltmod)))
+solve(numDeriv::hessian(mltmod$loglik, coef(mltmod)))
