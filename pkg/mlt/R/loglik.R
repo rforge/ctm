@@ -15,8 +15,11 @@
     return(ret)
 }
 
-.log <- function(x)
+.log <- function(x) {
+    if (any(x < .Machine$double.eps)) 
+        warning("negative contribution to likelihood; model constraints violated!")
     log(pmax(.Machine$double.eps, x))
+}
 
 .trunc_loglik <- function(beta, d, offset = 0, mmtrunc) {
     if (is.null(mmtrunc)) return(0)
