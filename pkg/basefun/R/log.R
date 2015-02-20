@@ -1,6 +1,40 @@
 
+#log_basis <- function(support = c(.Machine$double.eps, Inf),
+#                      ui = 1, ci = 0, varname = NULL) {
+#
+#    basis <- function(data, deriv = 0L) {
+#        if (is.atomic(data)) {
+#            x <- data
+#        } else {
+#            if (is.null(varname)) varname <- colnames(data)[1]
+#            x <- data[[varname]]
+#        }
+#        if (deriv == 0) {
+#            X <- matrix(log(x), ncol = 1)
+#        } else if (deriv == 1) {
+#            X <- matrix(1 / x, ncol = 1)
+#        } else {
+#            X <- matrix(NA, ncol = 1)
+#        }
+#        colnames(X) <- paste("log(", varname, ")", sep = "")
+#        attr(X, "constraint") <- list(ui = ui, ci = ci)
+#        attr(X, "Assign") <- varname
+#        X
+#    }
+#
+#    s <- list(support)
+#    names(s) <- varname
+#    attr(basis, "support") <- s
+#    attr(basis, "varnames") <- varname
+#
+#    class(basis) <- c("log_basis", "basis", class(basis))
+#    return(basis)
+#}
+
+
+
 log_basis <- function(support = c(.Machine$double.eps, Inf),
-                      ui = Diagonal(1), ci = 0, varname = NULL) {
+                      varname = NULL) {
 
     basis <- function(data, deriv = 0L) {
         if (is.atomic(data)) {
@@ -17,7 +51,9 @@ log_basis <- function(support = c(.Machine$double.eps, Inf),
             X <- matrix(NA, ncol = 1)
         }
         colnames(X) <- paste("log(", varname, ")", sep = "")
-        attr(X, "constraint") <- list(ui = ui, ci = ci)
+        attr(X, "constraint") <- list(ui = matrix(1 / x, ncol = 1), 
+                                      ci = rep(sqrt(.Machine$double.eps),
+                                               length(x)))
         attr(X, "Assign") <- varname
         X
     }
