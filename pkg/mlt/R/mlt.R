@@ -255,7 +255,7 @@
             if (!spg) {
                 ret <- constrOptim(theta = beta, f = loglikfct,
                                    grad = scorefct, ui = ui,ci = ci, hessian = hessian)
-                ret$gradient <- max(scorefct(ret$par))
+                ret$gradient <- max(abs(scorefct(ret$par)))
                 return(ret)
             }
             control <- list(...)
@@ -267,7 +267,7 @@
         optimfct <- function(beta, hessian = FALSE, ...) {
             ret <- optim(par = beta, fn = loglikfct, 
                   gr = scorefct, hessian = hessian)
-            ret$gradient <- max(scorefct(ret$par))
+            ret$gradient <- max(abs(scorefct(ret$par)))
             ret
        }
     } 
@@ -288,6 +288,15 @@
     }
     if (ret$convergence != 0)
         warning("algorithm did not converge")
+
+    ### check gradient and hessian
+    gr <- numDeriv::grad(loglikfct, ret$par)
+    s <- scorefct(ret$par)
+    cat("Score:", max(abs(gr / s)))
+
+    H1 <- numDeriv::hessian(loglikfct, ret$par)
+    H2 <- he(ret$par)
+    cat("Hessian:", max(abs(drop(H1 - H2))), "\n")
 
     coef <- numeric(length(fix))
     coef[fix] <- fixed

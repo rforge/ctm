@@ -52,7 +52,8 @@
         mmtrunc$left <- matrix(0, nrow = nrow(mmtrunc$right), 
                                   ncol = ncol(mmtrunc$right))
     return((crossprod(mmtrunc$right * w1) - 
-            2 * crossprod(mmtrunc$right * w1, mmtrunc$left * w2) + 
+            crossprod(mmtrunc$right * w1, mmtrunc$left * w2) - 
+            crossprod(mmtrunc$left * w2, mmtrunc$right * w1) + 
             crossprod(mmtrunc$left * w2))
            - (crossprod(mmtrunc$right * w3, mmtrunc$right) - 
               crossprod(mmtrunc$left * w4, mmtrunc$left)))
@@ -118,7 +119,7 @@
         W3 <- mmr * w3
         W4 <- mml * w4
         return(-(crossprod(mmr * w1, mmr) - crossprod(mml * w2, mml) - 
-                 (crossprod(W3) - 2 * crossprod(W3, W4) + crossprod(W4)) - 
+                 (crossprod(W3) - crossprod(W3, W4) - crossprod(W4, W3) + crossprod(W4)) - 
                  .trunc_hessian(beta, d, offset, mmtrunc, w)))
     }
 }
