@@ -38,6 +38,10 @@
         Y <- Y[, !fix, drop = FALSE]
     }
     theta <- lm.fit(y = z, x = Y)$coef
+    if (any(is.na(theta))) {
+        warning("cannot determine some starting values")
+        theta[is.na(theta)] <- 0
+    }
     if (is.null(ui)) return(theta)
     if (any(ui %*% theta - ci <= 0)) {
         citmp <- ci + .1
@@ -46,7 +50,8 @@
     theta
 }
 
-.mlt_fit <- function(model, data, weights = NULL, offset = NULL, fixed = NULL, trunc = NULL) {
+.mlt_fit <- function(model, data, weights = NULL, 
+                     offset = NULL, fixed = NULL, trunc = NULL, ...) {
 
     if (is.null(weights)) weights <- rep(1, nrow(data))
     if (is.null(offset)) offset <- rep(0, nrow(data))
@@ -300,11 +305,12 @@
         
 
     # theta <- checktheta(theta)
-    theta <- optimfct(theta, usescore = FALSE)$par
+    theta <- optimfct(theta, usescore = FALSE, 
+                      maxit = 200)$par
 
-    ret <- try(optimfct(theta))    
+    ret <- try(optimfct(theta, ...))    
     if (inherits(ret, "try-error") || ret$convergence != 0 || ret$gradient > 1)
-        ret <- optimfct(theta, usescore = FALSE)
+        ret <- optimfct(ret$par, ...)
 
     if (ret$convergence != 0)
         warning("algorithm did not converge")
