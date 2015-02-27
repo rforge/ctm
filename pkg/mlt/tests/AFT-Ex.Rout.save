@@ -20,9 +20,9 @@ Type 'q()' to quit R.
 Loading required package: basefun
 Loading required package: Matrix
 Loading required package: polynom
+Loading required package: numDeriv
 > library("eha")
 Loading required package: survival
-Loading required package: splines
 > set.seed(29)
 > 
 > ## ************** Exponential - AFT *********************************
@@ -45,8 +45,15 @@ Loading required package: splines
 > 
 > ## Estimate coefficients
 > coef(opt <- mlt(m, data = mydata, fixed = c("log(y)" = 1)))
+iter:  0  f-value:  164.5395  pgrad:  37.38274 
+iter:  10  f-value:  145.8508  pgrad:  0.7869284 
+iter:  20  f-value:  145.845  pgrad:  0.03773067 
+iter:  0  f-value:  176.2909  pgrad:  108.4028 
+iter:  10  f-value:  145.86  pgrad:  2.910091 
+iter:  20  f-value:  145.845  pgrad:  0.001732568 
+Score: 1.000074  Hessian: 5.99033e-09 
      log(y) (Intercept)          g2          g3 
-  1.0000000  -0.1229772   0.7915050   1.1189357 
+  1.0000000  -0.1230055   0.7915146   1.1190530 
 > 
 > coef(aft <- survreg(Surv(y, rep(TRUE, nrow(mydata))) ~ g, data = mydata,
 +                     dist = "exponential"))
@@ -66,7 +73,7 @@ Loading required package: splines
 > ## MLT
 > sqrt(diag(vcov(opt)))[c("g2", "g3")]
        g2        g3 
-0.1414197 0.1414235 
+0.1414213 0.1414213 
 > ## Cox
 > sqrt(diag(vcov(cox)))
        g2        g3 
@@ -87,16 +94,20 @@ Loading required package: splines
 > 
 > ## Estimate coefficients
 > (cf <- coef(opt2 <- mlt(m, data = mydata)))
-iter:  0  f-value:  273.693  pgrad:  457.8192 
-iter:  10  f-value:  152.4848  pgrad:  15.04078 
-iter:  20  f-value:  144.4947  pgrad:  2.087787 
-iter:  30  f-value:  144.2872  pgrad:  2.239676 
-iter:  40  f-value:  144.2832  pgrad:  0.006483715 
+iter:  0  f-value:  273.693  pgrad:  457.8191 
+iter:  10  f-value:  152.4848  pgrad:  15.04079 
+iter:  20  f-value:  144.4947  pgrad:  2.087788 
+iter:  30  f-value:  144.2872  pgrad:  2.239663 
+iter:  40  f-value:  144.2832  pgrad:  0.006458833 
+iter:  0  f-value:  144.2832  pgrad:  6.778886e-05 
+Score: 1.000014  Hessian: 3.275954e-08 
      log(y) (Intercept)          g2          g3 
-  0.9238443  -0.0759685   0.7234014   1.0274557 
+  0.9238448  -0.0759686   0.7234021   1.0274565 
+Warning message:
+In mlt(m, data = mydata) : NB not met
 > cf[-1] / cf[1]
 (Intercept)          g2          g3 
--0.08223085  0.78303386  1.11215249 
+-0.08223091  0.78303420  1.11215270 
 > 
 > coef(aft2 <- survreg(Surv(y, rep(TRUE, nrow(mydata))) ~ g, data = mydata,
 +                      dist = "weibull"))
@@ -118,7 +129,7 @@ iter:  40  f-value:  144.2832  pgrad:  0.006483715
 > 
 > sqrt(diag(vcov(opt2)))[c("g2", "g3")]
        g2        g3 
-0.1462997 0.1502460 
+0.1462996 0.1502460 
 > sqrt(diag(vcov(aft2)))[c("g2", "g3")]
        g2        g3 
 0.1531531 0.1531334 
@@ -128,33 +139,40 @@ iter:  40  f-value:  144.2832  pgrad:  0.006483715
 > 
 > mydata <- data.frame(y = Surv(y, sample(0:1, length(y), replace = TRUE)), g = g)
 > coef(opt <- mlt(m, data = mydata, fixed = c("log(y)" = 1)))
+iter:  0  f-value:  220.1503  pgrad:  145.1462 
+iter:  10  f-value:  171.3808  pgrad:  1.259213 
+iter:  20  f-value:  171.2178  pgrad:  0.03247465 
+iter:  0  f-value:  359.8636  pgrad:  366.7013 
+iter:  10  f-value:  171.7393  pgrad:  11.77245 
+iter:  20  f-value:  171.2178  pgrad:  0.01818192 
+Score: 1.000042  Hessian: 3.025207e-10 
      log(y) (Intercept)          g2          g3 
-  1.0000000  -0.9907409   1.0244029   1.2528246 
+  1.0000000  -0.9669759   1.0006068   1.2290541 
 > 
 > ## Estimate coefficients 
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "expo"))
 (Intercept)          g2          g3 
-  0.9905072  -1.0241384  -1.2525857 
+  0.9669767  -1.0006079  -1.2290552 
 > coef(cox <- coxph(y ~ g, data = mydata))
        g2        g3 
-0.9425123 1.1675680 
+0.8462725 1.0343735 
 > coef(phreg <- phreg(y ~ g, data = mydata, dist = "weibull", shape = 1))
         g2         g3 log(scale) 
- 1.0241384  1.2525857  0.9905072 
+ 1.0006079  1.2290552  0.9669767 
 > 
 > ## Compare standard errors
 > ## MLT
 > sqrt(diag(vcov(opt)))[c("g2", "g3")]
        g2        g3 
-0.2065973 0.2113015 
+0.2052406 0.2099741 
 > ## Cox
 > sqrt(diag(vcov(cox)))
        g2        g3 
-0.2222954 0.2314696 
+0.2215402 0.2298889 
 > ## phreg
 > sqrt(diag(phreg$var))[c("g2", "g3")]
        g2        g3 
-0.2065852 0.2112886 
+0.2052407 0.2099742 
 > 
 > 
 > 
@@ -165,22 +183,29 @@ iter:  40  f-value:  144.2832  pgrad:  0.006483715
 > 
 > ## Estimate coefficients
 > coef(opt <- mlt(m, data = mydata,  fixed = c("log(y)" = 1)))
+iter:  0  f-value:  236.0075  pgrad:  124.9442 
+iter:  10  f-value:  191.9798  pgrad:  0.1138687 
+iter:  20  f-value:  191.9795  pgrad:  0.008088819 
+iter:  0  f-value:  230.3107  pgrad:  114.8446 
+iter:  10  f-value:  191.9897  pgrad:  0.5548637 
+iter:  20  f-value:  191.9795  pgrad:  0.002391739 
+Score: 1.000085  Hessian: 6.51994e-10 
      log(y) (Intercept)          g2          g3 
-  1.0000000   0.2829694   0.7852644   1.1287001 
+  1.0000000   0.3913268   0.7907721   0.8952332 
 > 
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "expo"))
 (Intercept)          g2          g3 
- -0.2828844  -0.7853477  -1.1284822 
+ -0.3913267  -0.7907722  -0.8952333 
 > 
 > ## Compare standard errors
 > ## MLT
 > sqrt(diag(vcov(opt)))[c("g2", "g3")]
        g2        g3 
-0.1485616 0.1486445 
+0.1514390 0.1485206 
 > ## phreg
 > sqrt(diag(phreg$var))[c("g2", "g3")]
        g2        g3 
-0.2065852 0.2112886 
+0.2052407 0.2099742 
 > 
 > 
 > try(coef(cox <- coxph(y ~ g, data = mydata)))
@@ -197,21 +222,28 @@ Error in phreg(y ~ g, data = mydata, dist = "weibull", shape = 1) :
 +                      type = "interval"), g = g)
 > 
 > coef(opt<- mlt(m, data = mydata, fixed = c("log(y)" = 1)))
+iter:  0  f-value:  365.1111  pgrad:  203.6494 
+iter:  10  f-value:  276.4065  pgrad:  3.525097 
+iter:  20  f-value:  275.6352  pgrad:  0.006422738 
+iter:  0  f-value:  349.1775  pgrad:  210.4335 
+iter:  10  f-value:  275.7208  pgrad:  1.253729 
+iter:  20  f-value:  275.6352  pgrad:  0.04736629 
+Score: 1.000014  Hessian: 5.213963e-10 
      log(y) (Intercept)          g2          g3 
-  1.0000000  -0.5530805   0.8599560   1.2788339 
+  1.0000000  -0.5235630   0.8244432   1.2689316 
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "expo"))
 (Intercept)          g2          g3 
-  0.5531934  -0.8600648  -1.2789393 
+  0.5235629  -0.8244424  -1.2689331 
 > 
 > ## Compare standard errors
 > ## MLT
 > sqrt(diag(vcov(opt)))[c("g2", "g3")]
        g2        g3 
-0.1740382 0.1726382 
+0.1725323 0.1709445 
 > ## phreg
 > sqrt(diag(phreg$var))[c("g2", "g3")]
        g2        g3 
-0.2065852 0.2112886 
+0.2052407 0.2099742 
 > 
 > 
 > try(coef(cox <- coxph(y ~ g, data = mydata)))
@@ -248,14 +280,18 @@ Error in phreg(y ~ g, data = mydata, dist = "weibull", shape = 1) :
 > 
 > ## PH-scale
 > (cf <- coef(opt <- mlt(m, data = mydata)))
-iter:  0  f-value:  475.6143  pgrad:  181.8811 
+iter:  0  f-value:  475.6143  pgrad:  181.8812 
 iter:  10  f-value:  300.0763  pgrad:  19.71995 
-iter:  20  f-value:  259.8997  pgrad:  3.001601 
-iter:  30  f-value:  259.0671  pgrad:  0.606415 
-iter:  40  f-value:  259.0566  pgrad:  0.3117073 
-iter:  50  f-value:  259.0559  pgrad:  0.004163074 
+iter:  20  f-value:  259.8997  pgrad:  3.001715 
+iter:  30  f-value:  259.0671  pgrad:  0.6063851 
+iter:  40  f-value:  259.0566  pgrad:  0.3120391 
+iter:  50  f-value:  259.0559  pgrad:  0.004278604 
+iter:  0  f-value:  259.0559  pgrad:  6.023226e-05 
+Score: 1.000564  Hessian: 2.204424e-07 
      log(y) (Intercept)          g2          g3 
- 3.10039797 -0.02638596 -2.12855795 -3.37407198 
+ 3.10039805 -0.02638663 -2.12855797 -3.37407235 
+Warning message:
+In mlt(m, data = mydata) : NB not met
 > 
 > (coef_cox <- coef(cox <- coxph(Surv(y, rep(TRUE, nrow(mydata))) ~ g, 
 +                  	          data = mydata)))
@@ -275,7 +311,7 @@ iter:  50  f-value:  259.0559  pgrad:  0.004163074
 > 
 > cf[-1] / cf[1]
  (Intercept)           g2           g3 
--0.008510506 -0.686543462 -1.088270606 
+-0.008510725 -0.686543451 -1.088270700 
 > coef_cox * aft$scale
         g2         g3 
 -0.6816897 -1.0983578 
@@ -296,7 +332,7 @@ log(shape)
 > ## Compare standard errors
 > sqrt(diag(vcov(opt)))[c("g2", "g3")]
        g2        g3 
-0.1695251 0.2038083 
+0.1695251 0.2038084 
 > sqrt(diag(vcov(cox)))
        g2        g3 
 0.1855397 0.2196354 
@@ -320,12 +356,18 @@ log(shape)
 iter:  0  f-value:  384.0693  pgrad:  135.63 
 iter:  10  f-value:  268.3802  pgrad:  20.5458 
 iter:  20  f-value:  247.8291  pgrad:  4.889914 
-iter:  30  f-value:  244.4073  pgrad:  0.4896473 
-iter:  40  f-value:  244.3807  pgrad:  0.2917405 
-iter:  50  f-value:  244.3803  pgrad:  0.01239668 
-iter:  60  f-value:  244.3803  pgrad:  0.001332855 
+iter:  30  f-value:  244.4073  pgrad:  0.4896467 
+iter:  40  f-value:  244.3807  pgrad:  0.291798 
+iter:  50  f-value:  244.3803  pgrad:  0.01232507 
+iter:  60  f-value:  244.3803  pgrad:  0.0009521273 
+iter:  0  f-value:  244.3803  pgrad:  9.713667e-06 
+Score: 1.000874  Hessian: 1.294502e-09 
      log(y) (Intercept)          g2          g3 
   2.9704379  -0.5337426  -2.1300104  -3.3635876 
+Warning messages:
+1: In mlt(m, data = mydata) : NB not met
+2: In spg(par = beta, fn = loglikfct, gr = scorefct, project = "projectLinear",  :
+  convergence tolerance satisified at intial parameter values.
 > cf[-1] / cf[1]
 (Intercept)          g2          g3 
  -0.1796848  -0.7170695  -1.1323541 
@@ -370,13 +412,17 @@ iter:  60  f-value:  244.3803  pgrad:  0.001332855
 > ## Estimate coefficients
 > (cf <- coef(opt <- mlt(m, data = mydata)))
 iter:  0  f-value:  319.8111  pgrad:  124.1204 
-iter:  10  f-value:  236.7122  pgrad:  21.19239 
-iter:  20  f-value:  229.5851  pgrad:  1.52353 
-iter:  30  f-value:  229.4248  pgrad:  0.1802071 
-iter:  40  f-value:  229.4246  pgrad:  0.01224916 
-iter:  50  f-value:  229.4246  pgrad:  0.008605871 
+iter:  10  f-value:  236.7122  pgrad:  21.19246 
+iter:  20  f-value:  229.5851  pgrad:  1.523486 
+iter:  30  f-value:  229.4248  pgrad:  0.1803261 
+iter:  40  f-value:  229.4246  pgrad:  0.0122489 
+iter:  50  f-value:  229.4246  pgrad:  0.007381118 
+iter:  0  f-value:  229.4246  pgrad:  1.857103e-05 
+Score: 0.9999923  Hessian: 2.324109e-08 
      log(y) (Intercept)          g2          g3 
-  2.1201727   0.5300823  -1.5420718  -2.3381619 
+  2.1201728   0.5300824  -1.5420719  -2.3381620 
+Warning message:
+In mlt(m, data = mydata) : NB not met
 > cf[-1] / cf[1]
 (Intercept)          g2          g3 
   0.2500185  -0.7273331  -1.1028167 
@@ -400,16 +446,20 @@ iter:  50  f-value:  229.4246  pgrad:  0.008605871
 > ## Estimate coefficients
 > (cf <- coef(opt <- mlt(m, data = mydata)))
 iter:  0  f-value:  368.8032  pgrad:  101.9544 
-iter:  10  f-value:  278.497  pgrad:  8.2571 
-iter:  20  f-value:  270.6314  pgrad:  2.030704 
-iter:  30  f-value:  271.268  pgrad:  18.76866 
-iter:  40  f-value:  270.1912  pgrad:  0.009417637 
-iter:  50  f-value:  270.1912  pgrad:  0.00151393 
+iter:  10  f-value:  278.4969  pgrad:  8.257101 
+iter:  20  f-value:  270.6314  pgrad:  2.030634 
+iter:  30  f-value:  271.2684  pgrad:  18.77217 
+iter:  40  f-value:  270.1912  pgrad:  0.009385417 
+iter:  50  f-value:  270.1912  pgrad:  0.001482476 
+iter:  0  f-value:  270.1912  pgrad:  0.0001793998 
+Score: 1.000005  Hessian: 3.632765e-08 
      log(y) (Intercept)          g2          g3 
-  2.7086329  -0.4274823  -1.7414275  -2.7584069 
+   2.708629   -0.427483   -1.741423   -2.758401 
+Warning message:
+In mlt(m, data = mydata) : NB not met
 > cf[-1] / cf[1]
 (Intercept)          g2          g3 
- -0.1578222  -0.6429175  -1.0183760 
+ -0.1578226  -0.6429168  -1.0183753 
 > 
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "weibull"))
 (Intercept)          g2          g3 
@@ -424,4 +474,4 @@ iter:  50  f-value:  270.1912  pgrad:  0.00151393
 > 
 > proc.time()
    user  system elapsed 
-  2.528   0.077   2.595 
+  4.598   0.074   4.679 

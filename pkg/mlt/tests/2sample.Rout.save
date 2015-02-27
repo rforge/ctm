@@ -20,6 +20,7 @@ Type 'q()' to quit R.
 Loading required package: basefun
 Loading required package: Matrix
 Loading required package: polynom
+Loading required package: numDeriv
 > 
 > set.seed(28)
 > n <- 100
@@ -44,26 +45,30 @@ Note: method with signature 'Matrix#numLike' chosen for function '%*%',
 Note: method with signature 'Matrix#matrix' chosen for function '%*%',
  target signature 'dgTMatrix#matrix'.
  "TsparseMatrix#ANY" would also be valid
-iter:  0  f-value:  341.6287  pgrad:  49.3229 
-iter:  10  f-value:  266.1316  pgrad:  11.37079 
-iter:  20  f-value:  259.79  pgrad:  1.594614 
-iter:  30  f-value:  259.6653  pgrad:  7.093472 
-iter:  40  f-value:  259.6152  pgrad:  0.00423897 
+iter:  0  f-value:  341.6287  pgrad:  49.32291 
+iter:  10  f-value:  266.1316  pgrad:  11.3708 
+iter:  20  f-value:  259.79  pgrad:  1.594479 
+iter:  30  f-value:  259.6653  pgrad:  7.089959 
+iter:  40  f-value:  259.6152  pgrad:  0.004269509 
+iter:  0  f-value:  259.6152  pgrad:  0.0001606293 
+Score: 1.000031  Hessian: 2.029424e-09 
+Warning message:
+In mlt(m1, data = mydata) : NB not met
 > logLik(fm1)
 'log Lik.' -259.6152 (df=4)
 > vcov(fm1)
-            1           2            1            2
-1  0.08823056 -0.03935616  0.000000000  0.000000000
-2 -0.03935616  0.01979926  0.000000000  0.000000000
-1  0.00000000  0.00000000  0.010911454 -0.001366131
-2  0.00000000  0.00000000 -0.001366131  0.002047620
+            1           2           1           2
+1  0.08823069 -0.03935623  0.00000000  0.00000000
+2 -0.03935623  0.01979929  0.00000000  0.00000000
+1  0.00000000  0.00000000  0.01091145 -0.00136613
+2  0.00000000  0.00000000 -0.00136613  0.00204762
 > cf1 <- coef(fm1)
 > 1 / cf1[c(2, 4)] 
         2         2 
-0.5025293 1.5626449 
+0.5025284 1.5626450 
 > -cf1[c(1, 3)] / cf1[c(2,4)]
         1         1 
-1.9877582 0.6671796 
+1.9877585 0.6671793 
 > 
 > ### no constraints here!
 > by2 <- polynomial_basis(c(1, 1), var = "y", support = range(y))
@@ -77,49 +82,56 @@ Note: method with signature 'Matrix#matrix' chosen for function '%*%',
  target signature 'dtTMatrix#matrix'.
  "TsparseMatrix#ANY" would also be valid
 iter:  0  f-value:  341.6287  pgrad:  49.3229 
-iter:  10  f-value:  299.8037  pgrad:  16.73734 
-iter:  20  f-value:  274.6798  pgrad:  9.073913 
-iter:  30  f-value:  267.258  pgrad:  12.68914 
-iter:  40  f-value:  262.6286  pgrad:  5.083579 
-iter:  50  f-value:  261.1813  pgrad:  2.863118 
-iter:  60  f-value:  261.4064  pgrad:  47.39497 
-iter:  70  f-value:  259.9329  pgrad:  1.491292 
-iter:  80  f-value:  259.6225  pgrad:  0.1665561 
-iter:  90  f-value:  259.6162  pgrad:  0.2245918 
-iter:  100  f-value:  259.6152  pgrad:  0.02833424 
-iter:  110  f-value:  259.6152  pgrad:  0.005277986 
-iter:  120  f-value:  259.6152  pgrad:  0.004795975 
-iter:  130  f-value:  259.6152  pgrad:  0.002590394 
-iter:  140  f-value:  259.6152  pgrad:  0.0008974235 
-iter:  150  f-value:  259.6152  pgrad:  0.001045656 
-iter:  160  f-value:  259.6152  pgrad:  0.0007343773 
+iter:  10  f-value:  299.8039  pgrad:  16.73724 
+iter:  20  f-value:  274.6782  pgrad:  9.073611 
+iter:  30  f-value:  267.2569  pgrad:  12.60349 
+iter:  40  f-value:  262.6291  pgrad:  5.200912 
+iter:  50  f-value:  261.2799  pgrad:  3.352224 
+iter:  60  f-value:  260.6238  pgrad:  15.90531 
+iter:  70  f-value:  260.0913  pgrad:  12.68358 
+iter:  80  f-value:  259.7971  pgrad:  2.339358 
+iter:  90  f-value:  259.68  pgrad:  0.5323511 
+iter:  100  f-value:  259.6285  pgrad:  0.3502112 
+iter:  110  f-value:  259.6208  pgrad:  0.1527241 
+iter:  120  f-value:  259.617  pgrad:  0.4315666 
+iter:  130  f-value:  259.6162  pgrad:  0.1102728 
+iter:  140  f-value:  259.6157  pgrad:  0.04888818 
+iter:  150  f-value:  259.6152  pgrad:  0.04811 
+iter:  160  f-value:  259.6152  pgrad:  0.0135725 
+iter:  170  f-value:  259.6152  pgrad:  0.0001801936 
+iter:  0  f-value:  259.6152  pgrad:  0.0001852588 
+Score: 1.000004  Hessian: 0.0001899816 
+Warning messages:
+1: In mlt(m2, data = mydata) : NB not met
+2: In .log(mmprime %*% beta) :
+  negative contribution to likelihood; model constraints violated!
 > logLik(fm2)
 'log Lik.' -259.6152 (df=4)
 > vcov(fm2)
             1           2           1           2
-1  0.08823006 -0.03935591 -0.08823006  0.03935591
-2 -0.03935591  0.01979914  0.03935591 -0.01979914
-1 -0.08823006  0.03935591  0.09914152 -0.04072204
-2  0.03935591 -0.01979914 -0.04072204  0.02184676
+1  0.08823033 -0.03935604 -0.08823033  0.03935604
+2 -0.03935604  0.01979920  0.03935604 -0.01979920
+1 -0.08823033  0.03935604  0.09914178 -0.04072217
+2  0.03935604 -0.01979920 -0.04072217  0.02184682
 > (cf2 <- coef(fm2))
         1         2         1         2 
--3.955480  1.989921  3.528522 -1.349980 
+-3.955495  1.989928  3.528538 -1.349987 
 > c(cf1[1:2], cf1[3:4] - cf1[1:2])
         1         2         1         2 
--3.955507  1.989934  3.528552 -1.349993 
+-3.955515  1.989937  3.528560 -1.349997 
 > 
 > 1 / cf2[2]
         2 
-0.5025325 
+0.5025308 
 > 1 / sum(cf2[c(2, 4)])
-[1] 1.562643
+[1] 1.562644
 > 
 > -cf2[1] / cf2[2]
        1 
-1.987757 
+1.987758 
 > -sum(cf2[c(1, 3)]) / sum(cf2[c(2, 4)])
-[1] 0.6671834
+[1] 0.6671814
 > 
 > proc.time()
    user  system elapsed 
-  1.815   0.069   1.873 
+  2.398   0.058   2.454 

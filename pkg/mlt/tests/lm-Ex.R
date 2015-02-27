@@ -1,6 +1,7 @@
 
 library("mlt")
 
+set.seed(29)
 n <- 1000	
 y <- rnorm(n, 2, 1.5)
 d <- data.frame(y = y)

@@ -20,8 +20,8 @@ Type 'q()' to quit R.
 Loading required package: basefun
 Loading required package: Matrix
 Loading required package: polynom
+Loading required package: numDeriv
 > library("survival")
-Loading required package: splines
 > set.seed(29)
 > 
 > y <- rexp(10)
@@ -172,4 +172,4 @@ Loading required package: splines
 > 
 > proc.time()
    user  system elapsed 
-  1.412   0.053   1.454 
+  1.670   0.056   1.715 

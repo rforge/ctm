@@ -20,6 +20,7 @@ Type 'q()' to quit R.
 Loading required package: basefun
 Loading required package: Matrix
 Loading required package: polynom
+Loading required package: numDeriv
 > library("truncreg")
 Loading required package: maxLik
 Loading required package: miscTools
@@ -29,7 +30,16 @@ Henningsen, Arne and Toomet, Ott (2011). maxLik: A package for maximum likelihoo
 
 If you have questions, suggestions, or comments regarding the 'maxLik' package, please use a forum or 'tracker' at maxLik's R-Forge site:
 https://r-forge.r-project.org/projects/maxlik/
+
+Attaching package: 'maxLik'
+
+The following object is masked from 'package:numDeriv':
+
+    hessian
+
 > 
+> 
+> ## Left-truncated 
 > set.seed(29)
 > n <- 1000	
 > x <- runif(n, max = 2 * pi)
@@ -58,41 +68,129 @@ sigma       -7.445133e-06  1.637489e-06  3.940881e-05
 > m <- model(yb, shifting = fm, todistr = "Normal")
 > mltmod <- mlt(m, data = d[!is.na(d$yt),,drop = FALSE], trunc = c("left" = "trunc_left"))
 iter:  0  f-value:  2187.923  pgrad:  1110.073 
-iter:  10  f-value:  397.3736  pgrad:  164.4466 
-iter:  20  f-value:  50.01984  pgrad:  20.3993 
-iter:  30  f-value:  66.15981  pgrad:  2057.124 
-iter:  40  f-value:  33.99985  pgrad:  0.5886936 
-iter:  50  f-value:  33.99059  pgrad:  0.190836 
-iter:  60  f-value:  33.99035  pgrad:  0.9270303 
+iter:  10  f-value:  397.377  pgrad:  164.4495 
+iter:  20  f-value:  49.99689  pgrad:  20.385 
+iter:  30  f-value:  65.62051  pgrad:  913.0289 
+iter:  40  f-value:  34.00101  pgrad:  0.6300076 
+iter:  50  f-value:  33.99349  pgrad:  0.8211395 
+iter:  60  f-value:  33.99033  pgrad:  0.4706324 
+iter:  0  f-value:  33.99032  pgrad:  0.003049391 
+Score: 1.000002  Hessian: 1.111552e-06 
+Warning message:
+In mlt(m, data = d[!is.na(d$yt), , drop = FALSE], trunc = c(left = "trunc_left")) :
+  NB not met
 > (cf <- coef(mltmod))
         1         2         x 
--3.957637  3.882763 -7.733560 
+-3.957605  3.882749 -7.733535 
 > c(-cf[1] / cf[2], -cf[3] / cf[2], 1 / cf[2])
         1         x         2 
-1.0192835 1.9917670 0.2575485 
+1.0192791 1.9917680 0.2575495 
 > logLik(mltmod)
 'log Lik.' -33.99032 (df=3)
 > vcov(mltmod)
              1            2           x
-1  0.017689296 -0.009565421  0.01722587
-2 -0.009565421  0.008956892 -0.01774419
-x  0.017225873 -0.017744189  0.03562564
+1  0.017689280 -0.009565393  0.01722581
+2 -0.009565393  0.008956861 -0.01774413
+x  0.017225815 -0.017744128  0.03562551
 > 
-> library("numDeriv")
-
-Attaching package: 'numDeriv'
-
-The following object is masked from 'package:maxLik':
-
-    hessian
-
+> #library("numDeriv")
 > 
-> solve(hessian(mltmod$loglik, coef(mltmod)))
+> solve(numDeriv::hessian(mltmod$loglik, coef(mltmod)))
              [,1]         [,2]        [,3]
-[1,]  0.017689296 -0.009565421  0.01722587
-[2,] -0.009565421  0.008956892 -0.01774419
-[3,]  0.017225874 -0.017744190  0.03562564
+[1,]  0.017689280 -0.009565393  0.01722582
+[2,] -0.009565393  0.008956862 -0.01774413
+[3,]  0.017225816 -0.017744128  0.03562551
+> 
+> 
+> ## right-truncated
+> 
+> set.seed(29)
+> n <- 1000	
+> x <- runif(n, max = 2 * pi)
+> y <- rnorm(n, 2*x + 1, .25)
+> d <- data.frame(y = y, x = x)
+> ## truncated response
+> tr <- 11
+> d$yt <- ifelse(d$y < tr, d$y, NA)
+> d$trunc_right <- tr
+> 
+> tmod <- truncreg(yt ~ x, data = d, point = tr, direction = "right")
+> coef(tmod)
+(Intercept)           x       sigma 
+  1.0003424   1.9951261   0.2640064 
+> logLik(tmod)
+'log Lik.' -50.51895 (df=3)
+> vcov(tmod)
+              (Intercept)             x         sigma
+(Intercept)  3.312328e-04 -1.021957e-04 -2.840592e-06
+x           -1.021957e-04  4.352541e-05  1.854537e-06
+sigma       -2.840592e-06  1.854537e-06  4.525610e-05
+> 
+> ## MLT
+> fm <- as.formula("~ x")
+> yb <- polynomial_basis(c(TRUE, TRUE), var = "yt", ci = c(-Inf, 0))
+> m <- model(yb, shifting = fm, todistr = "Normal")
+> mltmod <- mlt(m, data = d[!is.na(d$yt),,drop = FALSE], trunc = c("right" = "trunc_right"))
+iter:  0  f-value:  1924.196  pgrad:  1319.759 
+iter:  10  f-value:  555.5695  pgrad:  455.0767 
+iter:  20  f-value:  477.8819  pgrad:  184.6086 
+iter:  30  f-value:  238.1965  pgrad:  76.99969 
+iter:  40  f-value:  169.6564  pgrad:  60.86542 
+iter:  50  f-value:  142.8382  pgrad:  146.7445 
+iter:  60  f-value:  103.8907  pgrad:  1486.506 
+iter:  70  f-value:  86.20123  pgrad:  580.3113 
+iter:  80  f-value:  51.04346  pgrad:  50.014 
+iter:  90  f-value:  50.53017  pgrad:  0.6353544 
+iter:  100  f-value:  50.51895  pgrad:  0.02748308 
+iter:  110  f-value:  50.51895  pgrad:  0.0006190248 
+iter:  0  f-value:  50.51895  pgrad:  0.001679758 
+Score: 1.000003  Hessian: 0.4566825 
+Warning messages:
+1: In mlt(m, data = d[!is.na(d$yt), , drop = FALSE], trunc = c(right = "trunc_right")) :
+  NB not met
+2: In .log(mmprime %*% beta) :
+  negative contribution to likelihood; model constraints violated!
+3: In .log(mmprime %*% beta) :
+  negative contribution to likelihood; model constraints violated!
+4: In .log(.dealinf(mmtrunc$right, beta, offset, d$p, 1) - .dealinf(mmtrunc$left,  :
+  negative contribution to likelihood; model constraints violated!
+5: In .log(.dealinf(mmtrunc$right, beta, offset, d$p, 1) - .dealinf(mmtrunc$left,  :
+  negative contribution to likelihood; model constraints violated!
+6: In .log(.dealinf(mmtrunc$right, beta, offset, d$p, 1) - .dealinf(mmtrunc$left,  :
+  negative contribution to likelihood; model constraints violated!
+7: In .log(.dealinf(mmtrunc$right, beta, offset, d$p, 1) - .dealinf(mmtrunc$left,  :
+  negative contribution to likelihood; model constraints violated!
+8: In .log(.dealinf(mmtrunc$right, beta, offset, d$p, 1) - .dealinf(mmtrunc$left,  :
+  negative contribution to likelihood; model constraints violated!
+9: In .log(.dealinf(mmtrunc$right, beta, offset, d$p, 1) - .dealinf(mmtrunc$left,  :
+  negative contribution to likelihood; model constraints violated!
+> (cf <- coef(mltmod))
+        1         2         x 
+-3.789073  3.787773 -7.557084 
+> c(-cf[1] / cf[2], -cf[3] / cf[2], 1 / cf[2])
+        1         x         2 
+1.0003432 1.9951258 0.2640074 
+> logLik(mltmod)
+'log Lik.' -50.51895 (df=3)
+> vcov(mltmod)
+             1            2           x
+1  0.014383277 -0.009473304  0.01733338
+2 -0.009473304  0.009315743 -0.01848530
+x  0.017333382 -0.018485299  0.03730390
+> 
+> #library("numDeriv")
+> 
+> solve(numDeriv::hessian(mltmod$loglik, coef(mltmod)))
+             [,1]         [,2]        [,3]
+[1,]  0.014235503 -0.009322112  0.01703080
+[2,] -0.009322112  0.009161281 -0.01817627
+[3,]  0.017030801 -0.018176268  0.03668567
+Warning message:
+In .log(.dealinf(mmtrunc$right, beta, offset, d$p, 1) - .dealinf(mmtrunc$left,  :
+  negative contribution to likelihood; model constraints violated!
+> 
+> 
 > 
 > proc.time()
    user  system elapsed 
-  1.768   0.069   1.826 
+  2.546   0.056   2.596 

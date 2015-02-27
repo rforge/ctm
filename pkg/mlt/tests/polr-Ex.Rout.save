@@ -24,6 +24,7 @@ Type 'q()' to quit R.
 Loading required package: basefun
 Loading required package: Matrix
 Loading required package: polynom
+Loading required package: numDeriv
 > 
 > s <- as.basis(~ Infl, data = housing, remove_intercept = TRUE)
 > r <- as.basis(~ Sat, data = housing, remove_intercept = TRUE,
@@ -35,11 +36,15 @@ Loading required package: polynom
 > 
 > mod <- mlt(m, housing, weights = housing$Freq)
 iter:  0  f-value:  1982.846  pgrad:  114.1486 
-iter:  10  f-value:  1797.974  pgrad:  27.66131 
-iter:  20  f-value:  1772.448  pgrad:  4.781346 
-iter:  30  f-value:  1771.721  pgrad:  3.539247 
-iter:  40  f-value:  1771.708  pgrad:  0.003130046 
-iter:  50  f-value:  1771.708  pgrad:  0.0002264945 
+iter:  10  f-value:  1797.975  pgrad:  27.66131 
+iter:  20  f-value:  1772.448  pgrad:  4.781332 
+iter:  30  f-value:  1771.721  pgrad:  3.539469 
+iter:  40  f-value:  1771.708  pgrad:  0.003074092 
+iter:  50  f-value:  1771.708  pgrad:  0.0002250999 
+iter:  0  f-value:  1771.708  pgrad:  1.956054e-05 
+Score: 1.000194  Hessian: 2.373008e-08 
+Warning message:
+In mlt(m, housing, weights = housing$Freq) : NB not met
 > 
 > logLik(mp)
 'log Lik.' -1771.708 (df=4)
@@ -54,7 +59,7 @@ InflMedium   InflHigh
  -0.2013727   0.9484658 
 > coef(mod)
       Sat1       Sat2 InflMedium   InflHigh 
--0.2013763  0.9484755 -0.5635787 -1.2486723 
+-0.2013763  0.9484755 -0.5635787 -1.2486719 
 > 
 > sqrt(diag(vcov(mp)))
 
@@ -64,8 +69,8 @@ Re-fitting to get Hessian
  0.10357053  0.12479361  0.07662596  0.08024304 
 > sqrt(diag(vcov(mod)))
       Sat1       Sat2 InflMedium   InflHigh 
-0.07133852 0.07400438 0.10344958 0.12434905 
+0.07662594 0.08024300 0.10357051 0.12479358 
 > 
 > proc.time()
    user  system elapsed 
-  1.652   0.044   1.687 
+  1.847   0.042   1.877 

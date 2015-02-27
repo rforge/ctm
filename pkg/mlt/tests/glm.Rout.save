@@ -20,6 +20,7 @@ Type 'q()' to quit R.
 Loading required package: basefun
 Loading required package: Matrix
 Loading required package: polynom
+Loading required package: numDeriv
 > set.seed(29)
 > 
 > n <- 100
@@ -36,15 +37,21 @@ Loading required package: polynom
 > 
 > m <- model(~ y, shift = ~ X1 + X2, todist = "Logis")
 > m2 <- mlt(m, data = df, fixed = c("y.L" = 0))
+iter:  0  f-value:  92.82517  pgrad:  32.12444 
+iter:  10  f-value:  68.14266  pgrad:  0.8374326 
+iter:  0  f-value:  88.48929  pgrad:  29.581 
+iter:  10  f-value:  68.12889  pgrad:  0.03527792 
+iter:  20  f-value:  68.12815  pgrad:  1.830052e-05 
+Score: 1.000296  Hessian: 8.11327e-10 
 Warning message:
 In mlt(m, data = df, fixed = c(y.L = 0)) :
   results may depend on ordering of levels
 > coef(m2)
 (Intercept)         y.L          X1          X2 
- -0.7367964   0.0000000   0.3847043   0.8285499 
+ -0.7372373   0.0000000   0.3848619   0.8291958 
 > 
 > max(abs(coef(m1) + coef(m2)[-2]))
-[1] 0.0006546535
+[1] 8.783614e-06
 > 
 > logLik(m1)
 'log Lik.' -68.12815 (df=3)
@@ -108,11 +115,201 @@ Note: method with signature 'Matrix#numLike' chosen for function '%*%',
 Note: method with signature 'Matrix#matrix' chosen for function '%*%',
  target signature 'dgTMatrix#matrix'.
  "TsparseMatrix#ANY" would also be valid
+iter:  0  f-value:  173.6819  pgrad:  107.9147 
+iter:  10  f-value:  127.7673  pgrad:  42.73108 
+iter:  20  f-value:  93.57495  pgrad:  24.55201 
+iter:  30  f-value:  63.27134  pgrad:  69.3199 
+iter:  40  f-value:  50.90616  pgrad:  142.067 
+iter:  50  f-value:  30.71208  pgrad:  3.768988 
+iter:  60  f-value:  25.78258  pgrad:  3.840058 
+iter:  70  f-value:  24.90408  pgrad:  66.36205 
+iter:  80  f-value:  18.4872  pgrad:  25.03871 
+iter:  90  f-value:  16.50514  pgrad:  1.335789 
+iter:  100  f-value:  12.22303  pgrad:  0.6571239 
+iter:  110  f-value:  11.90562  pgrad:  0.5521527 
+iter:  120  f-value:  11.21362  pgrad:  11.50154 
+iter:  130  f-value:  10.96221  pgrad:  12.89001 
+iter:  140  f-value:  10.24502  pgrad:  0.3833819 
+iter:  150  f-value:  9.969901  pgrad:  0.3622322 
+iter:  160  f-value:  9.729665  pgrad:  0.3348506 
+iter:  170  f-value:  9.571081  pgrad:  0.320742 
+iter:  180  f-value:  9.465032  pgrad:  0.3190414 
+iter:  190  f-value:  8.599465  pgrad:  0.4543776 
+iter:  200  f-value:  8.577877  pgrad:  2.626637 
+iter:  0  f-value:  8.570449  pgrad:  0.2481102 
+iter:  10  f-value:  8.173001  pgrad:  0.2107795 
+iter:  20  f-value:  8.098527  pgrad:  0.2011321 
+iter:  30  f-value:  8.010979  pgrad:  0.1931435 
+iter:  40  f-value:  7.912834  pgrad:  0.1846938 
+iter:  50  f-value:  7.777186  pgrad:  0.1795016 
+iter:  60  f-value:  7.714589  pgrad:  1.65272 
+iter:  70  f-value:  7.70482  pgrad:  4.774207 
+iter:  80  f-value:  7.454498  pgrad:  2.004027 
+iter:  90  f-value:  7.400543  pgrad:  0.14527 
+iter:  100  f-value:  7.367901  pgrad:  0.1437693 
+iter:  110  f-value:  7.337289  pgrad:  0.14765 
+iter:  120  f-value:  7.315089  pgrad:  0.1329401 
+iter:  130  f-value:  7.116924  pgrad:  0.1232856 
+iter:  140  f-value:  6.762112  pgrad:  8.24832 
+iter:  150  f-value:  6.351015  pgrad:  0.4979633 
+iter:  160  f-value:  6.266041  pgrad:  0.06298225 
+iter:  170  f-value:  6.257999  pgrad:  0.04047761 
+iter:  180  f-value:  6.242482  pgrad:  0.03925247 
+iter:  190  f-value:  6.23415  pgrad:  0.03847423 
+iter:  200  f-value:  6.224392  pgrad:  0.03756499 
+iter:  210  f-value:  6.211778  pgrad:  0.03921441 
+iter:  220  f-value:  6.211334  pgrad:  0.8434257 
+iter:  230  f-value:  6.203808  pgrad:  1.017779 
+iter:  240  f-value:  6.192635  pgrad:  0.04544531 
+iter:  250  f-value:  6.175988  pgrad:  0.03273231 
+iter:  260  f-value:  6.166255  pgrad:  0.03174276 
+iter:  270  f-value:  6.149781  pgrad:  0.03017843 
+iter:  280  f-value:  6.12529  pgrad:  0.02613807 
+iter:  290  f-value:  6.12056  pgrad:  1.033762 
+iter:  300  f-value:  6.098564  pgrad:  0.4495877 
+iter:  310  f-value:  6.093584  pgrad:  0.0250787 
+iter:  320  f-value:  6.088832  pgrad:  0.05078613 
+iter:  330  f-value:  6.084257  pgrad:  0.02320059 
+iter:  340  f-value:  6.072604  pgrad:  0.02188092 
+iter:  350  f-value:  6.065059  pgrad:  0.02103259 
+iter:  360  f-value:  6.053368  pgrad:  0.01925431 
+iter:  370  f-value:  6.047869  pgrad:  0.02540115 
+iter:  380  f-value:  6.044438  pgrad:  0.03274287 
+iter:  390  f-value:  6.042597  pgrad:  0.9674562 
+iter:  400  f-value:  6.032893  pgrad:  0.05594812 
+iter:  410  f-value:  6.024931  pgrad:  0.1064837 
+iter:  420  f-value:  6.022812  pgrad:  0.01589382 
+iter:  430  f-value:  6.013613  pgrad:  0.01462703 
+iter:  440  f-value:  6.010571  pgrad:  0.01424791 
+iter:  450  f-value:  6.003577  pgrad:  0.01220243 
+iter:  460  f-value:  6.004698  pgrad:  0.9273905 
+iter:  470  f-value:  6.00082  pgrad:  0.6900441 
+iter:  480  f-value:  5.99081  pgrad:  0.07551334 
+iter:  490  f-value:  5.990302  pgrad:  0.01120081 
+iter:  500  f-value:  5.98707  pgrad:  0.01066971 
+iter:  510  f-value:  5.985433  pgrad:  0.01041907 
+iter:  520  f-value:  5.982265  pgrad:  0.009628499 
+iter:  530  f-value:  5.981394  pgrad:  0.130545 
+iter:  540  f-value:  5.976132  pgrad:  0.5846891 
+iter:  550  f-value:  5.97145  pgrad:  0.1412393 
+iter:  560  f-value:  5.957914  pgrad:  0.004750032 
+iter:  570  f-value:  5.957727  pgrad:  0.004444451 
+iter:  580  f-value:  5.957386  pgrad:  0.004563669 
+iter:  590  f-value:  5.955675  pgrad:  0.8745033 
+iter:  600  f-value:  5.950027  pgrad:  0.0004492936 
+iter:  610  f-value:  5.950012  pgrad:  0.0004423292 
+iter:  620  f-value:  5.949956  pgrad:  0.004451108 
+iter:  630  f-value:  5.950044  pgrad:  0.114824 
+iter:  640  f-value:  5.949912  pgrad:  0.03126265 
+iter:  650  f-value:  5.949901  pgrad:  0.0003853914 
+iter:  660  f-value:  5.949886  pgrad:  0.0003774935 
+iter:  670  f-value:  5.949876  pgrad:  0.0003718853 
+iter:  680  f-value:  5.949868  pgrad:  0.0003672755 
+iter:  690  f-value:  5.949859  pgrad:  0.0003624024 
+iter:  700  f-value:  5.949856  pgrad:  0.02958782 
+iter:  710  f-value:  5.949842  pgrad:  0.0003526709 
+iter:  720  f-value:  5.949836  pgrad:  0.0003488085 
+iter:  730  f-value:  5.949829  pgrad:  0.0003449534 
+iter:  740  f-value:  5.94982  pgrad:  0.0003395498 
+iter:  750  f-value:  5.949819  pgrad:  0.02979102 
+iter:  760  f-value:  5.949767  pgrad:  0.0597781 
+iter:  770  f-value:  5.949747  pgrad:  0.04128206 
+iter:  780  f-value:  5.949737  pgrad:  0.0329078 
+iter:  790  f-value:  5.949724  pgrad:  0.0002820104 
+iter:  800  f-value:  5.94972  pgrad:  0.0002789889 
+iter:  810  f-value:  5.949714  pgrad:  0.0002754047 
+iter:  820  f-value:  5.94971  pgrad:  0.000273365 
+iter:  830  f-value:  5.949705  pgrad:  0.0002700849 
+iter:  840  f-value:  5.949699  pgrad:  0.0002663907 
+iter:  850  f-value:  5.949693  pgrad:  0.0002622505 
+iter:  860  f-value:  5.949688  pgrad:  0.0002593556 
+iter:  870  f-value:  5.949682  pgrad:  0.0002557482 
+iter:  880  f-value:  5.949658  pgrad:  0.0002401895 
+iter:  890  f-value:  5.949663  pgrad:  0.03518214 
+iter:  900  f-value:  5.94966  pgrad:  0.03721781 
+iter:  910  f-value:  5.949647  pgrad:  0.0002332435 
+iter:  920  f-value:  5.949644  pgrad:  0.0002315554 
+iter:  930  f-value:  5.94964  pgrad:  0.000229116 
+iter:  940  f-value:  5.949575  pgrad:  0.0001877573 
+iter:  950  f-value:  5.949571  pgrad:  0.009177262 
+iter:  960  f-value:  5.949571  pgrad:  0.01927862 
+iter:  970  f-value:  5.949568  pgrad:  0.02044524 
+iter:  980  f-value:  5.949568  pgrad:  0.03013933 
+iter:  990  f-value:  5.949567  pgrad:  0.03500217 
+iter:  1000  f-value:  5.949547  pgrad:  0.00246268 
+iter:  1010  f-value:  5.949541  pgrad:  0.0001665582 
+iter:  1020  f-value:  5.949539  pgrad:  0.0001653893 
+iter:  1030  f-value:  5.949535  pgrad:  0.0001624863 
+iter:  1040  f-value:  5.949534  pgrad:  0.01531856 
+iter:  1050  f-value:  5.949531  pgrad:  0.0001600054 
+iter:  1060  f-value:  5.949529  pgrad:  0.000198369 
+iter:  1070  f-value:  5.949528  pgrad:  0.007958059 
+iter:  1080  f-value:  5.949527  pgrad:  0.008921006 
+iter:  1090  f-value:  5.949525  pgrad:  0.01323441 
+iter:  1100  f-value:  5.949524  pgrad:  0.01436513 
+iter:  1110  f-value:  5.949521  pgrad:  0.000153747 
+iter:  1120  f-value:  5.949519  pgrad:  0.0001526097 
+iter:  1130  f-value:  5.949518  pgrad:  0.0001518149 
+iter:  1140  f-value:  5.949516  pgrad:  0.0001509945 
+iter:  1150  f-value:  5.949515  pgrad:  0.02458017 
+iter:  1160  f-value:  5.949507  pgrad:  0.0001452236 
+iter:  1170  f-value:  5.949506  pgrad:  0.000180886 
+iter:  1180  f-value:  5.949498  pgrad:  0.0001397959 
+iter:  1190  f-value:  5.9495  pgrad:  0.0226738 
+iter:  1200  f-value:  5.949494  pgrad:  0.01923183 
+iter:  1210  f-value:  5.949491  pgrad:  0.0001348764 
+iter:  1220  f-value:  5.949489  pgrad:  0.0001336801 
+iter:  1230  f-value:  5.949487  pgrad:  0.0001326261 
+iter:  1240  f-value:  5.94947  pgrad:  0.001276162 
+iter:  1250  f-value:  5.94947  pgrad:  0.0144674 
+iter:  1260  f-value:  5.949469  pgrad:  0.01747341 
+iter:  1270  f-value:  5.949467  pgrad:  0.01731504 
+iter:  1280  f-value:  5.949464  pgrad:  0.0001183209 
+iter:  1290  f-value:  5.949462  pgrad:  0.0001189456 
+iter:  1300  f-value:  5.949462  pgrad:  0.0001166746 
+iter:  1310  f-value:  5.94946  pgrad:  0.00011568 
+iter:  1320  f-value:  5.949459  pgrad:  0.006632895 
+iter:  1330  f-value:  5.949458  pgrad:  0.0001147421 
+iter:  1340  f-value:  5.949453  pgrad:  0.0001112253 
+iter:  1350  f-value:  5.949452  pgrad:  0.0001106397 
+iter:  1360  f-value:  5.949452  pgrad:  0.01072193 
+iter:  1370  f-value:  5.94945  pgrad:  0.0001093466 
+iter:  1380  f-value:  5.949449  pgrad:  0.0001088701 
+iter:  1390  f-value:  5.949448  pgrad:  0.000108199 
+iter:  1400  f-value:  5.949447  pgrad:  0.0001077318 
+iter:  1410  f-value:  5.949446  pgrad:  0.0002144559 
+iter:  1420  f-value:  5.949446  pgrad:  0.007363855 
+iter:  1430  f-value:  5.94944  pgrad:  0.0007592275 
+iter:  1440  f-value:  5.949438  pgrad:  0.0001021627 
+iter:  1450  f-value:  5.949437  pgrad:  0.0001011936 
+iter:  1460  f-value:  5.949436  pgrad:  0.0001008585 
+iter:  1470  f-value:  5.949436  pgrad:  0.0002790174 
+iter:  1480  f-value:  5.949434  pgrad:  9.934584e-05 
+iter:  1490  f-value:  5.949399  pgrad:  7.742176e-05 
+Score: 1.000039  Hessian: 0.03479159 
+Warning messages:
+1: In mlt(m, data = oiris) : NB not met
+2: In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
+  negative contribution to likelihood; model constraints violated!
+3: In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
+  negative contribution to likelihood; model constraints violated!
+4: In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
+  negative contribution to likelihood; model constraints violated!
+5: In spg(par = beta, fn = loglikfct, project = "projectLinear", projectArgs = list(A = ui,  :
+  Unsuccessful convergence.
+6: In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
+  negative contribution to likelihood; model constraints violated!
+7: In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
+  negative contribution to likelihood; model constraints violated!
+8: In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
+  negative contribution to likelihood; model constraints violated!
+9: In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
+  negative contribution to likelihood; model constraints violated!
 > coef(m2)
-  Species1   Species2   Species1   Species2   Species1   Species2   Species1 
-  3.447396  41.702660   2.436975   2.462019   5.696380   6.602397  -9.307886 
-  Species2   Species1   Species2 
- -9.292973 -17.985234 -17.985233 
+    Species1     Species2     Species1     Species2     Species1     Species2 
+  0.07988844  42.63780954   2.39824911   2.46514186   6.42955431   6.68103993 
+    Species1     Species2     Species1     Species2 
+-10.76271796  -9.42940445  -5.44300845 -18.28605535 
 > 
 > s <- sort(unique(oiris$Species))[1:2]
 > p2 <- do.call("rbind", lapply(predict(m2, newdata = oiris), 
@@ -122,9 +319,9 @@ Note: method with signature 'Matrix#matrix' chosen for function '%*%',
 > pp1 <- predict(m1, newdata = iris, type = "prob")
 > 
 > max(abs(pp1 - pp2))
-[1] 0.004738816
+[1] 0.001173567
 > 
 > 
 > proc.time()
    user  system elapsed 
-  5.213   0.052   5.256 
+  7.423   0.098   7.517 
