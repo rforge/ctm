@@ -21,7 +21,7 @@ as.basis.formula <- function(object, remove_intercept = FALSE,
         return(X)
     }
     if (!is.null(data)) {
-        s <- lapply(data, function(v) {
+        s <- lapply(data[, varnames, drop = FALSE], function(v) {
             if (is.factor(v)) return(unique(v))
             if (length(v) > 0)
                 return(range(v, na.rm = TRUE))
