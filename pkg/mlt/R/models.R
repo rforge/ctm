@@ -38,13 +38,34 @@ model <- function(response, interacting = NULL, shifting = NULL,
             mod <- c(bresponse = response, binteracting = interacting, 
                      bshifting = shifting)
     }
-    ret <- list(model = mod, response = varnames(response), todistr = todistr)
+    ret <- list(model = mod, response = varnames(response), 
+                todistr = todistr, remove_intercept = remove_intercept)
     class(ret) <- "model"
     return(ret)
 }
 
-model.matrix.model <- function(object, data, ...)
-    model.matrix(object$model, data = data, ...)
+model.matrix.model <- function(object, data, ...) {
+    if (is.null(object$model$binteracting) ||
+        is.null(object$model$bresponse))
+        return(model.matrix(object$model, data = data, ...))
+    X <- model.matrix(object$model, data = data, ...)
+    ui <- attr(X, "constraint")$ui
+    ci <- attr(X, "constraint")$ci
+    Xy <- model.matrix(object$model$bresponse, data = data, ...)
+    uiy <- attr(Xy, "constraint")$ui
+    ciy <- attr(Xy, "constraint")$ci
+    if (!any(is.finite(ciy))) return(X)
+    uiy <- uiy[is.finite(ciy),,drop = FALSE]
+    a <- attr(X, "Assign")
+    i <- grep("bresponse", apply(a, 2, paste, collapse = "-"))
+    ui[is.finite(ci),i] <- uiy[rep(1:nrow(uiy), sum(is.finite(ci)) / nrow(uiy)),]
+    attr(X, "constraint") <- list(ui = ui, 
+        ci = attr(X, "constraint")$ci)
+    X
+}
+
+
 
 varnames.model <- function(x)
     varnames(x$model)
+
