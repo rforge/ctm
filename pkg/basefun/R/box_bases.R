@@ -1,6 +1,6 @@
 
 ### box product of multiple _named_ basi(e)s objects
-b <- function(...) {
+b <- function(..., sumconstr = FALSE) {
 
     bases <- list(...)
     stopifnot(all(sapply(bases, inherits, what = c("basis", "bases"))))
@@ -9,6 +9,8 @@ b <- function(...) {
 
     varnames <- sapply(bases, varnames)
     stopifnot(all(!is.null(varnames)))
+
+    attr(bases, "sumconstr") <- sumconstr
 
     class(bases) <- c("box_bases", "bases")
     bases
@@ -45,8 +47,20 @@ model.matrix.box_bases <- function(object, data, model.matrix = TRUE,
         X
     })
     if (!model.matrix) return(ret)
-    constr <- do.call(".box_ui_ci", lapply(ret, function(r)
-                      attr(r, "constraint")))
+    if (attr(object, "sumconstr")) {
+        s1 <- generate(object[[1]], 2)
+        X1 <- model.matrix(object[[1]], data = expand.grid(s1))
+        s2 <- generate(object[[2]], 10)
+        X2 <- model.matrix(object[[2]], data = expand.grid(s2))
+        ui <- attr(X1, "constraint")$ui
+        ci <- attr(X1, "constraint")$ci
+        ui <- kronecker(X2, ui)
+        ci <- rep(ci, nrow(X2))
+        constr <- list(ui = ui, ci = ci)
+    } else {
+        constr <- do.call(".box_ui_ci", lapply(ret, function(r)
+                          attr(r, "constraint")))
+    }
     if (length(object) > 1) {
         a <- do.call(".box_char", lapply(ret, function(r) attr(r, "Assign")))
         ret <- do.call(".box", ret)
