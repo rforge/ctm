@@ -78,7 +78,7 @@ coef(opt <- mlt(m, data = mydata))
 ### uncensored, time-varying coefficints in both groups
 mydata <- data.frame(y = y, g = g)
 m <- model(response = c(blog = lb, bBern = Bb), 
-           interacting = as.basis(~ g, remove_intercept = TRUE),
+           interacting = as.basis(~ g, data = mydata),
            todist = "MinExtrVal")
 coef(opt <- mlt(m, data = mydata))
 coef(cph <- coxph(Surv(y, rep(TRUE, nrow(mydata))) ~ g, data = mydata))

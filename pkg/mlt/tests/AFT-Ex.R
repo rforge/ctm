@@ -18,7 +18,7 @@ mydata <- data.frame(y = y, g = g)
 boxplot(y ~ g, data = mydata)
 
 Bb <- log_basis(var = "y", support = range(y))
-Bx <- as.basis(~ g, remove_intercept = FALSE)
+Bx <- as.basis(~ g)
 m <- model(Bb, shifting = Bx, todist = "MinExtrVal")
 
 ## Estimate coefficients
@@ -145,7 +145,7 @@ mydata <- data.frame(y = y, g = g)
 boxplot(y ~ g, data = mydata)
 
 Bb <- log_basis(var = "y", support = range(y))
-Bx <- as.basis(~ g, remove_intercept = FALSE)
+Bx <- as.basis(~ g)
 m <- model(Bb, shifting = Bx, todist = "MinExtrVal")
 
 ## Estimate coefficients
