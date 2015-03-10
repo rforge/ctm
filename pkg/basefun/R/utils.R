@@ -24,7 +24,7 @@
                  sep = ":"), nrow = nrow(x))
 }
 
-### box "product" of character matices
+### box "product" of character matrices
 .box_char <- function(...) {
     args <- list(...)
     ret <- args[[1]]
