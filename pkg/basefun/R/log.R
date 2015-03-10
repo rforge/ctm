@@ -26,6 +26,7 @@ log_basis <- function(support = c(.Machine$double.eps, Inf),
     names(s) <- varname
     attr(basis, "support") <- s
     attr(basis, "varnames") <- varname
+    attr(basis, "intercept") <- FALSE
 
     class(basis) <- c("log_basis", "basis", class(basis))
     return(basis)

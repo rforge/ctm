@@ -39,6 +39,7 @@ polynomial_basis <- function(coef, support = c(0, 1),
     names(s) <- varname
     attr(basis, "support") <- s
     attr(basis, "varnames") <- varname
+    attr(basis, "intercept") <- TRUE
 
     class(basis) <- c("polynomial_basis", "basis", class(basis))
     return(basis)

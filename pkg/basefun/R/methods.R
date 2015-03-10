@@ -66,3 +66,15 @@ generate.bases <- generate.basis
 
 as.basis <- function(object, ...)
     UseMethod("as.basis")
+
+intercept <- function(object, ...)
+    UseMethod("intercept")
+
+intercept.default <- function(object, ...)
+    attr(object, "intercept")
+
+intercept.box_bases <- function(object, ...)
+    any(sapply(object, intercept))
+
+intercept.cbind_bases <- function(object, ...)
+    any(sapply(object, intercept))

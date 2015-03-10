@@ -10,6 +10,9 @@ c.basis <- function(..., recursive = FALSE) {
     stopifnot(length(unique(bnames)) == length(bases))
     varnames <- sapply(bases, varnames)
     stopifnot(all(!is.null(varnames)))
+    inter <- sapply(bases, intercept)
+    if (sum(inter) > 1) 
+        warning("more than one basis contains an intercept term")
  
     class(bases) <- c("cbind_bases", "bases")
     bases
