@@ -50,7 +50,7 @@ model.matrix.box_bases <- function(object, data, model.matrix = TRUE,
     if (attr(object, "sumconstr")) {
         s1 <- generate(object[[1]], 2)
         X1 <- model.matrix(object[[1]], data = expand.grid(s1))
-        s2 <- generate(object[[2]], 10)
+        s2 <- generate(object[[2]], 2) ### min/max for numerics; all levels for factors
         X2 <- model.matrix(object[[2]], data = expand.grid(s2))
         ui <- attr(X1, "constraint")$ui
         ci <- attr(X1, "constraint")$ci
