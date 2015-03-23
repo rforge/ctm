@@ -69,6 +69,7 @@ max(abs(H3 - H2))
 
 cov2cor(vcov(mod))
 
+if (FALSE) {
 library("multcomp")
 
 mp <- parm(coef(mod), vcov(mod))
@@ -92,3 +93,4 @@ plot(survfit(cm))
 lines(y, 1 - p(mc$confint[, "Estimate"]), col = "red")
 lines(y, 1 - p(mc$confint[, "lwr"]), col = "red")
 lines(y, 1 - p(mc$confint[, "upr"]), col = "red")
+}
