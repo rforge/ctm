@@ -305,7 +305,7 @@
         
 
     # theta <- checktheta(theta)
-    theta <- optimfct(theta, usescore = FALSE, 
+    theta <- optimfct(theta, usescore = TRUE, 
                       maxit = 200)$par
 
     ret <- try(optimfct(theta, ...))    
