@@ -1,6 +1,7 @@
 
 model <- function(response, interacting = NULL, shifting = NULL, 
-                  todistr = c("Normal", "Logistic", "MinExtrVal")) {
+                  todistr = c("Normal", "Logistic", "MinExtrVal"), 
+                  sumconstr = inherits(interacting, c("formula", "formula_basis"))) {
 
     ### generate() will not work due to missing data
     if (.is.formula(response)) 
@@ -15,7 +16,7 @@ model <- function(response, interacting = NULL, shifting = NULL,
 
     if (!is.null(interacting))
         interacting <- b(iresponse = response, iinteracting = interacting, 
-                         sumconstr = inherits(interacting, "formula_basis"))
+                         sumconstr = sumconstr)
 
     if (is.null(interacting) && is.null(shifting)) {
         mod <- c(bresponse = response)
