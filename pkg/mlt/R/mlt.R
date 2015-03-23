@@ -51,7 +51,8 @@
 }
 
 .mlt_fit <- function(model, data, weights = NULL, 
-                     offset = NULL, fixed = NULL, trunc = NULL, ...) {
+                     offset = NULL, fixed = NULL, trunc = NULL, 
+                     theta = NULL, ...) {
 
     if (is.null(weights)) weights <- rep(1, nrow(data))
     if (is.null(offset)) offset <- rep(0, nrow(data))
@@ -297,7 +298,8 @@
         return(spg(par = runif(length(beta)), fn = loglikfct, control = control))
     }
 
-    theta <- .findstart(model, data, ui, ci, fix, fixed)
+    if (is.null(theta))
+        theta <- .findstart(model, data, ui, ci, fix, fixed)
 
     ### at least one serious constraint
     if (!is.null(ui))
