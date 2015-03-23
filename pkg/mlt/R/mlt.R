@@ -305,8 +305,7 @@
         
 
     # theta <- checktheta(theta)
-    theta <- optimfct(theta, usescore = TRUE, 
-                      maxit = 200)$par
+    theta <- optimfct(theta, usescore = TRUE, maxit = 200, checkGrad = FALSE)$par
 
     ret <- try(optimfct(theta, ...))    
     if (inherits(ret, "try-error") || ret$convergence != 0 || ret$gradient > 1)
