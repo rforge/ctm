@@ -1,8 +1,11 @@
 
 ### Box product of two matrices
 .boxprod <- function(x, y) {
-    x[, rep(1:ncol(x), ncol(y)), drop = FALSE] * 
-    y[, rep(1:ncol(y), rep(ncol(x), ncol(y))), drop = FALSE]
+    ret <- x[, rep(1:ncol(x), ncol(y)), drop = FALSE] * 
+           y[, rep(1:ncol(y), rep(ncol(x), ncol(y))), drop = FALSE]
+    colnames(ret) <- paste(colnames(x)[rep(1:ncol(x), ncol(y))], 
+                           colnames(y)[rep(1:ncol(y), rep(ncol(x), ncol(y)))], sep = ":")
+    ret
 }
 
 ### box product of design matices

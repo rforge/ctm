@@ -96,7 +96,7 @@ Bernstein_basis <- function(order = 2, support = c(0, 1), normal = FALSE,
         }
         if (deriv > 0)
             X <- X * (1 / diff(support)^deriv)
-        colnames(X) <- 1:ncol(X)
+        colnames(X) <- paste("Bs", 1:ncol(X), "(", varname, ")", sep = "")
         if (zeroint) { ### normal???
             X <- X[, -ncol(X), drop = FALSE] - X[, ncol(X), drop = TRUE]
             constr$ui <- constr$ui[, -ncol(constr$ui),drop = FALSE]
