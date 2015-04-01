@@ -1,6 +1,6 @@
 
-R version 3.1.2 (2014-10-31) -- "Pumpkin Helmet"
-Copyright (C) 2014 The R Foundation for Statistical Computing
+R version 3.1.3 (2015-03-09) -- "Smooth Sidewalk"
+Copyright (C) 2015 The R Foundation for Statistical Computing
 Platform: x86_64-unknown-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -40,14 +40,14 @@ Loading required package: survival
 > boxplot(y ~ g, data = mydata)
 > 
 > Bb <- log_basis(var = "y", support = range(y))
-> Bx <- as.basis(~ g, remove_intercept = FALSE)
+> Bx <- as.basis(~ g)
 > m <- model(Bb, shifting = Bx, todist = "MinExtrVal")
 > 
 > ## Estimate coefficients
 > coef(opt <- mlt(m, data = mydata, fixed = c("log(y)" = 1)))
 iter:  0  f-value:  164.5395  pgrad:  37.38274 
-iter:  10  f-value:  145.8508  pgrad:  0.7869284 
-iter:  20  f-value:  145.845  pgrad:  0.03773067 
+iter:  10  f-value:  145.8508  pgrad:  0.786926 
+iter:  20  f-value:  145.845  pgrad:  0.03772748 
 iter:  0  f-value:  176.2909  pgrad:  108.4028 
 iter:  10  f-value:  145.86  pgrad:  2.910091 
 iter:  20  f-value:  145.845  pgrad:  0.001732568 
@@ -94,20 +94,20 @@ Score: 1.000074  Hessian: 5.99033e-09
 > 
 > ## Estimate coefficients
 > (cf <- coef(opt2 <- mlt(m, data = mydata)))
-iter:  0  f-value:  273.693  pgrad:  457.8191 
-iter:  10  f-value:  152.4848  pgrad:  15.04079 
-iter:  20  f-value:  144.4947  pgrad:  2.087788 
-iter:  30  f-value:  144.2872  pgrad:  2.239663 
-iter:  40  f-value:  144.2832  pgrad:  0.006458833 
-iter:  0  f-value:  144.2832  pgrad:  6.778886e-05 
-Score: 1.000014  Hessian: 3.275954e-08 
+iter:  0  f-value:  273.693  pgrad:  457.8192 
+iter:  10  f-value:  152.4848  pgrad:  15.04078 
+iter:  20  f-value:  144.4947  pgrad:  2.087787 
+iter:  30  f-value:  144.2872  pgrad:  2.239676 
+iter:  40  f-value:  144.2832  pgrad:  0.006483715 
+iter:  0  f-value:  144.2832  pgrad:  6.002722e-05 
+Score: 1.000066  Hessian: 2.046318e-08 
      log(y) (Intercept)          g2          g3 
-  0.9238448  -0.0759686   0.7234021   1.0274565 
+  0.9238445  -0.0759697   0.7234030   1.0274575 
 Warning message:
 In mlt(m, data = mydata) : NB not met
 > cf[-1] / cf[1]
 (Intercept)          g2          g3 
--0.08223091  0.78303420  1.11215270 
+-0.08223213  0.78303548  1.11215421 
 > 
 > coef(aft2 <- survreg(Surv(y, rep(TRUE, nrow(mydata))) ~ g, data = mydata,
 +                      dist = "weibull"))
@@ -129,7 +129,7 @@ In mlt(m, data = mydata) : NB not met
 > 
 > sqrt(diag(vcov(opt2)))[c("g2", "g3")]
        g2        g3 
-0.1462996 0.1502460 
+0.1462997 0.1502461 
 > sqrt(diag(vcov(aft2)))[c("g2", "g3")]
        g2        g3 
 0.1531531 0.1531334 
@@ -141,7 +141,7 @@ In mlt(m, data = mydata) : NB not met
 > coef(opt <- mlt(m, data = mydata, fixed = c("log(y)" = 1)))
 iter:  0  f-value:  220.1503  pgrad:  145.1462 
 iter:  10  f-value:  171.3808  pgrad:  1.259213 
-iter:  20  f-value:  171.2178  pgrad:  0.03247465 
+iter:  20  f-value:  171.2178  pgrad:  0.03248248 
 iter:  0  f-value:  359.8636  pgrad:  366.7013 
 iter:  10  f-value:  171.7393  pgrad:  11.77245 
 iter:  20  f-value:  171.2178  pgrad:  0.01818192 
@@ -184,8 +184,8 @@ Score: 1.000042  Hessian: 3.025207e-10
 > ## Estimate coefficients
 > coef(opt <- mlt(m, data = mydata,  fixed = c("log(y)" = 1)))
 iter:  0  f-value:  236.0075  pgrad:  124.9442 
-iter:  10  f-value:  191.9798  pgrad:  0.1138687 
-iter:  20  f-value:  191.9795  pgrad:  0.008088819 
+iter:  10  f-value:  191.9798  pgrad:  0.1138686 
+iter:  20  f-value:  191.9795  pgrad:  0.007941377 
 iter:  0  f-value:  230.3107  pgrad:  114.8446 
 iter:  10  f-value:  191.9897  pgrad:  0.5548637 
 iter:  20  f-value:  191.9795  pgrad:  0.002391739 
@@ -223,8 +223,8 @@ Error in phreg(y ~ g, data = mydata, dist = "weibull", shape = 1) :
 > 
 > coef(opt<- mlt(m, data = mydata, fixed = c("log(y)" = 1)))
 iter:  0  f-value:  365.1111  pgrad:  203.6494 
-iter:  10  f-value:  276.4065  pgrad:  3.525097 
-iter:  20  f-value:  275.6352  pgrad:  0.006422738 
+iter:  10  f-value:  276.4065  pgrad:  3.525098 
+iter:  20  f-value:  275.6352  pgrad:  0.006424904 
 iter:  0  f-value:  349.1775  pgrad:  210.4335 
 iter:  10  f-value:  275.7208  pgrad:  1.253729 
 iter:  20  f-value:  275.6352  pgrad:  0.04736629 
@@ -273,23 +273,23 @@ Error in phreg(y ~ g, data = mydata, dist = "weibull", shape = 1) :
 > boxplot(y ~ g, data = mydata)
 > 
 > Bb <- log_basis(var = "y", support = range(y))
-> Bx <- as.basis(~ g, remove_intercept = FALSE)
+> Bx <- as.basis(~ g)
 > m <- model(Bb, shifting = Bx, todist = "MinExtrVal")
 > 
 > ## Estimate coefficients
 > 
 > ## PH-scale
 > (cf <- coef(opt <- mlt(m, data = mydata)))
-iter:  0  f-value:  475.6143  pgrad:  181.8812 
+iter:  0  f-value:  475.6143  pgrad:  181.8811 
 iter:  10  f-value:  300.0763  pgrad:  19.71995 
-iter:  20  f-value:  259.8997  pgrad:  3.001715 
-iter:  30  f-value:  259.0671  pgrad:  0.6063851 
-iter:  40  f-value:  259.0566  pgrad:  0.3120391 
-iter:  50  f-value:  259.0559  pgrad:  0.004278604 
-iter:  0  f-value:  259.0559  pgrad:  6.023226e-05 
-Score: 1.000564  Hessian: 2.204424e-07 
+iter:  20  f-value:  259.8997  pgrad:  3.001601 
+iter:  30  f-value:  259.0671  pgrad:  0.606415 
+iter:  40  f-value:  259.0566  pgrad:  0.3117073 
+iter:  50  f-value:  259.0559  pgrad:  0.004163074 
+iter:  0  f-value:  259.0559  pgrad:  6.393919e-05 
+Score: 1.002171  Hessian: 3.074433e-07 
      log(y) (Intercept)          g2          g3 
- 3.10039805 -0.02638663 -2.12855797 -3.37407235 
+ 3.10039796 -0.02638619 -2.12855808 -3.37407221 
 Warning message:
 In mlt(m, data = mydata) : NB not met
 > 
@@ -311,7 +311,7 @@ In mlt(m, data = mydata) : NB not met
 > 
 > cf[-1] / cf[1]
  (Intercept)           g2           g3 
--0.008510725 -0.686543451 -1.088270700 
+-0.008510581 -0.686543503 -1.088270686 
 > coef_cox * aft$scale
         g2         g3 
 -0.6816897 -1.0983578 
@@ -356,12 +356,12 @@ log(shape)
 iter:  0  f-value:  384.0693  pgrad:  135.63 
 iter:  10  f-value:  268.3802  pgrad:  20.5458 
 iter:  20  f-value:  247.8291  pgrad:  4.889914 
-iter:  30  f-value:  244.4073  pgrad:  0.4896467 
-iter:  40  f-value:  244.3807  pgrad:  0.291798 
-iter:  50  f-value:  244.3803  pgrad:  0.01232507 
-iter:  60  f-value:  244.3803  pgrad:  0.0009521273 
-iter:  0  f-value:  244.3803  pgrad:  9.713667e-06 
-Score: 1.000874  Hessian: 1.294502e-09 
+iter:  30  f-value:  244.4073  pgrad:  0.4896473 
+iter:  40  f-value:  244.3807  pgrad:  0.2917405 
+iter:  50  f-value:  244.3803  pgrad:  0.01239668 
+iter:  60  f-value:  244.3803  pgrad:  0.001332855 
+iter:  0  f-value:  244.3803  pgrad:  2.783979e-06 
+Score: 1.000509  Hessian: 1.622681e-09 
      log(y) (Intercept)          g2          g3 
   2.9704379  -0.5337426  -2.1300104  -3.3635876 
 Warning messages:
@@ -412,20 +412,20 @@ Warning messages:
 > ## Estimate coefficients
 > (cf <- coef(opt <- mlt(m, data = mydata)))
 iter:  0  f-value:  319.8111  pgrad:  124.1204 
-iter:  10  f-value:  236.7122  pgrad:  21.19246 
-iter:  20  f-value:  229.5851  pgrad:  1.523486 
-iter:  30  f-value:  229.4248  pgrad:  0.1803261 
-iter:  40  f-value:  229.4246  pgrad:  0.0122489 
-iter:  50  f-value:  229.4246  pgrad:  0.007381118 
-iter:  0  f-value:  229.4246  pgrad:  1.857103e-05 
-Score: 0.9999923  Hessian: 2.324109e-08 
+iter:  10  f-value:  236.7122  pgrad:  21.19239 
+iter:  20  f-value:  229.5851  pgrad:  1.52353 
+iter:  30  f-value:  229.4248  pgrad:  0.1802071 
+iter:  40  f-value:  229.4246  pgrad:  0.01224916 
+iter:  50  f-value:  229.4246  pgrad:  0.008605871 
+iter:  0  f-value:  229.4246  pgrad:  1.308137e-05 
+Score: 1.000059  Hessian: 2.325321e-08 
      log(y) (Intercept)          g2          g3 
-  2.1201728   0.5300824  -1.5420719  -2.3381620 
+  2.1201730   0.5300825  -1.5420722  -2.3381623 
 Warning message:
 In mlt(m, data = mydata) : NB not met
 > cf[-1] / cf[1]
 (Intercept)          g2          g3 
-  0.2500185  -0.7273331  -1.1028167 
+  0.2500185  -0.7273332  -1.1028168 
 > 
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "weibull"))
 (Intercept)          g2          g3 
@@ -446,20 +446,20 @@ In mlt(m, data = mydata) : NB not met
 > ## Estimate coefficients
 > (cf <- coef(opt <- mlt(m, data = mydata)))
 iter:  0  f-value:  368.8032  pgrad:  101.9544 
-iter:  10  f-value:  278.4969  pgrad:  8.257101 
-iter:  20  f-value:  270.6314  pgrad:  2.030634 
-iter:  30  f-value:  271.2684  pgrad:  18.77217 
-iter:  40  f-value:  270.1912  pgrad:  0.009385417 
-iter:  50  f-value:  270.1912  pgrad:  0.001482476 
-iter:  0  f-value:  270.1912  pgrad:  0.0001793998 
-Score: 1.000005  Hessian: 3.632765e-08 
+iter:  10  f-value:  278.497  pgrad:  8.2571 
+iter:  20  f-value:  270.6314  pgrad:  2.030704 
+iter:  30  f-value:  271.268  pgrad:  18.76866 
+iter:  40  f-value:  270.1912  pgrad:  0.009417637 
+iter:  50  f-value:  270.1912  pgrad:  0.00151393 
+iter:  0  f-value:  270.1912  pgrad:  6.740493e-05 
+Score: 1  Hessian: 3.63239e-08 
      log(y) (Intercept)          g2          g3 
-   2.708629   -0.427483   -1.741423   -2.758401 
+  2.7086391  -0.4274801  -1.7414357  -2.7584193 
 Warning message:
 In mlt(m, data = mydata) : NB not met
 > cf[-1] / cf[1]
 (Intercept)          g2          g3 
- -0.1578226  -0.6429168  -1.0183753 
+ -0.1578210  -0.6429191  -1.0183783 
 > 
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "weibull"))
 (Intercept)          g2          g3 
@@ -474,4 +474,4 @@ In mlt(m, data = mydata) : NB not met
 > 
 > proc.time()
    user  system elapsed 
-  4.598   0.074   4.679 
+  3.832   0.080   3.903 

@@ -1,6 +1,6 @@
 
-R version 3.1.2 (2014-10-31) -- "Pumpkin Helmet"
-Copyright (C) 2014 The R Foundation for Statistical Computing
+R version 3.1.3 (2015-03-09) -- "Smooth Sidewalk"
+Copyright (C) 2015 The R Foundation for Statistical Computing
 Platform: x86_64-unknown-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -40,707 +40,706 @@ Loading required package: numDeriv
 + lines(ecdf(faithful$waiting))
 + 
 + }
-iter:  0  f-value:  1095.29  pgrad:  5.469462 
-iter:  10  f-value:  1090.44  pgrad:  0.02999968 
-iter:  0  f-value:  1090.44  pgrad:  2.145392e-05 
-Score: 1.000242  Hessian: 2.035854e-09 
-iter:  0  f-value:  1095.29  pgrad:  11.52177 
-iter:  10  f-value:  1071.57  pgrad:  0.00988166 
-iter:  0  f-value:  1071.57  pgrad:  1.108383e-05 
-Score: 1.00202  Hessian: 6.588124e-09 
+iter:  0  f-value:  1095.29  pgrad:  5.469466 
+iter:  10  f-value:  1090.44  pgrad:  0.02999725 
+iter:  0  f-value:  1090.44  pgrad:  1.776672e-05 
+Score: 1.010608  Hessian: 6.304361e-10 
+iter:  0  f-value:  1095.29  pgrad:  11.52178 
+iter:  10  f-value:  1071.57  pgrad:  0.009880445 
+iter:  0  f-value:  1071.57  pgrad:  9.136909e-06 
+Score: 1.000037  Hessian: 5.272625e-09 
 iter:  0  f-value:  1095.29  pgrad:  15.09944 
-iter:  10  f-value:  1053.767  pgrad:  0.885741 
-iter:  20  f-value:  1053.73  pgrad:  2.955858e-05 
-iter:  0  f-value:  1053.73  pgrad:  2.907589e-05 
-Score: 1  Hessian: 1.196562e-08 
+iter:  10  f-value:  1053.767  pgrad:  0.8857429 
+iter:  20  f-value:  1053.73  pgrad:  2.619668e-05 
+iter:  0  f-value:  1053.73  pgrad:  2.619668e-05 
+Score: 1.000249  Hessian: 7.46952e-09 
 iter:  0  f-value:  1095.29  pgrad:  16.32419 
-iter:  10  f-value:  1044.345  pgrad:  1.071339 
-iter:  20  f-value:  1044.307  pgrad:  0.001318767 
-iter:  0  f-value:  1044.307  pgrad:  7.3411e-06 
-Score: 1.002688  Hessian: 2.236819e-08 
+iter:  10  f-value:  1044.345  pgrad:  1.071335 
+iter:  20  f-value:  1044.307  pgrad:  0.001318435 
+iter:  0  f-value:  1044.307  pgrad:  1.254488e-05 
+Score: 1.000709  Hessian: 2.42462e-08 
 iter:  0  f-value:  1095.29  pgrad:  16.03783 
-iter:  10  f-value:  1041.212  pgrad:  1.284423 
-iter:  20  f-value:  1040.732  pgrad:  0.1762123 
-iter:  30  f-value:  1040.724  pgrad:  0.01432682 
-iter:  40  f-value:  1040.724  pgrad:  0.0013506 
-iter:  50  f-value:  1040.724  pgrad:  0.0003211653 
-iter:  0  f-value:  1040.724  pgrad:  6.525202e-05 
-Score: 1.000209  Hessian: 1.667499e-08 
-iter:  0  f-value:  1095.29  pgrad:  14.95265 
-iter:  10  f-value:  1036.613  pgrad:  0.2220918 
-iter:  20  f-value:  1036.604  pgrad:  0.01587068 
-iter:  30  f-value:  1036.604  pgrad:  0.003929017 
-iter:  40  f-value:  1036.604  pgrad:  0.0003433342 
-iter:  50  f-value:  1036.604  pgrad:  8.185452e-05 
-iter:  0  f-value:  1036.604  pgrad:  3.946263e-05 
-Score: 1.000036  Hessian: 1.971324e-08 
+iter:  10  f-value:  1041.212  pgrad:  1.284421 
+iter:  20  f-value:  1040.732  pgrad:  0.1762251 
+iter:  30  f-value:  1040.724  pgrad:  0.01431197 
+iter:  40  f-value:  1040.724  pgrad:  0.001721183 
+iter:  50  f-value:  1040.724  pgrad:  0.0002428876 
+iter:  60  f-value:  1040.724  pgrad:  3.330731e-05 
+iter:  0  f-value:  1040.724  pgrad:  3.330731e-05 
+Score: 1.000576  Hessian: 1.009205e-08 
+iter:  0  f-value:  1095.29  pgrad:  14.95264 
+iter:  10  f-value:  1036.613  pgrad:  0.2220924 
+iter:  20  f-value:  1036.604  pgrad:  0.01600195 
+iter:  30  f-value:  1036.604  pgrad:  0.004246211 
+iter:  40  f-value:  1036.604  pgrad:  0.0004144575 
+iter:  50  f-value:  1036.604  pgrad:  8.671099e-05 
+iter:  0  f-value:  1036.604  pgrad:  3.727093e-05 
+Score: 1.000108  Hessian: 9.978503e-09 
 iter:  0  f-value:  1095.29  pgrad:  13.52994 
-iter:  10  f-value:  1035.709  pgrad:  0.7679091 
-iter:  20  f-value:  1035.354  pgrad:  0.1085596 
-iter:  30  f-value:  1035.347  pgrad:  0.02229172 
-iter:  40  f-value:  1035.347  pgrad:  0.01726448 
-iter:  50  f-value:  1035.347  pgrad:  0.0007958079 
-iter:  60  f-value:  1035.347  pgrad:  0.0001932676 
-iter:  70  f-value:  1035.347  pgrad:  4.092726e-05 
-iter:  0  f-value:  1035.347  pgrad:  2.08135e-05 
-Score: 1.000264  Hessian: 4.366262e-07 
+iter:  10  f-value:  1035.709  pgrad:  0.7679132 
+iter:  20  f-value:  1035.354  pgrad:  0.1085742 
+iter:  30  f-value:  1035.347  pgrad:  0.02223805 
+iter:  40  f-value:  1035.347  pgrad:  0.01838331 
+iter:  50  f-value:  1035.347  pgrad:  0.0009053366 
+iter:  60  f-value:  1035.347  pgrad:  0.0001723659 
+iter:  70  f-value:  1035.347  pgrad:  0.0002712638 
+iter:  0  f-value:  1035.347  pgrad:  3.777132e-05 
+Score: 1.000146  Hessian: 9.117262e-07 
 iter:  0  f-value:  1095.29  pgrad:  13.00547 
-iter:  10  f-value:  1035.519  pgrad:  0.8829011 
-iter:  20  f-value:  1035.056  pgrad:  0.186933 
-iter:  30  f-value:  1035.033  pgrad:  0.07215476 
-iter:  40  f-value:  1035.032  pgrad:  0.004838512 
-iter:  50  f-value:  1035.032  pgrad:  0.0008435563 
-iter:  60  f-value:  1035.032  pgrad:  0.0007798917 
-iter:  0  f-value:  1035.032  pgrad:  3.594431e-05 
-Score: 1.000703  Hessian: 6.05816e-09 
+iter:  10  f-value:  1035.519  pgrad:  0.8828993 
+iter:  20  f-value:  1035.056  pgrad:  0.1868438 
+iter:  30  f-value:  1035.033  pgrad:  0.07460869 
+iter:  40  f-value:  1035.032  pgrad:  0.005223447 
+iter:  50  f-value:  1035.032  pgrad:  0.001217105 
+iter:  60  f-value:  1035.032  pgrad:  0.0002084536 
+iter:  70  f-value:  1035.032  pgrad:  5.313968e-05 
+iter:  0  f-value:  1035.032  pgrad:  3.568146e-05 
+Score: 1  Hessian: 1.420931e-08 
 iter:  0  f-value:  1095.29  pgrad:  12.68986 
-iter:  10  f-value:  1034.598  pgrad:  0.5753213 
-iter:  20  f-value:  1034.237  pgrad:  0.1721378 
-iter:  30  f-value:  1034.184  pgrad:  0.07382596 
-iter:  40  f-value:  1034.164  pgrad:  0.07705391 
-iter:  50  f-value:  1034.163  pgrad:  0.0008662937 
-iter:  60  f-value:  1034.163  pgrad:  0.0001614353 
-iter:  0  f-value:  1034.163  pgrad:  4.786065e-05 
-Score: 1.000228  Hessian: 1.157937e-08 
+iter:  10  f-value:  1034.598  pgrad:  0.5753221 
+iter:  20  f-value:  1034.237  pgrad:  0.1720842 
+iter:  30  f-value:  1034.184  pgrad:  0.07422521 
+iter:  40  f-value:  1034.163  pgrad:  0.03120269 
+iter:  50  f-value:  1034.163  pgrad:  0.001771452 
+iter:  60  f-value:  1034.163  pgrad:  0.0003050583 
+iter:  0  f-value:  1034.163  pgrad:  4.050938e-05 
+Score: 1.000536  Hessian: 7.676397e-09 
 iter:  0  f-value:  1095.29  pgrad:  12.03414 
-iter:  10  f-value:  1034.381  pgrad:  0.3422429 
-iter:  20  f-value:  1034.147  pgrad:  0.76016 
-iter:  30  f-value:  1034.068  pgrad:  0.0873797 
-iter:  40  f-value:  1034.047  pgrad:  0.07809376 
-iter:  50  f-value:  1034.042  pgrad:  0.390653 
-iter:  60  f-value:  1034.026  pgrad:  0.04492904 
-iter:  70  f-value:  1034.021  pgrad:  0.03869218 
-iter:  80  f-value:  1034.015  pgrad:  0.02670049 
-iter:  90  f-value:  1034.012  pgrad:  0.0201203 
-iter:  100  f-value:  1034.013  pgrad:  0.1587864 
-iter:  110  f-value:  1034.01  pgrad:  0.01138915 
-iter:  120  f-value:  1034.01  pgrad:  0.01225771 
-iter:  130  f-value:  1034.009  pgrad:  0.00905402 
-iter:  140  f-value:  1034.009  pgrad:  0.00715545 
-iter:  150  f-value:  1034.009  pgrad:  0.005413767 
-iter:  160  f-value:  1034.009  pgrad:  0.02021579 
-iter:  170  f-value:  1034.009  pgrad:  0.003790319 
-iter:  180  f-value:  1034.009  pgrad:  0.002171419 
-iter:  190  f-value:  1034.009  pgrad:  0.002019078 
-iter:  200  f-value:  1034.009  pgrad:  0.01131639 
-iter:  0  f-value:  1034.009  pgrad:  0.001977647 
-iter:  10  f-value:  1034.009  pgrad:  0.0009767139 
-iter:  20  f-value:  1034.009  pgrad:  0.0005151557 
-iter:  30  f-value:  1034.009  pgrad:  0.000319572 
-iter:  40  f-value:  1034.009  pgrad:  0.0002866505 
-iter:  50  f-value:  1034.009  pgrad:  0.0001631494 
-iter:  60  f-value:  1034.009  pgrad:  0.0001146171 
-iter:  70  f-value:  1034.009  pgrad:  0.0001271659 
-iter:  80  f-value:  1034.009  pgrad:  0.0003424621 
-iter:  90  f-value:  1034.009  pgrad:  5.194282e-05 
-iter:  100  f-value:  1034.009  pgrad:  5.470169e-05 
-Score: 1.000507  Hessian: 8.17214e-07 
+iter:  10  f-value:  1034.381  pgrad:  0.342243 
+iter:  20  f-value:  1034.147  pgrad:  0.760154 
+iter:  30  f-value:  1034.068  pgrad:  0.08738655 
+iter:  40  f-value:  1034.047  pgrad:  0.07785878 
+iter:  50  f-value:  1034.044  pgrad:  0.4055026 
+iter:  60  f-value:  1034.025  pgrad:  0.04459304 
+iter:  70  f-value:  1034.019  pgrad:  0.03416069 
+iter:  80  f-value:  1034.014  pgrad:  0.02504279 
+iter:  90  f-value:  1034.012  pgrad:  0.02437905 
+iter:  100  f-value:  1034.011  pgrad:  0.01578237 
+iter:  110  f-value:  1034.01  pgrad:  0.0584966 
+iter:  120  f-value:  1034.01  pgrad:  0.0137014 
+iter:  130  f-value:  1034.009  pgrad:  0.007174373 
+iter:  140  f-value:  1034.009  pgrad:  0.004913333 
+iter:  150  f-value:  1034.009  pgrad:  0.005918606 
+iter:  160  f-value:  1034.009  pgrad:  0.002886757 
+iter:  170  f-value:  1034.009  pgrad:  0.005953286 
+iter:  180  f-value:  1034.009  pgrad:  0.001821514 
+iter:  190  f-value:  1034.009  pgrad:  0.003266344 
+iter:  200  f-value:  1034.009  pgrad:  0.00548902 
+iter:  0  f-value:  1034.009  pgrad:  0.001146553 
+iter:  10  f-value:  1034.009  pgrad:  0.0008225877 
+iter:  20  f-value:  1034.009  pgrad:  0.0007305635 
+iter:  30  f-value:  1034.009  pgrad:  0.002654076 
+iter:  40  f-value:  1034.009  pgrad:  0.002211354 
+iter:  50  f-value:  1034.009  pgrad:  0.0002924212 
+iter:  60  f-value:  1034.009  pgrad:  0.0002311117 
+iter:  70  f-value:  1034.009  pgrad:  0.001978572 
+iter:  80  f-value:  1034.009  pgrad:  0.0001091617 
+iter:  90  f-value:  1034.009  pgrad:  8.547554e-05 
+iter:  100  f-value:  1034.009  pgrad:  6.781275e-05 
+iter:  110  f-value:  1034.009  pgrad:  4.950531e-05 
+iter:  120  f-value:  1034.009  pgrad:  3.777577e-05 
+Score: 1.003344  Hessian: 9.804926e-07 
 iter:  0  f-value:  1095.29  pgrad:  11.20361 
-iter:  10  f-value:  1034.094  pgrad:  0.3870286 
-iter:  20  f-value:  1033.73  pgrad:  0.2267757 
-iter:  30  f-value:  1033.651  pgrad:  0.1378817 
-iter:  40  f-value:  1033.602  pgrad:  0.106827 
-iter:  50  f-value:  1033.564  pgrad:  0.09412815 
-iter:  60  f-value:  1033.534  pgrad:  0.07310973 
-iter:  70  f-value:  1033.517  pgrad:  0.08509232 
-iter:  80  f-value:  1033.511  pgrad:  0.0361365 
-iter:  90  f-value:  1033.507  pgrad:  0.02718934 
-iter:  100  f-value:  1033.502  pgrad:  0.01849457 
-iter:  110  f-value:  1033.501  pgrad:  0.01404032 
-iter:  120  f-value:  1033.5  pgrad:  0.01109811 
-iter:  130  f-value:  1033.5  pgrad:  0.009329142 
-iter:  140  f-value:  1033.499  pgrad:  0.0205705 
-iter:  150  f-value:  1033.499  pgrad:  0.009724772 
-iter:  160  f-value:  1033.499  pgrad:  0.002089564 
-iter:  170  f-value:  1033.499  pgrad:  0.0003956302 
-iter:  180  f-value:  1033.499  pgrad:  0.0002110786 
-iter:  0  f-value:  1033.499  pgrad:  2.628356e-05 
-Score: 1.002428  Hessian: 1.188031e-08 
+iter:  10  f-value:  1034.094  pgrad:  0.3870264 
+iter:  20  f-value:  1033.73  pgrad:  0.2267669 
+iter:  30  f-value:  1033.651  pgrad:  0.138065 
+iter:  40  f-value:  1033.602  pgrad:  0.1070094 
+iter:  50  f-value:  1033.563  pgrad:  0.09436368 
+iter:  60  f-value:  1033.533  pgrad:  0.06799977 
+iter:  70  f-value:  1033.523  pgrad:  0.05371114 
+iter:  80  f-value:  1033.513  pgrad:  0.0376003 
+iter:  90  f-value:  1033.507  pgrad:  0.02901026 
+iter:  100  f-value:  1033.504  pgrad:  0.02349648 
+iter:  110  f-value:  1033.502  pgrad:  0.01671805 
+iter:  120  f-value:  1033.501  pgrad:  0.01378532 
+iter:  130  f-value:  1033.5  pgrad:  0.04986569 
+iter:  140  f-value:  1033.499  pgrad:  0.01476662 
+iter:  150  f-value:  1033.499  pgrad:  0.0009425552 
+iter:  160  f-value:  1033.499  pgrad:  0.0004286843 
+iter:  0  f-value:  1033.499  pgrad:  4.04684e-05 
+Score: 1.001235  Hessian: 1.204262e-08 
 iter:  0  f-value:  1095.29  pgrad:  10.93056 
-iter:  10  f-value:  1033.944  pgrad:  0.5027005 
-iter:  20  f-value:  1033.131  pgrad:  0.2941283 
-iter:  30  f-value:  1032.937  pgrad:  0.1911712 
-iter:  40  f-value:  1032.819  pgrad:  0.141938 
-iter:  50  f-value:  1032.747  pgrad:  0.1942453 
-iter:  60  f-value:  1032.685  pgrad:  0.6130472 
-iter:  70  f-value:  1032.639  pgrad:  0.05497213 
-iter:  80  f-value:  1032.636  pgrad:  0.1317562 
-iter:  90  f-value:  1032.634  pgrad:  0.01177341 
-iter:  100  f-value:  1032.633  pgrad:  0.02407243 
-iter:  110  f-value:  1032.633  pgrad:  0.003035439 
-iter:  120  f-value:  1032.633  pgrad:  0.001421085 
-iter:  130  f-value:  1032.633  pgrad:  0.0009958967 
-iter:  140  f-value:  1032.633  pgrad:  0.0005638867 
-iter:  150  f-value:  1032.633  pgrad:  0.0002705747 
-iter:  160  f-value:  1032.633  pgrad:  0.0001409717 
-iter:  170  f-value:  1032.633  pgrad:  0.0003387868 
-iter:  180  f-value:  1032.633  pgrad:  4.774847e-05 
-iter:  0  f-value:  1032.633  pgrad:  3.003591e-05 
-Score: 1.013028  Hessian: 1.828548e-08 
+iter:  10  f-value:  1033.944  pgrad:  0.502701 
+iter:  20  f-value:  1033.131  pgrad:  0.2941305 
+iter:  30  f-value:  1032.937  pgrad:  0.1911382 
+iter:  40  f-value:  1032.819  pgrad:  0.141392 
+iter:  50  f-value:  1032.826  pgrad:  0.7610096 
+iter:  60  f-value:  1032.699  pgrad:  0.125543 
+iter:  70  f-value:  1032.642  pgrad:  0.06569834 
+iter:  80  f-value:  1032.636  pgrad:  0.06554337 
+iter:  90  f-value:  1032.634  pgrad:  0.02203752 
+iter:  100  f-value:  1032.633  pgrad:  0.009871125 
+iter:  110  f-value:  1032.633  pgrad:  0.004322121 
+iter:  120  f-value:  1032.633  pgrad:  0.006290852 
+iter:  130  f-value:  1032.633  pgrad:  0.001020169 
+iter:  140  f-value:  1032.633  pgrad:  0.0005463717 
+iter:  150  f-value:  1032.633  pgrad:  0.0003509391 
+iter:  160  f-value:  1032.633  pgrad:  0.0001658027 
+iter:  170  f-value:  1032.633  pgrad:  6.956893e-05 
+iter:  0  f-value:  1032.633  pgrad:  4.455112e-05 
+Score: 1  Hessian: 1.252263e-08 
 iter:  0  f-value:  1095.29  pgrad:  10.61577 
-iter:  10  f-value:  1033.661  pgrad:  0.5653283 
-iter:  20  f-value:  1033.012  pgrad:  0.7350332 
-iter:  30  f-value:  1032.724  pgrad:  0.3098103 
-iter:  40  f-value:  1032.672  pgrad:  0.1304102 
-iter:  50  f-value:  1032.617  pgrad:  0.1063086 
-iter:  60  f-value:  1032.58  pgrad:  0.09447149 
-iter:  70  f-value:  1032.519  pgrad:  0.1053854 
-iter:  80  f-value:  1032.521  pgrad:  0.594783 
-iter:  90  f-value:  1032.457  pgrad:  0.04029971 
-iter:  100  f-value:  1032.455  pgrad:  0.03285322 
-iter:  110  f-value:  1032.453  pgrad:  0.07215021 
-iter:  120  f-value:  1032.452  pgrad:  0.008826646 
-iter:  130  f-value:  1032.452  pgrad:  0.047512 
-iter:  140  f-value:  1032.452  pgrad:  0.002521574 
-iter:  150  f-value:  1032.452  pgrad:  0.002210072 
-iter:  160  f-value:  1032.452  pgrad:  0.001664375 
-iter:  170  f-value:  1032.452  pgrad:  0.0005798029 
-iter:  180  f-value:  1032.452  pgrad:  0.0003728928 
-iter:  190  f-value:  1032.452  pgrad:  0.002353318 
-iter:  200  f-value:  1032.452  pgrad:  0.0001023182 
-iter:  0  f-value:  1032.452  pgrad:  0.0001026827 
-iter:  10  f-value:  1032.452  pgrad:  3.706085e-05 
-Score: 1  Hessian: 4.282115e-08 
+iter:  10  f-value:  1033.661  pgrad:  0.5653274 
+iter:  20  f-value:  1033.012  pgrad:  0.7348009 
+iter:  30  f-value:  1032.723  pgrad:  0.3151491 
+iter:  40  f-value:  1032.671  pgrad:  0.1301103 
+iter:  50  f-value:  1032.618  pgrad:  0.101444 
+iter:  60  f-value:  1032.549  pgrad:  0.09240563 
+iter:  70  f-value:  1032.459  pgrad:  0.1106572 
+iter:  80  f-value:  1032.455  pgrad:  0.03813723 
+iter:  90  f-value:  1032.452  pgrad:  0.01131258 
+iter:  100  f-value:  1032.452  pgrad:  0.006297251 
+iter:  110  f-value:  1032.452  pgrad:  0.003926705 
+iter:  120  f-value:  1032.452  pgrad:  0.006792624 
+iter:  130  f-value:  1032.452  pgrad:  0.001228603 
+iter:  140  f-value:  1032.452  pgrad:  0.004077068 
+iter:  150  f-value:  1032.452  pgrad:  0.0003370674 
+iter:  160  f-value:  1032.452  pgrad:  0.000228701 
+iter:  170  f-value:  1032.452  pgrad:  9.62978e-05 
+iter:  180  f-value:  1032.452  pgrad:  6.572708e-05 
+iter:  190  f-value:  1032.452  pgrad:  4.128174e-05 
+iter:  0  f-value:  1032.452  pgrad:  3.908029e-05 
+Score: 1.004242  Hessian: 2.306637e-08 
 iter:  0  f-value:  1095.29  pgrad:  10.1342 
-iter:  10  f-value:  1033.633  pgrad:  0.6617347 
-iter:  20  f-value:  1032.782  pgrad:  0.437733 
-iter:  30  f-value:  1032.407  pgrad:  0.1892863 
-iter:  40  f-value:  1032.15  pgrad:  0.1681042 
-iter:  50  f-value:  1032.055  pgrad:  0.1428248 
-iter:  60  f-value:  1031.982  pgrad:  0.1033868 
-iter:  70  f-value:  1031.95  pgrad:  0.09463747 
-iter:  80  f-value:  1031.886  pgrad:  0.04771891 
-iter:  90  f-value:  1031.882  pgrad:  0.0224054 
-iter:  100  f-value:  1031.881  pgrad:  0.01436547 
-iter:  110  f-value:  1031.881  pgrad:  0.01146645 
-iter:  120  f-value:  1031.881  pgrad:  0.00533646 
-iter:  130  f-value:  1031.881  pgrad:  0.003581135 
-iter:  140  f-value:  1031.881  pgrad:  0.003326477 
-iter:  150  f-value:  1031.88  pgrad:  0.001946319 
-iter:  160  f-value:  1031.88  pgrad:  0.001136868 
-iter:  170  f-value:  1031.88  pgrad:  0.000777618 
-iter:  180  f-value:  1031.88  pgrad:  0.0003637979 
-iter:  190  f-value:  1031.88  pgrad:  0.000250111 
-iter:  200  f-value:  1031.88  pgrad:  0.000172804 
-iter:  0  f-value:  1031.88  pgrad:  0.0001720722 
-iter:  10  f-value:  1031.88  pgrad:  6.6148e-05 
-iter:  20  f-value:  1031.88  pgrad:  5.119773e-05 
-Score: 1.000276  Hessian: 1.025459e-08 
-iter:  0  f-value:  1095.29  pgrad:  9.559508 
-iter:  10  f-value:  1033.445  pgrad:  1.653524 
-iter:  20  f-value:  1032.591  pgrad:  0.5013612 
-iter:  30  f-value:  1032.077  pgrad:  0.2206025 
-iter:  40  f-value:  1031.884  pgrad:  0.1942635 
-iter:  50  f-value:  1031.737  pgrad:  0.321135 
-iter:  60  f-value:  1031.668  pgrad:  0.1462354 
-iter:  70  f-value:  1031.399  pgrad:  0.2086597 
-iter:  80  f-value:  1031.335  pgrad:  0.1128842 
-iter:  90  f-value:  1031.268  pgrad:  0.1077046 
-iter:  100  f-value:  1031.263  pgrad:  0.5043557 
-iter:  110  f-value:  1031.227  pgrad:  0.07072231 
-iter:  120  f-value:  1031.221  pgrad:  0.0326213 
-iter:  130  f-value:  1031.22  pgrad:  0.01501348 
-iter:  140  f-value:  1031.219  pgrad:  0.007817107 
-iter:  150  f-value:  1031.219  pgrad:  0.004129106 
-iter:  160  f-value:  1031.219  pgrad:  0.002567049 
-iter:  170  f-value:  1031.219  pgrad:  0.001427907 
-iter:  180  f-value:  1031.219  pgrad:  0.003913101 
-iter:  190  f-value:  1031.219  pgrad:  0.0003183231 
-iter:  200  f-value:  1031.219  pgrad:  0.0001773515 
-iter:  0  f-value:  1031.219  pgrad:  0.0001815693 
-iter:  10  f-value:  1031.219  pgrad:  0.0001138073 
-iter:  20  f-value:  1031.219  pgrad:  0.0002417551 
-iter:  30  f-value:  1031.219  pgrad:  3.304483e-05 
-Score: 1.013282  Hessian: 2.060833e-08 
-iter:  0  f-value:  1095.29  pgrad:  9.457642 
-iter:  10  f-value:  1033.634  pgrad:  1.382985 
-iter:  20  f-value:  1032.215  pgrad:  0.7467304 
-iter:  30  f-value:  1031.937  pgrad:  0.2658953 
-iter:  40  f-value:  1031.772  pgrad:  0.1681497 
-iter:  50  f-value:  1031.638  pgrad:  0.1517992 
-iter:  60  f-value:  1031.471  pgrad:  0.1326521 
-iter:  70  f-value:  1031.346  pgrad:  0.1147009 
-iter:  80  f-value:  1031.309  pgrad:  0.2488332 
-iter:  90  f-value:  1031.244  pgrad:  0.08559027 
-iter:  100  f-value:  1031.214  pgrad:  0.08093821 
-iter:  110  f-value:  1031.189  pgrad:  0.1393778 
-iter:  120  f-value:  1031.17  pgrad:  0.07780045 
-iter:  130  f-value:  1031.128  pgrad:  0.07511744 
-iter:  140  f-value:  1031.121  pgrad:  0.3546734 
-iter:  150  f-value:  1031.102  pgrad:  0.0715977 
-iter:  160  f-value:  1031.094  pgrad:  0.05863058 
-iter:  170  f-value:  1031.092  pgrad:  0.1990134 
-iter:  180  f-value:  1031.087  pgrad:  0.01455419 
-iter:  190  f-value:  1031.087  pgrad:  0.02997467 
-iter:  200  f-value:  1031.087  pgrad:  0.0171404 
-iter:  0  f-value:  1031.087  pgrad:  0.009635478 
-iter:  10  f-value:  1031.086  pgrad:  0.003351419 
-iter:  20  f-value:  1031.086  pgrad:  0.002896463 
-iter:  30  f-value:  1031.086  pgrad:  0.0008558787 
-iter:  40  f-value:  1031.086  pgrad:  0.0009844251 
-iter:  50  f-value:  1031.086  pgrad:  0.0004380564 
-iter:  60  f-value:  1031.086  pgrad:  0.000192374 
-iter:  70  f-value:  1031.086  pgrad:  0.0001237161 
-iter:  80  f-value:  1031.086  pgrad:  7.23299e-05 
-iter:  90  f-value:  1031.086  pgrad:  4.704807e-05 
-Score: 1.000553  Hessian: 2.957427e-08 
+iter:  10  f-value:  1033.633  pgrad:  0.6617334 
+iter:  20  f-value:  1032.782  pgrad:  0.4376104 
+iter:  30  f-value:  1032.407  pgrad:  0.1894054 
+iter:  40  f-value:  1032.149  pgrad:  0.1684757 
+iter:  50  f-value:  1032.034  pgrad:  0.1865299 
+iter:  60  f-value:  1032.011  pgrad:  0.1108756 
+iter:  70  f-value:  1031.979  pgrad:  0.1003072 
+iter:  80  f-value:  1031.954  pgrad:  0.08699813 
+iter:  90  f-value:  1031.937  pgrad:  0.3955197 
+iter:  100  f-value:  1031.888  pgrad:  0.05271921 
+iter:  110  f-value:  1031.883  pgrad:  0.02412951 
+iter:  120  f-value:  1031.881  pgrad:  0.01654354 
+iter:  130  f-value:  1031.881  pgrad:  0.009407622 
+iter:  140  f-value:  1031.881  pgrad:  0.006962239 
+iter:  150  f-value:  1031.881  pgrad:  0.003263241 
+iter:  160  f-value:  1031.881  pgrad:  0.005901267 
+iter:  170  f-value:  1031.88  pgrad:  0.005481338 
+iter:  180  f-value:  1031.88  pgrad:  0.001154664 
+iter:  190  f-value:  1031.88  pgrad:  0.0003371016 
+iter:  200  f-value:  1031.88  pgrad:  0.001141639 
+iter:  0  f-value:  1031.88  pgrad:  0.0003490308 
+iter:  10  f-value:  1031.88  pgrad:  0.000172299 
+iter:  20  f-value:  1031.88  pgrad:  0.0001216021 
+iter:  30  f-value:  1031.88  pgrad:  7.71457e-05 
+iter:  40  f-value:  1031.88  pgrad:  0.0002151658 
+Score: 1.001612  Hessian: 1.366548e-08 
+iter:  0  f-value:  1095.29  pgrad:  9.559509 
+iter:  10  f-value:  1033.445  pgrad:  1.653526 
+iter:  20  f-value:  1032.591  pgrad:  0.5013298 
+iter:  30  f-value:  1032.077  pgrad:  0.2206363 
+iter:  40  f-value:  1031.884  pgrad:  0.1944106 
+iter:  50  f-value:  1031.778  pgrad:  0.2221537 
+iter:  60  f-value:  1031.656  pgrad:  0.1709297 
+iter:  70  f-value:  1031.518  pgrad:  0.1319395 
+iter:  80  f-value:  1031.451  pgrad:  0.1260869 
+iter:  90  f-value:  1031.379  pgrad:  0.1216864 
+iter:  100  f-value:  1031.338  pgrad:  0.2662677 
+iter:  110  f-value:  1031.308  pgrad:  0.1132497 
+iter:  120  f-value:  1031.273  pgrad:  0.1064541 
+iter:  130  f-value:  1031.238  pgrad:  0.1146583 
+iter:  140  f-value:  1031.226  pgrad:  0.06636609 
+iter:  150  f-value:  1031.22  pgrad:  0.02496675 
+iter:  160  f-value:  1031.219  pgrad:  0.01254966 
+iter:  170  f-value:  1031.219  pgrad:  0.007676573 
+iter:  180  f-value:  1031.219  pgrad:  0.004746616 
+iter:  190  f-value:  1031.219  pgrad:  0.00266464 
+iter:  200  f-value:  1031.219  pgrad:  0.00204504 
+iter:  0  f-value:  1031.219  pgrad:  0.00204504 
+iter:  10  f-value:  1031.219  pgrad:  0.002846247 
+iter:  20  f-value:  1031.219  pgrad:  0.0003287328 
+iter:  30  f-value:  1031.219  pgrad:  0.0003938439 
+iter:  40  f-value:  1031.219  pgrad:  6.110852e-05 
+Score: 1.001648  Hessian: 1.663922e-08 
+iter:  0  f-value:  1095.29  pgrad:  9.457641 
+iter:  10  f-value:  1033.634  pgrad:  1.382983 
+iter:  20  f-value:  1032.215  pgrad:  0.7468446 
+iter:  30  f-value:  1031.937  pgrad:  0.2657275 
+iter:  40  f-value:  1031.772  pgrad:  0.1679132 
+iter:  50  f-value:  1031.653  pgrad:  0.1540821 
+iter:  60  f-value:  1031.504  pgrad:  0.136147 
+iter:  70  f-value:  1031.443  pgrad:  0.1285711 
+iter:  80  f-value:  1031.35  pgrad:  0.1936175 
+iter:  90  f-value:  1031.309  pgrad:  0.1404531 
+iter:  100  f-value:  1031.278  pgrad:  0.09629944 
+iter:  110  f-value:  1031.257  pgrad:  0.08900292 
+iter:  120  f-value:  1031.2  pgrad:  0.08081231 
+iter:  130  f-value:  1031.177  pgrad:  0.08530645 
+iter:  140  f-value:  1031.159  pgrad:  0.07742937 
+iter:  150  f-value:  1031.103  pgrad:  0.25443 
+iter:  160  f-value:  1031.091  pgrad:  0.04400403 
+iter:  170  f-value:  1031.087  pgrad:  0.01862547 
+iter:  180  f-value:  1031.087  pgrad:  0.01081789 
+iter:  190  f-value:  1031.087  pgrad:  0.005899806 
+iter:  200  f-value:  1031.086  pgrad:  0.00344982 
+iter:  0  f-value:  1031.086  pgrad:  0.003668637 
+iter:  10  f-value:  1031.086  pgrad:  0.002434873 
+iter:  20  f-value:  1031.086  pgrad:  0.007640966 
+iter:  30  f-value:  1031.086  pgrad:  0.0008059017 
+iter:  40  f-value:  1031.086  pgrad:  0.0007804766 
+iter:  50  f-value:  1031.086  pgrad:  0.0002905958 
+iter:  60  f-value:  1031.086  pgrad:  0.0001417043 
+iter:  70  f-value:  1031.086  pgrad:  7.573786e-05 
+iter:  80  f-value:  1031.086  pgrad:  4.53331e-05 
+Score: 1.000107  Hessian: 1.626088e-08 
 iter:  0  f-value:  1095.29  pgrad:  9.166537 
-iter:  10  f-value:  1033.151  pgrad:  0.8586017 
-iter:  20  f-value:  1031.933  pgrad:  0.3880768 
-iter:  30  f-value:  1031.692  pgrad:  0.272039 
-iter:  40  f-value:  1031.297  pgrad:  0.1542367 
-iter:  50  f-value:  1031.241  pgrad:  0.2120062 
-iter:  60  f-value:  1031.113  pgrad:  0.2665176 
-iter:  70  f-value:  1031.093  pgrad:  0.3567008 
-iter:  80  f-value:  1031  pgrad:  0.1715762 
-iter:  90  f-value:  1030.95  pgrad:  0.2259026 
-iter:  100  f-value:  1030.92  pgrad:  0.06945129 
-iter:  110  f-value:  1030.902  pgrad:  0.0681348 
-iter:  120  f-value:  1030.856  pgrad:  0.05599759 
-iter:  130  f-value:  1030.837  pgrad:  0.1210907 
-iter:  140  f-value:  1030.821  pgrad:  0.05252332 
-iter:  150  f-value:  1030.808  pgrad:  0.05001539 
-iter:  160  f-value:  1030.784  pgrad:  0.09169753 
-iter:  170  f-value:  1030.777  pgrad:  0.04670483 
-iter:  180  f-value:  1030.77  pgrad:  0.045045 
-iter:  190  f-value:  1030.755  pgrad:  0.04389904 
-iter:  200  f-value:  1030.749  pgrad:  0.08613597 
-iter:  0  f-value:  1030.749  pgrad:  0.08613589 
-iter:  10  f-value:  1030.743  pgrad:  0.0597965 
-iter:  20  f-value:  1030.734  pgrad:  0.03753838 
-iter:  30  f-value:  1030.733  pgrad:  0.06290938 
-iter:  40  f-value:  1030.732  pgrad:  0.01127445 
-iter:  50  f-value:  1030.732  pgrad:  0.01089922 
-iter:  60  f-value:  1030.732  pgrad:  0.003978878 
-iter:  70  f-value:  1030.732  pgrad:  0.003000099 
-iter:  80  f-value:  1030.732  pgrad:  0.001998559 
-iter:  90  f-value:  1030.732  pgrad:  0.001280899 
-iter:  100  f-value:  1030.732  pgrad:  0.001126637 
-iter:  110  f-value:  1030.732  pgrad:  0.002205198 
-iter:  120  f-value:  1030.732  pgrad:  0.0002923252 
-iter:  130  f-value:  1030.732  pgrad:  0.0001835204 
-iter:  140  f-value:  1030.732  pgrad:  0.0001231705 
-iter:  150  f-value:  1030.732  pgrad:  6.86574e-05 
-iter:  160  f-value:  1030.732  pgrad:  4.428977e-05 
-Score: 1.00006  Hessian: 2.559288e-08 
+iter:  10  f-value:  1033.151  pgrad:  0.8586032 
+iter:  20  f-value:  1031.933  pgrad:  0.3880107 
+iter:  30  f-value:  1031.692  pgrad:  0.2720477 
+iter:  40  f-value:  1031.297  pgrad:  0.1567157 
+iter:  50  f-value:  1031.244  pgrad:  0.3090424 
+iter:  60  f-value:  1031.189  pgrad:  0.4401778 
+iter:  70  f-value:  1031.115  pgrad:  0.4079578 
+iter:  80  f-value:  1031.06  pgrad:  0.1035677 
+iter:  90  f-value:  1031.009  pgrad:  0.09307141 
+iter:  100  f-value:  1030.978  pgrad:  0.08270573 
+iter:  110  f-value:  1030.956  pgrad:  0.2310523 
+iter:  120  f-value:  1030.917  pgrad:  0.07236785 
+iter:  130  f-value:  1030.89  pgrad:  0.06485652 
+iter:  140  f-value:  1030.826  pgrad:  0.05018843 
+iter:  150  f-value:  1030.82  pgrad:  0.2708322 
+iter:  160  f-value:  1030.799  pgrad:  0.05003891 
+iter:  170  f-value:  1030.781  pgrad:  0.04474217 
+iter:  180  f-value:  1030.768  pgrad:  0.04537174 
+iter:  190  f-value:  1030.762  pgrad:  0.04410713 
+iter:  200  f-value:  1030.754  pgrad:  0.04340921 
+iter:  0  f-value:  1030.753  pgrad:  0.04328663 
+iter:  10  f-value:  1030.742  pgrad:  0.04302324 
+iter:  20  f-value:  1030.735  pgrad:  0.03197255 
+iter:  30  f-value:  1030.734  pgrad:  0.02393747 
+iter:  40  f-value:  1030.732  pgrad:  0.01254053 
+iter:  50  f-value:  1030.732  pgrad:  0.008261502 
+iter:  60  f-value:  1030.732  pgrad:  0.008495908 
+iter:  70  f-value:  1030.732  pgrad:  0.003093343 
+iter:  80  f-value:  1030.732  pgrad:  0.0019284 
+iter:  90  f-value:  1030.732  pgrad:  0.001302958 
+iter:  100  f-value:  1030.732  pgrad:  0.0007671526 
+iter:  110  f-value:  1030.732  pgrad:  0.0005008016 
+iter:  120  f-value:  1030.732  pgrad:  0.0002729291 
+iter:  130  f-value:  1030.732  pgrad:  0.0001633815 
+iter:  140  f-value:  1030.732  pgrad:  0.0001024468 
+iter:  150  f-value:  1030.732  pgrad:  7.18415e-05 
+Score: 1.000243  Hessian: 1.396157e-08 
 iter:  0  f-value:  1095.29  pgrad:  8.78496 
-iter:  10  f-value:  1033.189  pgrad:  0.7418771 
-iter:  20  f-value:  1031.926  pgrad:  0.3734806 
-iter:  30  f-value:  1031.17  pgrad:  0.2354477 
-iter:  40  f-value:  1030.997  pgrad:  0.4726417 
-iter:  50  f-value:  1030.939  pgrad:  0.1117041 
-iter:  60  f-value:  1030.879  pgrad:  0.09795031 
-iter:  70  f-value:  1030.846  pgrad:  0.2107436 
-iter:  80  f-value:  1030.798  pgrad:  0.08577217 
-iter:  90  f-value:  1030.763  pgrad:  0.08262305 
-iter:  100  f-value:  1030.732  pgrad:  0.08195912 
-iter:  110  f-value:  1030.711  pgrad:  0.07758899 
-iter:  120  f-value:  1030.683  pgrad:  0.0744194 
-iter:  130  f-value:  1030.667  pgrad:  0.2429116 
-iter:  140  f-value:  1030.653  pgrad:  0.2957874 
-iter:  150  f-value:  1030.628  pgrad:  0.06598384 
-iter:  160  f-value:  1030.614  pgrad:  0.06368509 
-iter:  170  f-value:  1030.602  pgrad:  0.06042228 
-iter:  180  f-value:  1030.586  pgrad:  0.05945139 
-iter:  190  f-value:  1030.569  pgrad:  0.05716174 
-iter:  200  f-value:  1030.557  pgrad:  0.07221161 
-iter:  0  f-value:  1030.556  pgrad:  0.05458938 
-iter:  10  f-value:  1030.549  pgrad:  0.05291018 
-iter:  20  f-value:  1030.546  pgrad:  0.2335885 
-iter:  30  f-value:  1030.53  pgrad:  0.04958401 
-iter:  40  f-value:  1030.523  pgrad:  0.04725559 
-iter:  50  f-value:  1030.514  pgrad:  0.04539127 
-iter:  60  f-value:  1030.508  pgrad:  0.04412008 
-iter:  70  f-value:  1030.501  pgrad:  0.04197477 
-iter:  80  f-value:  1030.492  pgrad:  0.03910908 
-iter:  90  f-value:  1030.485  pgrad:  0.0374792 
-iter:  100  f-value:  1030.473  pgrad:  0.03543997 
-iter:  110  f-value:  1030.468  pgrad:  0.03438688 
-iter:  120  f-value:  1030.461  pgrad:  0.02971069 
-iter:  130  f-value:  1030.459  pgrad:  0.03018164 
-iter:  140  f-value:  1030.454  pgrad:  0.02699972 
-iter:  150  f-value:  1030.452  pgrad:  0.02651778 
-iter:  160  f-value:  1030.45  pgrad:  0.02646836 
-iter:  170  f-value:  1030.448  pgrad:  0.02539677 
-iter:  180  f-value:  1030.445  pgrad:  0.0253478 
-iter:  190  f-value:  1030.444  pgrad:  0.01932694 
-iter:  200  f-value:  1030.444  pgrad:  0.01372792 
-iter:  210  f-value:  1030.444  pgrad:  0.05899181 
-iter:  220  f-value:  1030.443  pgrad:  0.00645016 
-iter:  230  f-value:  1030.443  pgrad:  0.008292062 
-iter:  240  f-value:  1030.443  pgrad:  0.005535328 
-iter:  250  f-value:  1030.443  pgrad:  0.005210646 
-iter:  260  f-value:  1030.443  pgrad:  0.01772231 
-iter:  270  f-value:  1030.443  pgrad:  0.004507519 
-iter:  280  f-value:  1030.443  pgrad:  0.004250378 
-iter:  290  f-value:  1030.443  pgrad:  0.00373189 
-iter:  300  f-value:  1030.443  pgrad:  0.004308641 
-iter:  310  f-value:  1030.443  pgrad:  0.003330043 
-iter:  320  f-value:  1030.443  pgrad:  0.003058704 
-iter:  330  f-value:  1030.443  pgrad:  0.005923158 
-iter:  340  f-value:  1030.443  pgrad:  0.002532983 
-iter:  350  f-value:  1030.443  pgrad:  0.002149349 
-iter:  360  f-value:  1030.443  pgrad:  0.001942807 
-iter:  370  f-value:  1030.443  pgrad:  0.005269392 
-iter:  380  f-value:  1030.443  pgrad:  0.001705089 
-iter:  390  f-value:  1030.443  pgrad:  0.001605171 
-iter:  400  f-value:  1030.443  pgrad:  0.001524896 
-iter:  410  f-value:  1030.443  pgrad:  0.001398997 
-iter:  420  f-value:  1030.443  pgrad:  0.009216501 
-iter:  430  f-value:  1030.443  pgrad:  0.001210982 
-iter:  440  f-value:  1030.442  pgrad:  0.001133851 
-iter:  450  f-value:  1030.442  pgrad:  0.0009393779 
-iter:  460  f-value:  1030.442  pgrad:  0.0009046515 
-iter:  470  f-value:  1030.442  pgrad:  0.0053432 
-iter:  480  f-value:  1030.442  pgrad:  0.0007158036 
-iter:  490  f-value:  1030.442  pgrad:  0.000648765 
-iter:  500  f-value:  1030.442  pgrad:  0.0005651557 
-iter:  510  f-value:  1030.442  pgrad:  0.001075375 
-iter:  520  f-value:  1030.442  pgrad:  0.0004834799 
-iter:  530  f-value:  1030.442  pgrad:  0.001920646 
-iter:  540  f-value:  1030.442  pgrad:  0.0003919558 
-iter:  550  f-value:  1030.442  pgrad:  0.0003445563 
-iter:  560  f-value:  1030.442  pgrad:  0.0005180947 
-iter:  570  f-value:  1030.442  pgrad:  0.0003148591 
-iter:  580  f-value:  1030.442  pgrad:  0.0002951901 
-iter:  590  f-value:  1030.442  pgrad:  0.000275126 
-iter:  600  f-value:  1030.442  pgrad:  0.0004999569 
-iter:  610  f-value:  1030.442  pgrad:  0.0002322044 
-iter:  620  f-value:  1030.442  pgrad:  0.000240796 
-iter:  630  f-value:  1030.442  pgrad:  0.00017837 
-iter:  640  f-value:  1030.442  pgrad:  0.0005051983 
-iter:  650  f-value:  1030.442  pgrad:  0.0004396874 
-iter:  660  f-value:  1030.442  pgrad:  0.0001465892 
-iter:  670  f-value:  1030.442  pgrad:  0.0001145487 
-iter:  680  f-value:  1030.442  pgrad:  0.0001001354 
-iter:  690  f-value:  1030.442  pgrad:  9.452561e-05 
-iter:  700  f-value:  1030.442  pgrad:  8.916922e-05 
-iter:  710  f-value:  1030.442  pgrad:  8.067352e-05 
-iter:  720  f-value:  1030.442  pgrad:  0.0003372839 
-iter:  730  f-value:  1030.442  pgrad:  6.822417e-05 
-iter:  740  f-value:  1030.442  pgrad:  6.17541e-05 
-iter:  750  f-value:  1030.442  pgrad:  5.958533e-05 
-iter:  760  f-value:  1030.442  pgrad:  9.800679e-05 
-iter:  770  f-value:  1030.442  pgrad:  5.372754e-05 
-iter:  780  f-value:  1030.442  pgrad:  4.54105e-05 
-Score: 1.000249  Hessian: 1.046373e-08 
+iter:  10  f-value:  1033.189  pgrad:  0.7418779 
+iter:  20  f-value:  1031.926  pgrad:  0.3734353 
+iter:  30  f-value:  1031.17  pgrad:  0.2332266 
+iter:  40  f-value:  1031.021  pgrad:  0.1720159 
+iter:  50  f-value:  1030.937  pgrad:  0.1048876 
+iter:  60  f-value:  1030.882  pgrad:  0.09353555 
+iter:  70  f-value:  1030.847  pgrad:  0.09215123 
+iter:  80  f-value:  1030.776  pgrad:  0.08458932 
+iter:  90  f-value:  1030.736  pgrad:  0.08143051 
+iter:  100  f-value:  1030.716  pgrad:  0.07833537 
+iter:  110  f-value:  1030.691  pgrad:  0.07323342 
+iter:  120  f-value:  1030.647  pgrad:  0.07118867 
+iter:  130  f-value:  1030.634  pgrad:  0.06709955 
+iter:  140  f-value:  1030.618  pgrad:  0.06448362 
+iter:  150  f-value:  1030.6  pgrad:  0.06096355 
+iter:  160  f-value:  1030.594  pgrad:  0.2064925 
+iter:  170  f-value:  1030.573  pgrad:  0.08383998 
+iter:  180  f-value:  1030.563  pgrad:  0.05534513 
+iter:  190  f-value:  1030.547  pgrad:  0.05025792 
+iter:  200  f-value:  1030.539  pgrad:  0.0509722 
+iter:  0  f-value:  1030.537  pgrad:  0.04713319 
+iter:  10  f-value:  1030.527  pgrad:  0.1091472 
+iter:  20  f-value:  1030.519  pgrad:  0.0465978 
+iter:  30  f-value:  1030.508  pgrad:  0.04473175 
+iter:  40  f-value:  1030.504  pgrad:  0.107583 
+iter:  50  f-value:  1030.498  pgrad:  0.04168994 
+iter:  60  f-value:  1030.492  pgrad:  0.04009877 
+iter:  70  f-value:  1030.487  pgrad:  0.03809396 
+iter:  80  f-value:  1030.482  pgrad:  0.03658292 
+iter:  90  f-value:  1030.477  pgrad:  0.03595103 
+iter:  100  f-value:  1030.473  pgrad:  0.03453211 
+iter:  110  f-value:  1030.469  pgrad:  0.03320911 
+iter:  120  f-value:  1030.467  pgrad:  0.089503 
+iter:  130  f-value:  1030.465  pgrad:  0.1668552 
+iter:  140  f-value:  1030.458  pgrad:  0.02966619 
+iter:  150  f-value:  1030.456  pgrad:  0.02876051 
+iter:  160  f-value:  1030.454  pgrad:  0.04575549 
+iter:  170  f-value:  1030.452  pgrad:  0.02754814 
+iter:  180  f-value:  1030.449  pgrad:  0.02710855 
+iter:  190  f-value:  1030.447  pgrad:  0.02546621 
+iter:  200  f-value:  1030.445  pgrad:  0.02446345 
+iter:  210  f-value:  1030.444  pgrad:  0.01414059 
+iter:  220  f-value:  1030.444  pgrad:  0.06518179 
+iter:  230  f-value:  1030.443  pgrad:  0.006648991 
+iter:  240  f-value:  1030.443  pgrad:  0.006097827 
+iter:  250  f-value:  1030.443  pgrad:  0.00570364 
+iter:  260  f-value:  1030.443  pgrad:  0.005221005 
+iter:  270  f-value:  1030.443  pgrad:  0.01647102 
+iter:  280  f-value:  1030.443  pgrad:  0.004379435 
+iter:  290  f-value:  1030.443  pgrad:  0.004025285 
+iter:  300  f-value:  1030.443  pgrad:  0.007117427 
+iter:  310  f-value:  1030.443  pgrad:  0.003258745 
+iter:  320  f-value:  1030.443  pgrad:  0.003085849 
+iter:  330  f-value:  1030.443  pgrad:  0.00387906 
+iter:  340  f-value:  1030.443  pgrad:  0.002730276 
+iter:  350  f-value:  1030.443  pgrad:  0.002583642 
+iter:  360  f-value:  1030.443  pgrad:  0.002380271 
+iter:  370  f-value:  1030.443  pgrad:  0.002147784 
+iter:  380  f-value:  1030.443  pgrad:  0.002120911 
+iter:  390  f-value:  1030.443  pgrad:  0.001895575 
+iter:  400  f-value:  1030.443  pgrad:  0.001653522 
+iter:  410  f-value:  1030.443  pgrad:  0.002090355 
+iter:  420  f-value:  1030.443  pgrad:  0.001386867 
+iter:  430  f-value:  1030.443  pgrad:  0.001305295 
+iter:  440  f-value:  1030.443  pgrad:  0.001939865 
+iter:  450  f-value:  1030.442  pgrad:  0.001113258 
+iter:  460  f-value:  1030.442  pgrad:  0.0009777358 
+iter:  470  f-value:  1030.442  pgrad:  0.002777028 
+iter:  480  f-value:  1030.442  pgrad:  0.0008580644 
+iter:  490  f-value:  1030.442  pgrad:  0.0007892655 
+iter:  500  f-value:  1030.442  pgrad:  0.0006968024 
+iter:  510  f-value:  1030.442  pgrad:  0.0006634821 
+iter:  520  f-value:  1030.442  pgrad:  0.0006202264 
+iter:  530  f-value:  1030.442  pgrad:  0.0009517712 
+iter:  540  f-value:  1030.442  pgrad:  0.0005563397 
+iter:  550  f-value:  1030.442  pgrad:  0.0005189426 
+iter:  560  f-value:  1030.442  pgrad:  0.0004616912 
+iter:  570  f-value:  1030.442  pgrad:  0.0004377471 
+iter:  580  f-value:  1030.442  pgrad:  0.0003975239 
+iter:  590  f-value:  1030.442  pgrad:  0.0003464944 
+iter:  600  f-value:  1030.442  pgrad:  0.0003125696 
+iter:  610  f-value:  1030.442  pgrad:  0.0002918714 
+iter:  620  f-value:  1030.442  pgrad:  0.0006175794 
+iter:  630  f-value:  1030.442  pgrad:  0.0002630074 
+iter:  640  f-value:  1030.442  pgrad:  0.0002424214 
+iter:  650  f-value:  1030.442  pgrad:  0.0002246038 
+iter:  660  f-value:  1030.442  pgrad:  0.000714718 
+iter:  670  f-value:  1030.442  pgrad:  0.000197803 
+iter:  680  f-value:  1030.442  pgrad:  0.0007196157 
+iter:  690  f-value:  1030.442  pgrad:  0.0003369724 
+iter:  700  f-value:  1030.442  pgrad:  0.0001347876 
+iter:  710  f-value:  1030.442  pgrad:  0.0001242921 
+iter:  720  f-value:  1030.442  pgrad:  0.000114203 
+iter:  730  f-value:  1030.442  pgrad:  0.000104852 
+iter:  740  f-value:  1030.442  pgrad:  9.416804e-05 
+iter:  750  f-value:  1030.442  pgrad:  0.0001428001 
+iter:  760  f-value:  1030.442  pgrad:  8.262645e-05 
+iter:  770  f-value:  1030.442  pgrad:  7.193213e-05 
+iter:  780  f-value:  1030.442  pgrad:  0.0001017438 
+iter:  790  f-value:  1030.442  pgrad:  6.194877e-05 
+iter:  800  f-value:  1030.442  pgrad:  5.310424e-05 
+iter:  810  f-value:  1030.442  pgrad:  5.025125e-05 
+Score: 1.000022  Hessian: 2.205996e-08 
 iter:  0  f-value:  1095.29  pgrad:  8.350788 
-iter:  10  f-value:  1033.003  pgrad:  0.6943287 
-iter:  20  f-value:  1031.707  pgrad:  0.3624973 
-iter:  30  f-value:  1031.287  pgrad:  0.2618481 
-iter:  40  f-value:  1030.967  pgrad:  0.1544686 
-iter:  50  f-value:  1030.834  pgrad:  0.1256103 
-iter:  60  f-value:  1030.778  pgrad:  0.07147719 
-iter:  70  f-value:  1030.754  pgrad:  0.1647913 
-iter:  80  f-value:  1030.733  pgrad:  0.07404878 
-iter:  90  f-value:  1030.715  pgrad:  0.07053814 
-iter:  100  f-value:  1030.694  pgrad:  0.2521892 
-iter:  110  f-value:  1030.655  pgrad:  0.06715482 
-iter:  120  f-value:  1030.636  pgrad:  0.0598493 
-iter:  130  f-value:  1030.62  pgrad:  0.05866013 
-iter:  140  f-value:  1030.601  pgrad:  0.05598622 
-iter:  150  f-value:  1030.59  pgrad:  0.05456286 
-iter:  160  f-value:  1030.58  pgrad:  0.05429001 
-iter:  170  f-value:  1030.566  pgrad:  0.06399205 
-iter:  180  f-value:  1030.56  pgrad:  0.05004495 
-iter:  190  f-value:  1030.545  pgrad:  0.04862613 
-iter:  200  f-value:  1030.539  pgrad:  0.1019635 
-iter:  0  f-value:  1030.538  pgrad:  0.0466126 
-iter:  10  f-value:  1030.528  pgrad:  0.04471908 
-iter:  20  f-value:  1030.523  pgrad:  0.1097234 
-iter:  30  f-value:  1030.514  pgrad:  0.04259046 
-iter:  40  f-value:  1030.508  pgrad:  0.1088362 
-iter:  50  f-value:  1030.5  pgrad:  0.03907232 
-iter:  60  f-value:  1030.494  pgrad:  0.03796299 
-iter:  70  f-value:  1030.484  pgrad:  0.03499799 
-iter:  80  f-value:  1030.481  pgrad:  0.1157941 
-iter:  90  f-value:  1030.476  pgrad:  0.0327655 
-iter:  100  f-value:  1030.473  pgrad:  0.03358308 
-iter:  110  f-value:  1030.468  pgrad:  0.03154649 
-iter:  120  f-value:  1030.464  pgrad:  0.03051244 
-iter:  130  f-value:  1030.461  pgrad:  0.02965873 
-iter:  140  f-value:  1030.456  pgrad:  0.02811777 
-iter:  150  f-value:  1030.454  pgrad:  0.02751083 
-iter:  160  f-value:  1030.449  pgrad:  0.02662044 
-iter:  170  f-value:  1030.446  pgrad:  0.02408165 
-iter:  180  f-value:  1030.445  pgrad:  0.02457558 
-iter:  190  f-value:  1030.443  pgrad:  0.02310419 
-iter:  200  f-value:  1030.441  pgrad:  0.02441464 
-iter:  210  f-value:  1030.439  pgrad:  0.06904208 
-iter:  220  f-value:  1030.437  pgrad:  0.02174812 
-iter:  230  f-value:  1030.434  pgrad:  0.02012836 
-iter:  240  f-value:  1030.432  pgrad:  0.0192185 
-iter:  250  f-value:  1030.431  pgrad:  0.02845586 
-iter:  260  f-value:  1030.429  pgrad:  0.04338634 
-iter:  270  f-value:  1030.428  pgrad:  0.01777854 
-iter:  280  f-value:  1030.427  pgrad:  0.01717366 
-iter:  290  f-value:  1030.426  pgrad:  0.01665431 
-iter:  300  f-value:  1030.426  pgrad:  0.01672253 
-iter:  310  f-value:  1030.423  pgrad:  0.01557535 
-iter:  320  f-value:  1030.423  pgrad:  0.01479519 
-iter:  330  f-value:  1030.422  pgrad:  0.01403739 
-iter:  340  f-value:  1030.421  pgrad:  0.01600079 
-iter:  350  f-value:  1030.42  pgrad:  0.01338913 
-iter:  360  f-value:  1030.42  pgrad:  0.01288495 
-iter:  370  f-value:  1030.419  pgrad:  0.01263589 
-iter:  380  f-value:  1030.419  pgrad:  0.01178589 
-iter:  390  f-value:  1030.419  pgrad:  0.01227037 
-iter:  400  f-value:  1030.418  pgrad:  0.004281937 
-iter:  410  f-value:  1030.418  pgrad:  0.007377312 
-iter:  420  f-value:  1030.418  pgrad:  0.001552433 
-iter:  430  f-value:  1030.418  pgrad:  0.001490581 
-iter:  440  f-value:  1030.418  pgrad:  0.004767678 
-iter:  450  f-value:  1030.418  pgrad:  0.001397439 
-iter:  460  f-value:  1030.418  pgrad:  0.001350946 
-iter:  470  f-value:  1030.418  pgrad:  0.001498059 
-iter:  480  f-value:  1030.418  pgrad:  0.001183293 
-iter:  490  f-value:  1030.418  pgrad:  0.001116783 
-iter:  500  f-value:  1030.418  pgrad:  0.001072459 
-iter:  510  f-value:  1030.418  pgrad:  0.002196739 
-iter:  520  f-value:  1030.418  pgrad:  0.0009569912 
-iter:  530  f-value:  1030.418  pgrad:  0.0008045501 
-iter:  540  f-value:  1030.418  pgrad:  0.0007720907 
-iter:  550  f-value:  1030.418  pgrad:  0.0007353103 
-iter:  560  f-value:  1030.418  pgrad:  0.0007940882 
-iter:  570  f-value:  1030.418  pgrad:  0.0006083525 
-iter:  580  f-value:  1030.418  pgrad:  0.0005702772 
-iter:  590  f-value:  1030.418  pgrad:  0.0006838892 
-iter:  600  f-value:  1030.418  pgrad:  0.0005112703 
-iter:  610  f-value:  1030.418  pgrad:  0.00161107 
-iter:  620  f-value:  1030.418  pgrad:  0.0004692609 
-iter:  630  f-value:  1030.418  pgrad:  0.000455989 
-iter:  640  f-value:  1030.418  pgrad:  0.0004370959 
-iter:  650  f-value:  1030.418  pgrad:  0.0006935522 
-iter:  660  f-value:  1030.418  pgrad:  0.0003986156 
-iter:  670  f-value:  1030.418  pgrad:  0.000379755 
-iter:  680  f-value:  1030.418  pgrad:  0.0006977767 
-iter:  690  f-value:  1030.418  pgrad:  0.001724729 
-iter:  700  f-value:  1030.418  pgrad:  0.0003333069 
-iter:  710  f-value:  1030.418  pgrad:  0.001133384 
-iter:  720  f-value:  1030.418  pgrad:  0.0002931631 
-iter:  730  f-value:  1030.418  pgrad:  0.0002800306 
-iter:  740  f-value:  1030.418  pgrad:  0.0002627717 
-iter:  750  f-value:  1030.418  pgrad:  0.0002536034 
-iter:  760  f-value:  1030.418  pgrad:  0.0002416551 
-iter:  770  f-value:  1030.418  pgrad:  0.0002253716 
-iter:  780  f-value:  1030.418  pgrad:  0.001578405 
-iter:  790  f-value:  1030.418  pgrad:  0.0002048321 
-iter:  800  f-value:  1030.418  pgrad:  0.0001945875 
-iter:  810  f-value:  1030.418  pgrad:  0.0001715478 
-iter:  820  f-value:  1030.418  pgrad:  0.0001657586 
-iter:  830  f-value:  1030.418  pgrad:  0.0005655769 
-iter:  840  f-value:  1030.418  pgrad:  0.0001523243 
-iter:  850  f-value:  1030.418  pgrad:  0.0001430773 
-iter:  860  f-value:  1030.418  pgrad:  0.0002444992 
-iter:  870  f-value:  1030.418  pgrad:  0.0001213715 
-iter:  880  f-value:  1030.418  pgrad:  0.0001121142 
-iter:  890  f-value:  1030.418  pgrad:  0.0001060744 
-iter:  900  f-value:  1030.418  pgrad:  0.0001005821 
-iter:  910  f-value:  1030.418  pgrad:  9.67726e-05 
-iter:  920  f-value:  1030.418  pgrad:  9.040809e-05 
-iter:  930  f-value:  1030.418  pgrad:  8.80314e-05 
-iter:  940  f-value:  1030.418  pgrad:  8.15739e-05 
-iter:  950  f-value:  1030.418  pgrad:  0.0001194289 
-iter:  960  f-value:  1030.418  pgrad:  7.405933e-05 
-iter:  970  f-value:  1030.418  pgrad:  7.020647e-05 
-iter:  980  f-value:  1030.418  pgrad:  5.963891e-05 
-iter:  990  f-value:  1030.418  pgrad:  5.449113e-05 
-iter:  1000  f-value:  1030.418  pgrad:  5.134665e-05 
-Score: 1.108487  Hessian: 2.361604e-08 
+iter:  10  f-value:  1033.003  pgrad:  0.6943271 
+iter:  20  f-value:  1031.707  pgrad:  0.3624972 
+iter:  30  f-value:  1031.287  pgrad:  0.2618476 
+iter:  40  f-value:  1030.967  pgrad:  0.1544375 
+iter:  50  f-value:  1030.835  pgrad:  0.1320049 
+iter:  60  f-value:  1030.78  pgrad:  0.2779545 
+iter:  70  f-value:  1030.76  pgrad:  0.06780505 
+iter:  80  f-value:  1030.723  pgrad:  0.09498258 
+iter:  90  f-value:  1030.694  pgrad:  0.1044212 
+iter:  100  f-value:  1030.682  pgrad:  0.06646395 
+iter:  110  f-value:  1030.653  pgrad:  0.06423791 
+iter:  120  f-value:  1030.647  pgrad:  0.250148 
+iter:  130  f-value:  1030.629  pgrad:  0.06002733 
+iter:  140  f-value:  1030.592  pgrad:  0.06780402 
+iter:  150  f-value:  1030.583  pgrad:  0.05371288 
+iter:  160  f-value:  1030.559  pgrad:  0.05007304 
+iter:  170  f-value:  1030.549  pgrad:  0.04825265 
+iter:  180  f-value:  1030.537  pgrad:  0.2483362 
+iter:  190  f-value:  1030.513  pgrad:  0.04169279 
+iter:  200  f-value:  1030.503  pgrad:  0.03991723 
+iter:  0  f-value:  1030.503  pgrad:  0.03964854 
+iter:  10  f-value:  1030.492  pgrad:  0.0366223 
+iter:  20  f-value:  1030.489  pgrad:  0.03654374 
+iter:  30  f-value:  1030.48  pgrad:  0.1298231 
+iter:  40  f-value:  1030.475  pgrad:  0.03311854 
+iter:  50  f-value:  1030.47  pgrad:  0.03111224 
+iter:  60  f-value:  1030.466  pgrad:  0.03134436 
+iter:  70  f-value:  1030.463  pgrad:  0.03028259 
+iter:  80  f-value:  1030.458  pgrad:  0.02743859 
+iter:  90  f-value:  1030.456  pgrad:  0.02820007 
+iter:  100  f-value:  1030.453  pgrad:  0.02714135 
+iter:  110  f-value:  1030.451  pgrad:  0.02631018 
+iter:  120  f-value:  1030.449  pgrad:  0.04887095 
+iter:  130  f-value:  1030.447  pgrad:  0.02572384 
+iter:  140  f-value:  1030.445  pgrad:  0.02471326 
+iter:  150  f-value:  1030.445  pgrad:  0.1513619 
+iter:  160  f-value:  1030.44  pgrad:  0.02287262 
+iter:  170  f-value:  1030.438  pgrad:  0.02205657 
+iter:  180  f-value:  1030.437  pgrad:  0.09061244 
+iter:  190  f-value:  1030.435  pgrad:  0.02095944 
+iter:  200  f-value:  1030.434  pgrad:  0.02054803 
+iter:  210  f-value:  1030.433  pgrad:  0.07560368 
+iter:  220  f-value:  1030.432  pgrad:  0.01939709 
+iter:  230  f-value:  1030.43  pgrad:  0.01889525 
+iter:  240  f-value:  1030.428  pgrad:  0.01769296 
+iter:  250  f-value:  1030.427  pgrad:  0.01761125 
+iter:  260  f-value:  1030.425  pgrad:  0.01641321 
+iter:  270  f-value:  1030.425  pgrad:  0.01597292 
+iter:  280  f-value:  1030.424  pgrad:  0.01614987 
+iter:  290  f-value:  1030.424  pgrad:  0.04441693 
+iter:  300  f-value:  1030.423  pgrad:  0.0141223 
+iter:  310  f-value:  1030.422  pgrad:  0.01439361 
+iter:  320  f-value:  1030.421  pgrad:  0.01386926 
+iter:  330  f-value:  1030.421  pgrad:  0.0489794 
+iter:  340  f-value:  1030.42  pgrad:  0.01324358 
+iter:  350  f-value:  1030.42  pgrad:  0.01293988 
+iter:  360  f-value:  1030.419  pgrad:  0.01262161 
+iter:  370  f-value:  1030.418  pgrad:  0.004261265 
+iter:  380  f-value:  1030.418  pgrad:  0.01120045 
+iter:  390  f-value:  1030.418  pgrad:  0.00216737 
+iter:  400  f-value:  1030.418  pgrad:  0.001627347 
+iter:  410  f-value:  1030.418  pgrad:  0.001557566 
+iter:  420  f-value:  1030.418  pgrad:  0.00380133 
+iter:  430  f-value:  1030.418  pgrad:  0.006639611 
+iter:  440  f-value:  1030.418  pgrad:  0.001369751 
+iter:  450  f-value:  1030.418  pgrad:  0.001273857 
+iter:  460  f-value:  1030.418  pgrad:  0.003194147 
+iter:  470  f-value:  1030.418  pgrad:  0.001208029 
+iter:  480  f-value:  1030.418  pgrad:  0.001162742 
+iter:  490  f-value:  1030.418  pgrad:  0.001202738 
+iter:  500  f-value:  1030.418  pgrad:  0.001065394 
+iter:  510  f-value:  1030.418  pgrad:  0.001005781 
+iter:  520  f-value:  1030.418  pgrad:  0.000929173 
+iter:  530  f-value:  1030.418  pgrad:  0.000907962 
+iter:  540  f-value:  1030.418  pgrad:  0.000862445 
+iter:  550  f-value:  1030.418  pgrad:  0.0008305184 
+iter:  560  f-value:  1030.418  pgrad:  0.002211463 
+iter:  570  f-value:  1030.418  pgrad:  0.0006997254 
+iter:  580  f-value:  1030.418  pgrad:  0.0006570368 
+iter:  590  f-value:  1030.418  pgrad:  0.000640233 
+iter:  600  f-value:  1030.418  pgrad:  0.000619033 
+iter:  610  f-value:  1030.418  pgrad:  0.0005248862 
+iter:  620  f-value:  1030.418  pgrad:  0.0005046018 
+iter:  630  f-value:  1030.418  pgrad:  0.0004650582 
+iter:  640  f-value:  1030.418  pgrad:  0.0004068425 
+iter:  650  f-value:  1030.418  pgrad:  0.0003496428 
+iter:  660  f-value:  1030.418  pgrad:  0.0003330796 
+iter:  670  f-value:  1030.418  pgrad:  0.0004651972 
+iter:  680  f-value:  1030.418  pgrad:  0.0003047208 
+iter:  690  f-value:  1030.418  pgrad:  0.0002559353 
+iter:  700  f-value:  1030.418  pgrad:  0.0002440971 
+Score: 1.000216  Hessian: 1.2267e-08 
 iter:  0  f-value:  1095.29  pgrad:  8.34822 
-iter:  10  f-value:  1032.93  pgrad:  0.8319898 
-iter:  20  f-value:  1031.54  pgrad:  0.4382559 
-iter:  30  f-value:  1031.006  pgrad:  0.2310298 
-iter:  40  f-value:  1030.76  pgrad:  0.173618 
-iter:  50  f-value:  1030.672  pgrad:  0.1829744 
-iter:  60  f-value:  1030.599  pgrad:  0.1955368 
-iter:  70  f-value:  1030.506  pgrad:  0.09521273 
-iter:  80  f-value:  1030.491  pgrad:  0.0636328 
-iter:  90  f-value:  1030.478  pgrad:  0.06069286 
-iter:  100  f-value:  1030.472  pgrad:  0.1073363 
-iter:  110  f-value:  1030.462  pgrad:  0.05745733 
-iter:  120  f-value:  1030.455  pgrad:  0.0524642 
-iter:  130  f-value:  1030.443  pgrad:  0.08009749 
-iter:  140  f-value:  1030.436  pgrad:  0.04695494 
-iter:  150  f-value:  1030.426  pgrad:  0.04336471 
-iter:  160  f-value:  1030.411  pgrad:  0.037885 
-iter:  170  f-value:  1030.407  pgrad:  0.03647074 
-iter:  180  f-value:  1030.39  pgrad:  0.03418336 
-iter:  190  f-value:  1030.385  pgrad:  0.03167315 
-iter:  200  f-value:  1030.382  pgrad:  0.03224386 
-iter:  0  f-value:  1030.381  pgrad:  0.03183763 
-iter:  10  f-value:  1030.342  pgrad:  0.02263331 
-iter:  20  f-value:  1030.341  pgrad:  0.02171704 
-iter:  30  f-value:  1030.34  pgrad:  0.02106349 
-iter:  40  f-value:  1030.337  pgrad:  0.01992424 
-iter:  50  f-value:  1030.336  pgrad:  0.01935795 
-iter:  60  f-value:  1030.336  pgrad:  0.09397866 
-iter:  70  f-value:  1030.333  pgrad:  0.01898744 
-iter:  80  f-value:  1030.332  pgrad:  0.01820479 
-iter:  90  f-value:  1030.332  pgrad:  0.01846816 
-iter:  100  f-value:  1030.328  pgrad:  0.04289735 
-iter:  110  f-value:  1030.327  pgrad:  0.01612826 
-iter:  120  f-value:  1030.327  pgrad:  0.01584409 
-iter:  130  f-value:  1030.325  pgrad:  0.01515029 
-iter:  140  f-value:  1030.325  pgrad:  0.01555285 
-iter:  150  f-value:  1030.324  pgrad:  0.01447833 
-iter:  160  f-value:  1030.323  pgrad:  0.01419953 
-iter:  170  f-value:  1030.323  pgrad:  0.01371977 
-iter:  180  f-value:  1030.321  pgrad:  0.01367371 
-iter:  190  f-value:  1030.321  pgrad:  0.05143868 
-iter:  200  f-value:  1030.321  pgrad:  0.01257202 
-iter:  210  f-value:  1030.32  pgrad:  0.0127538 
-iter:  220  f-value:  1030.32  pgrad:  0.01645705 
-iter:  230  f-value:  1030.319  pgrad:  0.01219642 
-iter:  240  f-value:  1030.318  pgrad:  0.01119509 
-iter:  250  f-value:  1030.318  pgrad:  0.01109309 
-iter:  260  f-value:  1030.317  pgrad:  0.01082525 
-iter:  270  f-value:  1030.317  pgrad:  0.01125506 
-iter:  280  f-value:  1030.317  pgrad:  0.01036093 
-iter:  290  f-value:  1030.316  pgrad:  0.009984812 
-iter:  300  f-value:  1030.316  pgrad:  0.009851158 
-iter:  310  f-value:  1030.316  pgrad:  0.009640712 
-iter:  320  f-value:  1030.315  pgrad:  0.03311008 
-iter:  330  f-value:  1030.315  pgrad:  0.008958701 
-iter:  340  f-value:  1030.315  pgrad:  0.008826344 
-iter:  350  f-value:  1030.314  pgrad:  0.01356406 
-iter:  360  f-value:  1030.314  pgrad:  0.02192149 
-iter:  370  f-value:  1030.313  pgrad:  0.007872046 
-iter:  380  f-value:  1030.313  pgrad:  0.007699362 
-iter:  390  f-value:  1030.313  pgrad:  0.007708794 
-iter:  400  f-value:  1030.313  pgrad:  0.01029716 
-iter:  410  f-value:  1030.313  pgrad:  0.007001919 
-iter:  420  f-value:  1030.312  pgrad:  0.02130444 
-iter:  430  f-value:  1030.312  pgrad:  0.006963266 
-iter:  440  f-value:  1030.312  pgrad:  0.006796021 
-iter:  450  f-value:  1030.312  pgrad:  0.01309061 
-iter:  460  f-value:  1030.312  pgrad:  0.006674717 
-iter:  470  f-value:  1030.311  pgrad:  0.005730567 
-iter:  480  f-value:  1030.311  pgrad:  0.005991769 
-iter:  490  f-value:  1030.311  pgrad:  0.005557533 
-iter:  500  f-value:  1030.311  pgrad:  0.005679399 
-iter:  510  f-value:  1030.311  pgrad:  0.005579501 
-iter:  520  f-value:  1030.311  pgrad:  0.01089491 
-iter:  530  f-value:  1030.311  pgrad:  0.005431525 
-iter:  540  f-value:  1030.311  pgrad:  0.005467317 
-iter:  550  f-value:  1030.311  pgrad:  0.005795188 
-iter:  560  f-value:  1030.311  pgrad:  0.005239336 
-iter:  570  f-value:  1030.311  pgrad:  0.005274422 
-iter:  580  f-value:  1030.311  pgrad:  0.00556412 
-iter:  590  f-value:  1030.311  pgrad:  0.005067696 
-iter:  600  f-value:  1030.311  pgrad:  0.004899396 
-iter:  610  f-value:  1030.311  pgrad:  0.007641923 
-iter:  620  f-value:  1030.311  pgrad:  0.004816536 
-iter:  630  f-value:  1030.31  pgrad:  0.004774346 
-iter:  640  f-value:  1030.31  pgrad:  0.006448121 
-iter:  650  f-value:  1030.31  pgrad:  0.004603205 
-iter:  660  f-value:  1030.31  pgrad:  0.00454248 
-iter:  670  f-value:  1030.31  pgrad:  0.004499387 
-iter:  680  f-value:  1030.31  pgrad:  0.004462504 
-iter:  690  f-value:  1030.31  pgrad:  0.03261625 
-iter:  700  f-value:  1030.31  pgrad:  0.00430005 
-iter:  710  f-value:  1030.31  pgrad:  0.004307316 
-iter:  720  f-value:  1030.31  pgrad:  0.004179935 
-iter:  730  f-value:  1030.31  pgrad:  0.004235563 
-iter:  740  f-value:  1030.31  pgrad:  0.01757129 
-iter:  750  f-value:  1030.31  pgrad:  0.004143135 
-iter:  760  f-value:  1030.309  pgrad:  0.004142507 
-iter:  770  f-value:  1030.309  pgrad:  0.01489329 
-iter:  780  f-value:  1030.309  pgrad:  0.004046993 
-iter:  790  f-value:  1030.309  pgrad:  0.003940078 
-iter:  800  f-value:  1030.309  pgrad:  0.004007271 
-iter:  810  f-value:  1030.309  pgrad:  0.003939358 
-iter:  820  f-value:  1030.309  pgrad:  0.003907245 
-iter:  830  f-value:  1030.309  pgrad:  0.003902293 
-iter:  840  f-value:  1030.309  pgrad:  0.00388554 
-iter:  850  f-value:  1030.309  pgrad:  0.003868874 
-iter:  860  f-value:  1030.309  pgrad:  0.004990659 
-iter:  870  f-value:  1030.309  pgrad:  0.01056088 
-iter:  880  f-value:  1030.309  pgrad:  0.003761355 
-iter:  890  f-value:  1030.309  pgrad:  0.00374133 
-iter:  900  f-value:  1030.309  pgrad:  0.00372746 
-iter:  910  f-value:  1030.309  pgrad:  0.01272857 
-iter:  920  f-value:  1030.308  pgrad:  0.00367441 
-iter:  930  f-value:  1030.308  pgrad:  0.003650056 
-iter:  940  f-value:  1030.308  pgrad:  0.003635219 
-iter:  950  f-value:  1030.308  pgrad:  0.01878034 
-iter:  960  f-value:  1030.308  pgrad:  0.005626226 
-iter:  970  f-value:  1030.308  pgrad:  0.003549663 
-iter:  980  f-value:  1030.308  pgrad:  0.003555664 
-iter:  990  f-value:  1030.308  pgrad:  0.003533713 
-iter:  1000  f-value:  1030.308  pgrad:  0.003484646 
-iter:  1010  f-value:  1030.308  pgrad:  0.003485911 
-iter:  1020  f-value:  1030.308  pgrad:  0.0173792 
-iter:  1030  f-value:  1030.308  pgrad:  0.0216222 
-iter:  1040  f-value:  1030.308  pgrad:  0.003453621 
-iter:  1050  f-value:  1030.308  pgrad:  0.003437963 
-iter:  1060  f-value:  1030.308  pgrad:  0.003385098 
-iter:  1070  f-value:  1030.308  pgrad:  0.003396402 
-iter:  1080  f-value:  1030.308  pgrad:  0.003389578 
-iter:  1090  f-value:  1030.308  pgrad:  0.005572089 
-iter:  1100  f-value:  1030.308  pgrad:  0.003334894 
-iter:  1110  f-value:  1030.308  pgrad:  0.00336082 
-iter:  1120  f-value:  1030.308  pgrad:  0.003524594 
-iter:  1130  f-value:  1030.307  pgrad:  0.003262672 
-iter:  1140  f-value:  1030.307  pgrad:  0.003292975 
-iter:  1150  f-value:  1030.307  pgrad:  0.009585394 
-iter:  1160  f-value:  1030.307  pgrad:  0.003221347 
-iter:  1170  f-value:  1030.307  pgrad:  0.01191103 
-iter:  1180  f-value:  1030.307  pgrad:  0.003450452 
-iter:  1190  f-value:  1030.307  pgrad:  0.003401272 
-iter:  1200  f-value:  1030.307  pgrad:  0.00331089 
-iter:  1210  f-value:  1030.307  pgrad:  0.003266582 
-iter:  1220  f-value:  1030.307  pgrad:  0.01239588 
-iter:  1230  f-value:  1030.307  pgrad:  0.003263362 
-iter:  1240  f-value:  1030.307  pgrad:  0.003280771 
-iter:  1250  f-value:  1030.307  pgrad:  0.003284656 
-iter:  1260  f-value:  1030.307  pgrad:  0.003201264 
-iter:  1270  f-value:  1030.307  pgrad:  0.003283402 
-iter:  1280  f-value:  1030.307  pgrad:  0.003217844 
-iter:  1290  f-value:  1030.307  pgrad:  0.003184825 
-iter:  1300  f-value:  1030.307  pgrad:  0.005700264 
-iter:  1310  f-value:  1030.307  pgrad:  0.003224189 
-iter:  1320  f-value:  1030.307  pgrad:  0.003122107 
-iter:  1330  f-value:  1030.306  pgrad:  0.003095059 
-iter:  1340  f-value:  1030.306  pgrad:  0.00288559 
-iter:  1350  f-value:  1030.306  pgrad:  0.002195372 
-iter:  1360  f-value:  1030.306  pgrad:  0.001936301 
-iter:  1370  f-value:  1030.306  pgrad:  0.001751104 
-iter:  1380  f-value:  1030.306  pgrad:  0.01026676 
-iter:  1390  f-value:  1030.306  pgrad:  0.001183904 
-iter:  1400  f-value:  1030.306  pgrad:  0.001117666 
-iter:  1410  f-value:  1030.306  pgrad:  0.00102623 
-iter:  1420  f-value:  1030.306  pgrad:  0.001582163 
-iter:  1430  f-value:  1030.306  pgrad:  0.0009297047 
-iter:  1440  f-value:  1030.306  pgrad:  0.0008333335 
-iter:  1450  f-value:  1030.306  pgrad:  0.0007166004 
-iter:  1460  f-value:  1030.306  pgrad:  0.0006880578 
-iter:  1470  f-value:  1030.306  pgrad:  0.0006361938 
-iter:  1480  f-value:  1030.306  pgrad:  0.000576381 
-iter:  1490  f-value:  1030.306  pgrad:  0.0004993892 
-iter:  1500  f-value:  1030.306  pgrad:  0.000442809 
-iter:  0  f-value:  1030.306  pgrad:  0.0004418293 
-iter:  10  f-value:  1030.306  pgrad:  0.000380827 
-iter:  20  f-value:  1030.306  pgrad:  0.0002575353 
-iter:  30  f-value:  1030.306  pgrad:  0.000248362 
-iter:  40  f-value:  1030.306  pgrad:  0.0002082225 
-iter:  50  f-value:  1030.306  pgrad:  0.0001870145 
-iter:  60  f-value:  1030.306  pgrad:  0.0001746462 
-iter:  70  f-value:  1030.306  pgrad:  0.0001560157 
-iter:  80  f-value:  1030.306  pgrad:  0.0001436667 
-iter:  90  f-value:  1030.306  pgrad:  0.0001261233 
-iter:  100  f-value:  1030.306  pgrad:  0.0001161104 
-iter:  110  f-value:  1030.306  pgrad:  0.0001025142 
-iter:  120  f-value:  1030.306  pgrad:  9.662666e-05 
-iter:  130  f-value:  1030.306  pgrad:  7.421265e-05 
-iter:  140  f-value:  1030.306  pgrad:  7.168165e-05 
-iter:  150  f-value:  1030.306  pgrad:  0.000362541 
-iter:  160  f-value:  1030.306  pgrad:  6.0196e-05 
-iter:  170  f-value:  1030.306  pgrad:  0.0003267577 
-iter:  180  f-value:  1030.306  pgrad:  5.166963e-05 
-iter:  190  f-value:  1030.306  pgrad:  9.978701e-05 
-Score: 1.000237  Hessian: 2.590083e-08 
-There were 31 warnings (use warnings() to see them)
+iter:  10  f-value:  1032.93  pgrad:  0.8319903 
+iter:  20  f-value:  1031.54  pgrad:  0.4382444 
+iter:  30  f-value:  1031.006  pgrad:  0.2310391 
+iter:  40  f-value:  1030.759  pgrad:  0.1738635 
+iter:  50  f-value:  1030.691  pgrad:  0.1563858 
+iter:  60  f-value:  1030.531  pgrad:  0.1096223 
+iter:  70  f-value:  1030.497  pgrad:  0.07695105 
+iter:  80  f-value:  1030.483  pgrad:  0.06002863 
+iter:  90  f-value:  1030.472  pgrad:  0.06051705 
+iter:  100  f-value:  1030.449  pgrad:  0.116482 
+iter:  110  f-value:  1030.441  pgrad:  0.04848234 
+iter:  120  f-value:  1030.434  pgrad:  0.04666429 
+iter:  130  f-value:  1030.43  pgrad:  0.04836333 
+iter:  140  f-value:  1030.42  pgrad:  0.03869064 
+iter:  150  f-value:  1030.413  pgrad:  0.04990845 
+iter:  160  f-value:  1030.412  pgrad:  0.2075603 
+iter:  170  f-value:  1030.405  pgrad:  0.03664635 
+iter:  180  f-value:  1030.4  pgrad:  0.06036215 
+iter:  190  f-value:  1030.397  pgrad:  0.03488771 
+iter:  200  f-value:  1030.391  pgrad:  0.03295299 
+iter:  0  f-value:  1030.391  pgrad:  0.03417728 
+iter:  10  f-value:  1030.389  pgrad:  0.1794878 
+iter:  20  f-value:  1030.383  pgrad:  0.03241329 
+iter:  30  f-value:  1030.379  pgrad:  0.03136051 
+iter:  40  f-value:  1030.376  pgrad:  0.03074793 
+iter:  50  f-value:  1030.372  pgrad:  0.0298338 
+iter:  60  f-value:  1030.36  pgrad:  0.02647983 
+iter:  70  f-value:  1030.356  pgrad:  0.02698664 
+iter:  80  f-value:  1030.351  pgrad:  0.02429463 
+iter:  90  f-value:  1030.349  pgrad:  0.02433091 
+iter:  100  f-value:  1030.347  pgrad:  0.03686822 
+iter:  110  f-value:  1030.345  pgrad:  0.02142083 
+iter:  120  f-value:  1030.342  pgrad:  0.02165667 
+iter:  130  f-value:  1030.341  pgrad:  0.02125578 
+iter:  140  f-value:  1030.337  pgrad:  0.0196268 
+iter:  150  f-value:  1030.335  pgrad:  0.01939803 
+iter:  160  f-value:  1030.334  pgrad:  0.01870883 
+iter:  170  f-value:  1030.333  pgrad:  0.01814332 
+iter:  180  f-value:  1030.331  pgrad:  0.03893809 
+iter:  190  f-value:  1030.33  pgrad:  0.01718429 
+iter:  200  f-value:  1030.329  pgrad:  0.01688397 
+iter:  210  f-value:  1030.328  pgrad:  0.02406586 
+iter:  220  f-value:  1030.328  pgrad:  0.01633744 
+iter:  230  f-value:  1030.327  pgrad:  0.01597967 
+iter:  240  f-value:  1030.326  pgrad:  0.01549535 
+iter:  250  f-value:  1030.325  pgrad:  0.01476012 
+iter:  260  f-value:  1030.325  pgrad:  0.01470295 
+iter:  270  f-value:  1030.324  pgrad:  0.01473568 
+iter:  280  f-value:  1030.322  pgrad:  0.01419147 
+iter:  290  f-value:  1030.321  pgrad:  0.01279858 
+iter:  300  f-value:  1030.319  pgrad:  0.01097368 
+iter:  310  f-value:  1030.319  pgrad:  0.01188283 
+iter:  320  f-value:  1030.318  pgrad:  0.01107924 
+iter:  330  f-value:  1030.318  pgrad:  0.0123034 
+iter:  340  f-value:  1030.317  pgrad:  0.01089761 
+iter:  350  f-value:  1030.317  pgrad:  0.01059856 
+iter:  360  f-value:  1030.317  pgrad:  0.0104187 
+iter:  370  f-value:  1030.316  pgrad:  0.01000865 
+iter:  380  f-value:  1030.316  pgrad:  0.009914686 
+iter:  390  f-value:  1030.316  pgrad:  0.009676487 
+iter:  400  f-value:  1030.315  pgrad:  0.009450135 
+iter:  410  f-value:  1030.315  pgrad:  0.009777574 
+iter:  420  f-value:  1030.315  pgrad:  0.008952962 
+iter:  430  f-value:  1030.315  pgrad:  0.01867209 
+iter:  440  f-value:  1030.314  pgrad:  0.02790023 
+iter:  450  f-value:  1030.314  pgrad:  0.007688685 
+iter:  460  f-value:  1030.314  pgrad:  0.01208222 
+iter:  470  f-value:  1030.314  pgrad:  0.008329218 
+iter:  480  f-value:  1030.313  pgrad:  0.008216924 
+iter:  490  f-value:  1030.313  pgrad:  0.007675153 
+iter:  500  f-value:  1030.313  pgrad:  0.007694863 
+iter:  510  f-value:  1030.313  pgrad:  0.007533112 
+iter:  520  f-value:  1030.313  pgrad:  0.007264371 
+iter:  530  f-value:  1030.312  pgrad:  0.007027134 
+iter:  540  f-value:  1030.312  pgrad:  0.006961317 
+iter:  550  f-value:  1030.312  pgrad:  0.006705172 
+iter:  560  f-value:  1030.312  pgrad:  0.02175617 
+iter:  570  f-value:  1030.312  pgrad:  0.006686404 
+iter:  580  f-value:  1030.312  pgrad:  0.006115908 
+iter:  590  f-value:  1030.312  pgrad:  0.006228608 
+iter:  600  f-value:  1030.312  pgrad:  0.007560572 
+iter:  610  f-value:  1030.312  pgrad:  0.02022668 
+iter:  620  f-value:  1030.311  pgrad:  0.006072362 
+iter:  630  f-value:  1030.311  pgrad:  0.005621154 
+iter:  640  f-value:  1030.311  pgrad:  0.005688996 
+iter:  650  f-value:  1030.311  pgrad:  0.00530669 
+iter:  660  f-value:  1030.311  pgrad:  0.005725873 
+iter:  670  f-value:  1030.311  pgrad:  0.00543752 
+iter:  680  f-value:  1030.311  pgrad:  0.005352471 
+iter:  690  f-value:  1030.311  pgrad:  0.005205104 
+iter:  700  f-value:  1030.311  pgrad:  0.005184497 
+iter:  710  f-value:  1030.311  pgrad:  0.005013148 
+iter:  720  f-value:  1030.311  pgrad:  0.00821907 
+iter:  730  f-value:  1030.311  pgrad:  0.008072121 
+iter:  740  f-value:  1030.311  pgrad:  0.004795576 
+iter:  750  f-value:  1030.311  pgrad:  0.004744505 
+iter:  760  f-value:  1030.31  pgrad:  0.004675405 
+iter:  770  f-value:  1030.31  pgrad:  0.01182538 
+iter:  780  f-value:  1030.31  pgrad:  0.004540656 
+iter:  790  f-value:  1030.31  pgrad:  0.004462885 
+iter:  800  f-value:  1030.31  pgrad:  0.005213465 
+iter:  810  f-value:  1030.31  pgrad:  0.004436163 
+iter:  820  f-value:  1030.31  pgrad:  0.01365173 
+iter:  830  f-value:  1030.31  pgrad:  0.004388736 
+iter:  840  f-value:  1030.31  pgrad:  0.01535514 
+iter:  850  f-value:  1030.31  pgrad:  0.004318421 
+iter:  860  f-value:  1030.31  pgrad:  0.00428804 
+iter:  870  f-value:  1030.31  pgrad:  0.00421239 
+iter:  880  f-value:  1030.31  pgrad:  0.005384726 
+iter:  890  f-value:  1030.31  pgrad:  0.004150305 
+iter:  900  f-value:  1030.309  pgrad:  0.006050681 
+iter:  910  f-value:  1030.309  pgrad:  0.004090409 
+iter:  920  f-value:  1030.309  pgrad:  0.01383345 
+iter:  930  f-value:  1030.309  pgrad:  0.004062516 
+iter:  940  f-value:  1030.309  pgrad:  0.00760893 
+iter:  950  f-value:  1030.309  pgrad:  0.004011987 
+iter:  960  f-value:  1030.309  pgrad:  0.00396651 
+iter:  970  f-value:  1030.309  pgrad:  0.003952454 
+iter:  980  f-value:  1030.309  pgrad:  0.003922723 
+iter:  990  f-value:  1030.309  pgrad:  0.008591942 
+iter:  1000  f-value:  1030.309  pgrad:  0.003896506 
+iter:  1010  f-value:  1030.309  pgrad:  0.009382882 
+iter:  1020  f-value:  1030.309  pgrad:  0.003828095 
+iter:  1030  f-value:  1030.309  pgrad:  0.005888543 
+iter:  1040  f-value:  1030.309  pgrad:  0.01748991 
+iter:  1050  f-value:  1030.309  pgrad:  0.003759539 
+iter:  1060  f-value:  1030.309  pgrad:  0.003751959 
+iter:  1070  f-value:  1030.309  pgrad:  0.003720999 
+iter:  1080  f-value:  1030.309  pgrad:  0.006699179 
+iter:  1090  f-value:  1030.308  pgrad:  0.003679687 
+iter:  1100  f-value:  1030.308  pgrad:  0.0206272 
+iter:  1110  f-value:  1030.308  pgrad:  0.003644258 
+iter:  1120  f-value:  1030.308  pgrad:  0.003613825 
+iter:  1130  f-value:  1030.308  pgrad:  0.003615409 
+iter:  1140  f-value:  1030.308  pgrad:  0.004942881 
+iter:  1150  f-value:  1030.308  pgrad:  0.003534966 
+iter:  1160  f-value:  1030.308  pgrad:  0.003490077 
+iter:  1170  f-value:  1030.308  pgrad:  0.009767175 
+iter:  1180  f-value:  1030.308  pgrad:  0.00347812 
+iter:  1190  f-value:  1030.308  pgrad:  0.00351685 
+iter:  1200  f-value:  1030.308  pgrad:  0.005286805 
+iter:  1210  f-value:  1030.308  pgrad:  0.003436357 
+iter:  1220  f-value:  1030.308  pgrad:  0.003421872 
+iter:  1230  f-value:  1030.308  pgrad:  0.003404031 
+iter:  1240  f-value:  1030.308  pgrad:  0.007492043 
+iter:  1250  f-value:  1030.308  pgrad:  0.00330903 
+iter:  1260  f-value:  1030.308  pgrad:  0.003568099 
+iter:  1270  f-value:  1030.308  pgrad:  0.003428225 
+iter:  1280  f-value:  1030.307  pgrad:  0.003236239 
+iter:  1290  f-value:  1030.307  pgrad:  0.003270963 
+iter:  1300  f-value:  1030.307  pgrad:  0.004492954 
+iter:  1310  f-value:  1030.307  pgrad:  0.00321002 
+iter:  1320  f-value:  1030.307  pgrad:  0.00335169 
+iter:  1330  f-value:  1030.307  pgrad:  0.003247326 
+iter:  1340  f-value:  1030.307  pgrad:  0.006483677 
+iter:  1350  f-value:  1030.307  pgrad:  0.004992093 
+iter:  1360  f-value:  1030.307  pgrad:  0.00325056 
+iter:  1370  f-value:  1030.307  pgrad:  0.003340596 
+iter:  1380  f-value:  1030.307  pgrad:  0.003324017 
+iter:  1390  f-value:  1030.307  pgrad:  0.00324812 
+iter:  1400  f-value:  1030.307  pgrad:  0.003238683 
+iter:  1410  f-value:  1030.307  pgrad:  0.003205162 
+iter:  1420  f-value:  1030.307  pgrad:  0.003172409 
+iter:  1430  f-value:  1030.307  pgrad:  0.003212955 
+iter:  1440  f-value:  1030.307  pgrad:  0.003214401 
+iter:  1450  f-value:  1030.307  pgrad:  0.009375943 
+iter:  1460  f-value:  1030.307  pgrad:  0.003226263 
+iter:  1470  f-value:  1030.307  pgrad:  0.003255494 
+iter:  1480  f-value:  1030.307  pgrad:  0.00317185 
+iter:  1490  f-value:  1030.307  pgrad:  0.003215466 
+iter:  1500  f-value:  1030.306  pgrad:  0.003030496 
+iter:  0  f-value:  1030.306  pgrad:  0.003042101 
+iter:  10  f-value:  1030.306  pgrad:  0.002839826 
+iter:  20  f-value:  1030.306  pgrad:  0.002318286 
+iter:  30  f-value:  1030.306  pgrad:  0.001904939 
+iter:  40  f-value:  1030.306  pgrad:  0.001746413 
+iter:  50  f-value:  1030.306  pgrad:  0.001615563 
+iter:  60  f-value:  1030.306  pgrad:  0.001433743 
+iter:  70  f-value:  1030.306  pgrad:  0.001235637 
+iter:  80  f-value:  1030.306  pgrad:  0.001442437 
+iter:  90  f-value:  1030.306  pgrad:  0.003583088 
+iter:  100  f-value:  1030.306  pgrad:  0.001435565 
+iter:  110  f-value:  1030.306  pgrad:  0.005858987 
+iter:  120  f-value:  1030.306  pgrad:  0.0008507546 
+iter:  130  f-value:  1030.306  pgrad:  0.001112359 
+iter:  140  f-value:  1030.306  pgrad:  0.000735317 
+iter:  150  f-value:  1030.306  pgrad:  0.000685246 
+iter:  160  f-value:  1030.306  pgrad:  0.002778619 
+iter:  170  f-value:  1030.306  pgrad:  0.0005428843 
+iter:  180  f-value:  1030.306  pgrad:  0.0005106957 
+iter:  190  f-value:  1030.306  pgrad:  0.0004584616 
+iter:  200  f-value:  1030.306  pgrad:  0.0009445567 
+iter:  210  f-value:  1030.306  pgrad:  0.0004082307 
+iter:  220  f-value:  1030.306  pgrad:  0.0003243964 
+iter:  230  f-value:  1030.306  pgrad:  0.00118839 
+iter:  240  f-value:  1030.306  pgrad:  0.0002834937 
+iter:  250  f-value:  1030.306  pgrad:  0.0002637259 
+iter:  260  f-value:  1030.306  pgrad:  0.0007097806 
+iter:  270  f-value:  1030.306  pgrad:  0.0002163624 
+iter:  280  f-value:  1030.306  pgrad:  0.0001917154 
+iter:  290  f-value:  1030.306  pgrad:  0.0001866993 
+iter:  300  f-value:  1030.306  pgrad:  0.0001482562 
+iter:  310  f-value:  1030.306  pgrad:  0.0002678726 
+iter:  320  f-value:  1030.306  pgrad:  0.0001168466 
+iter:  330  f-value:  1030.306  pgrad:  0.000103313 
+iter:  340  f-value:  1030.306  pgrad:  9.894744e-05 
+iter:  350  f-value:  1030.306  pgrad:  0.0002493076 
+iter:  360  f-value:  1030.306  pgrad:  8.551466e-05 
+iter:  370  f-value:  1030.306  pgrad:  7.813348e-05 
+iter:  380  f-value:  1030.306  pgrad:  0.0002088371 
+iter:  390  f-value:  1030.306  pgrad:  6.755589e-05 
+iter:  400  f-value:  1030.306  pgrad:  6.152064e-05 
+iter:  410  f-value:  1030.306  pgrad:  5.616932e-05 
+iter:  420  f-value:  1030.306  pgrad:  5.425683e-05 
+iter:  430  f-value:  1030.306  pgrad:  5.132359e-05 
+iter:  440  f-value:  1030.306  pgrad:  0.0002629484 
+iter:  450  f-value:  1030.306  pgrad:  4.352026e-05 
+Score: 1.000378  Hessian: 1.534866e-08 
+There were 30 warnings (use warnings() to see them)
 > 
 > plot(aic)
 > 
@@ -750,15 +749,15 @@ There were 31 warnings (use warnings() to see them)
 > m <- model(Bs)
 > mod <- mlt(m, data = faithful)
 iter:  0  f-value:  1095.29  pgrad:  13.52994 
-iter:  10  f-value:  1035.709  pgrad:  0.7679091 
-iter:  20  f-value:  1035.354  pgrad:  0.1085596 
-iter:  30  f-value:  1035.347  pgrad:  0.02229172 
-iter:  40  f-value:  1035.347  pgrad:  0.01726448 
-iter:  50  f-value:  1035.347  pgrad:  0.0007958079 
-iter:  60  f-value:  1035.347  pgrad:  0.0001932676 
-iter:  70  f-value:  1035.347  pgrad:  4.092726e-05 
-iter:  0  f-value:  1035.347  pgrad:  2.08135e-05 
-Score: 1.000264  Hessian: 4.366262e-07 
+iter:  10  f-value:  1035.709  pgrad:  0.7679132 
+iter:  20  f-value:  1035.354  pgrad:  0.1085742 
+iter:  30  f-value:  1035.347  pgrad:  0.02223805 
+iter:  40  f-value:  1035.347  pgrad:  0.01838331 
+iter:  50  f-value:  1035.347  pgrad:  0.0009053366 
+iter:  60  f-value:  1035.347  pgrad:  0.0001723659 
+iter:  70  f-value:  1035.347  pgrad:  0.0002712638 
+iter:  0  f-value:  1035.347  pgrad:  3.777132e-05 
+Score: 1.000146  Hessian: 9.117262e-07 
 Warning message:
 In mlt(m, data = faithful) : NB not met
 > 
@@ -792,15 +791,15 @@ In mlt(m, data = faithful) : NB not met
 > m <- model(Bs)
 > mod <- mlt(m, data = faithful)
 iter:  0  f-value:  1095.29  pgrad:  13.52994 
-iter:  10  f-value:  1035.709  pgrad:  0.7679091 
-iter:  20  f-value:  1035.354  pgrad:  0.1085596 
-iter:  30  f-value:  1035.347  pgrad:  0.02229172 
-iter:  40  f-value:  1035.347  pgrad:  0.01726448 
-iter:  50  f-value:  1035.347  pgrad:  0.0007958079 
-iter:  60  f-value:  1035.347  pgrad:  0.0001932676 
-iter:  70  f-value:  1035.347  pgrad:  4.092726e-05 
-iter:  0  f-value:  1035.347  pgrad:  2.08135e-05 
-Score: 1.000264  Hessian: 4.366262e-07 
+iter:  10  f-value:  1035.709  pgrad:  0.7679132 
+iter:  20  f-value:  1035.354  pgrad:  0.1085742 
+iter:  30  f-value:  1035.347  pgrad:  0.02223805 
+iter:  40  f-value:  1035.347  pgrad:  0.01838331 
+iter:  50  f-value:  1035.347  pgrad:  0.0009053366 
+iter:  60  f-value:  1035.347  pgrad:  0.0001723659 
+iter:  70  f-value:  1035.347  pgrad:  0.0002712638 
+iter:  0  f-value:  1035.347  pgrad:  3.777132e-05 
+Score: 1.000146  Hessian: 9.117262e-07 
 Warning message:
 In mlt(m, data = faithful) : NB not met
 > 
@@ -812,57 +811,56 @@ In mlt(m, data = faithful) : NB not met
 > w <- drop((Xprime %*% coef(mod))^2)
 > H3 <- crossprod(X) + crossprod(Xprime * w, Xprime)
 > max(abs(H3 - H2))
-[1] 9.885589
+[1] 9.885614
 > 
 > cov2cor(vcov(mod))
-           1          2          3          4          5          6          7
-1  1.0000000 -0.9652656  0.9032053 -0.8310317  0.7513996 -0.6649918  0.5741523
-2 -0.9652656  1.0000000 -0.9793104  0.9309906 -0.8628108  0.7788034 -0.6830279
-3  0.9032053 -0.9793104  1.0000000 -0.9835441  0.9383219 -0.8677581  0.7767008
-4 -0.8310317  0.9309906 -0.9835441  1.0000000 -0.9837278  0.9357829 -0.8583343
-5  0.7513996 -0.8628108  0.9383219 -0.9837278  1.0000000 -0.9824465  0.9286162
-6 -0.6649918  0.7788034 -0.8677581  0.9357829 -0.9824465  1.0000000 -0.9794871
-7  0.5741523 -0.6830279  0.7767008 -0.8583343  0.9286162 -0.9794871  1.0000000
-8 -0.4756211  0.5730197 -0.6625698  0.7479342 -0.8313483  0.9079639 -0.9699965
-9  0.3573296 -0.4341439  0.5079553 -0.5821468  0.6606656 -0.7427121  0.8292216
-           8          9
-1 -0.4756211  0.3573296
-2  0.5730197 -0.4341439
-3 -0.6625698  0.5079553
-4  0.7479342 -0.5821468
-5 -0.8313483  0.6606656
-6  0.9079639 -0.7427121
-7 -0.9699965  0.8292216
-8  1.0000000 -0.9214160
-9 -0.9214160  1.0000000
+             Bs1(waiting) Bs2(waiting) Bs3(waiting) Bs4(waiting) Bs5(waiting)
+Bs1(waiting)    1.0000000   -0.9652656    0.9032053   -0.8310317    0.7513995
+Bs2(waiting)   -0.9652656    1.0000000   -0.9793104    0.9309906   -0.8628108
+Bs3(waiting)    0.9032053   -0.9793104    1.0000000   -0.9835441    0.9383219
+Bs4(waiting)   -0.8310317    0.9309906   -0.9835441    1.0000000   -0.9837278
+Bs5(waiting)    0.7513995   -0.8628108    0.9383219   -0.9837278    1.0000000
+Bs6(waiting)   -0.6649918    0.7788034   -0.8677581    0.9357829   -0.9824465
+Bs7(waiting)    0.5741523   -0.6830278    0.7767008   -0.8583342    0.9286162
+Bs8(waiting)   -0.4756211    0.5730197   -0.6625697    0.7479342   -0.8313483
+Bs9(waiting)    0.3573296   -0.4341439    0.5079552   -0.5821468    0.6606656
+             Bs6(waiting) Bs7(waiting) Bs8(waiting) Bs9(waiting)
+Bs1(waiting)   -0.6649918    0.5741523   -0.4756211    0.3573296
+Bs2(waiting)    0.7788034   -0.6830278    0.5730197   -0.4341439
+Bs3(waiting)   -0.8677581    0.7767008   -0.6625697    0.5079552
+Bs4(waiting)    0.9357829   -0.8583342    0.7479342   -0.5821468
+Bs5(waiting)   -0.9824465    0.9286162   -0.8313483    0.6606656
+Bs6(waiting)    1.0000000   -0.9794871    0.9079639   -0.7427120
+Bs7(waiting)   -0.9794871    1.0000000   -0.9699965    0.8292216
+Bs8(waiting)    0.9079639   -0.9699965    1.0000000   -0.9214160
+Bs9(waiting)   -0.7427120    0.8292216   -0.9214160    1.0000000
 > 
-> library("multcomp")
-Loading required package: mvtnorm
-Loading required package: survival
-Loading required package: TH.data
-> 
-> mp <- parm(coef(mod), vcov(mod))
-> y <- generate(mod, 30)$waiting
-> g <- glht(mp, linfct = model.matrix(mod$model,
+> if (FALSE) {
++ library("multcomp")
++ 
++ mp <- parm(coef(mod), vcov(mod))
++ y <- generate(mod, 30)$waiting
++ g <- glht(mp, linfct = model.matrix(mod$model,
 +     data = data.frame(waiting = y)))
-> 
-> mc <- confint(g)
-> umc <- confint(glht(mp, linfct = model.matrix(mod$model, 
++ 
++ mc <- confint(g)
++ umc <- confint(glht(mp, linfct = model.matrix(mod$model, 
 +     data = data.frame(waiting = y))), calpha = qnorm(.975))
-> p <- mod$model$todistr$p
-> plot(y, p(mc$confint[, "Estimate"]), type = "l")
-> lines(y, p(mc$confint[, "lwr"]))
-> lines(y, p(mc$confint[, "upr"]))
-> lines(y, p(umc$confint[, "lwr"]))
-> lines(y, p(umc$confint[, "upr"]))
-> 
-> library("survival")
-> cm <- coxph(Surv(waiting, rep(TRUE, nrow(faithful))) ~ 1, data = faithful)
-> plot(survfit(cm))
-> lines(y, 1 - p(mc$confint[, "Estimate"]), col = "red")
-> lines(y, 1 - p(mc$confint[, "lwr"]), col = "red")
-> lines(y, 1 - p(mc$confint[, "upr"]), col = "red")
++ p <- mod$model$todistr$p
++ plot(y, p(mc$confint[, "Estimate"]), type = "l")
++ lines(y, p(mc$confint[, "lwr"]))
++ lines(y, p(mc$confint[, "upr"]))
++ lines(y, p(umc$confint[, "lwr"]))
++ lines(y, p(umc$confint[, "upr"]))
++ 
++ library("survival")
++ cm <- coxph(Surv(waiting, rep(TRUE, nrow(faithful))) ~ 1, data = faithful)
++ plot(survfit(cm))
++ lines(y, 1 - p(mc$confint[, "Estimate"]), col = "red")
++ lines(y, 1 - p(mc$confint[, "lwr"]), col = "red")
++ lines(y, 1 - p(mc$confint[, "upr"]), col = "red")
++ }
 > 
 > proc.time()
    user  system elapsed 
- 16.322   0.161  16.490 
+ 11.647   0.143  11.785 

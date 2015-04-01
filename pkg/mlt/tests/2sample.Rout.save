@@ -1,6 +1,6 @@
 
-R version 3.1.2 (2014-10-31) -- "Pumpkin Helmet"
-Copyright (C) 2014 The R Foundation for Statistical Computing
+R version 3.1.3 (2015-03-09) -- "Smooth Sidewalk"
+Copyright (C) 2015 The R Foundation for Statistical Computing
 Platform: x86_64-unknown-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -29,109 +29,99 @@ Loading required package: numDeriv
 > mydata <- data.frame(g = g, y = y)
 > 
 > by <- polynomial_basis(c(1, 1), var = "y", support = range(y), ci = c(-Inf, 0))
-> bg1 <- as.basis(~ g - 1)
-> 
-> m1 <- model(by, inter = bg1, remove_intercept = TRUE)
+> m1 <- model(by, interacting = as.basis(~ g - 1, data = mydata))
 > fm1 <- mlt(m1, data = mydata)
-Note: method with signature 'diagonalMatrix#Matrix' chosen for function 'kronecker',
- target signature 'ddiMatrix#ddiMatrix'.
- "Matrix#diagonalMatrix" would also be valid
-Note: method with signature 'TsparseMatrix#sparseMatrix' chosen for function 'kronecker',
- target signature 'dtTMatrix#ddiMatrix'.
- "Matrix#diagonalMatrix" would also be valid
-Note: method with signature 'Matrix#numLike' chosen for function '%*%',
- target signature 'dgTMatrix#numeric'.
- "TsparseMatrix#ANY" would also be valid
-Note: method with signature 'Matrix#matrix' chosen for function '%*%',
- target signature 'dgTMatrix#matrix'.
- "TsparseMatrix#ANY" would also be valid
-iter:  0  f-value:  341.6287  pgrad:  49.32291 
-iter:  10  f-value:  266.1316  pgrad:  11.3708 
-iter:  20  f-value:  259.79  pgrad:  1.594479 
-iter:  30  f-value:  259.6653  pgrad:  7.089959 
-iter:  40  f-value:  259.6152  pgrad:  0.004269509 
-iter:  0  f-value:  259.6152  pgrad:  0.0001606293 
-Score: 1.000031  Hessian: 2.029424e-09 
+iter:  0  f-value:  341.6287  pgrad:  49.3229 
+iter:  10  f-value:  266.1316  pgrad:  11.37079 
+iter:  20  f-value:  259.79  pgrad:  1.594614 
+iter:  30  f-value:  259.6653  pgrad:  7.093472 
+iter:  40  f-value:  259.6152  pgrad:  0.00423897 
+iter:  0  f-value:  259.6152  pgrad:  0.0001602536 
+Score: 1.000012  Hessian: 1.020226e-09 
 Warning message:
 In mlt(m1, data = mydata) : NB not met
 > logLik(fm1)
 'log Lik.' -259.6152 (df=4)
 > vcov(fm1)
-            1           2           1           2
-1  0.08823069 -0.03935623  0.00000000  0.00000000
-2 -0.03935623  0.01979929  0.00000000  0.00000000
-1  0.00000000  0.00000000  0.01091145 -0.00136613
-2  0.00000000  0.00000000 -0.00136613  0.00204762
+               (Intercept):g1        y:g1 (Intercept):g2         y:g2
+(Intercept):g1     0.08823106 -0.03935641    0.000000000  0.000000000
+y:g1              -0.03935641  0.01979939    0.000000000  0.000000000
+(Intercept):g2     0.00000000  0.00000000    0.010911454 -0.001366131
+y:g2               0.00000000  0.00000000   -0.001366131  0.002047620
 > cf1 <- coef(fm1)
 > 1 / cf1[c(2, 4)] 
-        2         2 
-0.5025284 1.5626450 
+     y:g1      y:g2 
+0.5025261 1.5626449 
 > -cf1[c(1, 3)] / cf1[c(2,4)]
-        1         1 
-1.9877585 0.6671793 
+(Intercept):g1 (Intercept):g2 
+     1.9877595      0.6671796 
 > 
 > ### no constraints here!
-> by2 <- polynomial_basis(c(1, 1), var = "y", support = range(y))
-> bg2 <- as.basis(~ g, remove_intercept = TRUE)
-> m2 <- model(by, inter = b(b1 = by2, b2 = bg2))
+> m2 <- model(by, interacting = as.basis(~ g, data = mydata))
 > fm2 <- mlt(m2, data = mydata)
-Note: method with signature 'Matrix#numLike' chosen for function '%*%',
- target signature 'dtTMatrix#numeric'.
- "TsparseMatrix#ANY" would also be valid
-Note: method with signature 'Matrix#matrix' chosen for function '%*%',
- target signature 'dtTMatrix#matrix'.
- "TsparseMatrix#ANY" would also be valid
 iter:  0  f-value:  341.6287  pgrad:  49.3229 
-iter:  10  f-value:  299.8039  pgrad:  16.73724 
-iter:  20  f-value:  274.6782  pgrad:  9.073611 
-iter:  30  f-value:  267.2569  pgrad:  12.60349 
-iter:  40  f-value:  262.6291  pgrad:  5.200912 
-iter:  50  f-value:  261.2799  pgrad:  3.352224 
-iter:  60  f-value:  260.6238  pgrad:  15.90531 
-iter:  70  f-value:  260.0913  pgrad:  12.68358 
-iter:  80  f-value:  259.7971  pgrad:  2.339358 
-iter:  90  f-value:  259.68  pgrad:  0.5323511 
-iter:  100  f-value:  259.6285  pgrad:  0.3502112 
-iter:  110  f-value:  259.6208  pgrad:  0.1527241 
-iter:  120  f-value:  259.617  pgrad:  0.4315666 
-iter:  130  f-value:  259.6162  pgrad:  0.1102728 
-iter:  140  f-value:  259.6157  pgrad:  0.04888818 
-iter:  150  f-value:  259.6152  pgrad:  0.04811 
-iter:  160  f-value:  259.6152  pgrad:  0.0135725 
-iter:  170  f-value:  259.6152  pgrad:  0.0001801936 
-iter:  0  f-value:  259.6152  pgrad:  0.0001852588 
-Score: 1.000004  Hessian: 0.0001899816 
+iter:  10  f-value:  299.8037  pgrad:  16.73734 
+iter:  20  f-value:  273.3911  pgrad:  9.832443 
+iter:  30  f-value:  267.9131  pgrad:  18.76965 
+iter:  40  f-value:  263.2954  pgrad:  5.326565 
+iter:  50  f-value:  261.7352  pgrad:  3.501373 
+iter:  60  f-value:  260.726  pgrad:  4.182614 
+iter:  70  f-value:  260.0356  pgrad:  24.29311 
+iter:  80  f-value:  259.6762  pgrad:  0.5149022 
+iter:  90  f-value:  259.638  pgrad:  0.312184 
+iter:  100  f-value:  259.6154  pgrad:  0.2990675 
+iter:  110  f-value:  259.6152  pgrad:  0.02204214 
+iter:  120  f-value:  259.6152  pgrad:  0.07903522 
+iter:  130  f-value:  259.6152  pgrad:  0.004740982 
+iter:  140  f-value:  259.6152  pgrad:  0.003456294 
+iter:  150  f-value:  259.6152  pgrad:  0.005574678 
+iter:  160  f-value:  259.6152  pgrad:  0.001572557 
+iter:  170  f-value:  259.6152  pgrad:  0.0009990141 
+iter:  180  f-value:  259.6152  pgrad:  0.0008022718 
+iter:  190  f-value:  259.6152  pgrad:  0.0008048325 
+iter:  200  f-value:  259.6152  pgrad:  0.0003537648 
+iter:  0  f-value:  259.6152  pgrad:  0.0003510057 
+Score: 1.000003  Hessian: 0.0001900169 
 Warning messages:
 1: In mlt(m2, data = mydata) : NB not met
 2: In .log(mmprime %*% beta) :
   negative contribution to likelihood; model constraints violated!
+3: In spg(par = beta, fn = loglikfct, gr = scorefct, project = "projectLinear",  :
+  Unsuccessful convergence.
 > logLik(fm2)
 'log Lik.' -259.6152 (df=4)
 > vcov(fm2)
-            1           2           1           2
-1  0.08823033 -0.03935604 -0.08823033  0.03935604
-2 -0.03935604  0.01979920  0.03935604 -0.01979920
-1 -0.08823033  0.03935604  0.09914178 -0.04072217
-2  0.03935604 -0.01979920 -0.04072217  0.02184682
+                        (Intercept):(Intercept) y:(Intercept) (Intercept):g2
+(Intercept):(Intercept)              0.08823162   -0.03935669    -0.08823162
+y:(Intercept)                       -0.03935669    0.01979953     0.03935669
+(Intercept):g2                      -0.08823162    0.03935669     0.09914307
+y:g2                                 0.03935669   -0.01979953    -0.04072282
+                               y:g2
+(Intercept):(Intercept)  0.03935669
+y:(Intercept)           -0.01979953
+(Intercept):g2          -0.04072282
+y:g2                     0.02184715
 > (cf2 <- coef(fm2))
-        1         2         1         2 
--3.955495  1.989928  3.528538 -1.349987 
+(Intercept):(Intercept)           y:(Intercept)          (Intercept):g2 
+              -3.955566                1.989961                3.528613 
+                   y:g2 
+              -1.350020 
 > c(cf1[1:2], cf1[3:4] - cf1[1:2])
-        1         2         1         2 
--3.955515  1.989937  3.528560 -1.349997 
+(Intercept):g1           y:g1 (Intercept):g2           y:g2 
+     -3.955535       1.989946       3.528580      -1.350006 
 > 
 > 1 / cf2[2]
-        2 
-0.5025308 
+y:(Intercept) 
+    0.5025225 
 > 1 / sum(cf2[c(2, 4)])
-[1] 1.562644
+[1] 1.562646
 > 
 > -cf2[1] / cf2[2]
-       1 
-1.987758 
+(Intercept):(Intercept) 
+               1.987761 
 > -sum(cf2[c(1, 3)]) / sum(cf2[c(2, 4)])
-[1] 0.6671814
+[1] 0.6671765
 > 
 > proc.time()
    user  system elapsed 
-  2.398   0.058   2.454 
+  2.025   0.053   2.066 

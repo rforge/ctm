@@ -1,6 +1,6 @@
 
-R version 3.1.2 (2014-10-31) -- "Pumpkin Helmet"
-Copyright (C) 2014 The R Foundation for Statistical Computing
+R version 3.1.3 (2015-03-09) -- "Smooth Sidewalk"
+Copyright (C) 2015 The R Foundation for Statistical Computing
 Platform: x86_64-unknown-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -68,38 +68,38 @@ sigma       -7.445133e-06  1.637489e-06  3.940881e-05
 > m <- model(yb, shifting = fm, todistr = "Normal")
 > mltmod <- mlt(m, data = d[!is.na(d$yt),,drop = FALSE], trunc = c("left" = "trunc_left"))
 iter:  0  f-value:  2187.923  pgrad:  1110.073 
-iter:  10  f-value:  397.377  pgrad:  164.4495 
-iter:  20  f-value:  49.99689  pgrad:  20.385 
-iter:  30  f-value:  65.62051  pgrad:  913.0289 
-iter:  40  f-value:  34.00101  pgrad:  0.6300076 
-iter:  50  f-value:  33.99349  pgrad:  0.8211395 
-iter:  60  f-value:  33.99033  pgrad:  0.4706324 
-iter:  0  f-value:  33.99032  pgrad:  0.003049391 
-Score: 1.000002  Hessian: 1.111552e-06 
+iter:  10  f-value:  397.3736  pgrad:  164.4466 
+iter:  20  f-value:  50.01984  pgrad:  20.3993 
+iter:  30  f-value:  66.15981  pgrad:  2057.124 
+iter:  40  f-value:  33.99985  pgrad:  0.5886936 
+iter:  50  f-value:  33.99059  pgrad:  0.190836 
+iter:  60  f-value:  33.99035  pgrad:  0.9270303 
+iter:  0  f-value:  33.99032  pgrad:  3.071742e-05 
+Score: 1.000788  Hessian: 1.111817e-06 
 Warning message:
 In mlt(m, data = d[!is.na(d$yt), , drop = FALSE], trunc = c(left = "trunc_left")) :
   NB not met
 > (cf <- coef(mltmod))
-        1         2         x 
--3.957605  3.882749 -7.733535 
+(Intercept)          yt           x 
+  -3.957638    3.882764   -7.733562 
 > c(-cf[1] / cf[2], -cf[3] / cf[2], 1 / cf[2])
-        1         x         2 
-1.0192791 1.9917680 0.2575495 
+(Intercept)           x          yt 
+  1.0192835   1.9917670   0.2575485 
 > logLik(mltmod)
 'log Lik.' -33.99032 (df=3)
 > vcov(mltmod)
-             1            2           x
-1  0.017689280 -0.009565393  0.01722581
-2 -0.009565393  0.008956861 -0.01774413
-x  0.017225815 -0.017744128  0.03562551
+             (Intercept)           yt           x
+(Intercept)  0.017689298 -0.009565423  0.01722588
+yt          -0.009565423  0.008956894 -0.01774419
+x            0.017225878 -0.017744194  0.03562564
 > 
 > #library("numDeriv")
 > 
 > solve(numDeriv::hessian(mltmod$loglik, coef(mltmod)))
              [,1]         [,2]        [,3]
-[1,]  0.017689280 -0.009565393  0.01722582
-[2,] -0.009565393  0.008956862 -0.01774413
-[3,]  0.017225816 -0.017744128  0.03562551
+[1,]  0.017689298 -0.009565423  0.01722588
+[2,] -0.009565423  0.008956894 -0.01774419
+[3,]  0.017225878 -0.017744194  0.03562565
 > 
 > 
 > ## right-truncated
@@ -132,19 +132,19 @@ sigma       -2.840592e-06  1.854537e-06  4.525610e-05
 > m <- model(yb, shifting = fm, todistr = "Normal")
 > mltmod <- mlt(m, data = d[!is.na(d$yt),,drop = FALSE], trunc = c("right" = "trunc_right"))
 iter:  0  f-value:  1924.196  pgrad:  1319.759 
-iter:  10  f-value:  555.5695  pgrad:  455.0767 
-iter:  20  f-value:  477.8819  pgrad:  184.6086 
-iter:  30  f-value:  238.1965  pgrad:  76.99969 
-iter:  40  f-value:  169.6564  pgrad:  60.86542 
-iter:  50  f-value:  142.8382  pgrad:  146.7445 
-iter:  60  f-value:  103.8907  pgrad:  1486.506 
-iter:  70  f-value:  86.20123  pgrad:  580.3113 
-iter:  80  f-value:  51.04346  pgrad:  50.014 
-iter:  90  f-value:  50.53017  pgrad:  0.6353544 
-iter:  100  f-value:  50.51895  pgrad:  0.02748308 
-iter:  110  f-value:  50.51895  pgrad:  0.0006190248 
-iter:  0  f-value:  50.51895  pgrad:  0.001679758 
-Score: 1.000003  Hessian: 0.4566825 
+iter:  10  f-value:  555.5692  pgrad:  455.0789 
+iter:  20  f-value:  477.8808  pgrad:  184.6084 
+iter:  30  f-value:  238.196  pgrad:  76.99994 
+iter:  40  f-value:  169.656  pgrad:  60.86556 
+iter:  50  f-value:  142.8381  pgrad:  146.7454 
+iter:  60  f-value:  103.8892  pgrad:  1486.475 
+iter:  70  f-value:  86.19486  pgrad:  580.2425 
+iter:  80  f-value:  51.04125  pgrad:  49.89992 
+iter:  90  f-value:  50.53012  pgrad:  0.6351273 
+iter:  100  f-value:  50.51895  pgrad:  0.02678399 
+iter:  110  f-value:  50.51895  pgrad:  0.01003689 
+iter:  0  f-value:  50.51895  pgrad:  1.267079e-06 
+Score: 1.020367  Hessian: 0.4566856 
 Warning messages:
 1: In mlt(m, data = d[!is.na(d$yt), , drop = FALSE], trunc = c(right = "trunc_right")) :
   NB not met
@@ -162,29 +162,31 @@ Warning messages:
   negative contribution to likelihood; model constraints violated!
 8: In .log(.dealinf(mmtrunc$right, beta, offset, d$p, 1) - .dealinf(mmtrunc$left,  :
   negative contribution to likelihood; model constraints violated!
-9: In .log(.dealinf(mmtrunc$right, beta, offset, d$p, 1) - .dealinf(mmtrunc$left,  :
+9: In spg(par = beta, fn = loglikfct, gr = scorefct, project = "projectLinear",  :
+  convergence tolerance satisified at intial parameter values.
+10: In .log(.dealinf(mmtrunc$right, beta, offset, d$p, 1) - .dealinf(mmtrunc$left,  :
   negative contribution to likelihood; model constraints violated!
 > (cf <- coef(mltmod))
-        1         2         x 
--3.789073  3.787773 -7.557084 
+(Intercept)          yt           x 
+  -3.789083    3.787786   -7.557111 
 > c(-cf[1] / cf[2], -cf[3] / cf[2], 1 / cf[2])
-        1         x         2 
-1.0003432 1.9951258 0.2640074 
+(Intercept)           x          yt 
+  1.0003424   1.9951261   0.2640064 
 > logLik(mltmod)
 'log Lik.' -50.51895 (df=3)
 > vcov(mltmod)
-             1            2           x
-1  0.014383277 -0.009473304  0.01733338
-2 -0.009473304  0.009315743 -0.01848530
-x  0.017333382 -0.018485299  0.03730390
+             (Intercept)           yt           x
+(Intercept)  0.014383309 -0.009473336  0.01733345
+yt          -0.009473336  0.009315775 -0.01848536
+x            0.017333447 -0.018485362  0.03730403
 > 
 > #library("numDeriv")
 > 
 > solve(numDeriv::hessian(mltmod$loglik, coef(mltmod)))
              [,1]         [,2]        [,3]
-[1,]  0.014235503 -0.009322112  0.01703080
-[2,] -0.009322112  0.009161281 -0.01817627
-[3,]  0.017030801 -0.018176268  0.03668567
+[1,]  0.014235534 -0.009322142  0.01703086
+[2,] -0.009322142  0.009161311 -0.01817633
+[3,]  0.017030861 -0.018176328  0.03668579
 Warning message:
 In .log(.dealinf(mmtrunc$right, beta, offset, d$p, 1) - .dealinf(mmtrunc$left,  :
   negative contribution to likelihood; model constraints violated!
@@ -193,4 +195,4 @@ In .log(.dealinf(mmtrunc$right, beta, offset, d$p, 1) - .dealinf(mmtrunc$left,  
 > 
 > proc.time()
    user  system elapsed 
-  2.546   0.056   2.596 
+  2.382   0.060   2.432 
