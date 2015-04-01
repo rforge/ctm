@@ -79,36 +79,45 @@ model.matrix.cbind_bases <- function(object, data, model.matrix = TRUE,
     return(ret )
 }
 
-predict.cbind_bases <- function(object, newdata, coef, deriv = NULL, integrate = NULL, ...) {
+predict.cbind_bases <- function(object, newdata, coef, deriv = NULL, 
+                                integrate = NULL, ...) {
 
     if (is.data.frame(newdata))
         return(predict.basis(object = object, newdata = newdata,
                              coef = coef, ...))
 
-    np <- sapply(object, nparm, data = newdata)
+#    np <- sapply(object, nparm, data = newdata)
+    if (!all(names(object) %in% names(newdata))) {
+        newdata <- lapply(names(object), function(b) {
+                          newdata[varnames(object[[b]])]
+        })
+        names(newdata) <- names(object)
+    }
+    np <- sapply(names(object), function(b) nparm(object[[b]], newdata[[b]]))
+
     ret <- lapply(1:length(object), function(b) {
-                  start <- ifelse(b == 1, 1, sum(np[1:(b - 1)]) + 1)
-                  cf <-  coef[start:sum(np[1:b])]
-                  thisargs <- list()
-                  if (!is.null(deriv)) { 
-                      if (names(deriv) %in% varnames(object[[b]])) {
-                          thisargs$deriv <- deriv
-                      } else {
-                          return(rep(0, nrow(model.matrix(object[[b]], data = newdata))))
-                      }
-                  }
-                  if (!is.null(integrate)) {
-                      if (names(integrate) %in% varnames(object[[b]]))
-                          thisargs$integrate <- integrate
-                  }
-                  thisargs$object <- object[[b]]
-                  thisargs$newdata <- newdata
-                  thisargs$coef <- cf
-                  return(do.call("predict", thisargs))
+        start <- ifelse(b == 1, 1, sum(np[1:(b - 1)]) + 1)
+        cf <-  coef[start:sum(np[1:b])]
+        thisargs <- list()
+        if (!is.null(deriv)) { 
+            if (names(deriv) %in% varnames(object[[b]])) {
+                thisargs$deriv <- deriv
+            } else {
+                return(rep(0, nrow(model.matrix(object[[b]], data = newdata))))
+	    }
+        }
+        if (!is.null(integrate)) {
+            if (names(integrate) %in% varnames(object[[b]]))
+                thisargs$integrate <- integrate
+        }
+        thisargs$object <- object[[b]]
+        thisargs$newdata <- newdata[[names(object)[b]]]
+        thisargs$coef <- cf
+        return(do.call("predict", thisargs))
     })
     vn <- sapply(object, varnames)
     if (length(unique(varnames(object))) == 1) return(Reduce("+", ret))
-    stopifnot(all(sapply(vn, length) == 1))
+#    stopifnot(all(sapply(vn, length) == 1))
     stopifnot(all(!duplicated(unlist(vn))))
-    return(rowSums(expand.grid(ret))) ### CHECK, outer?
+    return(array(rowSums(expand.grid(ret)), dim = sapply(ret, NROW))) ### CHECK, outer?
 }

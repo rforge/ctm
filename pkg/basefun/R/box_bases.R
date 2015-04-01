@@ -80,11 +80,13 @@ predict.box_bases <- function(object, newdata, coef, ...) {
         return(predict.basis(object = object, newdata = newdata,
                              coef = coef, ...))
     vn <- lapply(object, varnames)
-    stopifnot(all(sapply(vn, length) == 1))
+#    stopifnot(all(sapply(vn, length) == 1))
     stopifnot(all(!duplicated(unlist(vn))))
     X <- model.matrix(object = object, data = newdata, 
                       model.matrix = FALSE, ...)
     X <- lapply(X, function(x) as(x, "matrix"))
     X$beta <- array(coef, sapply(X, NCOL))
-    do.call(".cXb", X)
+    ret <- do.call(".cXb", X)
+#    dimnames(ret) <- names(object)
+    ret
 }

@@ -26,7 +26,7 @@ as.basis.formula <- function(object, remove_intercept = FALSE,
 
     ret <- function(data) {
         data <- data[varnames]
-        if (!is.data.frame(data)) data <- as.data.frame(data)
+        if (!is.data.frame(data)) data <- expand.grid(data)
         if (!is.null(mf)) {
             mf <- model.frame(mt, data = data, xlev = xlevels)
             if(!is.null(cl <- attr(mt, "dataClasses"))) .checkMFClasses(cl, mf)
