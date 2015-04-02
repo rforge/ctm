@@ -29,7 +29,11 @@ polynomial_basis <- function(coef, support = c(0, 1),
                 dobject <- deriv(dobject)
         }
         X <- sapply(dobject, predict, x)
-        colnames(X) <- c("(Intercept)", varname, paste(varname, "^", 2:(ncol(X) - 1), sep = ""))[1:ncol(X)]
+        if (!is.matrix(X)) X <- matrix(X, nrow = 1)
+        cn <- c("(Intercept)", varname)
+        if (ncol(X) > 2)
+            cn <- c(cn, paste(varname, "^", 2:(ncol(X) - 1), sep = ""))
+        colnames(X) <- cn[1:ncol(X)]
         attr(X, "constraint") <- list(ui = ui, ci = ci)
         attr(X, "Assign") <- matrix(varname, ncol = ncol(X))
         X

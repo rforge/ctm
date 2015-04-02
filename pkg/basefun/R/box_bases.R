@@ -19,6 +19,8 @@ b <- function(..., sumconstr = FALSE) {
 model.matrix.box_bases <- function(object, data, model.matrix = TRUE,
     deriv = NULL, integrate = NULL, ...) {
 
+    if (model.matrix) stopifnot(is.data.frame(data))
+
     varnames <- varnames(object)
     bnames <- names(object)
 
@@ -41,6 +43,7 @@ model.matrix.box_bases <- function(object, data, model.matrix = TRUE,
                 thisargs$integrate <- integrate
         }
         thisargs$object <- object[[b]]
+        if (b %in% names(data) &!is.data.frame(data)) data <- data[[b]]
         thisargs$data <- data
         X <- do.call("model.matrix", thisargs)
         attr(X, "Assign") <- rbind(attr(X, "Assign"), b)
@@ -76,12 +79,16 @@ nparm.box_bases <- function(object, data)
     prod(sapply(object, nparm, data = data))
 
 predict.box_bases <- function(object, newdata, coef, ...) {
+
+    vn <- sapply(object, varnames)
+
+    if (!is.data.frame(newdata) & any(duplicated(unlist(vn))))
+        newdata <- expand.grid(newdata)
+
     if (is.data.frame(newdata))    
         return(predict.basis(object = object, newdata = newdata,
                              coef = coef, ...))
-    vn <- lapply(object, varnames)
-#    stopifnot(all(sapply(vn, length) == 1))
-    stopifnot(all(!duplicated(unlist(vn))))
+
     X <- model.matrix(object = object, data = newdata, 
                       model.matrix = FALSE, ...)
     X <- lapply(X, function(x) as(x, "matrix"))

@@ -81,7 +81,7 @@ d <- generate(bb, n = 100)
 ## for each group
 p1 <- c(sapply(gf, function(l) predict(bb, newdata = data.frame(x = d$x, g = l), coef = coef(m1))))
 ## the same via expand.grid approach
-p2 <- predict(bb, newdata = d, coef(m1))
+p2 <- c(predict(bb, newdata = d, coef(m1)))
 ## brute force; 2 times
 p3 <- predict(bb, newdata = do.call(expand.grid, d), coef(m1))
 p4 <- predict(m2, newdata = do.call(expand.grid, d))
@@ -92,3 +92,4 @@ stopifnot(all.equal(p3, p4, check.attributes = FALSE))
 dp2 <- predict(bb, newdata = d, coef(m1), deriv = c(x = 1))
 
 
+	
