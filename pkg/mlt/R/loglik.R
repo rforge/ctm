@@ -21,6 +21,10 @@
     log(pmax(.Machine$double.eps, x))
 }
 
+### <FIXME> 
+### use .trunc_loglik = .mlt_loglik_interval for simplification, see paper
+### </FIXME>
+
 .trunc_loglik <- function(beta, d, offset = 0, mmtrunc) {
     if (is.null(mmtrunc)) return(0)
     return(.log(.dealinf(mmtrunc$right, beta, offset, d$p, 1) - 
