@@ -1,19 +1,31 @@
 
-### evaluate model.matrix of multiple basis objects
-model.matrix.basis <- function(object, data, ...)
-    object(data, ...)
-
 ### compute predicted values of (multiple) basis objects
-predict.basis <- function(object, newdata, coef, ...) {
-    X <- model.matrix(object = object, data = newdata, ...)
-    return(drop(X %*% coef))
+predict.basis <- function(object, newdata, coef, 
+                          dim = !is.data.frame(newdata), ...) {
+
+    if (isTRUE(dim))
+        dim <- sapply(newdata, NROW) 
+    else if (is.logical(dim)) 
+        dim <- NULL
+    
+    X <- model.matrix(object = object, data = newdata, dim = dim, ...)
+    lp <- c(X %*% coef)
+    if (is.null(dim)) return(lp)
+    nd <- names(dim)
+    return(.const_array(dim, nd[nd %in% varnames(object)], lp))
 }
 
 nparm <- function(object, data)
     UseMethod("nparm")
 
-nparm.basis <- function(object, data)
+nparm.basis <- function(object, data) {
+    if (!is.data.frame(data)) 
+        data <- expand.grid(data[varnames(object)])
     ncol(object(data))
+}
+
+nparm.bases <- function(object, data)
+    sapply(object, nparm, data = data)
 
 varnames <- function(x)
     UseMethod("varnames")

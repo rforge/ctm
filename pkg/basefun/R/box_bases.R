@@ -17,7 +17,7 @@ b <- function(..., sumconstr = FALSE) {
 }
 
 model.matrix.box_bases <- function(object, data, model.matrix = TRUE,
-    deriv = NULL, integrate = NULL, ...) {
+    dim = NULL, deriv = NULL, integrate = NULL, ...) {
 
     if (model.matrix) stopifnot(is.data.frame(data))
 
@@ -43,8 +43,9 @@ model.matrix.box_bases <- function(object, data, model.matrix = TRUE,
                 thisargs$integrate <- integrate
         }
         thisargs$object <- object[[b]]
-        if (b %in% names(data) &!is.data.frame(data)) data <- data[[b]]
         thisargs$data <- data
+        if (!is.null(dim))
+            thisargs$dim <- dim[names(dim) %in% varnames(object[[b]])]
         X <- do.call("model.matrix", thisargs)
         attr(X, "Assign") <- rbind(attr(X, "Assign"), b)
         X
@@ -75,25 +76,22 @@ model.matrix.box_bases <- function(object, data, model.matrix = TRUE,
     return(ret )
 }
 
-nparm.box_bases <- function(object, data)
-    prod(sapply(object, nparm, data = data))
+predict.box_bases <- function(object, newdata, coef, 
+                              dim = !is.data.frame(newdata), ...) {
 
-predict.box_bases <- function(object, newdata, coef, ...) {
-
-    vn <- sapply(object, varnames)
-
-    if (!is.data.frame(newdata) & any(duplicated(unlist(vn))))
-        newdata <- expand.grid(newdata)
-
-    if (is.data.frame(newdata))    
+    if (is.logical(dim) & !isTRUE(dim))
         return(predict.basis(object = object, newdata = newdata,
-                             coef = coef, ...))
+                             coef = coef, dim = dim, ...))
+
+    if (isTRUE(dim)) dim <- sapply(newdata, NROW)
 
     X <- model.matrix(object = object, data = newdata, 
-                      model.matrix = FALSE, ...)
+                      model.matrix = FALSE, dim = dim, ...)
     X <- lapply(X, function(x) as(x, "matrix"))
     X$beta <- array(coef, sapply(X, NCOL))
-    ret <- do.call(".cXb", X)
-#    dimnames(ret) <- names(object)
+    lp <- do.call(".cXb", X) 
+
+    vn <- varnames(object)
+    ret <- .const_array(dim, unlist(vn), c(lp))
     ret
 }

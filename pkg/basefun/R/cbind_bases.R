@@ -20,11 +20,8 @@ c.basis <- function(..., recursive = FALSE) {
 
 c.bases <- c.basis
 
-nparm.cbind_bases <- function(object, data)
-    sum(sapply(object, nparm, data = data))
-
 model.matrix.cbind_bases <- function(object, data, model.matrix = TRUE, 
-    deriv = NULL, integrate = NULL, ...) {
+    dim = NULL, deriv = NULL, integrate = NULL, ...) {
 
     if (model.matrix) stopifnot(is.data.frame(data))
 
@@ -55,8 +52,9 @@ model.matrix.cbind_bases <- function(object, data, model.matrix = TRUE,
                 thisargs$integrate <- integrate
         }
         thisargs$object <- object[[b]]
-        if (b %in% names(data) & !is.data.frame(data)) data <- data[[b]]
         thisargs$data <- data
+        if (!is.null(dim))
+            thisargs$dim <- dim[names(dim) %in% varnames(object[[b]])]
         X <- do.call("model.matrix", thisargs)
         attr(X, "Assign") <- rbind(attr(X, "Assign"), b)
         X
@@ -82,28 +80,27 @@ model.matrix.cbind_bases <- function(object, data, model.matrix = TRUE,
     return(ret )
 }
 
-predict.cbind_bases <- function(object, newdata, coef, reduce = TRUE, ...) {
+predict.cbind_bases <- function(object, newdata, coef, 
+                                dim = !is.data.frame(newdata), ...) {
+
+    if (isTRUE(dim))
+        dim <- sapply(newdata, NROW) 
+    else if (is.logical(dim)) 
+        dim <- FALSE
 
     if (length(object) == 1) 
-        return(predict(object[[1]], newdata = newdata, coef = coef, ...))
+        return(predict(object[[1]], newdata = newdata, 
+                       coef = coef, dim = dim, ...))
 
-    vn <- sapply(object, varnames)
+    np <- nparm(object, data = newdata)
 
-    if (!is.data.frame(newdata) & any(duplicated(unlist(vn))))
-        newdata <- expand.grid(newdata)
-
-    if (is.data.frame(newdata))
-        return(predict.basis(object = object, newdata = newdata,
-                             coef = coef, ...))
-
-    ret <- model.matrix(object, data = newdata, model.matrix = FALSE, ...)
-    np <- sapply(ret, ncol)
-    for (b in 1:length(ret)) {
-        start <- ifelse(b == 1, 1, sum(np[1:(b - 1)]) + 1)
-        cf <-  coef[start:sum(np[1:b])]
-        ret[[b]] <- ret[[b]] %*% cf
+    ret <- vector(mode = "list", length = length(object))
+    names(ret) <- names(object)
+    for (b in 1:length(object)) {
+        start <- ifelse(b == 1, 1, sum(unlist(np[names(object)[1:(b - 1)]])) + 1)
+        cf <- coef[start:sum(unlist(np[names(object)[1:b]]))]
+        ret[[b]] <- predict(object[[b]], newdata = newdata, 
+                            coef = cf, dim = dim, ...)
     }
-    if (!reduce) return(ret)
-    return(array(rowSums(expand.grid(ret)), 
-                         dim = sapply(ret, NROW))) ### CHECK, outer?
+    return(Reduce("+", ret))
 }
