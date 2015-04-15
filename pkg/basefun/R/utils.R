@@ -56,3 +56,14 @@
     }
     ret
 }
+
+.const_array <- function(dim, subdim, x) {
+    nd <- names(dim)
+    stopifnot(all(subdim %in% nd))
+    stopifnot(length(x) == prod(dim[subdim]))
+    nd2 <- c(nd[nd %in% subdim], nd[!(nd %in% subdim)])
+    
+    ret <- array(x, dim = dim[nd2])
+    aperm(ret, perm = match(nd, nd2))
+
+}
