@@ -33,4 +33,4 @@ log_basis <- function(support = c(.Machine$double.eps, Inf),
 }
 
 model.matrix.log_basis <- function(object, data, deriv = 0L, ...)
-    object(data, deriv = deriv, ...)
+    object(data, deriv = deriv)
