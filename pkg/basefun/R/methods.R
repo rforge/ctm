@@ -49,6 +49,7 @@ generate <- function(object, n)
     UseMethod("generate")
 
 ### <FIXME> can we generate only a subset of variables??? </FIXME>
+### <FIXME> rename to `design'? </FIXME>
 generate.basis <- function(object, n) {
     ret <- list()
     .generate <- function(s, n) {
