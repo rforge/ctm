@@ -282,6 +282,7 @@
         ui <- ui[!r0,,drop = FALSE]
         ci <- ci[!r0]
         if (nrow(ui) == 0) ui <- ci <- NULL
+        ci <- ci + sqrt(.Machine$double.eps) ### we need ui %*% theta > ci, not >= ci
     }
 
     optimfct <- function(beta, usescore = TRUE, ...) {
