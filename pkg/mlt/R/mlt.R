@@ -303,8 +303,8 @@
 
     ### at least one serious constraint
     if (!is.null(ui))
-        if(all(ui %*% theta - ci >= 0)) warning("NB not met")
-        
+        if(!all(ui %*% theta - ci >= 0)) 
+            warning("start from inadmissible parameters")
 
     # theta <- checktheta(theta)
     theta <- optimfct(theta, usescore = TRUE, maxit = 200, checkGrad = FALSE)$par
