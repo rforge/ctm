@@ -26,7 +26,7 @@ as.basis.formula <- function(object, remove_intercept = FALSE,
 
     ret <- function(data) {
         data <- data[varnames]
-        if (!is.data.frame(data)) data <- expand.grid(data)
+        stopifnot(is.data.frame(data)) 
         if (!is.null(mf)) {
             mf <- model.frame(mt, data = data, xlev = xlevels)
             if(!is.null(cl <- attr(mt, "dataClasses"))) .checkMFClasses(cl, mf)
@@ -53,4 +53,14 @@ as.basis.formula <- function(object, remove_intercept = FALSE,
     attr(ret, "intercept") <- !remove_intercept 
     class(ret) <- c("formula_basis", "basis", class(ret))
     ret
+}
+
+model.matrix.formula_basis <- function(object, data, dim = NULL, ...) {
+
+    if (!is.null(dim)) {
+        nd <- names(dim)
+        data <- do.call("expand.grid", data[nd[nd %in% varnames(object)]])
+    }
+
+    object(data)
 }
