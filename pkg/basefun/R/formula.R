@@ -60,13 +60,14 @@ model.matrix.formula_basis <- function(object, data, dim = NULL, ...) {
     if (!is.null(dim)) {
         nd <- names(dim)
         nd <- nd[nd %in% varnames(object)]
-        if (all(dim[nd] > 1)) {
+        if (length(nd) > 1 & all(dim[nd] > 1)) {
             data <- do.call("expand.grid", data[nd])
         } else {
             if (length(nd) > 1 & (sum(dim[nd] > 1) > 1))
                 stop("either all or just one element of dim can be larger one")
-            stopifnot(length(unique(sapply(data[nd], length))) == 1)
-            data <- as.data.frame(data[nd])
+            stopifnot(length(unique(sapply(data[varnames(object)], 
+                                           length))) == 1)
+            data <- as.data.frame(data[varnames(object)])
         }
     }
 
