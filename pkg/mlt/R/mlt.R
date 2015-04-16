@@ -50,6 +50,7 @@
     theta
 }
 
+### <FIXME> rename fixed to coef and allow for specification of coefs, ie fitted models? </FIXME>
 .mlt_setup <- function(model, data, weights = NULL, 
                        offset = NULL, trunc = NULL, fixed = NULL) {
 
