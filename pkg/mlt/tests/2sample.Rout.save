@@ -19,6 +19,13 @@ Type 'q()' to quit R.
 > library("mlt")
 Loading required package: basefun
 Loading required package: Matrix
+
+Attaching package: 'Matrix'
+
+The following objects are masked from 'package:base':
+
+    crossprod, tcrossprod
+
 Loading required package: polynom
 Loading required package: numDeriv
 > 
@@ -31,97 +38,63 @@ Loading required package: numDeriv
 > by <- polynomial_basis(c(1, 1), var = "y", support = range(y), ci = c(-Inf, 0))
 > m1 <- model(by, interacting = as.basis(~ g - 1, data = mydata))
 > fm1 <- mlt(m1, data = mydata)
-iter:  0  f-value:  341.6287  pgrad:  49.3229 
-iter:  10  f-value:  266.1316  pgrad:  11.37079 
-iter:  20  f-value:  259.79  pgrad:  1.594614 
-iter:  30  f-value:  259.6653  pgrad:  7.093472 
-iter:  40  f-value:  259.6152  pgrad:  0.00423897 
-iter:  0  f-value:  259.6152  pgrad:  0.0001602536 
-Score: 1.000012  Hessian: 1.020226e-09 
-Warning message:
-In mlt(m1, data = mydata) : NB not met
+Gradient[1] "Mean relative difference: 1.694041e-05"
+Hessian:[1] TRUE
 > logLik(fm1)
 'log Lik.' -259.6152 (df=4)
 > vcov(fm1)
                (Intercept):g1        y:g1 (Intercept):g2         y:g2
-(Intercept):g1     0.08823106 -0.03935641    0.000000000  0.000000000
-y:g1              -0.03935641  0.01979939    0.000000000  0.000000000
+(Intercept):g1     0.08823056 -0.03935616    0.000000000  0.000000000
+y:g1              -0.03935616  0.01979926    0.000000000  0.000000000
 (Intercept):g2     0.00000000  0.00000000    0.010911454 -0.001366131
 y:g2               0.00000000  0.00000000   -0.001366131  0.002047620
 > cf1 <- coef(fm1)
 > 1 / cf1[c(2, 4)] 
      y:g1      y:g2 
-0.5025261 1.5626449 
+0.5025293 1.5626449 
 > -cf1[c(1, 3)] / cf1[c(2,4)]
 (Intercept):g1 (Intercept):g2 
-     1.9877595      0.6671796 
+     1.9877582      0.6671796 
 > 
 > ### no constraints here!
 > m2 <- model(by, interacting = as.basis(~ g, data = mydata))
 > fm2 <- mlt(m2, data = mydata)
-iter:  0  f-value:  341.6287  pgrad:  49.3229 
-iter:  10  f-value:  299.8037  pgrad:  16.73734 
-iter:  20  f-value:  273.3911  pgrad:  9.832443 
-iter:  30  f-value:  267.9131  pgrad:  18.76965 
-iter:  40  f-value:  263.2954  pgrad:  5.326565 
-iter:  50  f-value:  261.7352  pgrad:  3.501373 
-iter:  60  f-value:  260.726  pgrad:  4.182614 
-iter:  70  f-value:  260.0356  pgrad:  24.29311 
-iter:  80  f-value:  259.6762  pgrad:  0.5149022 
-iter:  90  f-value:  259.638  pgrad:  0.312184 
-iter:  100  f-value:  259.6154  pgrad:  0.2990675 
-iter:  110  f-value:  259.6152  pgrad:  0.02204214 
-iter:  120  f-value:  259.6152  pgrad:  0.07903522 
-iter:  130  f-value:  259.6152  pgrad:  0.004740982 
-iter:  140  f-value:  259.6152  pgrad:  0.003456294 
-iter:  150  f-value:  259.6152  pgrad:  0.005574678 
-iter:  160  f-value:  259.6152  pgrad:  0.001572557 
-iter:  170  f-value:  259.6152  pgrad:  0.0009990141 
-iter:  180  f-value:  259.6152  pgrad:  0.0008022718 
-iter:  190  f-value:  259.6152  pgrad:  0.0008048325 
-iter:  200  f-value:  259.6152  pgrad:  0.0003537648 
-iter:  0  f-value:  259.6152  pgrad:  0.0003510057 
-Score: 1.000003  Hessian: 0.0001900169 
-Warning messages:
-1: In mlt(m2, data = mydata) : NB not met
-2: In .log(mmprime %*% beta) :
-  negative contribution to likelihood; model constraints violated!
-3: In spg(par = beta, fn = loglikfct, gr = scorefct, project = "projectLinear",  :
-  Unsuccessful convergence.
+Gradient[1] "Mean relative difference: 3.331392e-06"
+Hessian:[1] "Mean relative difference: 9.509121e-08"
 > logLik(fm2)
 'log Lik.' -259.6152 (df=4)
 > vcov(fm2)
                         (Intercept):(Intercept) y:(Intercept) (Intercept):g2
-(Intercept):(Intercept)              0.08823162   -0.03935669    -0.08823162
-y:(Intercept)                       -0.03935669    0.01979953     0.03935669
-(Intercept):g2                      -0.08823162    0.03935669     0.09914307
-y:g2                                 0.03935669   -0.01979953    -0.04072282
+(Intercept):(Intercept)              0.08823018   -0.03935597    -0.08823018
+y:(Intercept)                       -0.03935597    0.01979916     0.03935597
+(Intercept):g2                      -0.08823018    0.03935597     0.09914163
+y:g2                                 0.03935597   -0.01979916    -0.04072210
                                y:g2
-(Intercept):(Intercept)  0.03935669
-y:(Intercept)           -0.01979953
-(Intercept):g2          -0.04072282
-y:g2                     0.02184715
+(Intercept):(Intercept)  0.03935597
+y:(Intercept)           -0.01979916
+(Intercept):g2          -0.04072210
+y:g2                     0.02184679
 > (cf2 <- coef(fm2))
 (Intercept):(Intercept)           y:(Intercept)          (Intercept):g2 
-              -3.955566                1.989961                3.528613 
+              -3.955486                1.989924                3.528528 
                    y:g2 
-              -1.350020 
+              -1.349983 
 > c(cf1[1:2], cf1[3:4] - cf1[1:2])
 (Intercept):g1           y:g1 (Intercept):g2           y:g2 
-     -3.955535       1.989946       3.528580      -1.350006 
+     -3.955507       1.989934       3.528552      -1.349993 
 > 
 > 1 / cf2[2]
 y:(Intercept) 
-    0.5025225 
+    0.5025317 
 > 1 / sum(cf2[c(2, 4)])
-[1] 1.562646
+[1] 1.562644
 > 
 > -cf2[1] / cf2[2]
 (Intercept):(Intercept) 
-               1.987761 
+               1.987757 
 > -sum(cf2[c(1, 3)]) / sum(cf2[c(2, 4)])
-[1] 0.6671765
+[1] 0.6671825
 > 
 > proc.time()
    user  system elapsed 
-  2.025   0.053   2.066 
+  1.910   0.057   1.955 

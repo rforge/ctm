@@ -19,6 +19,13 @@ Type 'q()' to quit R.
 > library("mlt")
 Loading required package: basefun
 Loading required package: Matrix
+
+Attaching package: 'Matrix'
+
+The following objects are masked from 'package:base':
+
+    crossprod, tcrossprod
+
 Loading required package: polynom
 Loading required package: numDeriv
 > library("truncreg")
@@ -67,21 +74,11 @@ sigma       -7.445133e-06  1.637489e-06  3.940881e-05
 > yb <- polynomial_basis(c(TRUE, TRUE), var = "yt", ci = c(-Inf, 0))
 > m <- model(yb, shifting = fm, todistr = "Normal")
 > mltmod <- mlt(m, data = d[!is.na(d$yt),,drop = FALSE], trunc = c("left" = "trunc_left"))
-iter:  0  f-value:  2187.923  pgrad:  1110.073 
-iter:  10  f-value:  397.3736  pgrad:  164.4466 
-iter:  20  f-value:  50.01984  pgrad:  20.3993 
-iter:  30  f-value:  66.15981  pgrad:  2057.124 
-iter:  40  f-value:  33.99985  pgrad:  0.5886936 
-iter:  50  f-value:  33.99059  pgrad:  0.190836 
-iter:  60  f-value:  33.99035  pgrad:  0.9270303 
-iter:  0  f-value:  33.99032  pgrad:  3.071742e-05 
-Score: 1.000788  Hessian: 1.111817e-06 
-Warning message:
-In mlt(m, data = d[!is.na(d$yt), , drop = FALSE], trunc = c(left = "trunc_left")) :
-  NB not met
+Gradient[1] "Mean relative difference: 2.00001e-05"
+Hessian:[1] TRUE
 > (cf <- coef(mltmod))
 (Intercept)          yt           x 
-  -3.957638    3.882764   -7.733562 
+  -3.957637    3.882763   -7.733560 
 > c(-cf[1] / cf[2], -cf[3] / cf[2], 1 / cf[2])
 (Intercept)           x          yt 
   1.0192835   1.9917670   0.2575485 
@@ -89,17 +86,17 @@ In mlt(m, data = d[!is.na(d$yt), , drop = FALSE], trunc = c(left = "trunc_left")
 'log Lik.' -33.99032 (df=3)
 > vcov(mltmod)
              (Intercept)           yt           x
-(Intercept)  0.017689298 -0.009565423  0.01722588
-yt          -0.009565423  0.008956894 -0.01774419
-x            0.017225878 -0.017744194  0.03562564
+(Intercept)  0.017689296 -0.009565421  0.01722587
+yt          -0.009565421  0.008956892 -0.01774419
+x            0.017225873 -0.017744189  0.03562564
 > 
 > #library("numDeriv")
 > 
 > solve(numDeriv::hessian(mltmod$loglik, coef(mltmod)))
              [,1]         [,2]        [,3]
-[1,]  0.017689298 -0.009565423  0.01722588
-[2,] -0.009565423  0.008956894 -0.01774419
-[3,]  0.017225878 -0.017744194  0.03562565
+[1,]  0.017689296 -0.009565421  0.01722587
+[2,] -0.009565421  0.008956892 -0.01774419
+[3,]  0.017225874 -0.017744190  0.03562564
 > 
 > 
 > ## right-truncated
@@ -131,41 +128,21 @@ sigma       -2.840592e-06  1.854537e-06  4.525610e-05
 > yb <- polynomial_basis(c(TRUE, TRUE), var = "yt", ci = c(-Inf, 0))
 > m <- model(yb, shifting = fm, todistr = "Normal")
 > mltmod <- mlt(m, data = d[!is.na(d$yt),,drop = FALSE], trunc = c("right" = "trunc_right"))
-iter:  0  f-value:  1924.196  pgrad:  1319.759 
-iter:  10  f-value:  555.5692  pgrad:  455.0789 
-iter:  20  f-value:  477.8808  pgrad:  184.6084 
-iter:  30  f-value:  238.196  pgrad:  76.99994 
-iter:  40  f-value:  169.656  pgrad:  60.86556 
-iter:  50  f-value:  142.8381  pgrad:  146.7454 
-iter:  60  f-value:  103.8892  pgrad:  1486.475 
-iter:  70  f-value:  86.19486  pgrad:  580.2425 
-iter:  80  f-value:  51.04125  pgrad:  49.89992 
-iter:  90  f-value:  50.53012  pgrad:  0.6351273 
-iter:  100  f-value:  50.51895  pgrad:  0.02678399 
-iter:  110  f-value:  50.51895  pgrad:  0.01003689 
-iter:  0  f-value:  50.51895  pgrad:  1.267079e-06 
-Score: 1.020367  Hessian: 0.4566856 
+Gradient[1] "Mean relative difference: 0.00152262"
+Hessian:[1] "Mean relative difference: 1.225984e-05"
 Warning messages:
-1: In mlt(m, data = d[!is.na(d$yt), , drop = FALSE], trunc = c(right = "trunc_right")) :
-  NB not met
-2: In .log(mmprime %*% beta) :
-  negative contribution to likelihood; model constraints violated!
-3: In .log(mmprime %*% beta) :
-  negative contribution to likelihood; model constraints violated!
-4: In .log(.dealinf(mmtrunc$right, beta, offset, d$p, 1) - .dealinf(mmtrunc$left,  :
-  negative contribution to likelihood; model constraints violated!
-5: In .log(.dealinf(mmtrunc$right, beta, offset, d$p, 1) - .dealinf(mmtrunc$left,  :
-  negative contribution to likelihood; model constraints violated!
-6: In .log(.dealinf(mmtrunc$right, beta, offset, d$p, 1) - .dealinf(mmtrunc$left,  :
-  negative contribution to likelihood; model constraints violated!
-7: In .log(.dealinf(mmtrunc$right, beta, offset, d$p, 1) - .dealinf(mmtrunc$left,  :
-  negative contribution to likelihood; model constraints violated!
-8: In .log(.dealinf(mmtrunc$right, beta, offset, d$p, 1) - .dealinf(mmtrunc$left,  :
-  negative contribution to likelihood; model constraints violated!
-9: In spg(par = beta, fn = loglikfct, gr = scorefct, project = "projectLinear",  :
-  convergence tolerance satisified at intial parameter values.
-10: In .log(.dealinf(mmtrunc$right, beta, offset, d$p, 1) - .dealinf(mmtrunc$left,  :
-  negative contribution to likelihood; model constraints violated!
+1: In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
+  negative contribution to likelihood; constraints violated!
+2: In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
+  negative contribution to likelihood; constraints violated!
+3: In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
+  negative contribution to likelihood; constraints violated!
+4: In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
+  negative contribution to likelihood; constraints violated!
+5: In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
+  negative contribution to likelihood; constraints violated!
+6: In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
+  negative contribution to likelihood; constraints violated!
 > (cf <- coef(mltmod))
 (Intercept)          yt           x 
   -3.789083    3.787786   -7.557111 
@@ -188,11 +165,11 @@ x            0.017333447 -0.018485362  0.03730403
 [2,] -0.009322142  0.009161311 -0.01817633
 [3,]  0.017030861 -0.018176328  0.03668579
 Warning message:
-In .log(.dealinf(mmtrunc$right, beta, offset, d$p, 1) - .dealinf(mmtrunc$left,  :
-  negative contribution to likelihood; model constraints violated!
+In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
+  negative contribution to likelihood; constraints violated!
 > 
 > 
 > 
 > proc.time()
    user  system elapsed 
-  2.382   0.060   2.432 
+  2.216   0.053   2.257 

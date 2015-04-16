@@ -5,8 +5,14 @@ coef.mlt <- function(object, fixed = TRUE, ...) {
     return(object$par)
 }
 
+Hessian <- function(object, ...)
+    UseMethod("Hessian")
+
+Hessian.mlt <- function(object, ...)
+    object$hessian(coef(object, fixed = FALSE))
+    
 vcov.mlt <- function(object, ...)
-    solve(object$hessian(coef(object, fixed = FALSE)))
+    solve(Hessian(object, ...))
 
 logLik.mlt <- function(object, ...) {
     ret <- -object$loglik(coef(object, fixed = FALSE))

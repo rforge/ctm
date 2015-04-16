@@ -13,7 +13,7 @@ r <- as.basis(~ Sat, data = housing, remove_intercept = TRUE,
 
 m <- model(r, shift = s, todist = "Logi")
 
-mod <- mlt(m, housing, weights = housing$Freq)
+mod <- mlt(m, data = housing, weights = housing$Freq)
 
 logLik(mp)
 logLik(mod)

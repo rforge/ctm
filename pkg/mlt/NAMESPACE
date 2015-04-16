@@ -3,6 +3,7 @@ import(basefun)
 import(numDeriv)
 importFrom(BB, spg)
 importFrom(MASS, ginv)
+importFrom(sandwich, estfun)
 
 exportPattern("^[^\\.]")
 

@@ -19,6 +19,13 @@ Type 'q()' to quit R.
 > library("mlt")
 Loading required package: basefun
 Loading required package: Matrix
+
+Attaching package: 'Matrix'
+
+The following objects are masked from 'package:base':
+
+    crossprod, tcrossprod
+
 Loading required package: polynom
 Loading required package: numDeriv
 > set.seed(29)
@@ -37,21 +44,16 @@ Loading required package: numDeriv
 > 
 > m <- model(~ y, shift = ~ X1 + X2, todist = "Logis")
 > m2 <- mlt(m, data = df, fixed = c("y.L" = 0))
-iter:  0  f-value:  92.82517  pgrad:  32.12444 
-iter:  10  f-value:  68.14266  pgrad:  0.8374368 
-iter:  0  f-value:  88.48929  pgrad:  29.581 
-iter:  10  f-value:  68.12889  pgrad:  0.03527792 
-iter:  20  f-value:  68.12815  pgrad:  1.830052e-05 
-Score: 1.000296  Hessian: 8.11327e-10 
+Gradient[1] "Mean relative difference: 0.0002899951"
+Hessian:[1] TRUE
 Warning message:
-In mlt(m, data = df, fixed = c(y.L = 0)) :
+In .mlt_setup(list(model = list(bresponse = function (data)  :
   results may depend on ordering of levels
 > coef(m2)
-(Intercept)         y.L          X1          X2 
- -0.7372373   0.0000000   0.3848619   0.8291958 
+[1] -0.7372381  0.0000000  0.3848546  0.8292046
 > 
 > max(abs(coef(m1) + coef(m2)[-2]))
-[1] 8.783614e-06
+[1] 9.584264e-08
 > 
 > logLik(m1)
 'log Lik.' -68.12815 (df=3)
@@ -94,196 +96,20 @@ virginica    -23.83628    -7.923634  -15.370769     23.65978   15.135301
 Note: method with signature 'dsparseMatrix#dsparseMatrix' chosen for function 'kronecker',
  target signature 'dgTMatrix#dgCMatrix'.
  "TsparseMatrix#sparseMatrix" would also be valid
-iter:  0  f-value:  173.6819  pgrad:  107.9148 
-iter:  10  f-value:  126.544  pgrad:  45.39123 
-iter:  20  f-value:  71.61652  pgrad:  22.10187 
-iter:  30  f-value:  51.43963  pgrad:  23.70877 
-iter:  40  f-value:  43.71279  pgrad:  5.901679 
-iter:  50  f-value:  35.31477  pgrad:  4.467815 
-iter:  60  f-value:  26.17197  pgrad:  2.8455 
-iter:  70  f-value:  17.86875  pgrad:  10.58862 
-iter:  80  f-value:  16.26055  pgrad:  1.411973 
-iter:  90  f-value:  15.422  pgrad:  1.205807 
-iter:  100  f-value:  13.38452  pgrad:  0.8119769 
-iter:  110  f-value:  12.44974  pgrad:  0.6461074 
-iter:  120  f-value:  11.98674  pgrad:  0.6054355 
-iter:  130  f-value:  11.92056  pgrad:  1.547585 
-iter:  140  f-value:  11.65149  pgrad:  5.412271 
-iter:  150  f-value:  11.62213  pgrad:  6.10108 
-iter:  160  f-value:  11.22675  pgrad:  3.8799 
-iter:  170  f-value:  10.87923  pgrad:  1.523884 
-iter:  180  f-value:  10.59186  pgrad:  0.4685269 
-iter:  190  f-value:  10.57685  pgrad:  4.746255 
-iter:  200  f-value:  10.25485  pgrad:  0.3741888 
-iter:  0  f-value:  10.25336  pgrad:  0.3884612 
-iter:  10  f-value:  10.12929  pgrad:  3.169018 
-iter:  20  f-value:  9.957134  pgrad:  1.862235 
-iter:  30  f-value:  9.8634  pgrad:  1.858485 
-iter:  40  f-value:  9.657052  pgrad:  1.242371 
-iter:  50  f-value:  9.580399  pgrad:  0.8306031 
-iter:  60  f-value:  9.489341  pgrad:  1.83289 
-iter:  70  f-value:  9.436131  pgrad:  2.846553 
-iter:  80  f-value:  9.346052  pgrad:  0.2763257 
-iter:  90  f-value:  9.251162  pgrad:  0.3014585 
-iter:  100  f-value:  9.195941  pgrad:  0.2990519 
-iter:  110  f-value:  9.099197  pgrad:  0.2888109 
-iter:  120  f-value:  8.993886  pgrad:  0.275698 
-iter:  130  f-value:  8.951149  pgrad:  0.2752867 
-iter:  140  f-value:  8.865042  pgrad:  0.2663113 
-iter:  150  f-value:  8.799516  pgrad:  0.2609674 
-iter:  160  f-value:  8.780889  pgrad:  0.2533926 
-iter:  170  f-value:  8.770709  pgrad:  0.5620974 
-iter:  180  f-value:  8.696358  pgrad:  0.2556089 
-iter:  190  f-value:  8.606535  pgrad:  0.2474523 
-iter:  200  f-value:  8.374726  pgrad:  0.2273793 
-iter:  210  f-value:  8.293322  pgrad:  0.248768 
-iter:  220  f-value:  8.255455  pgrad:  3.120656 
-iter:  230  f-value:  8.184373  pgrad:  0.2098704 
-iter:  240  f-value:  7.903734  pgrad:  0.1875399 
-iter:  250  f-value:  7.743852  pgrad:  3.335004 
-iter:  260  f-value:  7.604634  pgrad:  0.1587618 
-iter:  270  f-value:  7.496436  pgrad:  0.1491547 
-iter:  280  f-value:  7.463709  pgrad:  0.1462906 
-iter:  290  f-value:  7.415221  pgrad:  0.1422773 
-iter:  300  f-value:  7.362942  pgrad:  0.1392171 
-iter:  310  f-value:  7.343308  pgrad:  4.051533 
-iter:  320  f-value:  7.195471  pgrad:  0.2575792 
-iter:  330  f-value:  7.174959  pgrad:  0.1213171 
-iter:  340  f-value:  7.143992  pgrad:  0.1183679 
-iter:  350  f-value:  7.115509  pgrad:  0.1158785 
-iter:  360  f-value:  7.092596  pgrad:  0.1137607 
-iter:  370  f-value:  7.058782  pgrad:  0.1309173 
-iter:  380  f-value:  7.034288  pgrad:  0.1155728 
-iter:  390  f-value:  7.007753  pgrad:  3.295155 
-iter:  400  f-value:  6.932411  pgrad:  0.1646302 
-iter:  410  f-value:  6.903874  pgrad:  0.09798002 
-iter:  420  f-value:  6.865325  pgrad:  0.09451581 
-iter:  430  f-value:  6.761563  pgrad:  0.08619168 
-iter:  440  f-value:  6.735439  pgrad:  0.08755925 
-iter:  450  f-value:  6.690234  pgrad:  1.333844 
-iter:  460  f-value:  6.44215  pgrad:  1.010946 
-iter:  470  f-value:  6.426835  pgrad:  0.05515796 
-iter:  480  f-value:  6.417498  pgrad:  0.0551379 
-iter:  490  f-value:  6.390494  pgrad:  0.0527533 
-iter:  500  f-value:  6.372057  pgrad:  0.05150925 
-iter:  510  f-value:  6.27462  pgrad:  0.1549149 
-iter:  520  f-value:  6.312933  pgrad:  2.066915 
-iter:  530  f-value:  6.260874  pgrad:  0.04085033 
-iter:  540  f-value:  6.232371  pgrad:  0.03814821 
-iter:  550  f-value:  6.219298  pgrad:  0.03691523 
-iter:  560  f-value:  6.194186  pgrad:  0.03462938 
-iter:  570  f-value:  6.183124  pgrad:  0.02966898 
-iter:  580  f-value:  6.189472  pgrad:  1.395499 
-iter:  590  f-value:  6.169262  pgrad:  0.06250002 
-iter:  600  f-value:  6.161829  pgrad:  0.03131742 
-iter:  610  f-value:  6.144691  pgrad:  0.02956914 
-iter:  620  f-value:  6.127341  pgrad:  0.02780388 
-iter:  630  f-value:  6.118788  pgrad:  0.0425557 
-iter:  640  f-value:  6.11426  pgrad:  0.02943269 
-iter:  650  f-value:  6.119479  pgrad:  1.207701 
-iter:  660  f-value:  6.095804  pgrad:  0.1516284 
-iter:  670  f-value:  6.093824  pgrad:  0.0242681 
-iter:  680  f-value:  6.078896  pgrad:  0.02258408 
-iter:  690  f-value:  6.072951  pgrad:  0.0219188 
-iter:  700  f-value:  6.067098  pgrad:  0.02126505 
-iter:  710  f-value:  6.058808  pgrad:  0.01881503 
-iter:  720  f-value:  6.064456  pgrad:  1.307926 
-iter:  730  f-value:  6.045686  pgrad:  0.09145152 
-iter:  740  f-value:  6.04466  pgrad:  0.01862413 
-iter:  750  f-value:  6.039092  pgrad:  0.01793008 
-iter:  760  f-value:  6.026839  pgrad:  0.01656745 
-iter:  770  f-value:  6.020333  pgrad:  0.06726263 
-iter:  780  f-value:  6.01158  pgrad:  0.7081452 
-iter:  790  f-value:  6.007782  pgrad:  0.669676 
-iter:  800  f-value:  6.004229  pgrad:  0.01331322 
-iter:  810  f-value:  5.988177  pgrad:  0.0108333 
-iter:  820  f-value:  5.986782  pgrad:  0.01072014 
-iter:  830  f-value:  5.978558  pgrad:  1.729634 
-iter:  840  f-value:  5.956896  pgrad:  0.004248579 
-iter:  850  f-value:  5.956393  pgrad:  0.004107537 
-iter:  860  f-value:  5.954984  pgrad:  0.003600407 
-iter:  870  f-value:  5.955837  pgrad:  0.4187292 
-iter:  880  f-value:  5.954596  pgrad:  0.2274036 
-iter:  890  f-value:  5.954011  pgrad:  0.003104084 
-iter:  900  f-value:  5.953706  pgrad:  0.0029386 
-iter:  910  f-value:  5.953441  pgrad:  0.002834091 
-iter:  920  f-value:  5.953192  pgrad:  0.04344225 
-iter:  930  f-value:  5.953066  pgrad:  0.1175715 
-iter:  940  f-value:  5.952355  pgrad:  0.05427371 
-iter:  950  f-value:  5.952219  pgrad:  0.0022831 
-iter:  960  f-value:  5.952033  pgrad:  0.002148893 
-iter:  970  f-value:  5.951902  pgrad:  0.002124419 
-iter:  980  f-value:  5.95163  pgrad:  0.001954344 
-iter:  990  f-value:  5.951617  pgrad:  0.1456316 
-iter:  1000  f-value:  5.951494  pgrad:  0.227754 
-iter:  1010  f-value:  5.950885  pgrad:  0.006485895 
-iter:  1020  f-value:  5.950846  pgrad:  0.00142892 
-iter:  1030  f-value:  5.950759  pgrad:  0.001351012 
-iter:  1040  f-value:  5.950705  pgrad:  0.04385882 
-iter:  1050  f-value:  5.950703  pgrad:  0.1054024 
-iter:  1060  f-value:  5.950581  pgrad:  0.001224578 
-iter:  1070  f-value:  5.950302  pgrad:  0.000943933 
-iter:  1080  f-value:  5.950247  pgrad:  0.01484706 
-iter:  1090  f-value:  5.950218  pgrad:  0.03309725 
-iter:  1100  f-value:  5.950184  pgrad:  0.0008448604 
-iter:  1110  f-value:  5.950155  pgrad:  0.0008155233 
-iter:  1120  f-value:  5.950092  pgrad:  0.003963446 
-iter:  1130  f-value:  5.950078  pgrad:  0.04960201 
-iter:  1140  f-value:  5.95005  pgrad:  0.0006573753 
-iter:  1150  f-value:  5.950028  pgrad:  0.000625369 
-iter:  1160  f-value:  5.950028  pgrad:  0.05217147 
-iter:  1170  f-value:  5.949998  pgrad:  0.0006119331 
-iter:  1180  f-value:  5.949975  pgrad:  0.0005608449 
-iter:  1190  f-value:  5.949954  pgrad:  0.01426174 
-iter:  1200  f-value:  5.949881  pgrad:  0.08632648 
-iter:  1210  f-value:  5.94982  pgrad:  0.000316054 
-iter:  1220  f-value:  5.949811  pgrad:  0.0003128355 
-iter:  1230  f-value:  5.949823  pgrad:  0.05200312 
-iter:  1240  f-value:  5.949795  pgrad:  0.0003064806 
-iter:  1250  f-value:  5.949788  pgrad:  0.0003034886 
-iter:  1260  f-value:  5.949781  pgrad:  0.0003005718 
-iter:  1270  f-value:  5.949771  pgrad:  0.0002964417 
-iter:  1280  f-value:  5.94977  pgrad:  0.02974117 
-iter:  1290  f-value:  5.949721  pgrad:  0.06534782 
-iter:  1300  f-value:  5.949698  pgrad:  0.04377778 
-iter:  1310  f-value:  5.949686  pgrad:  0.03020813 
-iter:  1320  f-value:  5.949675  pgrad:  0.0002590356 
-iter:  1330  f-value:  5.949673  pgrad:  0.0002473871 
-iter:  1340  f-value:  5.949621  pgrad:  0.0002162579 
-iter:  1350  f-value:  5.949618  pgrad:  0.0002141525 
-iter:  1360  f-value:  5.949614  pgrad:  0.0002120759 
-iter:  1370  f-value:  5.949618  pgrad:  0.0304383 
-iter:  1380  f-value:  5.949611  pgrad:  0.02131466 
-iter:  1390  f-value:  5.949605  pgrad:  0.0002061419 
-iter:  1400  f-value:  5.949573  pgrad:  0.0001859033 
-iter:  1410  f-value:  5.949571  pgrad:  0.0001846172 
-iter:  1420  f-value:  5.949568  pgrad:  0.01546678 
-iter:  1430  f-value:  5.949567  pgrad:  0.01953071 
-iter:  1440  f-value:  5.949563  pgrad:  0.02256206 
-iter:  1450  f-value:  5.949559  pgrad:  0.01851316 
-iter:  1460  f-value:  5.949553  pgrad:  0.0003415339 
-iter:  1470  f-value:  5.949552  pgrad:  0.0001731525 
-iter:  1480  f-value:  5.949547  pgrad:  0.0001700324 
-iter:  1490  f-value:  5.949544  pgrad:  0.0001681694 
-iter:  1500  f-value:  5.949542  pgrad:  0.0001668275 
-iter:  0  f-value:  5.949542  pgrad:  0.0001668273 
-iter:  10  f-value:  5.949371  pgrad:  5.99688e-05 
-Score: 1.000024  Hessian: 0.03482904 
-Warning messages:
-1: In mlt(m, data = oiris) : NB not met
-2: In spg(par = beta, fn = loglikfct, gr = scorefct, project = "projectLinear",  :
-  Unsuccessful convergence.
-3: In spg(par = beta, fn = loglikfct, gr = scorefct, project = "projectLinear",  :
+Gradient[1] "Mean relative difference: 1.415292e-06"
+Hessian:[1] "Mean relative difference: 0.0004797966"
+Warning message:
+In spg(par = theta, fn = loglikfct, gr = scorefct, project = "projectLinear",  :
   Unsuccessful convergence.
 > coef(m2)
  Species1:(Intercept)  Species2:(Intercept) Species1:Sepal.Length 
-            0.1029691            42.6514428             2.5592043 
+           0.05357553           42.63780769            2.46494636 
 Species2:Sepal.Length  Species1:Sepal.Width  Species2:Sepal.Width 
-            2.4650626             6.4124653             6.6820833 
+           2.46518639            6.21641456            6.68095269 
 Species1:Petal.Length Species2:Petal.Length  Species1:Petal.Width 
-          -11.0759460            -9.4312705            -5.5313412 
+         -10.68868143           -9.42939338           -5.31735494 
  Species2:Petal.Width 
-          -18.2901718 
+         -18.28610232 
 > 
 > s <- sort(unique(oiris$Species))[1:2]
 > p2 <- do.call("rbind", lapply(predict(m2, newdata = oiris), 
@@ -293,9 +119,9 @@ Species1:Petal.Length Species2:Petal.Length  Species1:Petal.Width
 > pp1 <- predict(m1, newdata = iris, type = "prob")
 > 
 > max(abs(pp1 - pp2))
-[1] 0.001232805
+[1] 0.001176896
 > 
 > 
 > proc.time()
    user  system elapsed 
-  4.417   0.068   4.477 
+  4.691   0.078   4.762 

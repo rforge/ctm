@@ -23,6 +23,13 @@ Type 'q()' to quit R.
 > library("mlt")
 Loading required package: basefun
 Loading required package: Matrix
+
+Attaching package: 'Matrix'
+
+The following objects are masked from 'package:base':
+
+    crossprod, tcrossprod
+
 Loading required package: polynom
 Loading required package: numDeriv
 > 
@@ -34,17 +41,9 @@ Loading required package: numDeriv
 > 
 > m <- model(r, shift = s, todist = "Logi")
 > 
-> mod <- mlt(m, housing, weights = housing$Freq)
-iter:  0  f-value:  1982.846  pgrad:  114.1486 
-iter:  10  f-value:  1797.974  pgrad:  27.66131 
-iter:  20  f-value:  1772.448  pgrad:  4.781346 
-iter:  30  f-value:  1771.721  pgrad:  3.539247 
-iter:  40  f-value:  1771.708  pgrad:  0.003130046 
-iter:  50  f-value:  1771.708  pgrad:  0.0002264945 
-iter:  0  f-value:  1771.708  pgrad:  1.427762e-05 
-Score: 1.018664  Hessian: 5.133938e-08 
-Warning message:
-In mlt(m, housing, weights = housing$Freq) : NB not met
+> mod <- mlt(m, data = housing, weights = housing$Freq)
+Gradient[1] "Mean relative difference: 7.181812e-05"
+Hessian:[1] TRUE
 > 
 > logLik(mp)
 'log Lik.' -1771.708 (df=4)
@@ -59,7 +58,7 @@ InflMedium   InflHigh
  -0.2013727   0.9484658 
 > coef(mod)
       Sat1       Sat2 InflMedium   InflHigh 
--0.2013763  0.9484755 -0.5635788 -1.2486721 
+-0.2013763  0.9484755 -0.5635787 -1.2486723 
 > 
 > sqrt(diag(vcov(mp)))
 
@@ -73,4 +72,4 @@ Re-fitting to get Hessian
 > 
 > proc.time()
    user  system elapsed 
-  1.769   0.057   1.811 
+  1.825   0.063   1.879 

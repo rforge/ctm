@@ -50,9 +50,8 @@
     theta
 }
 
-.mlt_fit <- function(model, data, weights = NULL, 
-                     offset = NULL, fixed = NULL, trunc = NULL, 
-                     theta = NULL, ...) {
+.mlt_setup <- function(model, data, weights = NULL, 
+                       offset = NULL, trunc = NULL, fixed = NULL) {
 
     if (is.null(weights)) weights <- rep(1, nrow(data))
     if (is.null(offset)) offset <- rep(0, nrow(data))
@@ -285,67 +284,86 @@
         ci <- ci + sqrt(.Machine$double.eps) ### we need ui %*% theta > ci, not >= ci
     }
 
-    optimfct <- function(beta, usescore = TRUE, ...) {
+    optimfct <- function(theta, ...) {
         control <- list(...)
-        if (!is.null(ui)) {
-            if (usescore)
-                return(spg(par = beta, fn = loglikfct, gr = scorefct, project = "projectLinear",
-                           projectArgs = list(A = ui, b = ci, meq = 0), control = control))
-            return(spg(par = beta, fn = loglikfct, project = "projectLinear",
+        if (!is.null(ui))
+            return(spg(par = theta, fn = loglikfct, gr = scorefct, project = "projectLinear",
                        projectArgs = list(A = ui, b = ci, meq = 0), control = control))
-        }
-        if (usescore)
-            return(spg(par = runif(length(beta)), fn = loglikfct, gr = scorefct, control = control))
-        return(spg(par = runif(length(beta)), fn = loglikfct, control = control))
+        return(spg(par = theta, fn = loglikfct, gr = scorefct, control = control))
     }
 
-    if (is.null(theta))
-        theta <- .findstart(model, data, ui, ci, fix, fixed)
+    theta <- .findstart(model, data, ui, ci, fix, fixed)
 
     ### at least one serious constraint
     if (!is.null(ui))
         if(!all(ui %*% theta - ci >= 0)) 
             warning("start from inadmissible parameters")
 
-    # theta <- checktheta(theta)
-    theta <- optimfct(theta, usescore = TRUE, maxit = 200, checkGrad = FALSE)$par
-
-    ret <- try(optimfct(theta, ...))    
-    if (inherits(ret, "try-error") || ret$convergence != 0 || ret$gradient > 1)
-        ret <- optimfct(ret$par, ...)
-
-    if (ret$convergence != 0)
-        warning("algorithm did not converge")
-
-    ### check gradient and hessian
-    gr <- numDeriv::grad(loglikfct, ret$par)
-    s <- scorefct(ret$par)
-    cat("Score:", max(abs(gr / s)), " ")
-
-    H1 <- numDeriv::hessian(loglikfct, ret$par)
-    H2 <- he(ret$par)
-    cat("Hessian:", max(abs(drop(H1 - H2))), "\n")
-
-    coef <- numeric(length(fix))
+    coef <- rep(NA, length(fix))
     coef[fix] <- fixed
-    coef[!fix] <- ret$par
+
     if (is.null(Y)) {
         names(coef) <- colnames(lY)
     } else {
         names(coef) <- colnames(Y)
     }
+
+    ret <- list()
+    ret$theta <- theta
+    ret$parm <- .parm
     ret$coef <- coef
     ret$model <- model
+    ret$data <- data
+    ret$weights <- weights
+    ret$offset <- offset
     ret$response <- response
     ret$todistr <- todistr
     ret$loglik <- loglikfct
     ret$score <- scorefct
     ret$hessian <- he
-    ret$optim <- optimfct
-    ret$data <- data
-    class(ret) <- "mlt"
+    ret$optimfct <- optimfct
+    class(ret) <- c("mlt_setup", "mlt")
     return(ret)
 }
 
-mlt <- .mlt_fit
+.mlt_fit <- function(object, theta = object$theta, check = TRUE, trace = FALSE, ...) {
 
+    ret <- try(object$optimfct(theta, trace = trace, ...))    
+    if (inherits(ret, "try-error") || ret$convergence != 0 || ret$gradient > 1)
+        ret <- object$optimfct(ret$par, trace = trace, ...)
+
+    if (ret$convergence != 0)
+        warning("algorithm did not converge")
+
+    cls <- class(object)
+    object <- c(object, ret)
+    object$coef <- object$parm(ret$par)
+    class(object) <- c("mlt_fit", cls)
+    
+    if (check) {
+        ### check gradient  and hessian
+        gr <- numDeriv::grad(object$loglik, ret$par)
+        s <- estfun(object)
+        cat("Gradient")
+        print(all.equal(gr, -s, check.attributes = FALSE))
+
+        H1 <- numDeriv::hessian(object$loglik, ret$par)
+        H2 <- Hessian(object)
+        cat("Hessian:")
+        print(all.equal(H1, H2, check.attributes = FALSE))
+    }
+
+    return(object)
+}
+
+mlt <- function(...) {
+    args <- list(...)
+    if (sum(names(args) == "") > 1)
+        stop("function mlt requires names arguments")
+    sa <- c("", "model", "data", "weights", "offset", "trunc", "fixed")
+    setupargs <- args[names(args) %in% sa]
+    fitargs <- args[!(names(args) %in% sa)]
+    s <- do.call(".mlt_setup", setupargs)
+    fitargs$object <- s
+    do.call(".mlt_fit", fitargs)
+}

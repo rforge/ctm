@@ -19,6 +19,13 @@ Type 'q()' to quit R.
 > library("mlt")
 Loading required package: basefun
 Loading required package: Matrix
+
+Attaching package: 'Matrix'
+
+The following objects are masked from 'package:base':
+
+    crossprod, tcrossprod
+
 Loading required package: polynom
 Loading required package: numDeriv
 > library("survival")
@@ -172,4 +179,4 @@ Loading required package: numDeriv
 > 
 > proc.time()
    user  system elapsed 
-  1.572   0.057   1.615 
+  1.636   0.064   1.690 
