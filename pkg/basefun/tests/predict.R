@@ -55,3 +55,11 @@ stopifnot(length(p) == nrow(d))
 (p2 <- predict(bb, newdata = list(x = x, y = y, g = g), coef = rep(1, ncol(X))))
 
 stopifnot(all.equal(p, c(p2), check.attributes = FALSE))
+
+dd <- list(x = x, y = y[1:3], g = rep(g[1], 3))
+(p3 <- predict(bb, newdata = dd, coef = rep(1, ncol(X)),
+               dim = c(x = 5, y = 3, g = 1)))
+
+stopifnot(all.equal(drop(p3), 
+    matrix(p2[as.matrix(expand.grid(1:5, 1:3, 1))], nrow = 5)))
+
