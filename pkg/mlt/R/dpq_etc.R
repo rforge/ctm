@@ -16,6 +16,7 @@ tmlt <- function(object, newdata = object$data, q = NULL, n = 50, ...) {
     if (is.data.frame(newdata)) {
 
         ### in sample predictions
+        ### this will _not_ work for censored responses
         if (!is.null(newdata[[y]]) & is.null(q)) {
             ret <- c(predict(model, newdata = newdata, 
                              coef = coef(object), ...))
