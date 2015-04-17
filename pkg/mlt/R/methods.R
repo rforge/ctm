@@ -5,6 +5,7 @@ coef.mlt <- function(object, fixed = TRUE, ...) {
     return(object$par)
 }
 
+### use maxLik::hessian?
 Hessian <- function(object, ...)
     UseMethod("Hessian")
 
