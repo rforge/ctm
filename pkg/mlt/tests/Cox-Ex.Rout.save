@@ -89,31 +89,11 @@ Hessian:[1] "Mean relative difference: 7.991511e-08"
  [8,]  0.764301899
  [9,]  1.068694530
 > ## sample from this model
-> nd <- samplefrom(opt, newdata = data.frame(g = gf), n = 100)
-> (cf2 <- coef(opt2 <- mlt(m, data = nd)))
+> sam <- simulate(opt, newdata = data.frame(g = gf), nsim = 100)
+> nd <- data.frame(y = unlist(sam), g = rep(gf, length(sam)))
+> opt2 <- mlt(m, data = nd)
 Gradient[1] TRUE
 Hessian:[1] TRUE
-            [,1]
- [1,]  1.0961758
- [2,] -0.2231665
- [3,] -0.2231665
- [4,] -0.2231665
- [5,] -0.2231665
- [6,] -0.2231665
- [7,]  0.5456321
- [8,]  0.8772897
- [9,]  1.0475200
-> cf1 - cf2
-             [,1]
- [1,] -0.25745354
- [2,] -0.08255151
- [3,]  0.22066033
- [4,]  0.22066033
- [5,]  0.22066033
- [6,]  0.22066033
- [7,] -0.27060245
- [8,] -0.11298779
- [9,]  0.02117453
 > ## visualise
 > yn <- generate(Bb, 50)$y
 > yn <- yn[yn > 0]
@@ -240,4 +220,4 @@ Warning messages:
 > 
 > proc.time()
    user  system elapsed 
-  5.927   0.071   5.989 
+  5.828   0.076   5.892 

@@ -95,67 +95,6 @@ predict.mlt <- function(object, newdata = NULL, ...) {
             coef = coef(object, fixed = TRUE), ...)
 }
 
-
-samplefrom <- function(object, ...)
-    UseMethod("samplefrom")
-
-samplefrom.model <- function(object, newdata = NULL, coef, 
-                             n = 1, ngrid = 10, ny = 100, interval = FALSE, ...) {
-
-    response <- object$response
-
-    if (is.null(newdata)) {
-        simdata <- generate(object$model, n = ngrid)
-        if (storage.mode(y) == "double")
-            y <- seq(from = min(y), to = max(y), length = ny)
-        if (is.factor(y)) y <- sort(y)[-nlevels(y)]
-        simdata[[response]] <- y
-        newdata <- simdata
-        newdata[[response]] <- NULL
-        newdata <- expand.grid(newdata)
-    } else {
-        y <- generate(object$model, n = ny)[[response]]
-        if (is.factor(y)) y <- sort(y)[-nlevels(y)]
-        simdata <- expand.grid(y = y, id = 1:nrow(newdata))
-        simdata <- cbind(simdata, newdata[simdata$id,,drop = FALSE])
-        simdata <- as.data.frame(simdata)
-    }
-
-    p <- object$todistr$p(predict(object$model, newdata = simdata, coef = coef, ...))
-    ny <- length(y)
-    nobs <- nrow(newdata)
-    p <- matrix(p, nrow = nobs, ncol = ny, byrow = TRUE)
-    p <- cbind(0, p, 1)
-
-    .sample <- function(i) {
-        idx <- rowSums(p <= (u <- runif(nobs)))
-        if (.type_of_response(y) != "double")
-            return(y[idx])
-        if (interval)
-            return(data.frame(left = y[idx], right = y[idx + 1]))
-        ptmp <- cbind(p[cbind(1:nrow(p), idx)], p[cbind(1:nrow(p), idx + 1)])
-        beta <- (ptmp[,2] - ptmp[,1]) / (y[idx + 1] - y[idx])
-        alpha <- ptmp[,1] - beta * y[idx]
-        return((u - alpha) / beta)
-    }
-    ret <- lapply(1:n, .sample)
-    if (interval) {
-        ret <- do.call("rbind", ret)
-    } else { 
-        ret <- unlist(ret)
-    }
-    newdata <- newdata[rep(1:nrow(newdata), n),,drop = FALSE]
-    newdata[[response]] <- ret
-    return(newdata)
-}
-
-samplefrom.mlt <- function(object, newdata = NULL, n = 1, ...) {
-
-    if (is.null(newdata)) newdata <- object$data
-    samplefrom(object$model, newdata = newdata, 
-               coef = coef(object, fixed = TRUE), n = n, ...)
-}
-
 plot.mlt <- function(x, formula, newdata = generate(x, n = 25), 
                      what = c("trafo", "prob"), ### density, quantile, ...
                      plotfun = plot, ...) {

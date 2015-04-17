@@ -41,9 +41,9 @@ lb <- log_basis(varname = "y", support = c(0, max(y)))
 m <- model(response = c(blog = lb, bBern = Bb), shifting = s, todist = "MinExtrVal")
 (cf1 <- coef(opt <- mlt(m, data = mydata)))
 ## sample from this model
-nd <- samplefrom(opt, newdata = data.frame(g = gf), n = 100)
-(cf2 <- coef(opt2 <- mlt(m, data = nd)))
-cf1 - cf2
+sam <- simulate(opt, newdata = data.frame(g = gf), nsim = 100)
+nd <- data.frame(y = unlist(sam), g = rep(gf, length(sam)))
+opt2 <- mlt(m, data = nd)
 ## visualise
 yn <- generate(Bb, 50)$y
 yn <- yn[yn > 0]
