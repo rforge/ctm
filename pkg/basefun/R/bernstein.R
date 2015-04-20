@@ -60,16 +60,24 @@ Bernstein_basis <- function(order = 2, support = c(0, 1), normal = FALSE,
             if (is.null(varname)) varname <- colnames(data)[1]
             x <- data[[varname]]
         }
-        stopifnot(order > deriv)
+
+        ### applies to all basis functions
+        ### deriv = -1 => 0
+        ### deriv = 0 => f(x)
+        ### deriv = 1 => f'(x)
+        ### deriv = 2 => f''(x)
+        ### ...
+
+        stopifnot(order > max(c(0, deriv)))
         x <- (x - support[1]) / diff(support)
         stopifnot(all(x >= 0 && x <= 1))
 
         if (!normal || ui != "none")
             X <- do.call("cbind", lapply(0:order, function(j) 
-                         .Bx(x, j, order, deriv = deriv, integrate = integrate)))
+                         .Bx(x, j, order, deriv = max(c(0, deriv)), integrate = integrate)))
         if (normal) {
             oX <- do.call("cbind", lapply(0:order, function(j) 
-                          .oBx(x, j, order, deriv = deriv, integrate = integrate)))
+                          .oBx(x, j, order, deriv = max(c(0, deriv)), integrate = integrate)))
             if (ui != "none" & (deriv == 0 & !integrate)) {
                 ### transform constraint on raw Bernstein bases into
                 ### constraint on orthogonal bases
@@ -96,6 +104,8 @@ Bernstein_basis <- function(order = 2, support = c(0, 1), normal = FALSE,
         }
         if (deriv > 0)
             X <- X * (1 / diff(support)^deriv)
+        if (deriv < 0)
+            X[] <- 0
         colnames(X) <- paste("Bs", 1:ncol(X), "(", varname, ")", sep = "")
         if (zeroint) { ### normal???
             X <- X[, -ncol(X), drop = FALSE] - X[, ncol(X), drop = TRUE]
@@ -119,4 +129,6 @@ Bernstein_basis <- function(order = 2, support = c(0, 1), normal = FALSE,
 ### evaluate model.matrix of Bernstein polynom
 model.matrix.Bernstein_basis <- function(object, data,
                                          deriv = 0L, integrate = FALSE, ...)
-    object(data = data, deriv = deriv, integrate = integrate)
+
+    object(data = data, deriv = .deriv(varnames(object), deriv), 
+           integrate = integrate)

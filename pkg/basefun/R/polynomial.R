@@ -34,6 +34,7 @@ polynomial_basis <- function(coef, support = c(0, 1),
         if (ncol(X) > 2)
             cn <- c(cn, paste(varname, "^", 2:(ncol(X) - 1), sep = ""))
         colnames(X) <- cn[1:ncol(X)]
+        if (deriv < 0) X[] <- 0
         attr(X, "constraint") <- list(ui = ui, ci = ci)
         attr(X, "Assign") <- matrix(varname, ncol = ncol(X))
         X
@@ -50,4 +51,4 @@ polynomial_basis <- function(coef, support = c(0, 1),
 }
 
 model.matrix.polynomial_basis <- function(object, data, deriv = 0L, ...)
-    object(data, deriv = deriv)
+    object(data, deriv = .deriv(varnames(object), deriv))

@@ -67,3 +67,21 @@
     aperm(ret, perm = match(nd, nd2))
 
 }
+
+.deriv <- function(vn, deriv) {
+
+    ### applies to all basis functions
+    ### deriv = -1 => 0
+    ### deriv = 0 => f(x)
+    ### deriv = 1 => f'(x)
+    ### deriv = 2 => f''(x)
+    ### ...
+
+    stopifnot(length(deriv) == 1)
+    if (deriv == 0L) return(deriv)
+    stopifnot(!is.null(names(deriv)))
+    if (names(deriv) %in% vn)
+        return(deriv)
+    return(-1L)
+}
+

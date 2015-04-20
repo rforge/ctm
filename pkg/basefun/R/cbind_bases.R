@@ -28,29 +28,10 @@ model.matrix.cbind_bases <- function(object, data, model.matrix = TRUE,
     bnames <- names(object)
     varnames <- varnames(object)
 
-    if (!is.null(deriv)) {
-        stopifnot(length(deriv) == 1)
-        if (!names(deriv) %in% varnames) deriv <- NULL
-    }
-    if (!is.null(integrate)) {
-        stopifnot(length(integrate) == 1)
-        if (!names(integrate) %in% varnames) integrate <- NULL
-    }
     ret <- lapply(bnames, function(b) {
         thisargs <- list()
-        if (!is.null(deriv)) {
-            if (names(deriv) %in% varnames(object[[b]])) {
-                thisargs$deriv <- deriv
-            } else {
-                X <- model.matrix(object[[b]], data)
-                X[] <- 0
-                return(X)
-            }
-        }
-        if (!is.null(integrate)) {
-            if (names(integrate) %in% varnames(object[[b]]))
-                thisargs$integrate <- integrate
-        }
+        thisargs$deriv <- deriv
+        thisargs$integrate <- integrate
         thisargs$object <- object[[b]]
         thisargs$data <- data
         if (!is.null(dim))
@@ -94,17 +75,25 @@ predict.cbind_bases <- function(object, newdata, coef,
                        coef = coef, dim = dim, ...))
 
     np <- nparm(object, data = newdata)
+    if (is.null(terms)) terms <- names(object)
 
     ret <- vector(mode = "list", length = length(object))
     names(ret) <- names(object)
     for (b in 1:length(object)) {
-        if (names(object)[b] %in% terms || names(object[[b]]) %in% terms) {
+        nmb <- names(object[[b]])
+        if (is.null(nmb)) nmb <- ""
+        if (names(object)[b] %in% terms || nmb %in% terms) {
             start <- ifelse(b == 1, 1, sum(unlist(np[names(object)[1:(b - 1)]])) + 1)
             cf <- coef[start:sum(unlist(np[names(object)[1:b]]))]
+            if (names(object)[b] %in% terms) {
+                tm <- names(object[[b]])
+            } else {
+                tm <- terms
+            }
             ret[[b]] <- predict(object[[b]], newdata = newdata, 
-                                coef = cf, dim = dim, terms = terms, ...)
+                                coef = cf, dim = dim, terms = tm, ...)
         } else {
-            ret[[b]] <- array(0, dim = dim)
+            ret[[b]] <- 0
         }
     }
     return(Reduce("+", ret))

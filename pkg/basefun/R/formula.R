@@ -24,7 +24,8 @@ as.basis.formula <- function(object, remove_intercept = FALSE,
         s <- NULL
     }
 
-    ret <- function(data) {
+    ret <- function(data, deriv = 0L) {
+
         data <- data[varnames]
         stopifnot(is.data.frame(data)) 
         if (!is.null(mf)) {
@@ -44,6 +45,13 @@ as.basis.formula <- function(object, remove_intercept = FALSE,
         if (is.null(ci)) ci <- rep(-Inf, ncol(X))
         attr(X, "constraint") <- list(ui = ui, ci = ci)
         attr(X, "Assign") <- c("(Intercept)", varnames)[attr(X, "assign") + 1]
+        if (deriv == 1) {
+            nm <- names(deriv)[deriv == 1L]
+            X[, attr(X, "Assign") %in% nm] <- 1
+            X[, !(attr(X, "Assign") %in% nm)] <- 0
+        }
+        if (deriv < 0)
+            X[] <- 0
         return(X)
     }
 
@@ -55,7 +63,7 @@ as.basis.formula <- function(object, remove_intercept = FALSE,
     ret
 }
 
-model.matrix.formula_basis <- function(object, data, dim = NULL, ...) {
+model.matrix.formula_basis <- function(object, data, dim = NULL, deriv = 0L, ...) {
 
     if (!is.null(dim)) {
         nd <- names(dim)
@@ -71,5 +79,5 @@ model.matrix.formula_basis <- function(object, data, dim = NULL, ...) {
         }
     }
 
-    object(data)
+    object(data, deriv = .deriv(varnames(object), deriv))
 }
