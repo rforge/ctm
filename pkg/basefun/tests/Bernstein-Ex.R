@@ -19,7 +19,7 @@ for (i in 1:length(fun)) {
         plot(x, fun[[i]](x), type = "l", col = "red", main = paste(deparse(fun[[i]]), o, R, sep = ":"))
         lines(x, fitted(m))
         plot(x, dfun[[i]](x), type = "l", col = "red", main = paste(deparse(fun[[i]]), o, R, sep = ":"))
-        lines(x, predict(Bb, newdata = data.frame(x = x), deriv = 1, coef = coef(m)))
+        lines(x, predict(Bb, newdata = data.frame(x = x), deriv = c(x = 1), coef = coef(m)))
     }
 }
 

@@ -30,10 +30,10 @@ p1 <- predict(Bb, newdata = data.frame(x = xn), coef = coef(m1))
 p2 <- predict(m2, newdata = data.frame(x = xn)) 
 stopifnot(all.equal(c(p1), p2, check.attributes = FALSE))
 ## compute derivative of estimated regression function
-dp1 <- predict(Bb, newdata = data.frame(x = xn), coef = coef(m1), deriv = 1)
-dp0 <- predict(Bb0, newdata = data.frame(x = xn), coef = coef(m0)[-1], deriv = 1)
+dp1 <- predict(Bb, newdata = data.frame(x = xn), coef = coef(m1), deriv = c(x = 1))
+dp0 <- predict(Bb0, newdata = data.frame(x = xn), coef = coef(m0)[-1], deriv = c(x = 1))
 stopifnot(all.equal(dp1, dp0))
-dp12 <- predict(Bb, newdata = data.frame(x = xn), coef = coef(m1), deriv = 1, integrate = TRUE)
+dp12 <- predict(Bb, newdata = data.frame(x = xn), coef = coef(m1), deriv = c(x = 1), integrate = TRUE)
 unique(c(p1 - dp12)) ### the same up to a constant
 
 ### two-dim (ANCOVA) problem
