@@ -145,9 +145,15 @@ qmlt <- function(object, newdata = object$data, p = .5, n = 50,
     ### and columns to quantiles q
     ptmp <- t(matrix(prob, nrow = length(q)))
     nr <- nrow(ptmp)
-    ptmp <- ptmp[rep(1:nr, length(p)),,drop = FALSE]
-    pp <- rep(p, each = nr)
+    ptmp <- ptmp[rep(1:nr, each = length(p)),,drop = FALSE]
+    pp <- rep(p, nr) ### p varies fastest
     ret <- .p2q(ptmp, q, pp, interpolate = interpolate)
+
+
+    ### arrays of factors are not allowed
+    if (is.factor(q)) return(ret)
+
+    ### return list of length(p)
     if (!interpolate) {
         tmp <- vector(mode = "list", length = length(p))
         names(tmp) <- .frmt(p)
@@ -161,8 +167,6 @@ qmlt <- function(object, newdata = object$data, p = .5, n = 50,
         return(tmp)
     }
 
-    ### arrays of factors are not allowed; use integer
-    if (is.factor(q)) ret <- (1:nlevels(q))[ret]
     dim <- dim(prob)
     dim[1] <- length(p)
     dn <- c(list(p = .frmt(p)), dimnames(prob)[-1])
