@@ -1,0 +1,77 @@
+
+R version 3.1.3 (2015-03-09) -- "Smooth Sidewalk"
+Copyright (C) 2015 The R Foundation for Statistical Computing
+Platform: x86_64-unknown-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library("mlt")
+Loading required package: basefun
+Loading required package: Matrix
+
+Attaching package: 'Matrix'
+
+The following objects are masked from 'package:base':
+
+    crossprod, tcrossprod
+
+Loading required package: polynom
+Loading required package: numDeriv
+> library("np")
+Nonparametric Kernel Methods for Mixed Datatypes (version 0.60-2)
+[vignette("np_faq",package="np") provides answers to frequently asked questions]
+> set.seed(29)
+> 
+> ### true dgp
+> rY <- function(n) rgamma(n, shape = 5)
+> pY <- function(x) pgamma(x, shape = 5)
+> dY <- function(x) dgamma(x, shape = 5)
+> 
+> ### generate y and set-up basis
+> y <- sort(rY(100))
+> Bb <- Bernstein_basis(order = 10, support = c(0, max(y) + .1),
++                       ui = "increasing", varname = "y")
+> 
+> mydata <- data.frame(y = y)
+> opt <- mlt(model(response = Bb), data = mydata)
+Gradient[1] "Mean relative difference: 1.637209e-08"
+Hessian:[1] TRUE
+> d <- opt$todistr
+> 
+> ### evaluate on grid
+> yn <- generate(Bb, n = 50)$y
+> ### eval estimated h and h'
+> h <- predict(Bb, newdata = data.frame(y = yn), coef = opt$par)
+> h1 <- predict(Bb, newdata = data.frame(y = yn), deriv = 1, coef = opt$par)
+> 
+> ### plot
+> layout(matrix(1:2, ncol = 1))
+> plot(yn, d$p(h), type = "l", col = "red", main = "distribution")
+> lines(yn, pY(yn), col = "blue")
+> lines(ecdf(y), col = "grey", cex = .1)
+> lines(yn, predict(npudist(npudistbw(~ y)), newdata = data.frame(y = yn)), 
++       col = "magenta")
+Multistart 1 of 1 |Multistart 1 of 1 |Multistart 1 of 1 |Multistart 1 of 1 /Multistart 1 of 1 |Multistart 1 of 1 |                   > rug(y)
+> plot(yn, d$d(h) * h1,  type = "l", col = "red", main = "density")
+> lines(yn, dY(yn), col = "blue")
+> lines(yn, predict(npudens(npudensbw(~ y)), newdata = data.frame(y = yn)), 
++       col = "magenta")
+Multistart 1 of 1 |Multistart 1 of 1 |Multistart 1 of 1 |Multistart 1 of 1 /Multistart 1 of 1 |Multistart 1 of 1 |                   > lines(density(y), col = "darkgreen")
+> legend("topright", lwd = 1, legend = c("trafo", "true", "np", "density"),
++        col = c("red", "blue", "magenta", "darkgreen"))
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  1.927   0.045   1.961 
