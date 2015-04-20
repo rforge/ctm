@@ -81,7 +81,8 @@ model.matrix.cbind_bases <- function(object, data, model.matrix = TRUE,
 }
 
 predict.cbind_bases <- function(object, newdata, coef, 
-                                dim = !is.data.frame(newdata), ...) {
+                                dim = !is.data.frame(newdata), 
+                                terms = names(object), ...) {
 
     if (isTRUE(dim))
         dim <- sapply(newdata, NROW) 
@@ -97,10 +98,14 @@ predict.cbind_bases <- function(object, newdata, coef,
     ret <- vector(mode = "list", length = length(object))
     names(ret) <- names(object)
     for (b in 1:length(object)) {
-        start <- ifelse(b == 1, 1, sum(unlist(np[names(object)[1:(b - 1)]])) + 1)
-        cf <- coef[start:sum(unlist(np[names(object)[1:b]]))]
-        ret[[b]] <- predict(object[[b]], newdata = newdata, 
-                            coef = cf, dim = dim, ...)
+        if (names(object)[b] %in% terms || names(object[[b]]) %in% terms) {
+            start <- ifelse(b == 1, 1, sum(unlist(np[names(object)[1:(b - 1)]])) + 1)
+            cf <- coef[start:sum(unlist(np[names(object)[1:b]]))]
+            ret[[b]] <- predict(object[[b]], newdata = newdata, 
+                                coef = cf, dim = dim, terms = terms, ...)
+        } else {
+            ret[[b]] <- array(0, dim = dim)
+        }
     }
     return(Reduce("+", ret))
 }
