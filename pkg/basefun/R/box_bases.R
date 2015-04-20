@@ -37,6 +37,8 @@ model.matrix.box_bases <- function(object, data, model.matrix = TRUE,
         if (!is.null(deriv)) {
             if (names(deriv) %in% varnames(object[[b]]))
                 thisargs$deriv <- deriv
+            ### don't feed deriv to other basis functions
+            ### because we look at their _product_ here
         }
         if (!is.null(integrate)) {
             if (names(integrate) %in% varnames(object[[b]]))
