@@ -21,7 +21,7 @@ d <- opt$todistr
 yn <- generate(Bb, n = 50)$y
 ### eval estimated h and h'
 h <- predict(Bb, newdata = data.frame(y = yn), coef = opt$par)
-h1 <- predict(Bb, newdata = data.frame(y = yn), deriv = 1, coef = opt$par)
+h1 <- predict(Bb, newdata = data.frame(y = yn), deriv = c(y = 1), coef = opt$par)
 
 ### plot
 layout(matrix(1:2, ncol = 1))
