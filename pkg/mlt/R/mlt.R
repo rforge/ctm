@@ -357,7 +357,7 @@
     return(object)
 }
 
-mlt <- function(...) {
+mlt <- function(..., dofit = TRUE) {
     args <- list(...)
     if (sum(names(args) == "") > 1)
         stop("function mlt requires names arguments")
@@ -365,6 +365,7 @@ mlt <- function(...) {
     setupargs <- args[names(args) %in% sa]
     fitargs <- args[!(names(args) %in% sa)]
     s <- do.call(".mlt_setup", setupargs)
+    if (!dofit) return(s)
     fitargs$object <- s
     do.call(".mlt_fit", fitargs)
 }

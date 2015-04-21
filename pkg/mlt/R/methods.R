@@ -5,6 +5,19 @@ coef.mlt <- function(object, fixed = TRUE, ...) {
     return(object$par)
 }
 
+"coef<-" <- function(object, value, ...)
+    UseMethod("coef<-")
+
+"coef<-.mlt" <- function(object, value, ...) {
+    cf <- coef(object, fixed = TRUE)
+    stopifnot(length(cf) == length(value))
+    if (!is.null(names(value)))
+        stopifnot(all.equal(names(cf), names(value)))
+    object$par <- object$parm(value)
+    object$coef <- value
+    object
+}
+
 ### use maxLik::hessian?
 Hessian <- function(object, ...)
     UseMethod("Hessian")
