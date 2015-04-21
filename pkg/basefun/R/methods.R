@@ -12,7 +12,7 @@ predict.basis <- function(object, newdata, coef,
     lp <- c(X %*% coef)
     if (is.null(dim)) return(lp)
     nd <- names(dim)
-    return(.const_array(dim, nd[nd %in% varnames(object)], lp))
+    return(.const_array(dim, nd[nd %in% variable.names(object)], lp))
 }
 
 nparm <- function(object, data)
@@ -20,21 +20,18 @@ nparm <- function(object, data)
 
 nparm.basis <- function(object, data) {
     if (!is.data.frame(data)) 
-        data <- expand.grid(data[varnames(object)])
+        data <- expand.grid(data[variable.names(object)])
     ncol(object(data))
 }
 
 nparm.bases <- function(object, data)
     sapply(object, nparm, data = data)
 
-varnames <- function(x)
-    UseMethod("varnames")
+variable.names.basis <- function(object, ...)
+    attr(object, "varnames")
 
-varnames.basis <- function(x)
-    attr(x, "varnames")
-
-varnames.bases <- function(x)
-    unique(sapply(x, varnames))
+variable.names.bases <- function(object, ...)
+    unique(sapply(object, variable.names))
 
 support <- function(x)
     UseMethod("support")

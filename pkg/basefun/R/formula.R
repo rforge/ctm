@@ -67,17 +67,17 @@ model.matrix.formula_basis <- function(object, data, dim = NULL, deriv = 0L, ...
 
     if (!is.null(dim)) {
         nd <- names(dim)
-        nd <- nd[nd %in% varnames(object)]
+        nd <- nd[nd %in% variable.names(object)]
         if (length(nd) > 1 & all(dim[nd] > 1)) {
             data <- do.call("expand.grid", data[nd])
         } else {
             if (length(nd) > 1 & (sum(dim[nd] > 1) > 1))
                 stop("either all or just one element of dim can be larger one")
-            stopifnot(length(unique(sapply(data[varnames(object)], 
+            stopifnot(length(unique(sapply(data[variable.names(object)], 
                                            length))) == 1)
-            data <- as.data.frame(data[varnames(object)])
+            data <- as.data.frame(data[variable.names(object)])
         }
     }
 
-    object(data, deriv = .deriv(varnames(object), deriv))
+    object(data, deriv = .deriv(variable.names(object), deriv))
 }

@@ -130,5 +130,5 @@ Bernstein_basis <- function(order = 2, support = c(0, 1), normal = FALSE,
 model.matrix.Bernstein_basis <- function(object, data,
                                          deriv = 0L, integrate = FALSE, ...)
 
-    object(data = data, deriv = .deriv(varnames(object), deriv), 
+    object(data = data, deriv = .deriv(variable.names(object), deriv), 
            integrate = integrate)

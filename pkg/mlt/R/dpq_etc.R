@@ -8,7 +8,7 @@
 ### transformation function
 tmlt <- function(object, newdata = object$data, q = NULL, n = 50, ...) {
 
-    vn <- unlist(varnames(object$model$model))
+    vn <- unlist(variable.names(object$model$model))
     vnx <- vn[!(vn %in% object$response)]
     y <- object$response
     model <- object$model$model

@@ -7,7 +7,7 @@ b <- function(..., sumconstr = FALSE) {
     bnames <- names(bases)
     stopifnot(length(unique(bnames)) == length(bases))
 
-    varnames <- sapply(bases, varnames)
+    varnames <- sapply(bases, variable.names)
     stopifnot(all(!is.null(varnames)))
 
     attr(bases, "sumconstr") <- sumconstr
@@ -21,7 +21,7 @@ model.matrix.box_bases <- function(object, data, model.matrix = TRUE,
 
     if (model.matrix) stopifnot(is.data.frame(data))
 
-    varnames <- varnames(object)
+    varnames <- variable.names(object)
     bnames <- names(object)
 
     if (!is.null(deriv)) {
@@ -35,19 +35,19 @@ model.matrix.box_bases <- function(object, data, model.matrix = TRUE,
     ret <- lapply(bnames, function(b) {
         thisargs <- list()
         if (!is.null(deriv)) {
-            if (names(deriv) %in% varnames(object[[b]]))
+            if (names(deriv) %in% variable.names(object[[b]]))
                 thisargs$deriv <- deriv
             ### don't feed deriv to other basis functions
             ### because we look at their _product_ here
         }
         if (!is.null(integrate)) {
-            if (names(integrate) %in% varnames(object[[b]]))
+            if (names(integrate) %in% variable.names(object[[b]]))
                 thisargs$integrate <- integrate
         }
         thisargs$object <- object[[b]]
         thisargs$data <- data
         if (!is.null(dim))
-            thisargs$dim <- dim[names(dim) %in% varnames(object[[b]])]
+            thisargs$dim <- dim[names(dim) %in% variable.names(object[[b]])]
         X <- do.call("model.matrix", thisargs)
         attr(X, "Assign") <- rbind(attr(X, "Assign"), b)
         X
@@ -93,7 +93,7 @@ predict.box_bases <- function(object, newdata, coef,
     X$beta <- array(coef, sapply(X, NCOL))
     lp <- do.call(".cXb", X) 
 
-    vn <- varnames(object)
+    vn <- variable.names(object)
     ret <- .const_array(dim, unlist(vn), c(lp))
     ret
 }

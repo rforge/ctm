@@ -86,7 +86,7 @@ predict.model <- function(object, newdata, coef, ...) {
 predict.mlt <- function(object, newdata = NULL, ...) {
 
     if (is.null(newdata)) {
-        if (length(varnames(object)) == 1)
+        if (length(variable.names(object)) == 1)
             newdata <- data.frame(const = 1)
         else 
             newdata <- object$data

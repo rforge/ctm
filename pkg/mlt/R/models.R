@@ -27,7 +27,7 @@ model <- function(response, interacting = NULL, shifting = NULL,
     } else {
         mod <- c(binteracting = interacting, bshifting = shifting)
     }
-    ret <- list(model = mod, response = varnames(response), 
+    ret <- list(model = mod, response = variable.names(response), 
                 todistr = todistr)
     class(ret) <- "model"
     return(ret)
@@ -36,6 +36,6 @@ model <- function(response, interacting = NULL, shifting = NULL,
 model.matrix.model <- function(object, data, ...)
     return(model.matrix(object$model, data = data, ...))
 
-varnames.model <- function(x)
-    varnames(x$model)
+variable.names.model <- function(object, ...)
+    variable.names(object$model)
 

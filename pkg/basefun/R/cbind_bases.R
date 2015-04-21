@@ -8,7 +8,7 @@ c.basis <- function(..., recursive = FALSE) {
     stopifnot(all(sapply(bases, inherits, what = c("basis", "bases"))))
     bnames <- names(bases)
     stopifnot(length(unique(bnames)) == length(bases))
-    varnames <- sapply(bases, varnames)
+    varnames <- sapply(bases, variable.names)
     stopifnot(all(!is.null(varnames)))
     inter <- sapply(bases, intercept)
     if (sum(inter) > 1) 
@@ -26,7 +26,7 @@ model.matrix.cbind_bases <- function(object, data, model.matrix = TRUE,
     if (model.matrix) stopifnot(is.data.frame(data))
 
     bnames <- names(object)
-    varnames <- varnames(object)
+    varnames <- variable.names(object)
 
     ret <- lapply(bnames, function(b) {
         thisargs <- list()
@@ -35,7 +35,7 @@ model.matrix.cbind_bases <- function(object, data, model.matrix = TRUE,
         thisargs$object <- object[[b]]
         thisargs$data <- data
         if (!is.null(dim))
-            thisargs$dim <- dim[names(dim) %in% varnames(object[[b]])]
+            thisargs$dim <- dim[names(dim) %in% variable.names(object[[b]])]
         X <- do.call("model.matrix", thisargs)
         attr(X, "Assign") <- rbind(attr(X, "Assign"), b)
         X
