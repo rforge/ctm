@@ -63,7 +63,7 @@ predict.model <- function(object, newdata, coef, ...) {
             if (type == "quantile") {
                 probs <- y
                 stopifnot(all(probs >= 0 & probs <= 1))
-                y <- generate(object, n = n)[[object$response]]
+                y <- mkgrid(object, n = n)[[object$response]]
                 yt <- .type_of_response(y)
                 p <- c(0, tpdfun(y, "prob") , 1)
                 idx <- sapply(probs, function(prob) sum(p <= prob))
@@ -95,7 +95,7 @@ predict.mlt <- function(object, newdata = NULL, ...) {
             coef = coef(object, fixed = TRUE), ...)
 }
 
-plot.mlt <- function(x, formula, newdata = generate(x, n = 25), 
+plot.mlt <- function(x, formula, newdata = mkgrid(x, n = 25), 
                      what = c("trafo", "prob"), ### density, quantile, ...
                      plotfun = plot, ...) {
 
@@ -113,8 +113,8 @@ plot.mlt <- function(x, formula, newdata = generate(x, n = 25),
     plotfun(formula, data = nd, ...)
 }
 
-generate.mlt <- function(object, ...)
-    generate(object$model, ...)
+mkgrid.mlt <- function(object, ...)
+    mkgrid(object$model, ...)
 
-generate.model <- function(object, ...)
-    generate(object$model, ...)
+mkgrid.model <- function(object, ...)
+    mkgrid(object$model, ...)

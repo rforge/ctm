@@ -23,7 +23,7 @@ s <- as.basis(~ g, data = data.frame(g = gf), remove_intercept = TRUE)
 m <- model(response = Bb, shifting = s, todist = "MinExtrVal")
 (cf1 <- coef(opt <- mlt(m, data = mydata)))
 coef(cph <- coxph(Surv(y, rep(TRUE, nrow(mydata))) ~ g, data = mydata))
-yn <- generate(Bb, 50)$y
+yn <- mkgrid(Bb, 50)$y
 yn <- yn[yn > 0]
 a <- predict(opt, newdata = data.frame(g = gf))
 layout(matrix(1:4, ncol = 2))
@@ -45,7 +45,7 @@ sam <- simulate(opt, newdata = data.frame(g = gf), nsim = 100)
 nd <- data.frame(y = unlist(sam), g = rep(gf, length(sam)))
 opt2 <- mlt(m, data = nd)
 ## visualise
-yn <- generate(Bb, 50)$y
+yn <- mkgrid(Bb, 50)$y
 yn <- yn[yn > 0]
 a <- predict(opt, newdata = data.frame(g = gf))
 layout(matrix(1:4, ncol = 2))

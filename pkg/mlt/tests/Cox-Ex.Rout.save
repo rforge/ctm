@@ -59,7 +59,7 @@ Hessian:[1] TRUE
 > coef(cph <- coxph(Surv(y, rep(TRUE, nrow(mydata))) ~ g, data = mydata))
       g2       g3 
 0.699808 1.022699 
-> yn <- generate(Bb, 50)$y
+> yn <- mkgrid(Bb, 50)$y
 > yn <- yn[yn > 0]
 > a <- predict(opt, newdata = data.frame(g = gf))
 > layout(matrix(1:4, ncol = 2))
@@ -95,7 +95,7 @@ Hessian:[1] "Mean relative difference: 7.991511e-08"
 Gradient[1] TRUE
 Hessian:[1] TRUE
 > ## visualise
-> yn <- generate(Bb, 50)$y
+> yn <- mkgrid(Bb, 50)$y
 > yn <- yn[yn > 0]
 > a <- predict(opt, newdata = data.frame(g = gf))
 > layout(matrix(1:4, ncol = 2))
@@ -220,4 +220,4 @@ Warning messages:
 > 
 > proc.time()
    user  system elapsed 
-  5.828   0.076   5.892 
+  5.959   0.076   6.025 

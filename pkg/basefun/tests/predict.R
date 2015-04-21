@@ -20,7 +20,7 @@ stopifnot(length(p) == nrow(d))
 
 stopifnot(all.equal(p, c(p2), check.attributes = FALSE))
 
-(p4 <- predict(cb, newdata = generate(cb, 4), coef = rep(1, ncol(X))))
+(p4 <- predict(cb, newdata = mkgrid(cb, 4), coef = rep(1, ncol(X))))
 
 stopifnot(all.equal(p, c(p4), check.attributes = FALSE))
 

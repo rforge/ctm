@@ -42,16 +42,15 @@ support.basis <- function(x)
 support.bases <- function(x)
     lapply(x, support)
 
-generate <- function(object, n)
-    UseMethod("generate")
+mkgrid <- function(object, n)
+    UseMethod("mkgrid")
 
 ### <FIXME> can we generate only a subset of variables??? </FIXME>
-### <FIXME> rename to `design'? </FIXME>
-generate.basis <- function(object, n) {
+mkgrid.basis <- function(object, n) {
     ret <- list()
-    .generate <- function(s, n) {
+    .mkgrid <- function(s, n) {
         if (!is.atomic(s)) {
-            tmp <- lapply(s, .generate, n = n)
+            tmp <- lapply(s, .mkgrid, n = n)
             if (all(sapply(s, is.atomic)))
                 ret[names(tmp)] <<- tmp
         }
@@ -67,12 +66,12 @@ generate.basis <- function(object, n) {
         }
         return(x)
     }
-    ret2 <- .generate(support(object), n = n)
+    ret2 <- .mkgrid(support(object), n = n)
     if (length(ret) == 0) return(ret2)
     ret
 }
 
-generate.bases <- generate.basis
+mkgrid.bases <- mkgrid.basis
 
 as.basis <- function(object, ...)
     UseMethod("as.basis")

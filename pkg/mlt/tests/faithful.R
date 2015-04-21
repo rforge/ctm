@@ -32,7 +32,7 @@ abline(h = AIC(mod))
 
 p <- predict(mod, newdata = data.frame(1))
 
-y <- generate(mod, 100)$waiting
+y <- mkgrid(mod, 100)$waiting
 
 tr <- p[[1]](y)
 tr1 <- p[[1]](y, deriv = c(waiting = 1))
@@ -43,7 +43,7 @@ abline(h = 0)
 
 d <- predict(mod, newdata = data.frame(1))
 
-y <- generate(mod, 100)$waiting
+y <- mkgrid(mod, 100)$waiting
 
 tr <- d[[1]](y, type = "density")
 lines(y, tr, type = "l", col = "blue", lwd = 1)
@@ -73,7 +73,7 @@ if (FALSE) {
 library("multcomp")
 
 mp <- parm(coef(mod), vcov(mod))
-y <- generate(mod, 30)$waiting
+y <- mkgrid(mod, 30)$waiting
 g <- glht(mp, linfct = model.matrix(mod$model,
     data = data.frame(waiting = y)))
 

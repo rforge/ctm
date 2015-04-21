@@ -34,7 +34,7 @@ tmlt <- function(object, newdata = object$data, q = NULL, n = 50, ...) {
         ### extra quantiles, compute transformation
         ### for each q and each row of newdata
         if (is.null(q)) 
-            q <- generate(object, n = n)[[y]]
+            q <- mkgrid(object, n = n)[[y]]
         stopifnot(length(unique(q)) == length(q))
         dim <- c(length(q), nrow(newdata))
 
@@ -130,7 +130,7 @@ qmlt <- function(object, newdata = object$data, p = .5, n = 50,
     y <- object$response
     ### don't accept user-generated quantiles
     newdata[[y]] <- NULL
-    q <- generate(object, n = n)[[y]]
+    q <- mkgrid(object, n = n)[[y]]
     if (is.data.frame(newdata)) {
         prob <- pmlt(object, newdata, q = q)
     } else {
@@ -193,7 +193,7 @@ simulate.mlt <- function(object, nsim = 1, seed = NULL,
     y <- object$response
     newdata[[y]] <- NULL
     ### don't accept user-generated quantiles
-    q <- generate(object, n = n)[[y]]
+    q <- mkgrid(object, n = n)[[y]]
     if (is.data.frame(newdata)) {
         p <- runif(nsim * NROW(newdata))
         ### basically compute quantiles for p; see qmlt
@@ -254,7 +254,7 @@ dmlt <- function(object, newdata = object$data, q = NULL, n = 50,
             ### extra quantiles, compute density
             ### for each q and each row of newdata 
             if (is.null(q))
-                q <- generate(object, n = n)[[y]]
+                q <- mkgrid(object, n = n)[[y]]
 
             first <- q == lev[1]
             qfirst <- q[first]

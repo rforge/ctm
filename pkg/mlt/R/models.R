@@ -3,7 +3,7 @@ model <- function(response, interacting = NULL, shifting = NULL,
                   todistr = c("Normal", "Logistic", "MinExtrVal"), 
                   sumconstr = inherits(interacting, c("formula", "formula_basis"))) {
 
-    ### generate() will not work due to missing data
+    ### mkgrid() will not work due to missing data
     if (.is.formula(response)) 
         response <- as.basis(response)
     if (.is.formula(interacting)) 

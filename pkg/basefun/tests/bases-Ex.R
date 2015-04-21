@@ -24,7 +24,7 @@ stopifnot(all.equal(fitted(m1), fitted(m0)))
 
 stopifnot(all.equal(coef(m1), coef(m2), check.attributes = FALSE))
 ## generate new data from support of basis
-xn <- generate(Bb, n = 100)
+xn <- mkgrid(Bb, n = 100)
 ## compute estimated regression function
 p1 <- predict(Bb, newdata = data.frame(x = xn), coef = coef(m1))
 p2 <- predict(m2, newdata = data.frame(x = xn)) 
@@ -52,7 +52,7 @@ m1 <- lm(y ~  X1 - 1)
 m2 <- lm(y ~  model.matrix(bb, data.frame(x = x, g = g)) - 1, data = data.frame(y = y, x = x, g = g))
 stopifnot(all.equal(coef(m1), coef(m2), check.attributes = FALSE))
 ## compute estimated regression functions
-d <- generate(bb, n = 100)
+d <- mkgrid(bb, n = 100)
 ## for each group
 p1 <- sapply(gf, function(l) predict(bb, newdata = data.frame(x = d$x, g = l), coef = coef(m1)))
 ## the same via _linear array_ approach
@@ -77,7 +77,7 @@ m1 <- lm(y ~  X1 - 1)
 m2 <- lm(y ~  model.matrix(bb, data.frame(x = x, g = g)) - 1, data = data.frame(y = y, x = x, g = g))
 stopifnot(all.equal(coef(m1), coef(m2), check.attributes = FALSE))
 ## compute estimated regression functions
-d <- generate(bb, n = 100)
+d <- mkgrid(bb, n = 100)
 ## for each group
 p1 <- c(sapply(gf, function(l) predict(bb, newdata = data.frame(x = d$x, g = l), coef = coef(m1))))
 ## the same via expand.grid approach

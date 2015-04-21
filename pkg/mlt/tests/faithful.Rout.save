@@ -105,7 +105,7 @@ Hessian:[1] TRUE
 > 
 > p <- predict(mod, newdata = data.frame(1))
 > 
-> y <- generate(mod, 100)$waiting
+> y <- mkgrid(mod, 100)$waiting
 > 
 > tr <- p[[1]](y)
 > tr1 <- p[[1]](y, deriv = c(waiting = 1))
@@ -116,7 +116,7 @@ Hessian:[1] TRUE
 > 
 > d <- predict(mod, newdata = data.frame(1))
 > 
-> y <- generate(mod, 100)$waiting
+> y <- mkgrid(mod, 100)$waiting
 > 
 > tr <- d[[1]](y, type = "density")
 > lines(y, tr, type = "l", col = "blue", lwd = 1)
@@ -169,7 +169,7 @@ Bs9(waiting)   -0.7427120    0.8292216   -0.9214160    1.0000000
 + library("multcomp")
 + 
 + mp <- parm(coef(mod), vcov(mod))
-+ y <- generate(mod, 30)$waiting
++ y <- mkgrid(mod, 30)$waiting
 + g <- glht(mp, linfct = model.matrix(mod$model,
 +     data = data.frame(waiting = y)))
 + 
@@ -193,4 +193,4 @@ Bs9(waiting)   -0.7427120    0.8292216   -0.9214160    1.0000000
 > 
 > proc.time()
    user  system elapsed 
-  9.796   0.069   9.856 
+ 10.251   0.087  10.331 

@@ -50,7 +50,7 @@ Hessian:[1] TRUE
 > d <- opt$todistr
 > 
 > ### evaluate on grid
-> yn <- generate(Bb, n = 50)$y
+> yn <- mkgrid(Bb, n = 50)$y
 > ### eval estimated h and h'
 > h <- predict(Bb, newdata = data.frame(y = yn), coef = opt$par)
 > h1 <- predict(Bb, newdata = data.frame(y = yn), deriv = c(y = 1), coef = opt$par)
@@ -74,4 +74,4 @@ Hessian:[1] TRUE
 > 
 > proc.time()
    user  system elapsed 
-  1.950   0.079   2.018 
+  2.119   0.041   2.149 

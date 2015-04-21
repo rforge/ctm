@@ -18,7 +18,7 @@ opt <- mlt(model(response = Bb), data = mydata)
 d <- opt$todistr
 
 ### evaluate on grid
-yn <- generate(Bb, n = 50)$y
+yn <- mkgrid(Bb, n = 50)$y
 ### eval estimated h and h'
 h <- predict(Bb, newdata = data.frame(y = yn), coef = opt$par)
 h1 <- predict(Bb, newdata = data.frame(y = yn), deriv = c(y = 1), coef = opt$par)
