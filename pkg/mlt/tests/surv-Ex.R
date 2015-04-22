@@ -39,4 +39,29 @@ cbind(unclass(s), mlt:::.Surv2matrix(s))
 attr(s, "type")
 cbind(unclass(s), mlt:::.Surv2matrix(s))
 
+### new interface
+tm <- runif(10)
+e <- sample(c(TRUE, FALSE), length(tm), replace = TRUE)
+s <- Surv(tm, e)
+cbind(s, as.data.frame(mlt:::.Surv2matrix(s)))
+cbind(s, mlt:::.Surv2R(s))
+
+s <- Surv(tm, e, type = "left")
+cbind(s, as.data.frame(mlt:::.Surv2matrix(s)))
+cbind(s, mlt:::.Surv2R(s))
+
+s <- Surv(tm, tm + 1, type = "interval2")
+cbind(s, as.data.frame(mlt:::.Surv2matrix(s)))
+cbind(s, mlt:::.Surv2R(s))
+
+s <- Surv(tm, tm + 1, sample(0:3, length(tm), replace = TRUE), type = "interval")
+cbind(s, as.data.frame(mlt:::.Surv2matrix(s)))
+cbind(s, mlt:::.Surv2R(s))
+
+s <- Surv(tm, tm + 1, e, type = "counting")
+cbind(s, as.data.frame(mlt:::.Surv2matrix(s)))
+cbind(s, mlt:::.Surv2R(s))
+
+R(gl(3, 2, ordered = TRUE))
+R(0:10)
 
