@@ -5,10 +5,10 @@ coef.mlt <- function(object, fixed = TRUE, ...) {
     return(object$par)
 }
 
-"coef<-" <- function(object, value, ...)
+"coef<-" <- function(object, value)
     UseMethod("coef<-")
 
-"coef<-.mlt" <- function(object, value, ...) {
+"coef<-.mlt" <- function(object, value) {
     cf <- coef(object, fixed = TRUE)
     stopifnot(length(cf) == length(value))
     if (!is.null(names(value)))
