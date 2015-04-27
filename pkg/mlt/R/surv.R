@@ -106,8 +106,9 @@ R <- function(exact = NA, cleft = NA, cright = NA,
             if (!is.ordered(exact)) 
                 warning("response is unordered factor; results may depend on order of levels")
             stopifnot(all(is.na(c(tleft, cleft, cright, tright))))
-            cright <- as.ordered(exact)
             lev <- levels(exact)
+            cright <- as.ordered(exact)
+            cright[cright == lev[nlevels(exact)]] <- NA
             cleft <- factor(unclass(exact) - 1, levels = 1:length(lev), 
                             labels = lev, exclude = 0, ordered = TRUE)
             exact <- NA
@@ -155,6 +156,7 @@ R <- function(exact = NA, cleft = NA, cright = NA,
 .mm_exact <- function(model, data, response, object) {
 
     e <- .exact(object)
+    if (!any(e)) return(NULL)
     tmp <- data[e,,drop = FALSE]
     tmp[[response]] <- object$exact[e]
     Y <- model.matrix(model, data = tmp)
@@ -168,10 +170,12 @@ R <- function(exact = NA, cleft = NA, cright = NA,
         Ytright <- matrix(Inf, nrow = nrow(Y), ncol = ncol(Y))
         if (any(il <- (.tleft(object) & e))) {
             tmp <- data[il,]
+            tmp[[response]] <- object$tleft[il]
             Ytleft[il,] <- model.matrix(model, data = tmp)
         }
         if (any(ir <- (.tright(object) & e))) {
             tmp <- data[ir,]
+            tmp[[response]] <- object$tright[ir]
             Ytright[ir,] <- model.matrix(model, data = tmp)
         }
         trunc <- list(left = Ytleft, right = Ytright)
@@ -183,39 +187,52 @@ R <- function(exact = NA, cleft = NA, cright = NA,
 .mm_interval <- function(model, data, response, object) {
 
     i <- .cinterval(object)
-    tmp <- data[i,,drop = FALSE]
+    if (!any(i)) return(NULL)
+    tmpdata <- data[i,,drop = FALSE]
+    object <- object[i,, drop = FALSE]
 
     Yleft <- NULL
     if (any(il <- .cleft(object))) {
-        tmp <- data[il,]
+        tmp <- tmpdata[il,]
+        tmp[[response]] <- object$cleft[il]
         Ytmp <- model.matrix(model, data = tmp)
-        Yleft <- matrix(-Inf, nrow = length(i), ncol = ncol(Ytmp))
-        Yleft[il & i,] <- Ytmp
+        Yleft <- matrix(-Inf, nrow = length(il), ncol = ncol(Ytmp))
+        colnames(Yleft) <- colnames(Ytmp)
+        Yleft[il,] <- Ytmp
     }
 
     Yright <- NULL
     if (any(ir <- .cright(object))) {
-        tmp <- data[ir,]
+        tmp <- tmpdata[ir,]
+        tmp[[response]] <- object$cright[ir]
         Ytmp <- model.matrix(model, data = tmp)
-        Yright <- matrix(Inf, nrow = length(i), ncol = ncol(Ytmp))
-        Yright[ir & i,] <- Ytmp
+        Yright <- matrix(Inf, nrow = length(ir), ncol = ncol(Ytmp))
+        colnames(Yright) <- colnames(Ytmp)
+        Yright[ir,] <- Ytmp
     }
 
-    if (is.null(Yright)) 
+    if (is.null(Yright)) { 
         Yright <- matrix(Inf, nrow = nrow(Yleft), ncol = ncol(Yleft))
-    if (is.null(Yleft)) 
+        colnames(Yright) <- colnames(Yleft)
+    }
+    if (is.null(Yleft)) {
         Yleft <- matrix(-Inf, nrow = nrow(Yright), ncol = ncol(Yright))
+        colnames(Yleft) <- colnames(Yright)
+    }
 
     trunc <- NULL
-    if (any(.tinterval(object) & i)) {
+    if (any(.tinterval(object))) {
         Ytleft <- matrix(-Inf, nrow = nrow(Yleft), ncol = ncol(Yleft))
         Ytright <- matrix(Inf, nrow = nrow(Yleft), ncol = ncol(Yleft))
-        if (any(il <- (.tleft(object) & i))) {
-            tmp <- data[il,]
+        colnames(Ytleft) <- colnames(Ytright) <- colnames(Yleft)
+        if (any(il <- (.tleft(object)))) {
+            tmp <- tmpdata[il,]
+            tmp[[response]] <- object$cleft[il]
             Ytleft[il,] <- model.matrix(model, data = tmp)
         }
-        if (any(ir <- (.tright(object) & i))) {
-            tmp <- data[ir,]
+        if (any(ir <- (.tright(object)))) {
+            tmp <- tmpdata[ir,]
+            tmp[[response]] <- object$cleft[ir]
             Ytright[ir,] <- model.matrix(model, data = tmp)
         }
         trunc <- list(left = Ytleft, right = Ytright)
