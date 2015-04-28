@@ -11,10 +11,14 @@ Bs <- Bernstein_basis(order = o, var = "waiting", ui = "incre",
                       support = range(faithful$waiting) + c(-5, 5))
 m <- model(Bs)
 mod <- mlt(m, data = faithful)
+yp <- mkgrid(mod, 50)[["waiting"]]
 
 aic[o - 1] <- AIC(mod)
 
-plot(mod, ~ waiting, what = "prob",  
+pd <- data.frame(waiting = yp)
+pd$p <- predict(mod, q = yp, type = "distribution")
+
+plot(p ~ waiting, data = pd,
      col = "red", pch = 21, main = paste("order", o, "aic", aic[o - 1]))
 lines(ecdf(faithful$waiting))
 
@@ -30,27 +34,17 @@ mod <- mlt(m, data = faithful)
 
 abline(h = AIC(mod))
 
-p <- predict(mod, newdata = data.frame(1))
+pd$d <- predict(mod, q = yp, type = "density")
 
-y <- mkgrid(mod, 100)$waiting
-
-tr <- p[[1]](y)
-tr1 <- p[[1]](y, deriv = c(waiting = 1))
-plot(y, mod$todistr$d(tr) * tr1, type = "l", col = "red", lwd = 3)
+plot(d ~ waiting, data = pd, type = "l", col = "red", lwd = 3)
 lines(density(faithful$waiting))
 lines(rug(faithful$waiting))
 abline(h = 0)
 
-d <- predict(mod, newdata = data.frame(1))
-
-y <- mkgrid(mod, 100)$waiting
-
-tr <- d[[1]](y, type = "density")
-lines(y, tr, type = "l", col = "blue", lwd = 1)
-
 p <- 1:99 / 100
+q <- predict(mod, p = p, n = 100, type = "quantile")
 
-plot(p, d[[1]](p, type = "quantile"))
+plot(p, q)
 lines(p, quantile(faithful$waiting, p))
 
 Bs <- Bernstein_basis(order = o, var = "waiting", ui = "incre", # normal = TRUE,

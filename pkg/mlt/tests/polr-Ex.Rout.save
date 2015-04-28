@@ -72,4 +72,4 @@ Re-fitting to get Hessian
 > 
 > proc.time()
    user  system elapsed 
-  1.825   0.063   1.879 
+  1.747   0.077   1.814 

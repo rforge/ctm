@@ -6,18 +6,28 @@
 }
 
 ### transformation function
-tmlt <- function(object, newdata = object$data, q = NULL, n = 50, ...) {
+tmlt <- function(object, newdata = object$data, q = NULL, ...) {
 
     vn <- unlist(variable.names(object$model$model))
     vnx <- vn[!(vn %in% object$response)]
     y <- object$response
     model <- object$model$model
 
+    stopifnot(!is.null(newdata[[y]]) || !is.null(q))
+
     if (is.data.frame(newdata)) {
+
+        ### unconditional
+        if (length(vnx) == 0 & !is.null(q)) {
+            newdata <- data.frame(q)
+            names(newdata) <- y
+            q <- NULL
+        }
 
         ### in sample predictions
         ### this will _not_ work for censored responses
         if (!is.null(newdata[[y]]) & is.null(q)) {
+            stopifnot(is.atomic(newdata[[y]]))
             ret <- c(predict(model, newdata = newdata, 
                              coef = coef(object), ...))
             names(ret) <- rownames(newdata)
@@ -33,8 +43,7 @@ tmlt <- function(object, newdata = object$data, q = NULL, n = 50, ...) {
 
         ### extra quantiles, compute transformation
         ### for each q and each row of newdata
-        if (is.null(q)) 
-            q <- mkgrid(object, n = n)[[y]]
+        stopifnot(is.atomic(q))
         stopifnot(length(unique(q)) == length(q))
         dim <- c(length(q), nrow(newdata))
 
@@ -63,6 +72,7 @@ tmlt <- function(object, newdata = object$data, q = NULL, n = 50, ...) {
     ### need to generate newdata outside tmlt such that
     ### the rows of expand.grid(newdata) match the elements of
     ### the return value
+    stopifnot(is.atomic(newdata[[y]]))
     stopifnot(is.null(q))
     stopifnot(y %in% names(newdata))
     ret <- predict(object$model$model, newdata = newdata, 
@@ -87,17 +97,17 @@ tmlt <- function(object, newdata = object$data, q = NULL, n = 50, ...) {
 }
 
 ### distribution function
-pmlt <- function(object, newdata = object$data, q = NULL, n = 50)
+pmlt <- function(object, newdata = object$data, q = NULL)
     object$model$todistr$p(tmlt(object = object, newdata = newdata,
-                                q = q, n = n))
+                                q = q))
 
 ### survivor function
-smlt <- function(object, newdata = object$data, q = NULL, n = 50)
-    1 - pmlt(object = object, newdata = newdata, q = q, n = n)
+smlt <- function(object, newdata = object$data, q = NULL)
+    1 - pmlt(object = object, newdata = newdata, q = q)
 
 ### cumulative hazard function
-Hmlt <- function(object, newdata = object$data, q = NULL, n = 50)
-    -log(smlt(object = object, newdata = newdata, q = q, n = n))
+Hmlt <- function(object, newdata = object$data, q = NULL)
+    -log(smlt(object = object, newdata = newdata, q = q))
 
 ### numerical inversion of distribution function
 ### to get quantile function
@@ -129,16 +139,16 @@ qmlt <- function(object, newdata = object$data, p = .5, n = 50,
 
     y <- object$response
     ### don't accept user-generated quantiles
-    newdata[[y]] <- NULL
     q <- mkgrid(object, n = n)[[y]]
-    if (is.data.frame(newdata)) {
-        prob <- pmlt(object, newdata, q = q)
-    } else {
+    if (!is.null(newdata) & !is.data.frame(newdata)) {
+        newdata[[y]] <- NULL
         nm <- names(newdata)
         newdata[[y]] <- q
         newdata <- newdata[c(y, nm)]
         prob <- pmlt(object, newdata)
-    }
+    } else {
+        prob <- pmlt(object, newdata = newdata, q = q)
+    } 
 
     ### convert potential array-values distribition function
     ### to matrix where rows correspond to observations newdata 
@@ -218,22 +228,23 @@ simulate.mlt <- function(object, nsim = 1, seed = NULL,
 }
 
 ### density
-dmlt <- function(object, newdata = object$data, q = NULL, n = 50, 
-                 log = FALSE) {
+dmlt <- function(object, newdata = object$data, q = NULL, log = FALSE) {
 
     response <- object$data[[y <- object$response]]
 
     ### Lebesgue density only for double
     if (.type_of_response(response) == "double") {
-        trafo <- tmlt(object, newdata = newdata, q = q, n = n)
+        trafo <- tmlt(object, newdata = newdata, q = q)
         deriv <- 1
         names(deriv) <- y
-        trafoprime <- tmlt(object, newdata = newdata, q = q, n = n, 
+        trafoprime <- tmlt(object, newdata = newdata, q = q, 
                            deriv = deriv)
         if (log)
             return(object$model$todistr$d(trafo, log = TRUE) + log(trafoprime))
         return(object$model$todistr$d(trafo) * trafoprime)
     }
+
+    stopifnot(!is.null(newdata[[y]]) || !is.null(q))
 
     ### for factors and integers compute density as F(y) - F(y - 1)
     lev <- levels(response)
@@ -241,6 +252,7 @@ dmlt <- function(object, newdata = object$data, q = NULL, n = 50,
 
         ### in sample density
         if (!is.null(newdata[[y]]) & is.null(q)) {
+            stopifnot(is.atomic(newdata[[y]]))
             q <- newdata[[y]]
             first <- q == lev[1]
             qwoK <- factor(lev[pmax(unclass(q) - 1), 1], 
@@ -253,9 +265,7 @@ dmlt <- function(object, newdata = object$data, q = NULL, n = 50,
         } else {
             ### extra quantiles, compute density
             ### for each q and each row of newdata 
-            if (is.null(q))
-                q <- mkgrid(object, n = n)[[y]]
-
+            stopifnot(is.atomic(q))
             first <- q == lev[1]
             qfirst <- q[first]
             qwoK <- q[q != lev[length(lev)]]
@@ -273,7 +283,7 @@ dmlt <- function(object, newdata = object$data, q = NULL, n = 50,
         ### need to generate newdata outside tmlt such that
         ### the rows of expand.grid(newdata) match the elements of
         ### the return value
-
+        stopifnot(is.atomic(newdata[[y]]))
         stopifnot(is.null(q))
         stopifnot(y %in% names(newdata))
         dim <- sapply(newdata, NROW)
@@ -320,11 +330,10 @@ dmlt <- function(object, newdata = object$data, q = NULL, n = 50,
 }
 
 ### hazard function
-hmlt <- function(object, newdata = object$data, q = NULL, n = 50, 
-                 log = FALSE) {
+hmlt <- function(object, newdata = object$data, q = NULL, log = FALSE) {
     if (log) 
-        return(dmlt(object, newdata = newdata, q = q, n = n, log = log) -
-               log(smlt(object, newdata = newdata, q = q, n = n)))
-    return(dmlt(object, newdata = object$data, q = q, n = n, log = log) /
-           smlt(object, newdata = object$data, q = q, n = n))
+        return(dmlt(object, newdata = newdata, q = q, log = TRUE) -
+               log(smlt(object, newdata = newdata, q = q)))
+    return(dmlt(object, newdata = object$data, q = q, log = FALSE) /
+           smlt(object, newdata = object$data, q = q))
 }

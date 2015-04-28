@@ -39,12 +39,11 @@ m <- model(r, interacting = as.basis(~ Sepal.Length + Sepal.Width + Petal.Length
 m2 <- mlt(m, data = oiris)
 coef(m2)
 
-s <- sort(unique(oiris$Species))[1:2]
-p2 <- do.call("rbind", lapply(predict(m2, newdata = oiris), 
-                              function(f) f(s, type = "prob")))
-pp2 <- cbind(p2[,1], p2[,2] - p2[,1], 1 - p2[,2])
+s <- sort(unique(oiris$Species))
+
+pp2 <- predict(m2, newdata = oiris, q = s, type = "density")
 
 pp1 <- predict(m1, newdata = iris, type = "prob")
 
-max(abs(pp1 - pp2))
+max(abs(pp1 - t(pp2)))
 

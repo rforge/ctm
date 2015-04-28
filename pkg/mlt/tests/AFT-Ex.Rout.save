@@ -133,9 +133,9 @@ Hessian:[1] TRUE
 > 
 > mydata <- data.frame(y = Surv(y, sample(0:1, length(y), replace = TRUE)), g = g)
 > coef(opt <- mlt(m, data = mydata, fixed = c("log(y)" = 1)))
-Gradient[1] "Mean relative difference: 5.781776e-05"
+Gradient[1] "Mean relative difference: 4.497023e-05"
 Hessian:[1] TRUE
-[1]  1.0000000 -0.9905065  1.0241375  1.2525848
+[1]  1.0000000 -0.9905069  1.0241381  1.2525855
 > 
 > ## Estimate coefficients 
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "expo"))
@@ -171,9 +171,9 @@ Hessian:[1] TRUE
 > 
 > ## Estimate coefficients
 > coef(opt <- mlt(m, data = mydata,  fixed = c("log(y)" = 1)))
-Gradient[1] "Mean relative difference: 0.004125379"
+Gradient[1] "Mean relative difference: 7.123942e-06"
 Hessian:[1] TRUE
-[1] 1.0000000 0.2828844 0.7853477 1.1284821
+[1] 1.0000000 0.2828846 0.7853469 1.1284812
 > 
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "expo"))
 (Intercept)          g2          g3 
@@ -204,9 +204,9 @@ Error in phreg(y ~ g, data = mydata, dist = "weibull", shape = 1) :
 +                      type = "interval"), g = g)
 > 
 > coef(opt<- mlt(m, data = mydata, fixed = c("log(y)" = 1)))
-Gradient[1] "Mean relative difference: 1.677142e-05"
+Gradient[1] "Mean relative difference: 0.0009422485"
 Hessian:[1] TRUE
-[1]  1.0000000 -0.5531928  0.8600625  1.2789399
+[1]  1.0000000 -0.5531934  0.8600648  1.2789393
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "expo"))
 (Intercept)          g2          g3 
   0.5531934  -0.8600648  -1.2789393 
@@ -215,7 +215,7 @@ Hessian:[1] TRUE
 > ## MLT
 > sqrt(diag(vcov(opt)))[c("g2", "g3")]
        g2        g3 
-0.1740433 0.1726433 
+0.1740432 0.1726434 
 > ## phreg
 > sqrt(diag(phreg$var))[c("g2", "g3")]
        g2        g3 
@@ -321,13 +321,13 @@ log(shape)
 > 
 > ## Estimate coefficients
 > (cf <- coef(opt <- mlt(m, data = mydata)))
-Gradient[1] "Mean relative difference: 0.000160409"
+Gradient[1] "Mean relative difference: 3.318987e-05"
 Hessian:[1] TRUE
      log(y) (Intercept)          g2          g3 
-  2.9704379  -0.5337426  -2.1300104  -3.3635876 
+  2.9704376  -0.5337423  -2.1300103  -3.3635874 
 > cf[-1] / cf[1]
 (Intercept)          g2          g3 
- -0.1796848  -0.7170695  -1.1323541 
+ -0.1796847  -0.7170695  -1.1323541 
 > 
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "weibull"))
 (Intercept)          g2          g3 
@@ -368,13 +368,13 @@ Hessian:[1] TRUE
 > 
 > ## Estimate coefficients
 > (cf <- coef(opt <- mlt(m, data = mydata)))
-Gradient[1] "Mean relative difference: 4.085317e-05"
+Gradient[1] "Mean relative difference: 2.736234e-06"
 Hessian:[1] TRUE
      log(y) (Intercept)          g2          g3 
-  2.1201727   0.5300823  -1.5420718  -2.3381619 
+  2.1201709   0.5300812  -1.5420690  -2.3381582 
 > cf[-1] / cf[1]
 (Intercept)          g2          g3 
-  0.2500185  -0.7273331  -1.1028167 
+  0.2500182  -0.7273324  -1.1028159 
 > 
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "weibull"))
 (Intercept)          g2          g3 
@@ -394,13 +394,13 @@ Hessian:[1] TRUE
 > 
 > ## Estimate coefficients
 > (cf <- coef(opt <- mlt(m, data = mydata)))
-Gradient[1] "Mean relative difference: 3.697288e-05"
+Gradient[1] "Mean relative difference: 0.001440967"
 Hessian:[1] TRUE
      log(y) (Intercept)          g2          g3 
-  2.7086329  -0.4274823  -1.7414275  -2.7584069 
+  2.7086374  -0.4274808  -1.7414335  -2.7584148 
 > cf[-1] / cf[1]
 (Intercept)          g2          g3 
- -0.1578222  -0.6429175  -1.0183760 
+ -0.1578214  -0.6429186  -1.0183773 
 > 
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "weibull"))
 (Intercept)          g2          g3 
@@ -415,4 +415,4 @@ Hessian:[1] TRUE
 > 
 > proc.time()
    user  system elapsed 
-  3.009   0.070   3.066 
+  3.008   0.080   3.077 

@@ -314,8 +314,8 @@ Loading required package: numDeriv
 2    NA  <NA>    NA      1     NA
 3    NA     1    NA      2     NA
 4    NA     1    NA      2     NA
-5    NA     2    NA      3     NA
-6    NA     2    NA      3     NA
+5    NA     2    NA   <NA>     NA
+6    NA     2    NA   <NA>     NA
 > R(0:10)
    tleft cleft exact cright tright
 1     NA    NA    NA      0     NA
@@ -333,4 +333,4 @@ Loading required package: numDeriv
 > 
 > proc.time()
    user  system elapsed 
-  1.680   0.073   1.742 
+  1.717   0.064   1.764 

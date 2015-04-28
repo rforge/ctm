@@ -61,15 +61,16 @@ Hessian:[1] TRUE
 0.699808 1.022699 
 > yn <- mkgrid(Bb, 50)$y
 > yn <- yn[yn > 0]
-> a <- predict(opt, newdata = data.frame(g = gf))
+> a <- predict(opt, newdata = data.frame(g = gf[1]), q = yn)
 > layout(matrix(1:4, ncol = 2))
-> plot(yn, a[[1]](yn, type = "trafo"), type = "l", col = "red")
+> plot(yn, a, type = "l", col = "red")
 > lines(yn, log(yn))
-> plot(yn, 1 - a[[1]](yn, type = "prob"), type = "l", col = "red", ylim = c(0, 1))
+> a <- predict(opt, newdata = data.frame(g = gf), q = yn, type = "survivor")
+> plot(yn, a[,1], type = "l", col = "red", ylim = c(0, 1))
 > lines(survfit(cph, newdata = data.frame(g = gf[1])))
-> plot(yn, 1 - a[[2]](yn, type = "prob"), type = "l", col = "red", ylim = c(0, 1))
+> plot(yn, a[,2], type = "l", col = "red", ylim = c(0, 1))
 > lines(survfit(cph, newdata = data.frame(g = gf[2])))
-> plot(yn, 1 - a[[3]](yn, type = "prob"), type = "l", col = "red", ylim = c(0, 1))
+> plot(yn, a[,3], type = "l", col = "red", ylim = c(0, 1))
 > lines(survfit(cph, newdata = data.frame(g = gf[3])))
 > 
 > ### h = c(log, bernstein)
@@ -97,15 +98,16 @@ Hessian:[1] TRUE
 > ## visualise
 > yn <- mkgrid(Bb, 50)$y
 > yn <- yn[yn > 0]
-> a <- predict(opt, newdata = data.frame(g = gf))
+> a <- predict(opt, newdata = data.frame(g = gf[1]), q = yn)
 > layout(matrix(1:4, ncol = 2))
-> plot(yn, a[[1]](yn, type = "trafo"), type = "l", col = "red")
+> plot(yn, a, type = "l", col = "red")
 > lines(yn, log(yn))
-> plot(yn, 1 - a[[1]](yn, type = "prob"), type = "l", col = "red", ylim = c(0, 1))
+> a <- predict(opt, newdata = data.frame(g = gf), q = yn, type = "survivor")
+> plot(yn, a[,1], type = "l", col = "red", ylim = c(0, 1))
 > lines(survfit(cph, newdata = data.frame(g = gf[1])))
-> plot(yn, 1 - a[[2]](yn, type = "prob"), type = "l", col = "red", ylim = c(0, 1))
+> plot(yn, a[,2], type = "l", col = "red", ylim = c(0, 1))
 > lines(survfit(cph, newdata = data.frame(g = gf[2])))
-> plot(yn, 1 - a[[3]](yn, type = "prob"), type = "l", col = "red", ylim = c(0, 1))
+> plot(yn, a[,3], type = "l", col = "red", ylim = c(0, 1))
 > lines(survfit(cph, newdata = data.frame(g = gf[3])))
 > 
 > ### right censoring
@@ -207,17 +209,19 @@ Warning messages:
       g2       g3 
 0.699808 1.022699 
 > ## visualize
-> a <- predict(opt, newdata = data.frame(g = gf))
+> a <- predict(opt, newdata = data.frame(g = gf[1]), q = yn)
 > layout(matrix(1:4, ncol = 2))
-> plot(yn, a[[1]](yn), type = "l", col = "red")
+> plot(yn, a, type = "l", col = "red")
 > lines(yn, log(yn))
-> plot(yn, 1 - a[[1]](yn, type = "prob"), type = "l", col = "red", ylim = c(0, 1))
+> a <- predict(opt, newdata = data.frame(g = gf), q = yn, type = "survivor")
+> plot(yn, a[,1], type = "l", col = "red", ylim = c(0, 1))
 > lines(survfit(cph, newdata = data.frame(g = gf[1])))
-> plot(yn, 1 - a[[2]](yn, type = "prob"), type = "l", col = "red", ylim = c(0, 1))
+> plot(yn, a[,2], type = "l", col = "red", ylim = c(0, 1))
 > lines(survfit(cph, newdata = data.frame(g = gf[2])))
-> plot(yn, 1 - a[[3]](yn, type = "prob"), type = "l", col = "red", ylim = c(0, 1))
+> plot(yn, a[,3], type = "l", col = "red", ylim = c(0, 1))
 > lines(survfit(cph, newdata = data.frame(g = gf[3])))
+> 
 > 
 > proc.time()
    user  system elapsed 
-  5.959   0.076   6.025 
+  6.893   0.072   6.954 

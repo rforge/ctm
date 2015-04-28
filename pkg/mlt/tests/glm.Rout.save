@@ -47,8 +47,8 @@ Loading required package: numDeriv
 Gradient[1] "Mean relative difference: 0.0002899951"
 Hessian:[1] TRUE
 Warning message:
-In .mlt_setup(list(model = list(bresponse = function (data, deriv = 0L)  :
-  results may depend on ordering of levels
+In R(exact = y) :
+  response is unordered factor; results may depend on order of levels
 > coef(m2)
 [1] -0.7372381  0.0000000  0.3848546  0.8292046
 > 
@@ -111,17 +111,16 @@ Species1:Petal.Length Species2:Petal.Length  Species1:Petal.Width
  Species2:Petal.Width 
          -18.28610232 
 > 
-> s <- sort(unique(oiris$Species))[1:2]
-> p2 <- do.call("rbind", lapply(predict(m2, newdata = oiris), 
-+                               function(f) f(s, type = "prob")))
-> pp2 <- cbind(p2[,1], p2[,2] - p2[,1], 1 - p2[,2])
+> s <- sort(unique(oiris$Species))
+> 
+> pp2 <- predict(m2, newdata = oiris, q = s, type = "density")
 > 
 > pp1 <- predict(m1, newdata = iris, type = "prob")
 > 
-> max(abs(pp1 - pp2))
+> max(abs(pp1 - t(pp2)))
 [1] 0.001176896
 > 
 > 
 > proc.time()
    user  system elapsed 
-  4.962   0.064   5.018 
+  3.728   0.072   3.789 

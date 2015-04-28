@@ -97,4 +97,4 @@ y:(Intercept)
 > 
 > proc.time()
    user  system elapsed 
-  1.910   0.057   1.955 
+  2.016   0.068   2.072 

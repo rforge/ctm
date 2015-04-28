@@ -73,7 +73,9 @@ sigma       -7.445133e-06  1.637489e-06  3.940881e-05
 > fm <- as.formula("~ x")
 > yb <- polynomial_basis(c(TRUE, TRUE), var = "yt", ci = c(-Inf, 0))
 > m <- model(yb, shifting = fm, todistr = "Normal")
-> mltmod <- mlt(m, data = d[!is.na(d$yt),,drop = FALSE], trunc = c("left" = "trunc_left"))
+> dfull <- d[!is.na(d$yt),,drop = FALSE]
+> dfull$yt <- R(dfull$yt, tleft = dfull$trunc_left)
+> mltmod <- mlt(m, data = dfull)
 Gradient[1] "Mean relative difference: 2.00001e-05"
 Hessian:[1] TRUE
 > (cf <- coef(mltmod))
@@ -127,7 +129,9 @@ sigma       -2.840592e-06  1.854537e-06  4.525610e-05
 > fm <- as.formula("~ x")
 > yb <- polynomial_basis(c(TRUE, TRUE), var = "yt", ci = c(-Inf, 0))
 > m <- model(yb, shifting = fm, todistr = "Normal")
-> mltmod <- mlt(m, data = d[!is.na(d$yt),,drop = FALSE], trunc = c("right" = "trunc_right"))
+> dfull <- d[!is.na(d$yt),,drop = FALSE]
+> dfull$yt <- R(dfull$yt, tright = dfull$trunc_right)
+> mltmod <- mlt(m, data = dfull)
 Gradient[1] "Mean relative difference: 0.00152262"
 Hessian:[1] "Mean relative difference: 1.225984e-05"
 Warning messages:
@@ -172,4 +176,4 @@ In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
 > 
 > proc.time()
    user  system elapsed 
-  2.216   0.053   2.257 
+  2.256   0.048   2.296 
