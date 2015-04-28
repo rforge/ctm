@@ -334,6 +334,6 @@ hmlt <- function(object, newdata = object$data, q = NULL, log = FALSE) {
     if (log) 
         return(dmlt(object, newdata = newdata, q = q, log = TRUE) -
                log(smlt(object, newdata = newdata, q = q)))
-    return(dmlt(object, newdata = object$data, q = q, log = FALSE) /
-           smlt(object, newdata = object$data, q = q))
+    return(dmlt(object, newdata = newdata, q = q, log = FALSE) /
+           smlt(object, newdata = newdata, q = q))
 }
