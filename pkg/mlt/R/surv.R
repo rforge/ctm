@@ -198,6 +198,8 @@ R <- function(exact = NA, cleft = NA, cright = NA,
         Ytmp <- model.matrix(model, data = tmp)
         Yleft <- matrix(-Inf, nrow = length(il), ncol = ncol(Ytmp))
         colnames(Yleft) <- colnames(Ytmp)
+        attr(Yleft, "constraint") <- attr(Ytmp, "constraint")
+        attr(Yleft, "Assign") <- attr(Ytmp, "Assign")
         Yleft[il,] <- Ytmp
     }
 
@@ -208,16 +210,22 @@ R <- function(exact = NA, cleft = NA, cright = NA,
         Ytmp <- model.matrix(model, data = tmp)
         Yright <- matrix(Inf, nrow = length(ir), ncol = ncol(Ytmp))
         colnames(Yright) <- colnames(Ytmp)
+        attr(Yright, "constraint") <- attr(Ytmp, "constraint")
+        attr(Yright, "Assign") <- attr(Ytmp, "Assign")
         Yright[ir,] <- Ytmp
     }
 
     if (is.null(Yright)) { 
         Yright <- matrix(Inf, nrow = nrow(Yleft), ncol = ncol(Yleft))
         colnames(Yright) <- colnames(Yleft)
+        attr(Yright, "constraint") <- attr(Yleft, "constraint")
+        attr(Yright, "Assign") <- attr(Yleft, "Assign")
     }
     if (is.null(Yleft)) {
         Yleft <- matrix(-Inf, nrow = nrow(Yright), ncol = ncol(Yright))
         colnames(Yleft) <- colnames(Yright)
+        attr(Yleft, "constraint") <- attr(Yright, "constraint")
+        attr(Yleft, "Assign") <- attr(Yright, "Assign")
     }
 
     trunc <- NULL
