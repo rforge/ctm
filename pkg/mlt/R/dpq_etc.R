@@ -115,7 +115,7 @@ Hmlt <- function(object, newdata = object$data, q = NULL)
 
     prob <- cbind(0, prob, 1)
     i <- rowSums(prob < p)
-    if (.type_of_response(q) != "double")
+    if (!(.type_of_response(q) %in% c("double", "survival")))
         return(q[i])
 
     ### return interval censored quantiles
@@ -233,7 +233,7 @@ dmlt <- function(object, newdata = object$data, q = NULL, log = FALSE) {
     response <- object$data[[y <- object$response]]
 
     ### Lebesgue density only for double
-    if (.type_of_response(response) == "double") {
+    if (.type_of_response(response) %in% c("double", "survival")) {
         trafo <- tmlt(object, newdata = newdata, q = q)
         deriv <- 1
         names(deriv) <- y
