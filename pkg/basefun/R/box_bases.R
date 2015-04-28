@@ -19,10 +19,11 @@ b <- function(..., sumconstr = FALSE) {
 model.matrix.box_bases <- function(object, data, model.matrix = TRUE,
     dim = NULL, deriv = NULL, integrate = NULL, ...) {
 
-    if (model.matrix) stopifnot(is.data.frame(data))
-
     varnames <- variable.names(object)
     bnames <- names(object)
+
+    if (model.matrix & !is.data.frame(data))
+        data <- expand.grid(data[varnames])
 
     if (!is.null(deriv)) {
         stopifnot(length(deriv) == 1)
