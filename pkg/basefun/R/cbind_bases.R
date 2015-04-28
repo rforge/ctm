@@ -23,7 +23,11 @@ c.bases <- c.basis
 model.matrix.cbind_bases <- function(object, data, model.matrix = TRUE, 
     dim = NULL, deriv = NULL, integrate = NULL, ...) {
 
-    if (model.matrix) stopifnot(is.data.frame(data))
+    if (model.matrix) {
+        vn <- unique(unlist(variable.names(object)))
+        if (length(vn) > 1)
+            stopifnot(is.data.frame(data))
+    }
 
     bnames <- names(object)
     varnames <- variable.names(object)

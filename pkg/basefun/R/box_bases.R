@@ -93,7 +93,11 @@ predict.box_bases <- function(object, newdata, coef,
     X$beta <- array(coef, sapply(X, NCOL))
     lp <- do.call(".cXb", X) 
 
-    vn <- variable.names(object)
-    ret <- .const_array(dim, unlist(vn), c(lp))
+    vn <- unlist(variable.names(object))
+    ### <FIXME> dimensions assessed by first varname; does this work?
+    if (length(dim) == 2)
+        vn <- vn[vn %in% names(dim)]
+    ### </FIXME>
+    ret <- .const_array(dim, vn, c(lp))
     ret
 }
