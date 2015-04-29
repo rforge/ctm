@@ -43,3 +43,6 @@ mkgrid.mlt <- function(object, ...)
 
 mkgrid.model <- function(object, ...)
     mkgrid(object$model, ...)
+
+variable.names.mlt <- function(object, ...)
+    variable.names(object$model)
