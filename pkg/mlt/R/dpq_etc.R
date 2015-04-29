@@ -201,19 +201,26 @@ simulate.mlt <- function(object, nsim = 1, seed = NULL,
     }
 
     y <- object$response
-    newdata[[y]] <- NULL
+    ### unconditional
+    if (all(unique(variable.names(object)) == y)) {
+        newdata <- data.frame(1) ### we need only NROW(newdata)
+    } else {
+        newdata[[y]] <- NULL
+    }
     ### don't accept user-generated quantiles
     q <- mkgrid(object, n = n)[[y]]
     if (is.data.frame(newdata)) {
         p <- runif(nsim * NROW(newdata))
         ### basically compute quantiles for p; see qmlt
         prob <- pmlt(object, newdata, q = q)
-        prob <- t(prob[, rep(1:ncol(prob), nsim),drop = FALSE])
+        ### unconditional
+        if (!is.matrix(prob)) prob <- matrix(prob, ncol = 1)
+        prob <- t(prob[, rep(1:NCOL(prob), nsim),drop = FALSE])
         ret <- .p2q(prob, q, p, interpolate = interpolate)
         if (nsim > 1) {
             tmp <- vector(mode = "list", length = nsim)
             for (i in 1:nsim) {
-                idx <- 1:nrow(newdata) + (i - 1) * nrow(newdata)
+                idx <- 1:NROW(newdata) + (i - 1) * NROW(newdata)
                 if (is.data.frame(ret)) 
                     tmp[[i]] <- ret[idx,]
                 else 
