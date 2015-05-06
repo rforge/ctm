@@ -1,6 +1,13 @@
 
 log_basis <- function(support = c(.Machine$double.eps, Inf),
-                      ui = Diagonal(1), ci = 0, varname = NULL) {
+                      ui = c("none", "increasing", "decreasing"),
+                      varname = NULL) {
+
+    ui <- match.arg(ui)
+    ci <- switch(ui, "none" = -Inf, 0)
+    ui <- switch(ui, "none" = matrix(1),
+                     "increasing" = matrix(1),
+                     "decreasing" = matrix(-1))
 
     basis <- function(data, deriv = 0L) {
         if (is.atomic(data)) {
