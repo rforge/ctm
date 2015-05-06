@@ -33,7 +33,7 @@
 ### arXiv preprint arXiv:1404.2293
 Bernstein_basis <- function(order = 2, support = c(0, 1), normal = FALSE,
                             ui = c("none", "increasing", "decreasing", "cyclic", "zerointegral"), 
-                            ci = 0, varname = NULL) {
+                            varname = NULL) {
 
     zeroint <- FALSE
     ui <- match.arg(ui, several.ok = TRUE)
@@ -48,9 +48,9 @@ Bernstein_basis <- function(order = 2, support = c(0, 1), normal = FALSE,
         "none" = list(ui = Diagonal(order + 1), 
                       ci = rep(-Inf, order + 1)),
         "increasing" = list(ui = diff(Diagonal(order + 1), differences = 1), 
-                            ci = rep(ci, order)),
+                            ci = rep(0, order)),
         "decreasing" = list(ui = diff(Diagonal(order + 1), differences = 1) * -1,
-                            ci = rep(ci, order)),
+                            ci = rep(0, order)),
         "cyclic" = stop("not yet implemented"))
 
     basis <- function(data, deriv = 0L, integrate = FALSE) {
