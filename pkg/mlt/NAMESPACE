@@ -1,6 +1,6 @@
 
 import(basefun)
-import(numDeriv)
+importFrom(numDeriv, grad, hessian)
 importFrom(BB, spg)
 importFrom(MASS, ginv)
 importFrom(sandwich, estfun)
