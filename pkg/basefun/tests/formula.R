@@ -21,14 +21,14 @@ attr(X1, "constraint")$ui
 attr(X2, "constraint")$ui
 
 dim(model.matrix(b12, d))
-nparm(b12, d)
+# nparm(b12, d)
 dim(model.matrix(c12, d))
-nparm(c12, d)
+# nparm(c12, d)
 
 tmp <- c(b12 = b12, c12 = c12)
 class(tmp)
 dim(model.matrix(tmp, d))
-nparm(tmp, d)
+# nparm(tmp, d)
 
 xd <- data.frame(x = x)
 b <- as.basis(~ scale(x), data = xd)
