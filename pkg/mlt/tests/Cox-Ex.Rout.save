@@ -18,16 +18,6 @@ Type 'q()' to quit R.
 > 
 > library("mlt")
 Loading required package: basefun
-Loading required package: Matrix
-
-Attaching package: 'Matrix'
-
-The following objects are masked from 'package:base':
-
-    crossprod, tcrossprod
-
-Loading required package: polynom
-Loading required package: numDeriv
 > library("survival")
 > set.seed(29)
 > 
@@ -74,7 +64,7 @@ Hessian:[1] TRUE
 > lines(survfit(cph, newdata = data.frame(g = gf[3])))
 > 
 > ### h = c(log, bernstein)
-> lb <- log_basis(varname = "y", support = c(0, max(y)))
+> lb <- log_basis(varname = "y", support = c(0, max(y)), ui = "increasing")
 > m <- model(response = c(blog = lb, bBern = Bb), shifting = s, todist = "MinExtrVal")
 > (cf1 <- coef(opt <- mlt(m, data = mydata)))
 Gradient[1] "Mean relative difference: 1.113868e-07"
@@ -224,4 +214,4 @@ Warning messages:
 > 
 > proc.time()
    user  system elapsed 
-  6.893   0.072   6.954 
+  6.645   0.075   6.715 

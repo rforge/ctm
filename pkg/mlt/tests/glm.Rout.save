@@ -18,16 +18,6 @@ Type 'q()' to quit R.
 > 
 > library("mlt")
 Loading required package: basefun
-Loading required package: Matrix
-
-Attaching package: 'Matrix'
-
-The following objects are masked from 'package:base':
-
-    crossprod, tcrossprod
-
-Loading required package: polynom
-Loading required package: numDeriv
 > set.seed(29)
 > 
 > n <- 100
@@ -88,14 +78,11 @@ virginica    -23.83628    -7.923634  -15.370769     23.65978   15.135301
 > r <- as.basis(~ Species, data = oiris, remove_intercept = TRUE,
 +               contrasts.arg = list(Species = function(n)
 +                   contr.treatment(n, base = 3)),
-+               ui = diff(Diagonal(2)), ci = rep(0, 1))
++               ui = diff(diag(2)), ci = rep(0, 1))
 > 
 > m <- model(r, interacting = as.basis(~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width, data = oiris),
 +            todistr = "Logis")
 > m2 <- mlt(m, data = oiris)
-Note: method with signature 'dsparseMatrix#dsparseMatrix' chosen for function 'kronecker',
- target signature 'dgTMatrix#dgCMatrix'.
- "TsparseMatrix#sparseMatrix" would also be valid
 Gradient[1] "Mean relative difference: 1.415292e-06"
 Hessian:[1] "Mean relative difference: 0.0004797966"
 Warning message:
@@ -123,4 +110,4 @@ Species1:Petal.Length Species2:Petal.Length  Species1:Petal.Width
 > 
 > proc.time()
    user  system elapsed 
-  3.728   0.072   3.789 
+  3.610   0.072   3.670 

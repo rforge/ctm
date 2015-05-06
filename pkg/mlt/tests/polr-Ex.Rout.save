@@ -22,22 +22,12 @@ Type 'q()' to quit R.
 > 
 > library("mlt")
 Loading required package: basefun
-Loading required package: Matrix
-
-Attaching package: 'Matrix'
-
-The following objects are masked from 'package:base':
-
-    crossprod, tcrossprod
-
-Loading required package: polynom
-Loading required package: numDeriv
 > 
 > s <- as.basis(~ Infl, data = housing, remove_intercept = TRUE)
 > r <- as.basis(~ Sat, data = housing, remove_intercept = TRUE,
 +               contrasts.arg = list(Sat = function(n) 
 +                   contr.treatment(n, base = 3)),
-+               ui = diff(Diagonal(2)), ci = 0)
++               ui = diff(diag(2)), ci = 0)
 > 
 > m <- model(r, shift = s, todist = "Logi")
 > 
@@ -72,4 +62,4 @@ Re-fitting to get Hessian
 > 
 > proc.time()
    user  system elapsed 
-  1.747   0.077   1.814 
+  1.615   0.067   1.672 

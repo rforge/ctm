@@ -18,16 +18,6 @@ Type 'q()' to quit R.
 > 
 > library("mlt")
 Loading required package: basefun
-Loading required package: Matrix
-
-Attaching package: 'Matrix'
-
-The following objects are masked from 'package:base':
-
-    crossprod, tcrossprod
-
-Loading required package: polynom
-Loading required package: numDeriv
 > library("eha")
 Loading required package: survival
 > set.seed(29)
@@ -46,7 +36,7 @@ Loading required package: survival
 > 
 > boxplot(y ~ g, data = mydata)
 > 
-> Bb <- log_basis(var = "y", support = range(y))
+> Bb <- log_basis(var = "y", support = range(y), ui = "increasing")
 > Bx <- as.basis(~ g)
 > m <- model(Bb, shifting = Bx, todist = "MinExtrVal")
 > 
@@ -248,7 +238,7 @@ Error in phreg(y ~ g, data = mydata, dist = "weibull", shape = 1) :
 > 
 > boxplot(y ~ g, data = mydata)
 > 
-> Bb <- log_basis(var = "y", support = range(y))
+> Bb <- log_basis(var = "y", support = range(y), ui = "increasing")
 > Bx <- as.basis(~ g)
 > m <- model(Bb, shifting = Bx, todist = "MinExtrVal")
 > 
@@ -415,4 +405,4 @@ Hessian:[1] TRUE
 > 
 > proc.time()
    user  system elapsed 
-  3.008   0.080   3.077 
+  2.969   0.081   3.037 

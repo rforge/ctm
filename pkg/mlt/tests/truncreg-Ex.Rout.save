@@ -18,16 +18,6 @@ Type 'q()' to quit R.
 > 
 > library("mlt")
 Loading required package: basefun
-Loading required package: Matrix
-
-Attaching package: 'Matrix'
-
-The following objects are masked from 'package:base':
-
-    crossprod, tcrossprod
-
-Loading required package: polynom
-Loading required package: numDeriv
 > library("truncreg")
 Loading required package: maxLik
 Loading required package: miscTools
@@ -37,13 +27,6 @@ Henningsen, Arne and Toomet, Ott (2011). maxLik: A package for maximum likelihoo
 
 If you have questions, suggestions, or comments regarding the 'maxLik' package, please use a forum or 'tracker' at maxLik's R-Forge site:
 https://r-forge.r-project.org/projects/maxlik/
-
-Attaching package: 'maxLik'
-
-The following object is masked from 'package:numDeriv':
-
-    hessian
-
 > 
 > 
 > ## Left-truncated 
@@ -176,4 +159,4 @@ In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
 > 
 > proc.time()
    user  system elapsed 
-  2.256   0.048   2.296 
+  2.270   0.040   2.298 

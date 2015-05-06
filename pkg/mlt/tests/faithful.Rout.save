@@ -18,16 +18,6 @@ Type 'q()' to quit R.
 > 
 > library("mlt")
 Loading required package: basefun
-Loading required package: Matrix
-
-Attaching package: 'Matrix'
-
-The following objects are masked from 'package:base':
-
-    crossprod, tcrossprod
-
-Loading required package: polynom
-Loading required package: numDeriv
 > library("lattice")
 > 
 > data("faithful")
@@ -187,4 +177,4 @@ Bs9(waiting)   -0.7427120    0.8292216   -0.9214160    1.0000000
 > 
 > proc.time()
    user  system elapsed 
- 12.736   0.043  12.773 
+ 12.364   0.054  12.411 

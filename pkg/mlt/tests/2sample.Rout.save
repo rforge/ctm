@@ -18,16 +18,6 @@ Type 'q()' to quit R.
 > 
 > library("mlt")
 Loading required package: basefun
-Loading required package: Matrix
-
-Attaching package: 'Matrix'
-
-The following objects are masked from 'package:base':
-
-    crossprod, tcrossprod
-
-Loading required package: polynom
-Loading required package: numDeriv
 > 
 > set.seed(28)
 > n <- 100
@@ -97,4 +87,4 @@ y:(Intercept)
 > 
 > proc.time()
    user  system elapsed 
-  2.016   0.068   2.072 
+  1.832   0.056   1.875 
