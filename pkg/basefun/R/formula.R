@@ -1,6 +1,6 @@
 
 as.basis.formula <- function(object, remove_intercept = FALSE, 
-                             data = NULL, ci = NULL, ui = NULL, ...) {
+                             data = NULL, ui = NULL, ci = NULL, ...) {
 
     varnames <- all.vars(object)
 
