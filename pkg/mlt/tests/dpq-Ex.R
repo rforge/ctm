@@ -1,5 +1,6 @@
 
 library("mlt")
+set.seed(29)
 
 n <- 20
 d <- data.frame(x1 = 1:n, x2 = 1:n + 1, y = rnorm(n))
@@ -32,7 +33,7 @@ d$y <- gl(3, 1, ordered = TRUE)[rep(1:3, length = n)]
 r <- as.basis(~ y, data = d, remove_intercept = TRUE,
               contrasts.arg = list(y = function(n)
                   contr.treatment(n, base = 3)),
-              ui = diff(Diagonal(2)), ci = 0)
+              ui = diff(diag(2)), ci = 0)
 
 mod2 <- mlt(model(r, shift = ~ x1 + x2), data = d)
 

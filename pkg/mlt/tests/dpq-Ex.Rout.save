@@ -18,16 +18,7 @@ Type 'q()' to quit R.
 > 
 > library("mlt")
 Loading required package: basefun
-Loading required package: Matrix
-
-Attaching package: 'Matrix'
-
-The following objects are masked from 'package:base':
-
-    crossprod, tcrossprod
-
-Loading required package: polynom
-Loading required package: numDeriv
+> set.seed(29)
 > 
 > n <- 20
 > d <- data.frame(x1 = 1:n, x2 = 1:n + 1, y = rnorm(n))
@@ -35,7 +26,7 @@ Loading required package: numDeriv
 +            ci = c(-Inf, 0), support = range(d$y)),
 +            shift = ~ x1 + x2)
 > mod <- mlt(m, data = d)
-Gradient[1] "Mean relative difference: 0.001059305"
+Gradient[1] "Mean relative difference: 0.0007853802"
 Hessian:[1] TRUE
 Warning message:
 In .findstart(model, y, data, ui, ci, fix, fixed) :
@@ -52,7 +43,7 @@ In .findstart(model, y, data, ui, ci, fix, fixed) :
   0.005   0.000   0.005 
 > system.time(p2 <- tmlt(mod, newdata = d, q = d$y[1]))
    user  system elapsed 
-  0.004   0.000   0.005 
+  0.004   0.000   0.004 
 > 
 > max(abs(p0 - as.vector(p1)))
 [1] 0
@@ -69,47 +60,47 @@ In .findstart(model, y, data, ui, ci, fix, fixed) :
 , , x2 =     2
 
        x1
-p                1          2            3
-   0.25 -0.5650239 -0.6522570 -0.739383547
-    0.5  0.1660175  0.0789103 -0.008197634
+p                1           2           3
+   0.25 -0.8374140 -0.72946583 -0.62177772
+    0.5 -0.1534156 -0.04559379  0.06220496
 
 , , x2 =     3
 
        x1
 p                1          2           3
-   0.25 -0.4989913 -0.5861570 -0.67321887
-    0.5  0.2321417  0.1450345  0.05792427
+   0.25 -0.9189783 -0.8112467 -0.70333119
+    0.5 -0.2350766 -0.1272570 -0.01945554
 
 > 
 > simulate(mod, nsim = 1, seed = 291, interpolate = FALSE)
-          left      right
-1         -Inf -1.5143392
-2   0.93481023  1.0090269
-3  -1.14325599 -1.0690393
-4   1.00902688  1.0832435
-5   0.48951033  0.5637270
-6   0.41529368  0.4895103
-7   2.12227665        Inf
-8   1.38011014  1.4543268
-9  -0.17843953 -0.1042229
-10  1.15746019  1.2316768
-11        -Inf -1.5143392
-12 -0.17843953 -0.1042229
-13  0.48951033  0.5637270
-14  0.04421042  0.1184271
-15  0.48951033  0.5637270
-16  0.71216028  0.7863769
-17        -Inf -1.5143392
-18  0.04421042  0.1184271
-19 -0.17843953 -0.1042229
-20  1.45432679  1.5285434
+           left       right
+1          -Inf -1.44201141
+2   0.587961900  0.66046095
+3  -1.297013314 -1.22451427
+4   0.805459040  0.87795809
+5   0.297965713  0.37046476
+6   0.370464760  0.44296381
+7   2.110441880         Inf
+8   1.312952366  1.38545141
+9  -0.137028567 -0.06452952
+10  1.167954273  1.24045332
+11 -1.369512361 -1.29701331
+12  0.007969526  0.08046857
+13  0.732959993  0.80545904
+14  0.297965713  0.37046476
+15  0.805459040  0.87795809
+16  1.022956180  1.09545523
+17 -1.224514267 -1.15201522
+18  0.515462853  0.58796190
+19  0.370464760  0.44296381
+20  1.892944740  1.96544379
 > 
 > d$y <- gl(3, 1, ordered = TRUE)[rep(1:3, length = n)]
 > 
 > r <- as.basis(~ y, data = d, remove_intercept = TRUE,
 +               contrasts.arg = list(y = function(n)
 +                   contr.treatment(n, base = 3)),
-+               ui = diff(Diagonal(2)), ci = 0)
++               ui = diff(diag(2)), ci = 0)
 > 
 > mod2 <- mlt(model(r, shift = ~ x1 + x2), data = d)
 Gradient[1] "Mean relative difference: 0.0006783188"
@@ -195,4 +186,4 @@ Levels: 1 < 2 < 3
 > 
 > proc.time()
    user  system elapsed 
-  2.085   0.064   2.135 
+  2.013   0.052   2.053 
