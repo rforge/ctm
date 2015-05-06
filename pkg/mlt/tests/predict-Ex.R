@@ -15,7 +15,7 @@ d$y <- with(d, rnorm(nrow(d),
            sd = sd))
 
 m <- model(polynomial_basis(c(TRUE, TRUE), var = "y", 
-               ui = Diagonal(2), ci = c(-Inf, 0), support = range(d$y) * c(1, 1.1)),
+               ui = diag(2), ci = c(-Inf, 0), support = range(d$y) * c(1, 1.1)),
            shift = ~ g + x)
 mod <- mlt(m, data = d, dofit = FALSE)
 coef(mod) <- cf

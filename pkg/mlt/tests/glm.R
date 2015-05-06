@@ -32,7 +32,7 @@ oiris$Species <- ordered(oiris$Species)
 r <- as.basis(~ Species, data = oiris, remove_intercept = TRUE,
               contrasts.arg = list(Species = function(n)
                   contr.treatment(n, base = 3)),
-              ui = diff(Diagonal(2)), ci = rep(0, 1))
+              ui = diff(diag(2)), ci = rep(0, 1))
 
 m <- model(r, interacting = as.basis(~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width, data = oiris),
            todistr = "Logis")
