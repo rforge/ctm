@@ -1,7 +1,6 @@
 
 polynomial_basis <- function(coef, support = c(0, 1),
-                             ui = Diagonal(length(object)), 
-                             ci = rep(-Inf, length(object)),
+                             ui = NULL, ci = NULL,
                              varname = NULL, orthogonal = NULL) {
 
     if (!is.null(orthogonal)) {
@@ -15,6 +14,9 @@ polynomial_basis <- function(coef, support = c(0, 1),
             return(polynomial(cf))
         }))
     }
+
+    if (is.null(ui)) ui <- Diagonal(length(object))
+    if (is.null(ci)) ci <- rep(-Inf, length(object))
 
     basis <- function(data, deriv = 0L) {
         if (is.atomic(data)) {
