@@ -23,3 +23,17 @@ for (i in 1:length(fun)) {
     }
 }
 
+### check linear extrapolation
+order <- 50
+xg <- seq(from = -1, to = 1, length.out = order + 1)
+B <- Bernstein_basis(order = order, support = c(-1, 1), var = "x")
+cf <- xg^2
+x <- -150:150/100
+X <- model.matrix(B, data = data.frame(x = x))
+plot(x, x^2, type = "l", col = "red")
+lines(x, X %*% cf)
+
+### deriv is constant outside support
+d <- model.matrix(B, data = data.frame(x = x), deriv = c(x = 1)) %*% cf
+stopifnot(length(unique(abs(d[abs(x) > 1]))) == 1)
+

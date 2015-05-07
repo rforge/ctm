@@ -128,7 +128,46 @@ Bernstein_basis <- function(order = 2, support = c(0, 1), normal = FALSE,
 
 ### evaluate model.matrix of Bernstein polynom
 model.matrix.Bernstein_basis <- function(object, data,
-                                         deriv = 0L, integrate = FALSE, ...)
+                                         deriv = 0L, integrate = FALSE, ...) {
 
-    object(data = data, deriv = .deriv(variable.names(object), deriv), 
-           integrate = integrate)
+    varname <- variable.names(object)
+    deriv <- .deriv(varname, deriv)
+    x <- data[[varname]]
+    s <- support(object)[[varname]]
+    small <- x < s[1]
+    large <- x > s[2]
+    if (all(!small) && all(!large))
+        return(object(data = data, deriv = deriv, integrate = integrate))
+
+    ### extrapolate linearily for x outside s
+    stopifnot(!integrate)
+    stopifnot(deriv %in% c(0, 1))
+    data[small,varname] <- s[1]        
+    data[large,varname] <- s[2]        
+    ret <- object(data = data, deriv = deriv, integrate = integrate)
+    if (mean(small + large) > .1)
+        warning("more than 10% of observations outside support")
+    if (any(small)) {
+        dsmall <- data.frame(x = rep(s[1], sum(small)))
+        names(dsmall) <- varname
+        X <- object(data = dsmall)
+        Xp <- object(data = dsmall, deriv = 1L)
+        if (deriv == 1L) {
+            ret[small,] <- Xp
+        } else {
+            ret[small,] <- (X + Xp * (x[small] - s[1]))
+        }
+    }
+    if (any(large)) {
+        dlarge <- data.frame(x = rep(s[2], sum(large)))
+        names(dlarge) <- varname
+        X <- object(data = dlarge)
+        Xp <- object(data = dlarge, deriv = 1L)
+        if (deriv == 1L) {
+            ret[large,] <- Xp
+        } else {
+            ret[large,] <- (X + Xp * (x[large] - s[2]))
+        }
+    }
+    return(ret)
+}
