@@ -1,4 +1,12 @@
 
+### better: 
+### (1) cluster x (hclust or something dirty)
+### (2) within each cluster: order response (somehow deal with censoring)
+### (3) working response F^-1 (0:n/n)
+### (4) design matrix: c(y, x)
+### (5) estimate parm via least squares
+### cf polr (uses glm)
+
 .findstart <- function(model, y, data, ui = NULL, ci = NULL, fix = NULL, fixed = NULL) {
 
     response <- model$response
@@ -119,6 +127,7 @@
     }
 
     loglikfct <- function(beta) -sum(weights * ll(beta))
+    score <- function(beta) weights * sc(beta)
     scorefct <- function(beta) -colSums(weights * sc(beta))
 
     if (all(!is.finite(ci))) {
@@ -163,7 +172,7 @@
     ret$response <- response
     ret$todistr <- todistr
     ret$loglik <- loglikfct
-    ret$score <- scorefct
+    ret$score <- score
     ret$hessian <- he
     ret$optimfct <- optimfct
     class(ret) <- c("mlt_setup", "mlt")
