@@ -5,5 +5,5 @@ Date: 2015-05-06
 Author: Torsten Hothorn
 Maintainer: Torsten Hothorn <Torsten.Hothorn@R-project.org>
 Description: Some very simple infrastructure for basis functions.
-Imports: stats, polynom, Matrix
+Imports: stats, polynom, Matrix, orthopolynom
 License: GPL-2
