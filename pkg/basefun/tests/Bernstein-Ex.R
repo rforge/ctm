@@ -37,3 +37,11 @@ lines(x, X %*% cf)
 d <- model.matrix(B, data = data.frame(x = x), deriv = c(x = 1)) %*% cf
 stopifnot(length(unique(abs(d[abs(x) > 1]))) == 1)
 
+### Legendre to Bernstein
+## Example from doi: 10.1016/j.amc.2007.09.050
+A <- .Call("L2B", 4L)
+B <- cbind(1, c(-1, -.5, 0, .5, 1), 
+              c(1, -.5, -1, -.5, 1), 
+              c(-1, 2, 0, -2, 1),  
+              c(1, -4, 6, -4, 1))
+stopifnot(max(abs(A - B)) < .Machine$double.eps)
