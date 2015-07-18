@@ -16,22 +16,11 @@
                 .Bx(x, j,     n - 1, deriv = deriv - 1L, integrate = integrate)))
 }
 
-.oBx <- function(x, j, n, deriv = 0L, integrate = FALSE) {
-    ret <- 0
-    for (k in 0:j)
-        ret <- ret + (-1)^k * choose(2 * n + 1 - k, j - k) *
-               choose(j, k) * .Bx(x, j - k, n - k, deriv = deriv, integrate = integrate) /
-               choose(n - k, j - k)
-    ret * sqrt(2 * (n - j) + 1)
-}
-
-
-
 ### set-up Bernstein polynom basis functions
 ### http://en.wikipedia.org/wiki/Bernstein_polynomial
 ### http://dx.doi.org/10.1080/02664761003692423
 ### arXiv preprint arXiv:1404.2293
-Bernstein_basis <- function(order = 2, support = c(0, 1), normal = FALSE,
+Bernstein_basis <- function(order = 2, support = c(0, 1), 
                             ui = c("none", "increasing", "decreasing", "cyclic", "zerointegral"), 
                             varname = NULL) {
 
@@ -72,42 +61,15 @@ Bernstein_basis <- function(order = 2, support = c(0, 1), normal = FALSE,
         x <- (x - support[1]) / diff(support)
         stopifnot(all(x >= 0 && x <= 1))
 
-        if (!normal || ui != "none")
-            X <- do.call("cbind", lapply(0:order, function(j) 
-                         .Bx(x, j, order, deriv = max(c(0, deriv)), integrate = integrate)))
-        if (normal) {
-            oX <- do.call("cbind", lapply(0:order, function(j) 
-                          .oBx(x, j, order, deriv = max(c(0, deriv)), integrate = integrate)))
-            if (ui != "none" & (deriv == 0 & !integrate)) {
-                ### transform constraint on raw Bernstein bases into
-                ### constraint on orthogonal bases
-                XtX <- crossprod(X)
-                ### did not work well oui <- try(constr$ui %*% chol2inv(chol(XtX)) %*% crossprod(X, oX))
-                oui <- try(constr$ui %*% solve(XtX) %*% crossprod(X, oX))
-                oci <- constr$ci
-                if (inherits(oui, "try-error")) { ### use f'(x) >= 0
-                    #ngrid <- max(c(2 * order, 20))
-                    #xgrid <- 0:ngrid / ngrid
-                    #oui <- do.call("cbind", lapply(0:order, function(j)
-                    #    .oBx(xgrid, j, order, deriv = 1, integrate = FALSE)))
-                    #if (ui == "decreasing") oui <- -oui
-                    #oci <- rep(constr$ci, length = nrow(oui))
-                    warning("cannot obtain constraints for orthogonal Bernstein basis, 
-                            returning unconstraint basis")
-                    oX <- X
-                    oui <- constr$ui
-                }
-                constr$ui <- oui
-                constr$ci <- oci
-            }
-            X <- oX
-        }
+        X <- do.call("cbind", lapply(0:order, function(j) 
+                     .Bx(x, j, order, deriv = max(c(0, deriv)), integrate = integrate)))
+
         if (deriv > 0)
             X <- X * (1 / diff(support)^deriv)
         if (deriv < 0)
             X[] <- 0
         colnames(X) <- paste("Bs", 1:ncol(X), "(", varname, ")", sep = "")
-        if (zeroint) { ### normal???
+        if (zeroint) {
             X <- X[, -ncol(X), drop = FALSE] - X[, ncol(X), drop = TRUE]
             constr$ui <- constr$ui[, -ncol(constr$ui),drop = FALSE]
         }

@@ -15,7 +15,7 @@ export(Bernstein_basis, as.basis, b,
        log_basis, mkgrid, 
 ##       nparm, 
        polynomial_basis,
-       orthopolynomial_basis)
+       Legendre_basis, L2B, B2L)
 ##       support
 
 S3method("as.basis", "formula")

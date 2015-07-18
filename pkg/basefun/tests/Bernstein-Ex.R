@@ -45,3 +45,6 @@ B <- cbind(1, c(-1, -.5, 0, .5, 1),
               c(-1, 2, 0, -2, 1),  
               c(1, -4, 6, -4, 1))
 stopifnot(max(abs(A - B)) < .Machine$double.eps)
+
+### Bernstein to Legendre
+stopifnot(max(abs(solve(A) - .Call("B2L", 4L))) < sqrt(.Machine$double.eps))
