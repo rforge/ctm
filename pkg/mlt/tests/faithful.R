@@ -63,8 +63,8 @@ max(abs(H3 - H2))
 
 cov2cor(vcov(mod))
 
-if (FALSE) {
-library("multcomp")
+if (TRUE) {
+library("multcomp") ### since 1.0-3
 
 mp <- parm(coef(mod), vcov(mod))
 y <- mkgrid(mod, 30)$waiting
@@ -72,8 +72,7 @@ g <- glht(mp, linfct = model.matrix(mod$model,
     data = data.frame(waiting = y)))
 
 mc <- confint(g)
-umc <- confint(glht(mp, linfct = model.matrix(mod$model, 
-    data = data.frame(waiting = y))), calpha = qnorm(.975))
+umc <- confint(g, calpha = qnorm(.975))
 p <- mod$model$todistr$p
 plot(y, p(mc$confint[, "Estimate"]), type = "l")
 lines(y, p(mc$confint[, "lwr"]))
