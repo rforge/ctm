@@ -2,9 +2,9 @@
 import(basefun)
 importFrom(numDeriv, grad, hessian)
 importFrom(BB, spg)
-importFrom(MASS, ginv)
 importFrom(sandwich, estfun)
 importFrom(stats, simulate, variable.names, model.matrix, logLik, vcov)
+importFrom(quadprog, solve.QP)
 
 # exportPattern("^[^\\.]")
 export(Hessian, Hmlt, R, "coef<-", dmlt, hmlt, mlt,

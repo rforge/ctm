@@ -1,5 +1,5 @@
 
-R version 3.1.3 (2015-03-09) -- "Smooth Sidewalk"
+R version 3.2.1 (2015-06-18) -- "World-Famous Astronaut"
 Copyright (C) 2015 The R Foundation for Statistical Computing
 Platform: x86_64-unknown-linux-gnu (64-bit)
 
@@ -43,9 +43,9 @@ Loading required package: basefun
 Gradient[1] TRUE
 Hessian:[1] TRUE
     Bs1(y)     Bs2(y)     Bs3(y)     Bs4(y)     Bs5(y)     Bs6(y)         g2 
--2.5706816  1.1035997  1.1035998  1.1035998  1.1035998  1.8004156  0.9323813 
+-2.5706843  1.1035974  1.1035974  1.1035974  1.1035974  1.8004139  0.9323842 
         g3 
- 1.2627530 
+ 1.2627559 
 > coef(cph <- coxph(Surv(y, rep(TRUE, nrow(mydata))) ~ g, data = mydata))
       g2       g3 
 0.699808 1.022699 
@@ -67,18 +67,12 @@ Hessian:[1] TRUE
 > lb <- log_basis(varname = "y", support = c(0, max(y)), ui = "increasing")
 > m <- model(response = c(blog = lb, bBern = Bb), shifting = s, todist = "MinExtrVal")
 > (cf1 <- coef(opt <- mlt(m, data = mydata)))
-Gradient[1] "Mean relative difference: 1.113868e-07"
-Hessian:[1] "Mean relative difference: 7.991511e-08"
-              [,1]
- [1,]  0.838722228
- [2,] -0.305718055
- [3,] -0.002506204
- [4,] -0.002506189
- [5,] -0.002506174
- [6,] -0.002506159
- [7,]  0.275029639
- [8,]  0.764301899
- [9,]  1.068694530
+Gradient[1] "Mean relative difference: 5.468353e-08"
+Hessian:[1] "Mean relative difference: 2.037386e-07"
+      log(y)       Bs1(y)       Bs2(y)       Bs3(y)       Bs4(y)       Bs5(y) 
+ 0.838721035 -0.305720642 -0.002503909 -0.002503894 -0.002503879 -0.002503864 
+      Bs6(y)           g2           g3 
+ 0.275032876  0.764301888  1.068694519 
 > ## sample from this model
 > sam <- simulate(opt, newdata = data.frame(g = gf), nsim = 100)
 > nd <- data.frame(y = unlist(sam), g = rep(gf, length(sam)))
@@ -105,16 +99,10 @@ Hessian:[1] TRUE
 > coef(opt <- mlt(m, data = mydata))
 Gradient[1] TRUE
 Hessian:[1] TRUE
-            [,1]
- [1,]  0.8548846
- [2,] -0.8701500
- [3,] -0.7839356
- [4,] -0.7839356
- [5,] -0.7839356
- [6,] -0.7839356
- [7,] -0.2774258
- [8,]  0.8692641
- [9,]  1.1418617
+    log(y)     Bs1(y)     Bs2(y)     Bs3(y)     Bs4(y)     Bs5(y)     Bs6(y) 
+ 0.8548918 -0.8701353 -0.7839483 -0.7839483 -0.7839483 -0.7839482 -0.2774455 
+        g2         g3 
+ 0.8692665  1.1418639 
 > coef(cph <- coxph(y ~ g, data = mydata))
        g2        g3 
 0.7891759 1.0616941 
@@ -124,16 +112,10 @@ Hessian:[1] TRUE
 > coef(opt <- mlt(m, data = mydata))
 Gradient[1] TRUE
 Hessian:[1] TRUE
-             [,1]
- [1,]  0.38199840
- [2,] -0.04273012
- [3,]  0.97761138
- [4,]  0.97761140
- [5,]  0.97761141
- [6,]  0.97761143
- [7,]  1.19849383
- [8,]  0.33286413
- [9,]  0.53880027
+     log(y)      Bs1(y)      Bs2(y)      Bs3(y)      Bs4(y)      Bs5(y) 
+ 0.38199704 -0.04273283  0.97761475  0.97761476  0.97761478  0.97761479 
+     Bs6(y)          g2          g3 
+ 1.19849883  0.33286279  0.53879923 
 > 
 > ### interval censoring
 > Bb <- Bernstein_basis(order = 5, support = c(0, max(y + 1) + .1),
@@ -142,18 +124,12 @@ Hessian:[1] TRUE
 +                      g = g)
 > m <- model(response = c(blog = lb, bBern = Bb), shifting = s, todist = "MinExtrVal")
 > coef(opt <- mlt(m, data = mydata))
-Gradient[1] "Mean relative difference: 3.713344e-08"
+Gradient[1] "Mean relative difference: 5.440672e-08"
 Hessian:[1] TRUE
-            [,1]
- [1,]  0.5103188
- [2,] -1.2644858
- [3,]  0.1631432
- [4,]  0.1631432
- [5,]  0.1631432
- [6,]  0.1631432
- [7,]  1.1422527
- [8,]  0.7207471
- [9,]  0.9519266
+    log(y)     Bs1(y)     Bs2(y)     Bs3(y)     Bs4(y)     Bs5(y)     Bs6(y) 
+ 0.5103245 -1.2644731  0.1631351  0.1631351  0.1631351  0.1631351  1.1422152 
+        g2         g3 
+ 0.7207465  0.9519261 
 > 
 > ### uncensored, time-varying coefficints in both groups
 > mydata <- data.frame(y = y, g = g)
@@ -164,36 +140,26 @@ Hessian:[1] TRUE
 Note: method with signature 'dsparseMatrix#dsparseMatrix' chosen for function 'kronecker',
  target signature 'dgTMatrix#dgCMatrix'.
  "TsparseMatrix#sparseMatrix" would also be valid
-Gradient[1] "Mean relative difference: 9.239765e-08"
-Hessian:[1] "Mean relative difference: 1.815827e-08"
-               [,1]
- [1,]  0.8083708893
- [2,] -0.0584612835
- [3,] -0.0584612686
- [4,] -0.0584612537
- [5,] -0.0584612388
- [6,] -0.0584612239
- [7,]  0.7439834277
- [8,] -0.1426383973
- [9,] -0.0009466315
-[10,]  1.2858419034
-[11,]  1.2858419034
-[12,]  1.2858419034
-[13,]  1.2858419034
-[14,]  1.0669816206
-[15,]  0.1693281946
-[16,]  1.0341447270
-[17,]  1.0341447270
-[18,]  1.0341447270
-[19,]  1.0341447270
-[20,]  2.8551343009
-[21,]  2.0526896642
+Gradient[1] TRUE
+Hessian:[1] "Mean relative difference: 2.365699e-08"
+log(y):(Intercept) Bs1(y):(Intercept) Bs2(y):(Intercept) Bs3(y):(Intercept) 
+      0.8084027019      -0.0584678409      -0.0584678260      -0.0584678111 
+Bs4(y):(Intercept) Bs5(y):(Intercept) Bs6(y):(Intercept)          log(y):g2 
+     -0.0584677962      -0.0584677813       0.7438069778      -0.1426389673 
+         Bs1(y):g2          Bs2(y):g2          Bs3(y):g2          Bs4(y):g2 
+     -0.0009000084       1.2857729470       1.2857729470       1.2857729470 
+         Bs5(y):g2          Bs6(y):g2          log(y):g3          Bs1(y):g3 
+      1.2857729470       1.0826737862       0.1690790366       1.0337780372 
+         Bs2(y):g3          Bs3(y):g3          Bs4(y):g3          Bs5(y):g3 
+      1.0337780372       1.0337780372       1.0337780372       2.9139589987 
+         Bs6(y):g3 
+      2.1116842545 
 Warning messages:
 1: In spg(par = theta, fn = loglikfct, gr = scorefct, project = "projectLinear",  :
   Unsuccessful convergence.
 2: In spg(par = theta, fn = loglikfct, gr = scorefct, project = "projectLinear",  :
   Unsuccessful convergence.
-3: In .mlt_fit(object = list(theta = c(0.100000014901161, -0.250000037252903,  :
+3: In .mlt_fit(object = list(parm = function (beta)  :
   algorithm did not converge
 > coef(cph <- coxph(Surv(y, rep(TRUE, nrow(mydata))) ~ g, data = mydata))
       g2       g3 
@@ -214,4 +180,4 @@ Warning messages:
 > 
 > proc.time()
    user  system elapsed 
-  6.645   0.075   6.715 
+  5.468   0.047   5.508 

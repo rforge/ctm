@@ -1,5 +1,5 @@
 
-R version 3.1.3 (2015-03-09) -- "Smooth Sidewalk"
+R version 3.2.1 (2015-06-18) -- "World-Famous Astronaut"
 Copyright (C) 2015 The R Foundation for Statistical Computing
 Platform: x86_64-unknown-linux-gnu (64-bit)
 
@@ -182,17 +182,17 @@ Loading required package: basefun
 9  0.3513491  0.3513491    NA
 10 0.4874011+ 0.4874011   Inf
 > cbind(s, mlt:::.Surv2R(s))
-            s tleft     cleft     exact cright tright
-1  0.3621201+    NA 0.3621201        NA    Inf     NA
-2  0.8667453+    NA 0.8667453        NA    Inf     NA
-3  0.3626263     NA        NA 0.3626263     NA     NA
-4  0.6658932     NA        NA 0.6658932     NA     NA
-5  0.6183130     NA        NA 0.6183130     NA     NA
-6  0.9728763     NA        NA 0.9728763     NA     NA
-7  0.9823095+    NA 0.9823095        NA    Inf     NA
-8  0.6216898     NA        NA 0.6216898     NA     NA
-9  0.3513491     NA        NA 0.3513491     NA     NA
-10 0.4874011+    NA 0.4874011        NA    Inf     NA
+            s tleft     cleft     exact cright tright rank
+1  0.3621201+    NA 0.3621201        NA    Inf     NA    7
+2  0.8667453+    NA 0.8667453        NA    Inf     NA    8
+3  0.3626263     NA        NA 0.3626263     NA     NA    2
+4  0.6658932     NA        NA 0.6658932     NA     NA    5
+5  0.6183130     NA        NA 0.6183130     NA     NA    3
+6  0.9728763     NA        NA 0.9728763     NA     NA    6
+7  0.9823095+    NA 0.9823095        NA    Inf     NA    9
+8  0.6216898     NA        NA 0.6216898     NA     NA    4
+9  0.3513491     NA        NA 0.3513491     NA     NA    1
+10 0.4874011+    NA 0.4874011        NA    Inf     NA   10
 > 
 > s <- Surv(tm, e, type = "left")
 > cbind(s, as.data.frame(mlt:::.Surv2matrix(s)))
@@ -208,17 +208,17 @@ Loading required package: basefun
 9   0.3513491   NA 0.3513491
 10 <0.4874011 -Inf 0.4874011
 > cbind(s, mlt:::.Surv2R(s))
-            s tleft cleft     exact    cright tright
-1  <0.3621201    NA  -Inf        NA 0.3621201     NA
-2  <0.8667453    NA  -Inf        NA 0.8667453     NA
-3   0.3626263    NA    NA 0.3626263        NA     NA
-4   0.6658932    NA    NA 0.6658932        NA     NA
-5   0.6183130    NA    NA 0.6183130        NA     NA
-6   0.9728763    NA    NA 0.9728763        NA     NA
-7  <0.9823095    NA  -Inf        NA 0.9823095     NA
-8   0.6216898    NA    NA 0.6216898        NA     NA
-9   0.3513491    NA    NA 0.3513491        NA     NA
-10 <0.4874011    NA  -Inf        NA 0.4874011     NA
+            s tleft cleft     exact    cright tright rank
+1  <0.3621201    NA  -Inf        NA 0.3621201     NA    7
+2  <0.8667453    NA  -Inf        NA 0.8667453     NA    8
+3   0.3626263    NA    NA 0.3626263        NA     NA    2
+4   0.6658932    NA    NA 0.6658932        NA     NA    5
+5   0.6183130    NA    NA 0.6183130        NA     NA    3
+6   0.9728763    NA    NA 0.9728763        NA     NA    6
+7  <0.9823095    NA  -Inf        NA 0.9823095     NA    9
+8   0.6216898    NA    NA 0.6216898        NA     NA    4
+9   0.3513491    NA    NA 0.3513491        NA     NA    1
+10 <0.4874011    NA  -Inf        NA 0.4874011     NA   10
 > 
 > s <- Surv(tm, tm + 1, type = "interval2")
 > cbind(s, as.data.frame(mlt:::.Surv2matrix(s)))
@@ -234,17 +234,17 @@ Loading required package: basefun
 9  [0.3513491, 1.351349] 0.3513491 1.351349
 10 [0.4874011, 1.487401] 0.4874011 1.487401
 > cbind(s, mlt:::.Surv2R(s))
-                       s tleft     cleft exact   cright tright
-1  [0.3621201, 1.362120]    NA 0.3621201    NA 1.362120     NA
-2  [0.8667453, 1.866745]    NA 0.8667453    NA 1.866745     NA
-3  [0.3626263, 1.362626]    NA 0.3626263    NA 1.362626     NA
-4  [0.6658932, 1.665893]    NA 0.6658932    NA 1.665893     NA
-5  [0.6183130, 1.618313]    NA 0.6183130    NA 1.618313     NA
-6  [0.9728763, 1.972876]    NA 0.9728763    NA 1.972876     NA
-7  [0.9823095, 1.982309]    NA 0.9823095    NA 1.982309     NA
-8  [0.6216898, 1.621690]    NA 0.6216898    NA 1.621690     NA
-9  [0.3513491, 1.351349]    NA 0.3513491    NA 1.351349     NA
-10 [0.4874011, 1.487401]    NA 0.4874011    NA 1.487401     NA
+                       s tleft     cleft exact   cright tright rank
+1  [0.3621201, 1.362120]    NA 0.3621201    NA 1.362120     NA   10
+2  [0.8667453, 1.866745]    NA 0.8667453    NA 1.866745     NA   10
+3  [0.3626263, 1.362626]    NA 0.3626263    NA 1.362626     NA   10
+4  [0.6658932, 1.665893]    NA 0.6658932    NA 1.665893     NA   10
+5  [0.6183130, 1.618313]    NA 0.6183130    NA 1.618313     NA   10
+6  [0.9728763, 1.972876]    NA 0.9728763    NA 1.972876     NA   10
+7  [0.9823095, 1.982309]    NA 0.9823095    NA 1.982309     NA   10
+8  [0.6216898, 1.621690]    NA 0.6216898    NA 1.621690     NA   10
+9  [0.3513491, 1.351349]    NA 0.3513491    NA 1.351349     NA   10
+10 [0.4874011, 1.487401]    NA 0.4874011    NA 1.487401     NA   10
 > 
 > s <- Surv(tm, tm + 1, sample(0:3, length(tm), replace = TRUE), type = "interval")
 > cbind(s, as.data.frame(mlt:::.Surv2matrix(s)))
@@ -260,17 +260,17 @@ Loading required package: basefun
 9  [0.3513491, 1.351349] 0.3513491 1.3513491
 10 [0.4874011, 1.487401] 0.4874011 1.4874011
 > cbind(s, mlt:::.Surv2R(s))
-                       s tleft     cleft     exact    cright tright
-1              0.3621201    NA        NA 0.3621201        NA     NA
-2              0.8667453    NA        NA 0.8667453        NA     NA
-3             0.3626263+    NA 0.3626263        NA       Inf     NA
-4             0.6658932-    NA      -Inf        NA 0.6658932     NA
-5             0.6183130+    NA 0.6183130        NA       Inf     NA
-6  [0.9728763, 1.972876]    NA 0.9728763        NA 1.9728763     NA
-7             0.9823095-    NA      -Inf        NA 0.9823095     NA
-8             0.6216898+    NA 0.6216898        NA       Inf     NA
-9  [0.3513491, 1.351349]    NA 0.3513491        NA 1.3513491     NA
-10 [0.4874011, 1.487401]    NA 0.4874011        NA 1.4874011     NA
+                       s tleft     cleft     exact    cright tright rank
+1              0.3621201    NA        NA 0.3621201        NA     NA    1
+2              0.8667453    NA        NA 0.8667453        NA     NA    2
+3             0.3626263+    NA 0.3626263        NA       Inf     NA    3
+4             0.6658932-    NA      -Inf        NA 0.6658932     NA    4
+5             0.6183130+    NA 0.6183130        NA       Inf     NA    5
+6  [0.9728763, 1.972876]    NA 0.9728763        NA 1.9728763     NA    6
+7             0.9823095-    NA      -Inf        NA 0.9823095     NA    7
+8             0.6216898+    NA 0.6216898        NA       Inf     NA    8
+9  [0.3513491, 1.351349]    NA 0.3513491        NA 1.3513491     NA    9
+10 [0.4874011, 1.487401]    NA 0.4874011        NA 1.4874011     NA   10
 > 
 > s <- Surv(tm, tm + 1, e, type = "counting")
 > cbind(s, as.data.frame(mlt:::.Surv2matrix(s)))
@@ -286,41 +286,41 @@ Loading required package: basefun
 9   (0.3513491,1.351349] 1.351349    NA 0.3513491
 10 (0.4874011,1.487401+] 1.487401   Inf 0.4874011
 > cbind(s, mlt:::.Surv2R(s))
-                       s     tleft    cleft    exact cright tright
-1  (0.3621201,1.362120+] 0.3621201 1.362120       NA    Inf     NA
-2  (0.8667453,1.866745+] 0.8667453 1.866745       NA    Inf     NA
-3   (0.3626263,1.362626] 0.3626263       NA 1.362626     NA     NA
-4   (0.6658932,1.665893] 0.6658932       NA 1.665893     NA     NA
-5   (0.6183130,1.618313] 0.6183130       NA 1.618313     NA     NA
-6   (0.9728763,1.972876] 0.9728763       NA 1.972876     NA     NA
-7  (0.9823095,1.982309+] 0.9823095 1.982309       NA    Inf     NA
-8   (0.6216898,1.621690] 0.6216898       NA 1.621690     NA     NA
-9   (0.3513491,1.351349] 0.3513491       NA 1.351349     NA     NA
-10 (0.4874011,1.487401+] 0.4874011 1.487401       NA    Inf     NA
+                       s     tleft    cleft    exact cright tright rank
+1  (0.3621201,1.362120+] 0.3621201 1.362120       NA    Inf     NA    7
+2  (0.8667453,1.866745+] 0.8667453 1.866745       NA    Inf     NA    8
+3   (0.3626263,1.362626] 0.3626263       NA 1.362626     NA     NA    2
+4   (0.6658932,1.665893] 0.6658932       NA 1.665893     NA     NA    5
+5   (0.6183130,1.618313] 0.6183130       NA 1.618313     NA     NA    3
+6   (0.9728763,1.972876] 0.9728763       NA 1.972876     NA     NA    6
+7  (0.9823095,1.982309+] 0.9823095 1.982309       NA    Inf     NA    9
+8   (0.6216898,1.621690] 0.6216898       NA 1.621690     NA     NA    4
+9   (0.3513491,1.351349] 0.3513491       NA 1.351349     NA     NA    1
+10 (0.4874011,1.487401+] 0.4874011 1.487401       NA    Inf     NA   10
 > 
 > R(gl(3, 2, ordered = TRUE))
-  tleft cleft exact cright tright
-1    NA  <NA>    NA      1     NA
-2    NA  <NA>    NA      1     NA
-3    NA     1    NA      2     NA
-4    NA     1    NA      2     NA
-5    NA     2    NA   <NA>     NA
-6    NA     2    NA   <NA>     NA
+  tleft cleft exact cright tright rank
+1    NA  <NA>    NA      1     NA    2
+2    NA  <NA>    NA      1     NA    2
+3    NA     1    NA      2     NA    4
+4    NA     1    NA      2     NA    4
+5    NA     2    NA   <NA>     NA    6
+6    NA     2    NA   <NA>     NA    6
 > R(0:10)
-   tleft cleft exact cright tright
-1     NA    NA    NA      0     NA
-2     NA     0    NA      1     NA
-3     NA     1    NA      2     NA
-4     NA     2    NA      3     NA
-5     NA     3    NA      4     NA
-6     NA     4    NA      5     NA
-7     NA     5    NA      6     NA
-8     NA     6    NA      7     NA
-9     NA     7    NA      8     NA
-10    NA     8    NA      9     NA
-11    NA     9    NA     10     NA
+   tleft cleft exact cright tright rank
+1     NA    NA    NA      0     NA    1
+2     NA     0    NA      1     NA    2
+3     NA     1    NA      2     NA    3
+4     NA     2    NA      3     NA    4
+5     NA     3    NA      4     NA    5
+6     NA     4    NA      5     NA    6
+7     NA     5    NA      6     NA    7
+8     NA     6    NA      7     NA    8
+9     NA     7    NA      8     NA    9
+10    NA     8    NA      9     NA   10
+11    NA     9    NA     10     NA   11
 > 
 > 
 > proc.time()
    user  system elapsed 
-  1.600   0.046   1.633 
+  0.978   0.030   0.999 

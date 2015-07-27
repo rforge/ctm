@@ -102,9 +102,11 @@ R <- function(exact = NA, cleft = NA, cright = NA,
     }
 
     if (any(!is.na(exact))) {
+        rank <- rank(exact, ties.method = "max")
         if (is.factor(exact)) {
             if (!is.ordered(exact)) 
-                warning("response is unordered factor; results may depend on order of levels")
+                warning("response is unordered factor; 
+                         results may depend on order of levels")
             stopifnot(all(is.na(c(tleft, cleft, cright, tright))))
             lev <- levels(exact)
             cright <- as.ordered(exact)
@@ -120,10 +122,22 @@ R <- function(exact = NA, cleft = NA, cright = NA,
             cleft[cleft < 0] <- NA
             exact <- NA
         }
+    } else {
+        ### some meaningful ordering of observations
+        tmpexact <- as.numeric(exact)
+        tmpleft <- as.numeric(cleft)
+        tmpright <- as.numeric(cright)
+        tmpleft[is.na(tmpleft)] <- 
+            pmin(tmpleft, tmpexact, tmpright, na.rm = TRUE)
+        tmpright[is.na(tmpright)] <- 
+            pmax(tmpleft, tmpexact, tmpright, na.rm = TRUE)
+        tmpexact[is.na(tmpexact)] <- 
+            ((tmpright - tmpleft) / 2)[is.na(tmpexact)]
+        rank <- rank(tmpexact, ties.method = "max")
     }
 
     ret <- data.frame(tleft = tleft, cleft = cleft, exact = exact,
-                      cright = cright, tright = tright)
+                      cright = cright, tright = tright, rank = rank)
 #    with(ret, stopifnot(cleft < cright))
 #    with(ret, stopifnot(tleft < tright))
 #    with(subset(ret, !is.na(exact)), stopifnot(cleft < exact))

@@ -3,6 +3,8 @@ library("mlt")
 set.seed(29)
 
 n <- 20
+### design has rank deficit; just for interface checking
+### we need something better!
 d <- data.frame(x1 = 1:n, x2 = 1:n + 1, y = rnorm(n))
 m <- model(polynomial_basis(c(TRUE, TRUE), varname = "y",
            ci = c(-Inf, 0), support = range(d$y)),

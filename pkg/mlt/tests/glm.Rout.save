@@ -1,5 +1,5 @@
 
-R version 3.1.3 (2015-03-09) -- "Smooth Sidewalk"
+R version 3.2.1 (2015-06-18) -- "World-Famous Astronaut"
 Copyright (C) 2015 The R Foundation for Statistical Computing
 Platform: x86_64-unknown-linux-gnu (64-bit)
 
@@ -34,16 +34,17 @@ Loading required package: basefun
 > 
 > m <- model(~ y, shift = ~ X1 + X2, todist = "Logis")
 > m2 <- mlt(m, data = df, fixed = c("y.L" = 0))
-Gradient[1] "Mean relative difference: 0.0002899951"
+Gradient[1] "Mean relative difference: 0.0001754592"
 Hessian:[1] TRUE
 Warning message:
-In R(exact = y) :
-  response is unordered factor; results may depend on order of levels
+In R(exact = y) : response is unordered factor; 
+                         results may depend on order of levels
 > coef(m2)
-[1] -0.7372381  0.0000000  0.3848546  0.8292046
+(Intercept)         y.L          X1          X2 
+ -0.7372349   0.0000000   0.3848510   0.8292017 
 > 
 > max(abs(coef(m1) + coef(m2)[-2]))
-[1] 9.584264e-08
+[1] 3.580145e-06
 > 
 > logLik(m1)
 'log Lik.' -68.12815 (df=3)
@@ -83,20 +84,24 @@ virginica    -23.83628    -7.923634  -15.370769     23.65978   15.135301
 > m <- model(r, interacting = as.basis(~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width, data = oiris),
 +            todistr = "Logis")
 > m2 <- mlt(m, data = oiris)
-Gradient[1] "Mean relative difference: 1.415292e-06"
-Hessian:[1] "Mean relative difference: 0.0004797966"
-Warning message:
-In spg(par = theta, fn = loglikfct, gr = scorefct, project = "projectLinear",  :
+Gradient[1] "Mean relative difference: 4.482669e-07"
+Hessian:[1] "Mean relative difference: 0.0004797972"
+Warning messages:
+1: In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
+  negative contribution to likelihood; constraints violated!
+2: In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
+  negative contribution to likelihood; constraints violated!
+3: In spg(par = theta, fn = loglikfct, gr = scorefct, project = "projectLinear",  :
   Unsuccessful convergence.
 > coef(m2)
  Species1:(Intercept)  Species2:(Intercept) Species1:Sepal.Length 
-           0.05357553           42.63780769            2.46494636 
+            0.5334547            42.6378008             2.3599572 
 Species2:Sepal.Length  Species1:Sepal.Width  Species2:Sepal.Width 
-           2.46518639            6.21641456            6.68095269 
+            2.4652423             6.2037428             6.6808441 
 Species1:Petal.Length Species2:Petal.Length  Species1:Petal.Width 
-         -10.68868143           -9.42939338           -5.31735494 
+          -10.6655199            -9.4293797            -5.2953701 
  Species2:Petal.Width 
-         -18.28610232 
+          -18.2861593 
 > 
 > s <- sort(unique(oiris$Species))
 > 
@@ -105,9 +110,9 @@ Species1:Petal.Length Species2:Petal.Length  Species1:Petal.Width
 > pp1 <- predict(m1, newdata = iris, type = "prob")
 > 
 > max(abs(pp1 - t(pp2)))
-[1] 0.001176896
+[1] 0.001181005
 > 
 > 
 > proc.time()
    user  system elapsed 
-  3.610   0.072   3.670 
+  2.584   0.014   2.592 

@@ -1,54 +1,7 @@
 
-### better: 
-### (1) cluster x (hclust or something dirty)
-### (2) within each cluster: order response (somehow deal with censoring)
-### (3) working response F^-1 (0:n/n)
-### (4) design matrix: c(y, x)
-### (5) estimate parm via least squares
-### cf polr (uses glm)
-
-.findstart <- function(model, y, data, ui = NULL, ci = NULL, fix = NULL, fixed = NULL) {
-
-    response <- model$response
-
-    r <- range(unlist(y), na.rm = TRUE, finite = TRUE)
-    if (any(!is.na(y$exact))) {
-        ytmp <- ifelse(!is.na(y$exact), y$exact, 
-                      (ifelse(is.finite(y$cleft), y$cleft, r[1]) + 
-                       ifelse(is.finite(y$cright), y$cright, r[2])) / 2)
-    } else {
-        if (is.factor(y$cright) || is.integer(y$right)) {
-            ytmp <- y$cright
-            ytmp[is.na(ytmp)] <- levels(y$cright)[nlevels(y$cright)]
-        } else {
-            ytmp <- (ifelse(is.finite(y$cleft), y$cleft, r[1]) +
-                     ifelse(is.finite(y$cright), y$cright, r[2])) / 2
-        }
-    }
-    if (is.factor(ytmp)) ytmps <- (1:nlevels(ytmp))[ytmp] else ytmps <- ytmp
-
-    z <- scale(ytmps)
-    data[[response]] <- ytmp
-    Y <- model.matrix(model, data)
-    if (any(fix)) {
-        z <- z - Y[, fix, drop = FALSE] %*% fixed
-        Y <- Y[, !fix, drop = FALSE]
-    }
-    theta <- lm.fit(y = z, x = Y)$coef
-    if (any(is.na(theta))) {
-        warning("cannot determine some starting values")
-        theta[is.na(theta)] <- 0
-    }
-    if (is.null(ui)) return(theta)
-    if (any(ui %*% theta - ci <= 0)) {
-        citmp <- ci + .1
-        theta <- MASS::ginv(ui) %*% citmp
-    }
-    theta
-}
-
-### <FIXME> rename fixed to coef and allow for specification of coefs, ie fitted models? </FIXME>
-.mlt_setup <- function(model, data, weights = NULL, 
+### <FIXME> rename fixed to coef and allow for specification of coefs, 
+###         ie fitted models? </FIXME>
+.mlt_setup <- function(model, data, y, weights = NULL, 
                        offset = NULL, fixed = NULL) {
 
     if (is.null(weights)) weights <- rep(1, nrow(data))
@@ -58,22 +11,8 @@
 
     response <- model$response
     stopifnot(length(response) == 1)
-    y <- data[[response]]
-
     todistr <- model$todistr
 
-    if (!inherits(y, "response")) {
-        ytype <- .type_of_response(y)
-        if (is.na(ytype))
-            stop("cannot deal with response class", class(y))
-
-        if (ytype == "survival") {
-            y <- .Surv2R(y)
-        } else {
-            y <- R(exact = y)
-        }
-    }
-    
     eY <- .mm_exact(model, data = data, response = response, object = y)
     iY <- .mm_interval(model, data = data, response = response, object = y)
 
@@ -150,19 +89,11 @@
         return(spg(par = theta, fn = loglikfct, gr = scorefct, control = control))
     }
 
-    theta <- .findstart(model, y, data, ui, ci, fix, fixed)
-
-    ### at least one serious constraint
-    if (!is.null(ui))
-        if(!all(ui %*% theta - ci >= 0)) 
-            warning("start from inadmissible parameters")
-
     coef <- rep(NA, length(fix))
     coef[fix] <- fixed
     names(coef) <- colnames(Y)
 
     ret <- list()
-    ret$theta <- theta
     ret$parm <- .parm
     ret$coef <- coef
     ret$model <- model
@@ -179,7 +110,77 @@
     return(ret)
 }
 
-.mlt_fit <- function(object, theta = object$theta, check = TRUE, trace = FALSE, ...) {
+.mlt_start <- function(model, data, y, pstart, offset = NULL, fixed = NULL) {
+
+    stopifnot(length(pstart) == nrow(data))
+    if (is.null(offset)) offset <- rep(0, nrow(data))
+
+    response <- model$response
+    stopifnot(length(response) == 1)
+
+    eY <- .mm_exact(model, data = data, response = response, object = y)
+    iY <- .mm_interval(model, data = data, response = response, object = y)
+
+    if (is.null(eY)) {
+        Y <- iY$Yleft
+    } else {
+        Y <- eY$Y
+    }
+
+    ui <- as.matrix(attr(Y, "constraint")$ui)
+    ci <- attr(Y, "constraint")$ci
+
+    if (!is.null(fixed)) {
+        stopifnot(all(names(fixed) %in% colnames(Y)))
+        fix <- colnames(Y) %in% names(fixed)
+        ui <- ui[,!fix,drop = FALSE]
+    } else {
+        fix <- rep(FALSE, ncol(Y))
+    } 
+
+    X <- matrix(0, nrow = NROW(y), ncol = ncol(Y))
+    if (!is.null(eY))
+        X[eY$which,] <- eY$Y
+    if (!is.null(iY))
+        X[iY$which,] <- iY$Yright
+    X[!is.finite(X[,1]),] <- 0
+
+    if (any(fix)) {
+        offset <- X[, fix, drop = FALSE] %*% fixed
+        X <- X[, !fix, drop = FALSE]
+    }
+
+    todistr <- model$todistr
+    Z <- todistr$q(pmax(.01, pmin(pstart, .99))) - offset
+
+    dvec <- crossprod(X, Z)
+    Dmat <- crossprod(X)
+    diag(Dmat) <- diag(Dmat) + 1e-08
+
+    if (all(!is.finite(ci))) {
+        ui <- ci <- NULL
+    } else {
+        ui <- as(ui[is.finite(ci),,drop = FALSE], "matrix")
+        ci <- ci[is.finite(ci)]
+        r0 <- rowSums(abs(ui)) == 0
+        ui <- ui[!r0,,drop = FALSE]
+        ci <- ci[!r0]
+        if (nrow(ui) == 0) ui <- ci <- NULL
+        ci <- ci + sqrt(.Machine$double.eps) ### we need ui %*% theta > ci, not >= ci
+    }
+
+    if (!is.null(ui)) {    
+        ret <- solve.QP(Dmat, dvec, t(ui), ci, meq = 0)$solution
+    } else {
+        ret <- lm.fit(x = X, y = Z)$coef
+    }
+    ret
+}
+
+.mlt_fit <- function(object, theta = NULL, check = TRUE, trace = FALSE, ...) {
+
+    if (is.null(theta))
+        stop(sQuote("mlt"), "needs suitable starting values")
 
     ret <- try(object$optimfct(theta, trace = trace, ...))    
     if (inherits(ret, "try-error") || ret$convergence != 0 || ret$gradient > 1)
@@ -190,15 +191,15 @@
 
     cls <- class(object)
     object <- c(object, ret)
-    object$coef <- object$parm(ret$par)
+    object$coef[] <- object$parm(ret$par) ### [] preserves names
     class(object) <- c("mlt_fit", cls)
     
     if (check) {
         ### check gradient  and hessian
         gr <- numDeriv::grad(object$loglik, ret$par)
-        s <- estfun(object)
+        s <- as.vector(colSums(estfun(object)))
         cat("Gradient")
-        print(all.equal(gr, -s, check.attributes = FALSE))
+        print(all.equal(gr, s, check.attributes = FALSE))
 
         H1 <- numDeriv::hessian(object$loglik, ret$par)
         H2 <- Hessian(object)
@@ -209,16 +210,41 @@
     return(object)
 }
 
-mlt <- function(..., dofit = TRUE) {
-    args <- list(...)
-    if (sum(names(args) == "") > 1)
-        stop("function mlt requires names arguments")
-    sa <- c("", "model", "data", "weights", "offset", "trunc", "fixed")
-    setupargs <- args[names(args) %in% sa]
-    fitargs <- args[!(names(args) %in% sa)]
-    s <- do.call(".mlt_setup", setupargs)
-    if (!dofit) return(s)
-    fitargs$object <- s
-    do.call(".mlt_fit", fitargs)
-}
+mlt <- function(model, data, weights = NULL, offset = NULL, fixed = NULL,
+                theta = NULL, pstart = NULL, check = TRUE, checkGrad = FALSE, 
+                trace = FALSE, dofit = TRUE, ...) {
 
+    response <- model$response
+    stopifnot(length(response) == 1)
+    y <- data[[response]]
+    if (!inherits(y, "response")) {
+        ytype <- .type_of_response(y)
+        if (is.na(ytype))
+            stop("cannot deal with response class", class(y))
+
+        if (ytype == "survival") {
+            y <- .Surv2R(y)
+        } else {
+            y <- R(exact = y)
+        }
+    }
+
+    s <- .mlt_setup(model = model, data = data, y = y, weights = weights, 
+                    offset = offset, fixed = fixed) 
+    if (!dofit) return(s)
+
+    if (is.null(theta)) {
+        ### unconditional ECDF, essentially
+        if (is.null(pstart)) pstart <- y$rank / max(y$rank)
+        theta <- .mlt_start(model = model, data = data, y = y, 
+                            pstart = pstart, offset = offset, fixed = fixed)
+    }
+
+    args <- list(...)
+    args$object <- s
+    args$theta <- theta
+    args$check <- check
+    args$checkGrad <- checkGrad
+    args$trace <- trace
+    do.call(".mlt_fit", args)
+}
