@@ -1,19 +1,13 @@
 
 polynomial_basis <- function(coef, support = c(0, 1),
-                             ui = NULL, ci = NULL,
-                             varname = NULL, orthogonal = NULL) {
+                             ui = NULL, ci = NULL, varname = NULL) {
 
-    if (!is.null(orthogonal)) {
-        stopifnot(is.atomic(orthogonal))
-        object <- poly.orth(orthogonal, degree = length(coef))
-    } else {
-        stopifnot(all(coef %in% c(0, 1)))
-        object <- do.call("polylist", lapply(1:length(coef), function(i) {
-            cf <- coef[1:i]
-            cf[1:i < i] <- 0
-            return(polynomial(cf))
-        }))
-    }
+    stopifnot(all(coef %in% c(0, 1)))
+    object <- do.call("polylist", lapply(1:length(coef), function(i) {
+        cf <- coef[1:i]
+        cf[1:i < i] <- 0
+        return(polynomial(cf))
+    }))
 
     if (is.null(ui)) ui <- Diagonal(length(object))
     if (is.null(ci)) ci <- rep(-Inf, length(object))
