@@ -13,10 +13,10 @@ mod <- mlt(m, data = d)
 
 p <- tmlt(mod, newdata = d)
 
-system.time(p0 <- predict(mod$model$model, 
+(p0 <- predict(mod$model$model, 
     newdata = expand.grid(d), coef = coef(mod)))
-system.time(p1 <- tmlt(mod, newdata = as.list(d)))
-system.time(p2 <- tmlt(mod, newdata = d, q = d$y[1]))
+(p1 <- tmlt(mod, newdata = as.list(d)))
+(p2 <- tmlt(mod, newdata = d, q = d$y[1]))
 
 max(abs(p0 - as.vector(p1)))
 
