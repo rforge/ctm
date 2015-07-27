@@ -197,7 +197,7 @@
     if (check) {
         ### check gradient  and hessian
         gr <- numDeriv::grad(object$loglik, ret$par)
-        s <- as.vector(colSums(estfun(object)))
+        s <- Gradient(object)
         cat("Gradient")
         print(all.equal(gr, s, check.attributes = FALSE))
 

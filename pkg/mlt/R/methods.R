@@ -19,14 +19,20 @@ coef.mlt <- function(object, fixed = TRUE, ...) {
 }
 
 ### use maxLik::hessian?
-Hessian <- function(object, ...)
+Hessian <- function(object)
     UseMethod("Hessian")
 
-Hessian.mlt <- function(object, ...)
+Hessian.mlt <- function(object)
     object$hessian(coef(object, fixed = FALSE))
     
+Gradient <- function(object)
+    UseMethod("Gradient")
+
+Gradient.mlt <- function(object)
+    as.vector(colSums(estfun(object)))
+
 vcov.mlt <- function(object, ...)
-    solve(Hessian(object, ...))
+    solve(Hessian(object))
 
 logLik.mlt <- function(object, ...) {
     ret <- -object$loglik(coef(object, fixed = FALSE))
