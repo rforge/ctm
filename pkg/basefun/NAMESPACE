@@ -4,7 +4,7 @@ useDynLib("basefun")
 import(Matrix)#, rBind, Diagonal, bdiag)
 import(polynom)
 importFrom(orthopolynom, legendre.polynomials)
-importFrom(stats, variable.names)
+importFrom(stats, variable.names, model.matrix, predict)
 
 # exportPattern("^[^\\.]")
 

@@ -1,0 +1,10 @@
+Package: ltm
+Title: Linear Transformation Models
+Version: 0.0-11
+Date: 2015-07-27
+Author: Torsten Hothorn
+Maintainer: Torsten Hothorn <Torsten.Hothorn@R-project.org>
+Description: Unified specification and estimation of linear transformation
+  models for arbitrary responses.
+Depends: mlt (>= 0.0-11), Formula
+License: GPL-2
