@@ -8,5 +8,5 @@ Description: Estimation via transformation.
 Depends: basefun (>= 0.0-11)
 Imports: BB, sandwich, stats, numDeriv, quadprog
 Enhances: np, eha, survival, nnet, truncreg
-Suggests: lattice, multcomp (>= 1.0-3)
+Suggests: lattice, multcomp (>= 1.0-3), MASS
 License: GPL-2
