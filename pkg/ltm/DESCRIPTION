@@ -6,5 +6,5 @@ Author: Torsten Hothorn
 Maintainer: Torsten Hothorn <Torsten.Hothorn@R-project.org>
 Description: Unified specification and estimation of linear transformation
   models for arbitrary responses.
-Depends: mlt (>= 0.0-11), Formula
+Depends: mlt (>= 0.0-12), Formula, multcomp
 License: GPL-2
