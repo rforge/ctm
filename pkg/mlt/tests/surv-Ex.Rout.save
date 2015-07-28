@@ -323,4 +323,4 @@ Loading required package: basefun
 > 
 > proc.time()
    user  system elapsed 
-  0.978   0.030   0.999 
+  1.036   0.056   1.084 

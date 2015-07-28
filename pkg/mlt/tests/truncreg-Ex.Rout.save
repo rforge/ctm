@@ -59,11 +59,12 @@ sigma       -7.445133e-06  1.637489e-06  3.940881e-05
 > dfull <- d[!is.na(d$yt),,drop = FALSE]
 > dfull$yt <- R(dfull$yt, tleft = dfull$trunc_left)
 > mltmod <- mlt(m, data = dfull)
-Gradient[1] "Mean relative difference: 5.303728e-05"
+  Successful convergence.
+Gradient[1] "Mean relative difference: 0.0002588669"
 Hessian:[1] TRUE
 > (cf <- coef(mltmod))
 (Intercept)          yt           x 
-  -3.957637    3.882763   -7.733560 
+  -3.957638    3.882764   -7.733562 
 > c(-cf[1] / cf[2], -cf[3] / cf[2], 1 / cf[2])
 (Intercept)           x          yt 
   1.0192835   1.9917670   0.2575485 
@@ -71,17 +72,17 @@ Hessian:[1] TRUE
 'log Lik.' -33.99032 (df=3)
 > vcov(mltmod)
              (Intercept)           yt           x
-(Intercept)  0.017689296 -0.009565421  0.01722587
-yt          -0.009565421  0.008956892 -0.01774419
-x            0.017225873 -0.017744189  0.03562564
+(Intercept)  0.017689298 -0.009565423  0.01722588
+yt          -0.009565423  0.008956894 -0.01774419
+x            0.017225877 -0.017744193  0.03562564
 > 
 > #library("numDeriv")
 > 
 > solve(numDeriv::hessian(mltmod$loglik, coef(mltmod)))
              [,1]         [,2]        [,3]
-[1,]  0.017689296 -0.009565421  0.01722587
-[2,] -0.009565421  0.008956892 -0.01774419
-[3,]  0.017225874 -0.017744190  0.03562564
+[1,]  0.017689298 -0.009565423  0.01722588
+[2,] -0.009565423  0.008956894 -0.01774419
+[3,]  0.017225878 -0.017744194  0.03562565
 > 
 > 
 > ## right-truncated
@@ -115,18 +116,21 @@ sigma       -2.840592e-06  1.854537e-06  4.525610e-05
 > dfull <- d[!is.na(d$yt),,drop = FALSE]
 > dfull$yt <- R(dfull$yt, tright = dfull$trunc_right)
 > mltmod <- mlt(m, data = dfull)
-Gradient[1] "Mean relative difference: 8.93805e-06"
+  Successful convergence.
+Gradient[1] "Mean relative difference: 1.153748e-05"
 Hessian:[1] "Mean relative difference: 1.225984e-05"
 Warning messages:
-1: In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
+1: In .log(mmprime %*% beta) :
   negative contribution to likelihood; constraints violated!
 2: In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
   negative contribution to likelihood; constraints violated!
 3: In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
   negative contribution to likelihood; constraints violated!
+4: In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
+  negative contribution to likelihood; constraints violated!
 > (cf <- coef(mltmod))
 (Intercept)          yt           x 
-  -3.789082    3.787785   -7.557109 
+  -3.789083    3.787786   -7.557110 
 > c(-cf[1] / cf[2], -cf[3] / cf[2], 1 / cf[2])
 (Intercept)           x          yt 
   1.0003424   1.9951261   0.2640065 
@@ -134,17 +138,17 @@ Warning messages:
 'log Lik.' -50.51895 (df=3)
 > vcov(mltmod)
              (Intercept)           yt           x
-(Intercept)  0.014383306 -0.009473333  0.01733344
-yt          -0.009473333  0.009315772 -0.01848536
-x            0.017333440 -0.018485356  0.03730401
+(Intercept)  0.014383308 -0.009473335  0.01733344
+yt          -0.009473335  0.009315774 -0.01848536
+x            0.017333444 -0.018485360  0.03730402
 > 
 > #library("numDeriv")
 > 
 > solve(numDeriv::hessian(mltmod$loglik, coef(mltmod)))
              [,1]         [,2]        [,3]
-[1,]  0.014235530 -0.009322139  0.01703085
-[2,] -0.009322139  0.009161308 -0.01817632
-[3,]  0.017030855 -0.018176322  0.03668577
+[1,]  0.014235532 -0.009322141  0.01703086
+[2,] -0.009322141  0.009161310 -0.01817633
+[3,]  0.017030859 -0.018176326  0.03668578
 Warning message:
 In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
   negative contribution to likelihood; constraints violated!
@@ -153,4 +157,4 @@ In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
 > 
 > proc.time()
    user  system elapsed 
-  1.558   0.061   1.608 
+  1.452   0.047   1.490 

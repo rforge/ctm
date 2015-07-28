@@ -41,49 +41,66 @@ Loading required package: basefun
 + lines(ecdf(faithful$waiting))
 + 
 + }
-Gradient[1] "Mean relative difference: 0.000698944"
+  Successful convergence.
+Gradient[1] "Mean relative difference: 0.0002958226"
 Hessian:[1] TRUE
+  Successful convergence.
 Gradient[1] TRUE
 Hessian:[1] TRUE
+  Successful convergence.
 Gradient[1] TRUE
 Hessian:[1] TRUE
+  Successful convergence.
 Gradient[1] TRUE
 Hessian:[1] TRUE
+  Successful convergence.
 Gradient[1] TRUE
 Hessian:[1] TRUE
+  Successful convergence.
 Gradient[1] TRUE
 Hessian:[1] TRUE
-Gradient[1] "Mean relative difference: 2.735775e-08"
+  Successful convergence.
+Gradient[1] "Mean relative difference: 3.041097e-08"
 Hessian:[1] TRUE
+  Successful convergence.
 Gradient[1] TRUE
 Hessian:[1] TRUE
+  Successful convergence.
 Gradient[1] TRUE
 Hessian:[1] TRUE
-Gradient[1] "Mean relative difference: 1.526991e-08"
+  Successful convergence.
+Gradient[1] "Mean relative difference: 1.724299e-08"
 Hessian:[1] TRUE
+  Successful convergence.
 Gradient[1] TRUE
 Hessian:[1] TRUE
+  Successful convergence.
 Gradient[1] TRUE
 Hessian:[1] TRUE
+  Successful convergence.
 Gradient[1] TRUE
 Hessian:[1] TRUE
+  Successful convergence.
 Gradient[1] TRUE
 Hessian:[1] TRUE
-Gradient[1] "Mean relative difference: 1.50821e-08"
+  Successful convergence.
+Gradient[1] TRUE
 Hessian:[1] TRUE
-Gradient[1] "Mean relative difference: 1.562013e-08"
+  Successful convergence.
+Gradient[1] TRUE
 Hessian:[1] TRUE
-Gradient[1] "Mean relative difference: 1.649378e-08"
+  Successful convergence.
+Gradient[1] TRUE
 Hessian:[1] TRUE
-Gradient[1] "Mean relative difference: 3.764643e-08"
+  Successful convergence.
+Gradient[1] "Mean relative difference: 3.224944e-08"
 Hessian:[1] TRUE
-Gradient[1] "Mean relative difference: 3.553898e-08"
+  Successful convergence.
+Gradient[1] "Mean relative difference: 2.39713e-08"
 Hessian:[1] TRUE
-Gradient[1] "Mean relative difference: 3.361534e-08"
+  Successful convergence.
+Gradient[1] "Mean relative difference: 4.000367e-08"
 Hessian:[1] TRUE
-Warning message:
-In spg(par = theta, fn = loglikfct, gr = scorefct, project = "projectLinear",  :
-  Unsuccessful convergence.
 > 
 > plot(aic)
 > 
@@ -92,7 +109,8 @@ In spg(par = theta, fn = loglikfct, gr = scorefct, project = "projectLinear",  :
 +                       support = range(faithful$waiting) + c(-5, 5))
 > m <- model(Bs)
 > mod <- mlt(m, data = faithful)
-Gradient[1] "Mean relative difference: 2.735775e-08"
+  Successful convergence.
+Gradient[1] "Mean relative difference: 3.041097e-08"
 Hessian:[1] TRUE
 > 
 > abline(h = AIC(mod))
@@ -114,7 +132,8 @@ Hessian:[1] TRUE
 +                       support = range(faithful$waiting) + c(-5, 5))
 > m <- model(Bs)
 > mod <- mlt(m, data = faithful)
-Gradient[1] "Mean relative difference: 2.735775e-08"
+  Successful convergence.
+Gradient[1] "Mean relative difference: 3.041097e-08"
 Hessian:[1] TRUE
 > 
 > # H1 <- mod$optim(coef(mod), hessian = TRUE)$hessian
@@ -125,29 +144,29 @@ Hessian:[1] TRUE
 > w <- drop((Xprime %*% coef(mod))^2)
 > H3 <- crossprod(X) + crossprod(Xprime * w, Xprime)
 > max(abs(H3 - H2))
-[1] 9.885543
+[1] 9.885597
 > 
 > cov2cor(vcov(mod))
              Bs1(waiting) Bs2(waiting) Bs3(waiting) Bs4(waiting) Bs5(waiting)
-Bs1(waiting)    1.0000000   -0.9652655    0.9032052   -0.8310316    0.7513994
-Bs2(waiting)   -0.9652655    1.0000000   -0.9793104    0.9309905   -0.8628107
-Bs3(waiting)    0.9032052   -0.9793104    1.0000000   -0.9835440    0.9383218
-Bs4(waiting)   -0.8310316    0.9309905   -0.9835440    1.0000000   -0.9837277
-Bs5(waiting)    0.7513994   -0.8628107    0.9383218   -0.9837277    1.0000000
-Bs6(waiting)   -0.6649917    0.7788032   -0.8677579    0.9357828   -0.9824465
-Bs7(waiting)    0.5741521   -0.6830276    0.7767006   -0.8583341    0.9286162
-Bs8(waiting)   -0.4756209    0.5730194   -0.6625695    0.7479340   -0.8313482
-Bs9(waiting)    0.3573293   -0.4341435    0.5079549   -0.5821465    0.6606654
+Bs1(waiting)    1.0000000   -0.9652656    0.9032053   -0.8310317    0.7513995
+Bs2(waiting)   -0.9652656    1.0000000   -0.9793104    0.9309906   -0.8628108
+Bs3(waiting)    0.9032053   -0.9793104    1.0000000   -0.9835441    0.9383219
+Bs4(waiting)   -0.8310317    0.9309906   -0.9835441    1.0000000   -0.9837278
+Bs5(waiting)    0.7513995   -0.8628108    0.9383219   -0.9837278    1.0000000
+Bs6(waiting)   -0.6649918    0.7788034   -0.8677581    0.9357829   -0.9824465
+Bs7(waiting)    0.5741523   -0.6830278    0.7767008   -0.8583342    0.9286162
+Bs8(waiting)   -0.4756211    0.5730197   -0.6625697    0.7479342   -0.8313483
+Bs9(waiting)    0.3573296   -0.4341439    0.5079552   -0.5821468    0.6606656
              Bs6(waiting) Bs7(waiting) Bs8(waiting) Bs9(waiting)
-Bs1(waiting)   -0.6649917    0.5741521   -0.4756209    0.3573293
-Bs2(waiting)    0.7788032   -0.6830276    0.5730194   -0.4341435
-Bs3(waiting)   -0.8677579    0.7767006   -0.6625695    0.5079549
-Bs4(waiting)    0.9357828   -0.8583341    0.7479340   -0.5821465
-Bs5(waiting)   -0.9824465    0.9286162   -0.8313482    0.6606654
-Bs6(waiting)    1.0000000   -0.9794871    0.9079639   -0.7427119
+Bs1(waiting)   -0.6649918    0.5741523   -0.4756211    0.3573296
+Bs2(waiting)    0.7788034   -0.6830278    0.5730197   -0.4341439
+Bs3(waiting)   -0.8677581    0.7767008   -0.6625697    0.5079552
+Bs4(waiting)    0.9357829   -0.8583342    0.7479342   -0.5821468
+Bs5(waiting)   -0.9824465    0.9286162   -0.8313483    0.6606656
+Bs6(waiting)    1.0000000   -0.9794871    0.9079639   -0.7427120
 Bs7(waiting)   -0.9794871    1.0000000   -0.9699965    0.8292216
-Bs8(waiting)    0.9079639   -0.9699965    1.0000000   -0.9214161
-Bs9(waiting)   -0.7427119    0.8292216   -0.9214161    1.0000000
+Bs8(waiting)    0.9079639   -0.9699965    1.0000000   -0.9214160
+Bs9(waiting)   -0.7427120    0.8292216   -0.9214160    1.0000000
 > 
 > if (TRUE) {
 + library("multcomp") ### since 1.0-3
@@ -179,4 +198,4 @@ Loading required package: TH.data
 > 
 > proc.time()
    user  system elapsed 
- 17.092   0.031  17.122 
+ 19.771   0.021  19.787 

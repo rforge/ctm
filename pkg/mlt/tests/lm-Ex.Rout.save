@@ -28,17 +28,18 @@ Loading required package: basefun
 > m <- model(lin)
 > 
 > o <- mlt(m, data = d)
-Gradient[1] TRUE
+  Successful convergence.
+Gradient[1] "Mean relative difference: 6.015761e-05"
 Hessian:[1] TRUE
 > 
 > s2ml <- sqrt(var(y) * (n - 1) / n)
 > 1 / coef(o)[2] - s2ml
-            y 
--2.602585e-12 
+           y 
+5.944143e-08 
 > 
 > -coef(o)[1] / coef(o)[2] - mean(y)
   (Intercept) 
--3.525402e-12 
+-8.815473e-08 
 > 
 > x <- runif(n, max = 2 * pi)
 > y <- rnorm(n, sin(x), .25)
@@ -53,18 +54,17 @@ In c.basis(bresponse = response, bshifting = shifting) :
   more than one basis contains an intercept term
 > 
 > o <- mlt(m, data = d)
-Gradient[1] "Mean relative difference: 2.084928e-06"
+  Unsuccessful convergence.
+Gradient[1] "Mean relative difference: 7.08799e-07"
 Hessian:[1] TRUE
 Warning messages:
-1: In spg(par = theta, fn = loglikfct, gr = scorefct, project = "projectLinear",  :
-  Unsuccessful convergence.
-2: In spg(par = theta, fn = loglikfct, gr = scorefct, project = "projectLinear",  :
-  Unsuccessful convergence.
-3: In .mlt_fit(object = list(parm = function (beta)  :
-  algorithm did not converge
+1: In .log(mmprime %*% beta) :
+  negative contribution to likelihood; constraints violated!
+2: In .log(mmprime %*% beta) :
+  negative contribution to likelihood; constraints violated!
 > 1 / coef(o)[2]
         y 
-0.2608426 
+0.2608465 
 > p <- predict(Bb,
 +              newdata = data.frame(x = x), coef = coef(o)[-(1:2)])
 > plot(x, y)
@@ -92,15 +92,12 @@ Note: method with signature 'Matrix#numLike' chosen for function '%*%',
 Note: method with signature 'sparseMatrix#matrix' chosen for function '%*%',
  target signature 'dgTMatrix#matrix'.
  "TsparseMatrix#ANY" would also be valid
-Gradient[1] "Mean relative difference: 0.0001953126"
-Hessian:[1] "Mean relative difference: 1.19919e-05"
-Warning messages:
-1: In spg(par = theta, fn = loglikfct, gr = scorefct, project = "projectLinear",  :
   Unsuccessful convergence.
-2: In spg(par = theta, fn = loglikfct, gr = scorefct, project = "projectLinear",  :
-  Unsuccessful convergence.
-3: In .mlt_fit(object = list(parm = function (beta)  :
-  algorithm did not converge
+Gradient[1] "Mean relative difference: 2.063975e-07"
+Hessian:[1] "Mean relative difference: 4.584995e-07"
+Warning message:
+In .log(mmprime %*% beta) :
+  negative contribution to likelihood; constraints violated!
 > 
 > nd <- data.frame(x = sort(x))
 > layout(matrix(1:2, nr = 2))
@@ -111,4 +108,4 @@ Warning messages:
 > 
 > proc.time()
    user  system elapsed 
- 11.350   0.031  11.377 
+ 29.657   0.119  29.775 

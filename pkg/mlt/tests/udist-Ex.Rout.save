@@ -35,7 +35,8 @@ Nonparametric Kernel Methods for Mixed Datatypes (version 0.60-2)
 > 
 > mydata <- data.frame(y = y)
 > opt <- mlt(model(response = Bb), data = mydata)
-Gradient[1] "Mean relative difference: 1.785087e-08"
+  Successful convergence.
+Gradient[1] TRUE
 Hessian:[1] TRUE
 > d <- opt$todistr
 > 
@@ -64,4 +65,4 @@ Hessian:[1] TRUE
 > 
 > proc.time()
    user  system elapsed 
-  1.379   0.040   1.409 
+  1.370   0.027   1.390 

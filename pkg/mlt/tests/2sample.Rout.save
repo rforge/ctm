@@ -28,54 +28,56 @@ Loading required package: basefun
 > by <- polynomial_basis(c(1, 1), var = "y", support = range(y), ci = c(-Inf, 0))
 > m1 <- model(by, interacting = as.basis(~ g - 1, data = mydata))
 > fm1 <- mlt(m1, data = mydata)
-Gradient[1] "Mean relative difference: 2.500937e-05"
+  Successful convergence.
+Gradient[1] "Mean relative difference: 4.198332e-05"
 Hessian:[1] TRUE
 > logLik(fm1)
 'log Lik.' -259.6152 (df=4)
 > vcov(fm1)
-               (Intercept):g1        y:g1 (Intercept):g2         y:g2
-(Intercept):g1     0.08823072 -0.03935624    0.000000000  0.000000000
-y:g1              -0.03935624  0.01979930    0.000000000  0.000000000
-(Intercept):g2     0.00000000  0.00000000    0.010911454 -0.001366131
-y:g2               0.00000000  0.00000000   -0.001366131  0.002047620
+               (Intercept):g1        y:g1 (Intercept):g2        y:g2
+(Intercept):g1     0.08823084 -0.03935630     0.00000000  0.00000000
+y:g1              -0.03935630  0.01979933     0.00000000  0.00000000
+(Intercept):g2     0.00000000  0.00000000     0.01091145 -0.00136613
+y:g2               0.00000000  0.00000000    -0.00136613  0.00204762
 > cf1 <- coef(fm1)
 > 1 / cf1[c(2, 4)] 
      y:g1      y:g2 
-0.5025282 1.5626449 
+0.5025275 1.5626454 
 > -cf1[c(1, 3)] / cf1[c(2,4)]
 (Intercept):g1 (Intercept):g2 
-     1.9877586      0.6671796 
+     1.9877589      0.6671776 
 > 
 > ### no constraints here!
 > m2 <- model(by, interacting = as.basis(~ g, data = mydata))
 > fm2 <- mlt(m2, data = mydata)
-Gradient[1] "Mean relative difference: 2.501699e-05"
-Hessian:[1] "Mean relative difference: 9.509969e-08"
+  Successful convergence.
+Gradient[1] "Mean relative difference: 3.011037e-05"
+Hessian:[1] "Mean relative difference: 9.509927e-08"
 > logLik(fm2)
 'log Lik.' -259.6152 (df=4)
 > vcov(fm2)
                         (Intercept):(Intercept) y:(Intercept) (Intercept):g2
-(Intercept):(Intercept)              0.08823079   -0.03935628    -0.08823079
-y:(Intercept)                       -0.03935628    0.01979932     0.03935628
-(Intercept):g2                      -0.08823079    0.03935628     0.09914225
-y:g2                                 0.03935628   -0.01979932    -0.04072241
+(Intercept):(Intercept)              0.08823076   -0.03935626    -0.08823076
+y:(Intercept)                       -0.03935626    0.01979931     0.03935626
+(Intercept):g2                      -0.08823076    0.03935626     0.09914222
+y:g2                                 0.03935626   -0.01979931    -0.04072239
                                y:g2
-(Intercept):(Intercept)  0.03935628
-y:(Intercept)           -0.01979932
-(Intercept):g2          -0.04072241
-y:g2                     0.02184694
+(Intercept):(Intercept)  0.03935626
+y:(Intercept)           -0.01979931
+(Intercept):g2          -0.04072239
+y:g2                     0.02184693
 > (cf2 <- coef(fm2))
 (Intercept):(Intercept)           y:(Intercept)          (Intercept):g2 
-              -3.955520                1.989940                3.528565 
+              -3.955519                1.989939                3.528563 
                    y:g2 
-              -1.349999 
+              -1.349998 
 > c(cf1[1:2], cf1[3:4] - cf1[1:2])
 (Intercept):g1           y:g1 (Intercept):g2           y:g2 
-     -3.955516       1.989938       3.528561      -1.349997 
+     -3.955523       1.989941       3.528569      -1.350001 
 > 
 > 1 / cf2[2]
 y:(Intercept) 
-    0.5025278 
+     0.502528 
 > 1 / sum(cf2[c(2, 4)])
 [1] 1.562645
 > 
@@ -87,4 +89,4 @@ y:(Intercept)
 > 
 > proc.time()
    user  system elapsed 
-  1.249   0.024   1.263 
+  1.417   0.022   1.435 
