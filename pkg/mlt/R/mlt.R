@@ -78,15 +78,34 @@
         ui <- ui[!r0,,drop = FALSE]
         ci <- ci[!r0]
         if (nrow(ui) == 0) ui <- ci <- NULL
-        ci <- ci + sqrt(.Machine$double.eps) ### we need ui %*% theta > ci, not >= ci
+        ### ci <- ci + sqrt(.Machine$double.eps) ### we need ui %*% theta > ci, not >= ci
     }
 
-    optimfct <- function(theta, ...) {
+    optimfct <- function(theta, scale = FALSE, ...) {
         control <- list(...)
-        if (!is.null(ui))
-            return(spg(par = theta, fn = loglikfct, gr = scorefct, project = "projectLinear",
-                       projectArgs = list(A = ui, b = ci, meq = 0), control = control))
-        return(spg(par = theta, fn = loglikfct, gr = scorefct, control = control))
+        if (scale) {
+            Ytmp <- Y
+            Ytmp[!is.finite(Ytmp)] <- NA
+            sc <- apply(abs(Ytmp[, !fix, drop = FALSE]), 2, max, na.rm = TRUE)
+            lt1 <- sc < 1.1
+            gt1 <- sc >= 1.1
+            sc[gt1] <- 1 / sc[gt1]
+            sc[lt1] <- 1
+            f <- function(gamma) loglikfct(sc * gamma)
+            g <- function(gamma) scorefct(sc * gamma) * sc
+            theta <- theta / sc
+        } else {
+            f <- loglikfct
+            g <- scorefct
+        }
+        if (!is.null(ui)) {
+            ret <- BBoptim(par = theta, fn = f, gr = g, project = "projectLinear",
+                           projectArgs = list(A = ui, b = ci, meq = 0), control = control)
+        } else {
+            ret <- BBoptim(par = theta, fn = f, gr = g, control = control)
+        }
+        if (scale) ret$par <- ret$par * sc
+        return(ret)
     }
 
     coef <- rep(NA, length(fix))
@@ -177,21 +196,18 @@
     ret
 }
 
-.mlt_fit <- function(object, theta = NULL, check = TRUE, trace = FALSE, ...) {
+.mlt_fit <- function(object, theta = NULL, scale = FALSE, check = TRUE, trace = FALSE, ...) {
 
     if (is.null(theta))
         stop(sQuote("mlt"), "needs suitable starting values")
 
-    ret <- try(object$optimfct(theta, trace = trace, ...))    
-    if (inherits(ret, "try-error") || ret$convergence != 0 || ret$gradient > 1)
-        ret <- object$optimfct(ret$par, trace = trace, ...)
-
-    if (ret$convergence != 0)
-        warning("algorithm did not converge")
+    ### BBoptim issues a warning in case of unsuccessful convergence
+    ret <- try(object$optimfct(theta, trace = trace, scale = scale, ...))    
 
     cls <- class(object)
     object <- c(object, ret)
     object$coef[] <- object$parm(ret$par) ### [] preserves names
+    object$theta <- theta ### starting value
     class(object) <- c("mlt_fit", cls)
     
     if (check) {
@@ -211,7 +227,7 @@
 }
 
 mlt <- function(model, data, weights = NULL, offset = NULL, fixed = NULL,
-                theta = NULL, pstart = NULL, check = TRUE, checkGrad = FALSE, 
+                theta = NULL, pstart = NULL, scale = FALSE, check = TRUE, checkGrad = FALSE, 
                 trace = FALSE, dofit = TRUE, ...) {
 
     response <- model$response
@@ -243,8 +259,9 @@ mlt <- function(model, data, weights = NULL, offset = NULL, fixed = NULL,
     args <- list(...)
     args$object <- s
     args$theta <- theta
+    args$scale <- scale
     args$check <- check
-    args$checkGrad <- checkGrad
     args$trace <- trace
+    args$checkGrad <- checkGrad
     do.call(".mlt_fit", args)
 }

@@ -1,7 +1,7 @@
 
 import(basefun)
 importFrom(numDeriv, grad, hessian)
-importFrom(BB, spg)
+importFrom(BB, spg, BBoptim)
 importFrom(sandwich, estfun)
 importFrom(stats, simulate, variable.names, model.matrix, logLik, vcov)
 importFrom(quadprog, solve.QP)
