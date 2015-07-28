@@ -188,7 +188,7 @@ R <- function(exact = NA, cleft = NA, cright = NA,
             Ytleft[il,] <- model.matrix(model, data = tmp)
         }
         if (any(ir <- (.tright(object) & e))) {
-            tmp <- data[ir,]
+            tmp <- data[ir,,drop = FALSE]
             tmp[[response]] <- object$tright[ir]
             Ytright[ir,] <- model.matrix(model, data = tmp)
         }
@@ -207,7 +207,7 @@ R <- function(exact = NA, cleft = NA, cright = NA,
 
     Yleft <- NULL
     if (any(il <- .cleft(object))) {
-        tmp <- tmpdata[il,]
+        tmp <- tmpdata[il,,drop = FALSE]
         tmp[[response]] <- object$cleft[il]
         Ytmp <- model.matrix(model, data = tmp)
         Yleft <- matrix(-Inf, nrow = length(il), ncol = ncol(Ytmp))
@@ -219,7 +219,7 @@ R <- function(exact = NA, cleft = NA, cright = NA,
 
     Yright <- NULL
     if (any(ir <- .cright(object))) {
-        tmp <- tmpdata[ir,]
+        tmp <- tmpdata[ir,, drop = FALSE]
         tmp[[response]] <- object$cright[ir]
         Ytmp <- model.matrix(model, data = tmp)
         Yright <- matrix(Inf, nrow = length(ir), ncol = ncol(Ytmp))
@@ -248,12 +248,12 @@ R <- function(exact = NA, cleft = NA, cright = NA,
         Ytright <- matrix(Inf, nrow = nrow(Yleft), ncol = ncol(Yleft))
         colnames(Ytleft) <- colnames(Ytright) <- colnames(Yleft)
         if (any(il <- (.tleft(object)))) {
-            tmp <- tmpdata[il,]
+            tmp <- tmpdata[il,,drop = FALSE]
             tmp[[response]] <- object$cleft[il]
             Ytleft[il,] <- model.matrix(model, data = tmp)
         }
         if (any(ir <- (.tright(object)))) {
-            tmp <- tmpdata[ir,]
+            tmp <- tmpdata[ir,,drop = FALSE]
             tmp[[response]] <- object$cleft[ir]
             Ytright[ir,] <- model.matrix(model, data = tmp)
         }

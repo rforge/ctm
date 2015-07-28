@@ -2,7 +2,7 @@
 ltm <- function(formula, data, subset, weights, na.action = na.omit,
                 method = c("logistic", "probit", "cloglog"),
                 trafo = c("Bernstein", "Legendre", "fixed log", "log"),
-                integerAsFactor = FALSE, order = 5, support = NULL, ...) {
+                integerAsFactor = FALSE, order = 5, support = NULL, contrasts.arg = NULL, ...) {
 
     if (missing(data))
         data <- environment(formula)
@@ -59,6 +59,7 @@ ltm <- function(formula, data, subset, weights, na.action = na.omit,
                               "probit" = "Normal",
                               "cloglog" = "MinExtrVal")
 
+    fixed <- NULL
     if (rtype == "discrete" & ifelse(rclass == "integer", integerAsFactor, TRUE)) {
         if (rclass == "integer") Y <- ordered(Y)
         nlev <- nlevels(Y)
@@ -75,17 +76,21 @@ ltm <- function(formula, data, subset, weights, na.action = na.omit,
                           ui = "increasing", varname = response),
             "Legendre" = Legendre_basis(order = order, support = support,
                           ui = "increasing", varname = response))
+        if (trafo == "fixed log") {
+            fixed <- 1
+            names(fixed) <- names(model.matrix(rtrafo, data = mf))
+        }
     }
 
     strafo <- xtrafo <- NULL
     if (strata)
         strafo <- as.basis(as.formula(paste("~ ", names(stratum), "- 1")), data = mf)
-    xtrafo <- as.basis(mtX, data = mf, remove_intercept = TRUE)
+    xtrafo <- as.basis(mtX, data = mf, remove_intercept = TRUE, contrasts.arg = contrasts.arg)
     if (ncol(model.matrix(xtrafo, data = mf)) == 0) xtrafo <- NULL
 
     m <- model(rtrafo, interacting = strafo, shifting = xtrafo, todistr = todistr)
 
-    ret <- mlt(m, data = mf, scale = TRUE, check = FALSE, ...)
+    ret <- mlt(m, data = mf, fixed = fixed, scale = TRUE, check = FALSE, ...)
     class(ret) <- c("ltm", class(ret))
     ret
 }
@@ -93,19 +98,51 @@ ltm <- function(formula, data, subset, weights, na.action = na.omit,
 model.frame.ltm <- function(object, ...)
     object$data
 
-model.matrix.ltm <- function(object, ...)
-    model.matrix(object$model$model$bshifting, data = model.frame(object))
+model.matrix.ltm <- function(object, data = model.frame(object), all = FALSE, ...) {
+    if (all) {
+        class(object) <- class(object)[-1]
+        return(model.matrix(object, data = data, ...))
+    }
+    if (is.null(object$model$model$bshifting))
+        return(NA)
+    model.matrix(object$model$model$bshifting, data = data, ...)
+}
 
-coef.ltm <- function(object, ...) {
+coef.ltm <- function(object, all = FALSE, ...) {
+    if (all) {
+        class(object) <- class(object)[-1]
+        return(coef(object, ...))
+    }      
     xn <- colnames(model.matrix(object))
+    if (length(xn) == 0) return(NA)
     class(object) <- class(object)[-1]
     coef(object)[xn]
 }
 
-vcov.ltm <- function(object, ...) {
+vcov.ltm <- function(object, all = FALSE, ...) {
+    if (all) {
+        class(object) <- class(object)[-1]
+        return(vcov(object, ...))
+    }      
     xn <- colnames(model.matrix(object))
+    if (length(xn) == 0) return(NA)
     class(object) <- class(object)[-1]
     vcov(object)[xn, xn, drop = FALSE]
+}
+
+predict.ltm <- function(object, ...) {
+    class(object) <- class(object)[-1]
+    predict(object, ...)
+}
+
+AIC.ltm <- function(object, ..., k = 2) {
+    class(object) <- class(object)[-1]
+    AIC(object, ..., k = k)
+}
+
+logLik.ltm <- function(object, ...) {
+    class(object) <- class(object)[-1]
+    logLik(object, ...)
 }
 
 print.ltm <- function(x, ...) 
@@ -114,11 +151,69 @@ print.ltm <- function(x, ...)
 library("mlt")
 library("Formula")
 library("multcomp")
-coef(ltm(Sepal.Length ~ Sepal.Width | Species, data = iris, trafo = "log"))
+coef(a <- ltm(Sepal.Length ~ Sepal.Width | Species, data = iris, trafo = "log"))
+
+### predict(a)
 
 library("survival")
 data("GBSG2", package = "TH.data")
 
-ltm(Surv(time, cens) ~ horTh, data = GBSG2)
+b <- ltm(time ~ horTh , data = GBSG2)
 
-ltm(Surv(time, cens) ~ horTh + menostat + pnodes | tgrade, data = GBSG2, method = "cloglog")
+predict(b)
+
+b <- ltm(time ~ 1, data = GBSG2)
+
+predict(b)
+
+b <- ltm(time ~ 1 | tgrade, data = GBSG2)
+
+predict(b, newdata = data.frame(tgrade = unique(GBSG2$tgrade)), q = 100:110)
+
+cc <- ltm(Surv(time, cens) ~ horTh + menostat + pnodes | tgrade, data = GBSG2, method = "cloglog")
+
+predict(cc, newdata = list(horTh = c("no", "yes"), menostat = "Pre",
+                           pnodes = 100, tgrade = "II", "Surv(time, cens)" = 100:101))
+
+
+d <- ltm(Surv(time, cens) ~ 1, data = GBSG2, method = "cloglog")
+class(d) <- class(d)[-1]
+cf <- coef(d)
+v <- vcov(d)
+prm <- parm(cf, v)
+K <- diag(length(cf))
+rownames(K) <- colnames(K) <- names(cf)
+ci <- confint(glht(prm, linfct = K), calpha = qnorm(.975))
+
+lwr <- d
+class(lwr) <- class(lwr)[-1]
+upr <- d
+class(upr) <- class(upr)[-1]
+coef(lwr) <- ci$confint[, "lwr"]
+coef(upr) <- ci$confint[, "upr"]
+
+tm <- 10:2700
+
+s <- seq(from = min(GBSG2$time), to = max(GBSG2$time), length = length(cf))
+plot(tm, predict(d, q = tm), type = "l", ylim = range(ci$confint))
+points(s, cf, col = "red")
+
+lines(tm, predict(lwr, q = tm))
+points(s, coef(lwr), col = "blue")
+
+lines(tm, predict(upr, q = tm))
+points(s, coef(upr), col = "green")
+
+plot(tm, 1 - predict(d, q = tm, type = "distr"), type = "l")
+
+lines(tm, 1 - predict(lwr, q = tm, type = "distr"))
+
+lines(tm, 1 - predict(upr, q = tm, type = "distr"))
+
+
+
+plot(survfit(Surv(time, cens) ~ 1, data = GBSG2))
+lines(tm, 1 - predict(d, q = tm, type = "distr"))
+lines(tm, 1 - predict(lwr, q = tm, type = "distr"))
+lines(tm, 1 - predict(upr, q = tm, type = "distr"))
+

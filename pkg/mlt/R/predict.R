@@ -15,8 +15,8 @@ predict.mlt <- function(object, newdata = object$data, type = c("trafo", "distri
     if (type == "quantile")
         stopifnot(!is.null(p) && (min(p) > 0 & max(p) < 1))
 
-    if (!is.data.frame(object))
-        stopifnot(object$response %in% names(object))
+    if (!is.data.frame(newdata))
+        stopifnot(object$response %in% names(newdata))
 
     ret <- switch(type, 
         "trafo" = tmlt(object = object, newdata = newdata, q = q, terms = terms, ...),
