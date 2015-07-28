@@ -14,7 +14,7 @@ coef.mlt <- function(object, fixed = TRUE, ...) {
     if (!is.null(names(value)))
         stopifnot(all.equal(names(cf), names(value)))
     object$par <- object$parm(value)
-    object$coef <- value
+    object$coef[] <- value ### preserve names
     object
 }
 
