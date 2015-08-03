@@ -8,7 +8,7 @@ importFrom(quadprog, solve.QP)
 
 # exportPattern("^[^\\.]")
 export(Hessian, Gradient, Hmlt, R, "coef<-", dmlt, hmlt, mlt,
-       model, pmlt, qmlt, smlt, tmlt)
+       model, pmlt, qmlt, smlt, tmlt, paraboot)
 
 S3method("estfun", "mlt")
 S3method("predict", "mlt")
@@ -22,6 +22,7 @@ S3method("vcov", "mlt")
 S3method("coef<-", "mlt")
 S3method("Gradient", "mlt")
 S3method("Hessian", "mlt")
+S3method("paraboot", "mlt")
 
 S3method("variable.names", "model")
 S3method("mkgrid", "model")

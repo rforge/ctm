@@ -208,6 +208,7 @@
     object <- c(object, ret)
     object$coef[] <- object$parm(ret$par) ### [] preserves names
     object$theta <- theta ### starting value
+    object$scale <- scale ### starting value
     class(object) <- c("mlt_fit", cls)
     
     if (check) {

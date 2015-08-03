@@ -121,7 +121,7 @@ Hmlt <- function(object, newdata = object$data, q = NULL)
     ### return interval censored quantiles
     if (!interpolate) {
         qq <- c(-Inf, q, Inf)
-        return(data.frame(left = qq[i], right = qq[i + 1]))
+        return(R(cleft = qq[i], cright = qq[i + 1]))
     }
 
     ### interpolate linearily
@@ -181,57 +181,6 @@ qmlt <- function(object, newdata = object$data, p = .5, n = 50,
     dim[1] <- length(p)
     dn <- c(list(p = .frmt(p)), dimnames(prob)[-1])
     return(array(ret, dim = dim, dimnames = dn))
-}
-    
-### simulate from model object with data newdata
-simulate.mlt <- function(object, nsim = 1, seed = NULL, 
-                         newdata = object$data, n = 50, 
-                         interpolate = TRUE, ...) {
-
-    ### from stats:::simulate.lm
-    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) 
-        runif(1)
-    if (is.null(seed)) 
-        RNGstate <- get(".Random.seed", envir = .GlobalEnv)
-    else {
-        R.seed <- get(".Random.seed", envir = .GlobalEnv)
-        set.seed(seed)
-        RNGstate <- structure(seed, kind = as.list(RNGkind()))
-        on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
-    }
-
-    y <- object$response
-    ### unconditional
-    if (all(unique(variable.names(object)) == y)) {
-        newdata <- data.frame(1) ### we need only NROW(newdata)
-    } else {
-        newdata[[y]] <- NULL
-    }
-    ### don't accept user-generated quantiles
-    q <- mkgrid(object, n = n)[[y]]
-    if (is.data.frame(newdata)) {
-        p <- runif(nsim * NROW(newdata))
-        ### basically compute quantiles for p; see qmlt
-        prob <- pmlt(object, newdata, q = q)
-        ### unconditional
-        if (!is.matrix(prob)) prob <- matrix(prob, ncol = 1)
-        prob <- t(prob[, rep(1:NCOL(prob), nsim),drop = FALSE])
-        ret <- .p2q(prob, q, p, interpolate = interpolate)
-        if (nsim > 1) {
-            tmp <- vector(mode = "list", length = nsim)
-            for (i in 1:nsim) {
-                idx <- 1:NROW(newdata) + (i - 1) * NROW(newdata)
-                if (is.data.frame(ret)) 
-                    tmp[[i]] <- ret[idx,]
-                else 
-                    tmp[[i]] <- ret[idx]
-            }
-            ret <- tmp
-        }
-    } else {
-        stop("not yet implemented")
-    }
-    return(ret)
 }
 
 ### density
