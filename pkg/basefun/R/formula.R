@@ -1,6 +1,7 @@
 
 as.basis.formula <- function(object, remove_intercept = FALSE, 
-                             data = NULL, ui = NULL, ci = NULL, ...) {
+                             data = NULL, ui = NULL, ci = NULL, negative = FALSE,
+                             ...) {
 
     varnames <- all.vars(object)
 
@@ -52,6 +53,7 @@ as.basis.formula <- function(object, remove_intercept = FALSE,
         }
         if (deriv < 0)
             X[] <- 0
+        if (negative) return(-X)
         return(X)
     }
 
