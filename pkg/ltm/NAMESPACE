@@ -1,0 +1,17 @@
+
+import("mlt")
+import("Formula")
+import("multcomp")
+import("basefun")
+importFrom(sandwich, estfun)
+
+export("ltm")
+
+S3method("coef", "ltm")
+S3method("logLik", "ltm")
+S3method("AIC", "ltm")
+S3method("vcov", "ltm")
+S3method("estfun", "ltm")
+S3method("predict", "ltm")
+S3method("print", "ltm")
+S3method("paraboot", "ltm")
