@@ -12,7 +12,15 @@ predict.basis <- function(object, newdata, coef,
     lp <- c(X %*% coef)
     if (is.null(dim)) return(lp)
     nd <- names(dim)
-    return(.const_array(dim, nd[nd %in% variable.names(object)], lp))
+    ### <FIXME> essentially handle the length(dim) == 2 case
+    if (any(nd %in% variable.names(object))) {
+        nd <- nd[nd %in% variable.names(object)]
+    } else {
+        stopifnot(length(dim) == 2)
+        nd <- names(dim)[2]
+    }
+    ### <FIXME>
+    return(.const_array(dim, nd, lp))
 }
 
 nparm <- function(object, data)
@@ -24,7 +32,10 @@ nparm.basis <- function(object, data) {
     ncol(object(data))
 }
 
-nparm.bases <- function(object, data)
+nparm.box_bases <- function(object, data)
+    prod(sapply(object, nparm, data = data))
+
+nparm.cbind_bases <- function(object, data)
     sapply(object, nparm, data = data)
 
 variable.names.basis <- function(object, ...)
