@@ -19,30 +19,30 @@ coef.mlt <- function(object, fixed = TRUE, ...) {
 }
 
 ### use maxLik::hessian?
-Hessian <- function(object)
+Hessian <- function(object, ...)
     UseMethod("Hessian")
 
-Hessian.mlt <- function(object)
-    object$hessian(coef(object, fixed = FALSE))
+Hessian.mlt <- function(object, parm = coef(object, fixed = FALSE), ...)
+    object$hessian(parm)
     
-Gradient <- function(object)
+Gradient <- function(object, ...)
     UseMethod("Gradient")
 
-Gradient.mlt <- function(object)
-    as.vector(colSums(estfun(object)))
+Gradient.mlt <- function(object, parm = coef(object, fixed = FALSE), ...)
+    as.vector(colSums(estfun(object, parm = parm)))
 
-vcov.mlt <- function(object, ...)
-    solve(Hessian(object))
+vcov.mlt <- function(object, parm = coef(object, fixed = FALSE), ...)
+    solve(Hessian(object, parm = parm))
 
-logLik.mlt <- function(object, ...) {
-    ret <- -object$loglik(coef(object, fixed = FALSE))
+logLik.mlt <- function(object, parm = coef(object, fixed = FALSE), ...) {
+    ret <- -object$loglik(parm)
     attr(ret, "df") <- length(coef(object, fixed = FALSE))
     class(ret) <- "logLik"
     ret
 }
 
-estfun.mlt <- function(object, ...)
-    -object$score(coef(object, fixed = FALSE))
+estfun.mlt <- function(object, parm = coef(object, fixed = FALSE), ...)
+    -object$score(parm)
 
 mkgrid.mlt <- function(object, ...)
     mkgrid(object$model, ...)
