@@ -2,7 +2,8 @@
 ltm <- function(formula, data, subset, weights, na.action = na.omit,
                 method = c("logistic", "probit", "cloglog"),
                 trafo = c("Bernstein", "Legendre", "fixed log", "log"),
-                integerAsFactor = FALSE, order = 5, support = NULL, contrasts.arg = NULL, ...) {
+                integerAsFactor = FALSE, order = 5, support = NULL, 
+                negative_lp = TRUE, contrasts.arg = NULL, ...) {
 
     if (missing(data))
         data <- environment(formula)
@@ -85,7 +86,8 @@ ltm <- function(formula, data, subset, weights, na.action = na.omit,
     strafo <- xtrafo <- NULL
     if (strata)
         strafo <- as.basis(as.formula(paste("~ ", names(stratum), "- 1")), data = mf)
-    xtrafo <- as.basis(mtX, data = mf, remove_intercept = TRUE, contrasts.arg = contrasts.arg)
+    xtrafo <- as.basis(mtX, data = mf, remove_intercept = TRUE, contrasts.arg = contrasts.arg,
+                       negative = negative_lp)
     if (ncol(model.matrix(xtrafo, data = mf)) == 0) xtrafo <- NULL
 
     m <- model(rtrafo, interacting = strafo, shifting = xtrafo, todistr = todistr)
@@ -130,11 +132,6 @@ vcov.ltm <- function(object, all = FALSE, ...) {
     vcov(object)[xn, xn, drop = FALSE]
 }
 
-predict.ltm <- function(object, ...) {
-    class(object) <- class(object)[-1]
-    predict(object, ...)
-}
-
 AIC.ltm <- function(object, ..., k = 2) {
     class(object) <- class(object)[-1]
     AIC(object, ..., k = k)
@@ -148,6 +145,30 @@ logLik.ltm <- function(object, ...) {
 print.ltm <- function(x, ...) 
     print(cftest(x))
 
+predict.ltm <- function(object, newdata, type = c("lp", "trafo", "distribution", 
+    "survivor", "density", "logdensity", "hazard", "loghazard", "cumhazard", "quantile"),
+    q = NULL, n = 50, ...) {
+
+    class(object) <- class(object)[-1]
+
+    if (missing(newdata))
+        newdata <- object$data
+    stopifnot(is.data.frame(newdata))
+
+    type <- match.arg(type)
+    if (type == "lp") {
+        if (!is.null(q)) warning("argument q ignored")
+        q <- mkgrid(object, n = 1)[[object$response]] 
+        return(drop(predict(object, newdata = newdata, 
+                            type = "trafo", terms = "bshifting", q = q)))
+    }
+
+    if (is.null(q))
+        q <- mkgrid(object, n = n)[[object$response]]
+
+    predict(object, newdata = newdata, type = type, q = q, ...)
+}
+
 library("mlt")
 library("Formula")
 library("multcomp")
@@ -157,24 +178,26 @@ coef(a <- ltm(Sepal.Length ~ Sepal.Width | Species, data = iris, trafo = "log"))
 
 library("survival")
 data("GBSG2", package = "TH.data")
+storage.mode(GBSG2$time) <- "double"
 
 b <- ltm(time ~ horTh , data = GBSG2)
 
 predict(b)
 
+predict(b, newdata = data.frame(horTh = unique(GBSG2$horTh)), q = 100:110, type = "trafo")
+
 b <- ltm(time ~ 1, data = GBSG2)
 
-predict(b)
+predict(b, q = 100:110, type = "distribution")
 
 b <- ltm(time ~ 1 | tgrade, data = GBSG2)
 
-predict(b, newdata = data.frame(tgrade = unique(GBSG2$tgrade)), q = 100:110)
+predict(b, newdata = data.frame(tgrade = unique(GBSG2$tgrade)), q = 100:110, type = "distribution")
 
 cc <- ltm(Surv(time, cens) ~ horTh + menostat + pnodes | tgrade, data = GBSG2, method = "cloglog")
 
-predict(cc, newdata = list(horTh = c("no", "yes"), menostat = "Pre",
-                           pnodes = 100, tgrade = "II", "Surv(time, cens)" = 100:101))
-
+predict(cc, newdata = expand.grid(horTh = c("no", "yes"), menostat = "Pre",
+                           pnodes = 100, tgrade = "II"), q = 100:101, type = "trafo")
 
 d <- ltm(Surv(time, cens) ~ 1, data = GBSG2, method = "cloglog")
 class(d) <- class(d)[-1]
