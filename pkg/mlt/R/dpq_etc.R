@@ -48,7 +48,7 @@ tmlt <- function(object, newdata = object$data, q = NULL, ...) {
         dim <- c(length(q), nrow(newdata))
 
         ### <FIXME> this triggers a trick in 
-        ### basefun:::predict.formula_basis; better checks needed </FIXME>
+        ### basefun:::predict.basis; better checks needed </FIXME>
         names(dim) <- c(y, vnx[1])
         newdata <- as.list(newdata)
         newdata[[y]] <- q
