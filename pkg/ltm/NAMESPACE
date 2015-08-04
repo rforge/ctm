@@ -4,6 +4,7 @@ import("Formula")
 import("multcomp")
 import("basefun")
 importFrom(sandwich, estfun)
+importFrom(stats, coef, logLik, AIC, vcov, predict, confint)
 
 export("ltm")
 
@@ -15,3 +16,4 @@ S3method("estfun", "ltm")
 S3method("predict", "ltm")
 S3method("print", "ltm")
 S3method("paraboot", "ltm")
+S3method("confint", "ltm")

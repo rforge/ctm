@@ -7,8 +7,8 @@ importFrom(stats, simulate, variable.names, model.matrix, logLik, vcov)
 importFrom(quadprog, solve.QP)
 
 # exportPattern("^[^\\.]")
-export(Hessian, Gradient, Hmlt, R, "coef<-", dmlt, hmlt, mlt,
-       model, pmlt, qmlt, smlt, tmlt, paraboot)
+export(Hessian, Gradient, R, "coef<-", mlt, model, paraboot)
+#       Hmlt dmlt, hmlt, pmlt, qmlt, smlt, tmlt)
 
 S3method("estfun", "mlt")
 S3method("predict", "mlt")
