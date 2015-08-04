@@ -1,46 +1,4 @@
 
-.Surv2matrix <- function(object) {
-
-    type <- attr(object, "type")
-    stopifnot(type %in% c("left", "right", "interval", 
-                          "interval2", "counting"))
-    status <- object[, "status"]
-
-    ret <- switch(type,
-        "right" = cbind(left = object[, "time"],
-                        right = ifelse(status == 1, NA, Inf)),
-        "left" = cbind(left = ifelse(status == 1, NA, -Inf),
-                       right = object[, "time"]),
-        "interval2" = {
-            ret <- cbind(left = object[, "time1"], 
-                         right = object[, "time2"])
-            ret$left[is.na(ret$left)] <- -Inf
-            ret$right[is.na(ret$right)] <- Inf
-        },
-        "interval" = {
-            status <- factor(status, levels = 0:3, 
-                             labels = c("right", "exact", "left", "interval"))
-            tmp <- matrix(NA, nrow = nrow(object), ncol = 2)
-            colnames(tmp) <- c("left", "right")
-            for (s in levels(status)) {
-                idx <- which(status == s)
-                tmp[idx, ] <- switch(s, 
-                    "right" = cbind(object[idx, "time1"], Inf),
-                    "exact" = cbind(object[idx, "time1"], NA),
-                    "left" = cbind(-Inf, object[idx, "time1"]),
-                    "interval" = object[idx, c("time1", "time2")])
-            }
-            return(tmp)
-        },
-        ### left truncation, right censoring
-        "counting" = cbind(left = object[, "stop"],
-                           right = ifelse(status == 1, NA, Inf),
-                           lefttrunc = object[, "start"])
-    )
-    ### right truncation, left censoring? truncation and interval?
-    ret
-}
-
 .Surv2R <- function(object) {
 
     type <- attr(object, "type")
@@ -100,10 +58,23 @@ R <- function(exact = NA, cleft = NA, cright = NA,
         n1 <- n[n > 1]
         stopifnot(length(unique(n1)) == 1)
     }
+    nm <- max(n)
+    if (length(exact) == 1 && is.na(exact)) 
+        exact <- rep(exact, nm)
+    if (length(cleft) == 1 && is.na(cleft)) 
+        cleft <- rep(cleft, nm)
+    if (length(cright) == 1 && is.na(cright)) 
+        cright <- rep(cright, nm)
+    if (length(tleft) == 1 && is.na(tleft)) 
+        tleft <- rep(tleft, nm)
+    if (length(tright) == 1 && is.na(tright)) 
+        tright <- rep(tright, nm)
 
-    if (any(!is.na(exact))) {
+    if (all(!is.na(exact))) {
         rank <- rank(exact, ties.method = "max")
+        type <- "double"
         if (is.factor(exact)) {
+            type <- class(exact)[1]
             if (!is.ordered(exact)) 
                 warning("response is unordered factor; 
                          results may depend on order of levels")
@@ -116,6 +87,7 @@ R <- function(exact = NA, cleft = NA, cright = NA,
             exact <- NA
         }
         if (is.integer(exact)) {
+            type <- "integer"
             stopifnot(all(is.na(c(tleft, cleft, cright, tright))))
             cright <- exact
             cleft <- exact - 1
@@ -123,14 +95,19 @@ R <- function(exact = NA, cleft = NA, cright = NA,
             exact <- NA
         }
     } else {
+        if (any(!is.na(exact)) && !is.double(exact))
+            stop("Mix of exact and censored observations currently only implemented for doubles")
+        ### <FIXME> allow for censord factors and integers </FIXME>
+        type <- "double"
+
         ### some meaningful ordering of observations
         tmpexact <- as.numeric(exact)
         tmpleft <- as.numeric(cleft)
         tmpright <- as.numeric(cright)
         tmpleft[is.na(tmpleft)] <- 
-            pmin(tmpleft, tmpexact, tmpright, na.rm = TRUE)
+            pmin(tmpleft, tmpexact, tmpright, na.rm = TRUE)[is.na(tmpleft)]
         tmpright[is.na(tmpright)] <- 
-            pmax(tmpleft, tmpexact, tmpright, na.rm = TRUE)
+            pmax(tmpleft, tmpexact, tmpright, na.rm = TRUE)[is.na(tmpright)]
         tmpexact[is.na(tmpexact)] <- 
             ((tmpright - tmpleft) / 2)[is.na(tmpexact)]
         rank <- rank(tmpexact, ties.method = "max")
@@ -138,10 +115,7 @@ R <- function(exact = NA, cleft = NA, cright = NA,
 
     ret <- data.frame(tleft = tleft, cleft = cleft, exact = exact,
                       cright = cright, tright = tright, rank = rank)
-#    with(ret, stopifnot(cleft < cright))
-#    with(ret, stopifnot(tleft < tright))
-#    with(subset(ret, !is.na(exact)), stopifnot(cleft < exact))
-#    with(subset(ret, !is.na(exact)), stopifnot(exact < cright))
+    attr(ret, "type") <- type
     class(ret) <- c("response", class(ret))
     ret
 }
