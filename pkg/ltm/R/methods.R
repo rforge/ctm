@@ -4,7 +4,7 @@ model.frame.ltm <- function(object, ...)
 
 model.matrix.ltm <- function(object, data = model.frame(object), all = FALSE, ...) {
     if (all) {
-        class(object) <- class(object)[-1]
+        class(object) <- class(object)[-(1:2)]
         return(model.matrix(object, data = data, ...))
     }
     if (is.null(object$model$model$bshifting))
@@ -14,44 +14,44 @@ model.matrix.ltm <- function(object, data = model.frame(object), all = FALSE, ..
 
 coef.ltm <- function(object, all = FALSE, ...) {
     if (all) {
-        class(object) <- class(object)[-1]
+        class(object) <- class(object)[-(1:2)]
         return(coef(object, ...))
     }      
     xn <- colnames(model.matrix(object))
     if (length(xn) == 0) return(NA)
-    class(object) <- class(object)[-1]
+    class(object) <- class(object)[-(1:2)]
     coef(object)[xn]
 }
 
 vcov.ltm <- function(object, all = FALSE, ...) {
     if (all) {
-        class(object) <- class(object)[-1]
+        class(object) <- class(object)[-(1:2)]
         return(vcov(object, ...))
     }      
     xn <- colnames(model.matrix(object))
     if (length(xn) == 0) return(NA)
-    class(object) <- class(object)[-1]
+    class(object) <- class(object)[-(1:2)]
     vcov(object)[xn, xn, drop = FALSE]
 }
 
 estfun.ltm <- function(object, all = FALSE, ...) {
     if (all) {
-        class(object) <- class(object)[-1]
+        class(object) <- class(object)[-(1:2)]
         return(estfun(object, ...))
     }      
     xn <- colnames(model.matrix(object))
     if (length(xn) == 0) return(NA)
-    class(object) <- class(object)[-1]
+    class(object) <- class(object)[-(1:2)]
     estfun(object)[, xn, drop = FALSE]
 }
 
 AIC.ltm <- function(object, ..., k = 2) {
-    class(object) <- class(object)[-1]
+    class(object) <- class(object)[-(1:2)]
     AIC(object, ..., k = k)
 }
 
 logLik.ltm <- function(object, ...) {
-    class(object) <- class(object)[-1]
+    class(object) <- class(object)[-(1:2)]
     logLik(object, ...)
 }
 
@@ -61,6 +61,6 @@ print.ltm <- function(x, ...) {
 }
 
 paraboot.ltm <- function(object, ...) {
-    class(object) <- class(object)[-1]
+    class(object) <- class(object)[-(1:2)]
     paraboot(object)
 }
