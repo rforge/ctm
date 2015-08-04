@@ -55,8 +55,10 @@ logLik.ltm <- function(object, ...) {
     logLik(object, ...)
 }
 
-print.ltm <- function(x, ...) 
-    print(cftest(x))
+print.ltm <- function(x, ...) {
+    if (!is.na(coef(x)))
+        print(cftest(x))
+}
 
 paraboot.ltm <- function(object, ...) {
     class(object) <- class(object)[-1]
