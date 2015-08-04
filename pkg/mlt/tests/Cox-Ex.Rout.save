@@ -118,9 +118,9 @@ Hessian:[1] TRUE
 Gradient[1] TRUE
 Hessian:[1] TRUE
      log(y)      Bs1(y)      Bs2(y)      Bs3(y)      Bs4(y)      Bs5(y) 
- 0.38199702 -0.04273287  0.97761519  0.97761519  0.97761519  0.97761519 
+ 0.38199124 -0.04274403  0.97763056  0.97763056  0.97763056  0.97763056 
      Bs6(y)          g2          g3 
- 1.19849922  0.33286297  0.53879934 
+ 1.19852459  0.33285740  0.53879516 
 > 
 > ### interval censoring
 > Bb <- Bernstein_basis(order = 5, support = c(0, max(y + 1) + .1),
@@ -130,12 +130,12 @@ Hessian:[1] TRUE
 > m <- model(response = c(blog = lb, bBern = Bb), shifting = s, todist = "MinExtrVal")
 > coef(opt <- mlt(m, data = mydata))
   Successful convergence.
-Gradient[1] "Mean relative difference: 3.471747e-08"
+Gradient[1] "Mean relative difference: 3.913553e-08"
 Hessian:[1] TRUE
     log(y)     Bs1(y)     Bs2(y)     Bs3(y)     Bs4(y)     Bs5(y)     Bs6(y) 
- 0.5103236 -1.2644752  0.1631364  0.1631364  0.1631364  0.1631364  1.1422212 
+ 0.5103199 -1.2644809  0.1631430  0.1631430  0.1631430  0.1631430  1.1422497 
         g2         g3 
- 0.7207465  0.9519261 
+ 0.7207449  0.9519242 
 > 
 > ### uncensored, time-varying coefficints in both groups
 > mydata <- data.frame(y = y, g = g)
@@ -181,4 +181,4 @@ There were 13 warnings (use warnings() to see them)
 > 
 > proc.time()
    user  system elapsed 
- 11.663   0.070  11.740 
+ 10.759   0.040  10.792 
