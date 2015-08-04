@@ -2,7 +2,7 @@
 library("ltm")
 library("multcomp")
 
-coef(a <- ltm(Sepal.Length ~ Sepal.Width | Species, data = iris, trafo = "log"))
+coef(a <- ltm(Sepal.Length | Species ~ Sepal.Width, data = iris, trafo = "log"))
 predict(a)
 
 library("survival")
@@ -19,11 +19,11 @@ b <- ltm(time ~ 1, data = GBSG2)
 
 predict(b, q = 100:110, type = "distribution")
 
-b <- ltm(time ~ 1 | tgrade, data = GBSG2)
+b <- ltm(time | tgrade ~ 1, data = GBSG2)
 
 predict(b, newdata = data.frame(tgrade = unique(GBSG2$tgrade)), q = 100:110, type = "distribution")
 
-cc <- ltm(Surv(time, cens) ~ horTh + menostat + pnodes | tgrade, data = GBSG2, method = "cloglog")
+cc <- ltm(Surv(time, cens) | tgrade ~ horTh + menostat + pnodes, data = GBSG2, method = "cloglog")
 
 predict(cc, newdata = expand.grid(horTh = c("no", "yes"), menostat = "Pre",
                            pnodes = 100, tgrade = "II"), q = 100:101, type = "trafo")
@@ -32,7 +32,7 @@ d <- ltm(Surv(time, cens) ~ 1, data = GBSG2, method = "cloglog")
 
 confint(d, calpha = univariate_calpha())
 
-class(d) <- class(d)[-1]
+class(d) <- class(d)[-(1:2)]
 cf <- coef(d)
 v <- vcov(d)
 
@@ -43,9 +43,9 @@ rownames(K) <- colnames(K) <- names(cf)
 ci <- confint(glht(prm, linfct = K), calpha = qnorm(.975))
 
 lwr <- d
-class(lwr) <- class(lwr)[-1]
+class(lwr) <- class(lwr)[-(1:2)]
 upr <- d
-class(upr) <- class(upr)[-1]
+class(upr) <- class(upr)[-(1:2)]
 coef(lwr) <- ci$confint[, "lwr"]
 coef(upr) <- ci$confint[, "upr"]
 
