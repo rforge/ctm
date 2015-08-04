@@ -7,10 +7,10 @@
     status <- object[, "status"]
 
     ret <- switch(type,
-        "right" = R(exact = ifelse(status == 1, object[, "time"], NA),
+        "right" = R(y = ifelse(status == 1, object[, "time"], NA),
                     cleft = ifelse(status != 1, object[, "time"], NA),
                     cright = ifelse(status != 1, Inf, NA)),
-        "left" =  R(exact = ifelse(status == 1, object[, "time"], NA),
+        "left" =  R(y = ifelse(status == 1, object[, "time"], NA),
                     cleft = ifelse(status != 1, -Inf, NA),
                     cright = ifelse(status != 1, object[, "time"], NA)),
 
@@ -34,12 +34,12 @@
                     "left" = cbind(-Inf, object[idx, "time1"]),
                     "interval" = object[idx, c("time1", "time2")])
             }
-            R(exact = ifelse(is.na(tmp[, "right"]), tmp[, "left"], NA), 
+            R(y = ifelse(is.na(tmp[, "right"]), tmp[, "left"], NA), 
               cleft = ifelse(is.na(tmp[, "right"]), NA, tmp[, "left"]), 
               cright = tmp[, "right"])
         },
         ### left truncation, right censoring
-        "counting" = R(exact = ifelse(status == 1, object[, "stop"], NA),
+        "counting" = R(y = ifelse(status == 1, object[, "stop"], NA),
                        cleft = ifelse(status != 1, object[, "stop"], NA),
                        cright = ifelse(status != 1, Inf, NA),
                        tleft = object[, "start"])
@@ -48,9 +48,13 @@
 }
 
 ### handle exact integer / factor as interval censored
-R <- function(exact = NA, cleft = NA, cright = NA, 
+R <- function(y = NA, cleft = NA, cright = NA, 
               tleft = NA, tright = NA) {
 
+    if (inherits(y, "Surv"))
+        return(.Surv2R(y))
+
+    exact <- y
     n <- c(length(exact), length(cleft), length(cright), 
            length(tleft), length(tright))    
     if (length(unique(n)) > 1) {

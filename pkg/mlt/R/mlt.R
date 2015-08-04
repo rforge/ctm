@@ -238,12 +238,7 @@ mlt <- function(model, data, weights = NULL, offset = NULL, fixed = NULL,
         ytype <- .type_of_response(y)
         if (is.na(ytype))
             stop("cannot deal with response class", class(y))
-
-        if (ytype == "survival") {
-            y <- .Surv2R(y)
-        } else {
-            y <- R(exact = y)
-        }
+        y <- R(y)
     }
 
     s <- .mlt_setup(model = model, data = data, y = y, weights = weights, 
