@@ -1,5 +1,6 @@
 
 library("ltm")
+library("multcomp")
 
 coef(a <- ltm(Sepal.Length ~ Sepal.Width | Species, data = iris, trafo = "log"))
 predict(a)
@@ -28,11 +29,13 @@ predict(cc, newdata = expand.grid(horTh = c("no", "yes"), menostat = "Pre",
                            pnodes = 100, tgrade = "II"), q = 100:101, type = "trafo")
 
 d <- ltm(Surv(time, cens) ~ 1, data = GBSG2, method = "cloglog")
+
+confint(d, calpha = univariate_calpha())
+
 class(d) <- class(d)[-1]
 cf <- coef(d)
 v <- vcov(d)
 
-library("multcomp")
 
 prm <- parm(cf, v)
 K <- diag(length(cf))
