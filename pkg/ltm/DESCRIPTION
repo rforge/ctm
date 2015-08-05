@@ -1,7 +1,7 @@
 Package: ltm
 Title: Linear Transformation Models
-Version: 0.0-13
-Date: 2015-08-04
+Version: 0.0-14
+Date: 2015-08-05
 Author: Torsten Hothorn
 Maintainer: Torsten Hothorn <Torsten.Hothorn@R-project.org>
 Description: Unified specification and estimation of linear transformation
