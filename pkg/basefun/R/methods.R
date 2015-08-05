@@ -29,7 +29,7 @@ nparm <- function(object, data)
 nparm.basis <- function(object, data) {
     if (!is.data.frame(data)) 
         data <- expand.grid(data[variable.names(object)])
-    ncol(object(data))
+    ncol(model.matrix(object, data = data))
 }
 
 nparm.box_bases <- function(object, data)
@@ -53,11 +53,11 @@ support.basis <- function(x)
 support.bases <- function(x)
     lapply(x, support)
 
-mkgrid <- function(object, n)
+mkgrid <- function(object, n, ...)
     UseMethod("mkgrid")
 
 ### <FIXME> can we generate only a subset of variables??? </FIXME>
-mkgrid.basis <- function(object, n) {
+mkgrid.basis <- function(object, n, ...) {
     ret <- list()
     .mkgrid <- function(s, n) {
         if (!is.atomic(s)) {
