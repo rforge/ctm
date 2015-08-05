@@ -52,3 +52,6 @@ mkgrid.model <- function(object, ...)
 
 variable.names.mlt <- function(object, ...)
     variable.names(object$model)
+
+as.mlt <- function(object)
+    UseMethod("as.mlt")
