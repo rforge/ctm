@@ -20,7 +20,7 @@
 ### http://en.wikipedia.org/wiki/Bernstein_polynomial
 ### http://dx.doi.org/10.1080/02664761003692423
 ### arXiv preprint arXiv:1404.2293
-Bernstein_basis <- function(order = 2, support = c(0, 1), 
+Bernstein_basis <- function(order = 2, support = c(0, 1), interval = support,
                             ui = c("none", "increasing", "decreasing", "cyclic", "zerointegral"), 
                             varname = NULL) {
 
@@ -42,6 +42,12 @@ Bernstein_basis <- function(order = 2, support = c(0, 1),
                             ci = rep(0, order)),
         "cyclic" = stop("not yet implemented"))
 
+    stopifnot(all(diff(support) > 0))
+    stopifnot(length(interval) == 2)
+    stopifnot(diff(interval) > 0)
+    stopifnot(interval[1] >= min(support))
+    stopifnot(interval[2] <= max(support))
+
     basis <- function(data, deriv = 0L, integrate = FALSE) {
         if (is.atomic(data)) {
             x <- data
@@ -58,14 +64,14 @@ Bernstein_basis <- function(order = 2, support = c(0, 1),
         ### ...
 
         stopifnot(order > max(c(0, deriv)))
-        x <- (x - support[1]) / diff(support)
+        x <- (x - interval[1]) / diff(interval)
         stopifnot(all(x >= 0 && x <= 1))
 
         X <- do.call("cbind", lapply(0:order, function(j) 
                      .Bx(x, j, order, deriv = max(c(0, deriv)), integrate = integrate)))
 
         if (deriv > 0)
-            X <- X * (1 / diff(support)^deriv)
+            X <- X * (1 / diff(interval)^deriv)
         if (deriv < 0)
             X[] <- 0
         colnames(X) <- paste("Bs", 1:ncol(X), "(", varname, ")", sep = "")
@@ -81,6 +87,9 @@ Bernstein_basis <- function(order = 2, support = c(0, 1),
     s <- list(support)
     names(s) <- varname
     attr(basis, "support") <- s
+    i <- list(interval)
+    names(i) <- varname
+    attr(basis, "interval") <- i
     attr(basis, "varnames") <- varname
     attr(basis, "intercept") <- zeroint
 
@@ -95,7 +104,7 @@ model.matrix.Bernstein_basis <- function(object, data,
     varname <- variable.names(object)
     deriv <- .deriv(varname, deriv)
     x <- data[[varname]]
-    s <- support(object)[[varname]]
+    s <- attr(object, "interval")[[varname]] ### was: support(object)[[varname]]
     small <- x < s[1]
     large <- x > s[2]
     if (all(!small) && all(!large))
@@ -104,11 +113,11 @@ model.matrix.Bernstein_basis <- function(object, data,
     ### extrapolate linearily for x outside s
     stopifnot(!integrate)
     stopifnot(deriv %in% c(0, 1))
-    data[small,varname] <- s[1]        
-    data[large,varname] <- s[2]        
+    data[[varname]][small] <- s[1]        
+    data[[varname]][large] <- s[2]        
     ret <- object(data = data, deriv = deriv, integrate = integrate)
-    if (mean(small + large) > .1)
-        warning("more than 10% of observations outside support")
+    if (mean(small + large) > .5)
+        warning("more than 50% of observations outside interval")
     if (any(small)) {
         dsmall <- data.frame(x = rep(s[1], sum(small)))
         names(dsmall) <- varname

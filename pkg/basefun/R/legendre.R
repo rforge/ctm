@@ -1,5 +1,5 @@
 
-Legendre_basis <- function(order, support = c(0, 1),
+Legendre_basis <- function(order, support = c(0, 1), interval = support,
                            ui = c("none", "increasing", "decreasing", "cyclic"), # "zerointegral"),
                            varname = NULL, ...) {
 
@@ -8,6 +8,12 @@ Legendre_basis <- function(order, support = c(0, 1),
     ui <- match.arg(ui)
     B <- Bernstein_basis(order, ui = ui, varname = varname)
     constr <- get("constr", environment(B))
+
+    stopifnot(all(diff(support) > 0))
+    stopifnot(length(interval) == 2)
+    stopifnot(diff(interval) > 0)
+    stopifnot(interval[1] >= min(support))
+    stopifnot(interval[2] <= max(support))
 
     basis <- function(data, deriv = 0L, integrate = FALSE) {
 
@@ -27,14 +33,14 @@ Legendre_basis <- function(order, support = c(0, 1),
         }
 
         ### map into [0, 1]
-        x <- (x - support[1]) / diff(support)
+        x <- (x - interval[1]) / diff(interval)
         stopifnot(all(x >= 0 && x <= 1))
 
         ### Legendre is on [-1, 1] !
         X <- do.call("cbind", as.vector(lapply(dobject, predict, 2 * x - 1)))
         colnames(X) <- paste("L", 1:ncol(X), sep = "")
         if (deriv > 0)
-            X <- X * (2 / diff(support)^deriv)
+            X <- X * (2 / diff(interval)^deriv)
         if (deriv < 0) X[] <- 0
         if (ui != "none")
             constr$ui <- constr$ui %*% L2B(order)
@@ -46,6 +52,9 @@ Legendre_basis <- function(order, support = c(0, 1),
     s <- list(support)
     names(s) <- varname
     attr(basis, "support") <- s
+    i <- list(interval)
+    names(i) <- varname
+    attr(basis, "interval") <- i
     attr(basis, "varnames") <- varname
     attr(basis, "intercept") <- TRUE
 
