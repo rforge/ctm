@@ -27,9 +27,17 @@ nparm <- function(object, data)
     UseMethod("nparm")
 
 nparm.basis <- function(object, data) {
-    if (!is.data.frame(data)) 
-        data <- expand.grid(data[variable.names(object)])
-    ncol(model.matrix(object, data = data))
+    if (!is.data.frame(data)) {
+        data <- data[variable.names(object)]
+        data <- lapply(data, function(d) {
+            if (length(d) < 4) return(d)
+            ### we need only NCOL
+            if (is.factor(d)) return(unique(d))
+            return(d[1:4])
+        })
+        data <- expand.grid(data)
+    }
+    ncol(model.matrix(object, data = data)) 
 }
 
 nparm.box_bases <- function(object, data)
