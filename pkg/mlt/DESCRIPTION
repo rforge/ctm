@@ -1,11 +1,11 @@
 Package: mlt
 Title: Most Likely Transformations
-Version: 0.0-14
+Version: 0.0-15
 Date: 2015-08-05
 Author: Torsten Hothorn
 Maintainer: Torsten Hothorn <Torsten.Hothorn@R-project.org>
 Description: Estimation via transformation.
-Depends: basefun (>= 0.0-13)
+Depends: basefun (>= 0.0-15)
 Imports: BB, sandwich, stats, numDeriv, quadprog
 Enhances: np, eha, survival, nnet, truncreg
 Suggests: lattice, multcomp (>= 1.0-3), MASS, TH.data
