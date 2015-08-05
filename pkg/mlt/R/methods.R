@@ -44,11 +44,31 @@ logLik.mlt <- function(object, parm = coef(object, fixed = FALSE), ...) {
 estfun.mlt <- function(object, parm = coef(object, fixed = FALSE), ...)
     -object$score(parm)
 
-mkgrid.mlt <- function(object, ...)
-    mkgrid(object$model, ...)
+mkgrid.mlt <- function(object, n, ...)
+    mkgrid(object$model, n = n, ...)
 
-mkgrid.model <- function(object, ...)
-    mkgrid(object$model, ...)
+mkgrid.model <- function(object, n = n, bounds = NULL, ...) {
+    ret <- mkgrid(object$model, n = n, ...)
+    if (!is.null(bounds)) {
+        stopifnot(length(bounds) == 1)
+        stopifnot(names(bounds) %in% names(ret))
+        m <- ret[[names(bounds)]]
+        if (is.double(m)) { ### <FIXME> what about integers? </FIXME>
+            b <- bounds[[1]]
+            s <- range(m)
+            if (is.finite(b[1])) {
+                stopifnot(b[1] <= s[1])
+                s[1] <- b[1]
+            }
+            if (is.finite(b[2])) {
+                stopifnot(s[2] <= b[2])
+                s[2] <- b[2]
+            }
+            ret[[names(bounds)]] <- seq(from = s[1], to = s[2], length.out = length(m))
+        }
+    }
+    ret
+}
 
 variable.names.mlt <- function(object, ...)
     variable.names(object$model)

@@ -24,7 +24,7 @@ simulate.mlt <- function(object, nsim = 1, seed = NULL,
         newdata[[y]] <- NULL
     }
     ### don't accept user-generated quantiles
-    q <- mkgrid(object, n = n)[[y]]
+    q <- mkgrid(object, n = n, bounds = object$bounds)[[y]]
     if (is.data.frame(newdata)) {
         p <- runif(nsim * NROW(newdata))
         ### basically compute quantiles for p; see qmlt

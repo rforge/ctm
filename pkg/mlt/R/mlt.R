@@ -120,6 +120,8 @@
     ret$weights <- weights
     ret$offset <- offset
     ret$response <- response
+    ret$bounds <- list(attr(y, "bounds"))
+    names(ret$bounds) <- response
     ret$todistr <- todistr
     ret$loglik <- loglikfct
     ret$score <- score
@@ -227,7 +229,7 @@
     return(object)
 }
 
-mlt <- function(model, data, weights = NULL, offset = NULL, fixed = NULL,
+mlt <- function(model, data, weights = NULL, offset = NULL, fixed = NULL, bounds = c(-Inf, Inf),
                 theta = NULL, pstart = NULL, scale = FALSE, check = TRUE, checkGrad = FALSE, 
                 trace = FALSE, dofit = TRUE, ...) {
 
@@ -238,7 +240,7 @@ mlt <- function(model, data, weights = NULL, offset = NULL, fixed = NULL,
         ytype <- .type_of_response(y)
         if (is.na(ytype))
             stop("cannot deal with response class", class(y))
-        y <- R(y)
+        y <- R(y, bounds = bounds)
     }
 
     s <- .mlt_setup(model = model, data = data, y = y, weights = weights, 

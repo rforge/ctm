@@ -37,6 +37,12 @@ tmlt <- function(object, newdata = object$data, q = NULL, ...) {
                 i <- f == levels(f)[nlevels(f)]
                 if (any(i)) 
                     ret[i] <- Inf
+            } else {
+                ### Y in (b[1], b[2]) => P(Y \le b[1]) = 0, P(Y \le b[2]) = 1
+                ### <FIXME> what happens with deriv in ...? </FIXME>
+                b <- object$bounds[[y]]
+                ret[f == b[1]] <- -Inf
+                ret[f == b[2]] <- Inf
             }
             return(ret)
         }
@@ -65,6 +71,12 @@ tmlt <- function(object, newdata = object$data, q = NULL, ...) {
             i <- f == levels(f)[nlevels(f)]
             if (any(i))
                 ret[i,] <- Inf
+        } else {
+            ### Y in (b[1], b[2]) => P(Y \le b[1]) = 0, P(Y \le b[2]) = 1
+                ### <FIXME> what happens with deriv in ...? </FIXME>
+            b <- object$bounds[[y]]
+            ret[f == b[1]] <- -Inf
+            ret[f == b[2]] <- Inf
         }
         return(ret)
     }
@@ -83,6 +95,30 @@ tmlt <- function(object, newdata = object$data, q = NULL, ...) {
     ### trafo of last level is always Inf, see above
     if (is.factor(f <- newdata[[y]])) {
         i <- f == levels(f)[nlevels(f)]
+        if (any(i)) {
+            args <- lapply(names(dn), function(d) {
+                if (d == y)
+                    return(i)
+                return(1:(dim(ret)[which(names(dn) == d)]))
+            })
+            ret <- do.call("[<-", c(list(i = ret), args, 
+                                    list(value = Inf)))
+        }
+    } else {
+        ### Y in (b[1], b[2]) => P(Y \le b[1]) = 0, P(Y \le b[2]) = 1
+                ### <FIXME> what happens with deriv in ...? </FIXME>
+        b <- object$bounds[[y]]
+        i <- f == b[1]
+        if (any(i)) {
+            args <- lapply(names(dn), function(d) {
+                if (d == y)
+                    return(i)
+                return(1:(dim(ret)[which(names(dn) == d)]))
+            })
+            ret <- do.call("[<-", c(list(i = ret), args, 
+                                    list(value = -Inf)))
+        }
+        i <- f == b[2]
         if (any(i)) {
             args <- lapply(names(dn), function(d) {
                 if (d == y)
@@ -139,7 +175,7 @@ qmlt <- function(object, newdata = object$data, p = .5, n = 50,
 
     y <- object$response
     ### don't accept user-generated quantiles
-    q <- mkgrid(object, n = n)[[y]]
+    q <- mkgrid(object, n = n, bounds = object$bounds)[[y]]
     if (!is.null(newdata) & !is.data.frame(newdata)) {
         newdata[[y]] <- NULL
         nm <- names(newdata)
@@ -195,6 +231,8 @@ dmlt <- function(object, newdata = object$data, q = NULL, log = FALSE) {
         names(deriv) <- y
         trafoprime <- tmlt(object, newdata = newdata, q = q, 
                            deriv = deriv)
+        ### <FIXME> bounds to not pay attention to deriv in tmlt </FIXME>
+        trafoprime <- pmax(0, trafoprime)
         if (log)
             return(object$model$todistr$d(trafo, log = TRUE) + log(trafoprime))
         return(object$model$todistr$d(trafo) * trafoprime)

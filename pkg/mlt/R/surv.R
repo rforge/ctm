@@ -44,12 +44,14 @@
                        cright = ifelse(status != 1, Inf, NA),
                        tleft = object[, "start"])
     )
+    ### survival times are always positive
+    attr(ret, "bounds") <- c(0, Inf)
     ret
 }
 
 ### handle exact integer / factor as interval censored
 R <- function(y = NA, cleft = NA, cright = NA, 
-              tleft = NA, tright = NA) {
+              tleft = NA, tright = NA, bounds = c(-Inf, Inf)) {
 
     if (inherits(y, "Surv"))
         return(.Surv2R(y))
@@ -120,6 +122,7 @@ R <- function(y = NA, cleft = NA, cright = NA,
     ret <- data.frame(tleft = tleft, cleft = cleft, exact = exact,
                       cright = cright, tright = tright, rank = rank)
     attr(ret, "type") <- type
+    attr(ret, "bounds") <- bounds
     class(ret) <- c("response", class(ret))
     ret
 }
