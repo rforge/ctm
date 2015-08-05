@@ -2,7 +2,7 @@
 ltm <- function(formula, data, subset, weights, na.action = na.omit,
                 method = c("logistic", "probit", "cloglog"),
                 trafo = c("Bernstein", "Legendre", "fixed log", "log", "linear"),
-                integerAsFactor = TRUE, order = 5, support = NULL, 
+                integerAsFactor = TRUE, order = 5, support = NULL, bounds = c(-Inf, Inf),
                 negative_lp = TRUE, contrasts.arg = NULL, ...) {
 
     ### extract response and possibly a stratum and predictor variables
@@ -36,7 +36,7 @@ ltm <- function(formula, data, subset, weights, na.action = na.omit,
 
     SURV <- inherits(Y, "Surv")
     if (!inherits(Y, "response"))
-        Y <- R(Y)
+        Y <- R(Y, bounds = bounds)
     type <- attr(Y, "type")
     DISCRETE <- type != "double" || (type == "integer" && !integerAsFactor)
     
@@ -44,7 +44,8 @@ ltm <- function(formula, data, subset, weights, na.action = na.omit,
         if (is.null(support)) {
             tmp <- unlist(Y[, c("cleft", "exact", "cright")])
             support <- range(tmp[is.finite(tmp)], na.rm = TRUE)
-            if (SURV) support[1] <- 0
+            interval <- quantile(tmp[is.finite(tmp)], na.rm = TRUE, prob = c(.025, .975))
+            if (SURV) bounds[1] <- 0
         }
     } 
 
@@ -67,11 +68,11 @@ ltm <- function(formula, data, subset, weights, na.action = na.omit,
         rtrafo <- lapply(trafo, function(tr) switch(tr, 
             "fixed log" = log_basis(ui = "increasing", varname = response, support = support),
             "log" = log_basis(ui = "increasing", varname = response, support = support),
-            "Bernstein" = Bernstein_basis(order = order, support = support,
+            "Bernstein" = Bernstein_basis(order = order, support = support, interval = interval,
                           ui = "increasing", varname = response),
-            "Legendre" = Legendre_basis(order = order, support = support,
+            "Legendre" = Legendre_basis(order = order, support = support, interval = interval,
                           ui = "increasing", varname = response),
-            "linear" = polynomial_basis(c(TRUE, TRUE), var = response, 
+            "linear" = polynomial_basis(c(TRUE, TRUE), varname = response, 
                                         support = support, ci = c(-Inf, 0)))
         )
         if ("fixed log" %in% trafo) {
@@ -93,7 +94,7 @@ ltm <- function(formula, data, subset, weights, na.action = na.omit,
     if (ncol(model.matrix(xtrafo, data = mf)) == 0) xtrafo <- NULL
     m <- model(rtrafo, interacting = strafo, shifting = xtrafo, todistr = todistr)
 
-    ret <- mlt(m, data = mf, fixed = fixed, scale = TRUE, check = FALSE, ...)
+    ret <- mlt(m, data = mf, fixed = fixed, bounds = bounds, scale = TRUE, check = FALSE, ...)
     ret$call <- match.call(expand.dots = TRUE)
 
     class(ret) <- c(ifelse(DISCRETE, "dltm", "cltm"), "ltm", class(ret))
