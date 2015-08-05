@@ -74,9 +74,11 @@ predict.cbind_bases <- function(object, newdata, coef,
     else if (is.logical(dim)) 
         dim <- FALSE
 
-    if (length(object) == 1) 
+    if (length(object) == 1) {
+        if (!(names(object) %in% terms)) return(NULL)
         return(predict(object[[1]], newdata = newdata, 
                        coef = coef, dim = dim, ...))
+    }
 
     np <- nparm(object, data = newdata)
     if (is.null(terms)) terms <- names(object)
