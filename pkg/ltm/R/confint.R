@@ -3,7 +3,7 @@ confint.ltm <- function(object, parm, level = 0.95,
                         type = c("trafo", "distribution", "survivor", "cumhazard"), n = 20, ...) {
 
     cf <- coef(object)
-    if (all(is.na(cf)) && length(cf) == 1)
+    if (is.null(cf))
         parm <- data.frame(var = 1)
     if (missing(parm))
         parm <- names(cf)
@@ -31,8 +31,8 @@ confint.ltm <- function(object, parm, level = 0.95,
     parm <- parm[rep(1, length(q)),,drop = FALSE]
     parm[[y]] <- q
     X <- model.matrix(object$model$model, data = parm)
-    ci <- confint(glht(parm(coef(object, all = TRUE), 
-                            vcov(object, all = TRUE)), 
+    ci <- confint(glht(parm(coef(object, lp_only = FALSE), 
+                            vcov(object, lp_only = FALSE)), 
                        linfct = X), ...)$confint
     if (type == "distribution") ci <- object$model$todistr$p(ci)
     if (type == "survivor") ci <- 1 - object$model$todistr$p(ci)
