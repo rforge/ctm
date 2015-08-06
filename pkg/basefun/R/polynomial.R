@@ -10,7 +10,8 @@ polynomial_basis <- function(coef, support = c(0, 1),
     }))
 
     if (is.null(ui)) ui <- Diagonal(length(object))
-    if (is.null(ci)) ci <- rep(-Inf, length(object))
+    if (is.null(ci)) ci <- rep(-Inf, nrow(ui))
+    stopifnot(nrow(ui) == length(ci))
 
     basis <- function(data, deriv = 0L) {
         if (is.atomic(data)) {

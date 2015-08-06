@@ -43,7 +43,8 @@ as.basis.formula <- function(object, remove_intercept = FALSE,
             attr(X, "assign") <- a[-1]
         }
         if (is.null(ui)) ui <- Diagonal(ncol(X))
-        if (is.null(ci)) ci <- rep(-Inf, ncol(X))
+        if (is.null(ci)) ci <- rep(-Inf, nrow(ui))
+        stopifnot(nrow(ui) == length(ci))
         attr(X, "constraint") <- list(ui = ui, ci = ci)
         attr(X, "Assign") <- c("(Intercept)", varnames)[attr(X, "assign") + 1]
         if (deriv == 1) {
