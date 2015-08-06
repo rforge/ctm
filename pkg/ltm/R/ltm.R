@@ -36,33 +36,26 @@ ltm <- function(formula, data, subset, weights, na.action = na.omit,
 
     SURV <- inherits(Y, "Surv")
     if (!inherits(Y, "response"))
-        Y <- R(Y, bounds = bounds)
-    type <- attr(Y, "type")
-    DISCRETE <- type != "double" || (type == "integer" && !integerAsFactor)
+        RY <- R(Y, bounds = bounds)
+    type <- attr(RY, "type")
+    DISCRETE <- type != "double" 
+    if (type == "integer") DISCRETE <- integerAsFactor
     
-    if (!DISCRETE) {
-        if (is.null(support)) {
-            tmp <- unlist(Y[, c("cleft", "exact", "cright")])
-            support <- range(tmp[is.finite(tmp)], na.rm = TRUE)
-            interval <- quantile(tmp[is.finite(tmp)], na.rm = TRUE, prob = c(.025, .975))
-            if (SURV) bounds[1] <- 0
-        }
-    } 
-
-    method <- match.arg(method)
-    todistr <- switch(method, "logistic" = "Logistic",
-                              "probit" = "Normal",
-                              "cloglog" = "MinExtrVal")
-
     fixed <- NULL
     if (DISCRETE) {
-        if (type == "integer") Y <- ordered(Y)
+        if (type == "integer") Y <- mf[[response]] <- ordered(Y)
         nlev <- nlevels(Y)
         cntr <- list(function(n) contr.treatment(n, base = nlev))
         names(cntr) <- response
         rtrafo <- as.basis(as.formula(paste("~", response)), data = mf, remove_intercept = TRUE,
-              contrasts.arg = cntr, ui = diff(diag(nlev - 1)), ci = 0)
+              contrasts.arg = cntr, ui = diff(diag(nlev - 1)), ci = rep(0, nlev - 2))
     } else {
+        if (is.null(support)) {
+            tmp <- unlist(RY[, c("cleft", "exact", "cright")])
+            support <- range(tmp[is.finite(tmp)], na.rm = TRUE)
+            interval <- quantile(tmp[is.finite(tmp)], na.rm = TRUE, prob = c(.025, .975))
+            if (SURV) bounds[1] <- 0
+        }
         if (is.null(match.call()$trafo)) trafo <- "Bernstein"
         trafo <- match.arg(trafo, several.ok = TRUE)
         rtrafo <- lapply(trafo, function(tr) switch(tr, 
@@ -92,6 +85,12 @@ ltm <- function(formula, data, subset, weights, na.action = na.omit,
     xtrafo <- as.basis(mtX, data = mf, remove_intercept = TRUE, contrasts.arg = contrasts.arg,
                        negative = negative_lp)
     if (ncol(model.matrix(xtrafo, data = mf)) == 0) xtrafo <- NULL
+
+    method <- match.arg(method)
+    todistr <- switch(method, "logistic" = "Logistic",
+                              "probit" = "Normal",
+                              "cloglog" = "MinExtrVal")
+
     m <- model(rtrafo, interacting = strafo, shifting = xtrafo, todistr = todistr)
 
     ret <- mlt(m, data = mf, fixed = fixed, bounds = bounds, scale = TRUE, check = FALSE, ...)
