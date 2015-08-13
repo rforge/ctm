@@ -63,7 +63,7 @@ Bernstein_basis <- function(order = 2, support = c(0, 1), interval = support,
         ### deriv = 2 => f''(x)
         ### ...
 
-        stopifnot(order > max(c(0, deriv)))
+        stopifnot(order > max(c(0, deriv - 1L)))
         x <- (x - interval[1]) / diff(interval)
         stopifnot(all(x >= 0 && x <= 1))
 
