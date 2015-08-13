@@ -116,8 +116,8 @@ model.matrix.Bernstein_basis <- function(object, data,
     data[[varname]][small] <- s[1]        
     data[[varname]][large] <- s[2]        
     ret <- object(data = data, deriv = deriv, integrate = integrate)
-    if (mean(small + large) > .5)
-        warning("more than 50% of observations outside interval")
+#    if (mean(small + large) > .5)
+#        warning("more than 50% of observations outside interval")
     if (any(small)) {
         dsmall <- data.frame(x = rep(s[1], sum(small)))
         names(dsmall) <- varname
