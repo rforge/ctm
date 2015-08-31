@@ -1,4 +1,6 @@
 
+### plot.mlt?
+
 plot.ltm <- function(x, newdata, type = c("distribution",
     "survivor", "density", "logdensity", "hazard", "loghazard", "cumhazard", "quantile", "trafo"),
     q = NULL, p = 1:9 / 10, n = 50, col = rgb(.1, .1, .1, .1), ...) {

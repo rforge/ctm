@@ -4,6 +4,8 @@ as.mlt.ltm <- function(object) {
     object
 }
 
+### is.ltm?
+
 model.frame.ltm <- function(object, ...)
     object$data
 
@@ -73,6 +75,7 @@ summary.ltm <- function(object, ...) {
         rownames(mtests) <- paste(rownames(mtests), alt, x$rhs)
         ret$coefficients <- mtests
     }
+    ### add chisq test
     ret$AIC <- AIC(object)
     ret$logLik <- logLik(object)
     class(ret) <- "summary.ltm"

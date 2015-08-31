@@ -17,6 +17,7 @@ confint.ltm <- function(object, parm, level = 0.95,
                        ...))
     } 
 
+    ### confint.mlt?
     stopifnot(is.data.frame(parm))
     if (nrow(parm) > 1) {
         ret <- lapply(1:nrow(parm), function(i) 
