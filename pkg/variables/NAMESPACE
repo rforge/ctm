@@ -1,0 +1,32 @@
+
+importFrom("stats", "variable.names")
+
+export(factor_var, ordered_var, numeric_var, desc, units, support, bounds,
+       is.bounded, mkgrid)
+
+S3method("c", "var")
+S3method("variable.names", "var")
+S3method("desc", "var")
+S3method("desc", "vars")
+S3method("units", "numeric_var")
+S3method("units", "var")
+S3method("units", "vars")
+S3method("support", "var")
+S3method("support", "vars")
+S3method("levels", "factor_var")
+S3method("levels", "discrete_var")
+S3method("levels", "var")
+S3method("levels", "vars")
+S3method("bounds", "continuous_var")
+S3method("bounds", "discrete_var")
+S3method("bounds", "ordered_var")
+S3method("bounds", "vars")
+S3method("bounds", "default")
+S3method("is.bounded", "continuous_var")
+S3method("is.bounded", "var")
+S3method("is.bounded", "vars")
+S3method("mkgrid", "var")
+S3method("mkgrid", "continuous_var")
+S3method("mkgrid", "vars")
+S3method("as.data.frame", "vars")
+
