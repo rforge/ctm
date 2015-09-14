@@ -152,3 +152,50 @@ as.data.frame.vars <- function(x, row.names = NULL, optional = FALSE, n = 1L, ..
     as.data.frame(lapply(g, function(x) rep_len(x, length.out = len)))
 }
 
+as.vars <- function(data) {
+    stopifnot(is.data.frame(data))
+    v <- lapply(colnames(data), function(x) {
+        if (is.ordered(data[[x]])) return(ordered_var(x, levels = levels(data[[x]])))
+        if (is.factor(data[[x]])) return(factor_var(x, levels = levels(data[[x]])))
+        if (is.integer(data[[x]])) {
+            s <- sort(unique(data[[x]]))
+        } else {
+            s <- range(data[[x]])
+        }
+        return(numeric_var(x, support = s))
+    })
+    return(do.call("c", v))
+}
+
+check <- function(object, data)
+    UseMethod("check")
+
+check.ordered_var <- function(object, data) {
+    v <- variable.names(object)
+    stopifnot(v %in% colnames(data))
+    is.ordered(data[[v]]) && all.equal(levels(data[[v]]), levels(object))
+}
+
+check.factor_var <- function(object, data) {
+    v <- variable.names(object)
+    stopifnot(v %in% colnames(data))
+    is.factor(data[[v]]) && all.equal(levels(data[[v]]), levels(object))
+}
+
+check.discrete_var <- function(object, data) {
+    v <- variable.names(object)
+    stopifnot(v %in% colnames(data))
+    all(data[[v]] %in% support(object))
+}
+
+check.continuous_var <- function(object, data) {
+    v <- variable.names(object)
+    stopifnot(v %in% colnames(data))
+    b <- bounds(object)
+    min(data[[v]], na.rm = TRUE) >= b[1] && 
+    max(data[[v]], na.rm = TRUE) <= b[2]
+}
+
+check.vars <- function(object, data)
+    all(sapply(object, check, data = data))
+    
