@@ -80,7 +80,7 @@ predict.cbind_bases <- function(object, newdata, coef,
                        coef = coef, dim = dim, ...))
     }
 
-    np <- nparm(object, data = newdata)
+    np <- nparm(object)
     if (is.null(terms)) terms <- names(object)
 
     ret <- vector(mode = "list", length = length(object))

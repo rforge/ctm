@@ -1,7 +1,11 @@
 
-log_basis <- function(support = c(.Machine$double.eps, Inf),
-                      ui = c("none", "increasing", "decreasing"),
-                      varname = NULL) {
+log_basis <- function(var, 
+                      ui = c("none", "increasing", "decreasing")) {
+
+    stopifnot(inherits(var, "numeric_var"))
+    varname <- variable.names(var)
+    support <- support(var)[[varname]]
+    stopifnot(support[1] > 0)
 
     ui <- match.arg(ui)
     ci <- switch(ui, "none" = -Inf, 0)
@@ -10,6 +14,8 @@ log_basis <- function(support = c(.Machine$double.eps, Inf),
                      "decreasing" = matrix(-1))
 
     basis <- function(data, deriv = 0L) {
+
+        stopifnot(check(var, data))
         if (is.atomic(data)) {
             x <- data
         } else {
@@ -31,10 +37,7 @@ log_basis <- function(support = c(.Machine$double.eps, Inf),
         X
     }
 
-    s <- list(support)
-    names(s) <- varname
-    attr(basis, "support") <- s
-    attr(basis, "varnames") <- varname
+    attr(basis, "variables") <- var
     attr(basis, "intercept") <- FALSE
 
     class(basis) <- c("log_basis", "basis", class(basis))

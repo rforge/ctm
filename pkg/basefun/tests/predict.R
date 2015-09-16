@@ -5,8 +5,9 @@ x <- 1:5
 y <- as.double(1:4)
 g <- gl(3, 1)
 d <- expand.grid(x = x, y = y, g = g)
+xvar <- numeric_var("x", support = x)
 
-cb <- c(logx = log_basis(x, varname = "x"), 
+cb <- c(logx = log_basis(xvar), 
         X = as.basis(~ y + g, data = expand.grid(y = y, g = g)))
 
 X <- model.matrix(cb, data = d)
@@ -43,7 +44,7 @@ pX2 <- predict(cb[["X"]], newdata = expand.grid(y = y, g = g),
 
 stopifnot(all.equal(c(pX), c(pX2), check.attributes = FALSE))
 
-bb <- b(logx = log_basis(x, varname = "x"),
+bb <- b(logx = log_basis(xvar),
         X = as.basis(~ y + g, data = expand.grid(y = y, g = g)))
 
 X <- model.matrix(bb, data = d)

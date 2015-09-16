@@ -20,9 +20,8 @@
 ### http://en.wikipedia.org/wiki/Bernstein_polynomial
 ### http://dx.doi.org/10.1080/02664761003692423
 ### arXiv preprint arXiv:1404.2293
-Bernstein_basis <- function(order = 2, support = c(0, 1), interval = support,
-                            ui = c("none", "increasing", "decreasing", "cyclic", "zerointegral"), 
-                            varname = NULL) {
+Bernstein_basis <- function(var, order = 2, 
+                            ui = c("none", "increasing", "decreasing", "cyclic", "zerointegral")) {
 
     zeroint <- FALSE
     ui <- match.arg(ui, several.ok = TRUE)
@@ -42,6 +41,15 @@ Bernstein_basis <- function(order = 2, support = c(0, 1), interval = support,
                             ci = rep(0, order)),
         "cyclic" = stop("not yet implemented"))
 
+    stopifnot(inherits(var, "numeric_var"))
+    varname <- variable.names(var)
+    support <- support(var)[[varname]]
+    if (is.bounded(var)) {
+        interval <- bounds(var)[[varname]]
+    } else {
+        interval <- support
+    }
+
     stopifnot(all(diff(support) > 0))
     stopifnot(length(interval) == 2)
     stopifnot(diff(interval) > 0)
@@ -49,6 +57,8 @@ Bernstein_basis <- function(order = 2, support = c(0, 1), interval = support,
     stopifnot(interval[2] <= max(support))
 
     basis <- function(data, deriv = 0L, integrate = FALSE) {
+
+        stopifnot(check(var, data))
         if (is.atomic(data)) {
             x <- data
         } else {
@@ -84,13 +94,10 @@ Bernstein_basis <- function(order = 2, support = c(0, 1), interval = support,
         return(X)
     }
 
-    s <- list(support)
-    names(s) <- varname
-    attr(basis, "support") <- s
+    attr(basis, "variables") <- var
     i <- list(interval)
     names(i) <- varname
     attr(basis, "interval") <- i
-    attr(basis, "varnames") <- varname
     attr(basis, "intercept") <- zeroint
 
     class(basis) <- c("Bernstein_basis", "basis", class(basis))

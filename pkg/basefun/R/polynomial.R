@@ -1,6 +1,10 @@
 
-polynomial_basis <- function(coef, support = c(0, 1),
-                             ui = NULL, ci = NULL, varname = NULL) {
+polynomial_basis <- function(var, coef, 
+                             ui = NULL, ci = NULL) {
+
+    stopifnot(inherits(var, "numeric_var"))
+    varname <- variable.names(var)
+    support <- support(var)[[varname]]
 
     stopifnot(all(coef %in% c(0, 1)))
     object <- do.call("polylist", lapply(1:length(coef), function(i) {
@@ -14,6 +18,8 @@ polynomial_basis <- function(coef, support = c(0, 1),
     stopifnot(nrow(ui) == length(ci))
 
     basis <- function(data, deriv = 0L) {
+
+        stopifnot(check(var, data))
         if (is.atomic(data)) {
             x <- data
         } else {
@@ -37,10 +43,7 @@ polynomial_basis <- function(coef, support = c(0, 1),
         X
     }
 
-    s <- list(support)
-    names(s) <- varname
-    attr(basis, "support") <- s
-    attr(basis, "varnames") <- varname
+    attr(basis, "variables") <- var
     attr(basis, "intercept") <- TRUE
 
     class(basis) <- c("polynomial_basis", "basis", class(basis))

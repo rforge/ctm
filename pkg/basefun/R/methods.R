@@ -23,74 +23,49 @@ predict.basis <- function(object, newdata, coef,
     return(.const_array(dim, nd, lp))
 }
 
-nparm <- function(object, data)
+nparm <- function(object)
     UseMethod("nparm")
 
-nparm.basis <- function(object, data) {
-    if (!is.data.frame(data)) {
-        data <- data[variable.names(object)]
-        data <- lapply(data, function(d) {
-            if (length(d) < 4) return(d)
-            ### we need only NCOL
-            if (is.factor(d)) return(unique(d))
-            return(d[1:4])
-        })
-        data <- expand.grid(data)
-    }
-    ncol(model.matrix(object, data = data)) 
-}
+nparm.basis <- function(object)
+    ncol(model.matrix(object, 
+                      data = as.data.frame(attr(object, "variables"), 
+                                           n = 10))) 
 
-nparm.box_bases <- function(object, data)
-    prod(sapply(object, nparm, data = data))
+nparm.box_bases <- function(object)
+    prod(sapply(object, nparm))
 
-nparm.cbind_bases <- function(object, data)
-    sapply(object, nparm, data = data)
+nparm.cbind_bases <- function(object)
+    sapply(object, nparm)
 
 variable.names.basis <- function(object, ...)
-    attr(object, "varnames")
+    variable.names(attr(object, "variables"))
 
 variable.names.bases <- function(object, ...)
-    unique(sapply(object, variable.names))
+    unique(unlist(sapply(object, variable.names)))
 
-support <- function(x)
-    UseMethod("support")
-
-support.basis <- function(x)
-    attr(x, "support")
-
-support.bases <- function(x)
-    lapply(x, support)
-
-mkgrid <- function(object, n, ...)
-    UseMethod("mkgrid")
-
-### <FIXME> can we generate only a subset of variables??? </FIXME>
-mkgrid.basis <- function(object, n, ...) {
-    ret <- list()
-    .mkgrid <- function(s, n) {
-        if (!is.atomic(s)) {
-            tmp <- lapply(s, .mkgrid, n = n)
-            if (all(sapply(s, is.atomic)))
-                ret[names(tmp)] <<- tmp
-        }
-        ### <FIXME> better type check as in mlt </FIXME>
-        if ((length(s) == 2) && (storage.mode(s) == "double")) {
-            x <- seq(from = s[1], to = s[2], length.out = n)
-        } else if (is.factor(s)) {
-            x <- s
-        } else if (is.integer(s)) {
-            x <- s
-        } else {
-            x <- NULL
-        }
-        return(x)
-    }
-    ret2 <- .mkgrid(support(object), n = n)
-    if (length(ret) == 0) return(ret2)
-    ret
-}
+mkgrid.basis <- function(object, n, ...)
+    mkgrid(as.vars(object), n = n, ...)
 
 mkgrid.bases <- mkgrid.basis
+
+as.vars.basis <- function(object)
+    attr(object, "variables")
+
+as.vars.bases <- function(object) {
+    vn <- variable.names(object)
+    ret <- vector(mode = "list", length = length(vn))
+    names(ret) <- vn
+    .vars <- function(o) {
+        if (inherits(o, "basis")) {
+            v <- as.vars(o)
+            if (inherits(v, "var")) v <- c(v)
+            ret[variable.names(v)] <<- v
+        } else 
+            sapply(o, .vars)
+    }
+    ret2 <- .vars(object)
+    do.call("c", ret)
+}
 
 as.basis <- function(object, ...)
     UseMethod("as.basis")

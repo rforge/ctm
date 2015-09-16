@@ -9,7 +9,8 @@ d <- data.frame(y = y, x = x, g = g)
 de <- d[-(1:nrow(d)),]
 
 b1 <- as.basis(~ x + g, data = d)
-b2 <- Bernstein_basis(order = 4, var = "y", ui = "incre")
+b2 <- Bernstein_basis(numeric_var("y", support = c(0.0, 1.0)), 
+                      order = 4, ui = "incre")
 
 b12 <- b(b1 = b1, b2 = b2)
 c12 <- c(b1 = b1, b2 = b2)

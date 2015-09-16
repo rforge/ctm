@@ -1,9 +1,16 @@
 
-as.basis.formula <- function(object, remove_intercept = FALSE, 
-                             data = NULL, ui = NULL, ci = NULL, negative = FALSE,
+as.basis.formula <- function(object, data = NULL, remove_intercept = FALSE, 
+                             ui = NULL, ci = NULL, negative = FALSE,
                              ...) {
 
+    if (inherits(data, "data.frame")) {
+        vars <- as.vars(data[all.vars(object)])
+    } else {
+        vars <- data[all.vars(object)]
+        data <- as.data.frame(vars, n = 10)
+    }
     varnames <- all.vars(object)
+    stopifnot(varnames %in% variable.names(vars))
 
     mf <- NULL
     if (!is.null(data) && NROW(data) > 0) {
@@ -14,19 +21,10 @@ as.basis.formula <- function(object, remove_intercept = FALSE,
         contr <- attr(X, "contrasts")
         xlevels <- .getXlevels(mt, mf)
     }
-    if (!is.null(data)) {
-        s <- lapply(data[, varnames, drop = FALSE], function(v) {
-            if (is.factor(v)) return(unique(v))
-            if (length(v) > 0)
-                return(range(v, na.rm = TRUE))
-            return(NULL)
-        })
-    } else {
-        s <- NULL
-    }
 
     ret <- function(data, deriv = 0L) {
 
+        stopifnot(check(vars, data))
         data <- data[varnames]
         stopifnot(is.data.frame(data)) 
         if (!is.null(mf)) {
@@ -58,8 +56,7 @@ as.basis.formula <- function(object, remove_intercept = FALSE,
         return(X)
     }
 
-    attr(ret, "varnames") <- varnames
-    attr(ret, "support") <- s
+    attr(ret, "variables") <- vars
     ### note: ~ a - 1 also contains intercept!
     attr(ret, "intercept") <- !remove_intercept 
     class(ret) <- c("formula_basis", "basis", class(ret))

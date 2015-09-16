@@ -1,13 +1,22 @@
 
-Legendre_basis <- function(order, support = c(0, 1), interval = support,
-                           ui = c("none", "increasing", "decreasing", "cyclic"), # "zerointegral"),
-                           varname = NULL, ...) {
+Legendre_basis <- function(var, order = 2, 
+                           ui = c("none", "increasing", "decreasing", "cyclic"), ...) { # "zerointegral")
+
+    stopifnot(inherits(var, "numeric_var"))
 
     object <- legendre.polynomials(order, ...)
 
     ui <- match.arg(ui)
-    B <- Bernstein_basis(order, ui = ui, varname = varname)
+    B <- Bernstein_basis(var, order, ui = ui)
     constr <- get("constr", environment(B))
+
+    varname <- variable.names(var)
+    support <- support(var)[[varname]]
+    if (is.bounded(var)) {
+        interval <- bounds(var)[[varname]]
+    } else {
+        interval <- support
+    }
 
     stopifnot(all(diff(support) > 0))
     stopifnot(length(interval) == 2)
@@ -17,6 +26,7 @@ Legendre_basis <- function(order, support = c(0, 1), interval = support,
 
     basis <- function(data, deriv = 0L, integrate = FALSE) {
 
+        stopifnot(check(var, data))
         if (integrate) stop("Integration not yet implemented")
 
         stopifnot(order > max(c(0, deriv)))
@@ -49,13 +59,10 @@ Legendre_basis <- function(order, support = c(0, 1), interval = support,
         X
     }
 
-    s <- list(support)
-    names(s) <- varname
-    attr(basis, "support") <- s
+    attr(basis, "variables") <- var
     i <- list(interval)
     names(i) <- varname
     attr(basis, "interval") <- i
-    attr(basis, "varnames") <- varname
     attr(basis, "intercept") <- TRUE
 
     class(basis) <- c("Legendre_basis", "Bernstein_basis", "basis", class(basis))

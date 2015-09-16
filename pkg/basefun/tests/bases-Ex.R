@@ -8,7 +8,8 @@ set.seed(29)
 x <- sort(runif(100))
 y <- x^2 + rnorm(length(x), sd = .1) 
 ## set-up monotone Bernstein polynom basis
-Bb <- Bernstein_basis(order = 5, ui = "increasing", varname = "x")
+xvar <- numeric_var("x", support = c(0.0, 1.0))
+Bb <- Bernstein_basis(xvar, order = 5, ui = "increasing")
 ## evaluate basis
 X1 <- model.matrix(Bb, data = data.frame(x = x))
 X2 <- Bb(x)
@@ -16,7 +17,7 @@ stopifnot(all.equal(X1, X2))
 ## fit model
 m1 <- lm(y ~  X1 - 1)
 m2 <- lm(y ~  Bb(x) - 1, data = data.frame(y = y, x = x))
-Bb0 <- Bernstein_basis(order = 5, ui = "zeroint", varname = "x")
+Bb0 <- Bernstein_basis(xvar, order = 5, ui = "zeroint")
 X0 <- model.matrix(Bb0, data = data.frame(x = x))
 m0 <- lm(y ~  X0)
 stopifnot(all.equal(fitted(m1), fitted(m2)))

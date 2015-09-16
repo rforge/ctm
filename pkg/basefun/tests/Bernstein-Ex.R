@@ -9,10 +9,11 @@ dfun <- list(cos, function(x) -sin(x), function(x) -.5 * x^(-3/2), function(x) 1
 ### http://r.789695.n4.nabble.com/Derivative-of-the-probit-td2133341.html
 ord <- 3:10
 x <- seq(from = 0.01, to = 2*pi - 0.01, length.out = 100)
+xvar <- numeric_var("x", support = range(x) + c(-.5, .5))
 for (i in 1:length(fun)) {
     for (o in ord) {
         y <- fun[[i]](x)
-        Bb <- Bernstein_basis(order = o, varname = "x", support = range(x) + c(-.5, .5))
+        Bb <- Bernstein_basis(xvar, order = o)
         m <- lm(y ~ Bb(x) - 1, data = data.frame(y = y, x = x))
         R <- summary(m)$r.squared
         layout(matrix(1:2, ncol = 2))
@@ -26,7 +27,8 @@ for (i in 1:length(fun)) {
 ### check linear extrapolation
 order <- 50
 xg <- seq(from = -1, to = 1, length.out = order + 1)
-B <- Bernstein_basis(order = order, support = c(-1, 1), var = "x")
+xvar2 <- numeric_var("x", support = c(-1.0, 1.0))
+B <- Bernstein_basis(xvar2, order = order)
 cf <- xg^2
 x <- -150:150/100
 X <- model.matrix(B, data = data.frame(x = x))
