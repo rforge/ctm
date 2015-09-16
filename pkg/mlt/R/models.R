@@ -1,15 +1,15 @@
 
-model <- function(response, interacting = NULL, shifting = NULL, 
+model <- function(response, interacting = NULL, shifting = NULL, data = NULL,
                   todistr = c("Normal", "Logistic", "MinExtrVal"), 
                   sumconstr = inherits(interacting, c("formula", "formula_basis"))) {
 
     ### mkgrid() will not work due to missing data
     if (.is.formula(response)) 
-        response <- as.basis(response)
+        response <- as.basis(response, data = data)
     if (.is.formula(interacting)) 
-        interacting <- as.basis(interacting)
+        interacting <- as.basis(interacting, data = data)
     if (.is.formula(shifting)) 
-        shifting <- as.basis(shifting, remove_intercept = TRUE)
+        shifting <- as.basis(shifting, data = data, remove_intercept = TRUE)
 
     if (is.character(todistr))
         todistr <- .distr(todistr)
