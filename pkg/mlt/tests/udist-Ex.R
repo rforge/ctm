@@ -10,8 +10,8 @@ dY <- function(x) dgamma(x, shape = 5)
 
 ### generate y and set-up basis
 y <- sort(rY(100))
-Bb <- Bernstein_basis(order = 10, support = c(0, max(y) + .1),
-                      ui = "increasing", varname = "y")
+Bb <- Bernstein_basis(numeric_var("y", support = c(0, max(y) + .1)), order = 10,
+                      ui = "increasing")
 
 mydata <- data.frame(y = y)
 opt <- mlt(model(response = Bb), data = mydata)

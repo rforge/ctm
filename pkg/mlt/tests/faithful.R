@@ -7,8 +7,8 @@ data("faithful")
 aic <- numeric(20)
 
 for (o in 2:(length(aic) + 1)) {
-Bs <- Bernstein_basis(order = o, var = "waiting", ui = "incre", 
-                      support = range(faithful$waiting) + c(-5, 5))
+Bs <- Bernstein_basis(numeric_var("waiting", support = range(faithful$waiting) + c(-5, 5)),
+                      order = o, ui = "incre")
 m <- model(Bs)
 mod <- mlt(m, data = faithful)
 yp <- mkgrid(mod, 50)[["waiting"]]
@@ -27,8 +27,8 @@ lines(ecdf(faithful$waiting))
 plot(aic)
 
 o <- which.min(aic) + 1
-Bs <- Bernstein_basis(order = o, var = "waiting", ui = "incre",
-                      support = range(faithful$waiting) + c(-5, 5))
+Bs <- Bernstein_basis(numeric_var("waiting", support = range(faithful$waiting) + c(-5, 5)),
+                      order = o, ui = "incre")
 m <- model(Bs)
 mod <- mlt(m, data = faithful)
 
@@ -47,8 +47,8 @@ q <- predict(mod, p = p, n = 100, type = "quantile")
 plot(p, q)
 lines(p, quantile(faithful$waiting, p))
 
-Bs <- Bernstein_basis(order = o, var = "waiting", ui = "incre", # normal = TRUE,
-                      support = range(faithful$waiting) + c(-5, 5))
+Bs <- Bernstein_basis(numeric_var("waiting", support = range(faithful$waiting) + c(-5, 5)),
+                      order = o, ui = "incre")
 m <- model(Bs)
 mod <- mlt(m, data = faithful)
 

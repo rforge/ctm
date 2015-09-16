@@ -21,8 +21,9 @@ vcov(tmod)
 
 ## MLT
 fm <- as.formula("~ x")
-yb <- polynomial_basis(c(TRUE, TRUE), var = "yt", ci = c(-Inf, 0))
-m <- model(yb, shifting = fm, todistr = "Normal")
+yb <- polynomial_basis(numeric_var("yt", support = range(d$yt, na.rm = TRUE)), 
+                       coef = c(TRUE, TRUE), ci = c(-Inf, 0))
+m <- model(yb, shifting = fm, todistr = "Normal", data = d)
 dfull <- d[!is.na(d$yt),,drop = FALSE]
 dfull$yt <- R(dfull$yt, tleft = dfull$trunc_left)
 mltmod <- mlt(m, data = dfull)
@@ -55,8 +56,9 @@ vcov(tmod)
 
 ## MLT
 fm <- as.formula("~ x")
-yb <- polynomial_basis(c(TRUE, TRUE), var = "yt", ci = c(-Inf, 0))
-m <- model(yb, shifting = fm, todistr = "Normal")
+yb <- polynomial_basis(numeric_var("yt", support = range(d$yt, na.rm = TRUE)), 
+                       coef = c(TRUE, TRUE), ci = c(-Inf, 0))
+m <- model(yb, shifting = fm, todistr = "Normal", data = d)
 dfull <- d[!is.na(d$yt),,drop = FALSE]
 dfull$yt <- R(dfull$yt, tright = dfull$trunc_right)
 mltmod <- mlt(m, data = dfull)

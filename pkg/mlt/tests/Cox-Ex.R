@@ -17,8 +17,8 @@ mydata <- data.frame(y = y, g = g)
 boxplot(y ~ g, data = mydata)
 
 ### uncensored, Cox model, h = bernstein
-Bb <- Bernstein_basis(order = 5, support = c(0, max(y) + .1),
-                      ui = "increasing", var = "y")
+Bb <- Bernstein_basis(numeric_var("y", support = c(0, max(y) + .1)), order = 5,
+                      ui = "increasing")
 s <- as.basis(~ g, data = data.frame(g = gf), remove_intercept = TRUE)
 m <- model(response = Bb, shifting = s, todist = "MinExtrVal")
 (cf1 <- coef(opt <- mlt(m, data = mydata)))
@@ -38,7 +38,7 @@ plot(yn, a[,3], type = "l", col = "red", ylim = c(0, 1))
 lines(survfit(cph, newdata = data.frame(g = gf[3])))
 
 ### h = c(log, bernstein)
-lb <- log_basis(varname = "y", support = c(0, max(y)), ui = "increasing")
+lb <- log_basis(numeric_var("y", support = c(.Machine$double.eps, max(y))), ui = "increasing")
 m <- model(response = c(blog = lb, bBern = Bb), shifting = s, todist = "MinExtrVal")
 (cf1 <- coef(opt <- mlt(m, data = mydata)))
 ## sample from this model
@@ -70,8 +70,8 @@ mydata <- data.frame(y = Surv(y, sample(0:1, length(y), replace = TRUE), type = 
 coef(opt <- mlt(m, data = mydata))
 
 ### interval censoring
-Bb <- Bernstein_basis(order = 5, support = c(0, max(y + 1) + .1),
-                      ui = "increasing", var = "y")
+Bb <- Bernstein_basis(numeric_var("y", support = c(0, max(y + 1) + .1)), order = 5,
+                      ui = "increasing")
 mydata <- data.frame(y = Surv(y, y + 1, sample(0:3, length(y), replace = TRUE), type = "interval"), 
                      g = g)
 m <- model(response = c(blog = lb, bBern = Bb), shifting = s, todist = "MinExtrVal")

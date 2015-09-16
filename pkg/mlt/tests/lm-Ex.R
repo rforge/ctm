@@ -6,7 +6,7 @@ n <- 1000
 y <- rnorm(n, 2, 1.5)
 d <- data.frame(y = y)
 
-lin <- polynomial_basis(c(1, 1), var = "y", support = range(y), ci = c(-Inf, 0))
+lin <- polynomial_basis(numeric_var("y", support = range(y)), coef = c(1, 1), ci = c(-Inf, 0))
 m <- model(lin)
 
 o <- mlt(m, data = d)
@@ -22,7 +22,7 @@ d <- data.frame(y = y, x = x)
 
 plot(x, y)
 
-Bb <- Bernstein_basis(order = 10, support = c(0, 2*pi), var = "x", ui = "zero")
+Bb <- Bernstein_basis(numeric_var("x", support = c(0, 2*pi)), order = 10, ui = "zero")
 m <- model(lin, shift = Bb)
 
 o <- mlt(m, data = d)
@@ -38,7 +38,7 @@ d <- data.frame(y = y, x = x)
 
 plot(x, y)
 
-Bb <- Bernstein_basis(order = 10, support = c(0, 2*pi), var = "x")
+Bb <- Bernstein_basis(numeric_var("x", support = c(0, 2*pi)), order = 10)
 m <- model(lin, interacting = Bb)
 
 o <- mlt(m, data = d)

@@ -12,8 +12,8 @@ df <- data.frame(y = y, x)
 m1 <- glm(y ~ X1 + X2, data = df, family = binomial())
 coef(m1)
 
-m <- model(~ y, shift = ~ X1 + X2, todist = "Logis")
-m2 <- mlt(m, data = df, fixed = c("y.L" = 0))
+m <- model(~ y, shift = ~ X1 + X2, todist = "Logis", data = df)
+m2 <- mlt(m, data = df, fixed = c("y1" = 0))
 coef(m2)
 
 max(abs(coef(m1) + coef(m2)[-2]))

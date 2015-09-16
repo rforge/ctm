@@ -7,7 +7,7 @@ g <- gl(2, n)
 y <- rnorm(length(g), mean = c(2, 1)[g], sd = c(.5, 1.5)[g])
 mydata <- data.frame(g = g, y = y)
 
-by <- polynomial_basis(c(1, 1), var = "y", support = range(y), ci = c(-Inf, 0))
+by <- polynomial_basis(numeric_var("y", support = range(y)), coef = c(1, 1), ci = c(-Inf, 0))
 m1 <- model(by, interacting = as.basis(~ g - 1, data = mydata))
 fm1 <- mlt(m1, data = mydata)
 logLik(fm1)

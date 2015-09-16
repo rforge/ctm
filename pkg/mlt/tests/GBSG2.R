@@ -12,8 +12,8 @@ fm <- as.formula(paste("Surv(time, cens) ~ ", paste(xvar, collapse = "+")))
 cmod <- coxph(fm, data = GBSG2)
 
 order <- 10
-by <- Bernstein_basis(order, support = c(0, max(GBSG2$time)),
-                      ui = "incre", var = "y")
+by <- Bernstein_basis(numeric_var("y", support = c(0, max(GBSG2$time))), order = order,
+                      ui = "incre")
 bx <- as.basis(as.formula(paste("~", paste(xvar, collapse = "+"))), data = GBSG2,
                remove_intercept = TRUE)
 
