@@ -81,7 +81,7 @@
         ### ci <- ci + sqrt(.Machine$double.eps) ### we need ui %*% theta > ci, not >= ci
     }
 
-    optimfct <- function(theta, scale = FALSE, quiet = FALSE, ...) {
+    optimfct <- function(theta, scale = FALSE, ...) {
         control <- list(...)
         if (scale) {
             Ytmp <- Y
@@ -100,10 +100,9 @@
         }
         if (!is.null(ui)) {
             ret <- BBoptim(par = theta, fn = f, gr = g, project = "projectLinear",
-                           projectArgs = list(A = ui, b = ci, meq = 0), control = control,
-                           quiet = quiet)
+                           projectArgs = list(A = ui, b = ci, meq = 0), control = control)
         } else {
-            ret <- BBoptim(par = theta, fn = f, gr = g, control = control, quiet = quiet)
+            ret <- BBoptim(par = theta, fn = f, gr = g, control = control)
         }
         if (scale) ret$par <- ret$par * sc
         return(ret)
@@ -199,14 +198,13 @@
     ret
 }
 
-.mlt_fit <- function(object, theta = NULL, scale = FALSE, check = TRUE, trace = FALSE, 
-                     quiet = FALSE, ...) {
+.mlt_fit <- function(object, theta = NULL, scale = FALSE, check = TRUE, trace = FALSE, ...) {
 
     if (is.null(theta))
         stop(sQuote("mlt"), "needs suitable starting values")
 
     ### BBoptim issues a warning in case of unsuccessful convergence
-    ret <- try(object$optimfct(theta, trace = trace, scale = scale, quiet = quiet, ...))    
+    ret <- try(object$optimfct(theta, trace = trace, scale = scale, ...))    
 
     cls <- class(object)
     object <- c(object, ret)
@@ -231,11 +229,14 @@
     return(object)
 }
 
-mlt <- function(model, data, weights = NULL, offset = NULL, fixed = NULL, bounds = c(-Inf, Inf),
+mlt <- function(model, data, weights = NULL, offset = NULL, fixed = NULL,
                 theta = NULL, pstart = NULL, scale = FALSE, check = TRUE, checkGrad = FALSE, 
-                trace = FALSE, quiet = FALSE, dofit = TRUE, ...) {
+                trace = FALSE, dofit = TRUE, ...) {
 
+    vars <- as.vars(model$model)
     response <- model$response
+    responsevar <- vars[[response]]
+    bounds <- bounds(responsevar)[[response]]
     stopifnot(length(response) == 1)
     y <- data[[response]]
     if (!inherits(y, "response")) {
