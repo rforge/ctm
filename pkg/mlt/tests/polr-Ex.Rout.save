@@ -1,7 +1,7 @@
 
-R version 3.2.1 (2015-06-18) -- "World-Famous Astronaut"
+R version 3.2.2 (2015-08-14) -- "Fire Safety"
 Copyright (C) 2015 The R Foundation for Statistical Computing
-Platform: x86_64-unknown-linux-gnu (64-bit)
+Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -22,6 +22,7 @@ Type 'q()' to quit R.
 > 
 > library("mlt")
 Loading required package: basefun
+Loading required package: variables
 > 
 > s <- as.basis(~ Infl, data = housing, remove_intercept = TRUE)
 > r <- as.basis(~ Sat, data = housing, remove_intercept = TRUE,
@@ -66,4 +67,4 @@ Re-fitting to get Hessian
 > 
 > proc.time()
    user  system elapsed 
-  1.141   0.026   1.161 
+  1.171   0.028   1.190 

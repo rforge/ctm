@@ -1,7 +1,7 @@
 
-R version 3.2.1 (2015-06-18) -- "World-Famous Astronaut"
+R version 3.2.2 (2015-08-14) -- "Fire Safety"
 Copyright (C) 2015 The R Foundation for Statistical Computing
-Platform: x86_64-unknown-linux-gnu (64-bit)
+Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -18,6 +18,7 @@ Type 'q()' to quit R.
 > 
 > library("mlt")
 Loading required package: basefun
+Loading required package: variables
 > library("eha")
 Loading required package: survival
 > set.seed(29)
@@ -36,8 +37,8 @@ Loading required package: survival
 > 
 > boxplot(y ~ g, data = mydata)
 > 
-> Bb <- log_basis(var = "y", support = range(y), ui = "increasing")
-> Bx <- as.basis(~ g)
+> Bb <- log_basis(numeric_var("y", support = range(y)), ui = "increasing")
+> Bx <- as.basis(~ g, data = mydata)
 > m <- model(Bb, shifting = Bx, todist = "MinExtrVal")
 > 
 > ## Estimate coefficients
@@ -247,8 +248,8 @@ Error in phreg(y ~ g, data = mydata, dist = "weibull", shape = 1) :
 > 
 > boxplot(y ~ g, data = mydata)
 > 
-> Bb <- log_basis(var = "y", support = range(y), ui = "increasing")
-> Bx <- as.basis(~ g)
+> Bb <- log_basis(numeric_var("y", support = range(y)), ui = "increasing")
+> Bx <- as.basis(~ g, data = mydata)
 > m <- model(Bb, shifting = Bx, todist = "MinExtrVal")
 > 
 > ## Estimate coefficients
@@ -418,4 +419,4 @@ Hessian:[1] TRUE
 > 
 > proc.time()
    user  system elapsed 
-  2.385   0.029   2.403 
+  2.405   0.048   2.442 

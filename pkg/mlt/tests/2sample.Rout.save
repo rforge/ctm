@@ -1,7 +1,7 @@
 
-R version 3.2.1 (2015-06-18) -- "World-Famous Astronaut"
+R version 3.2.2 (2015-08-14) -- "Fire Safety"
 Copyright (C) 2015 The R Foundation for Statistical Computing
-Platform: x86_64-unknown-linux-gnu (64-bit)
+Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -18,6 +18,7 @@ Type 'q()' to quit R.
 > 
 > library("mlt")
 Loading required package: basefun
+Loading required package: variables
 > 
 > set.seed(28)
 > n <- 100
@@ -25,7 +26,7 @@ Loading required package: basefun
 > y <- rnorm(length(g), mean = c(2, 1)[g], sd = c(.5, 1.5)[g])
 > mydata <- data.frame(g = g, y = y)
 > 
-> by <- polynomial_basis(c(1, 1), var = "y", support = range(y), ci = c(-Inf, 0))
+> by <- polynomial_basis(numeric_var("y", support = range(y)), coef = c(1, 1), ci = c(-Inf, 0))
 > m1 <- model(by, interacting = as.basis(~ g - 1, data = mydata))
 > fm1 <- mlt(m1, data = mydata)
   Successful convergence.
@@ -89,4 +90,4 @@ y:(Intercept)
 > 
 > proc.time()
    user  system elapsed 
-  1.417   0.022   1.435 
+  1.298   0.048   1.333 

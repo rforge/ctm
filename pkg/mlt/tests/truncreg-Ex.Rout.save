@@ -1,7 +1,7 @@
 
-R version 3.2.1 (2015-06-18) -- "World-Famous Astronaut"
+R version 3.2.2 (2015-08-14) -- "Fire Safety"
 Copyright (C) 2015 The R Foundation for Statistical Computing
-Platform: x86_64-unknown-linux-gnu (64-bit)
+Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -18,6 +18,7 @@ Type 'q()' to quit R.
 > 
 > library("mlt")
 Loading required package: basefun
+Loading required package: variables
 > library("truncreg")
 Loading required package: maxLik
 Loading required package: miscTools
@@ -54,8 +55,9 @@ sigma       -7.445133e-06  1.637489e-06  3.940881e-05
 > 
 > ## MLT
 > fm <- as.formula("~ x")
-> yb <- polynomial_basis(c(TRUE, TRUE), var = "yt", ci = c(-Inf, 0))
-> m <- model(yb, shifting = fm, todistr = "Normal")
+> yb <- polynomial_basis(numeric_var("yt", support = range(d$yt, na.rm = TRUE)), 
++                        coef = c(TRUE, TRUE), ci = c(-Inf, 0))
+> m <- model(yb, shifting = fm, todistr = "Normal", data = d)
 > dfull <- d[!is.na(d$yt),,drop = FALSE]
 > dfull$yt <- R(dfull$yt, tleft = dfull$trunc_left)
 > mltmod <- mlt(m, data = dfull)
@@ -111,8 +113,9 @@ sigma       -2.840592e-06  1.854537e-06  4.525610e-05
 > 
 > ## MLT
 > fm <- as.formula("~ x")
-> yb <- polynomial_basis(c(TRUE, TRUE), var = "yt", ci = c(-Inf, 0))
-> m <- model(yb, shifting = fm, todistr = "Normal")
+> yb <- polynomial_basis(numeric_var("yt", support = range(d$yt, na.rm = TRUE)), 
++                        coef = c(TRUE, TRUE), ci = c(-Inf, 0))
+> m <- model(yb, shifting = fm, todistr = "Normal", data = d)
 > dfull <- d[!is.na(d$yt),,drop = FALSE]
 > dfull$yt <- R(dfull$yt, tright = dfull$trunc_right)
 > mltmod <- mlt(m, data = dfull)
@@ -157,4 +160,4 @@ In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
 > 
 > proc.time()
    user  system elapsed 
-  1.452   0.047   1.490 
+  1.463   0.048   1.501 

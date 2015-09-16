@@ -1,7 +1,7 @@
 
-R version 3.2.1 (2015-06-18) -- "World-Famous Astronaut"
+R version 3.2.2 (2015-08-14) -- "Fire Safety"
 Copyright (C) 2015 The R Foundation for Statistical Computing
-Platform: x86_64-unknown-linux-gnu (64-bit)
+Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -18,6 +18,7 @@ Type 'q()' to quit R.
 > 
 > library("mlt")
 Loading required package: basefun
+Loading required package: variables
 > library("survival")
 > set.seed(29)
 > 
@@ -35,8 +36,8 @@ Loading required package: basefun
 > boxplot(y ~ g, data = mydata)
 > 
 > ### uncensored, Cox model, h = bernstein
-> Bb <- Bernstein_basis(order = 5, support = c(0, max(y) + .1),
-+                       ui = "increasing", var = "y")
+> Bb <- Bernstein_basis(numeric_var("y", support = c(0, max(y) + .1)), order = 5,
++                       ui = "increasing")
 > s <- as.basis(~ g, data = data.frame(g = gf), remove_intercept = TRUE)
 > m <- model(response = Bb, shifting = s, todist = "MinExtrVal")
 > (cf1 <- coef(opt <- mlt(m, data = mydata)))
@@ -65,7 +66,7 @@ Hessian:[1] TRUE
 > lines(survfit(cph, newdata = data.frame(g = gf[3])))
 > 
 > ### h = c(log, bernstein)
-> lb <- log_basis(varname = "y", support = c(0, max(y)), ui = "increasing")
+> lb <- log_basis(numeric_var("y", support = c(.Machine$double.eps, max(y))), ui = "increasing")
 > m <- model(response = c(blog = lb, bBern = Bb), shifting = s, todist = "MinExtrVal")
 > (cf1 <- coef(opt <- mlt(m, data = mydata)))
   Successful convergence.
@@ -123,8 +124,8 @@ Hessian:[1] TRUE
  1.19852459  0.33285740  0.53879516 
 > 
 > ### interval censoring
-> Bb <- Bernstein_basis(order = 5, support = c(0, max(y + 1) + .1),
-+                       ui = "increasing", var = "y")
+> Bb <- Bernstein_basis(numeric_var("y", support = c(0, max(y + 1) + .1)), order = 5,
++                       ui = "increasing")
 > mydata <- data.frame(y = Surv(y, y + 1, sample(0:3, length(y), replace = TRUE), type = "interval"), 
 +                      g = g)
 > m <- model(response = c(blog = lb, bBern = Bb), shifting = s, todist = "MinExtrVal")
@@ -181,4 +182,4 @@ There were 13 warnings (use warnings() to see them)
 > 
 > proc.time()
    user  system elapsed 
- 10.759   0.040  10.792 
+ 10.632   0.071  10.697 

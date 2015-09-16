@@ -1,7 +1,7 @@
 
-R version 3.2.1 (2015-06-18) -- "World-Famous Astronaut"
+R version 3.2.2 (2015-08-14) -- "Fire Safety"
 Copyright (C) 2015 The R Foundation for Statistical Computing
-Platform: x86_64-unknown-linux-gnu (64-bit)
+Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -18,6 +18,7 @@ Type 'q()' to quit R.
 > 
 > library("mlt")
 Loading required package: basefun
+Loading required package: variables
 > library("np")
 Nonparametric Kernel Methods for Mixed Datatypes (version 0.60-2)
 [vignette("np_faq",package="np") provides answers to frequently asked questions]
@@ -30,8 +31,8 @@ Nonparametric Kernel Methods for Mixed Datatypes (version 0.60-2)
 > 
 > ### generate y and set-up basis
 > y <- sort(rY(100))
-> Bb <- Bernstein_basis(order = 10, support = c(0, max(y) + .1),
-+                       ui = "increasing", varname = "y")
+> Bb <- Bernstein_basis(numeric_var("y", support = c(0, max(y) + .1)), order = 10,
++                       ui = "increasing")
 > 
 > mydata <- data.frame(y = y)
 > opt <- mlt(model(response = Bb), data = mydata)
@@ -65,4 +66,4 @@ Hessian:[1] TRUE
 > 
 > proc.time()
    user  system elapsed 
-  1.370   0.027   1.390 
+  1.445   0.044   1.477 
