@@ -7,7 +7,7 @@
 
 factor_var <- function(name, desc = NULL, levels) {
     ret <- .var(name = name, desc = desc)
-    ret$support <- factor(levels)
+    ret$support <- factor(levels, labels = levels)
     class(ret) <- c("factor_var", class(ret))
     ret
 }
@@ -44,7 +44,9 @@ numeric_var <- function(name, desc = NULL, unit = NULL,
 
 c.var <- function(...) {
     ret <- list(...)
-    names(ret) <- sapply(ret, variable.names)
+    nm <- sapply(ret, variable.names)
+    stopifnot(all(!duplicated(nm))) ### make sure no duplicate names
+    names(ret) <- nm
     stopifnot(all(sapply(ret, function(x) inherits(x, "var"))))
     class(ret) <- "vars"
     ret
@@ -162,17 +164,21 @@ as.data.frame.vars <- function(x, row.names = NULL, optional = FALSE,
 
 as.data.frame.var <- as.data.frame.vars
 
-as.vars <- function(data) {
-    stopifnot(is.data.frame(data))
-    v <- lapply(colnames(data), function(x) {
-        if (is.ordered(data[[x]])) 
-            return(ordered_var(x, levels = levels(data[[x]])))
-        if (is.factor(data[[x]])) 
-            return(factor_var(x, levels = levels(data[[x]])))
-        if (is.integer(data[[x]])) {
-            s <- sort(unique(data[[x]]))
+as.vars <- function(object) 
+    UseMethod("as.vars")
+
+as.vars.data.frame <- function(object) {
+    v <- lapply(colnames(object), function(x) {
+        if (is.ordered(object[[x]])) 
+            return(ordered_var(x, levels = levels(object[[x]])))
+        if (is.factor(object[[x]])) 
+            return(factor_var(x, levels = levels(object[[x]])))
+        if (is.integer(object[[x]])) {
+            s <- sort(unique(object[[x]]))
+        } else if (inherits(object[[x]], "Surv")) { ### <FIXME>: only right censored </FIXME>
+            s <- c(.Machine$double.eps, max(object[[x]][,1], na.rm = TRUE))
         } else {
-            s <- range(data[[x]])
+            s <- range(object[[x]], na.rm = TRUE)
         }
         return(numeric_var(x, support = s))
     })
@@ -183,31 +189,43 @@ check <- function(object, data)
     UseMethod("check")
 
 check.ordered_var <- function(object, data) {
-    v <- variable.names(object)
-    stopifnot(v %in% colnames(data))
-    is.ordered(data[[v]]) && all.equal(levels(data[[v]]), 
-                                       levels(object))
+    if (!is.atomic(data)) {
+        v <- variable.names(object)
+        stopifnot(v %in% names(data))
+        data <- data[[v]]
+    }
+    is.ordered(data) && isTRUE(all.equal(levels(data), 
+                                         levels(object)))
 }
 
 check.factor_var <- function(object, data) {
-    v <- variable.names(object)
-    stopifnot(v %in% colnames(data))
-    is.factor(data[[v]]) && all.equal(levels(data[[v]]), 
-                                      levels(object))
+    if (!is.atomic(data)) {
+        v <- variable.names(object)
+        stopifnot(v %in% names(data))
+        data <- data[[v]]
+    }
+    is.factor(data) && isTRUE(all.equal(levels(data), 
+                                        levels(object)))
 }
 
 check.discrete_var <- function(object, data) {
-    v <- variable.names(object)
-    stopifnot(v %in% colnames(data))
-    all(data[[v]] %in% support(object)[[v]])
+    if (!is.atomic(data)) {
+        v <- variable.names(object)
+        stopifnot(v %in% names(data))
+        data <- data[[v]]
+    }
+    all(data %in% support(object)[[variable.names(object)]])
 }
 
 check.continuous_var <- function(object, data) {
-    v <- variable.names(object)
-    stopifnot(v %in% colnames(data))
-    b <- bounds(object)[[v]]
-    min(data[[v]], na.rm = TRUE) >= b[1] && 
-    max(data[[v]], na.rm = TRUE) <= b[2]
+    if (!is.atomic(data)) {
+        v <- variable.names(object)
+        stopifnot(v %in% names(data))
+        data <- data[[v]]
+    }
+    b <- bounds(object)[[variable.names(object)]]
+    min(data, na.rm = TRUE) >= b[1] && 
+    max(data, na.rm = TRUE) <= b[2]
 }
 
 check.vars <- function(object, data)
