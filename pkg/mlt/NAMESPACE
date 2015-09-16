@@ -1,5 +1,6 @@
 
 import(basefun)
+import(variables)
 importFrom(numDeriv, grad, hessian)
 importFrom(BB, spg, BBoptim)
 importFrom(sandwich, estfun)
