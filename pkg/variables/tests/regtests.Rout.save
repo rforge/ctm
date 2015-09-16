@@ -26,15 +26,24 @@ Type 'q()' to quit R.
 > units(x1)
 [1] "cm"
 > support(x1)
+$d_vari
 [1] 0.0 1.5
+
 > levels(x1)
 [1] NA
 > bounds(x1)
+$d_vari
 [1] -Inf  Inf
+
 > is.bounded(x1)
 [1] FALSE
 > mkgrid(x1)
+$d_vari
 [1] 0.0 1.5
+
+> as.data.frame(x1)
+  d_vari
+1    1.5
 > 
 > x2 <- numeric_var("i_vari", "integer", "cm", support = 1:10)
 > variable.names(x2)
@@ -44,17 +53,35 @@ Type 'q()' to quit R.
 > units(x2)
 [1] "cm"
 > support(x2)
+$i_vari
  [1]  1  2  3  4  5  6  7  8  9 10
+
 > levels(x2)
  [1]  1  2  3  4  5  6  7  8  9 10
 > bounds(x2)
+$i_vari
 [1]  1 10
+
 > is.bounded(x2)
 [1] TRUE
 > mkgrid(x2)
+$i_vari
  [1]  1  2  3  4  5  6  7  8  9 10
+
+> as.data.frame(x2)
+   i_vari
+1       1
+2       2
+3       3
+4       4
+5       5
+6       6
+7       7
+8       8
+9       9
+10     10
 > 
-> x3 <- numeric_var("dd_vari", "discrete double", "cm", support = runif(4))
+> x3 <- numeric_var("dd_vari", "discrete double", "cm", support = 1:4/6)
 > variable.names(x3)
 [1] "dd_vari"
 > desc(x3)
@@ -62,15 +89,27 @@ Type 'q()' to quit R.
 > units(x3)
 [1] "cm"
 > support(x3)
-[1] 0.5163721 0.9892689 0.0441549 0.4660505
+$dd_vari
+[1] 0.1666667 0.3333333 0.5000000 0.6666667
+
 > levels(x3)
-[1] 0.5163721 0.9892689 0.0441549 0.4660505
+[1] 0.1666667 0.3333333 0.5000000 0.6666667
 > bounds(x3)
-[1] 0.0441549 0.9892689
+$dd_vari
+[1] 0.1666667 0.6666667
+
 > is.bounded(x3)
 [1] TRUE
 > mkgrid(x3)
-[1] 0.5163721 0.9892689 0.0441549 0.4660505
+$dd_vari
+[1] 0.1666667 0.3333333 0.5000000 0.6666667
+
+> as.data.frame(x3)
+    dd_vari
+1 0.1666667
+2 0.3333333
+3 0.5000000
+4 0.6666667
 > 
 > x4 <- numeric_var("db_vari", "bounded double", "cm", support = c(0.1, 1.4), bounds = c(0.0, 1.5))
 > variable.names(x4)
@@ -80,45 +119,89 @@ Type 'q()' to quit R.
 > units(x4)
 [1] "cm"
 > support(x4)
+$db_vari
 [1] 0.1 1.4
+
 > levels(x4)
 [1] NA
 > bounds(x4)
+$db_vari
 [1] 0.0 1.5
+
 > is.bounded(x4)
 [1] TRUE
 > mkgrid(x4)
+$db_vari
 [1] 0.1 1.4
+
+> as.data.frame(x4)
+  db_vari
+1     1.3
 > 
-> x5 <- ordered_var("f_vari", "ordered", LETTERS[1:3])
+> x5 <- ordered_var("o_vari", "ordered", LETTERS[1:3])
 > variable.names(x5)
-[1] "f_vari"
+[1] "o_vari"
 > desc(x5)
 [1] "ordered"
 > units(x5)
 [1] NA
 > support(x5)
+$o_vari
 [1] A B C
 Levels: A < B < C
+
 > levels(x5)
 [1] "A" "B" "C"
 > bounds(x5)
+$o_vari
 [1] A C
 Levels: A < B < C
+
 > is.bounded(x5)
 [1] TRUE
+> as.data.frame(x5)
+  o_vari
+1      A
+2      B
+3      C
 > 
-> xy <- c(x1, x2, x3, x4, x5)
+> x6 <- factor_var("f_vari", "unordered", LETTERS[1:3])
+> variable.names(x6)
+[1] "f_vari"
+> desc(x6)
+[1] "unordered"
+> units(x6)
+[1] NA
+> support(x6)
+$f_vari
+[1] A B C
+Levels: A B C
+
+> levels(x6)
+[1] "A" "B" "C"
+> bounds(x6)
+$f_vari
+[1] NA
+
+> is.bounded(x6)
+[1] TRUE
+> as.data.frame(x6)
+  f_vari
+1      A
+2      B
+3      C
+> 
+> xy <- c(x1, x2, x3, x4, x5, x6)
 > names(xy)
-[1] "d_vari"  "i_vari"  "dd_vari" "db_vari" "f_vari" 
+[1] "d_vari"  "i_vari"  "dd_vari" "db_vari" "o_vari"  "f_vari" 
 > desc(xy)
            d_vari            i_vari           dd_vari           db_vari 
          "double"         "integer" "discrete double"  "bounded double" 
-           f_vari 
-        "ordered" 
+           o_vari            f_vari 
+        "ordered"       "unordered" 
 > units(xy)
- d_vari  i_vari dd_vari db_vari  f_vari 
-   "cm"    "cm"    "cm"    "cm"      NA 
+ d_vari  i_vari dd_vari db_vari  o_vari  f_vari 
+   "cm"    "cm"    "cm"    "cm"      NA      NA 
 > support(xy)
 $d_vari
 [1] 0.0 1.5
@@ -127,31 +210,21 @@ $i_vari
  [1]  1  2  3  4  5  6  7  8  9 10
 
 $dd_vari
-[1] 0.5163721 0.9892689 0.0441549 0.4660505
+[1] 0.1666667 0.3333333 0.5000000 0.6666667
 
 $db_vari
 [1] 0.1 1.4
 
-$f_vari
+$o_vari
 [1] A B C
 Levels: A < B < C
 
-> levels(xy)
-$d_vari
-[1] NA
-
-$i_vari
- [1]  1  2  3  4  5  6  7  8  9 10
-
-$dd_vari
-[1] 0.5163721 0.9892689 0.0441549 0.4660505
-
-$db_vari
-[1] NA
-
 $f_vari
-[1] "A" "B" "C"
+[1] A B C
+Levels: A B C
 
+> levels(xy)
+NULL
 > bounds(xy)
 $d_vari
 [1] -Inf  Inf
@@ -160,18 +233,21 @@ $i_vari
 [1]  1 10
 
 $dd_vari
-[1] 0.0441549 0.9892689
+[1] 0.1666667 0.6666667
 
 $db_vari
 [1] 0.0 1.5
 
-$f_vari
+$o_vari
 [1] A C
 Levels: A < B < C
 
+$f_vari
+[1] NA
+
 > is.bounded(xy)
- d_vari  i_vari dd_vari db_vari  f_vari 
-  FALSE    TRUE    TRUE    TRUE    TRUE 
+ d_vari  i_vari dd_vari db_vari  o_vari  f_vari 
+  FALSE    TRUE    TRUE    TRUE    TRUE    TRUE 
 > mkgrid(xy, n = 3)
 $d_vari
 [1] 0.00 0.75 1.50
@@ -180,28 +256,26 @@ $i_vari
  [1]  1  2  3  4  5  6  7  8  9 10
 
 $dd_vari
-[1] 0.5163721 0.9892689 0.0441549 0.4660505
+[1] 0.1666667 0.3333333 0.5000000 0.6666667
 
 $db_vari
 [1] 0.10 0.75 1.40
 
-$f_vari
+$o_vari
 [1] A B C
 Levels: A < B < C
 
-> as.data.frame(xy, n = 10)
-      d_vari i_vari   dd_vari   db_vari f_vari
-1  0.0000000      1 0.5163721 0.1000000      A
-2  0.1666667      2 0.9892689 0.2444444      B
-3  0.3333333      3 0.0441549 0.3888889      C
-4  0.5000000      4 0.4660505 0.5333333      A
-5  0.6666667      5 0.5163721 0.6777778      B
-6  0.8333333      6 0.9892689 0.8222222      C
-7  1.0000000      7 0.0441549 0.9666667      A
-8  1.1666667      8 0.4660505 1.1111111      B
-9  1.3333333      9 0.5163721 1.2555556      C
-10 1.5000000     10 0.9892689 1.4000000      A
+$f_vari
+[1] A B C
+Levels: A B C
+
+> dxy <- as.data.frame(xy, n = 10)
+> check(xy, dxy)
+[1] TRUE
+> sapply(xy, check, data = dxy)
+ d_vari  i_vari dd_vari db_vari  o_vari  f_vari 
+   TRUE    TRUE    TRUE    TRUE    TRUE    TRUE 
 > 
 > proc.time()
    user  system elapsed 
-  0.193   0.020   0.198 
+  0.161   0.009   0.158 

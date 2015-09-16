@@ -81,48 +81,52 @@ support <- function(object)
     UseMethod("support")
 
 support.var <- function(object)
-    object$support
+    return(structure(list(object$support), 
+                     names = variable.names(object)))
 
 support.vars <- function(object)
-   lapply(object, support)
+   structure(do.call("c", lapply(object, support)), 
+             names = variable.names(object))
 
 levels.factor_var <- function(x)
-    levels(support(x))
+    levels(support(x)[[variable.names(x)]])
 
 levels.discrete_var <- function(x)
-    support(x)
+    support(x)[[variable.names(x)]]
 
 levels.var <- function(x)
     return(NA)
-
-levels.vars <- function(x)
-    lapply(x, levels)
 
 bounds <- function(object)
     UseMethod("bounds")
 
 bounds.continuous_var <- function(object) 
-    object$bounds
+    structure(list(object$bounds),
+              names = variable.names(object))
 
-bounds.discrete_var <- function(object)
-    return(range(support(object)))
+bounds.discrete_var <- function(object) {
+    s <- support(object)[[variable.names(object)]]
+    structure(list(range(s)), names = variable.names(object))
+}
 
 bounds.ordered_var <- function(object) {
-    f <- support(object)
-    return(f[c(1, nlevels(f))])
+    f <- support(object)[[variable.names(object)]]
+    structure(list(f[c(1, nlevels(f))]), 
+              names = variable.names(object))
 }
 
 bounds.vars <- function(object)
-    lapply(object, bounds)
+   structure(do.call("c", lapply(object, bounds)),
+             names = variable.names(object))
     
 bounds.default <- function(object)
-    return(NA)
+    structure(list(NA), names = variable.names(object))
 
 is.bounded <- function(object)
     UseMethod("is.bounded")
 
 is.bounded.continuous_var <- function(object)
-    any(is.finite(bounds(object)))
+    any(is.finite(bounds(object)[[variable.names(object)]]))
 
 is.bounded.var <- function(object)
     return(TRUE)
@@ -137,26 +141,34 @@ mkgrid.var <- function(object, ...)
     return(support(object))
 
 mkgrid.continuous_var <- function(object, n = 2, ...) {
-    s <- support(object)
+    s <- support(object)[[variable.names(object)]]
     stopifnot(n > 0)
-    if (n == 1L) return(diff(s))    
-    return(seq(from = s[1], to = s[2], length.out = n))
+    if (n == 1L) return(structure(list(diff(s)), 
+                                  names = variable.names(object)))    
+    return(structure(list(seq(from = s[1], to = s[2], length.out = n)), 
+                     names = variable.names(object))) 
 }
     
 mkgrid.vars <- function(object, ...)
-    lapply(object, mkgrid, ...)
+   structure(do.call("c", lapply(object, mkgrid, ...)),
+             names = variable.names(object))
 
-as.data.frame.vars <- function(x, row.names = NULL, optional = FALSE, n = 1L, ...) {
+as.data.frame.vars <- function(x, row.names = NULL, optional = FALSE, 
+                               n = 1L, ...) {
     g <- mkgrid(x, n = n)
     len <- max(sapply(g, length))
     as.data.frame(lapply(g, function(x) rep_len(x, length.out = len)))
 }
 
+as.data.frame.var <- as.data.frame.vars
+
 as.vars <- function(data) {
     stopifnot(is.data.frame(data))
     v <- lapply(colnames(data), function(x) {
-        if (is.ordered(data[[x]])) return(ordered_var(x, levels = levels(data[[x]])))
-        if (is.factor(data[[x]])) return(factor_var(x, levels = levels(data[[x]])))
+        if (is.ordered(data[[x]])) 
+            return(ordered_var(x, levels = levels(data[[x]])))
+        if (is.factor(data[[x]])) 
+            return(factor_var(x, levels = levels(data[[x]])))
         if (is.integer(data[[x]])) {
             s <- sort(unique(data[[x]]))
         } else {
@@ -173,29 +185,30 @@ check <- function(object, data)
 check.ordered_var <- function(object, data) {
     v <- variable.names(object)
     stopifnot(v %in% colnames(data))
-    is.ordered(data[[v]]) && all.equal(levels(data[[v]]), levels(object))
+    is.ordered(data[[v]]) && all.equal(levels(data[[v]]), 
+                                       levels(object))
 }
 
 check.factor_var <- function(object, data) {
     v <- variable.names(object)
     stopifnot(v %in% colnames(data))
-    is.factor(data[[v]]) && all.equal(levels(data[[v]]), levels(object))
+    is.factor(data[[v]]) && all.equal(levels(data[[v]]), 
+                                      levels(object))
 }
 
 check.discrete_var <- function(object, data) {
     v <- variable.names(object)
     stopifnot(v %in% colnames(data))
-    all(data[[v]] %in% support(object))
+    all(data[[v]] %in% support(object)[[v]])
 }
 
 check.continuous_var <- function(object, data) {
     v <- variable.names(object)
     stopifnot(v %in% colnames(data))
-    b <- bounds(object)
+    b <- bounds(object)[[v]]
     min(data[[v]], na.rm = TRUE) >= b[1] && 
     max(data[[v]], na.rm = TRUE) <= b[2]
 }
 
 check.vars <- function(object, data)
     all(sapply(object, check, data = data))
-    
