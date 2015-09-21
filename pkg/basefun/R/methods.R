@@ -28,7 +28,7 @@ nparm <- function(object)
 
 nparm.basis <- function(object)
     ncol(model.matrix(object, 
-                      data = as.data.frame(attr(object, "variables"), 
+                      data = as.data.frame(as.vars(object), 
                                            n = 10))) 
 
 nparm.box_bases <- function(object)
@@ -38,7 +38,7 @@ nparm.cbind_bases <- function(object)
     sapply(object, nparm)
 
 variable.names.basis <- function(object, ...)
-    variable.names(attr(object, "variables"))
+    variable.names(as.vars(object))
 
 variable.names.bases <- function(object, ...)
     unique(unlist(sapply(object, variable.names)))

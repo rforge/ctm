@@ -43,7 +43,7 @@ Bernstein_basis <- function(var, order = 2,
 
     stopifnot(inherits(var, "numeric_var"))
     varname <- variable.names(var)
-    support <- support(var)[[varname]]
+    support <- range(support(var)[[varname]])
     stopifnot(all(diff(support) > 0))
 
     basis <- function(data, deriv = 0L, integrate = FALSE) {
@@ -98,7 +98,7 @@ model.matrix.Bernstein_basis <- function(object, data,
     varname <- variable.names(object)
     deriv <- .deriv(varname, deriv)
     x <- data[[varname]]
-    s <- support(attr(object, "variables"))[[varname]]
+    s <- support(as.vars(object))[[varname]]
     small <- x < s[1]
     large <- x > s[2]
     if (all(!small) && all(!large))

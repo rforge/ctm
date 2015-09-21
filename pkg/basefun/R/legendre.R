@@ -11,7 +11,7 @@ Legendre_basis <- function(var, order = 2,
     constr <- get("constr", environment(B))
 
     varname <- variable.names(var)
-    support <- support(var)[[varname]]
+    support <- range(support(var)[[varname]])
     stopifnot(all(diff(support) > 0))
 
     basis <- function(data, deriv = 0L, integrate = FALSE) {
