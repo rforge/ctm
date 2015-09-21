@@ -47,7 +47,7 @@ estfun.mlt <- function(object, parm = coef(object, fixed = FALSE), ...)
 mkgrid.mlt <- function(object, n, ...)
     mkgrid(object$model, n = n, ...)
 
-mkgrid.model <- function(object, n = n, bounds = NULL, ...) {
+mkgrid.ctm <- function(object, n = n, bounds = NULL, ...) {
     ret <- mkgrid(object$model, n = n, ...)
     if (!is.null(bounds)) {
         stopifnot(length(bounds) == 1)

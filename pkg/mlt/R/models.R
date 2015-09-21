@@ -1,5 +1,5 @@
 
-model <- function(response, interacting = NULL, shifting = NULL, data = NULL,
+ctm <- function(response, interacting = NULL, shifting = NULL, data = NULL,
                   todistr = c("Normal", "Logistic", "MinExtrVal"), 
                   sumconstr = inherits(interacting, c("formula", "formula_basis"))) {
 
@@ -29,13 +29,13 @@ model <- function(response, interacting = NULL, shifting = NULL, data = NULL,
     }
     ret <- list(model = mod, response = variable.names(response), 
                 todistr = todistr)
-    class(ret) <- "model"
+    class(ret) <- "ctm"
     return(ret)
 }
 
-model.matrix.model <- function(object, data, ...)
+model.matrix.ctm <- function(object, data, ...)
     return(model.matrix(object$model, data = data, ...))
 
-variable.names.model <- function(object, ...)
+variable.names.ctm <- function(object, ...)
     variable.names(object$model)
 
