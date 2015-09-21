@@ -81,7 +81,7 @@
         ### ci <- ci + sqrt(.Machine$double.eps) ### we need ui %*% theta > ci, not >= ci
     }
 
-    optimfct <- function(theta, scale = FALSE, ...) {
+    optimfct <- function(theta, scale = FALSE, quiet = FALSE, ...) {
         control <- list(...)
         if (scale) {
             Ytmp <- Y
@@ -100,9 +100,10 @@
         }
         if (!is.null(ui)) {
             ret <- BBoptim(par = theta, fn = f, gr = g, project = "projectLinear",
-                           projectArgs = list(A = ui, b = ci, meq = 0), control = control)
+                           projectArgs = list(A = ui, b = ci, meq = 0), control = control, 
+                           quiet = quiet)
         } else {
-            ret <- BBoptim(par = theta, fn = f, gr = g, control = control)
+            ret <- BBoptim(par = theta, fn = f, gr = g, control = control, quiet = quiet)
         }
         if (scale) ret$par <- ret$par * sc
         return(ret)
@@ -198,13 +199,14 @@
     ret
 }
 
-.mlt_fit <- function(object, theta = NULL, scale = FALSE, check = TRUE, trace = FALSE, ...) {
+.mlt_fit <- function(object, theta = NULL, scale = FALSE, check = TRUE, trace = FALSE, 
+                     quiet = FALSE, ...) {
 
     if (is.null(theta))
         stop(sQuote("mlt"), "needs suitable starting values")
 
     ### BBoptim issues a warning in case of unsuccessful convergence
-    ret <- try(object$optimfct(theta, trace = trace, scale = scale, ...))    
+    ret <- try(object$optimfct(theta, trace = trace, scale = scale, quiet = quiet, ...))    
 
     cls <- class(object)
     object <- c(object, ret)
@@ -230,8 +232,8 @@
 }
 
 mlt <- function(model, data, weights = NULL, offset = NULL, fixed = NULL,
-                theta = NULL, pstart = NULL, scale = FALSE, check = TRUE, checkGrad = FALSE, 
-                trace = FALSE, dofit = TRUE, ...) {
+                theta = NULL, pstart = NULL, scale = FALSE, check = TRUE, 
+                checkGrad = FALSE, trace = FALSE, quiet = FALSE, dofit = TRUE, ...) {
 
     vars <- as.vars(model$model)
     response <- model$response
@@ -264,5 +266,6 @@ mlt <- function(model, data, weights = NULL, offset = NULL, fixed = NULL,
     args$check <- check
     args$trace <- trace
     args$checkGrad <- checkGrad
+    args$quiet <- quiet
     do.call(".mlt_fit", args)
 }
