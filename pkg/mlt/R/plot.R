@@ -1,7 +1,5 @@
 
-### plot.mlt?
-
-plot.ltm <- function(x, newdata, type = c("distribution",
+plot.mlt <- function(x, newdata, type = c("distribution",
     "survivor", "density", "logdensity", "hazard", "loghazard", "cumhazard", "quantile", "trafo"),
     q = NULL, p = 1:(n-1) / n, n = 50, col = rgb(.1, .1, .1, .1), add = FALSE, ...) {
 
@@ -31,11 +29,11 @@ plot.ltm <- function(x, newdata, type = c("distribution",
         axis(2)
         box()
     }
-    if (inherits(x, "cltm")) {
+    y <- as.vars(x$model$model)[[x$response]]
+    if (inherits(y, "continuous_var")) {
         for (i in 1:ncol(pr)) lines(q, pr[,i], col = col[i])
     } else {
         for (i in 1:ncol(pr)) lines(stepfun(q, c(ylim[1], pr[,i])), col = col[i])
     }
     invisible(pr)
 }
-
