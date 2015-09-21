@@ -7,7 +7,7 @@
 
 factor_var <- function(name, desc = NULL, levels) {
     ret <- .var(name = name, desc = desc)
-    ret$support <- factor(levels, labels = levels)
+    ret$support <- factor(levels, levels = levels, labels = levels)
     class(ret) <- c("factor_var", class(ret))
     ret
 }
