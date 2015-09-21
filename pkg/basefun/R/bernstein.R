@@ -44,17 +44,7 @@ Bernstein_basis <- function(var, order = 2,
     stopifnot(inherits(var, "numeric_var"))
     varname <- variable.names(var)
     support <- support(var)[[varname]]
-    if (is.bounded(var)) {
-        interval <- bounds(var)[[varname]]
-    } else {
-        interval <- support
-    }
-
     stopifnot(all(diff(support) > 0))
-    stopifnot(length(interval) == 2)
-    stopifnot(diff(interval) > 0)
-    stopifnot(interval[1] >= min(support))
-    stopifnot(interval[2] <= max(support))
 
     basis <- function(data, deriv = 0L, integrate = FALSE) {
 
@@ -74,14 +64,14 @@ Bernstein_basis <- function(var, order = 2,
         ### ...
 
         stopifnot(order > max(c(0, deriv - 1L)))
-        x <- (x - interval[1]) / diff(interval)
+        x <- (x - support[1]) / diff(support)
         stopifnot(all(x >= 0 && x <= 1))
 
         X <- do.call("cbind", lapply(0:order, function(j) 
                      .Bx(x, j, order, deriv = max(c(0, deriv)), integrate = integrate)))
 
         if (deriv > 0)
-            X <- X * (1 / diff(interval)^deriv)
+            X <- X * (1 / diff(support)^deriv)
         if (deriv < 0)
             X[] <- 0
         colnames(X) <- paste("Bs", 1:ncol(X), "(", varname, ")", sep = "")
@@ -95,9 +85,6 @@ Bernstein_basis <- function(var, order = 2,
     }
 
     attr(basis, "variables") <- var
-    i <- list(interval)
-    names(i) <- varname
-    attr(basis, "interval") <- i
     attr(basis, "intercept") <- zeroint
 
     class(basis) <- c("Bernstein_basis", "basis", class(basis))
@@ -111,7 +98,7 @@ model.matrix.Bernstein_basis <- function(object, data,
     varname <- variable.names(object)
     deriv <- .deriv(varname, deriv)
     x <- data[[varname]]
-    s <- attr(object, "interval")[[varname]] ### was: support(object)[[varname]]
+    s <- support(attr(object, "variables"))[[varname]]
     small <- x < s[1]
     large <- x > s[2]
     if (all(!small) && all(!large))

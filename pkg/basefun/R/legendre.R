@@ -12,17 +12,7 @@ Legendre_basis <- function(var, order = 2,
 
     varname <- variable.names(var)
     support <- support(var)[[varname]]
-    if (is.bounded(var)) {
-        interval <- bounds(var)[[varname]]
-    } else {
-        interval <- support
-    }
-
     stopifnot(all(diff(support) > 0))
-    stopifnot(length(interval) == 2)
-    stopifnot(diff(interval) > 0)
-    stopifnot(interval[1] >= min(support))
-    stopifnot(interval[2] <= max(support))
 
     basis <- function(data, deriv = 0L, integrate = FALSE) {
 
@@ -43,14 +33,14 @@ Legendre_basis <- function(var, order = 2,
         }
 
         ### map into [0, 1]
-        x <- (x - interval[1]) / diff(interval)
+        x <- (x - support[1]) / diff(support)
         stopifnot(all(x >= 0 && x <= 1))
 
         ### Legendre is on [-1, 1] !
         X <- do.call("cbind", as.vector(lapply(dobject, predict, 2 * x - 1)))
         colnames(X) <- paste("L", 1:ncol(X), sep = "")
         if (deriv > 0)
-            X <- X * (2 / diff(interval)^deriv)
+            X <- X * (2 / diff(support)^deriv)
         if (deriv < 0) X[] <- 0
         if (ui != "none")
             constr$ui <- constr$ui %*% L2B(order)
@@ -60,9 +50,6 @@ Legendre_basis <- function(var, order = 2,
     }
 
     attr(basis, "variables") <- var
-    i <- list(interval)
-    names(i) <- varname
-    attr(basis, "interval") <- i
     attr(basis, "intercept") <- TRUE
 
     class(basis) <- c("Legendre_basis", "Bernstein_basis", "basis", class(basis))
