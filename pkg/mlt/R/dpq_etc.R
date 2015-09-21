@@ -251,9 +251,9 @@ dmlt <- function(object, newdata = object$data, q = NULL, log = FALSE) {
             first <- q == lev[1]
             qwoK <- factor(lev[pmax(unclass(q) - 1), 1], 
                            levels = lev, labels = lev)
-            p <- pmlt(model, newdata = newdata)
+            p <- pmlt(object, newdata = newdata)
             newdata[[y]] <- qwoK
-            pwoK <- pmlt(model, newdata = newdata)
+            pwoK <- pmlt(object, newdata = newdata)
             pwoK[first] <- 0
             ret <- p - pwoK
         } else {
