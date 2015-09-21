@@ -66,7 +66,6 @@ ltm <- function(formula, data, subset, weights, na.action = na.omit,
             tmp <- unlist(RY[, c("cleft", "exact", "cright")])
             support <- range(tmp[is.finite(tmp)], na.rm = TRUE)
             interval <- quantile(tmp[is.finite(tmp)], na.rm = TRUE, prob = c(.025, .975))
-            if (SURV) bounds[1] <- 0
         }
         if (is.null(match.call()$trafo)) trafo <- "Bernstein"
         trafo <- match.arg(trafo, several.ok = TRUE)
