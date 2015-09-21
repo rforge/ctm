@@ -1,0 +1,197 @@
+
+R version 3.2.2 (2015-08-14) -- "Fire Safety"
+Copyright (C) 2015 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library("ltm")
+Loading required package: mlt
+Loading required package: basefun
+Loading required package: variables
+> library("multcomp")
+Loading required package: mvtnorm
+Loading required package: survival
+Loading required package: TH.data
+> library("MASS")
+> 
+> options(contrasts = c("contr.treatment", "contr.poly"))
+> fm <- Sat ~ Infl + Type
+> house.plr <- polr(fm, weights = Freq, data = housing)
+> 
+> house.ltm <- ltm(fm, weights = Freq, data = housing)
+  Successful convergence.
+Warning message:
+In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
+  negative contribution to likelihood; constraints violated!
+> 
+> summary(house.plr, digits = 3)
+
+Re-fitting to get Hessian
+
+Call:
+polr(formula = fm, data = housing, weights = Freq)
+
+Coefficients:
+               Value Std. Error t value
+InflMedium     0.548      0.104    5.26
+InflHigh       1.237      0.126    9.82
+TypeApartment -0.521      0.118   -4.41
+TypeAtrium    -0.289      0.153   -1.89
+TypeTerrace   -1.014      0.150   -6.78
+
+Intercepts:
+            Value  Std. Error t value
+Low|Medium  -0.673  0.116     -5.817 
+Medium|High  0.506  0.115      4.389 
+
+Residual Deviance: 3493.456 
+AIC: 3507.456 
+> summary(house.ltm, digits = 3)  
+
+Call:
+ltm(formula = fm, data = housing, weights = Freq)
+
+Coefficients (response transformation):
+      Sat1       Sat2 
+-0.6729697  0.5056078 
+
+Coefficients (linear predictor):
+                   Estimate Std. Error z value Pr(>|z|)    
+InflMedium == 0      0.5484     0.1043   5.257 1.46e-07 ***
+InflHigh == 0        1.2373     0.1260   9.822  < 2e-16 ***
+TypeApartment == 0  -0.5215     0.1182  -4.411 1.03e-05 ***
+TypeAtrium == 0     -0.2894     0.1534  -1.886   0.0592 .  
+TypeTerrace == 0    -1.0141     0.1496  -6.780 1.20e-11 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+AIC: 3507.456
+Log-Likelihood: -1746.728 (df = 7)
+Warning message:
+In chkdots(...) : Argument(s) 'digits' passed to '...' are ignored
+> 
+> summary(update(house.plr, method = "probit", Hess = TRUE), digits = 3)
+Call:
+polr(formula = fm, data = housing, weights = Freq, Hess = TRUE, 
+    method = "probit")
+
+Coefficients:
+               Value Std. Error t value
+InflMedium     0.335     0.0640    5.24
+InflHigh       0.751     0.0758    9.90
+TypeApartment -0.315     0.0716   -4.40
+TypeAtrium    -0.171     0.0938   -1.82
+TypeTerrace   -0.619     0.0910   -6.80
+
+Intercepts:
+            Value  Std. Error t value
+Low|Medium  -0.408  0.071     -5.786 
+Medium|High  0.314  0.070      4.460 
+
+Residual Deviance: 3494.356 
+AIC: 3508.356 
+> summary(ltm(fm, weights = Freq, data = housing, method = "probit"))
+  Successful convergence.
+
+Call:
+ltm(formula = fm, data = housing, weights = Freq, method = "probit")
+
+Coefficients (response transformation):
+      Sat1       Sat2 
+-0.4082468  0.3139745 
+
+Coefficients (linear predictor):
+                   Estimate Std. Error z value Pr(>|z|)    
+InflMedium == 0     0.33527    0.06399   5.239 1.61e-07 ***
+InflHigh == 0       0.75050    0.07580   9.901  < 2e-16 ***
+TypeApartment == 0 -0.31502    0.07164  -4.397 1.10e-05 ***
+TypeAtrium == 0    -0.17065    0.09381  -1.819   0.0689 .  
+TypeTerrace == 0   -0.61863    0.09097  -6.801 1.04e-11 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+AIC: 3508.356
+Log-Likelihood: -1747.178 (df = 7)
+Warning message:
+In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
+  negative contribution to likelihood; constraints violated!
+> 
+> summary(update(house.plr, method = "cloglog", Hess = TRUE), digits = 3)
+Call:
+polr(formula = fm, data = housing, weights = Freq, Hess = TRUE, 
+    method = "cloglog")
+
+Coefficients:
+               Value Std. Error t value
+InflMedium     0.371     0.0701    5.28
+InflHigh       0.886     0.0921    9.62
+TypeApartment -0.377     0.0855   -4.41
+TypeAtrium    -0.242     0.1105   -2.19
+TypeTerrace   -0.712     0.1009   -7.06
+
+Intercepts:
+            Value   Std. Error t value
+Low|Medium   -0.902   0.084    -10.746
+Medium|High  -0.053   0.079     -0.666
+
+Residual Deviance: 3494.283 
+AIC: 3508.283 
+> summary(ltm(fm, weights = Freq, data = housing, method = "cloglog"))
+  Successful convergence.
+
+Call:
+ltm(formula = fm, data = housing, weights = Freq, method = "cloglog")
+
+Coefficients (response transformation):
+       Sat1        Sat2 
+-0.90231749 -0.05284289 
+
+Coefficients (linear predictor):
+                   Estimate Std. Error z value Pr(>|z|)    
+InflMedium == 0     0.37054    0.07015   5.282 1.28e-07 ***
+InflHigh == 0       0.88579    0.09206   9.621  < 2e-16 ***
+TypeApartment == 0 -0.37743    0.08553  -4.413 1.02e-05 ***
+TypeAtrium == 0    -0.24248    0.11048  -2.195   0.0282 *  
+TypeTerrace == 0   -0.71186    0.10089  -7.056 1.72e-12 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+AIC: 3508.283
+Log-Likelihood: -1747.142 (df = 7)
+Warning message:
+In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
+  negative contribution to likelihood; constraints violated!
+> 
+> max(abs(predict(house.plr, housing, type = "p") - 
++         t(predict(house.ltm, type = "dens"))))
+[1] 1.077178e-05
+> 
+> pr <- profile(house.plr)
+
+Re-fitting to get Hessian
+
+> confint(pr)
+                   2.5 %      97.5 %
+InflMedium     0.3442917  0.75325149
+InflHigh       0.9916820  1.48567195
+TypeApartment -0.7539976 -0.29045326
+TypeAtrium    -0.5901351  0.01140195
+TypeTerrace   -1.3085621 -0.72205784
+> 
+> plot(house.ltm)
+> 
+> proc.time()
+   user  system elapsed 
+  1.869   0.035   1.894 

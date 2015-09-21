@@ -8,5 +8,5 @@ Description: Unified specification and estimation of linear transformation
   models for arbitrary responses.
 Depends: mlt (>= 0.0-16)
 Imports: stats, Formula, multcomp, sandwich, basefun, variables
-Suggests: survival, TH.data
+Suggests: survival, TH.data, MASS
 License: GPL-2
