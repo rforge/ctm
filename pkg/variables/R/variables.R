@@ -144,6 +144,9 @@ mkgrid.var <- function(object, ...)
 
 mkgrid.continuous_var <- function(object, n = 2, ...) {
     s <- support(object)[[variable.names(object)]]
+    b <- bounds(object)[[variable.names(object)]]
+    if (is.finite(b[1])) s[1] <- b[1]
+    if (is.finite(b[2])) s[2] <- b[2]
     stopifnot(n > 0)
     if (n == 1L) return(structure(list(diff(s)), 
                                   names = variable.names(object)))    
@@ -173,14 +176,16 @@ as.vars.data.frame <- function(object) {
             return(ordered_var(x, levels = levels(object[[x]])))
         if (is.factor(object[[x]])) 
             return(factor_var(x, levels = levels(object[[x]])))
+        b <- NULL
         if (is.integer(object[[x]])) {
             s <- sort(unique(object[[x]]))
         } else if (inherits(object[[x]], "Surv")) { ### <FIXME>: only right censored </FIXME>
             s <- c(.Machine$double.eps, max(object[[x]][,1], na.rm = TRUE))
+            b <- c(0, Inf)
         } else {
             s <- range(object[[x]], na.rm = TRUE)
         }
-        return(numeric_var(x, support = s))
+        return(numeric_var(x, support = s, bounds = b))
     })
     return(do.call("c", v))
 }
