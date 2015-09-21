@@ -61,7 +61,7 @@ summary.ltm <- function(object, ...) {
         ret$coefficients <- NULL
     } else {
         ret$intercepts <- cf[!(names(cf) %in% names(cfltm))]
-        x <- summary(cftest(object, ...))
+        x <- cftest(object, ...)
         pq <- x$test
         mtests <- cbind(pq$coefficients, pq$sigma, pq$tstat, pq$pvalues)
         pname <- switch(x$alternativ, less = paste("Pr(<", ifelse(x$df == 

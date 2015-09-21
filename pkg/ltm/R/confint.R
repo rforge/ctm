@@ -14,7 +14,7 @@ confint.ltm <- function(object, parm, level = 0.95,
         rownames(K) <- names(cf)
         K <- K[parm,,drop = FALSE]
         return(confint(glht(multcomp::parm(cf, vcov(object)), linfct = K), 
-                       ...))
+                       level = level, ...))
     } 
 
     ### confint.mlt?
