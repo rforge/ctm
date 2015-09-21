@@ -3,10 +3,10 @@
 
 plot.ltm <- function(x, newdata, type = c("distribution",
     "survivor", "density", "logdensity", "hazard", "loghazard", "cumhazard", "quantile", "trafo"),
-    q = NULL, p = 1:9 / 10, n = 50, col = rgb(.1, .1, .1, .1), ...) {
+    q = NULL, p = 1:(n-1) / n, n = 50, col = rgb(.1, .1, .1, .1), add = FALSE, ...) {
 
     if (is.null(q))
-        q <- mkgrid(x, n = n, bounds = x$bounds)[[x$response]]
+        q <- mkgrid(x, n = n)[[x$response]]
     type <- match.arg(type)
     pr <- predict(x, newdata = newdata, type = type, q = q, p = p, ...)
     pr[!is.finite(pr)] <- NA
@@ -18,13 +18,24 @@ plot.ltm <- function(x, newdata, type = c("distribution",
                          "cumhazard" = c(0, rpr[2]),
                          rpr)
     if (type == "quantile")  q <- p
+    if (length(col) == 1) col <- rep(col, ncol(pr))
     
-    plot(q, rep(rpr[1], length(q)), ylim = ylim, xlab = x$response,
-         ylab = type, type = "n")
-    if (is.double(q)) {
-        out <- apply(pr, 2, function(y) lines(q, y, col = col))
-    } else {
-        out <- apply(pr, 2, function(y) points(q, y, col = col))
+    if (!add) {
+        plot(unclass(q), rep(rpr[1], length(q)), ylim = ylim, xlab = x$response,
+             ylab = type, type = "n", axes = FALSE)
+        if (is.factor(q)) {
+            axis(1, at = unclass(q), labels = levels(q))
+        } else {
+            axis(1)
+        }
+        axis(2)
+        box()
     }
+    if (inherits(x, "cltm")) {
+        for (i in 1:ncol(pr)) lines(q, pr[,i], col = col[i])
+    } else {
+        for (i in 1:ncol(pr)) lines(stepfun(q, c(ylim[1], pr[,i])), col = col[i])
+    }
+    invisible(pr)
 }
 
