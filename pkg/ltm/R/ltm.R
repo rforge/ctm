@@ -105,7 +105,8 @@ ltm <- function(formula, data, subset, weights, na.action = na.omit,
 
     m <- model(rtrafo, interacting = strafo, shifting = xtrafo, todistr = todistr)
 
-    ret <- mlt(m, data = mf, fixed = fixed, scale = TRUE, check = FALSE, ...)
+    ret <- mlt(m, data = mf, fixed = fixed, scale = TRUE, check = FALSE, weights = weights,
+               ...)
     ret$call <- match.call(expand.dots = TRUE)
 
     class(ret) <- c(ifelse(DISCRETE, "dltm", "cltm"), "ltm", class(ret))
