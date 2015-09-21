@@ -24,7 +24,8 @@ as.basis.formula <- function(object, data = NULL, remove_intercept = FALSE,
 
     ret <- function(data, deriv = 0L) {
 
-        stopifnot(check(vars, data))
+        if (!is.null(vars)) ### intercept only
+            stopifnot(check(vars, data))
         data <- data[varnames]
         stopifnot(is.data.frame(data)) 
         if (!is.null(mf)) {
