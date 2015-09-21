@@ -17,7 +17,7 @@ by <- Bernstein_basis(numeric_var("y", support = c(0, max(GBSG2$time))), order =
 bx <- as.basis(as.formula(paste("~", paste(xvar, collapse = "+"))), data = GBSG2,
                remove_intercept = TRUE)
 
-m <- model(by, shift = bx, todist = "MinEx")
+m <- ctm(by, shift = bx, todist = "MinEx")
 
 mod <- mlt(m, data = GBSG2, scale = TRUE, check = FALSE)
 

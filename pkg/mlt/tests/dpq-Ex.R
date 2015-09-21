@@ -6,7 +6,7 @@ n <- 20
 ### design has rank deficit; just for interface checking
 ### we need something better!
 d <- data.frame(x1 = 1:n, x2 = 1:n + 1, y = rnorm(n))
-m <- model(polynomial_basis(numeric_var("y", support = range(d$y)),
+m <- ctm(polynomial_basis(numeric_var("y", support = range(d$y)),
                             coef = c(TRUE, TRUE), ci = c(-Inf, 0)),
            shift = ~ x1 + x2, data = d)
 mod <- mlt(m, data = d)
@@ -37,7 +37,7 @@ r <- as.basis(~ y, data = d, remove_intercept = TRUE,
                   contr.treatment(n, base = 3)),
               ui = diff(diag(2)), ci = 0)
 
-mod2 <- mlt(model(r, shift = ~ x1 + x2, data = d), data = d)
+mod2 <- mlt(ctm(r, shift = ~ x1 + x2, data = d), data = d)
 
 predict(mod2, q = unique(d$y))
 

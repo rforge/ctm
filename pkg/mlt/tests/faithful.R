@@ -9,7 +9,7 @@ aic <- numeric(20)
 for (o in 2:(length(aic) + 1)) {
 Bs <- Bernstein_basis(numeric_var("waiting", support = range(faithful$waiting) + c(-5, 5)),
                       order = o, ui = "incre")
-m <- model(Bs)
+m <- ctm(Bs)
 mod <- mlt(m, data = faithful)
 yp <- mkgrid(mod, 50)[["waiting"]]
 
@@ -29,7 +29,7 @@ plot(aic)
 o <- which.min(aic) + 1
 Bs <- Bernstein_basis(numeric_var("waiting", support = range(faithful$waiting) + c(-5, 5)),
                       order = o, ui = "incre")
-m <- model(Bs)
+m <- ctm(Bs)
 mod <- mlt(m, data = faithful)
 
 abline(h = AIC(mod))
@@ -49,7 +49,7 @@ lines(p, quantile(faithful$waiting, p))
 
 Bs <- Bernstein_basis(numeric_var("waiting", support = range(faithful$waiting) + c(-5, 5)),
                       order = o, ui = "incre")
-m <- model(Bs)
+m <- ctm(Bs)
 mod <- mlt(m, data = faithful)
 
 # H1 <- mod$optim(coef(mod), hessian = TRUE)$hessian

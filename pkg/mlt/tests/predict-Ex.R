@@ -14,7 +14,7 @@ d$y <- with(d, rnorm(nrow(d),
            mean = lcf["(Intercept)"] + lcf["g2"] * (g == "2") + lcf["x"] * x, 
            sd = sd))
 
-m <- model(polynomial_basis(numeric_var("y", support = range(d$y) * c(1, 1.1)),
+m <- ctm(polynomial_basis(numeric_var("y", support = range(d$y) * c(1, 1.1)),
                             coef = c(TRUE, TRUE), ui = diag(2), ci = c(-Inf, 0)),
            shift = ~ g + x, data = d)
 mod <- mlt(m, data = d, dofit = FALSE)

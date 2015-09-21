@@ -19,7 +19,7 @@ boxplot(y ~ g, data = mydata)
 
 Bb <- log_basis(numeric_var("y", support = range(y)), ui = "increasing")
 Bx <- as.basis(~ g, data = mydata)
-m <- model(Bb, shifting = Bx, todist = "MinExtrVal")
+m <- ctm(Bb, shifting = Bx, todist = "MinExtrVal")
 
 ## Estimate coefficients
 coef(opt <- mlt(m, data = mydata, fixed = c("log(y)" = 1)))
@@ -146,7 +146,7 @@ boxplot(y ~ g, data = mydata)
 
 Bb <- log_basis(numeric_var("y", support = range(y)), ui = "increasing")
 Bx <- as.basis(~ g, data = mydata)
-m <- model(Bb, shifting = Bx, todist = "MinExtrVal")
+m <- ctm(Bb, shifting = Bx, todist = "MinExtrVal")
 
 ## Estimate coefficients
 

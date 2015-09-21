@@ -11,7 +11,7 @@ r <- as.basis(~ Sat, data = housing, remove_intercept = TRUE,
                   contr.treatment(n, base = 3)),
               ui = diff(diag(2)), ci = 0)
 
-m <- model(r, shift = s, todist = "Logi")
+m <- ctm(r, shift = s, todist = "Logi")
 
 mod <- mlt(m, data = housing, weights = housing$Freq)
 

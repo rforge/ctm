@@ -20,7 +20,7 @@ boxplot(y ~ g, data = mydata)
 Bb <- Bernstein_basis(numeric_var("y", support = c(0, max(y) + .1)), order = 5,
                       ui = "increasing")
 s <- as.basis(~ g, data = data.frame(g = gf), remove_intercept = TRUE)
-m <- model(response = Bb, shifting = s, todist = "MinExtrVal")
+m <- ctm(response = Bb, shifting = s, todist = "MinExtrVal")
 (cf1 <- coef(opt <- mlt(m, data = mydata)))
 coef(cph <- coxph(Surv(y, rep(TRUE, nrow(mydata))) ~ g, data = mydata))
 yn <- mkgrid(Bb, 50)$y
@@ -39,7 +39,7 @@ lines(survfit(cph, newdata = data.frame(g = gf[3])))
 
 ### h = c(log, bernstein)
 lb <- log_basis(numeric_var("y", support = c(.Machine$double.eps, max(y))), ui = "increasing")
-m <- model(response = c(blog = lb, bBern = Bb), shifting = s, todist = "MinExtrVal")
+m <- ctm(response = c(blog = lb, bBern = Bb), shifting = s, todist = "MinExtrVal")
 (cf1 <- coef(opt <- mlt(m, data = mydata)))
 ## sample from this model
 sam <- simulate(opt, newdata = data.frame(g = gf), nsim = 100)
@@ -74,12 +74,12 @@ Bb <- Bernstein_basis(numeric_var("y", support = c(0, max(y + 1) + .1)), order =
                       ui = "increasing")
 mydata <- data.frame(y = Surv(y, y + 1, sample(0:3, length(y), replace = TRUE), type = "interval"), 
                      g = g)
-m <- model(response = c(blog = lb, bBern = Bb), shifting = s, todist = "MinExtrVal")
+m <- ctm(response = c(blog = lb, bBern = Bb), shifting = s, todist = "MinExtrVal")
 coef(opt <- mlt(m, data = mydata))
 
 ### uncensored, time-varying coefficints in both groups
 mydata <- data.frame(y = y, g = g)
-m <- model(response = c(blog = lb, bBern = Bb), 
+m <- ctm(response = c(blog = lb, bBern = Bb), 
            interacting = as.basis(~ g, data = mydata),
            todist = "MinExtrVal")
 coef(opt <- mlt(m, data = mydata))

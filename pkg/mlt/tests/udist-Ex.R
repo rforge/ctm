@@ -14,7 +14,7 @@ Bb <- Bernstein_basis(numeric_var("y", support = c(0, max(y) + .1)), order = 10,
                       ui = "increasing")
 
 mydata <- data.frame(y = y)
-opt <- mlt(model(response = Bb), data = mydata)
+opt <- mlt(ctm(response = Bb), data = mydata)
 d <- opt$todistr
 
 ### evaluate on grid

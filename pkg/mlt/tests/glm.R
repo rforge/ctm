@@ -12,7 +12,7 @@ df <- data.frame(y = y, x)
 m1 <- glm(y ~ X1 + X2, data = df, family = binomial())
 coef(m1)
 
-m <- model(~ y, shift = ~ X1 + X2, todist = "Logis", data = df)
+m <- ctm(~ y, shift = ~ X1 + X2, todist = "Logis", data = df)
 m2 <- mlt(m, data = df, fixed = c("y1" = 0))
 coef(m2)
 
@@ -34,7 +34,7 @@ r <- as.basis(~ Species, data = oiris, remove_intercept = TRUE,
                   contr.treatment(n, base = 3)),
               ui = diff(diag(2)), ci = rep(0, 1))
 
-m <- model(r, interacting = as.basis(~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width, data = oiris),
+m <- ctm(r, interacting = as.basis(~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width, data = oiris),
            todistr = "Logis")
 m2 <- mlt(m, data = oiris)
 coef(m2)
