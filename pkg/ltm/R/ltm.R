@@ -102,9 +102,9 @@ ltm <- function(formula, data, subset, weights, na.action = na.omit,
                               "probit" = "Normal",
                               "cloglog" = "MinExtrVal")
 
-    m <- model(rtrafo, interacting = strafo, shifting = xtrafo, todistr = todistr)
+    m <- mlt::ctm(rtrafo, interacting = strafo, shifting = xtrafo, todistr = todistr)
 
-    ret <- mlt(m, data = mf, fixed = fixed, scale = TRUE, check = FALSE, weights = weights,
+    ret <- mlt::mlt(m, data = mf, fixed = fixed, scale = TRUE, check = FALSE, weights = weights,
                ...)
     ret$call <- match.call(expand.dots = TRUE)
 
