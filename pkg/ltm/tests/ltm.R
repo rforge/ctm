@@ -38,8 +38,11 @@ summary(cc)
 coef(cc)
 vcov(cc)
 predict(cc)
-predict(cc, newdata = expand.grid(horTh = c("no", "yes"), menostat = "Pre",
-                           pnodes = 100, tgrade = "II"), q = 500:501, type = "trafo")
+predict(cc, newdata = expand.grid(horTh = sort(unique(GBSG2$horTh)), 
+                                  menostat = sort(unique(GBSG2$menostat))[1L],
+                                  pnodes = 30L, 
+                                  tgrade = sort(unique(GBSG2$tgrade))[2L]), 
+         q = 500:501, type = "trafo")
 
 (d <- ltm(Surv(time, cens) ~ 1, data = GBSG2, method = "cloglog"))
 summary(d)

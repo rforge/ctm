@@ -1,8 +1,9 @@
 
 ltm <- function(formula, data, subset, weights, na.action = na.omit,
+                response,
                 method = c("logistic", "probit", "cloglog"),
                 trafo = c("Bernstein", "Legendre", "fixed log", "log", "linear"),
-                integerAsFactor = TRUE, order = 5, support = NULL, bounds = c(-Inf, Inf),
+                integerAsFactor = TRUE, order = 5,
                 negative_lp = TRUE, contrasts.arg = NULL, ...) {
 
     ### extract response and possibly a stratum and predictor variables
@@ -31,24 +32,35 @@ ltm <- function(formula, data, subset, weights, na.action = na.omit,
     }
     weights <- model.weights(mf)
     Y <- Formula::model.part(formula, mf, lhs = 1L, rhs = 0)
-    response <- names(Y)
-    Y <- Y[[response]]
+    ### "Surv(time, event)" means response is "time"
+    if (inherits(Y[[1L]], "Surv")) {
+        y <- gsub("Surv\\(", "", strsplit(names(Y)[[1L]], ",")[[1L]][1L])
+        mf[[y]] <- Y[[1L]]
+        mf[[names(Y)]] <- NULL
+    } else {
+        y <- names(Y)[[1L]]
+    }
+    if (missing(response))
+        response <- as.vars(mf)[[y]]
+    stopifnot(variable.names(response) == y)
+    Y <- Y[[1L]]
 
-    SURV <- inherits(Y, "Surv")
     if (!inherits(Y, "response"))
-        RY <- R(Y, bounds = bounds)
+        RY <- R(Y, bounds = bounds(response)[[1]])
     type <- attr(RY, "type")
     DISCRETE <- type != "double" 
     if (type == "integer") DISCRETE <- integerAsFactor
     
     fixed <- NULL
     if (DISCRETE) {
-        if (type == "integer") Y <- mf[[response]] <- ordered(Y)
+        if (type == "integer") Y <- mf[[variable.names(response)]] <- ordered(Y)
         nlev <- nlevels(Y)
         cntr <- list(function(n) contr.treatment(n, base = nlev))
-        names(cntr) <- response
-        rtrafo <- as.basis(as.formula(paste("~", response)), data = mf, remove_intercept = TRUE,
-              contrasts.arg = cntr, ui = diff(diag(nlev - 1)), ci = rep(0, nlev - 2))
+        names(cntr) <- variable.names(response)
+        rtrafo <- as.basis(as.formula(paste("~", variable.names(response))), 
+                           data = mf, remove_intercept = TRUE,
+                           contrasts.arg = cntr, ui = diff(diag(nlev - 1)), 
+                           ci = rep(0, nlev - 2))
     } else {
         if (is.null(support)) {
             tmp <- unlist(RY[, c("cleft", "exact", "cright")])
@@ -59,14 +71,14 @@ ltm <- function(formula, data, subset, weights, na.action = na.omit,
         if (is.null(match.call()$trafo)) trafo <- "Bernstein"
         trafo <- match.arg(trafo, several.ok = TRUE)
         rtrafo <- lapply(trafo, function(tr) switch(tr, 
-            "fixed log" = log_basis(ui = "increasing", varname = response, support = support),
-            "log" = log_basis(ui = "increasing", varname = response, support = support),
-            "Bernstein" = Bernstein_basis(order = order, support = support, interval = interval,
-                          ui = "increasing", varname = response),
-            "Legendre" = Legendre_basis(order = order, support = support, interval = interval,
-                          ui = "increasing", varname = response),
-            "linear" = polynomial_basis(c(TRUE, TRUE), varname = response, 
-                                        support = support, ci = c(-Inf, 0)))
+            "fixed log" = log_basis(ui = "increasing", var = response),
+            "log" = log_basis(ui = "increasing", var = response),
+            "Bernstein" = Bernstein_basis(order = order, var = response, 
+                                          ui = "increasing"),
+            "Legendre" = Legendre_basis(order = order, var = response,
+                                        ui = "increasing"),
+            "linear" = polynomial_basis(c(TRUE, TRUE), var = response, 
+                                        ci = c(-Inf, 0)))
         )
         if ("fixed log" %in% trafo) {
             fixed <- 1
@@ -93,10 +105,9 @@ ltm <- function(formula, data, subset, weights, na.action = na.omit,
 
     m <- model(rtrafo, interacting = strafo, shifting = xtrafo, todistr = todistr)
 
-    ret <- mlt(m, data = mf, fixed = fixed, bounds = bounds, scale = TRUE, check = FALSE, ...)
+    ret <- mlt(m, data = mf, fixed = fixed, scale = TRUE, check = FALSE, ...)
     ret$call <- match.call(expand.dots = TRUE)
 
     class(ret) <- c(ifelse(DISCRETE, "dltm", "cltm"), "ltm", class(ret))
     ret
 }
-

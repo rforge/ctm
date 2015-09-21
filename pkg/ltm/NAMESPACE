@@ -5,6 +5,7 @@ import("multcomp")
 import("basefun")
 importFrom(sandwich, estfun)
 importFrom(stats, coef, logLik, AIC, vcov, predict, confint)
+importFrom(variables, mkgrid, as.vars)
 
 export("ltm")
 
