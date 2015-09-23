@@ -1,2 +1,0 @@
-
- o better checks for type of response; unify with R()
