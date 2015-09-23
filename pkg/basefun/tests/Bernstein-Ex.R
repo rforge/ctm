@@ -37,6 +37,7 @@ lines(x, X %*% cf)
 
 ### deriv is constant outside support
 d <- model.matrix(B, data = data.frame(x = x), deriv = c(x = 1)) %*% cf
+d[abs(x) > 1]
 stopifnot(length(unique(abs(d[abs(x) > 1]))) == 1)
 
 ### Legendre to Bernstein
