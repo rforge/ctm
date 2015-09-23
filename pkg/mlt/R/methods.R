@@ -73,9 +73,6 @@ mkgrid.ctm <- function(object, n = n, bounds = NULL, ...) {
 variable.names.mlt <- function(object, ...)
     variable.names(object$model)
 
-as.mlt <- function(object)
-    UseMethod("as.mlt")
-
 model <- function(object)
     UseMethod("model")
 

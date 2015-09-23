@@ -1,4 +1,7 @@
 
+as.mlt <- function(object)
+    UseMethod("as.mlt")
+
 as.mlt.ltm <- function(object) {
     class(object) <- class(object)[-(1:2)]
     object
@@ -48,8 +51,8 @@ AIC.ltm <- function(object, ..., k = 2)
 logLik.ltm <- function(object, ...)
     logLik(as.mlt(object), ...)
 
-paraboot.ltm <- function(object, ...)
-    paraboot(as.mlt(object))
+#paraboot.ltm <- function(object, ...)
+#    paraboot(as.mlt(object))
 
 summary.ltm <- function(object, ...) {
 
