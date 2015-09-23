@@ -9,7 +9,8 @@ importFrom(quadprog, solve.QP)
 importFrom(multcomp, glht, parm)
 
 # exportPattern("^[^\\.]")
-export(Hessian, Gradient, R, "coef<-", mlt, ctm, paraboot, as.mlt, confband)
+export(Hessian, Gradient, R, "coef<-", mlt, ctm, paraboot, as.mlt, confband,
+       description)
 #       Hmlt dmlt, hmlt, pmlt, qmlt, smlt, tmlt)
 
 S3method("estfun", "mlt")
@@ -25,6 +26,9 @@ S3method("coef<-", "mlt")
 S3method("Gradient", "mlt")
 S3method("Hessian", "mlt")
 S3method("paraboot", "mlt")
+S3method("summary", "mlt")
+S3method("print", "mlt")
+S3method("print", "summary.mlt")
 
 S3method("variable.names", "ctm")
 S3method("mkgrid", "ctm")

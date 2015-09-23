@@ -116,6 +116,7 @@
     ret <- list()
     ret$parm <- .parm
     ret$coef <- coef
+    ret$fixed <- fixed
     ret$model <- model
     ret$data <- data
     ret$weights <- weights
@@ -267,5 +268,7 @@ mlt <- function(model, data, weights = NULL, offset = NULL, fixed = NULL,
     args$trace <- trace
     args$checkGrad <- checkGrad
     args$quiet <- quiet
-    do.call(".mlt_fit", args)
+    ret <- do.call(".mlt_fit", args)
+    ret$call <- match.call()
+    ret
 }

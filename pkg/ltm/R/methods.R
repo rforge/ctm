@@ -75,6 +75,7 @@ summary.ltm <- function(object, ...) {
         rownames(mtests) <- paste(rownames(mtests), alt, x$rhs)
         ret$coefficients <- mtests
     }
+    ret$type <- summary(as.mlt(object))$type
     ### add chisq test
     ret$AIC <- AIC(object)
     ret$logLik <- logLik(object)
@@ -88,6 +89,7 @@ print.summary.ltm <- function(x,  digits = max(3L, getOption("digits") - 3L), ..
     print(x$call)
     if (x$convergence != 0L)
     cat("\nCould not estimate parameters; optimisation did not converge!\n")
+    cat("Model: ", x$type)
     cat("\nCoefficients (response transformation):\n")
     print(x$intercepts)
     if (!is.null(x$coefficients)) {
@@ -106,6 +108,7 @@ print.ltm <- function(x, ...) {
     print(x$call)
     if (x$convergence != 0L)
     cat("\nCould not estimate parameters; optimisation did not converge!\n")
+    cat("Model: ", x$type)
     cat("\nCoefficients:\n")
     print(coef(x, lp_only = FALSE))
 }

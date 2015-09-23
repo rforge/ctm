@@ -9,6 +9,7 @@ plot.mlt <- function(x, newdata, type = c("distribution",
     pr <- predict(x, newdata = newdata, type = type, q = q, p = p, ...)
     pr[!is.finite(pr)] <- NA
     rpr <- range(pr, na.rm = TRUE)
+    if (is.null(dim(pr))) pr <- matrix(pr, ncol = 1)
     ylim <- switch(type, "distribution" = c(0, 1),
                          "survivor" = c(0, 1),
                          "density" = c(0, rpr[2]),

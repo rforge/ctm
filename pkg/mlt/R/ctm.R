@@ -1,9 +1,9 @@
 
 ctm <- function(response, interacting = NULL, shifting = NULL, data = NULL,
-                  todistr = c("Normal", "Logistic", "MinExtrVal"), 
-                  sumconstr = inherits(interacting, c("formula", "formula_basis"))) {
+                todistr = c("Normal", "Logistic", "MinExtrVal"),
+                sumconstr = inherits(interacting, c("formula", "formula_basis"))) {
 
-    ### mkgrid() will not work due to missing data
+    ### mkgrid() will not work if data is missing
     if (.is.formula(response)) 
         response <- as.basis(response, data = data)
     if (.is.formula(interacting)) 
@@ -13,6 +13,8 @@ ctm <- function(response, interacting = NULL, shifting = NULL, data = NULL,
 
     if (is.character(todistr))
         todistr <- .distr(todistr)
+
+    bases <- list(response = response, interacting = interacting, shifting = shifting)
 
     if (!is.null(interacting))
         interacting <- b(iresponse = response, iinteracting = interacting, 
@@ -28,7 +30,7 @@ ctm <- function(response, interacting = NULL, shifting = NULL, data = NULL,
         mod <- c(binteracting = interacting, bshifting = shifting)
     }
     ret <- list(model = mod, response = variable.names(response), 
-                todistr = todistr)
+                todistr = todistr, bases = bases)
     class(ret) <- "ctm"
     return(ret)
 }

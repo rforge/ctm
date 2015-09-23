@@ -7,6 +7,7 @@ confband.mlt <- function(object, newdata, level = 0.95,
 
     stopifnot(!missing(newdata))
     stopifnot(is.data.frame(newdata))
+    type <- match.arg(type)
     if (nrow(newdata) > 1) {
         ret <- lapply(1:nrow(newdata), function(i)
             confint(object = object, newdata = newdata[i,,drop = FALSE],

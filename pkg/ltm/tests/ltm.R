@@ -1,4 +1,4 @@
-
+	
 library("ltm")
 library("multcomp")
 
@@ -50,44 +50,10 @@ coef(d)
 vcov(d)
 predict(d)
 
-confint(d, calpha = univariate_calpha())
+cb <- confband(d, newdata = data.frame(1), calpha = univariate_calpha(), type = "surv")
 
-d <- as.mlt(d)
-cf <- coef(d)
-v <- vcov(d)
-
-prm <- parm(cf, v)
-K <- diag(length(cf))
-rownames(K) <- colnames(K) <- names(cf)
-ci <- confint(glht(prm, linfct = K), calpha = qnorm(.975))
-
-lwr <- d
-upr <- d
-coef(lwr) <- ci$confint[, "lwr"]
-coef(upr) <- ci$confint[, "upr"]
-
-tm <- 10:2700
-
-s <- seq(from = min(GBSG2$time), to = max(GBSG2$time), length = length(cf))
-plot(tm, predict(d, q = tm), type = "l", ylim = range(ci$confint))
-points(s, cf, col = "red")
-
-lines(tm, predict(lwr, q = tm))
-points(s, coef(lwr), col = "blue")
-
-lines(tm, predict(upr, q = tm))
-points(s, coef(upr), col = "green")
-
-plot(tm, 1 - predict(d, q = tm, type = "distr"), type = "l")
-
-lines(tm, 1 - predict(lwr, q = tm, type = "distr"))
-
-lines(tm, 1 - predict(upr, q = tm, type = "distr"))
-
-
-
+layout(matrix(1:2, ncol = 2))
 plot(survfit(Surv(time, cens) ~ 1, data = GBSG2))
-lines(tm, 1 - predict(d, q = tm, type = "distr"))
-lines(tm, 1 - predict(lwr, q = tm, type = "distr"))
-lines(tm, 1 - predict(upr, q = tm, type = "distr"))
-
+plot(d, newdata = data.frame(1), type = "surv")
+lines(cb[,"q"], cb[,"lwr"])
+lines(cb[,"q"], cb[,"upr"])

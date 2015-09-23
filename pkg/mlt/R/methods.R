@@ -75,3 +75,86 @@ variable.names.mlt <- function(object, ...)
 
 as.mlt <- function(object)
     UseMethod("as.mlt")
+
+model <- function(object)
+    UseMethod("model")
+
+.one_factor_only <- function(object) {
+    f <- inherits(object, "formula_basis")
+    v <- as.vars(object)
+    f && (length(v) == 1 && inherits(v[[1L]], "factor_var"))
+}
+    
+model.ctm <- function(object) {
+    x <- object$bases
+    ret <- list(response_trafo = c("continuous", "discrete")[.one_factor_only(x$response) + 1L],
+                response_type = sapply(x$response, class),
+                response_var = as.vars(x$response),
+                interaction_trafo = !is.null(x$interacting),
+                shift_trafo = !is.null(x$shifting))
+    if (ret$interaction_trafo) {
+        ret$interaction_vars = as.vars(x$interacting)
+        ret$interaction_type = c("continuous", "discrete")[.one_factor_only(x$interacting) + 1L]
+    }
+    if (ret$shift_trafo) 
+        ret$shift_vars = as.vars(x$shifting) 
+    return(ret)
+}
+
+model.mlt <- function(object) {
+    c(model(object$model), 
+      list(todistr = object$todistr$name,
+           fixed = object$fixed))
+}
+
+description <- function(object) {
+    stopifnot(inherits(object, "mlt"))
+    m <- model(object)
+    cond <- m$interaction_trafo || m$shift_trafo
+    strat <- m$interaction_trafo && m$interaction_type == "discrete"
+    lin <- cond && (!m$interaction_trafo || strat)
+    if (lin) pm <- switch(m$todistr, "logistic" = "odds",
+                                     "minimum extreme value" = "hazards", "")
+
+    ret <- paste(m$response_trafo, 
+       if (!cond) "unconditional",
+       if (strat) "stratified",
+       if (lin) "linear", 
+       if (!lin && cond) "conditional",
+       "transformation model", 
+       "(transformed", m$todistr, "distribution)")
+    if (cond && lin && pm != "")
+        ret <- c(ret, paste(m$response_trafo, if (strat) "stratified", "proportional", pm, "model"))
+    ret <- gsub("\\s\\s*", " ", ret)
+    return(ret)
+}
+
+summary.mlt <- function(object, ...) {
+
+    ret <- list(call = object$call,
+                convergence = object$convergence,
+                type = paste(description(object), collapse = "\n\t"),
+                logLik = logLik(object),
+                AIC = AIC(object),
+                coef = coef(object))
+    class(ret) <- "summary.mlt"
+    ret
+}
+
+print.summary.mlt <- function(x, digits = max(3L, getOption("digits") - 3L), ...) {
+
+    cat("\nCall:\n")
+    print(x$call)
+    if (x$convergence != 0L)
+    cat("\nCould not estimate parameters; optimisation did not converge!\n")
+    cat("\nType: ", x$type)
+    cat("\nAIC: ", x$AIC)
+    cat("\nLog-Likelihood: ", x$logLik, " (df = ", attr(x$logLik, "df"), ")", sep = "")
+    cat("\n")
+    cat("\nCoefficients:", x$coef)
+    cat("\n\n")
+    invisible(x)
+}
+
+print.mlt <- function(x, ...)
+    print(summary(x, ...))
