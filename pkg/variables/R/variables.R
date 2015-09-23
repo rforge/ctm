@@ -58,17 +58,14 @@ variable.names.var <- function(object, ...)
 variable.names.vars <- function(object, ...)
     sapply(object, variable.names)
 
-desc <- function(x)
+desc <- function(object)
     UseMethod("desc")
 
-desc.var <- function(x)
-    x$desc
+desc.var <- function(object)
+    object$desc
 
-desc.vars <- function(x)
-    sapply(x, desc)
-
-units <- function(x)
-    UseMethod("units")
+desc.vars <- function(object)
+    sapply(object, desc)
 
 units.numeric_var <- function(x)
     x$unit
