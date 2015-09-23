@@ -23,7 +23,9 @@ as.basis(object, ...)
                example contrasts}
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+  \code{as.basis} returns a function for the evaluation of
+  the basis functions with corresponding \code{model.matrix} and \code{predict}
+  methods.
 }
 \examples{
 
@@ -33,7 +35,7 @@ as.basis(object, ...)
                  contrasts.arg = list(y = "contr.sum"))
 
   ## evaluate basis functions
-  model.matrix(fb, data = as.data.frame(v, n = 10)))
+  model.matrix(fb, data = as.data.frame(v, n = 10))
   ## basically the same as (but wo intercept and times -1)
   model.matrix(~ x + y, data = as.data.frame(v, n = 10))
 

@@ -1,7 +1,7 @@
 Package: basefun
 Title: Infrastructure for Computing with Basis Functions
-Version: 0.0-16
-Date: 2015-09-16
+Version: 0.0-17
+Date: 2015-09-23
 Author: Torsten Hothorn
 Maintainer: Torsten Hothorn <Torsten.Hothorn@R-project.org>
 Description: Some very simple infrastructure for basis functions.

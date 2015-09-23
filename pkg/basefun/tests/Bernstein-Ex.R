@@ -41,7 +41,7 @@ stopifnot(length(unique(abs(d[abs(x) > 1]))) == 1)
 
 ### Legendre to Bernstein
 ## Example from doi: 10.1016/j.amc.2007.09.050
-A <- .Call("L2B", 4L)
+A <- basefun:::L2B(4L)
 B <- cbind(1, c(-1, -.5, 0, .5, 1), 
               c(1, -.5, -1, -.5, 1), 
               c(-1, 2, 0, -2, 1),  
@@ -49,4 +49,4 @@ B <- cbind(1, c(-1, -.5, 0, .5, 1),
 stopifnot(max(abs(A - B)) < .Machine$double.eps)
 
 ### Bernstein to Legendre
-stopifnot(max(abs(solve(A) - .Call("B2L", 4L))) < sqrt(.Machine$double.eps))
+stopifnot(max(abs(solve(A) - basefun:::B2L(4L))) < sqrt(.Machine$double.eps))

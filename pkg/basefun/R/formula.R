@@ -6,7 +6,8 @@ as.basis.formula <- function(object, data = NULL, remove_intercept = FALSE,
     if (inherits(data, "data.frame")) {
         vars <- as.vars(data[all.vars(object)])
     } else {
-        vars <- data[all.vars(object)]
+        if (inherits(data, "var")) data <- c(data)
+        vars <- do.call("c", data[all.vars(object)])
         data <- as.data.frame(vars, n = 10)
     }
     varnames <- all.vars(object)
