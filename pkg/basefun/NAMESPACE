@@ -1,20 +1,16 @@
 
 useDynLib("basefun")
 
-import(variables)
+import("variables")
 
-import(Matrix)#, rBind, Diagonal, bdiag)
-import(polynom)
+import("Matrix")#, rBind, Diagonal, bdiag)
+import("polynom")
 importFrom(orthopolynom, legendre.polynomials)
 importFrom(stats, variable.names, model.matrix, predict)
 
-# exportPattern("^[^\\.]")
-
 export(Bernstein_basis, as.basis, b, 
-##       cyclic_basis,
-       log_basis, 
-       polynomial_basis,
-       Legendre_basis)
+       log_basis, polynomial_basis, Legendre_basis)
+##     cyclic_basis,
 
 S3method("as.basis", "formula")
 S3method("mkgrid", "basis")

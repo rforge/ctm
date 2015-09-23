@@ -8,7 +8,6 @@ importFrom(stats, simulate, variable.names, model.matrix, logLik, vcov)
 importFrom(quadprog, solve.QP)
 importFrom(multcomp, glht, parm)
 
-# exportPattern("^[^\\.]")
 export(R, "coef<-", mlt, ctm, confband)
 # Hessian, Gradient, paraboot, description
 # Hmlt dmlt, hmlt, pmlt, qmlt, smlt, tmlt
