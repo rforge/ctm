@@ -132,11 +132,11 @@ $db_vari
 [1] TRUE
 > mkgrid(x4)
 $db_vari
-[1] 0.1 1.4
+[1] 0.0 1.5
 
 > as.data.frame(x4)
   db_vari
-1     1.3
+1     1.5
 > 
 > x5 <- ordered_var("o_vari", "ordered", LETTERS[1:3])
 > variable.names(x5)
@@ -259,7 +259,7 @@ $dd_vari
 [1] 0.1666667 0.3333333 0.5000000 0.6666667
 
 $db_vari
-[1] 0.10 0.75 1.40
+[1] 0.00 0.75 1.50
 
 $o_vari
 [1] A B C
@@ -278,4 +278,4 @@ Levels: A B C
 > 
 > proc.time()
    user  system elapsed 
-  0.161   0.009   0.158 
+  0.134   0.018   0.140 

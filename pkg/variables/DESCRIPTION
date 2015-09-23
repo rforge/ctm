@@ -1,7 +1,7 @@
 Package: variables
 Title: Variable Descriptions
-Version: 0.0-16
-Date: 2015-09-16
+Version: 0.0-17
+Date: 2015-09-23
 Author: Torsten Hothorn
 Maintainer: Torsten Hothorn <Torsten.Hothorn@R-project.org>
 Description: Names and properties of yet unobserved variables.
