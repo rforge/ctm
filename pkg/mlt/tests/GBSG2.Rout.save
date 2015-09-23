@@ -36,7 +36,7 @@ Loading required package: variables
 > bx <- as.basis(as.formula(paste("~", paste(xvar, collapse = "+"))), data = GBSG2,
 +                remove_intercept = TRUE)
 > 
-> m <- model(by, shift = bx, todist = "MinEx")
+> m <- ctm(by, shift = bx, todist = "MinEx")
 > 
 > mod <- mlt(m, data = GBSG2, scale = TRUE, check = FALSE)
   Successful convergence.
@@ -59,4 +59,4 @@ Loading required package: variables
 > 
 > proc.time()
    user  system elapsed 
-  1.437   0.027   1.455 
+  1.508   0.032   1.530 

@@ -30,7 +30,7 @@ Loading required package: variables
 +                   contr.treatment(n, base = 3)),
 +               ui = diff(diag(2)), ci = 0)
 > 
-> m <- model(r, shift = s, todist = "Logi")
+> m <- ctm(r, shift = s, todist = "Logi")
 > 
 > mod <- mlt(m, data = housing, weights = housing$Freq)
   Successful convergence.
@@ -67,4 +67,4 @@ Re-fitting to get Hessian
 > 
 > proc.time()
    user  system elapsed 
-  1.171   0.028   1.190 
+  1.230   0.043   1.264 

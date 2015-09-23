@@ -35,7 +35,7 @@ Nonparametric Kernel Methods for Mixed Datatypes (version 0.60-2)
 +                       ui = "increasing")
 > 
 > mydata <- data.frame(y = y)
-> opt <- mlt(model(response = Bb), data = mydata)
+> opt <- mlt(ctm(response = Bb), data = mydata)
   Successful convergence.
 Gradient[1] TRUE
 Hessian:[1] TRUE
@@ -66,4 +66,4 @@ Hessian:[1] TRUE
 > 
 > proc.time()
    user  system elapsed 
-  1.445   0.044   1.477 
+  1.436   0.031   1.456 

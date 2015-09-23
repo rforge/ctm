@@ -39,7 +39,7 @@ Loading required package: variables
 > Bb <- Bernstein_basis(numeric_var("y", support = c(0, max(y) + .1)), order = 5,
 +                       ui = "increasing")
 > s <- as.basis(~ g, data = data.frame(g = gf), remove_intercept = TRUE)
-> m <- model(response = Bb, shifting = s, todist = "MinExtrVal")
+> m <- ctm(response = Bb, shifting = s, todist = "MinExtrVal")
 > (cf1 <- coef(opt <- mlt(m, data = mydata)))
   Successful convergence.
 Gradient[1] TRUE
@@ -67,7 +67,7 @@ Hessian:[1] TRUE
 > 
 > ### h = c(log, bernstein)
 > lb <- log_basis(numeric_var("y", support = c(.Machine$double.eps, max(y))), ui = "increasing")
-> m <- model(response = c(blog = lb, bBern = Bb), shifting = s, todist = "MinExtrVal")
+> m <- ctm(response = c(blog = lb, bBern = Bb), shifting = s, todist = "MinExtrVal")
 > (cf1 <- coef(opt <- mlt(m, data = mydata)))
   Successful convergence.
 Gradient[1] "Mean relative difference: 1.03349e-07"
@@ -128,7 +128,7 @@ Hessian:[1] TRUE
 +                       ui = "increasing")
 > mydata <- data.frame(y = Surv(y, y + 1, sample(0:3, length(y), replace = TRUE), type = "interval"), 
 +                      g = g)
-> m <- model(response = c(blog = lb, bBern = Bb), shifting = s, todist = "MinExtrVal")
+> m <- ctm(response = c(blog = lb, bBern = Bb), shifting = s, todist = "MinExtrVal")
 > coef(opt <- mlt(m, data = mydata))
   Successful convergence.
 Gradient[1] "Mean relative difference: 3.913553e-08"
@@ -140,7 +140,7 @@ Hessian:[1] TRUE
 > 
 > ### uncensored, time-varying coefficints in both groups
 > mydata <- data.frame(y = y, g = g)
-> m <- model(response = c(blog = lb, bBern = Bb), 
+> m <- ctm(response = c(blog = lb, bBern = Bb), 
 +            interacting = as.basis(~ g, data = mydata),
 +            todist = "MinExtrVal")
 > coef(opt <- mlt(m, data = mydata))
@@ -182,4 +182,4 @@ There were 13 warnings (use warnings() to see them)
 > 
 > proc.time()
    user  system elapsed 
- 10.632   0.071  10.697 
+ 11.583   0.042  11.633 

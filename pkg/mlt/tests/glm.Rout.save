@@ -33,7 +33,7 @@ Loading required package: variables
 (Intercept)          X1          X2 
   0.7372381  -0.3848546  -0.8292045 
 > 
-> m <- model(~ y, shift = ~ X1 + X2, todist = "Logis", data = df)
+> m <- ctm(~ y, shift = ~ X1 + X2, todist = "Logis", data = df)
 > m2 <- mlt(m, data = df, fixed = c("y1" = 0))
   Successful convergence.
 Gradient[1] "Mean relative difference: 1.46906e-05"
@@ -83,7 +83,7 @@ virginica    -23.83628    -7.923634  -15.370769     23.65978   15.135301
 +                   contr.treatment(n, base = 3)),
 +               ui = diff(diag(2)), ci = rep(0, 1))
 > 
-> m <- model(r, interacting = as.basis(~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width, data = oiris),
+> m <- ctm(r, interacting = as.basis(~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width, data = oiris),
 +            todistr = "Logis")
 > m2 <- mlt(m, data = oiris)
   Successful convergence.
@@ -111,4 +111,4 @@ Species1:Petal.Length Species2:Petal.Length  Species1:Petal.Width
 > 
 > proc.time()
    user  system elapsed 
-  1.573   0.023   1.583 
+  1.669   0.047   1.702 

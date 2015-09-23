@@ -28,7 +28,7 @@ Loading required package: variables
 > for (o in 2:(length(aic) + 1)) {
 + Bs <- Bernstein_basis(numeric_var("waiting", support = range(faithful$waiting) + c(-5, 5)),
 +                       order = o, ui = "incre")
-+ m <- model(Bs)
++ m <- ctm(Bs)
 + mod <- mlt(m, data = faithful)
 + yp <- mkgrid(mod, 50)[["waiting"]]
 + 
@@ -108,7 +108,7 @@ Hessian:[1] TRUE
 > o <- which.min(aic) + 1
 > Bs <- Bernstein_basis(numeric_var("waiting", support = range(faithful$waiting) + c(-5, 5)),
 +                       order = o, ui = "incre")
-> m <- model(Bs)
+> m <- ctm(Bs)
 > mod <- mlt(m, data = faithful)
   Successful convergence.
 Gradient[1] "Mean relative difference: 3.041097e-08"
@@ -131,7 +131,7 @@ Hessian:[1] TRUE
 > 
 > Bs <- Bernstein_basis(numeric_var("waiting", support = range(faithful$waiting) + c(-5, 5)),
 +                       order = o, ui = "incre")
-> m <- model(Bs)
+> m <- ctm(Bs)
 > mod <- mlt(m, data = faithful)
   Successful convergence.
 Gradient[1] "Mean relative difference: 3.041097e-08"
@@ -199,4 +199,4 @@ Loading required package: TH.data
 > 
 > proc.time()
    user  system elapsed 
- 19.903   0.058  19.958 
+ 21.998   0.054  22.045 

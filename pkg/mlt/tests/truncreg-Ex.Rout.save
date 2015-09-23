@@ -57,7 +57,7 @@ sigma       -7.445133e-06  1.637489e-06  3.940881e-05
 > fm <- as.formula("~ x")
 > yb <- polynomial_basis(numeric_var("yt", support = range(d$yt, na.rm = TRUE)), 
 +                        coef = c(TRUE, TRUE), ci = c(-Inf, 0))
-> m <- model(yb, shifting = fm, todistr = "Normal", data = d)
+> m <- ctm(yb, shifting = fm, todistr = "Normal", data = d)
 > dfull <- d[!is.na(d$yt),,drop = FALSE]
 > dfull$yt <- R(dfull$yt, tleft = dfull$trunc_left)
 > mltmod <- mlt(m, data = dfull)
@@ -115,7 +115,7 @@ sigma       -2.840592e-06  1.854537e-06  4.525610e-05
 > fm <- as.formula("~ x")
 > yb <- polynomial_basis(numeric_var("yt", support = range(d$yt, na.rm = TRUE)), 
 +                        coef = c(TRUE, TRUE), ci = c(-Inf, 0))
-> m <- model(yb, shifting = fm, todistr = "Normal", data = d)
+> m <- ctm(yb, shifting = fm, todistr = "Normal", data = d)
 > dfull <- d[!is.na(d$yt),,drop = FALSE]
 > dfull$yt <- R(dfull$yt, tright = dfull$trunc_right)
 > mltmod <- mlt(m, data = dfull)
@@ -160,4 +160,4 @@ In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
 > 
 > proc.time()
    user  system elapsed 
-  1.463   0.048   1.501 
+  1.574   0.045   1.604 

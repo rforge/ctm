@@ -168,4 +168,4 @@ Loading required package: variables
 > 
 > proc.time()
    user  system elapsed 
-  1.018   0.048   1.052 
+  1.053   0.067   1.110 
