@@ -11,7 +11,7 @@ b(..., sumconstr = FALSE)
 }
 \arguments{
   \item{\dots}{named objects of class \code{basis}}
-  \item{sumconstr}{logical indicating if sum constraints shall be applied}
+  \item{sumconstr}{a logical indicating if sum constraints shall be applied}
 }
 \details{
   \code{b()} joins the corresponding design matrices 
