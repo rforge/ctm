@@ -58,90 +58,84 @@ R.factor <- function(object, ...) {
     return(R(as.ordered(object), ...))
 }
 
-R.ordered <- function(object, ...) {
+R.ordered <- function(object, cleft = NA, cright = NA, ...) {
 
-    rank <- rank(object, ties.method = "max")
-    type <- class(object)[1] 
     lev <- levels(object)
-    cright <- as.ordered(object)
-    cright[cright == lev[nlevels(object)]] <- NA
-    cleft <- factor(unclass(object) - 1, levels = 1:length(lev),
-                    labels = lev, exclude = 0, ordered = TRUE)
-    ret <- data.frame(tleft = NA, cleft = cleft, exact = NA,
-                      cright = cright, tright = NA, rank = rank)
-    attr(ret, "type") <- type
-    class(ret) <- c("response", class(ret))
+    ret <- .mkR(exact = object, cleft = cleft, cright = cright, ...)
+    ret[is.na(ret$cright), "cright"] <- ret$exact[is.na(ret$cright)]
+    ret[is.na(ret$cleft), "cleft"] <- factor(unclass(object)[is.na(ret$cleft)] - 1,
+        levels = 1:length(lev), labels = lev, exclude = 0, ordered = TRUE)
+    ret$exact <- NA
+    ret[ret$cright == lev[nlevels(object)], "cright"] <- NA
     ret
 }
 
-R.integer <- function(object, ...) {
+R.integer <- function(object, cleft = NA, cright = NA, ...) {
 
-    rank <- rank(object, ties.method = "max")
-    type <- "integer"   
-    cright <- object
-    cleft <- object - 1
-    cleft[cleft < 0] <- NA
-    ret <- data.frame(tleft = NA, cleft = cleft, exact = NA,
-                      cright = cright, tright = NA, rank = rank)
-    attr(ret, "type") <- type  
-    class(ret) <- c("response", class(ret))
+    ret <- .mkR(exact = object, cleft = cleft, cright = cright, ...)
+    ret$cright[is.na(ret$cright)] <- ret$exact[is.na(ret$cright)]
+    ret$cleft[is.na(ret$cleft)] <- ret$exact[is.na(ret$cleft)] - 1
+    ret$cleft[ret$cleft < 0] <- NA
+    ret$exact <- NA
     ret
-
 }
 
 ### handle exact integer / factor as interval censored
 R.numeric <- function(object = NA, cleft = NA, cright = NA, 
                       tleft = NA, tright = NA, ...) {
 
-    n <- c(length(object), length(cleft), length(cright), 
-           length(tleft), length(tright))    
-    if (length(unique(n)) > 1) {
-        stopifnot(any(n > 1))
-        n1 <- n[n > 1]
-        stopifnot(length(unique(n1)) == 1)
-    }
-    nm <- max(n)
-    if (length(object) == 1 && is.na(object)) 
-        object <- rep(object, nm)
-    if (length(cleft) == 1 && is.na(cleft)) 
-        cleft <- rep(cleft, nm)
-    if (length(cright) == 1 && is.na(cright)) 
-        cright <- rep(cright, nm)
-    if (length(tleft) == 1 && is.na(tleft)) 
-        tleft <- rep(tleft, nm)
-    if (length(tright) == 1 && is.na(tright)) 
-        tright <- rep(tright, nm)
-
-    if (all(!is.na(object))) {
-        rank <- rank(object, ties.method = "max")
-        type <- "double"
-    } else {
-        if (any(!is.na(object)) && !is.double(object))
-            stop("Mix of exact and censored observations currently only implemented for doubles")
-        ### <FIXME> allow for censord factors and integers </FIXME>
-        type <- "double"
-
-        ### some meaningful ordering of observations
-        tmpexact <- as.numeric(object)
-        tmpleft <- as.numeric(cleft)
-        tmpright <- as.numeric(cright)
-        tmpleft[is.na(tmpleft)] <- 
-            pmin(tmpleft, tmpexact, tmpright, na.rm = TRUE)[is.na(tmpleft)]
-        tmpright[is.na(tmpright)] <- 
-            pmax(tmpleft, tmpexact, tmpright, na.rm = TRUE)[is.na(tmpright)]
-        tmpexact[is.na(tmpexact)] <- 
-            ((tmpright - tmpleft) / 2)[is.na(tmpexact)]
-        rank <- rank(tmpexact, ties.method = "max")
-    }
-
-    ret <- data.frame(tleft = tleft, cleft = cleft, exact = object,
-                      cright = cright, tright = tright, rank = rank)
-    attr(ret, "type") <- type
-    class(ret) <- c("response", class(ret))
-    ret
+    .mkR(exact = object, cleft = cleft, cright = cright,
+         tleft = tleft, tright = tright)
 }
 
 R.default <- R.numeric
+
+.mkR <- function(...) {
+
+    args <- list(...)
+    cls <- unique(sapply(args, function(a) class(a)[1]))
+    cls <- cls[cls != "logical"]
+    stopifnot(length(cls) <= 1)
+
+    n <- unique(sapply(args, length))
+    stopifnot(length(n) <= 2)
+    if (length(n) == 2) stopifnot(min(n) == 1)
+
+    ret <- do.call("as.data.frame", list(x = args))
+    if (is.null(ret$exact)) ret$exact <- NA
+    if (is.null(ret$cleft) || all(is.na(ret$cleft))) {
+        ret$cleft <- NA
+        if (is.ordered(ret$exact)) 
+            ret$cleft <- factor(ret$cleft, levels = 1:nlevels(ret$exact), 
+                                labels = levels(ret$exact), ordered = TRUE)
+    }
+    if (is.null(ret$cright) || all(is.na(ret$cright))) {
+        ret$cright <- NA
+        if (is.ordered(ret$exact)) 
+            ret$cright <- factor(ret$cright, levels = 1:nlevels(ret$exact), 
+                                 labels = levels(ret$exact), ordered = TRUE)
+    }
+    if (is.null(ret$tleft)) ret$tleft <- NA
+    if (is.null(ret$tright)) ret$tright <- NA
+
+    if (all(is.finite(ret$exact))) {
+        ret$rank <- rank(ret$exact, ties.method = "max")
+    } else {
+        ### some meaningful ordering of observations
+        tmpexact <- as.numeric(ret$exact)
+        tmpleft <- as.numeric(ret$cleft)
+        tmpright <- as.numeric(ret$cright)
+        tmpleft[is.na(tmpleft)] <-    
+            pmin(tmpleft, tmpexact, tmpright, na.rm = TRUE)[is.na(tmpleft)]
+        tmpright[is.na(tmpright)] <-
+            pmax(tmpleft, tmpexact, tmpright, na.rm = TRUE)[is.na(tmpright)]
+        tmpexact[is.na(tmpexact)] <-
+            ((tmpright - tmpleft) / 2)[is.na(tmpexact)]
+        ret$rank <- rank(tmpexact, ties.method = "max")   
+    }
+    class(ret) <- c("response", class(ret))
+    ret[, c("tleft", "cleft", "exact", "cright", "tright", "rank"), drop = FALSE]
+}
 
 .exact <- function(object)
     !is.na(object$exact)
