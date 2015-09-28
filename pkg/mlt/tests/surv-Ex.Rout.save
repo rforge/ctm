@@ -30,7 +30,7 @@ Loading required package: variables
  [7] 0.20866373  1.79566143+ 0.65482017  0.32505510+
 > attr(s, "type")
 [1] "right"
-> cbind(s, mlt:::.Surv2R(s))
+> cbind(s, R(s))
              s tleft      cleft     exact cright tright rank
 1  2.67433818     NA         NA 2.6743382     NA     NA    5
 2  1.45783672+    NA 1.45783672        NA    Inf     NA   10
@@ -51,7 +51,7 @@ Loading required package: variables
 [10] (0.32505510,1.325055+]
 > attr(s, "type")
 [1] "counting"
-> cbind(s, mlt:::.Surv2R(s))
+> cbind(s, R(s))
                         s      tleft    cleft    exact cright tright rank
 1   (2.67433818,3.674338] 2.67433818       NA 3.674338     NA     NA    5
 2  (1.45783672,2.457837+] 1.45783672 2.457837       NA    Inf     NA   10
@@ -70,7 +70,7 @@ Loading required package: variables
  [7]  0.20866373 <1.79566143  0.65482017 <0.32505510
 > attr(s, "type")
 [1] "left"
-> cbind(s, mlt:::.Surv2R(s))
+> cbind(s, R(s))
              s tleft cleft     exact     cright tright rank
 1   2.67433818    NA    NA 2.6743382         NA     NA    5
 2  <1.45783672    NA  -Inf        NA 1.45783672     NA   10
@@ -92,7 +92,7 @@ Loading required package: variables
 [10] 0.32505510            
 > attr(s, "type")
 [1] "interval"
-> cbind(s, mlt:::.Surv2R(s))
+> cbind(s, R(s))
                         s tleft     cleft      exact    cright tright rank
 1             2.67433818+    NA 2.6743382         NA       Inf     NA   10
 2              1.45783672    NA        NA 1.45783672        NA     NA    5
@@ -113,7 +113,7 @@ Loading required package: variables
 [10] [0.32505510, 1.325055]
 > attr(s, "type")
 [1] "interval"
-> cbind(s, mlt:::.Surv2R(s))
+> cbind(s, R(s))
                         s tleft      cleft exact   cright tright rank
 1  [2.67433818, 3.674338]    NA 2.67433818    NA 3.674338     NA    9
 2  [1.45783672, 2.457837]    NA 1.45783672    NA 2.457837     NA    9
@@ -133,7 +133,7 @@ Loading required package: variables
 [10] [0.32505510, 1.325055]
 > attr(s, "type")
 [1] "interval"
-> cbind(s, mlt:::.Surv2R(s))
+> cbind(s, R(s))
                         s tleft      cleft exact   cright tright rank
 1  [2.67433818,      Inf]    NA 2.67433818    NA      Inf     NA   10
 2  [1.45783672, 2.457837]    NA 1.45783672    NA 2.457837     NA    4
@@ -153,7 +153,7 @@ Loading required package: variables
 [10] [0.32505510, 1.325055]
 > attr(s, "type")
 [1] "interval"
-> cbind(s, mlt:::.Surv2R(s))
+> cbind(s, R(s))
                         s tleft      cleft exact   cright tright rank
 1             2.67433818+    NA 2.67433818    NA      Inf     NA   10
 2  [1.45783672, 2.457837]    NA 1.45783672    NA 2.457837     NA    4
@@ -168,4 +168,4 @@ Loading required package: variables
 > 
 > proc.time()
    user  system elapsed 
-  1.053   0.067   1.110 
+  1.040   0.052   1.082 

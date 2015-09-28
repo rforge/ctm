@@ -175,7 +175,7 @@ qmlt <- function(object, newdata = object$data, p = .5, n = 50,
 
     y <- object$response
     ### don't accept user-generated quantiles
-    q <- mkgrid(object, n = n, bounds = object$bounds)[[y]]
+    q <- mkgrid(object, n = n)[[y]]
     if (!is.null(newdata) & !is.data.frame(newdata)) {
         newdata[[y]] <- NULL
         nm <- names(newdata)

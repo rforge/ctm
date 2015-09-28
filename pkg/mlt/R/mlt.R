@@ -122,8 +122,6 @@
     ret$weights <- weights
     ret$offset <- offset
     ret$response <- response
-    ret$bounds <- list(attr(y, "bounds"))
-    names(ret$bounds) <- response
     ret$todistr <- todistr
     ret$loglik <- loglikfct
     ret$score <- score
@@ -239,14 +237,14 @@ mlt <- function(model, data, weights = NULL, offset = NULL, fixed = NULL,
     vars <- as.vars(model$model)
     response <- model$response
     responsevar <- vars[[response]]
-    bounds <- bounds(responsevar)[[response]]
+    bounds <- bounds(responsevar)
     stopifnot(length(response) == 1)
     y <- data[[response]]
     if (!inherits(y, "response")) {
-        ytype <- .type_of_response(y)
+        ytype <- .type_of_response(y) ### <FIXME> replace with var </FIXME>
         if (is.na(ytype))
             stop("cannot deal with response class", class(y))
-        y <- R(y, bounds = bounds)
+        y <- R(object = y)
     }
 
     s <- .mlt_setup(model = model, data = data, y = y, weights = weights, 
@@ -270,5 +268,6 @@ mlt <- function(model, data, weights = NULL, offset = NULL, fixed = NULL,
     args$quiet <- quiet
     ret <- do.call(".mlt_fit", args)
     ret$call <- match.call()
+    ret$bounds <- bounds
     ret
 }

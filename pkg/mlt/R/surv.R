@@ -1,5 +1,8 @@
 
-.Surv2R <- function(object) {
+R <- function(object, ...)
+    UseMethod("R")
+
+R.Surv <- function(object, ...) {
 
     type <- attr(object, "type")
     stopifnot(type %in% c("left", "right", "interval", 
@@ -7,10 +10,10 @@
     status <- object[, "status"]
 
     ret <- switch(type,
-        "right" = R(y = ifelse(status == 1, object[, "time"], NA),
+        "right" = R(object = ifelse(status == 1, object[, "time"], NA),
                     cleft = ifelse(status != 1, object[, "time"], NA),
                     cright = ifelse(status != 1, Inf, NA)),
-        "left" =  R(y = ifelse(status == 1, object[, "time"], NA),
+        "left" =  R(object = ifelse(status == 1, object[, "time"], NA),
                     cleft = ifelse(status != 1, -Inf, NA),
                     cright = ifelse(status != 1, object[, "time"], NA)),
 
@@ -34,30 +37,63 @@
                     "left" = cbind(-Inf, object[idx, "time1"]),
                     "interval" = object[idx, c("time1", "time2")])
             }
-            R(y = ifelse(is.na(tmp[, "right"]), tmp[, "left"], NA), 
+            R(object = ifelse(is.na(tmp[, "right"]), tmp[, "left"], NA), 
               cleft = ifelse(is.na(tmp[, "right"]), NA, tmp[, "left"]), 
               cright = tmp[, "right"])
         },
         ### left truncation, right censoring
-        "counting" = R(y = ifelse(status == 1, object[, "stop"], NA),
+        "counting" = R(object = ifelse(status == 1, object[, "stop"], NA),
                        cleft = ifelse(status != 1, object[, "stop"], NA),
                        cright = ifelse(status != 1, Inf, NA),
                        tleft = object[, "start"])
     )
-    ### survival times are always positive
-    attr(ret, "bounds") <- c(0, Inf)
     ret
 }
 
+
+R.factor <- function(object, ...) {
+
+    warning("response is unordered factor;
+             results may depend on order of levels")
+    return(R(as.ordered(object), ...))
+}
+
+R.ordered <- function(object, ...) {
+
+    rank <- rank(object, ties.method = "max")
+    type <- class(object)[1] 
+    lev <- levels(object)
+    cright <- as.ordered(object)
+    cright[cright == lev[nlevels(object)]] <- NA
+    cleft <- factor(unclass(object) - 1, levels = 1:length(lev),
+                    labels = lev, exclude = 0, ordered = TRUE)
+    ret <- data.frame(tleft = NA, cleft = cleft, exact = NA,
+                      cright = cright, tright = NA, rank = rank)
+    attr(ret, "type") <- type
+    class(ret) <- c("response", class(ret))
+    ret
+}
+
+R.integer <- function(object, ...) {
+
+    rank <- rank(object, ties.method = "max")
+    type <- "integer"   
+    cright <- object
+    cleft <- object - 1
+    cleft[cleft < 0] <- NA
+    ret <- data.frame(tleft = NA, cleft = cleft, exact = NA,
+                      cright = cright, tright = NA, rank = rank)
+    attr(ret, "type") <- type  
+    class(ret) <- c("response", class(ret))
+    ret
+
+}
+
 ### handle exact integer / factor as interval censored
-R <- function(y = NA, cleft = NA, cright = NA, 
-              tleft = NA, tright = NA, bounds = c(-Inf, Inf)) {
+R.numeric <- function(object = NA, cleft = NA, cright = NA, 
+                      tleft = NA, tright = NA, ...) {
 
-    if (inherits(y, "Surv"))
-        return(.Surv2R(y))
-
-    exact <- y
-    n <- c(length(exact), length(cleft), length(cright), 
+    n <- c(length(object), length(cleft), length(cright), 
            length(tleft), length(tright))    
     if (length(unique(n)) > 1) {
         stopifnot(any(n > 1))
@@ -65,8 +101,8 @@ R <- function(y = NA, cleft = NA, cright = NA,
         stopifnot(length(unique(n1)) == 1)
     }
     nm <- max(n)
-    if (length(exact) == 1 && is.na(exact)) 
-        exact <- rep(exact, nm)
+    if (length(object) == 1 && is.na(object)) 
+        object <- rep(object, nm)
     if (length(cleft) == 1 && is.na(cleft)) 
         cleft <- rep(cleft, nm)
     if (length(cright) == 1 && is.na(cright)) 
@@ -76,38 +112,17 @@ R <- function(y = NA, cleft = NA, cright = NA,
     if (length(tright) == 1 && is.na(tright)) 
         tright <- rep(tright, nm)
 
-    if (all(!is.na(exact))) {
-        rank <- rank(exact, ties.method = "max")
+    if (all(!is.na(object))) {
+        rank <- rank(object, ties.method = "max")
         type <- "double"
-        if (is.factor(exact)) {
-            type <- class(exact)[1]
-            if (!is.ordered(exact)) 
-                warning("response is unordered factor; 
-                         results may depend on order of levels")
-            stopifnot(all(is.na(c(tleft, cleft, cright, tright))))
-            lev <- levels(exact)
-            cright <- as.ordered(exact)
-            cright[cright == lev[nlevels(exact)]] <- NA
-            cleft <- factor(unclass(exact) - 1, levels = 1:length(lev), 
-                            labels = lev, exclude = 0, ordered = TRUE)
-            exact <- NA
-        }
-        if (is.integer(exact)) {
-            type <- "integer"
-            stopifnot(all(is.na(c(tleft, cleft, cright, tright))))
-            cright <- exact
-            cleft <- exact - 1
-            cleft[cleft < 0] <- NA
-            exact <- NA
-        }
     } else {
-        if (any(!is.na(exact)) && !is.double(exact))
+        if (any(!is.na(object)) && !is.double(object))
             stop("Mix of exact and censored observations currently only implemented for doubles")
         ### <FIXME> allow for censord factors and integers </FIXME>
         type <- "double"
 
         ### some meaningful ordering of observations
-        tmpexact <- as.numeric(exact)
+        tmpexact <- as.numeric(object)
         tmpleft <- as.numeric(cleft)
         tmpright <- as.numeric(cright)
         tmpleft[is.na(tmpleft)] <- 
@@ -119,13 +134,14 @@ R <- function(y = NA, cleft = NA, cright = NA,
         rank <- rank(tmpexact, ties.method = "max")
     }
 
-    ret <- data.frame(tleft = tleft, cleft = cleft, exact = exact,
+    ret <- data.frame(tleft = tleft, cleft = cleft, exact = object,
                       cright = cright, tright = tright, rank = rank)
     attr(ret, "type") <- type
-    attr(ret, "bounds") <- bounds
     class(ret) <- c("response", class(ret))
     ret
 }
+
+R.default <- R.numeric
 
 .exact <- function(object)
     !is.na(object$exact)

@@ -39,8 +39,8 @@ Loading required package: variables
 Gradient[1] "Mean relative difference: 1.46906e-05"
 Hessian:[1] TRUE
 Warning message:
-In R(y, bounds = bounds) : response is unordered factor; 
-                         results may depend on order of levels
+In R.factor(object = y) : response is unordered factor;
+             results may depend on order of levels
 > coef(m2)
 (Intercept)          y1          X1          X2 
  -0.7372250   0.0000000   0.3848409   0.8291921 
@@ -111,4 +111,4 @@ Species1:Petal.Length Species2:Petal.Length  Species1:Petal.Width
 > 
 > proc.time()
    user  system elapsed 
-  1.669   0.047   1.702 
+  1.671   0.043   1.699 
