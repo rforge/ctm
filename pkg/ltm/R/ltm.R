@@ -45,15 +45,13 @@ ltm <- function(formula, data, subset, weights, na.action = na.omit,
     stopifnot(variable.names(response) == y)
     Y <- Y[[1L]]
 
-    if (!inherits(Y, "response"))
-        RY <- R(Y, bounds = bounds(response)[[1]])
-    type <- attr(RY, "type")
-    DISCRETE <- type != "double" 
-    if (type == "integer") DISCRETE <- integerAsFactor
+    RY <- R(Y)
+    DISCRETE <- !(inherits(Y, "Surv") || is.double(Y))
+    if (is.integer(Y)) DISCRETE <- integerAsFactor
     
     fixed <- NULL
     if (DISCRETE) {
-        if (type == "integer") Y <- mf[[variable.names(response)]] <- ordered(Y)
+        if (is.integer(Y)) Y <- mf[[variable.names(response)]] <- ordered(Y)
         nlev <- nlevels(Y)
         cntr <- list(function(n) contr.treatment(n, base = nlev))
         names(cntr) <- variable.names(response)
