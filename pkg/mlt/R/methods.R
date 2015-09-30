@@ -135,3 +135,9 @@ print.summary.mlt <- function(x, digits = max(3L, getOption("digits") - 3L), ...
 
 print.mlt <- function(x, ...)
     print(summary(x, ...))
+
+as.vars.ctm <- function(object)
+    as.vars(object$model)
+
+as.vars.mlt <- function(object)
+    as.vars(object$model)

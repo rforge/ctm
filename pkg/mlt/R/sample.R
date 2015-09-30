@@ -32,7 +32,10 @@ simulate.mlt <- function(object, nsim = 1, seed = NULL,
         ### unconditional
         if (!is.matrix(prob)) prob <- matrix(prob, ncol = 1)
         prob <- t(prob[, rep(1:NCOL(prob), nsim),drop = FALSE])
-        ret <- .p2q(prob, q, p, interpolate = interpolate)
+        discrete <- !inherits(as.vars(object)[[object$response]],
+                              "continuous_var")
+        ret <- .p2q(prob, q, p, interpolate = interpolate,
+                    discrete = discrete)
         if (nsim > 1) {
             tmp <- vector(mode = "list", length = nsim)
             for (i in 1:nsim) {

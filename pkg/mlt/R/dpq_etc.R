@@ -147,11 +147,12 @@ Hmlt <- function(object, newdata = object$data, q = NULL)
 
 ### numerical inversion of distribution function
 ### to get quantile function
-.p2q <- function(prob, q, p, interpolate = FALSE, fact = 1.1) {
+.p2q <- function(prob, q, p, interpolate = FALSE, fact = 1.1, 
+                 discrete = FALSE) {
 
     prob <- cbind(0, prob, 1)
     i <- rowSums(prob < p)
-    if (!(.type_of_response(q) %in% c("double", "survival")))
+    if (discrete)
         return(q[i])
 
     ### return interval censored quantiles
@@ -186,15 +187,17 @@ qmlt <- function(object, newdata = object$data, p = .5, n = 50,
         prob <- pmlt(object, newdata = newdata, q = q)
     } 
 
-    ### convert potential array-values distribition function
+    ### convert potential array-valued distribution function
     ### to matrix where rows correspond to observations newdata 
     ### and columns to quantiles q
     ptmp <- t(matrix(prob, nrow = length(q)))
     nr <- nrow(ptmp)
     ptmp <- ptmp[rep(1:nr, each = length(p)),,drop = FALSE]
     pp <- rep(p, nr) ### p varies fastest
-    ret <- .p2q(ptmp, q, pp, interpolate = interpolate)
-
+    discrete <- !inherits(as.vars(object)[[object$response]],
+                          "continuous_var")
+    ret <- .p2q(ptmp, q, pp, interpolate = interpolate, 
+                discrete = discrete)
 
     ### arrays of factors are not allowed
     if (is.factor(q)) return(ret)

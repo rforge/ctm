@@ -234,18 +234,12 @@ mlt <- function(model, data, weights = NULL, offset = NULL, fixed = NULL,
                 theta = NULL, pstart = NULL, scale = FALSE, check = TRUE, 
                 checkGrad = FALSE, trace = FALSE, quiet = FALSE, dofit = TRUE, ...) {
 
-    vars <- as.vars(model$model)
+    vars <- as.vars(model)
     response <- model$response
     responsevar <- vars[[response]]
     bounds <- bounds(responsevar)
     stopifnot(length(response) == 1)
-    y <- data[[response]]
-    if (!inherits(y, "response")) {
-        ytype <- .type_of_response(y) ### <FIXME> replace with var </FIXME>
-        if (is.na(ytype))
-            stop("cannot deal with response class", class(y))
-        y <- R(object = y)
-    }
+    y <- R(object = data[[response]])
 
     s <- .mlt_setup(model = model, data = data, y = y, weights = weights, 
                     offset = offset, fixed = fixed) 

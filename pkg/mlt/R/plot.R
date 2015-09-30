@@ -30,7 +30,7 @@ plot.mlt <- function(x, newdata, type = c("distribution",
         axis(2)
         box()
     }
-    y <- as.vars(x$model$model)[[x$response]]
+    y <- as.vars(x)[[x$response]]
     if (inherits(y, "continuous_var")) {
         for (i in 1:ncol(pr)) lines(q, pr[,i], col = col[i])
     } else {
