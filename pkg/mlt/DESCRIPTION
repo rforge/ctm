@@ -1,11 +1,12 @@
 Package: mlt
 Title: Most Likely Transformations
-Version: 0.0-17
-Date: 2015-09-23
-Author: Torsten Hothorn
-Maintainer: Torsten Hothorn <Torsten.Hothorn@R-project.org>
-Description: Estimation via transformation.
-Depends: basefun (>= 0.0-16), variables (>= 0.0-16)
+Version: 0.0-18
+Date: 2015-09-30
+Authors@R: person("Torsten", "Hothorn", role = c("aut", "cre"),
+                  email = "Torsten.Hothorn@R-project.org")  
+Description: Likelihood-based estimation of conditional transformation
+  models via the most likely transformation approach.
+Depends: basefun (>= 0.0-18), variables (>= 0.0-18)
 Imports: BB, sandwich, stats, numDeriv, quadprog, multcomp
 Enhances: np, eha, survival, nnet, truncreg
 Suggests: lattice, MASS, TH.data
