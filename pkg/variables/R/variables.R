@@ -26,6 +26,8 @@ numeric_var <- function(name, desc = NULL, unit = NULL,
     stopifnot(length(support) >= 2L)
     stopifnot(all(is.finite(support)))
     stopifnot(is.integer(support) || is.double(support))
+    if (is.integer(support) && length(support) == 2L)
+        support <- support[1]:support[2]
     ret$support <- support
     discrete <- is.integer(support) || (length(support) > 2L)
     if (discrete) {
