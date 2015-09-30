@@ -98,7 +98,7 @@ model.matrix.Bernstein_basis <- function(object, data,
     varname <- variable.names(object)
     deriv <- .deriv(varname, deriv)
     x <- data[[varname]]
-    s <- support(as.vars(object))[[varname]]
+    s <- range(support(as.vars(object))[[varname]])
     small <- x < s[1]
     large <- x > s[2]
     if (all(!small) && all(!large))
