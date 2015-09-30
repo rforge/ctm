@@ -234,8 +234,9 @@ dmlt <- function(object, newdata = object$data, q = NULL, log = FALSE) {
         names(deriv) <- y
         trafoprime <- tmlt(object, newdata = newdata, q = q, 
                            deriv = deriv)
-        ### <FIXME> bounds to not pay attention to deriv in tmlt </FIXME>
-        trafoprime <- pmax(0, trafoprime)
+        ### <FIXME> trafoprime is +/-Inf at boundaries, so use 0 density
+        trafoprime[!is.finite(trafoprime)] <- .Machine$double.eps
+        trafoprime <- pmax(.Machine$double.eps, trafoprime)
         if (log)
             return(object$model$todistr$d(trafo, log = TRUE) + log(trafoprime))
         return(object$model$todistr$d(trafo) * trafoprime)
