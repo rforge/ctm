@@ -88,7 +88,14 @@ R.numeric <- function(object = NA, cleft = NA, cright = NA,
          tleft = tleft, tright = tright)
 }
 
-R.default <- R.numeric
+### for object = NA, ie censored observations only
+R.logical <- R.numeric
+
+R.response <- function(object, ...)
+    return(object)
+
+R.default <- function(object, ...)
+    stop("cannot deal with response class", class(object))
 
 .mkR <- function(...) {
 
