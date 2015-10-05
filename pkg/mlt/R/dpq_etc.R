@@ -162,6 +162,9 @@ Hmlt <- function(object, newdata = object$data, q = NULL)
     }
 
     ### interpolate linearily
+    ### <FIXME> fact handles left and right censored cases
+    ### where p < min(prob) or p > max(prob). These should
+    ### be treated as censored in any case </FIXME>
     qq <- c(abs(min(q)) * fact * sign(min(q)), q, max(q) * fact)
     ptmp <- cbind(prob[cbind(1:nrow(prob), i)], 
                   prob[cbind(1:nrow(prob), i + 1)])
