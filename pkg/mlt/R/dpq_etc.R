@@ -147,30 +147,35 @@ Hmlt <- function(object, newdata = object$data, q = NULL)
 
 ### numerical inversion of distribution function
 ### to get quantile function
-.p2q <- function(prob, q, p, interpolate = FALSE, fact = 1.1, 
-                 discrete = FALSE) {
+.p2q <- function(prob, q, p, interpolate = FALSE, 
+                 discrete = FALSE, bounds = c(-Inf, Inf)) {
 
     prob <- cbind(0, prob, 1)
     i <- rowSums(prob < p)
     if (discrete)
         return(q[i])
 
-    ### return interval censored quantiles
-    if (!interpolate) {
-        qq <- c(-Inf, q, Inf)
-        return(R(cleft = qq[i], cright = qq[i + 1]))
-    }
+    qq <- c(bounds[1], q, bounds[2])
 
-    ### interpolate linearily
-    ### <FIXME> fact handles left and right censored cases
-    ### where p < min(prob) or p > max(prob). These should
-    ### be treated as censored in any case </FIXME>
-    qq <- c(abs(min(q)) * fact * sign(min(q)), q, max(q) * fact)
-    ptmp <- cbind(prob[cbind(1:nrow(prob), i)], 
+    ### return interval censored quantiles
+    if (!interpolate)
+        return(R(cleft = qq[i], cright = qq[i + 1]))
+
+    FIN <- is.finite(qq[i]) & is.finite(qq[i + 1])
+
+    ptmp <- cbind(prob[cbind(1:nrow(prob), i)],    
                   prob[cbind(1:nrow(prob), i + 1)])
     beta <- (ptmp[,2] - ptmp[,1]) / (qq[i + 1] - qq[i])
     alpha <- ptmp[,1] - beta * qq[i]
-    return((p - alpha) / beta) 
+    ret <- (p - alpha) / beta
+
+    if (all(FIN)) return(ret)
+    ret[!FIN] <- NA
+    left <- qq[i]
+    left[FIN] <- NA
+    right <- qq[i + 1]
+    right[FIN] <- NA
+    return(R(ret, cleft = left, cright = right))
 }
 
 ### quantile function
@@ -199,25 +204,16 @@ qmlt <- function(object, newdata = object$data, p = .5, n = 50,
     pp <- rep(p, nr) ### p varies fastest
     discrete <- !inherits(as.vars(object)[[object$response]],
                           "continuous_var")
-    ret <- .p2q(ptmp, q, pp, interpolate = interpolate, 
+    bounds <- bounds(object)[[y]]
+    ret <- .p2q(ptmp, q, pp, interpolate = interpolate, bounds = bounds,
                 discrete = discrete)
 
     ### arrays of factors are not allowed
     if (is.factor(q)) return(ret)
 
-    ### return list of length(p)
-    if (!interpolate) {
-        tmp <- vector(mode = "list", length = length(p))
-        names(tmp) <- .frmt(p)
-        for (i in 1:length(p)) {
-            idx <- 1:nr + (i - 1) * nr
-            if (is.data.frame(ret))  
-                tmp[[i]] <- ret[idx,]
-            else 
-                tmp[[i]] <- ret[idx]
-        }
-        return(tmp)
-    }
+    ### return "response" object
+    if (!interpolate || inherits(ret, "response")) 
+        return(ret)
 
     dim <- dim(prob)
     dim[1] <- length(p)

@@ -144,3 +144,10 @@ as.vars.ctm <- function(object)
 
 as.vars.mlt <- function(object)
     as.vars(object$model)
+
+bounds.ctm <- function(object)
+    bounds(as.vars(object))
+
+bounds.mlt <- function(object)
+    bounds(as.vars(object))
+

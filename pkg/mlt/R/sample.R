@@ -34,7 +34,8 @@ simulate.mlt <- function(object, nsim = 1, seed = NULL,
         prob <- t(prob[, rep(1:NCOL(prob), nsim),drop = FALSE])
         discrete <- !inherits(as.vars(object)[[object$response]],
                               "continuous_var")
-        ret <- .p2q(prob, q, p, interpolate = interpolate,
+        bounds <- bounds(object)[[y]]
+        ret <- .p2q(prob, q, p, interpolate = interpolate, bounds = bounds,
                     discrete = discrete)
         if (nsim > 1) {
             tmp <- vector(mode = "list", length = nsim)

@@ -29,6 +29,8 @@ S3method("R", "Surv")
 S3method("R", "factor")
 S3method("R", "ordered")
 S3method("R", "numeric")
+S3method("bounds", "mlt")
+S3method("bounds", "ctm")
 
 S3method("variable.names", "ctm")
 S3method("mkgrid", "ctm")
