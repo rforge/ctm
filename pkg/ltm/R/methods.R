@@ -115,3 +115,10 @@ print.ltm <- function(x, ...) {
     cat("\nCoefficients:\n")
     print(coef(x, lp_only = FALSE))
 }
+
+update.ltm <- function(object, weights, theta, ...) {
+    cls <- class(object)
+    ret <- update(as.mlt(object), weights, theta, ...)
+    class(ret) <- cls
+    ret
+}
