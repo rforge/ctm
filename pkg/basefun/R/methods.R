@@ -67,6 +67,12 @@ as.vars.bases <- function(object) {
     do.call("c", ret)
 }
 
+bounds.basis <- function(object)
+    bounds(as.vars(object))
+
+bounds.bases <- function(object)
+    bounds(as.vars(object))
+
 as.basis <- function(object, ...)
     UseMethod("as.basis")
 
