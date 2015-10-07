@@ -1,4 +1,7 @@
 
+weights.mlt <- function(object, ...)
+    object$weights
+
 coef.mlt <- function(object, fixed = TRUE, ...) {
     if (fixed) 
         return(object$coef)
@@ -23,7 +26,7 @@ Hessian <- function(object, ...)
     UseMethod("Hessian")
 
 Hessian.mlt <- function(object, parm = coef(object, fixed = FALSE), ...)
-    object$hessian(parm)
+    object$hessian(parm, weights = weights(object))
     
 Gradient <- function(object, ...)
     UseMethod("Gradient")
@@ -35,14 +38,14 @@ vcov.mlt <- function(object, parm = coef(object, fixed = FALSE), ...)
     solve(Hessian(object, parm = parm))
 
 logLik.mlt <- function(object, parm = coef(object, fixed = FALSE), ...) {
-    ret <- -object$loglik(parm)
+    ret <- -object$loglik(parm, weights = weights(object))
     attr(ret, "df") <- length(coef(object, fixed = FALSE))
     class(ret) <- "logLik"
     ret
 }
 
 estfun.mlt <- function(object, parm = coef(object, fixed = FALSE), ...)
-    -object$score(parm)
+    -object$score(parm, weights = weights(object))
 
 mkgrid.mlt <- function(object, n, ...)
     mkgrid(object$model, n = n, ...)

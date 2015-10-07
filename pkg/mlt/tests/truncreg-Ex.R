@@ -34,7 +34,8 @@ vcov(mltmod)
 
 #library("numDeriv")
 
-solve(numDeriv::hessian(mltmod$loglik, coef(mltmod)))
+solve(numDeriv::hessian(mltmod$loglik, coef(mltmod), 
+                        weights = weights(mltmod)))
 
 
 ## right-truncated
@@ -69,6 +70,7 @@ vcov(mltmod)
 
 #library("numDeriv")
 
-solve(numDeriv::hessian(mltmod$loglik, coef(mltmod)))
+solve(numDeriv::hessian(mltmod$loglik, coef(mltmod), 
+                        weights = weights(mltmod)))
 
 

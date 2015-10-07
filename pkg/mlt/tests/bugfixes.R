@@ -1,5 +1,6 @@
 
 library("mlt")
+library("sandwich")
 set.seed(29)
 
 ### Nadja Klein
@@ -17,3 +18,23 @@ mltm2 <- mlt(ctmm2, data = dat, check = FALSE)
 (p <- predict(mltm2, newdata = data.frame(x1=0, x2 = 0), q = mkgrid(mltm2, n = 10)[["y"]]))
 ### plot data
 plot(mltm2,newdata=expand.grid(x1=0:1, x2 = 0:1))
+
+### check update
+dist <- numeric_var("dist", support = c(2.0, 100), bounds = c(0, Inf))
+speed <- numeric_var("speed", support = c(5.0, 23), bounds = c(0, Inf)) 
+ctmm <- ctm(response = Bernstein_basis(dist, order = 4, ui = "increasing"),
+            interacting = Bernstein_basis(speed, order = 3))
+
+m <- mlt(ctmm, data = cars)
+e <- estfun(m)
+w <- runif(nrow(cars)) < .8
+m1 <- update(m, weights = w, theta = coef(m))
+e1 <- estfun(m1, parm = coef(m))
+stopifnot(max(abs(e * w - e1)) < .Machine$double.eps)
+e1 <- estfun(m1)
+m2 <- mlt(ctmm, data = cars[w > 0,], theta = coef(m))
+stopifnot(isTRUE(all.equal(logLik(m1), logLik(m2))))
+stopifnot(isTRUE(all.equal(logLik(m1, coef(m2)), logLik(m2, coef(m1)))))
+e2 <- estfun(m2, parm = coef(m1))
+stopifnot(max(abs(e1[w > 0,] - e2)) < .Machine$double.eps)
+

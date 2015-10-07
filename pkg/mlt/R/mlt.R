@@ -1,13 +1,7 @@
 
 ### <FIXME> rename fixed to coef and allow for specification of coefs, 
 ###         ie fitted models? </FIXME>
-.mlt_setup <- function(model, data, y, weights = NULL, 
-                       offset = NULL, fixed = NULL) {
-
-    if (is.null(weights)) weights <- rep(1, nrow(data))
-    if (is.null(offset)) offset <- rep(0, nrow(data))
-    stopifnot(nrow(data) == length(weights))
-    stopifnot(nrow(data) == length(offset))
+.mlt_setup <- function(model, data, y, offset = NULL, fixed = NULL) {
 
     response <- model$response
     stopifnot(length(response) == 1)
@@ -56,7 +50,7 @@
         ret[!exact,] <- .mlt_score_interval(todistr, iY$Yleft, iY$Yright, offset[!exact], iY$trunc)(.parm(beta))
         return(ret[, !fix, drop = FALSE])
     }
-    he <- function(beta) {
+    he <- function(beta, weights) {
         ret <- 0
         if (any(exact))
             ret <- ret + .mlt_hessian_exact(todistr, eY$Y, eY$Yprime, offset[exact], eY$trunc, weights[exact])(.parm(beta))
@@ -65,9 +59,9 @@
         return(ret[!fix, !fix, drop = FALSE])
     }
 
-    loglikfct <- function(beta) -sum(weights * ll(beta))
-    score <- function(beta) weights * sc(beta)
-    scorefct <- function(beta) -colSums(weights * sc(beta))
+    loglikfct <- function(beta, weights) -sum(weights * ll(beta))
+    score <- function(beta, weights) weights * sc(beta)
+    scorefct <- function(beta, weights) -colSums(score(beta, weights))
 
     if (all(!is.finite(ci))) {
         ui <- ci <- NULL
@@ -81,7 +75,7 @@
         ### ci <- ci + sqrt(.Machine$double.eps) ### we need ui %*% theta > ci, not >= ci
     }
 
-    optimfct <- function(theta, scale = FALSE, quiet = FALSE, ...) {
+    optimfct <- function(theta, weights, scale = FALSE, quiet = FALSE, ...) {
         control <- list(...)
         if (scale) {
             Ytmp <- Y
@@ -91,12 +85,12 @@
             gt1 <- sc >= 1.1
             sc[gt1] <- 1 / sc[gt1]
             sc[lt1] <- 1
-            f <- function(gamma) loglikfct(sc * gamma)
-            g <- function(gamma) scorefct(sc * gamma) * sc
+            f <- function(gamma) loglikfct(sc * gamma, weights)
+            g <- function(gamma) scorefct(sc * gamma, weights) * sc
             theta <- theta / sc
         } else {
-            f <- loglikfct
-            g <- scorefct
+            f <- function(gamma) loglikfct(gamma, weights)
+            g <- function(gamma) scorefct(gamma, weights)
         }
         if (!is.null(ui)) {
             ret <- BBoptim(par = theta, fn = f, gr = g, project = "projectLinear",
@@ -119,7 +113,6 @@
     ret$fixed <- fixed
     ret$model <- model
     ret$data <- data
-    ret$weights <- weights
     ret$offset <- offset
     ret$response <- response
     ret$todistr <- todistr
@@ -198,30 +191,36 @@
     ret
 }
 
-.mlt_fit <- function(object, theta = NULL, scale = FALSE, check = TRUE, trace = FALSE, 
+.mlt_fit <- function(object, weights, theta = NULL, scale = FALSE, check = TRUE, trace = FALSE, 
                      quiet = FALSE, ...) {
 
     if (is.null(theta))
         stop(sQuote("mlt"), "needs suitable starting values")
 
     ### BBoptim issues a warning in case of unsuccessful convergence
-    ret <- try(object$optimfct(theta, trace = trace, scale = scale, quiet = quiet, ...))    
+    ret <- try(object$optimfct(theta, weights = weights, 
+                               trace = trace, scale = scale, quiet = quiet, ...))    
 
     cls <- class(object)
+    object[names(ret)] <- NULL
     object <- c(object, ret)
     object$coef[] <- object$parm(ret$par) ### [] preserves names
     object$theta <- theta ### starting value
-    object$scale <- scale ### starting value
+    object$scale <- scale ### scaling yes/no
+    object$weights <- weights
+    object$check <- check
+    object$trace <- trace
+    object$quiet <- quiet
     class(object) <- c("mlt_fit", cls)
     
     if (check) {
         ### check gradient  and hessian
-        gr <- numDeriv::grad(object$loglik, ret$par)
+        gr <- numDeriv::grad(object$loglik, ret$par, weights = weights)
         s <- Gradient(object)
         cat("Gradient")
         print(all.equal(gr, s, check.attributes = FALSE))
 
-        H1 <- numDeriv::hessian(object$loglik, ret$par)
+        H1 <- numDeriv::hessian(object$loglik, ret$par, weights = weights)
         H2 <- Hessian(object)
         cat("Hessian:")
         print(all.equal(H1, H2, check.attributes = FALSE))
@@ -241,7 +240,12 @@ mlt <- function(model, data, weights = NULL, offset = NULL, fixed = NULL,
     stopifnot(length(response) == 1)
     y <- R(object = data[[response]])
 
-    s <- .mlt_setup(model = model, data = data, y = y, weights = weights, 
+    if (is.null(weights)) weights <- rep(1, nrow(data))
+    if (is.null(offset)) offset <- rep(0, nrow(data))
+    stopifnot(nrow(data) == length(weights))
+    stopifnot(nrow(data) == length(offset))
+
+    s <- .mlt_setup(model = model, data = data, y = y, 
                     offset = offset, fixed = fixed) 
     if (!dofit) return(s)
 
@@ -254,6 +258,7 @@ mlt <- function(model, data, weights = NULL, offset = NULL, fixed = NULL,
 
     args <- list(...)
     args$object <- s
+    args$weights <- weights
     args$theta <- theta
     args$scale <- scale
     args$check <- check
@@ -263,5 +268,32 @@ mlt <- function(model, data, weights = NULL, offset = NULL, fixed = NULL,
     ret <- do.call(".mlt_fit", args)
     ret$call <- match.call()
     ret$bounds <- bounds
+    ret
+}
+
+update.mlt_fit <- function(object, weights, theta, ...) {
+
+    stopifnot(length(weights) == NROW(object$data))
+    args <- list(...)
+    if (inherits(object, "mlt_fit")) 
+        class(object) <- class(object)[-1L]
+    args$object <- object
+    if (missing(weights)) {
+        args$weights <- weights(object)
+    } else {
+        args$weights <- weights
+    }
+    if (missing(theta)) {
+        args$theta <- object$theta
+    } else {
+        args$theta <- theta
+    }
+    args$scale <- object$scale
+    args$check <- object$check
+    args$trace <- object$trace
+    args$checkGrad <- object$checkGrad
+    args$quiet <- object$quiet
+    ret <- do.call(".mlt_fit", args)
+    ret$call <- match.call()
     ret
 }

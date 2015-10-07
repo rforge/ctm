@@ -53,7 +53,7 @@ m <- ctm(Bs)
 mod <- mlt(m, data = faithful)
 
 # H1 <- mod$optim(coef(mod), hessian = TRUE)$hessian
-H2 <- mod$hessian(coef(mod))
+H2 <- mod$hessian(coef(mod), weights(mod))
 
 X <- model.matrix(m, faithful)
 Xprime <- model.matrix(m, faithful, deriv = c(waiting = 1))

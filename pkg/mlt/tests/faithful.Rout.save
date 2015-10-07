@@ -138,7 +138,7 @@ Gradient[1] "Mean relative difference: 3.041097e-08"
 Hessian:[1] TRUE
 > 
 > # H1 <- mod$optim(coef(mod), hessian = TRUE)$hessian
-> H2 <- mod$hessian(coef(mod))
+> H2 <- mod$hessian(coef(mod), weights(mod))
 > 
 > X <- model.matrix(m, faithful)
 > Xprime <- model.matrix(m, faithful, deriv = c(waiting = 1))
@@ -199,4 +199,4 @@ Loading required package: TH.data
 > 
 > proc.time()
    user  system elapsed 
- 21.998   0.054  22.045 
+ 19.778   0.063  19.849 

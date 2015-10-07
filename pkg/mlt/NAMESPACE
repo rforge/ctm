@@ -12,6 +12,7 @@ export(R, "coef<-", mlt, ctm, confband)
 # Hessian, Gradient, paraboot, description
 # Hmlt dmlt, hmlt, pmlt, qmlt, smlt, tmlt
 
+S3method("update", "mlt_fit")
 S3method("estfun", "mlt")
 S3method("predict", "mlt")
 S3method("simulate", "mlt")

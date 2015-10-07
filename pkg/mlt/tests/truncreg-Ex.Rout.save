@@ -80,7 +80,8 @@ x            0.017225877 -0.017744193  0.03562564
 > 
 > #library("numDeriv")
 > 
-> solve(numDeriv::hessian(mltmod$loglik, coef(mltmod)))
+> solve(numDeriv::hessian(mltmod$loglik, coef(mltmod), 
++                         weights = weights(mltmod)))
              [,1]         [,2]        [,3]
 [1,]  0.017689298 -0.009565423  0.01722588
 [2,] -0.009565423  0.008956894 -0.01774419
@@ -147,7 +148,8 @@ x            0.017333444 -0.018485360  0.03730402
 > 
 > #library("numDeriv")
 > 
-> solve(numDeriv::hessian(mltmod$loglik, coef(mltmod)))
+> solve(numDeriv::hessian(mltmod$loglik, coef(mltmod), 
++                         weights = weights(mltmod)))
              [,1]         [,2]        [,3]
 [1,]  0.014235532 -0.009322141  0.01703086
 [2,] -0.009322141  0.009161310 -0.01817633
@@ -160,4 +162,4 @@ In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
 > 
 > proc.time()
    user  system elapsed 
-  1.574   0.045   1.604 
+  1.736   0.043   1.781 
