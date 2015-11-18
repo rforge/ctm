@@ -27,7 +27,7 @@ model.matrix.box_bases <- function(object, data, model.matrix = TRUE,
 
     if (!is.null(deriv)) {
         stopifnot(length(deriv) == 1)
-        if (!names(deriv) %in% varnames) deriv <- NULL
+        ### if (!names(deriv) %in% varnames) NULL
     }
     if (!is.null(integrate)) {
         stopifnot(length(integrate) == 1)
@@ -35,8 +35,11 @@ model.matrix.box_bases <- function(object, data, model.matrix = TRUE,
     }
     ret <- lapply(bnames, function(b) {
         thisargs <- list()
+        thisargs$object <- object[[b]]
+        thisargs$data <- data
         if (!is.null(deriv)) {
-            if (names(deriv) %in% variable.names(object[[b]]))
+            if (names(deriv) %in% variable.names(object[[b]]) || 
+                !(names(deriv) %in% varnames))  ### all X need to be matrix(0) then
                 thisargs$deriv <- deriv
             ### don't feed deriv to other basis functions
             ### because we look at their _product_ here
@@ -45,8 +48,6 @@ model.matrix.box_bases <- function(object, data, model.matrix = TRUE,
             if (names(integrate) %in% variable.names(object[[b]]))
                 thisargs$integrate <- integrate
         }
-        thisargs$object <- object[[b]]
-        thisargs$data <- data
         if (!is.null(dim))
             thisargs$dim <- dim[names(dim) %in% variable.names(object[[b]])]
         X <- do.call("model.matrix", thisargs)
