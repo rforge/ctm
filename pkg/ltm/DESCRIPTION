@@ -1,7 +1,7 @@
 Package: ltm
 Title: Linear Transformation Models
-Version: 0.0-18
-Date: 2015-09-30
+Version: 0.0-19
+Date: 2015-11-18
 Authors@R: person("Torsten", "Hothorn", role = c("aut", "cre"),
                   email = "Torsten.Hothorn@R-project.org")
 Description: Unified specification and estimation of linear transformation
