@@ -40,10 +40,10 @@ model.matrix.cbind_bases <- function(object, data, model.matrix = TRUE,
 
     ret <- lapply(bnames, function(b) {
         thisargs <- list()
-        thisargs$deriv <- deriv
-        thisargs$integrate <- integrate
         thisargs$object <- object[[b]]
         thisargs$data <- data
+        thisargs$deriv <- deriv
+        thisargs$integrate <- integrate
         if (!is.null(dim))
             thisargs$dim <- dim[names(dim) %in% variable.names(object[[b]])]
         X <- do.call("model.matrix", thisargs)
