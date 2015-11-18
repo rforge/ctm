@@ -41,7 +41,7 @@ variable.names.basis <- function(object, ...)
     variable.names(as.vars(object))
 
 variable.names.bases <- function(object, ...)
-    unique(unlist(sapply(object, variable.names)))
+    unique(unlist(lapply(object, variable.names)))
 
 mkgrid.basis <- function(object, n, ...)
     mkgrid(as.vars(object), n = n, ...)
