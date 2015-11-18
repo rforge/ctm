@@ -21,7 +21,8 @@
 ### http://dx.doi.org/10.1080/02664761003692423
 ### arXiv preprint arXiv:1404.2293
 Bernstein_basis <- function(var, order = 2, 
-                            ui = c("none", "increasing", "decreasing", "cyclic", "zerointegral")) {
+                            ui = c("none", "increasing", "decreasing", 
+                                   "cyclic", "zerointegral", "positive", "negative")) {
 
     zeroint <- FALSE
     ui <- match.arg(ui, several.ok = TRUE)
@@ -39,7 +40,9 @@ Bernstein_basis <- function(var, order = 2,
                             ci = rep(0, order)),
         "decreasing" = list(ui = diff(Diagonal(order + 1), differences = 1) * -1,
                             ci = rep(0, order)),
-        "cyclic" = stop("not yet implemented"))
+        "cyclic" = stop("not yet implemented"),
+        "positive" = list(ui = Diagonal(order + 1), ci = rep(0, order + 1)),
+        "negative" = list(ui = -Diagonal(order + 1), ci = rep(0, order + 1)))
 
     stopifnot(inherits(var, "numeric_var"))
     varname <- variable.names(var)
@@ -62,6 +65,8 @@ Bernstein_basis <- function(var, order = 2,
         ### deriv = 1 => f'(x)
         ### deriv = 2 => f''(x)
         ### ...
+
+        if (deriv < 0) x <- rep(diff(support), NROW(data))
 
         stopifnot(order > max(c(0, deriv - 1L)))
         x <- (x - support[1]) / diff(support)
@@ -97,6 +102,8 @@ model.matrix.Bernstein_basis <- function(object, data,
 
     varname <- variable.names(object)
     deriv <- .deriv(varname, deriv)
+    if (deriv < 0)
+        return(object(data = data, deriv = deriv))
     x <- data[[varname]]
     s <- range(support(as.vars(object))[[varname]])
     small <- x < s[1]

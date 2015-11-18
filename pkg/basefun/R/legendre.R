@@ -1,6 +1,7 @@
 
 Legendre_basis <- function(var, order = 2, 
-                           ui = c("none", "increasing", "decreasing", "cyclic"), ...) { # "zerointegral")
+                           ui = c("none", "increasing", "decreasing", "cyclic",
+                                  "positive", "negative"), ...) { # "zerointegral")
 
     stopifnot(inherits(var, "numeric_var"))
 
