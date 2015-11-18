@@ -32,9 +32,6 @@ Loading required package: TH.data
 > 
 > house.ltm <- ltm(fm, weights = Freq, data = housing)
   Successful convergence.
-Warning message:
-In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
-  negative contribution to likelihood; constraints violated!
 > 
 > summary(house.plr, digits = 3)
 
@@ -62,7 +59,8 @@ AIC: 3507.456
 
 Call:
 ltm(formula = fm, data = housing, weights = Freq)
-
+Model:  discrete linear transformation model (transformed logistic distribution)
+	discrete proportional odds model
 Coefficients (response transformation):
       Sat1       Sat2 
 -0.6729697  0.5056078 
@@ -107,7 +105,7 @@ AIC: 3508.356
 
 Call:
 ltm(formula = fm, data = housing, weights = Freq, method = "probit")
-
+Model:  discrete linear transformation model (transformed normal distribution)
 Coefficients (response transformation):
       Sat1       Sat2 
 -0.4082468  0.3139745 
@@ -124,9 +122,6 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
 AIC: 3508.356
 Log-Likelihood: -1747.178 (df = 7)
-Warning message:
-In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
-  negative contribution to likelihood; constraints violated!
 > 
 > summary(update(house.plr, method = "cloglog", Hess = TRUE), digits = 3)
 Call:
@@ -153,7 +148,8 @@ AIC: 3508.283
 
 Call:
 ltm(formula = fm, data = housing, weights = Freq, method = "cloglog")
-
+Model:  discrete linear transformation model (transformed minimum extreme value distribution)
+	discrete proportional hazards model
 Coefficients (response transformation):
        Sat1        Sat2 
 -0.90231749 -0.05284289 
@@ -170,9 +166,6 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
 AIC: 3508.283
 Log-Likelihood: -1747.142 (df = 7)
-Warning message:
-In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
-  negative contribution to likelihood; constraints violated!
 > 
 > max(abs(predict(house.plr, housing, type = "p") - 
 +         t(predict(house.ltm, type = "dens"))))
@@ -194,4 +187,4 @@ TypeTerrace   -1.3085621 -0.72205784
 > 
 > proc.time()
    user  system elapsed 
-  1.869   0.035   1.894 
+  1.885   0.087   1.971 

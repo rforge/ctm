@@ -58,11 +58,6 @@ In c.basis(bresponse = response, bshifting = shifting) :
   Unsuccessful convergence.
 Gradient[1] "Mean relative difference: 7.08799e-07"
 Hessian:[1] TRUE
-Warning messages:
-1: In .log(mmprime %*% beta) :
-  negative contribution to likelihood; constraints violated!
-2: In .log(mmprime %*% beta) :
-  negative contribution to likelihood; constraints violated!
 > 1 / coef(o)[2]
         y 
 0.2608465 
@@ -96,9 +91,6 @@ Note: method with signature 'sparseMatrix#matrix' chosen for function '%*%',
   Unsuccessful convergence.
 Gradient[1] "Mean relative difference: 2.063975e-07"
 Hessian:[1] "Mean relative difference: 4.584995e-07"
-Warning message:
-In .log(mmprime %*% beta) :
-  negative contribution to likelihood; constraints violated!
 > 
 > nd <- data.frame(x = sort(x))
 > layout(matrix(1:2, nr = 2))
@@ -109,4 +101,4 @@ In .log(mmprime %*% beta) :
 > 
 > proc.time()
    user  system elapsed 
- 29.880   0.120  30.002 
+ 30.883   0.154  31.103 

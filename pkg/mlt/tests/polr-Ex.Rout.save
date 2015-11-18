@@ -38,7 +38,8 @@ Gradient[1] "Mean relative difference: 0.001977726"
 Hessian:[1] TRUE
 Warning message:
 In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
-  negative contribution to likelihood; constraints violated!
+  negative contribution to likelihood ( -5.55111512312578e-17 ); 
+                      constraints violated!
 > 
 > logLik(mp)
 'log Lik.' -1771.708 (df=4)
@@ -67,4 +68,4 @@ Re-fitting to get Hessian
 > 
 > proc.time()
    user  system elapsed 
-  1.230   0.043   1.264 
+  1.338   0.030   1.367 

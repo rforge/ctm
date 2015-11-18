@@ -111,4 +111,4 @@ Species1:Petal.Length Species2:Petal.Length  Species1:Petal.Width
 > 
 > proc.time()
    user  system elapsed 
-  1.667   0.051   1.709 
+  1.617   0.051   1.660 

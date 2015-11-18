@@ -41,7 +41,7 @@ Note: method with signature 'dsparseMatrix#dsparseMatrix' chosen for function 'k
 Call:
 ltm(formula = Surv(time, cens) | tgrade ~ horTh + menostat + 
     pnodes, data = GBSG2, method = "cloglog", order = 5, negative_lp = FALSE)
-
+Model: 
 Coefficients:
   Bs1(time):tgradeI   Bs2(time):tgradeI   Bs3(time):tgradeI   Bs4(time):tgradeI 
          -9.6398482          -1.3275604          -1.3275604          -1.3275604 
@@ -74,7 +74,8 @@ n= 686, number of events= 299
 Call:
 ltm(formula = Surv(time, cens) | tgrade ~ horTh + menostat + 
     pnodes, data = GBSG2, method = "cloglog", order = 5, negative_lp = FALSE)
-
+Model:  continuous stratified linear transformation model (transformed minimum extreme value distribution)
+	continuous stratified proportional hazards model
 Coefficients (response transformation):
   Bs1(time):tgradeI   Bs2(time):tgradeI   Bs3(time):tgradeI   Bs4(time):tgradeI 
          -9.6398482          -1.3275604          -1.3275604          -1.3275604 
@@ -183,4 +184,4 @@ pnodes        3.239249e-05 -1.741195e-05  4.689883e-05
 > 
 > proc.time()
    user  system elapsed 
-  1.947   0.047   1.985 
+  2.359   0.034   2.392 

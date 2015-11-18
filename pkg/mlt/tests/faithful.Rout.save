@@ -199,4 +199,4 @@ Loading required package: TH.data
 > 
 > proc.time()
    user  system elapsed 
- 19.778   0.063  19.849 
+ 18.206   0.029  18.251 

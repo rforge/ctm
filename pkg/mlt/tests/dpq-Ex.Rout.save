@@ -3464,13 +3464,6 @@ p                1          2           3
   Successful convergence.
 Gradient[1] "Mean relative difference: 0.000195899"
 Hessian:[1] TRUE
-Warning messages:
-1: In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
-  negative contribution to likelihood; constraints violated!
-2: In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
-  negative contribution to likelihood; constraints violated!
-3: In .log(.dealinf(mmr, beta, offset, d$p, 1) - .dealinf(mml, beta,  :
-  negative contribution to likelihood; constraints violated!
 > 
 > predict(mod2, q = unique(d$y))
    
@@ -3549,4 +3542,4 @@ Levels: 1 < 2 < 3
 > 
 > proc.time()
    user  system elapsed 
-  1.315   0.240   1.545 
+  1.425   0.234   1.664 

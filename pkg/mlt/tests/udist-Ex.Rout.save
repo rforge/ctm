@@ -66,4 +66,4 @@ Hessian:[1] TRUE
 > 
 > proc.time()
    user  system elapsed 
-  1.436   0.031   1.456 
+  1.572   0.027   1.606 

@@ -15,7 +15,7 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 'help.start()' for an HTML browser interface to help.
 Type 'q()' to quit R.
 
-> 
+> 	
 > library("ltm")
 Loading required package: mlt
 Loading required package: basefun
@@ -31,7 +31,7 @@ Loading required package: TH.data
 Call:
 ltm(formula = Sepal.Length | Species ~ Sepal.Width, data = iris, 
     trafo = "log")
-
+Model: 
 Coefficients:
     log(Sepal.Length):Speciessetosa log(Sepal.Length):Speciesversicolor 
                           13.807061                           10.167397 
@@ -42,7 +42,8 @@ Coefficients:
 Call:
 ltm(formula = Sepal.Length | Species ~ Sepal.Width, data = iris, 
     trafo = "log")
-
+Model:  continuous stratified linear transformation model (transformed logistic distribution)
+	continuous stratified proportional odds model
 Coefficients (response transformation):
     log(Sepal.Length):Speciessetosa log(Sepal.Length):Speciesversicolor 
                            13.80706                            10.16740 
@@ -96,7 +97,7 @@ Sepal.Width   0.1960146
 
 Call:
 ltm(formula = time ~ horTh, data = GBSG2)
-
+Model: 
 Coefficients:
  Bs1(time)  Bs2(time)  Bs3(time)  Bs4(time)  Bs5(time)  Bs6(time)   horThyes 
 -4.3923316  0.4580785  0.4580785  0.4580785  1.5347135  6.3422409  0.4780533 
@@ -104,7 +105,8 @@ Coefficients:
 
 Call:
 ltm(formula = time ~ horTh, data = GBSG2)
-
+Model:  continuous linear transformation model (transformed logistic distribution)
+	continuous proportional odds model
 Coefficients (response transformation):
  Bs1(time)  Bs2(time)  Bs3(time)  Bs4(time)  Bs5(time)  Bs6(time) 
 -4.3923316  0.4580785  0.4580785  0.4580785  1.5347135  6.3422409 
@@ -259,7 +261,7 @@ time         [,1]      [,2]
 
 Call:
 ltm(formula = time ~ 1, data = GBSG2)
-
+Model: 
 Coefficients:
  Bs1(time)  Bs2(time)  Bs3(time)  Bs4(time)  Bs5(time)  Bs6(time) 
 -4.5307254  0.2960832  0.2960832  0.2960832  1.3211493  6.1513632 
@@ -267,7 +269,7 @@ Coefficients:
 
 Call:
 ltm(formula = time ~ 1, data = GBSG2)
-
+Model:  continuous unconditional transformation model (transformed logistic distribution)
 Coefficients (response transformation):
  Bs1(time)  Bs2(time)  Bs3(time)  Bs4(time)  Bs5(time)  Bs6(time) 
 -4.5307254  0.2960832  0.2960832  0.2960832  1.3211493  6.1513632 
@@ -294,7 +296,7 @@ Note: method with signature 'dsparseMatrix#dsparseMatrix' chosen for function 'k
 
 Call:
 ltm(formula = time | tgrade ~ 1, data = GBSG2)
-
+Model: 
 Coefficients:
   Bs1(time):tgradeI   Bs2(time):tgradeI   Bs3(time):tgradeI   Bs4(time):tgradeI 
          -5.0632465          -0.6604987          -0.2425022          -0.2425022 
@@ -310,7 +312,8 @@ Bs5(time):tgradeIII Bs6(time):tgradeIII
 
 Call:
 ltm(formula = time | tgrade ~ 1, data = GBSG2)
-
+Model:  continuous stratified linear transformation model (transformed logistic distribution)
+	continuous stratified proportional odds model
 Coefficients (response transformation):
   Bs1(time):tgradeI   Bs2(time):tgradeI   Bs3(time):tgradeI   Bs4(time):tgradeI 
          -5.0632465          -0.6604987          -0.2425022          -0.2425022 
@@ -352,7 +355,7 @@ time         [,1]      [,2]      [,3]
 Call:
 ltm(formula = Surv(time, cens) | tgrade ~ horTh + menostat + 
     pnodes, data = GBSG2, method = "cloglog")
-
+Model: 
 Coefficients:
   Bs1(time):tgradeI   Bs2(time):tgradeI   Bs3(time):tgradeI   Bs4(time):tgradeI 
          -9.6398482          -1.3275604          -1.3275604          -1.3275604 
@@ -371,7 +374,8 @@ Bs5(time):tgradeIII Bs6(time):tgradeIII            horThyes        menostatPost
 Call:
 ltm(formula = Surv(time, cens) | tgrade ~ horTh + menostat + 
     pnodes, data = GBSG2, method = "cloglog")
-
+Model:  continuous stratified linear transformation model (transformed minimum extreme value distribution)
+	continuous stratified proportional hazards model
 Coefficients (response transformation):
   Bs1(time):tgradeI   Bs2(time):tgradeI   Bs3(time):tgradeI   Bs4(time):tgradeI 
          -9.6398482          -1.3275604          -1.3275604          -1.3275604 
@@ -556,7 +560,7 @@ time          [,1]      [,2]
 
 Call:
 ltm(formula = Surv(time, cens) ~ 1, data = GBSG2, method = "cloglog")
-
+Model: 
 Coefficients:
  Bs1(time)  Bs2(time)  Bs3(time)  Bs4(time)  Bs5(time)  Bs6(time) 
 -4.6995126 -0.4965052 -0.4965052 -0.4965052 -0.3473768  0.2640242 
@@ -564,7 +568,7 @@ Coefficients:
 
 Call:
 ltm(formula = Surv(time, cens) ~ 1, data = GBSG2, method = "cloglog")
-
+Model:  continuous unconditional transformation model (transformed minimum extreme value distribution)
 Coefficients (response transformation):
  Bs1(time)  Bs2(time)  Bs3(time)  Bs4(time)  Bs5(time)  Bs6(time) 
 -4.6995126 -0.4965052 -0.4965052 -0.4965052 -0.3473768  0.2640242 
@@ -578,69 +582,14 @@ NULL
 > predict(d)
 NULL
 > 
-> confint(d, calpha = univariate_calpha())
-              q    Estimate        lwr         upr
-1  2.220446e-16 -4.69951257 -5.3653924 -4.03363274
-2  1.399474e+02 -3.70391090 -4.0951597 -3.31266208
-3  2.798947e+02 -2.90652284 -3.1761187 -2.63692700
-4  4.198421e+02 -2.27592576 -2.4937730 -2.05807858
-5  5.597895e+02 -1.78402103 -1.9687004 -1.59934161
-6  6.997368e+02 -1.40582958 -1.5642433 -1.24741587
-7  8.396842e+02 -1.11928754 -1.2601724 -0.97840272
-8  9.796316e+02 -0.90504179 -1.0368252 -0.77325839
-9  1.119579e+03 -0.74624555 -0.8736139 -0.61887715
-10 1.259526e+03 -0.62835398 -0.7530620 -0.50364595
-11 1.399474e+03 -0.53891975 -0.6620771 -0.41576239
-12 1.539421e+03 -0.46738864 -0.5901753 -0.34460196
-13 1.679368e+03 -0.40489514 -0.5280531 -0.28173720
-14 1.819316e+03 -0.34405799 -0.4680912 -0.22002476
-15 1.959263e+03 -0.27877581 -0.4053221 -0.15222947
-16 2.099211e+03 -0.20402267 -0.3365808 -0.07146460
-17 2.239158e+03 -0.11564370 -0.2598092  0.02852184
-18 2.379105e+03 -0.01015062 -0.1839042  0.16360294
-19 2.519053e+03  0.11548260 -0.1500969  0.38106209
-20 2.659000e+03  0.26402422 -0.2198534  0.74790186
+> cb <- confband(d, newdata = data.frame(1), calpha = univariate_calpha(), type = "surv")
 > 
-> d <- as.mlt(d)
-> cf <- coef(d)
-> v <- vcov(d)
-> 
-> prm <- parm(cf, v)
-> K <- diag(length(cf))
-> rownames(K) <- colnames(K) <- names(cf)
-> ci <- confint(glht(prm, linfct = K), calpha = qnorm(.975))
-> 
-> lwr <- d
-> upr <- d
-> coef(lwr) <- ci$confint[, "lwr"]
-> coef(upr) <- ci$confint[, "upr"]
-> 
-> tm <- 10:2700
-> 
-> s <- seq(from = min(GBSG2$time), to = max(GBSG2$time), length = length(cf))
-> plot(tm, predict(d, q = tm), type = "l", ylim = range(ci$confint))
-> points(s, cf, col = "red")
-> 
-> lines(tm, predict(lwr, q = tm))
-> points(s, coef(lwr), col = "blue")
-> 
-> lines(tm, predict(upr, q = tm))
-> points(s, coef(upr), col = "green")
-> 
-> plot(tm, 1 - predict(d, q = tm, type = "distr"), type = "l")
-> 
-> lines(tm, 1 - predict(lwr, q = tm, type = "distr"))
-> 
-> lines(tm, 1 - predict(upr, q = tm, type = "distr"))
-> 
-> 
-> 
+> layout(matrix(1:2, ncol = 2))
 > plot(survfit(Surv(time, cens) ~ 1, data = GBSG2))
-> lines(tm, 1 - predict(d, q = tm, type = "distr"))
-> lines(tm, 1 - predict(lwr, q = tm, type = "distr"))
-> lines(tm, 1 - predict(upr, q = tm, type = "distr"))
-> 
+> plot(d, newdata = data.frame(1), type = "surv")
+> lines(cb[,"q"], cb[,"lwr"])
+> lines(cb[,"q"], cb[,"upr"])
 > 
 > proc.time()
    user  system elapsed 
-  2.855   0.065   2.910 
+  2.948   0.078   3.026 
