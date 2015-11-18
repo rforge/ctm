@@ -8,7 +8,8 @@
 }
 \usage{
 Bernstein_basis(var, order = 2, ui = c("none", "increasing", "decreasing", 
-                                       "cyclic", "zerointegral"))
+                                       "cyclic", "zerointegral", "positive",
+                                       "negative"))
 }
 \arguments{
   \item{var}{a \code{\link[variables]{numeric_var}} object}
