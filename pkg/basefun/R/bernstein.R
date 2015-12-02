@@ -66,7 +66,7 @@ Bernstein_basis <- function(var, order = 2,
         ### deriv = 2 => f''(x)
         ### ...
 
-        if (deriv < 0) x <- rep(diff(support), NROW(data))
+        if (deriv < 0) x <- rep(mean(support), NROW(data))
 
         stopifnot(order > max(c(0, deriv - 1L)))
         x <- (x - support[1]) / diff(support)
