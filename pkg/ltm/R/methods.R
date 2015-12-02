@@ -2,17 +2,17 @@
 as.mlt <- function(object)
     UseMethod("as.mlt")
 
-as.mlt.ltm <- function(object) {
+as.mlt.sltm <- function(object) {
     class(object) <- class(object)[-(1:2)]
     object
 }
 
-### is.ltm?
+### is.sltm?
 
-model.frame.ltm <- function(object, ...)
+model.frame.sltm <- function(object, ...)
     object$data
 
-model.matrix.ltm <- function(object, data = model.frame(object), lp_only = TRUE, ...) {
+model.matrix.sltm <- function(object, data = model.frame(object), lp_only = TRUE, ...) {
     if (!lp_only)
         return(model.matrix(as.mlt(object), data = data, ...))
     if (is.null(object$model$model$bshifting))
@@ -20,7 +20,7 @@ model.matrix.ltm <- function(object, data = model.frame(object), lp_only = TRUE,
     model.matrix(object$model$model$bshifting, data = data, ...)
 }
 
-coef.ltm <- function(object, lp_only = TRUE, ...) {
+coef.sltm <- function(object, lp_only = TRUE, ...) {
     if (!lp_only)
         return(coef(as.mlt(object), ...))
     xn <- colnames(model.matrix(object))
@@ -28,7 +28,7 @@ coef.ltm <- function(object, lp_only = TRUE, ...) {
     coef(as.mlt(object))[xn]
 }
 
-vcov.ltm <- function(object, lp_only = TRUE, ...) {
+vcov.sltm <- function(object, lp_only = TRUE, ...) {
     if (!lp_only)
         return(vcov(as.mlt(object), ...))
     xn <- colnames(model.matrix(object))
@@ -37,7 +37,7 @@ vcov.ltm <- function(object, lp_only = TRUE, ...) {
 }
 
 ### do we really need this?
-estfun.ltm <- function(object, lp_only = TRUE, ...) {
+estfun.sltm <- function(object, lp_only = TRUE, ...) {
     if (!lp_only)
         return(estfun(as.mlt(object), ...))
     xn <- colnames(model.matrix(object))
@@ -45,25 +45,25 @@ estfun.ltm <- function(object, lp_only = TRUE, ...) {
     estfun(as.mlt(object))[, xn, drop = FALSE]
 }
 
-AIC.ltm <- function(object, ..., k = 2)
+AIC.sltm <- function(object, ..., k = 2)
     AIC(as.mlt(object), ..., k = k)
 
-logLik.ltm <- function(object, ...)
+logLik.sltm <- function(object, ...)
     logLik(as.mlt(object), ...)
 
-#paraboot.ltm <- function(object, ...)
+#paraboot.sltm <- function(object, ...)
 #    paraboot(as.mlt(object))
 
-summary.ltm <- function(object, ...) {
+summary.sltm <- function(object, ...) {
 
     cf <- coef(as.mlt(object))
-    cfltm <- coef(object)
+    cfsltm <- coef(object)
     ret <- list(call = object$call, convergence = object$convergence)
-    if (is.null(cfltm)) {
+    if (is.null(cfsltm)) {
         ret$intercepts <- cf
         ret$coefficients <- NULL
     } else {
-        ret$intercepts <- cf[!(names(cf) %in% names(cfltm))]
+        ret$intercepts <- cf[!(names(cf) %in% names(cfsltm))]
         x <- cftest(object, ...)
         pq <- x$test
         mtests <- cbind(pq$coefficients, pq$sigma, pq$tstat, pq$pvalues)
@@ -82,11 +82,11 @@ summary.ltm <- function(object, ...) {
     ### add chisq test
     ret$AIC <- AIC(object)
     ret$logLik <- logLik(object)
-    class(ret) <- "summary.ltm"
+    class(ret) <- "summary.sltm"
     ret
 }
 
-print.summary.ltm <- function(x,  digits = max(3L, getOption("digits") - 3L), ...) {
+print.summary.sltm <- function(x,  digits = max(3L, getOption("digits") - 3L), ...) {
 
     cat("\nCall:\n")
     print(x$call)
@@ -106,7 +106,7 @@ print.summary.ltm <- function(x,  digits = max(3L, getOption("digits") - 3L), ..
     invisible(x)
 }
 
-print.ltm <- function(x, ...) {
+print.sltm <- function(x, ...) {
     cat("\nCall:\n")
     print(x$call)
     if (x$convergence != 0L)
@@ -116,7 +116,7 @@ print.ltm <- function(x, ...) {
     print(coef(x, lp_only = FALSE))
 }
 
-update.ltm <- function(object, weights, theta, ...) {
+update.sltm <- function(object, weights, theta, ...) {
     cls <- class(object)
     ret <- update(as.mlt(object), weights, theta, ...)
     class(ret) <- cls

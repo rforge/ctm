@@ -16,7 +16,7 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > 
-> library("ltm")
+> library("sltm")
 Loading required package: mlt
 Loading required package: basefun
 Loading required package: variables
@@ -28,18 +28,19 @@ Loading required package: TH.data
 > data("GBSG2", package = "TH.data")
 > storage.mode(GBSG2$time) <- "double"
 > 
-> mltm <- ltm(Surv(time, cens) | tgrade ~ horTh + menostat + pnodes, data = GBSG2, method = "cloglog",
-+             negative_lp = FALSE, order = 5)
+> msltm <- sltm(Surv(time, cens) | tgrade ~ horTh + menostat + pnodes, data = GBSG2, 
++               method = "cloglog", negative_lp = FALSE, order = 5)
 Note: method with signature 'dsparseMatrix#dsparseMatrix' chosen for function 'kronecker',
  target signature 'dgTMatrix#dgCMatrix'.
  "TsparseMatrix#sparseMatrix" would also be valid
   Successful convergence.
-> mcox <- coxph(Surv(time, cens) ~ horTh + menostat + pnodes + strata(tgrade), data = GBSG2)
+> mcox <- coxph(Surv(time, cens) ~ horTh + menostat + pnodes + strata(tgrade), 
++               data = GBSG2)
 > 
-> print(mltm)
+> print(msltm)
 
 Call:
-ltm(formula = Surv(time, cens) | tgrade ~ horTh + menostat + 
+sltm(formula = Surv(time, cens) | tgrade ~ horTh + menostat + 
     pnodes, data = GBSG2, method = "cloglog", order = 5, negative_lp = FALSE)
 Model: 
 Coefficients:
@@ -69,10 +70,10 @@ pnodes        0.05422   1.05572  0.00685  7.92 2.4e-15
 Likelihood ratio test=52.2  on 3 df, p=2.67e-11
 n= 686, number of events= 299 
 > 
-> summary(mltm)
+> summary(msltm)
 
 Call:
-ltm(formula = Surv(time, cens) | tgrade ~ horTh + menostat + 
+sltm(formula = Surv(time, cens) | tgrade ~ horTh + menostat + 
     pnodes, data = GBSG2, method = "cloglog", order = 5, negative_lp = FALSE)
 Model:  continuous stratified linear transformation model (transformed minimum extreme value distribution)
 	continuous stratified proportional hazards model
@@ -124,7 +125,7 @@ Wald test            = 73.22  on 3 df,   p=8.882e-16
 Score (logrank) test = 74.5  on 3 df,   p=4.441e-16
 
 > 
-> confint(mltm, calpha = univariate_calpha())
+> confint(msltm, calpha = univariate_calpha())
 
 	 Simultaneous Confidence Intervals
 
@@ -146,14 +147,14 @@ horThyes     -0.62387374 -0.11973612
 menostatPost -0.09943788  0.37692668
 pnodes        0.04079817  0.06764291
 > 
-> coef(mltm)
+> coef(msltm)
     horThyes menostatPost       pnodes 
   -0.3876009    0.1395527    0.0565349 
 > coef(mcox)
     horThyes menostatPost       pnodes 
  -0.37180493   0.13874440   0.05422054 
 > 
-> vcov(mltm)
+> vcov(msltm)
                   horThyes  menostatPost        pnodes
 horThyes      0.0166113082 -3.360261e-03  3.503420e-05
 menostatPost -0.0033602614  1.476389e-02 -1.325394e-05
@@ -164,7 +165,7 @@ horThyes      1.654025e-02 -3.401211e-03  3.239249e-05
 menostatPost -3.401211e-03  1.476804e-02 -1.741195e-05
 pnodes        3.239249e-05 -1.741195e-05  4.689883e-05
 > 
-> summary(predict(mltm, newdata = GBSG2, type = "lp") - model.matrix(mcox) %*% coef(mcox))
+> summary(predict(msltm, newdata = GBSG2, type = "lp") - model.matrix(mcox) %*% coef(mcox))
        V1           
  Min.   :-0.013482  
  1st Qu.:-0.001910  
@@ -179,9 +180,8 @@ pnodes        3.239249e-05 -1.741195e-05  4.689883e-05
 +                   tgrade = sort(unique(GBSG2$tgrade))[2L])
 > 
 > plot(survfit(mcox, newdata = nd, col = "grey"))
-> plot(mltm, newdata = nd, type = "surv", add = TRUE, col = "red")
-> 
+> plot(msltm, newdata = nd, type = "surv", add = TRUE, col = "red")
 > 
 > proc.time()
    user  system elapsed 
-  2.359   0.034   2.392 
+  2.386   0.073   2.483 

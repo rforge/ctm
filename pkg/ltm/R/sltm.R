@@ -1,10 +1,9 @@
 
-ltm <- function(formula, data, subset, weights, na.action = na.omit,
-                response,
-                method = c("logistic", "probit", "cloglog"),
-                trafo = c("Bernstein", "Legendre", "fixed log", "log", "linear"),
-                integerAsFactor = TRUE, order = 5,
-                negative_lp = TRUE, contrasts.arg = NULL, ...) {
+sltm <- function(formula, data, subset, weights, na.action = na.omit,
+                 response, method = c("logistic", "probit", "cloglog"),
+                 trafo = c("Bernstein", "Legendre", "fixed log", "log", "linear"),
+                 integerAsFactor = TRUE, order = 5,
+                 negative_lp = TRUE, contrasts.arg = NULL, ...) {
 
     ### extract response and possibly a stratum and predictor variables
     if (missing(data))
@@ -106,6 +105,6 @@ ltm <- function(formula, data, subset, weights, na.action = na.omit,
                ...)
     ret$call <- match.call(expand.dots = TRUE)
 
-    class(ret) <- c(ifelse(DISCRETE, "dltm", "cltm"), "ltm", class(ret))
+    class(ret) <- c(ifelse(DISCRETE, "dsltm", "csltm"), "sltm", class(ret))
     ret
 }

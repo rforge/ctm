@@ -1,5 +1,5 @@
 
-confint.ltm <- function(object, parm, level = 0.95, ...) {
+confint.sltm <- function(object, parm, level = 0.95, ...) {
 
     cf <- coef(object)
     if (is.null(cf))
@@ -14,8 +14,8 @@ confint.ltm <- function(object, parm, level = 0.95, ...) {
                    level = level, ...))
 }
 
-confband.ltm <- function(object, newdata, level = 0.95,
-                         type = c("trafo", "distribution", "survivor", "cumhazard"), 
-                         n = 20, ...)
+confband.sltm <- function(object, newdata, level = 0.95,
+                          type = c("trafo", "distribution", "survivor", "cumhazard"), 
+                          n = 20, ...)
     mlt::confband(as.mlt(object), newdata = newdata, 
                   level = level, type = type, n = n, ...)

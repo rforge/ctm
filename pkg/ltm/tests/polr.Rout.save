@@ -16,7 +16,7 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > 
-> library("ltm")
+> library("sltm")
 Loading required package: mlt
 Loading required package: basefun
 Loading required package: variables
@@ -30,7 +30,7 @@ Loading required package: TH.data
 > fm <- Sat ~ Infl + Type
 > house.plr <- polr(fm, weights = Freq, data = housing)
 > 
-> house.ltm <- ltm(fm, weights = Freq, data = housing)
+> house.sltm <- sltm(fm, weights = Freq, data = housing)
   Successful convergence.
 > 
 > summary(house.plr, digits = 3)
@@ -55,10 +55,10 @@ Medium|High  0.506  0.115      4.389
 
 Residual Deviance: 3493.456 
 AIC: 3507.456 
-> summary(house.ltm, digits = 3)  
+> summary(house.sltm, digits = 3)  
 
 Call:
-ltm(formula = fm, data = housing, weights = Freq)
+sltm(formula = fm, data = housing, weights = Freq)
 Model:  discrete linear transformation model (transformed logistic distribution)
 	discrete proportional odds model
 Coefficients (response transformation):
@@ -100,11 +100,11 @@ Medium|High  0.314  0.070      4.460
 
 Residual Deviance: 3494.356 
 AIC: 3508.356 
-> summary(ltm(fm, weights = Freq, data = housing, method = "probit"))
+> summary(sltm(fm, weights = Freq, data = housing, method = "probit"))
   Successful convergence.
 
 Call:
-ltm(formula = fm, data = housing, weights = Freq, method = "probit")
+sltm(formula = fm, data = housing, weights = Freq, method = "probit")
 Model:  discrete linear transformation model (transformed normal distribution)
 Coefficients (response transformation):
       Sat1       Sat2 
@@ -143,11 +143,11 @@ Medium|High  -0.053   0.079     -0.666
 
 Residual Deviance: 3494.283 
 AIC: 3508.283 
-> summary(ltm(fm, weights = Freq, data = housing, method = "cloglog"))
+> summary(sltm(fm, weights = Freq, data = housing, method = "cloglog"))
   Successful convergence.
 
 Call:
-ltm(formula = fm, data = housing, weights = Freq, method = "cloglog")
+sltm(formula = fm, data = housing, weights = Freq, method = "cloglog")
 Model:  discrete linear transformation model (transformed minimum extreme value distribution)
 	discrete proportional hazards model
 Coefficients (response transformation):
@@ -168,7 +168,7 @@ AIC: 3508.283
 Log-Likelihood: -1747.142 (df = 7)
 > 
 > max(abs(predict(house.plr, housing, type = "p") - 
-+         t(predict(house.ltm, type = "dens"))))
++         t(predict(house.sltm, type = "dens"))))
 [1] 1.077178e-05
 > 
 > pr <- profile(house.plr)
@@ -183,8 +183,8 @@ TypeApartment -0.7539976 -0.29045326
 TypeAtrium    -0.5901351  0.01140195
 TypeTerrace   -1.3085621 -0.72205784
 > 
-> plot(house.ltm)
+> plot(house.sltm)
 > 
 > proc.time()
    user  system elapsed 
-  1.885   0.087   1.971 
+  1.964   0.038   2.003 

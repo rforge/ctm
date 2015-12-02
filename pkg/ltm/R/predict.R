@@ -1,5 +1,5 @@
 
-predict.ltm <- function(object, newdata, type = c("lp", "trafo", "distribution", 
+predict.sltm <- function(object, newdata, type = c("lp", "trafo", "distribution", 
     "survivor", "density", "logdensity", "hazard", "loghazard", "cumhazard", "quantile"),
     q = NULL, n = 50, ...) {
 

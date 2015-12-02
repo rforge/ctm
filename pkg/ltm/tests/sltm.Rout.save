@@ -16,7 +16,7 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > 	
-> library("ltm")
+> library("sltm")
 Loading required package: mlt
 Loading required package: basefun
 Loading required package: variables
@@ -25,11 +25,11 @@ Loading required package: mvtnorm
 Loading required package: survival
 Loading required package: TH.data
 > 
-> (a <- ltm(Sepal.Length | Species ~ Sepal.Width, data = iris, trafo = "log"))
+> (a <- sltm(Sepal.Length | Species ~ Sepal.Width, data = iris, trafo = "log"))
   Successful convergence.
 
 Call:
-ltm(formula = Sepal.Length | Species ~ Sepal.Width, data = iris, 
+sltm(formula = Sepal.Length | Species ~ Sepal.Width, data = iris, 
     trafo = "log")
 Model: 
 Coefficients:
@@ -40,7 +40,7 @@ Coefficients:
 > summary(a)
 
 Call:
-ltm(formula = Sepal.Length | Species ~ Sepal.Width, data = iris, 
+sltm(formula = Sepal.Length | Species ~ Sepal.Width, data = iris, 
     trafo = "log")
 Model:  continuous stratified linear transformation model (transformed logistic distribution)
 	continuous stratified proportional odds model
@@ -92,11 +92,11 @@ Sepal.Width   0.1960146
 > data("GBSG2", package = "TH.data")
 > storage.mode(GBSG2$time) <- "double"
 > 
-> (b <- ltm(time ~ horTh , data = GBSG2))
+> (b <- sltm(time ~ horTh , data = GBSG2))
   Successful convergence.
 
 Call:
-ltm(formula = time ~ horTh, data = GBSG2)
+sltm(formula = time ~ horTh, data = GBSG2)
 Model: 
 Coefficients:
  Bs1(time)  Bs2(time)  Bs3(time)  Bs4(time)  Bs5(time)  Bs6(time)   horThyes 
@@ -104,7 +104,7 @@ Coefficients:
 > summary(b)
 
 Call:
-ltm(formula = time ~ horTh, data = GBSG2)
+sltm(formula = time ~ horTh, data = GBSG2)
 Model:  continuous linear transformation model (transformed logistic distribution)
 	continuous proportional odds model
 Coefficients (response transformation):
@@ -256,11 +256,11 @@ time         [,1]      [,2]
     509 -1.236787 -1.714841
     510 -1.232777 -1.710830
 > 
-> (b <- ltm(time ~ 1, data = GBSG2))
+> (b <- sltm(time ~ 1, data = GBSG2))
   Successful convergence.
 
 Call:
-ltm(formula = time ~ 1, data = GBSG2)
+sltm(formula = time ~ 1, data = GBSG2)
 Model: 
 Coefficients:
  Bs1(time)  Bs2(time)  Bs3(time)  Bs4(time)  Bs5(time)  Bs6(time) 
@@ -268,7 +268,7 @@ Coefficients:
 > summary(b)
 
 Call:
-ltm(formula = time ~ 1, data = GBSG2)
+sltm(formula = time ~ 1, data = GBSG2)
 Model:  continuous unconditional transformation model (transformed logistic distribution)
 Coefficients (response transformation):
  Bs1(time)  Bs2(time)  Bs3(time)  Bs4(time)  Bs5(time)  Bs6(time) 
@@ -288,14 +288,14 @@ NULL
         9        10        11 
 0.1986471 0.1992840 0.1999213 
 > 
-> (b <- ltm(time | tgrade ~ 1, data = GBSG2))
+> (b <- sltm(time | tgrade ~ 1, data = GBSG2))
 Note: method with signature 'dsparseMatrix#dsparseMatrix' chosen for function 'kronecker',
  target signature 'dgTMatrix#dgCMatrix'.
  "TsparseMatrix#sparseMatrix" would also be valid
   Successful convergence.
 
 Call:
-ltm(formula = time | tgrade ~ 1, data = GBSG2)
+sltm(formula = time | tgrade ~ 1, data = GBSG2)
 Model: 
 Coefficients:
   Bs1(time):tgradeI   Bs2(time):tgradeI   Bs3(time):tgradeI   Bs4(time):tgradeI 
@@ -311,7 +311,7 @@ Bs5(time):tgradeIII Bs6(time):tgradeIII
 > summary(b)
 
 Call:
-ltm(formula = time | tgrade ~ 1, data = GBSG2)
+sltm(formula = time | tgrade ~ 1, data = GBSG2)
 Model:  continuous stratified linear transformation model (transformed logistic distribution)
 	continuous stratified proportional odds model
 Coefficients (response transformation):
@@ -349,11 +349,11 @@ time         [,1]      [,2]      [,3]
     509 0.1859787 0.2844638 0.1093735
     510 0.1866049 0.2852701 0.1097607
 > 
-> (cc <- ltm(Surv(time, cens) | tgrade ~ horTh + menostat + pnodes, data = GBSG2, method = "cloglog"))
+> (cc <- sltm(Surv(time, cens) | tgrade ~ horTh + menostat + pnodes, data = GBSG2, method = "cloglog"))
   Successful convergence.
 
 Call:
-ltm(formula = Surv(time, cens) | tgrade ~ horTh + menostat + 
+sltm(formula = Surv(time, cens) | tgrade ~ horTh + menostat + 
     pnodes, data = GBSG2, method = "cloglog")
 Model: 
 Coefficients:
@@ -372,7 +372,7 @@ Bs5(time):tgradeIII Bs6(time):tgradeIII            horThyes        menostatPost
 > summary(cc)
 
 Call:
-ltm(formula = Surv(time, cens) | tgrade ~ horTh + menostat + 
+sltm(formula = Surv(time, cens) | tgrade ~ horTh + menostat + 
     pnodes, data = GBSG2, method = "cloglog")
 Model:  continuous stratified linear transformation model (transformed minimum extreme value distribution)
 	continuous stratified proportional hazards model
@@ -555,11 +555,11 @@ time          [,1]      [,2]
     500 -0.6647328 -1.052334
     501 -0.6609481 -1.048549
 > 
-> (d <- ltm(Surv(time, cens) ~ 1, data = GBSG2, method = "cloglog"))
+> (d <- sltm(Surv(time, cens) ~ 1, data = GBSG2, method = "cloglog"))
   Successful convergence.
 
 Call:
-ltm(formula = Surv(time, cens) ~ 1, data = GBSG2, method = "cloglog")
+sltm(formula = Surv(time, cens) ~ 1, data = GBSG2, method = "cloglog")
 Model: 
 Coefficients:
  Bs1(time)  Bs2(time)  Bs3(time)  Bs4(time)  Bs5(time)  Bs6(time) 
@@ -567,7 +567,7 @@ Coefficients:
 > summary(d)
 
 Call:
-ltm(formula = Surv(time, cens) ~ 1, data = GBSG2, method = "cloglog")
+sltm(formula = Surv(time, cens) ~ 1, data = GBSG2, method = "cloglog")
 Model:  continuous unconditional transformation model (transformed minimum extreme value distribution)
 Coefficients (response transformation):
  Bs1(time)  Bs2(time)  Bs3(time)  Bs4(time)  Bs5(time)  Bs6(time) 
@@ -592,4 +592,4 @@ NULL
 > 
 > proc.time()
    user  system elapsed 
-  2.948   0.078   3.026 
+  2.818   0.079   2.891 
