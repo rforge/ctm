@@ -7,11 +7,14 @@
     The logarithmic basis function
 }
 \usage{
-log_basis(var, ui = c("none", "increasing", "decreasing"))
+log_basis(var, ui = c("none", "increasing", "decreasing"),
+          remove_intercept = TRUE)
 }
 \arguments{
   \item{var}{a \code{\link[variables]{numeric_var}} object}
   \item{ui}{a character describing possible constraints}
+  \item{remove_intercept}{a logical indicating if the intercept 
+        term shall be removed}
 }
 \details{
   \code{log_basis} returns a function for the evaluation of
