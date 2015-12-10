@@ -17,20 +17,15 @@ simulate.mlt <- function(object, nsim = 1, seed = NULL,
     }
 
     y <- object$response
-    ### unconditional
-    if (all(unique(variable.names(object)) == y)) {
-        newdata <- data.frame(1) ### we need only NROW(newdata)
-    } else {
-        newdata[[y]] <- NULL
-    }
     ### don't accept user-generated quantiles
     q <- mkgrid(object, n = n)[[y]]
     if (is.data.frame(newdata)) {
         p <- runif(nsim * NROW(newdata))
         ### basically compute quantiles for p; see qmlt
         prob <- predict(object, newdata = newdata, q = q, type = "distribution")
-        ### unconditional
-        if (!is.matrix(prob)) prob <- matrix(prob, ncol = 1)
+        ### unconditional: newdata is ignored in the presence of q
+        if (!is.matrix(prob))
+            prob <- matrix(prob, ncol = 1)[,rep(1, NROW(newdata)), drop = FALSE]
         prob <- t(prob[, rep(1:NCOL(prob), nsim),drop = FALSE])
         discrete <- !inherits(as.vars(object)[[object$response]],
                               "continuous_var")

@@ -41,8 +41,8 @@ tmlt <- function(object, newdata = object$data, q = NULL, ...) {
                 ### Y in (b[1], b[2]) => P(Y \le b[1]) = 0, P(Y \le b[2]) = 1
                 ### <FIXME> what happens with deriv in ...? </FIXME>
                 b <- object$bounds[[y]]
-                ret[f == b[1]] <- -Inf
-                ret[f == b[2]] <- Inf
+                ret[f < (b[1] + .Machine$double.eps)] <- -Inf
+                ret[f > (b[2] - .Machine$double.eps)] <- Inf
             }
             return(ret)
         }
@@ -75,8 +75,8 @@ tmlt <- function(object, newdata = object$data, q = NULL, ...) {
             ### Y in (b[1], b[2]) => P(Y \le b[1]) = 0, P(Y \le b[2]) = 1
                 ### <FIXME> what happens with deriv in ...? </FIXME>
             b <- object$bounds[[y]]
-            ret[f == b[1]] <- -Inf
-            ret[f == b[2]] <- Inf
+            ret[f < (b[1] + .Machine$double.eps)] <- -Inf
+            ret[f > (b[2] - .Machine$double.eps)] <- Inf
         }
         return(ret)
     }
@@ -108,7 +108,7 @@ tmlt <- function(object, newdata = object$data, q = NULL, ...) {
         ### Y in (b[1], b[2]) => P(Y \le b[1]) = 0, P(Y \le b[2]) = 1
                 ### <FIXME> what happens with deriv in ...? </FIXME>
         b <- object$bounds[[y]]
-        i <- f == b[1]
+        i <- (f < (b[1] + .Machine$double.eps))
         if (any(i)) {
             args <- lapply(names(dn), function(d) {
                 if (d == y)
@@ -118,7 +118,7 @@ tmlt <- function(object, newdata = object$data, q = NULL, ...) {
             ret <- do.call("[<-", c(list(i = ret), args, 
                                     list(value = -Inf)))
         }
-        i <- f == b[2]
+        i <- (f > (b[2] - .Machine$double.eps))
         if (any(i)) {
             args <- lapply(names(dn), function(d) {
                 if (d == y)
@@ -155,25 +155,27 @@ Hmlt <- function(object, newdata = object$data, q = NULL)
     if (discrete)
         return(q[i])
 
-    qq <- c(bounds[1], q, bounds[2])
+    ### Note: mkgrid for bounded variables already contains the bounds
+    q <- c(bounds[1], q, bounds[2])
 
     ### return interval censored quantiles
     if (!interpolate)
-        return(R(cleft = qq[i], cright = qq[i + 1]))
+        return(R(cleft = q[i], cright = q[i + 1]))
 
-    FIN <- is.finite(qq[i]) & is.finite(qq[i + 1])
+    FIN <- is.finite(q[i]) & is.finite(q[i + 1])
 
     ptmp <- cbind(prob[cbind(1:nrow(prob), i)],    
                   prob[cbind(1:nrow(prob), i + 1)])
-    beta <- (ptmp[,2] - ptmp[,1]) / (qq[i + 1] - qq[i])
-    alpha <- ptmp[,1] - beta * qq[i]
+    beta <- (ptmp[,2] - ptmp[,1]) / (q[i + 1] - q[i])
+    alpha <- ptmp[,1] - beta * q[i]
     ret <- (p - alpha) / beta
+    ret[!is.finite(beta)] <- q[i][!is.finite(beta)]
 
     if (all(FIN)) return(ret)
     ret[!FIN] <- NA
-    left <- qq[i]
+    left <- q[i]
     left[FIN] <- NA
-    right <- qq[i + 1]
+    right <- q[i + 1]
     right[FIN] <- NA
     return(R(ret, cleft = left, cright = right))
 }
