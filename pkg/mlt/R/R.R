@@ -82,8 +82,19 @@ R.integer <- function(object, cleft = NA, cright = NA, ...) {
 
 ### handle exact integer / factor as interval censored
 R.numeric <- function(object = NA, cleft = NA, cright = NA, 
-                      tleft = NA, tright = NA, ...) {
+                      tleft = NA, tright = NA, tol = sqrt(.Machine$double.eps), 
+                      ...) {
 
+    ### treat extremely small intervals as `exact' observations
+    d <- cright - cleft
+    if (any(!is.na(d) | is.finite(d))) {
+        if (any(d < 0, na.rm = TRUE)) stop("cleft > cright")
+        i <- (d < tol)
+        if (any(i, na.rm = TRUE)) {
+            object[i] <- cleft[i]
+            cleft[i] <- cright[i] <- NA
+        }
+    }
     .mkR(exact = object, cleft = cleft, cright = cright,
          tleft = tleft, tright = tright)
 }

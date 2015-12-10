@@ -13,7 +13,8 @@
 \usage{
 R(object, ...)
 \method{R}{numeric}(object = NA, cleft = NA, cright = NA,
-                    tleft = NA, tright = NA, ...)
+                    tleft = NA, tright = NA, tol = sqrt(.Machine$double.eps),
+                    ...)
 \method{R}{ordered}(object, cleft = NA, cright = NA, ...)
 \method{R}{factor}(object, ...)
 \method{R}{Surv}(object, ...)
@@ -29,6 +30,8 @@ R(object, ...)
   A vector of left truncations}
   \item{tright}{
   A vector of right truncations}
+  \item{tol}{
+  Tolerance for checking if \code{cleft} < \code{cright}}
   \item{\dots}{
   other arguments, ignored except for \code{tleft} and \code{tright} to
   \code{R.ordered}}
