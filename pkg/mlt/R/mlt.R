@@ -88,6 +88,7 @@
             f <- function(gamma) loglikfct(sc * gamma, weights)
             g <- function(gamma) scorefct(sc * gamma, weights) * sc
             theta <- theta / sc
+            ui <- t(t(ui) * sc)
         } else {
             f <- function(gamma) loglikfct(gamma, weights)
             g <- function(gamma) scorefct(gamma, weights)

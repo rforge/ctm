@@ -38,3 +38,14 @@ stopifnot(isTRUE(all.equal(logLik(m1, coef(m2)), logLik(m2, coef(m1)))))
 e2 <- estfun(m2, parm = coef(m1))
 stopifnot(max(abs(e1[w > 0,] - e2)) < .Machine$double.eps)
 
+### Muriel Buri
+data("bodyfat", package = "TH.data")
+set.seed(29)
+
+y <- numeric_var("DEXfat", support = c(15, 45), bounds = c(10, 64))
+basis_y <- Bernstein_basis(y, order = 2, ui = "incre")
+x <- names(bodyfat)[-2]
+xfm <- as.formula(paste("~", x, collapse = "+"))
+m <- ctm(basis_y, shift = xfm, data = bodyfat)
+mod <- mlt(m, data = bodyfat, scale = TRUE, check = FALSE, checkGrad = FALSE)
+summary(mod)
