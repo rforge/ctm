@@ -13,9 +13,9 @@ R CMD build mlt
 R CMD check mlt
 R CMD INSTALL mlt
 
-R CMD build ltm
-R CMD check ltm
-R CMD INSTALL ltm
+R CMD build sltm
+R CMD check sltm
+R CMD INSTALL sltm
 
 
 
