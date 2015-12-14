@@ -61,9 +61,9 @@ p2 <- predict(bb, newdata = d, coef(m1))
 ## brute force; 2 times
 p3 <- matrix(predict(bb, newdata = do.call(expand.grid, d), coef(m1)), ncol = nlevels(gf))
 p4 <- matrix(predict(m2, newdata = do.call(expand.grid, d)), ncol = nlevels(gf))
-stopifnot(all.equal(p1, p2))
-stopifnot(all.equal(p2, p3))
-stopifnot(all.equal(p3, p4))
+stopifnot(all.equal(p1, p2, check.attributes = FALSE))
+stopifnot(all.equal(p2, p3, check.attributes = FALSE))
+stopifnot(all.equal(p3, p4, check.attributes = FALSE))
 ## compute derivative wrt the first element
 dp2 <- predict(bb, newdata = d, coef(m1), deriv = c(x = 1))
 
