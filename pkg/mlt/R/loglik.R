@@ -16,7 +16,7 @@
 }
 
 .log <- function(x) {
-    if (any(x < 0))
+    if (any(x < -.Machine$double.eps))
         warning(paste("negative contribution to likelihood (", min(x), "); 
                       constraints violated!"))
     log(pmax(.Machine$double.eps, x))
