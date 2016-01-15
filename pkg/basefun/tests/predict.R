@@ -62,5 +62,6 @@ dd <- list(x = x, y = y[1:3], g = rep(g[1], 3))
                dim = c(x = 5, y = 3, g = 1)))
 
 stopifnot(all.equal(drop(p3), 
-    matrix(p2[as.matrix(expand.grid(1:5, 1:3, 1))], nrow = 5)))
+    matrix(p2[as.matrix(expand.grid(1:5, 1:3, 1))], nrow = 5), 
+    check.attributes = FALSE))
 
