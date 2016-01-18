@@ -1,0 +1,192 @@
+
+\documentclass[article,nojss,shortnames]{jss}
+
+%% packages
+\usepackage{thumbpdf}
+\usepackage{amsfonts,amstext,amsmath,amssymb,amsthm}
+\usepackage{accents}
+\usepackage{color}
+\usepackage{rotating}
+\usepackage{verbatim}
+%% need no \usepackage{Sweave.sty}
+\usepackage[nolists]{endfloat}
+
+<<setup, echo = FALSE>>=
+printfun <- function(fun) {
+    f <- formals(fun)
+    cf <- sapply(f, function(x) {
+        if (is.call(x)) return(parse(text = x))
+        if (is.null(x)) return("NULL")
+        return(as.character(x))
+    })
+    fun <- as.name(match.call()[[2]])
+    paste(fun, "(", paste(names(f), ifelse(cf == "", "", " = ") , 
+          cf, collapse = ", ", sep = ""), ")", sep = "")
+}
+library("mlt")
+@
+
+\newcommand{\TODO}[1]{{\color{red} #1}}
+
+\newcommand\Torsten[1]{{\color{blue}Torsten: ``#1''}}
+
+% File with math commands etc.
+\input{defs.tex}
+
+\renewcommand{\thefootnote}{}
+
+%% code commands
+\newcommand{\Rclass}[1]{`\code{#1}'}
+%% JSS
+\author{Torsten Hothorn \\ Universit\"at Z\"urich}
+\Plainauthor{Hothorn}
+
+\title{\pkg{mlt}: Transformation Analysis in R} 
+\Plaintitle{mlt: Transformation Analysis in R}
+\Shorttitle{Transformation Analysis}
+
+\Abstract{
+tbd
+}
+
+\Keywords{transformation model, distribution regression, conditional
+distribution function, conditional quantile function, censoring,
+truncation}
+\Plainkeywords{transformation model, distribution regression, conditional
+distribution function, conditional quantile function, censoring,
+truncation}
+
+\Address{
+  Torsten Hothorn\\
+  Institut f\"ur Epidemiologie, Biostatistik und Pr\"avention \\
+  Universit\"at Z\"urich \\
+  Hirschengraben 84, CH-8001 Z\"urich, Switzerland \\
+  \texttt{Torsten.Hothorn@uzh.ch} \\
+}
+
+\begin{document}
+
+\section{Introduction}
+
+The history of statistics can be told as the story of great conceptual ideas
+and contemporaneous computable approximations thereof.  As time went by, the
+computationally inaccessible concept often vanished from the collective
+consciousness of our profession and the approximation was taught and
+understood as the real thing.  Least squares regression emerged from
+Gau{\ss}' computational trick of changing Boscovics absolute to squared
+error and it took more than 200 years for the original, and in many aspects
+advantageous, concept to surface again under the name ``quantile
+regression''.  This most prominent example of an idea got lost illustrates
+the impact computable approximations had and still have on our understanding
+of statistical methods and procedures.  In the early days of statistical
+computing, implementations of such approximations were a challenge.  With
+todays computing power and software infrastructure at our fingertips, our
+duty shall be to go back to the original concepts and search for ways how to
+reawake them for the benefit of a simpler understanding of statistical
+models and concepts.
+
+This paper describes an attempt to understand and unify a large class of
+statistical models as models for distributions.  This sounds like an
+implicitness, but do we really practice (in courses on applied statistics or
+while talking to our subject-matter collaborators) what we preach in a
+theory course?  Let's perform a small experiment: Pick, at random, a
+statistics book from your book shelf and look-up how the general linear
+model is introduced. Most probably you will find something not unlike
+\begin{eqnarray*}
+\rY = \rx^\top \beta + \varepsilon, \quad \varepsilon \sim \ND(0, \sigma^2)
+\end{eqnarray*}
+
+
+\section{Specifying Transformation Models}
+
+\subsection{Unconditional Transformation Models}
+
+\begin{eqnarray*}
+\Prob(\rY \le \ry) = \pZ(\h(\ry)) = \pZ(\basisy(\ry)^\top \parm) \\
+\end{eqnarray*}
+
+\subsection{Linear Transformation Models}
+
+\begin{eqnarray*}
+\Prob(\rY \le \ry | \rX = \rx) = \pZ(\h(\ry | \rx)) = 
+\pZ(\h(\ry) - \rx^\top \shiftparm) = \pZ(\basisyx(\ry, \rx)^\top \parm) = \pZ(\basisy(\ry)^\top \parm_1 - \rx^\top \shiftparm) \\ 
+\basisyx = (\basisy^\top, -\basisx_\text{shift}^\top)^\top
+\end{eqnarray*}
+
+\subsection{Stratified Linear Transformation Models}
+
+\begin{eqnarray*}
+\Prob(\rY \le \ry | \text{stratum} = s, \rX = \rx) = \pZ(\h(\ry | s, \rx)) =
+\pZ(\h(\ry | s) - \rx^\top \shiftparm) = \pZ(\basisyx(\ry, s, \rx)^\top \parm)
+\basisyx = (\basisy^\top \otimes \basisx_\text{stratum}^\top, -\basisx_\text{shift}^\top)^\top                                       
+\end{eqnarray*}
+
+\subsection{Conditional Transformation Models}
+
+\begin{eqnarray*}
+\basisyx = (\basisy_1^\top \otimes (\basisx_1^\top,\dots, \basisx_J^\top), -\basisx_\text{shift}^\top)
+\end{eqnarray*}
+
+<<ctm-fun, echo = FALSE, results = tex>>=
+printfun(ctm)
+@
+
+\section{Estimating Most Likely Transformations}
+
+\section{Looking at Transformation Models}
+
+\section{Classical Likelihood Inference for Most Likely Transformations}
+
+\section{Simulation Likelihood Inference for Most Likely Transformations}
+
+\section*{Computational Details}
+
+<<funs, echo = FALSE, results = hide>>=
+if (file.exists("packages.bib")) file.remove("packages.bib")
+pkgversion <- function(pkg) {
+    pkgbib(pkg)
+    packageDescription(pkg)$Version
+}
+pkgbib <- function(pkg) {
+    x <- citation(package = pkg, auto = TRUE)[[1]]
+    b <- toBibtex(x)
+    b <- gsub("Buehlmann", "B{\\\\\"u}hlmann", b)
+    b[1] <- paste("@Manual{pkg:", pkg, ",", sep = "")
+    if (is.na(b["url"])) {
+        b[length(b)] <- paste("   URL = {http://CRAN.R-project.org/package=",
+                              pkg, "}", sep = "")
+        b <- c(b, "}")
+    }
+    cat(b, sep = "\n", file = "packages.bib", append = TRUE)
+}
+pkg <- function(pkg)
+    paste("\\\\pkg{", pkg, "} \\\\citep[version~",
+          pkgversion(pkg), ",][]{pkg:", pkg, "}", sep = "")
+pkg("gamlss")
+mlt <- c("@Manual{pkg:mlt, \n
+          title = {mlt: Most Likely Transformations},\n
+          author = {Torsten Hothorn},\n
+          url = {https://r-forge.r-project.org/projects/ctm/},\n
+          year = {2015},\n
+          note = {R package version 0.0-15, svn revision 313}}\n")
+cat(mlt, sep = "\n", file = "packages.bib", append = TRUE)
+@
+
+A reference implementation of most likely transformation models is available
+in the \pkg{mlt} package \citep{pkg:mlt}. 
+The spectral projected gradient method implemented
+in the \code{spg()} function of package \pkg{BB} \citep{Varadhan_Gilbert_2009}
+was used for optimising the log-likelihood.
+\citep{R}.
+
+\bibliography{mlt,packages}
+
+\begin{appendix}
+
+\section{variables}
+
+\section{basefun}
+
+\end{appendix}
+
+\end{document}
