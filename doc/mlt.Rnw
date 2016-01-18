@@ -93,8 +93,57 @@ theory course?  Let's perform a small experiment: Pick, at random, a
 statistics book from your book shelf and look-up how the general linear
 model is introduced. Most probably you will find something not unlike
 \begin{eqnarray*}
-\rY = \rx^\top \beta + \varepsilon, \quad \varepsilon \sim \ND(0, \sigma^2)
+\rY = \alpha + \rx^\top \beta + \varepsilon, \quad \varepsilon \sim \ND(0, \sigma^2)
 \end{eqnarray*}
+where model interpretation relies on $\Ex(\rY | \rX = \rx) = \alpha + \rx^\top \beta$ and
+one estimates the intercept $\alpha$ and the 
+regression parameters $\beta$ by minimisation of the squared error 
+$(\rY - \alpha - \rx^\top \beta)^2$. With some touch-up in notation, the model 
+can be equivalently written as a model for a conditional distribution
+\begin{eqnarray*}
+\Prob(\rY \le \ry | \rX = \rx) = \Phi\left(\frac{\ry - \alpha - \rx^\top \beta}{\sigma}\right) \text{ or } (\rY | \rX = \rx) \sim \ND(\alpha + \rx^\top\beta, \sigma^2).
+\end{eqnarray*}
+This little change highlights that the model is, in fact, a model for a
+conditional distribution and not just a model for a conditional mean. It also
+stresses the fact that the variance $\sigma^2$ is a model parameter in its own right. The usual
+treatment of $\sigma^2$ as a nuisance parameter only works when the likelihood 
+is approximated by the density of the normal distribtion. Since we always observe
+intervals $(\ubar{\ry}, \bar{\ry}]$ and never real numbers $\ry$, the exact likelihood
+is
+\begin{eqnarray*}
+\Prob(\ubar{\ry} < \rY \le \bar{\ry} | \rX = \rx) = 
+\Phi\left(\frac{\bar{\ry} - \alpha - \rx^\top \beta}{\sigma}\right) - \Phi\left(\frac{\ubar{\ry} - \alpha - \rx^\top \beta}{\sigma}\right)
+\end{eqnarray*}
+which requires simultaneous optimisation of all three model parameters $\alpha$, $\beta$ and $\sigma$ but
+is exact also under other forms of random censoring. If we were going to reformulate the model
+a little further to
+\begin{eqnarray*}
+\Prob(\rY \le \ry | \rX = \rx) = \Phi(\tilde{\alpha}_1 + \tilde{\alpha}_2 \ry - \rx^\top \tilde{\beta})
+\end{eqnarray*}
+with $\tilde{\alpha}_1 = -\alpha / \sigma, \tilde{\alpha}_2 = 1 / \sigma$ and $\tilde{\beta} = \beta / \sigma$
+we see that the model is of the form
+\begin{eqnarray*}
+\Prob(\rY \le \ry | \rX = \rx) = \pZ(\h_\rY(\ry) - \rx^\top \tilde{\beta})
+\end{eqnarray*}
+with distribution function $\pZ = \Phi$ and linear transformation $\h_\rY(\ry) = \tilde{\alpha}_1 + \tilde{\alpha}_2 \ry$
+such that $\Ex(\h_\rY(\rY) | \rX = \rx) = \rx^\top \beta$. If we now change $\pZ$ to the distribution
+function of the minimum extreme value distribution and allow a non-linear monotone transformation
+$\h_\rY$ we get
+\begin{eqnarray*}
+\Prob(\rY \le \ry | \rX = \rx) = 1 - \exp(-\exp(\h_\rY(\ry) - \rx^\top \tilde{\beta}))
+\end{eqnarray*}
+which is the continuous proportional hazards, or Cox, model. From this point
+of view, the linear and the Cox model are two instances of so-called linear
+transformation models (a misleading name, because the transformation
+$\h_\rY$ is non-linear in the latter case and only the shift $\rx^\top
+\tilde{\beta}$ is linear in $\rx$).  It is now also obvious that the Cox
+model has nothing to do with censoring, let alone survival times $\rY > 0$. 
+It is a model for the conditional distribution of a continuous responses
+$\rY \in \RR$ when it is appropriate to assume that the conditional hazard
+function is scaled by $\exp(\rx^\top \tilde{\beta})$.  For both the linear
+and the Cox model, application of the exact likelihood allows the models to
+be fitted to imprecise, or ``censored'', observations $(\ubar{\ry},
+\bar{\ry}]$.
 
 
 \section{Specifying Transformation Models}
