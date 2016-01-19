@@ -26,6 +26,19 @@ printfun <- function(fun) {
 }
 library("mlt")
 library("survival")
+library("lattice")
+library("gridExtra")
+library("grid") ### for textGrob
+library("latticeExtra")
+trellis.par.set(list(plot.symbol = list(col=1,pch=20, cex=0.7),
+                     box.rectangle = list(col=1),
+                     box.umbrella = list(lty=1, col=1),
+                     strip.background = list(col = "white")))
+ltheme <- canonical.theme(color = FALSE)     ## in-built B&W theme
+ltheme$strip.background$col <- "transparent" ## change strip bg
+lattice.options(default.theme = ltheme)
+library("colorspace")
+library("multcomp")
 @
 
 \newcommand{\TODO}[1]{{\color{red} #1}}
@@ -283,6 +296,416 @@ printfun(ctm)
 \section{Classical Likelihood Inference for Most Likely Transformations}
 
 \section{Simulation Likelihood Inference for Most Likely Transformations}
+
+\section{Applications}
+
+\paragraph{Quantile Regression: Head Circumference}
+
+The Fourth Dutch Growth Study \citep{Fredriks_Buuren_Burgmeijer_2000} 
+is a
+cross-sectional study on growth and development of the Dutch population
+younger than $22$ years.  \cite{Stasinopoulos_Rigby_2007} fitted
+a growth curve to head circumferences (HC) of $7040$ boys using a GAMLSS
+model with a Box-Cox $t$ distribution describing the first four moments of
+head circumference conditionally on age.  The model showed evidence of
+kurtosis, especially for older boys.  We fitted the same growth curves by the
+conditional transformation model $(\Phi, (\bern{3}(\text{HC})^\top \otimes
+\bernx{3}(\text{age}^{1/3})^\top)^\top, \parm)$ by maximisation of the approximate
+log-likelihood under $3 \times 4$ linear constraints. 
+
+<<head, echo = TRUE>>=
+data("db", package = "gamlss.data")
+db$lage <- with(db, age^(1/3))
+B1 <- Bernstein_basis(order = 3, ui = "incre",
+                      var = numeric_var("head", support = quantile(db$head, c(.1, .9)), bounds = range(db$head)))
+B2 <- Bernstein_basis(order = 3, ui = "none",
+                      var = numeric_var("lage", support = quantile(db$lage, c(.1, .9)), bounds = range(db$lage)))
+m <- ctm(B1, interacting = B2)
+mod <- mlt(m, data = db, maxit = 5000, check = FALSE, scale = TRUE)
+pr <- expand.grid(s <- mkgrid(m, 100))
+pr$p <- c(predict(mod, newdata = s, type = "distribution"))
+pr$lage <- pr$lage^3
+pr$cut <- factor(pr$lage > 2.5)
+levels(pr$cut) <- c("Age < 2.5 yrs", "Age > 2.5 yrs")
+@
+
+Figure~\ref{fig:head-plot} shows the
+data overlaid with quantile curves obtained via inversion of the estimated
+conditional distributions.  The figure very closely reproduces the growth
+curves presented in Figure~16 of \cite{Stasinopoulos_Rigby_2007} and also
+indicates a certain asymmetry towards older boys.
+
+\begin{figure}[t]
+\begin{center}
+<<head-plot, fig = TRUE, echo = FALSE>>=
+pfun <- function(x, y, z, subscripts, at, ...) {
+    panel.contourplot(x, y, z, subscripts,
+        at = c(0.4, 2, 10, 25, 50, 75, 90, 98, 99.6)/ 100, ...)
+    panel.xyplot(x = db$age, y = db$head, pch = 20,
+                 col = rgb(.1, .1, .1, .1), ...)
+}
+print(contourplot(p ~ lage + head | cut, data = pr, panel = pfun, region = FALSE,
+            xlab = "Age (years)", ylab = "Head circumference (cm)",
+            scales = list(x = list(relation = "free"))))
+@
+\caption{Head Circumference Growth. Observed head circumference and age for
+         $7040$ boys with estimated quantile curves for
+         $\tau = 0.04, 0.02, 0.1, 0.25, 0.5, 0.75, 0.9, 0.98, 0.996$.
+         \label{fig:head-plot}}
+\end{center}
+\end{figure}
+
+\paragraph{Survival Analysis: German Breast Cancer Study Group-2 Trial} 
+
+This prospective, controlled clinical trial on the treatment of node positive
+breast cancer patients was conducted by the German Breast Cancer Study 
+Group \citep[GBSG-2,][]{gbsg2:1994}.  Patients not older than $65$ years with
+positive regional lymph nodes but no distant metastases were included in
+the study.  Out of $686$ women, $246$ received hormonal therapy whereas the
+control group of $440$ women did not receive hormonal therapy.  Additional
+variables include age, menopausal status, tumor size, tumor grade, number of
+positive lymph nodes, progesterone receptor and estrogen receptor.  The
+right-censored recurrence-free survival time is the response variable of
+interest.
+
+The Cox model $(\pMEV, (\bern{5}^\top, \I(\text{hormonal
+therapy}))^\top, \parm)$ implements the transformation function $\h(\ry |
+\text{treatment}) = \bern{5}(\ry)^\top \parm_1 + \I(\text{hormonal therapy})
+\beta$ where $\bern{5}^\top \parm_1$ is the log-cumulative baseline hazard function
+parameterised by a Bernstein polynomial and $\beta \in \RR$ is the
+log-hazard ratio of hormonal therapy. 
+
+<<GBSG2-Cox, echo = TRUE>>=
+data("GBSG2", package = "TH.data")
+GBSG2$y <- with(GBSG2, Surv(time, cens))
+dist <- "Min"
+yvar <- numeric_var("y", support = c(100.0, max(GBSG2$time)), bounds = c(0, Inf))
+### Cox model
+By <- Bernstein_basis(var = yvar, order = 10, ui = "incre")
+fm <- "horTh + age + menostat + tsize + tgrade + pnodes + progrec + estrec"
+m <- ctm(By, shift = as.formula(paste("~",fm)), todistr = dist, data = GBSG2)
+coxmod <- mlt(m, data = GBSG2, maxit = 3000, scale = TRUE, check = FALSE)
+coef(coxmod)
+AIC(coxmod)
+
+coxmod2 <- coxph(as.formula(paste("Surv(time, cens) ~", fm)), data = GBSG2)
+AIC(coxmod2)
+cf <- coef(coxmod2)
+n <- length(coef(coxmod))
+n <- (n - length(cf) + 1):n
+
+cbind(coef(coxmod2), coef(coxmod)[n])
+cbind(sqrt(diag(vcov(coxmod))[n]), sqrt(diag(vcov(coxmod2))))
+
+cf1 <- cftest(coxmod)
+cf2 <- cftest(coxmod2)
+@
+
+
+
+This is the classical Cox model with one treatment parameter $\beta$ 
+but fully parameterised baseline transformation function which was fitted by the exact
+log-likelihood under five linear constraints. The model assumes proportional hazards, an assumption whose
+appropriateness we wanted to assess using the non-proportional hazards model
+$(\pMEV, (\bern{5}^\top \otimes (1, \I(\text{hormonal therapy})))^{\top}, \parm)$ with
+transformation function 
+\begin{eqnarray*}
+\h(\ry | \text{treatment}) = \bern{5}(\ry)^\top \parm_1 + \I(\text{hormonal therapy}) \bern{5}(\ry)^\top \parm_2. 
+\end{eqnarray*}
+The function $\bern{5}^\top \parm_2$ is the time-varying treatment effect
+and can be interpreted as the deviation, on the scale of the transformation
+function, induced by the hormonal therapy.  Under the null hypothesis of no
+treatment effect, we would expect $\parm_2 \equiv \bold{0}$.  This monotone
+deviation function adds five linear constraints to the model. We first
+compared the fitted survivor functions obtained from the model including 
+a time-varying treatment effect with the Kaplan-Meier
+estimators in both treatment groups.  The left panel of
+Figure~\ref{fig_5_logrank} shows a nicely smoothed version of the survivor
+functions obtained from this transformation model.  The right
+panel of Figure~\ref{fig_5_logrank} shows the time-varying treatment effect
+$\bern{5}^\top \hat{\parm}_2$, together with a $95\%$ confidence band
+computed from the joint normal distribution of $\hat{\parm}_2$ for a grid
+over time as described by \cite{Hothorn_Bretz_Westfall_2008}; 
+the method is
+much simpler than other methods for inference on time-varying
+effects \citep[for example][]{Sun_Sundaram_Zhao_2009}.  The $95\%$
+confidence interval around the log-hazard ratio $\hat{\beta}$ is plotted in
+addition and since the latter is fully covered by the confidence band for
+the time-varying treatment effect there is no reason to question the
+treatment effect computed under the proportional hazards assumption.
+
+<<GBSG2-timevarying, echo = TRUE>>=
+### two separate transformation functions
+BhorTh <- as.basis(~ horTh - 1, data = GBSG2, remove_intercept = FALSE)
+By <- Bernstein_basis(order = 5, ui = "incre", var = yvar)
+m <- ctm(By, interacting = BhorTh, todistr = dist)
+mod <- mlt(m, data = GBSG2, check = FALSE)
+AIC(mod)
+
+s <- mkgrid(mod, 100)
+nd <- expand.grid(s)
+nd$h <- c(predict(mod, newdata = s))
+nd$p <- c(predict(mod, newdata = s, type = "distribution"))
+
+### deviation transformation
+BhorTh <- as.basis(~ horTh, data = GBSG2)
+m <- ctm(By, interacting = BhorTh, todistr = dist)
+mod <- mlt(m, data = GBSG2, check = FALSE)
+AIC(mod)
+
+s <- mkgrid(mod, 15)
+s$y <- s$y[s$y > 100 & s$y < 2400]
+nd <- expand.grid(s)
+K <- model.matrix(m, data = nd)
+Kyes <- K[nd$horTh == "yes",]
+Kyes[,1:6] <- 0
+gh <- glht(parm(coef(mod), vcov(mod)), Kyes)
+ci <- confint(gh)
+
+m <- ctm(By, shifting = ~ horTh, todistr = dist, data = GBSG2)
+coxmod <- mlt(m, data = GBSG2, check = FALSE)
+AIC(coxmod)
+
+K <- matrix(0, nrow = 1, ncol = length(coef(coxmod)))
+K[,length(coef(coxmod))] <- 1
+ci2 <- confint(glht(coxmod, K))
+coxy <- s$y
+
+### 2 separate KM curves
+s <- mkgrid(mod, 50)
+s$y <- s$y[s$y > 100 & s$y < 2400]
+coxnd <- expand.grid(s)
+coxnd$p <- c(predict(coxmod, newdata = s, type = "survivor"))
+library("prodlim")
+coxnd$pp <- unlist(predict(prodlim(Surv(time, cens) ~ horTh, data = GBSG2), 
+                 newdata = data.frame(horTh = s$horTh), times = s$y))
+@
+
+\begin{figure}[t]
+\begin{center}
+<<fig_5_logrank, fig = TRUE, echo = FALSE>>=
+layout(matrix(1:2, nrow = 1))
+par("mai" = par("mai") * c(1, .95, 1, .85))
+plot(coxnd$y, coxnd$p, ylim = c(0, 1), xlab = "Survival time (days)",
+     ylab = "Probability", type = "n", las = 1)
+with(subset(coxnd, horTh == "no"), lines(y, p, col = "grey", lty = 2))
+with(subset(coxnd, horTh == "yes"), lines(y, p, lty = 2))
+with(subset(coxnd, horTh == "no"), lines(y, pp, type = "s", col = "grey"))
+with(subset(coxnd, horTh == "yes"), lines(y, pp, type = "s"))
+legend("bottomright", lty = c(1, 1, 2, 2), col = c("black", "grey", "black", "grey"),
+       legend = c("hormonal therapy, KM", "no hormonal therapy, KM",
+                  "hormonal therapy, MLT", "no hormonal therapy, MLT"), bty = "n", cex = .6)
+plot(coxy, ci$confint[, "Estimate"], ylim = range(ci$confint), type = "n",
+     xlab = "Survival time (days)", ylab = "Transformation deviation", las = 1)
+polygon(c(coxy, rev(coxy)), c(ci$confint[,"lwr"], rev(ci$confint[, "upr"])),
+        border = NA, col = rgb(.1, .1, .1, .1))
+lines(coxy, ci$confint[, "Estimate"], lty = 1, lwd = 1)
+lines(coxy, rep(ci2$confint[,"Estimate"], length(coxy)), lty = 2, lwd = 1)
+lines(coxy, rep(0, length(coxy)), lty = 3)
+polygon(c(coxy[c(1, length(coxy))], rev(coxy[c(1, length(coxy))])), 
+        rep(ci2$confint[,c("lwr", "upr")], c(2, 2)), 
+        border = NA, col = rgb(.1, .1, .1, .1))
+legend("bottomright", lty = 1:2, lwd = 1, legend = c("time-varying treatment effect", 
+       "time-constant log-hazard ratio"), bty = "n", cex = .6)
+
+@
+\caption{GBSG-2. Estimated survivor functions 
+         by the most likely transformation model (MLT) and the Kaplan-Meier (KM) estimator in the two 
+         treatment groups (left panel). 
+         Verification of proportional hazards (right panel): The log-hazard ratio $\hat{\beta}$
+         (dashed line) with $95\%$ confidence interval (dark grey) is fully 
+         covered by a $95\%$ confidence band for the time-varying treatment effect (light grey,
+         the estimate is the solid line)
+         computed from a non-proportional hazards model. \label{fig_5_logrank}}
+\end{center}
+\end{figure}
+
+
+In a second step, we allowed an age-varying treatment effect 
+in the model $(\pMEV, (\bern{5}(\ry)^\top \otimes
+       (\I(\text{hormonal therapy}), 1 - \I(\text{hormonal therapy}))
+       \otimes \bernx{5}(\text{age})^\top)^\top, \parm)$. For both treatment
+groups, we estimated a conditional transformation function of survival time
+$\ry$ given age parameterised as the tensor basis of two Bernstein bases. Each of the
+two basis functions comes with $5 \times 6$ linear constraints, so the model
+was fitted under $60$ linear constraints. 
+Figure~\ref{fig_6_GBSG2} allows an assessment of the prognostic and
+predictive properties of age.  As the surivor functions were clearly larger
+under hormonal treatment for all patients, the positive treatment effect
+applied to all patients.  However, the size of the treatment effect varied
+greatly.  For women younger than $30$, the effect was most pronounced and
+levelled-off a little for older patients.  In general, the survival times were
+longest for women between $40$ and $60$ years old.  Younger women suffered
+the highest risk; for women older than $60$ years, the risk started to
+increase again.  This effect was shifted towards younger women by the
+application of hormonal treatment.
+
+<<GBSG2-agevarying, echo = TRUE>>=
+### age-varying treatment effect
+Bage <- Bernstein_basis(order = 3, var = numeric_var("age", support = range(GBSG2$age)))
+BhorTh <- as.basis(~ horTh - 1, data = GBSG2)
+
+m <- ctm(By, interacting = b(horTh = BhorTh, age = Bage), todistr = dist)
+mod <- mlt(m, data = GBSG2, check = FALSE)
+
+s <- mkgrid(m, 100)
+nd <- expand.grid(s)
+nd$h <- c(predict(mod, newdata = s))
+nd$d <- c(predict(mod, newdata = s, type = "density"))
+nd$p <- c(predict(mod, newdata = s, type = "distribution"))
+nd$l <- c(predict(mod, newdata = s, type = "hazard"))
+@
+
+\begin{figure}[t]
+\begin{center}
+<<fig_6_GBSG2, fig = TRUE, echo = FALSE>>=
+nlev <- c(no = "without hormonal therapy", yes = "with hormonal therapy")
+levels(nd$horTh) <- nlev[match(levels(nd$horTh), names(nlev))]
+contourplot(I(1 - p) ~ age + y | horTh, data = nd, at = 1:9 / 10,
+            ylab = "Survival time (days)", xlab = "Age (years)",
+            scales = list(x = list(alternating = c(1, 1))))
+@
+\caption{GBSG-2. Prognostic and predictive effect of age. The contours depict the
+         conditional survivor functions given treatment and age of the patient. 
+         \label{fig_6_GBSG2}}
+\end{center}
+\end{figure}
+
+Finally, we fitted the Cox model $(\pMEV, (\bern{5}^\top, \tilde{\rx}^\top)^\top,
+\parm)$ to the data, where $\tilde{\rx}$ contains the treatment indicator
+and all other variables in the transformation function $\h(\ry | \rx) =
+\bern{5}(\ry)^\top \parm_1 + \tilde{\rx}^\top \shiftparm$.  In contrast to the
+classical Cox model where only $\shiftparm$ is estimated by the partial
+likelihood, we estimated all model parameters simultaneously under five linear constraints.  
+The results obtained from the partial and the exact log-likelihood are practically
+equivalent, Figure~\ref{fig_7_cox} shows the corresponding $z$-statistics for
+$\hat{\shiftparm}$.
+
+\begin{figure}[t]
+\begin{center}
+<<fig_7_cox, fig = TRUE, width = 3.5, echo = FALSE>>=
+lim <- range(cf1$test$tstat[n]) * c(1, 1.375)
+plot(cf1$test$tstat[n], cf2$test$tstat, xlab = "z-Statistic MLT exact likelihood", 
+     ylab = "z-Statistic Cox partial likelihood", xlim = lim, ylim = lim, las = 1)
+abline(a = 0, b = 1, col = "grey")
+points(cf1$test$tstat[n], cf2$test$tstat)
+text(cf1$test$tstat[n], cf2$test$tstat, labels =  names(cf2$test$coefficients), pos = 4,
+     cex = .7)
+@
+\caption{GBSG-2. Comparison of $z$-statistics for all variables obtained from the partial likelihood 
+         (function \code{coxph()} in package \pkg{survival}) and 
+         the exact likelihood with parameterisation of the log-cumulative baseline hazard function. 
+         \label{fig_7_cox}}
+\end{center}
+\end{figure}
+
+\paragraph{Count Regression: Tree Pipit Counts}
+
+\cite{Mueller_Hothorn_2004} reported data on the number of tree pipits
+\textit{Anthus trivialis}, a small passerine bird, counted on $86$ forest plots at a light gradient
+ranging from open and sunny stands (small cover storey) to dense and dark
+stands (large cover storey).  We modelled the conditional distribution of the
+number of tree pipits at one plot given the cover storey at this plot 
+by the transformation
+model $(\Phi, (\basisy^\top \otimes \bernx{4}(\text{cover storey})^\top)^\top,
+\parm)$, where $\basisy(y) = \evec_5(y + 1), y = 0, \dots, 4$; the model
+was fitted under $4 \times 5$ linear constraints. In this
+model for count data, the conditional distribution depends on
+both the number of counted birds and the cover storey and the effect of
+cover storey may change with different numbers of birds observed.  The left
+panel of Figure~\ref{fig_8_treepipit} depicts the observations and the
+center panel shows the conditional distribution function evaluated for $0,
+\dots, 5$ observed birds.  The conditional distribution function obtained
+from a generalised additive Poisson (GAM) model with smooth mean effect of cover
+storey is given in the right panel.  Despite some overfitting, this model is
+more restrictive than our transformation model because one mean function determines the whole distribution
+(the local minima of the conditional distributions as a function of cover storey were
+constant in the right panel whereas they were shifted towards higher values of
+cover storey in the center panel).
+
+<<treepipit, echo = TRUE>>=
+data("treepipit", package = "coin")
+
+tmp <- treepipit
+tmp$counts <- ordered(tmp$counts)
+
+Bcs <- Bernstein_basis(order = 4, var = numeric_var("coverstorey", support = 1:110))
+Bc <- as.basis(~ counts, data = tmp, remove_intercept = TRUE,
+              contrasts.arg = list(counts = function(n)
+                  contr.treatment(n, base = 6)),
+              ui = diff(diag(5)), ci = rep(0, 4))
+
+m <- ctm(Bc, interacting = Bcs)
+mod <- mlt(m, data = tmp, maxit = 10000, check = FALSE)
+
+s <- mkgrid(m, 100)
+s$counts <- s$counts[1:5]
+nd <- expand.grid(s)
+nd$p <- c(predict(mod, newdata = s, type = "distribution"))
+
+### produce a table
+(tpt <- xtabs(~ counts + coverstorey, data = treepipit))
+
+### construct a data frame with frequencies
+treepipit2 <- sapply(as.data.frame(tpt, stringsAsFactors = FALSE),
+                     as.integer)
+
+s <- mkgrid(m, 10)
+s$counts <- s$counts[1]
+K <- model.matrix(m, data = expand.grid(s))
+#g <- glht(parm(coef(mod), vcov(mod)), linfct = K)
+#confint(g)
+
+library("mgcv")
+pmod <- gam(counts ~ s(coverstorey), data = treepipit, 
+            family = "poisson")
+nd$lambda <- predict(pmod, newdata = nd, type = "response")
+@
+
+\begin{figure}[t]
+\begin{center}
+<<fig_8_treepipit, fig = TRUE, width = 6, height = 3, echo = FALSE>>=
+layout(matrix(1:3, nr = 1))
+par("mai" = par("mai") * c(1, .95, 1, .85))
+xlim <- range(treepipit[, "coverstorey"]) * c(0.98, 1.05)
+xlab <- "Cover storey"
+ylab <- "Number of tree pipits (TP)"
+### scatterplot again; plots are proportional to number of plots
+plot(counts ~ coverstorey, data = treepipit2, cex = sqrt(Freq),
+     ylim = c(-.5, 5), xlab = xlab, ylab = ylab, col = "darkgrey", 
+     xlim = xlim, las = 1, main = "Observations")
+
+plot(c(0, 110), c(0, 1), type = "n", xlab = xlab, ylab = "Conditional probability",
+     xlim = xlim, las = 1, main = "MLT")
+with(subset(nd, counts == "0"), lines(coverstorey, p, lty = 1))
+with(subset(nd, counts == "1"), lines(coverstorey, p, lty = 2))
+with(subset(nd, counts == "2"), lines(coverstorey, p, lty = 3))
+with(subset(nd, counts == "3"), lines(coverstorey, p, lty = 4))
+with(subset(nd, counts == "4"), lines(coverstorey, p, lty = 5))
+abline(h = 1, lty = 6)
+legend("bottomright", lty = 1:6, legend = c(expression(TP == 0),
+                                            expression(TP <= 1),
+                                            expression(TP <= 2),
+                                            expression(TP <= 3),
+                                            expression(TP <= 4),
+                                            expression(TP <= 5)), bty = "n")
+
+plot(c(0, 110), c(0, 1), type = "n", xlab = xlab, ylab = "Conditional probability",
+     xlim = xlim, las = 1, main = "GAM")
+with(subset(nd, counts == "0"), lines(coverstorey, ppois(0, lambda), lty = 1))
+with(subset(nd, counts == "1"), lines(coverstorey, ppois(1, lambda), lty = 2))
+with(subset(nd, counts == "2"), lines(coverstorey, ppois(2, lambda), lty = 3))
+with(subset(nd, counts == "3"), lines(coverstorey, ppois(3, lambda), lty = 4))
+with(subset(nd, counts == "4"), lines(coverstorey, ppois(4, lambda), lty = 5))
+abline(h = 1, lty = 6)
+@
+\caption{Tree Pipit Counts. Observations (left panel, the size of the points is
+         proportional to the number of observations) and estimated conditional distribution
+         of number of tree pipits given cover storey by the most likely transformation model (MLT, center panel)
+         and a generalised additive Poisson model (function \code{gam()} in package \pkg{mgcv}, 
+         GAM, right panel). \label{fig_8_treepipit}}
+\end{center}
+\end{figure}
 
 \section*{Computational Details}
 
