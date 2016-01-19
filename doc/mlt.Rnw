@@ -9,7 +9,7 @@
 \usepackage{rotating}
 \usepackage{verbatim}
 %% need no \usepackage{Sweave.sty}
-\usepackage[nolists]{endfloat}
+%%\usepackage[nolists]{endfloat}
 
 <<setup, echo = FALSE>>=
 printfun <- function(fun) {
@@ -20,10 +20,12 @@ printfun <- function(fun) {
         return(as.character(x))
     })
     fun <- as.name(match.call()[[2]])
-    paste(fun, "(", paste(names(f), ifelse(cf == "", "", " = ") , 
+    ret <- paste(fun, "(", paste(names(f), ifelse(cf == "", "", " = ") , 
           cf, collapse = ", ", sep = ""), ")", sep = "")
+    cat(ret, "\n")
 }
 library("mlt")
+library("survival")
 @
 
 \newcommand{\TODO}[1]{{\color{red} #1}}
@@ -145,7 +147,101 @@ and the Cox model, application of the exact likelihood allows the models to
 be fitted to imprecise, or ``censored'', observations $(\ubar{\ry},
 \bar{\ry}]$.
 
+The class of linear transformation models is a subclass of conditional 
+transformation models. The conditional distribution function is then
+\begin{eqnarray*}
+\Prob(\rY \le \ry | \rX = \rx) = \pZ(\h(\ry | \rx))
+\end{eqnarray*}
+where the transformation function $\h$ depends on both $\ry$ and $\rx$. We 
+describe how such models can be specified, fitted and analysed in \proglang{R}
+using the \pkg{mlt} add-on package. Before we start looking at details,
+we illustrate the workflow by means of an example from unconditional density 
+estimation.
 
+The duration of eruptions and the waiting time between eruptions of the Old
+Faithful geyser in the Yellowstone national park became a standard benchmark
+for non-parametric density estimation \citep[the original data were given
+by][]{Azzalini_Bowman_1990}.  An unconditional density estimate for the
+duration of the eruptions needs to deal with censoring because exact
+duration times are only available for the day time measurements.  At night
+time, the observations were either left-censored (``short'' eruption),
+interval-censored (``medium'' eruption) or right-censored (``long''
+eruption) as explained by \cite{Azzalini_Bowman_1990}.  This fact was widely
+ignored in analyses of the Old Faithful data because most non-parametric
+kernel techniques cannot deal with censoring. We fit the parameters
+$\parm$ in the transformation model
+\begin{eqnarray*}
+\Prob(\rY \le \ry) = \Phi(\h(\ry)) = \Phi(\basisy(\ry)^\top \parm)
+\end{eqnarray*}
+by maximisation of the exact likelihood as follows. After loading package
+\pkg{mlt} we specify the \code{duration} variable we are interested in
+<<geyser-var, echo = TRUE>>=
+dvar <- numeric_var("duration", support = c(1.0, 5.0), bound = c(0, Inf))
+@
+This abstract representation refers to a positive and conceptually
+continuous variable \code{duration}.  We then set-up a basis function
+$\basisy$ for this variable in the interval $[1, 5]$, in our case a monotone
+increasing Bernstein polynomial of order eight
+<<geyser-basis, echo = TRUE>>=                            
+Bd <- Bernstein_basis(order = 8, var = dvar, ui = "incre")
+@
+The (in our case unconditional) transformation model is now fully described by
+the parameterisation $\h(\ry) = \basisy(\ry)^\top \parm$ and $\pZ = \Phi$
+<<geyser-ctm, echo = TRUE>>=
+md <- ctm(Bd, todistr = "Normal")
+@
+and we can generate a grid of duration times from
+<<geyser-grid, echo = TRUE>>=
+str(ndd <- mkgrid(md, 100))
+@
+Only after the model was specified we need to load the data containing the
+\code{duration} variable as a \code{Surv} object: 
+<<geyser-data, echo = TRUE>>=
+data("geyser", package = "TH.data")
+head(geyser)
+@
+The most likely transformation $\hat{\h}(\ry) = \basisy(\ry)^\top \hat{\parm}$ is 
+now obtained from the maximum likelihood estimate $\hat{\parm}$ computed as
+<<geyser-fit, echo = TRUE>>=
+modd <- mlt(md, data = geyser, check = FALSE)
+logLik(modd)
+coef(modd)
+vcov(modd)
+@
+and the model is best visualised in terms of the corresponding density
+$\phi(\basisy(\ry)^\top \hat{\parm}) \basisy^\prime(\ry)^\top \hat{\parm}$
+<<geyser-density, echo = TRUE>>=
+ndd$d <- predict(modd, newdata = ndd, type = "density")
+@
+depicted in Figure~\ref{fig:geyser-plot}. The plot shows the well-known bimodal
+distribution in a nice smooth way. Several things are quite unusual in this short example. 
+First, the model was specified without reference to the actual observations, maybe 
+with the exception of the domain of the Bernstein polynomial. Second, although the
+model is fully parametric, the resulting density resembles a non-parametric flexibility.
+Third, the exact likelihood as defined by the interval-censored observations, was used
+to obtain the model. Fourth, no regularisation was necessary due to the monotonicity
+constraint (implemented as linear constraints for maximum likelihood estimation) and thus
+standard likelihood asymptotics work for $\hat{\parm}$. Fifth,
+inspection of the parameter estimates is uninteresting, the model is better looked at
+by means of the estimated distribution, density, quantile, hazard or cumulative 
+hazard functions. Sixth, because the model is a model for a full distribution, we can 
+easily draw random samples from the model and refit its parameters using the parametric
+bootstrap. Seventh, all of this is not only possible theoretically but readily implemented
+in package \pkg{mlt}. The only remaining question is ``Do all this nice properties
+carry over to the conditional case, \ie to regression models?''. The answer to this
+question is ``yes!'' and the rest of this paper describes the details following the
+workflow sketched in this section.
+
+\begin{figure}
+\begin{center}
+<<geyser-plot, echo = TRUE, fig = TRUE>>=
+plot(d ~ duration, data = ndd, type = "l", ylab = "Density")
+@
+\caption{Estimated density for duration. \label{fig:geyser-plot}}
+\end{center}
+\end{figure}
+
+ 
 \section{Specifying Transformation Models}
 
 \subsection{Unconditional Transformation Models}
@@ -176,7 +272,7 @@ be fitted to imprecise, or ``censored'', observations $(\ubar{\ry},
 \basisyx = (\basisy_1^\top \otimes (\basisx_1^\top,\dots, \basisx_J^\top), -\basisx_\text{shift}^\top)
 \end{eqnarray*}
 
-<<ctm-fun, echo = FALSE, results = tex>>=
+<<ctm-fun, echo = FALSE>>=
 printfun(ctm)
 @
 
