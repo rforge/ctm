@@ -11,7 +11,7 @@
 %% need no \usepackage{Sweave.sty}
 %%\usepackage[nolists]{endfloat}
 
-<<setup, echo = FALSE>>=
+<<setup, echo = FALSE, results = "hide", message = FALSE>>=
 printfun <- function(fun) {
     f <- formals(fun)
     cf <- sapply(f, function(x) {
@@ -195,7 +195,7 @@ This abstract representation refers to a positive and conceptually
 continuous variable \code{duration}.  We then set-up a basis function
 $\basisy$ for this variable in the interval $[1, 5]$, in our case a monotone
 increasing Bernstein polynomial of order eight
-<<geyser-basis, echo = TRUE>>=                            
+<<geyser-basis, echo = TRUE>>=
 Bd <- Bernstein_basis(order = 8, var = dvar, ui = "incre")
 @
 The (in our case unconditional) transformation model is now fully described by
@@ -247,7 +247,7 @@ workflow sketched in this section.
 
 \begin{figure}
 \begin{center}
-<<geyser-plot, echo = TRUE, fig = TRUE>>=
+<<geyser-plot, echo = TRUE>>=
 plot(d ~ duration, data = ndd, type = "l", ylab = "Density")
 @
 \caption{Estimated density for duration. \label{fig:geyser-plot}}
@@ -257,11 +257,183 @@ plot(d ~ duration, data = ndd, type = "l", ylab = "Density")
  
 \section{Specifying Transformation Models}
 
+In this section we study a cascade of increasingly complex transformation models
+and discuss how one can specify such models using the infrastructure provided
+by the \pkg{mlt} package. We start with the simplest case of models for
+unconditional distribution functions.
+
 \subsection{Unconditional Transformation Models}
 
+The distribution function on an at least ordered response $\rY$ is
+defined in terms of a transformation function $\h$ and a distribution
+function $\pZ$. The transformation function is parameterised in terms
+of a basis function $\basisy$:
 \begin{eqnarray*}
-\Prob(\rY \le \ry) = \pZ(\h(\ry)) = \pZ(\basisy(\ry)^\top \parm) \\
+\Prob(\rY \le \ry) = \pZ(\h(\ry)) = \pZ(\basisy(\ry)^\top \parm).
 \end{eqnarray*}
+The triple $(\pZ, \basisy, \parm)$ fully defines the distribution of $\rY$ 
+is called transformation model.
+The choice of the basis function $\basisy$ depends on the measurement 
+scale of $\rY$ and we can differentiate between the following situations.
+
+\paragraph{Discrete Models for Categorical Responses}
+
+For ordered categorical responses $\rY$ from a
+finite sample space $\samY = \{\ry_1, \dots, \ry_K\}$ we assign one
+parameter to each element of the sample space except $\ry_K$.  This
+corresponds to the basis function $\basisy(\ry_k) = \evec_{K - 1}(k)$, where
+$\evec_{K-1}(k)$ is the unit vector of length $K - 1$ with its
+$k$th element being one.  The transformation function $\h$ is
+\begin{eqnarray*}
+\h(\ry_k) & = & \evec_{K - 1}(k)^\top \parm = \eparm_k \in \RR, \quad 1 \le k < K, \quad
+\text{st} \quad \eparm_1 < \dots <
+\eparm_{K - 1}
+\end{eqnarray*}
+with $\h(\ry_K) = \infty$,  and the unconditional distribution function of $\pY$ is
+$\pY(\ry_k) = \pZ(\eparm_k)$. Note that monotonicity of $\h$ is guaranteed by the
+$K - 2$ linear constraints $\eparm_2 - \eparm_1 > 0, \dots, \eparm_{K -1} -
+\eparm_{K -2} > 0$ when constrained optimisation is performed.
+
+For an ordered categorical variable at five levels with density $(.15, .25, .18, .23, .19)$
+<<ctm-uncon-disc-var>>=
+yvar <- ordered_var("y", levels = LETTERS[1:5])
+(gy <- mkgrid(yvar))
+dy <- c(.15, .25, .18, .23, .19)
+@
+we can specify the discrete basis function $\basisy$ as
+<<ctm-uncon-disc-basis>>=
+a <- as.basis(~ y, data = yvar, remove_intercept = TRUE,
+              contrasts.arg = list(y = function(n)
+                  contr.treatment(n, base = 5)),
+              ui = diff(diag(4)), ci = rep(0, 3))
+model.matrix(a, data = as.data.frame(gy))
+@
+The basis function evaluated at the levels of the factor can
+be obtained from the \code{model.matrix} method, along with
+the linear constraints imposed by this basis function.
+
+The conditional transformation model (although being unconditional here) 
+is defined using the \code{ctm} function.
+<<ctm-uncon-disc-ctm>>=
+my <- ctm(a)
+@
+An unfitted model can be set-up by a call to the fitting function
+\code{mlt} with argument \code{dofit = FALSE}. A model with exactly
+the density defined above only requires the corresponding coefficients
+to be given to the resulting object
+<<ctm-uncon-disc-mlt>>=
+mody <- mlt(my, data = as.data.frame(gy), dofit = FALSE)
+coef(mody) <- qnorm(cumsum(dy[-5L]))
+@
+Because the model is now fully defined, we can draw random samples
+from this model and refit the model
+<<ctm-uncon-disc-sim, message = FALSE>>=
+ry <- do.call("c", simulate(mody, nsim = 10000))
+ry <- ordered(ry, levels = 1:nlevels(yvar), labels = levels(yvar))
+nd <- data.frame(y = ry)
+m <- mlt(my, data = nd, check = FALSE)
+@
+The true and estimated distribution and density functions can 
+now be compared
+<<ctm-uncon-disc-output>>=
+cumsum(dy)
+c(pnorm(coef(m)), 1)
+predict(m, q = gy, type = "distribution")
+pnorm(confint(m))
+cbind(dy, diff(c(0, c(pnorm(coef(m)), 1))))
+@
+Of course, the above exercise is an extremely cumbersome way
+of estimating a discrete density those maximum likelihood estimator
+simply is
+<<ctm-uncon-table>>=
+prop.table(table(ry))
+@
+but, as we will see in the rest of this paper, a generalisation
+to the conditional case strongly relies on this parameterisation.
+
+\paragraph{Continuous Models for Continuous Responses}
+
+For continuous responses $\rY$ the
+parameterisation $\h(\ry) = \basisy(\ry)^\top \parm$, and thus also
+$\hatpY$, should be smooth in $\ry$, so any polynomial or spline basis is a
+suitable choice for $\basisy$.  We apply Bernstein polynomials \citep[for an
+overview see][]{Farouki_2012} of order $M$
+($\dimparm = M + 1$) defined on the interval $[\ubar{\imath}, \bar{\imath}]$ with
+\begin{eqnarray*}
+\bern{M}(\ry) & = & (M + 1)^{-1}(f_{\text{Be}(1, M + 1)}(\tilde{\ry}), \dots,
+                            f_{\text{Be}(m, M - m + 1)}(\tilde{\ry}), \dots,
+                            f_{\text{Be}(M + 1, 1)}(\tilde{\ry}))^\top \in \RR^{M + 1} \\
+\h(\ry) & = & \bern{M}(\ry)^\top \parm =
+              \sum_{m = 0}^{M} \eparm_m f_{\text{Be}(m + 1, M - m + 1)}(\tilde{\ry}) / (M + 1) \\
+\h^\prime(\ry) & = & \bern{M}^\prime(\ry)^\top \parm =
+              \sum_{m = 0}^{M - 1} (\eparm_{m + 1} - \eparm_m) f_{\text{Be}(m + 1, M - m)}(\tilde{\ry}) M /
+((M + 1) (\bar{\imath} - \ubar{\imath}))
+\end{eqnarray*}
+where $\tilde{\ry} = (\ry -\ubar{\imath}) / (\bar{\imath} - \ubar{\imath}) \in [0,
+1]$ and $f_{\text{Be}(m, M)}$ is the density of the Beta distribution with
+parameters $m$ and $M$.  This choice is computationally attractive because
+strict monotonicity can be formulated as a set of $M$ linear constraints on the
+parameters $\eparm_m < \eparm_{m + 1}$ for all $m = 0, \dots, M$
+\citep{Curtis_Ghosh_2011}.  Therefore, application of constrained optimisation guarantees
+monotone estimates $\hat{\h}_N$. The basis contains an intercept.  
+
+As an example, we want to estimate the unconditional distribution of
+waiting times in the Old Faithful data. The Bernstein polynomial
+for \code{waiting} is defined as
+<<geyser-w>>=
+wvar <- numeric_var("waiting", support = c(40.0, 100), bound = c(35, 115))
+Bw <- Bernstein_basis(order = 8, var = wvar, ui = "incre")
+@
+The (in our case unconditional) transformation model is now fully described by
+the parameterisation $\h(\ry) = \basisy(\ry)^\top \parm$ and $\pZ = \Phi$
+<<geyser-w-ctm, echo = TRUE>>=
+mw <- ctm(Bw, todistr = "Normal")
+@
+and we can generate a grid of waiting times from
+<<geyser-w-grid, echo = TRUE>>=
+str(ndw <- mkgrid(mw, 100))
+@
+The most likely transformation $\hat{\h}(\ry) = \basisy(\ry)^\top \hat{\parm}$ is 
+now obtained from the maximum likelihood estimate $\hat{\parm}$ computed as
+<<geyser-w-fit, echo = TRUE>>=
+modw <- mlt(mw, data = geyser, check = FALSE)
+@
+and we compare the estimated distribution function 
+<<geyser-w-distribution, echo = TRUE>>=
+ndw$d <- predict(modw, newdata = ndw, type = "distribution")
+@
+with the empirical cumulative distribution function in Figure~\ref{fig:geyser-w-plot}.
+
+\begin{figure}
+\begin{center}
+<<geyser-w-plot, echo = FALSE, cache = TRUE, height = 4>>=
+layout(matrix(1:2, ncol = 2))
+plot(ecdf(geyser$waiting), col = "grey", xlab = "Waiting times", main = "")
+lines(ndw$waiting, ndw$d)
+Bw <- Bernstein_basis(order = 40, var = wvar, ui = "incre")
+mw <- ctm(Bw, todistr = "Normal")
+modw40 <- mlt(mw, data = geyser, check = FALSE)
+ndw$d2 <- predict(modw40, q = ndw$waiting, type = "distribution")
+lines(ndw$waiting, ndw$d2, lty = 2)
+legend("topleft", lty = 1:2, legend = c("M = 8", "M = 40"), bty = "n")
+plot(ndw$waiting, predict(modw, q = ndw$waiting, type = "density"), type = "l")
+lines(ndw$waiting, predict(modw40, q = ndw$waiting, type = "density"), lty = 2)
+@
+\caption{Waiting times. \label{fig:geyser-w-plot}}
+\end{center}
+\end{figure}
+
+The question arises how the degree of the polynomial affects the estimated
+distribution function.  On the one hand, the model $(\Phi, \bern{1}, \parm)$ only allows
+linear transformation functions of a standard normal and $\pY$ is restricted to the
+normal family.  On the other hand, $(\Phi, \bern{N - 1}, \parm)$ has one
+parameter for each observation and $\hatpY$ is the non-parametric maximum
+likelihood estimator $\text{ECDF}$ which, by the Glivenko-Cantelli lemma,
+converges to $\pY$.  In this sense, we cannot choose $M$ ``too large''. This
+is a consequence of the monotonicity constraint on the estimator
+$\basisy^\top \hat{\parm}_N$ which, in this extreme case, just interpolates
+the step-function $\pZ^{-1} \circ \text{ECDF}$.
+
 
 \subsection{Linear Transformation Models}
 
@@ -313,7 +485,7 @@ conditional transformation model $(\Phi, (\bern{3}(\text{HC})^\top \otimes
 \bernx{3}(\text{age}^{1/3})^\top)^\top, \parm)$ by maximisation of the approximate
 log-likelihood under $3 \times 4$ linear constraints. 
 
-<<head, echo = TRUE>>=
+<<head, echo = TRUE, cache = TRUE>>=
 data("db", package = "gamlss.data")
 db$lage <- with(db, age^(1/3))
 B1 <- Bernstein_basis(order = 3, ui = "incre",
@@ -337,7 +509,7 @@ indicates a certain asymmetry towards older boys.
 
 \begin{figure}[t]
 \begin{center}
-<<head-plot, fig = TRUE, echo = FALSE>>=
+<<head-plot, echo = FALSE>>=
 pfun <- function(x, y, z, subscripts, at, ...) {
     panel.contourplot(x, y, z, subscripts,
         at = c(0.4, 2, 10, 25, 50, 75, 90, 98, 99.6)/ 100, ...)
@@ -434,7 +606,7 @@ addition and since the latter is fully covered by the confidence band for
 the time-varying treatment effect there is no reason to question the
 treatment effect computed under the proportional hazards assumption.
 
-<<GBSG2-timevarying, echo = TRUE>>=
+<<GBSG2-timevarying, echo = TRUE, cache = TRUE>>=
 ### two separate transformation functions
 BhorTh <- as.basis(~ horTh - 1, data = GBSG2, remove_intercept = FALSE)
 By <- Bernstein_basis(order = 5, ui = "incre", var = yvar)
@@ -483,7 +655,7 @@ coxnd$pp <- unlist(predict(prodlim(Surv(time, cens) ~ horTh, data = GBSG2),
 
 \begin{figure}[t]
 \begin{center}
-<<fig_5_logrank, fig = TRUE, echo = FALSE>>=
+<<fig_5_logrank, echo = FALSE>>=
 layout(matrix(1:2, nrow = 1))
 par("mai" = par("mai") * c(1, .95, 1, .85))
 plot(coxnd$y, coxnd$p, ylim = c(0, 1), xlab = "Survival time (days)",
@@ -540,7 +712,7 @@ the highest risk; for women older than $60$ years, the risk started to
 increase again.  This effect was shifted towards younger women by the
 application of hormonal treatment.
 
-<<GBSG2-agevarying, echo = TRUE>>=
+<<GBSG2-agevarying, echo = TRUE, cache = TRUE>>=
 ### age-varying treatment effect
 Bage <- Bernstein_basis(order = 3, var = numeric_var("age", support = range(GBSG2$age)))
 BhorTh <- as.basis(~ horTh - 1, data = GBSG2)
@@ -558,7 +730,7 @@ nd$l <- c(predict(mod, newdata = s, type = "hazard"))
 
 \begin{figure}[t]
 \begin{center}
-<<fig_6_GBSG2, fig = TRUE, echo = FALSE>>=
+<<fig_6_GBSG2, echo = FALSE>>=
 nlev <- c(no = "without hormonal therapy", yes = "with hormonal therapy")
 levels(nd$horTh) <- nlev[match(levels(nd$horTh), names(nlev))]
 contourplot(I(1 - p) ~ age + y | horTh, data = nd, at = 1:9 / 10,
@@ -583,7 +755,7 @@ $\hat{\shiftparm}$.
 
 \begin{figure}[t]
 \begin{center}
-<<fig_7_cox, fig = TRUE, width = 3.5, echo = FALSE>>=
+<<fig_7_cox, fig.width=3.5, echo = FALSE>>=
 lim <- range(cf1$test$tstat[n]) * c(1, 1.375)
 plot(cf1$test$tstat[n], cf2$test$tstat, xlab = "z-Statistic MLT exact likelihood", 
      ylab = "z-Statistic Cox partial likelihood", xlim = lim, ylim = lim, las = 1)
@@ -623,7 +795,7 @@ more restrictive than our transformation model because one mean function determi
 constant in the right panel whereas they were shifted towards higher values of
 cover storey in the center panel).
 
-<<treepipit, echo = TRUE>>=
+<<treepipit, echo = TRUE, cache = TRUE>>=
 data("treepipit", package = "coin")
 
 tmp <- treepipit
@@ -664,7 +836,7 @@ nd$lambda <- predict(pmod, newdata = nd, type = "response")
 
 \begin{figure}[t]
 \begin{center}
-<<fig_8_treepipit, fig = TRUE, width = 6, height = 3, echo = FALSE>>=
+<<fig_8_treepipit, fig.width=6, fig.height=3, echo = FALSE>>=
 layout(matrix(1:3, nr = 1))
 par("mai" = par("mai") * c(1, .95, 1, .85))
 xlim <- range(treepipit[, "coverstorey"]) * c(0.98, 1.05)
@@ -709,7 +881,7 @@ abline(h = 1, lty = 6)
 
 \section*{Computational Details}
 
-<<funs, echo = FALSE, results = hide>>=
+<<funs, echo = FALSE, results='hide'>>=
 if (file.exists("packages.bib")) file.remove("packages.bib")
 pkgversion <- function(pkg) {
     pkgbib(pkg)
