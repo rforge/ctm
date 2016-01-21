@@ -216,15 +216,15 @@ head(geyser)
 The most likely transformation $\hat{\h}(\ry) = \basisy(\ry)^\top \hat{\parm}$ is 
 now obtained from the maximum likelihood estimate $\hat{\parm}$ computed as
 <<geyser-fit, echo = TRUE>>=
-modd <- mlt(md, data = geyser, check = FALSE)
-logLik(modd)
-coef(modd)
-vcov(modd)
+mltd <- mlt(md, data = geyser, check = FALSE)
+logLik(mltd)
+coef(mltd)
+vcov(mltd)
 @
 and the model is best visualised in terms of the corresponding density
 $\phi(\basisy(\ry)^\top \hat{\parm}) \basisy^\prime(\ry)^\top \hat{\parm}$
 <<geyser-density, echo = TRUE>>=
-ndd$d <- predict(modd, newdata = ndd, type = "density")
+ndd$d <- predict(mltd, newdata = ndd, type = "density")
 @
 depicted in Figure~\ref{fig:geyser-plot}. The plot shows the well-known bimodal
 distribution in a nice smooth way. Several things are quite unusual in this short example. 
@@ -322,25 +322,25 @@ An unfitted model can be set-up by a call to the fitting function
 the density defined above only requires the corresponding coefficients
 to be given to the resulting object
 <<ctm-uncon-disc-mlt>>=
-mody <- mlt(my, data = as.data.frame(gy), dofit = FALSE)
-coef(mody) <- qnorm(cumsum(dy[-5L]))
+mlty <- mlt(my, data = as.data.frame(gy), dofit = FALSE)
+coef(mlty) <- qnorm(cumsum(dy[-5L]))
 @
 Because the model is now fully defined, we can draw random samples
 from this model and refit the model
 <<ctm-uncon-disc-sim, message = FALSE>>=
-ry <- do.call("c", simulate(mody, nsim = 10000))
+ry <- do.call("c", simulate(mlty, nsim = 10000))
 ry <- ordered(ry, levels = 1:nlevels(yvar), labels = levels(yvar))
 nd <- data.frame(y = ry)
-m <- mlt(my, data = nd, check = FALSE)
+mltnd <- mlt(my, data = nd, check = FALSE)
 @
 The true and estimated distribution and density functions can 
 now be compared
 <<ctm-uncon-disc-output>>=
 cumsum(dy)
-c(pnorm(coef(m)), 1)
-predict(m, q = gy, type = "distribution")
-pnorm(confint(m))
-cbind(dy, diff(c(0, c(pnorm(coef(m)), 1))))
+c(pnorm(coef(mltnd)), 1)
+predict(mltnd, q = gy, type = "distribution")
+pnorm(confint(mltnd))
+cbind(dy, diff(c(0, c(pnorm(coef(mltnd)), 1))))
 @
 Of course, the above exercise is an extremely cumbersome way
 of estimating a discrete density those maximum likelihood estimator
@@ -396,11 +396,11 @@ str(ndw <- mkgrid(mw, 100))
 The most likely transformation $\hat{\h}(\ry) = \basisy(\ry)^\top \hat{\parm}$ is 
 now obtained from the maximum likelihood estimate $\hat{\parm}$ computed as
 <<geyser-w-fit, echo = TRUE>>=
-modw <- mlt(mw, data = geyser, check = FALSE)
+mltw <- mlt(mw, data = geyser, check = FALSE)
 @
 and we compare the estimated distribution function 
 <<geyser-w-distribution, echo = TRUE>>=
-ndw$d <- predict(modw, newdata = ndw, type = "distribution")
+ndw$d <- predict(mltw, newdata = ndw, type = "distribution")
 @
 with the empirical cumulative distribution function in Figure~\ref{fig:geyser-w-plot}.
 
@@ -412,12 +412,12 @@ plot(ecdf(geyser$waiting), col = "grey", xlab = "Waiting times", main = "")
 lines(ndw$waiting, ndw$d)
 Bw <- Bernstein_basis(order = 40, var = wvar, ui = "incre")
 mw <- ctm(Bw, todistr = "Normal")
-modw40 <- mlt(mw, data = geyser, check = FALSE)
-ndw$d2 <- predict(modw40, q = ndw$waiting, type = "distribution")
+mltw40 <- mlt(mw, data = geyser, check = FALSE)
+ndw$d2 <- predict(mltw40, q = ndw$waiting, type = "distribution")
 lines(ndw$waiting, ndw$d2, lty = 2)
 legend("topleft", lty = 1:2, legend = c("M = 8", "M = 40"), bty = "n")
-plot(ndw$waiting, predict(modw, q = ndw$waiting, type = "density"), type = "l")
-lines(ndw$waiting, predict(modw40, q = ndw$waiting, type = "density"), lty = 2)
+plot(ndw$waiting, predict(mltw, q = ndw$waiting, type = "density"), type = "l")
+lines(ndw$waiting, predict(mltw40, q = ndw$waiting, type = "density"), lty = 2)
 @
 \caption{Waiting times. \label{fig:geyser-w-plot}}
 \end{center}
@@ -443,6 +443,95 @@ the step-function $\pZ^{-1} \circ \text{ECDF}$.
 \basisyx = (\basisy^\top, -\basisx_\text{shift}^\top)^\top
 \end{eqnarray*}
 
+\paragraph{Discrete Response}
+
+Proportional odds models
+
+<<housing>>=
+library("MASS")
+polrhousing <- polr(Sat ~ Infl, weights = Freq, data = housing)
+s <- as.basis(~ Infl, data = housing, remove_intercept = TRUE, 
+              negative = TRUE)
+r <- as.basis(~ Sat, data = housing, remove_intercept = TRUE,
+              contrasts.arg = list(Sat = function(n) 
+                  contr.treatment(n, base = 3)),
+              ui = diff(diag(2)), ci = 0)
+mhousing <- ctm(r, shift = s, todist = "Logi")
+mlthousing <- mlt(mhousing, data = housing, weights = housing$Freq, check = FALSE)
+
+logLik(polrhousing)
+logLik(mlthousing)
+
+cbind(polr = c(polrhousing$zeta, coef(polrhousing)), mlt = coef(mlthousing))
+
+cbind(polr = sqrt(diag(vcov(polrhousing)))[c(3, 4, 1, 2)],
+      mlt = sqrt(diag(vcov(mlthousing))))
+@
+
+\paragraph{Continuous Responses}
+
+Cox model for GBSG-2
+
+<<GBSG2-Cox, echo = TRUE>>=
+data("GBSG2", package = "TH.data")
+GBSG2$y <- with(GBSG2, Surv(time, cens))
+dist <- "Min"
+yvar <- numeric_var("y", support = c(100.0, max(GBSG2$time)), bounds = c(0, Inf))
+### Cox model
+By <- Bernstein_basis(var = yvar, order = 10, ui = "incre")
+fmGBSG2 <- Surv(time, cens) ~ horTh + age + menostat + tsize + tgrade + pnodes + progrec + estrec
+mGBSG2 <- ctm(By, shift = fmGBSG2[-2L], todistr = dist, data = GBSG2)
+mltGBSG2 <- mlt(mGBSG2, data = GBSG2, maxit = 3000, scale = TRUE, check = FALSE)
+
+coxphGBSG2 <- coxph(fmGBSG2, data = GBSG2)
+
+cf <- coef(coxphGBSG2)
+cbind(coxph = cf, mlt = coef(mltGBSG2)[names(cf)])
+cbind(coxph = sqrt(diag(vcov(coxphGBSG2))), 
+      mlt = sqrt(diag(vcov(mltGBSG2)))[names(cf)])
+@
+
+AFT Models
+
+<<GBSG2-exponential>>=
+ly <- log_basis(yvar, ui = "increasing")
+mGBSG2 <- ctm(ly, shift = as.basis(fmGBSG2[-2L], data = GBSG2, negative = TRUE), todistr = dist)
+mltGBSG2 <- mlt(mGBSG2, data = GBSG2, fixed = c("log(y)" = 1), scale = TRUE, check = FALSE)
+
+survregGBSG2 <- survreg(fmGBSG2, data = GBSG2, dist = "exponential")
+library("eha")
+phregGBSG2 <- phreg(fmGBSG2, data = GBSG2, dist = "weibull", shape = 1)
+
+logLik(mltGBSG2)
+logLik(survregGBSG2)
+phregGBSG2$loglik[2]
+
+cbind(survreg = coef(survregGBSG2)[names(cf)], phreg = coef(phregGBSG2)[names(cf)], 
+      mlt = coef(mltGBSG2)[names(cf)])
+
+cbind(survreg = sqrt(diag(vcov(survregGBSG2))[names(cf)]), 
+      phreg = sqrt(diag(phregGBSG2$var)[names(cf)]),
+      mlt = sqrt(diag(vcov(mltGBSG2)))[names(cf)])
+@
+
+<<GBSG2-weibull>>=
+mltGBSG2 <- mlt(mGBSG2, data = GBSG2, scale = TRUE, check = FALSE)
+
+survregGBSG2 <- survreg(fmGBSG2, data = GBSG2, dist = "weibull")
+library("eha")
+phregGBSG2 <- phreg(fmGBSG2, data = GBSG2, dist = "weibull")
+
+logLik(mltGBSG2)
+logLik(survregGBSG2)
+phregGBSG2$loglik[2]
+
+cbind(survreg = coef(survregGBSG2)[names(cf)] / survregGBSG2$scale, phreg = coef(phregGBSG2)[names(cf)], 
+      mlt = coef(mltGBSG2)[names(cf)])
+@
+
+Tobit, see truncreg
+
+
 \subsection{Stratified Linear Transformation Models}
 
 \begin{eqnarray*}
@@ -450,6 +539,26 @@ the step-function $\pZ^{-1} \circ \text{ECDF}$.
 \pZ(\h(\ry | s) - \rx^\top \shiftparm) = \pZ(\basisyx(\ry, s, \rx)^\top \parm)
 \basisyx = (\basisy^\top \otimes \basisx_\text{stratum}^\top, -\basisx_\text{shift}^\top)^\top                                       
 \end{eqnarray*}
+
+<<ovarian>>=
+yvar <- numeric_var("time", support = range(ovarian$futime), bounds = c(0, Inf))
+ovarian$time <- with(ovarian, Surv(futime, fustat))
+ly <- log_basis(yvar, ui = "incre")
+fmovarian <- Surv(futime, fustat) ~ age
+movarian <- ctm(ly, interacting = as.basis(~ as.factor(rx) - 1, data = ovarian), 
+                shift = as.basis(fmovarian[-2L], data = ovarian, remove_intercept = FALSE, negative = TRUE), todistr = dist)
+mltovarian <- mlt(movarian, data = ovarian, scale = TRUE, check = FALSE)
+
+survregovarian <- survreg(Surv(futime, fustat) ~ age + strata(rx), data=ovarian,
+                          dist = "weibull")
+
+logLik(mltovarian)
+logLik(survregovarian)
+
+cftest(mltovarian)
+cftest(survregovarian)
+
+@
 
 \subsection{Conditional Transformation Models}
 
@@ -547,31 +656,6 @@ therapy}))^\top, \parm)$ implements the transformation function $\h(\ry |
 parameterised by a Bernstein polynomial and $\beta \in \RR$ is the
 log-hazard ratio of hormonal therapy. 
 
-<<GBSG2-Cox, echo = TRUE>>=
-data("GBSG2", package = "TH.data")
-GBSG2$y <- with(GBSG2, Surv(time, cens))
-dist <- "Min"
-yvar <- numeric_var("y", support = c(100.0, max(GBSG2$time)), bounds = c(0, Inf))
-### Cox model
-By <- Bernstein_basis(var = yvar, order = 10, ui = "incre")
-fm <- "horTh + age + menostat + tsize + tgrade + pnodes + progrec + estrec"
-m <- ctm(By, shift = as.formula(paste("~",fm)), todistr = dist, data = GBSG2)
-coxmod <- mlt(m, data = GBSG2, maxit = 3000, scale = TRUE, check = FALSE)
-coef(coxmod)
-AIC(coxmod)
-
-coxmod2 <- coxph(as.formula(paste("Surv(time, cens) ~", fm)), data = GBSG2)
-AIC(coxmod2)
-cf <- coef(coxmod2)
-n <- length(coef(coxmod))
-n <- (n - length(cf) + 1):n
-
-cbind(coef(coxmod2), coef(coxmod)[n])
-cbind(sqrt(diag(vcov(coxmod))[n]), sqrt(diag(vcov(coxmod2))))
-
-cf1 <- cftest(coxmod)
-cf2 <- cftest(coxmod2)
-@
 
 
 
@@ -752,24 +836,6 @@ likelihood, we estimated all model parameters simultaneously under five linear c
 The results obtained from the partial and the exact log-likelihood are practically
 equivalent, Figure~\ref{fig_7_cox} shows the corresponding $z$-statistics for
 $\hat{\shiftparm}$.
-
-\begin{figure}[t]
-\begin{center}
-<<fig_7_cox, fig.width=3.5, echo = FALSE>>=
-lim <- range(cf1$test$tstat[n]) * c(1, 1.375)
-plot(cf1$test$tstat[n], cf2$test$tstat, xlab = "z-Statistic MLT exact likelihood", 
-     ylab = "z-Statistic Cox partial likelihood", xlim = lim, ylim = lim, las = 1)
-abline(a = 0, b = 1, col = "grey")
-points(cf1$test$tstat[n], cf2$test$tstat)
-text(cf1$test$tstat[n], cf2$test$tstat, labels =  names(cf2$test$coefficients), pos = 4,
-     cex = .7)
-@
-\caption{GBSG-2. Comparison of $z$-statistics for all variables obtained from the partial likelihood 
-         (function \code{coxph()} in package \pkg{survival}) and 
-         the exact likelihood with parameterisation of the log-cumulative baseline hazard function. 
-         \label{fig_7_cox}}
-\end{center}
-\end{figure}
 
 \paragraph{Count Regression: Tree Pipit Counts}
 
