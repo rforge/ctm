@@ -83,12 +83,12 @@ truncation}
 
 \section{Introduction}
 
-The history of statistics can be told as the story of great conceptual ideas
+The history of statistics can be told as a story of great conceptual ideas
 and contemporaneous computable approximations thereof.  As time went by, the
 computationally inaccessible concept often vanished from the collective
 consciousness of our profession and the approximation was taught and
 understood as the real thing.  Least squares regression emerged from
-Gau{\ss}' computational trick of changing Boscovics absolute to squared
+Gau{\ss}' computational trick of changing Bo\v{s}covi{\'c}' absolute to squared
 error and it took more than 200 years for the original, and in many aspects
 advantageous, concept to surface again under the name ``quantile
 regression''.  This most prominent example of an idea got lost illustrates
@@ -108,65 +108,67 @@ theory course?  Let's perform a small experiment: Pick, at random, a
 statistics book from your book shelf and look-up how the general linear
 model is introduced. Most probably you will find something not unlike
 \begin{eqnarray*}
-\rY = \alpha + \rx^\top \beta + \varepsilon, \quad \varepsilon \sim \ND(0, \sigma^2)
+\rY = \alpha + \rx^\top \shiftparm + \varepsilon, \quad \varepsilon \sim \ND(0, \sigma^2)
 \end{eqnarray*}
-where model interpretation relies on $\Ex(\rY | \rX = \rx) = \alpha + \rx^\top \beta$ and
+where model interpretation relies on $\Ex(\rY | \rX = \rx) = \alpha + \rx^\top \shiftparm$ and
 one estimates the intercept $\alpha$ and the 
-regression parameters $\beta$ by minimisation of the squared error 
-$(\rY - \alpha - \rx^\top \beta)^2$. With some touch-up in notation, the model 
+regression parameters $\shiftparm$ by minimisation of the squared error 
+$(\rY - \alpha - \rx^\top \shiftparm)^2$. With some touch-up in notation, the model 
 can be equivalently written as a model for a conditional distribution
 \begin{eqnarray*}
-\Prob(\rY \le \ry | \rX = \rx) = \Phi\left(\frac{\ry - \alpha - \rx^\top \beta}{\sigma}\right) \text{ or } (\rY | \rX = \rx) \sim \ND(\alpha + \rx^\top\beta, \sigma^2).
+\Prob(\rY \le \ry | \rX = \rx) = \Phi\left(\frac{\ry - \alpha - \rx^\top \shiftparm}{\sigma}\right) \text{ or } (\rY | \rX = \rx) \sim \ND(\alpha + \rx^\top\shiftparm, \sigma^2).
 \end{eqnarray*}
 This little change highlights that the model is, in fact, a model for a
 conditional distribution and not just a model for a conditional mean. It also
 stresses the fact that the variance $\sigma^2$ is a model parameter in its own right. The usual
 treatment of $\sigma^2$ as a nuisance parameter only works when the likelihood 
-is approximated by the density of the normal distribtion. Since we always observe
+is approximated by the density of the normal distribtion. Because we always observe
 intervals $(\ubar{\ry}, \bar{\ry}]$ and never real numbers $\ry$, the exact likelihood
-is
+is, as originally \textit{defined} by \cite{Fisher_1934} \citep[another example of the approximation winning over the basic concept][]{Lindsey_1996}
 \begin{eqnarray*}
 \Prob(\ubar{\ry} < \rY \le \bar{\ry} | \rX = \rx) = 
-\Phi\left(\frac{\bar{\ry} - \alpha - \rx^\top \beta}{\sigma}\right) - \Phi\left(\frac{\ubar{\ry} - \alpha - \rx^\top \beta}{\sigma}\right)
+\Phi\left(\frac{\bar{\ry} - \alpha - \rx^\top \shiftparm}{\sigma}\right) - \Phi\left(\frac{\ubar{\ry} - \alpha - \rx^\top \shiftparm}{\sigma}\right)
 \end{eqnarray*}
-which requires simultaneous optimisation of all three model parameters $\alpha$, $\beta$ and $\sigma$ but
+which requires simultaneous optimisation of all three model parameters $\alpha$, $\shiftparm$ and $\sigma$ but
 is exact also under other forms of random censoring. If we were going to reformulate the model
 a little further to
 \begin{eqnarray*}
-\Prob(\rY \le \ry | \rX = \rx) = \Phi(\tilde{\alpha}_1 + \tilde{\alpha}_2 \ry - \rx^\top \tilde{\beta})
+\Prob(\rY \le \ry | \rX = \rx) = \Phi(\tilde{\alpha}_1 + \tilde{\alpha}_2 \ry - \rx^\top \tilde{\shiftparm})
 \end{eqnarray*}
-with $\tilde{\alpha}_1 = -\alpha / \sigma, \tilde{\alpha}_2 = 1 / \sigma$ and $\tilde{\beta} = \beta / \sigma$
+with $\tilde{\alpha}_1 = -\alpha / \sigma, \tilde{\alpha}_2 = 1 / \sigma$ and $\tilde{\shiftparm} = \shiftparm / \sigma$
 we see that the model is of the form
 \begin{eqnarray*}
-\Prob(\rY \le \ry | \rX = \rx) = \pZ(\h_\rY(\ry) - \rx^\top \tilde{\beta})
+\Prob(\rY \le \ry | \rX = \rx) = \pZ(\h_\rY(\ry) - \rx^\top \tilde{\shiftparm})
 \end{eqnarray*}
 with distribution function $\pZ = \Phi$ and linear transformation $\h_\rY(\ry) = \tilde{\alpha}_1 + \tilde{\alpha}_2 \ry$
-such that $\Ex(\h_\rY(\rY) | \rX = \rx) = \rx^\top \beta$. If we now change $\pZ$ to the distribution
+such that $\Ex(\h_\rY(\rY) | \rX = \rx) = \rx^\top \shiftparm$. If we now change $\pZ$ to the distribution
 function of the minimum extreme value distribution and allow a non-linear monotone transformation
 $\h_\rY$ we get
 \begin{eqnarray*}
-\Prob(\rY \le \ry | \rX = \rx) = 1 - \exp(-\exp(\h_\rY(\ry) - \rx^\top \tilde{\beta}))
+\Prob(\rY \le \ry | \rX = \rx) = 1 - \exp(-\exp(\h_\rY(\ry) - \rx^\top \tilde{\shiftparm}))
 \end{eqnarray*}
 which is the continuous proportional hazards, or Cox, model. From this point
 of view, the linear and the Cox model are two instances of so-called linear
 transformation models (a misleading name, because the transformation
 $\h_\rY$ is non-linear in the latter case and only the shift $\rx^\top
-\tilde{\beta}$ is linear in $\rx$).  It is now also obvious that the Cox
+\tilde{\shiftparm}$ is linear in $\rx$).  It is now also obvious that the Cox
 model has nothing to do with censoring, let alone survival times $\rY > 0$. 
 It is a model for the conditional distribution of a continuous responses
 $\rY \in \RR$ when it is appropriate to assume that the conditional hazard
-function is scaled by $\exp(\rx^\top \tilde{\beta})$.  For both the linear
+function is scaled by $\exp(\rx^\top \tilde{\shiftparm})$.  For both the linear
 and the Cox model, application of the exact likelihood allows the models to
 be fitted to imprecise, or ``censored'', observations $(\ubar{\ry},
 \bar{\ry}]$.
 
 The class of linear transformation models is a subclass of conditional 
-transformation models. The conditional distribution function is then
+transformation models. In this latter class, the conditional distribution function is 
 \begin{eqnarray*}
 \Prob(\rY \le \ry | \rX = \rx) = \pZ(\h(\ry | \rx))
 \end{eqnarray*}
-where the transformation function $\h$ depends on both $\ry$ and $\rx$. We 
-describe how such models can be specified, fitted and analysed in \proglang{R}
+where the transformation function $\h$ depends on both $\ry$ and $\rx$. Because
+we are interested in analysing, \ie estimating and interpreting, the transformation
+function $\h$, we refer to the methods presented in this paper as \textit{transformation analysis}.
+We describe how conditional transformation models can be specified, fitted and analysed in \proglang{R}
 using the \pkg{mlt} add-on package. Before we start looking at details,
 we illustrate the workflow by means of an example from unconditional density 
 estimation.
@@ -205,28 +207,28 @@ md <- ctm(Bd, todistr = "Normal")
 @
 and we can generate a grid of duration times from
 <<geyser-grid, echo = TRUE>>=
-str(ndd <- mkgrid(md, 100))
+str(ndd <- mkgrid(md, 200))
 @
-Only after the model was specified we need to load the data containing the
-\code{duration} variable as a \code{Surv} object: 
+Only after the model was specified we need to load the data frame containing the
+observations of \code{duration} as a \code{Surv} object: 
 <<geyser-data, echo = TRUE>>=
 data("geyser", package = "TH.data")
 head(geyser)
 @
-The most likely transformation $\hat{\h}(\ry) = \basisy(\ry)^\top \hat{\parm}$ is 
+The most likely transformation (MLT) $\hat{\h}(\ry) = \basisy(\ry)^\top \hat{\parm}$ is 
 now obtained from the maximum likelihood estimate $\hat{\parm}$ computed as
 <<geyser-fit, echo = TRUE>>=
 mltd <- mlt(md, data = geyser, check = FALSE)
 logLik(mltd)
 coef(mltd)
-vcov(mltd)
 @
 and the model is best visualised in terms of the corresponding density
-$\phi(\basisy(\ry)^\top \hat{\parm}) \basisy^\prime(\ry)^\top \hat{\parm}$
+$\phi(\basisy(\ry)^\top \hat{\parm}) \basisy^\prime(\ry)^\top \hat{\parm}$,
+extracted from the fitted model as
 <<geyser-density, echo = TRUE>>=
 ndd$d <- predict(mltd, newdata = ndd, type = "density")
 @
-depicted in Figure~\ref{fig:geyser-plot}. The plot shows the well-known bimodal
+The result is depicted in Figure~\ref{fig:geyser-plot}. The plot shows the well-known bimodal
 distribution in a nice smooth way. Several things are quite unusual in this short example. 
 First, the model was specified without reference to the actual observations, maybe 
 with the exception of the domain of the Bernstein polynomial. Second, although the
@@ -247,17 +249,19 @@ workflow sketched in this section.
 
 \begin{figure}
 \begin{center}
-<<geyser-plot, echo = TRUE>>=
-plot(d ~ duration, data = ndd, type = "l", ylab = "Density")
+<<geyser-plot, echo = FALSE, fig.width = 5, fig.height = 4>>=
+plot(d ~ duration, data = ndd, type = "l", ylab = "Density", xlab = "Duration time")
 @
-\caption{Estimated density for duration. \label{fig:geyser-plot}}
+\caption{Geyser data: Estimated density for duration time obtained from
+         an unconditional transformation model where the transformation function
+         was parameterised by means of a Bernstein polynomial. \label{fig:geyser-plot}}
 \end{center}
 \end{figure}
 
  
 \section{Specifying Transformation Models}
 
-In this section we study a cascade of increasingly complex transformation models
+In this section we introduce a cascade of increasingly complex transformation models
 and discuss how one can specify such models using the infrastructure provided
 by the \pkg{mlt} package. We start with the simplest case of models for
 unconditional distribution functions.
@@ -271,7 +275,7 @@ of a basis function $\basisy$:
 \begin{eqnarray*}
 \Prob(\rY \le \ry) = \pZ(\h(\ry)) = \pZ(\basisy(\ry)^\top \parm).
 \end{eqnarray*}
-The triple $(\pZ, \basisy, \parm)$ fully defines the distribution of $\rY$ 
+The triple $(\pZ, \basisy, \parm)$ fully defines the distribution of $\rY$ and
 is called transformation model.
 The choice of the basis function $\basisy$ depends on the measurement 
 scale of $\rY$ and we can differentiate between the following situations.
@@ -402,24 +406,29 @@ and we compare the estimated distribution function
 <<geyser-w-distribution, echo = TRUE>>=
 ndw$d <- predict(mltw, newdata = ndw, type = "distribution")
 @
-with the empirical cumulative distribution function in Figure~\ref{fig:geyser-w-plot}.
+with the empirical cumulative distribution function in the left panel of Figure~\ref{fig:geyser-w-plot}.
 
 \begin{figure}
 \begin{center}
-<<geyser-w-plot, echo = FALSE, cache = TRUE, height = 4>>=
+<<geyser-w-plot, echo = FALSE, cache = TRUE, fig.height = 4, fig.width = 6, results = "hide">>=
 layout(matrix(1:2, ncol = 2))
-plot(ecdf(geyser$waiting), col = "grey", xlab = "Waiting times", main = "")
+plot(ecdf(geyser$waiting), col = "grey", xlab = "Waiting times", ylab = "Distribution", 
+     main = "")
 lines(ndw$waiting, ndw$d)
 Bw <- Bernstein_basis(order = 40, var = wvar, ui = "incre")
 mw <- ctm(Bw, todistr = "Normal")
 mltw40 <- mlt(mw, data = geyser, check = FALSE)
 ndw$d2 <- predict(mltw40, q = ndw$waiting, type = "distribution")
 lines(ndw$waiting, ndw$d2, lty = 2)
-legend("topleft", lty = 1:2, legend = c("M = 8", "M = 40"), bty = "n")
-plot(ndw$waiting, predict(mltw, q = ndw$waiting, type = "density"), type = "l")
+legend("bottomright", lty = 1:2, legend = c("M = 8", "M = 40"), bty = "n")
+plot(ndw$waiting, predict(mltw, q = ndw$waiting, type = "density"), type = "l",
+     ylim = c(0, .04), xlab = "Waiting times", ylab = "Density")
 lines(ndw$waiting, predict(mltw40, q = ndw$waiting, type = "density"), lty = 2)
 @
-\caption{Waiting times. \label{fig:geyser-w-plot}}
+\caption{Geyser data: Estimated distribution (left, also featuring the empirical
+         cumulative distribution function) and density (right) function for 
+         two transformation models parameterised in terms of Bernstein polynomials
+         of order $8$ and $40$.  \label{fig:geyser-w-plot}}
 \end{center}
 \end{figure}
 
@@ -432,7 +441,13 @@ likelihood estimator $\text{ECDF}$ which, by the Glivenko-Cantelli lemma,
 converges to $\pY$.  In this sense, we cannot choose $M$ ``too large''. This
 is a consequence of the monotonicity constraint on the estimator
 $\basisy^\top \hat{\parm}_N$ which, in this extreme case, just interpolates
-the step-function $\pZ^{-1} \circ \text{ECDF}$.
+the step-function $\pZ^{-1} \circ \text{ECDF}$. The practical effect can be inspected
+in Figure~\ref{fig:geyser-w-plot} where two Bernstein polynomials of order $M = 8$ and
+$M = 40$ are compared on the scale of the distribution function (left panel) and density
+function (right panel). It is hardly possible to notice the difference in probabilities
+but the more flexible model features a more erratic density estimate, but not overly so.
+The corresponding AIC values are $\Sexpr{round(AIC(mltw),1)}$ 
+for $M = 8$ and $\Sexpr{round(AIC(mltw40),1)}$ for $M = 40$ in favor of the smaller model.
 
 
 \subsection{Linear Transformation Models}
