@@ -533,16 +533,6 @@ Tobit, see truncreg
 
 <<tobin>>=
 data("tobin", package = "survival")
-dvar <- numeric_var("cdur", support = range(tobin$durable[tobin$durable > 0]), bounds = c(0, Inf))
-
-tobin$cdur <- with(tobin, Surv(durable, durable > 0, type = "left"))
-ld <- log_basis(dvar, ui = "increasing")
-mtobin <- ctm(ld, shift = as.basis(~ age + quant, data = tobin), todistr = "Normal")
-mlttobin <- mlt(mtobin, data = tobin, scale = TRUE, check = FALSE)
-
-survregtobin <- survreg(Surv(durable, durable > 0, type = "left") ~ age + quant,
-       data = tobin, dist = "gaussian")
-
 ttobin <- subset(tobin, durable > 0)
 library("truncreg")
 (truncregtobin <- truncreg(durable ~ age + quant, data = ttobin))
@@ -557,6 +547,47 @@ logLik(mlttobin)
 
 -coef(mlttobin)[c("(Intercept)", "age", "quant")] / coef(mlttobin)["durable"]
 @
+
+lm; Boston Housing
+<<BostonHousing>>=
+data("BostonHousing", package = "mlbench")
+lmBostonHousing <- lm(medv ~ ., data = BostonHousing)
+
+coef(lmBostonHousing)
+summary(lmBostonHousing)$sigma
+logLik(lmBostonHousing)
+
+BostonHousing$medvc <- with(BostonHousing, Surv(medv, medv < 50))
+mvar <- numeric_var("medvc", support = c(10.0, 40.0), bounds = c(0, Inf))
+Bm <- Bernstein_basis(mvar, order = 6, ui = "increasing")
+fmBostonHousing <- medvc ~ crim + zn + indus + chas + nox + rm + age + 
+    dis + rad + tax + ptratio + b + lstat
+mBostonHousing <- ctm(Bm, shift = as.basis(fmBostonHousing[-2L], data = BostonHousing, 
+                                           remove_intercept = TRUE, negative = TRUE),
+                      todistr = "Normal")
+mltBostonHousing <- mlt(mBostonHousing, data = BostonHousing, scale = TRUE, 
+                        check = FALSE)
+logLik(mltBostonHousing)
+
+survregBostonHousing <- survreg(fmBostonHousing, data = BostonHousing, dist = "gaussian")
+logLik(survregBostonHousing)
+cf <- coef(survregBostonHousing)
+xv <- names(cf)[-1]
+cbind(lm = coef(lmBostonHousing)[xv] / summary(lmBostonHousing)$sigma,
+      survreg = cf[xv] / survregBostonHousing$scale,
+      mlt = coef(mltBostonHousing)[xv])
+
+q <- mkgrid(mvar, 100)
+plot(q[[1]], predict(mltBostonHousing, newdata = data.frame(1), q = q[[1]], 
+                     terms = "bresponse"))
+abline(a = -cf["(Intercept)"] / survregBostonHousing$scale, 1 / survregBostonHousing$scale)
+
+cbind(lm = sqrt(diag(vcov(lmBostonHousing))[xv]),
+survreg = sqrt(diag(vcov(survregBostonHousing))[xv]),
+mlt = sqrt(diag(vcov(mltBostonHousing))[xv]))
+
+@
+
 
 \subsection{Stratified Linear Transformation Models}
 
