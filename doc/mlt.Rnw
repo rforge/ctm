@@ -531,6 +531,32 @@ cbind(survreg = coef(survregGBSG2)[names(cf)] / survregGBSG2$scale, phreg = coef
 
 Tobit, see truncreg
 
+<<tobin>>=
+data("tobin", package = "survival")
+dvar <- numeric_var("cdur", support = range(tobin$durable[tobin$durable > 0]), bounds = c(0, Inf))
+
+tobin$cdur <- with(tobin, Surv(durable, durable > 0, type = "left"))
+ld <- log_basis(dvar, ui = "increasing")
+mtobin <- ctm(ld, shift = as.basis(~ age + quant, data = tobin), todistr = "Normal")
+mlttobin <- mlt(mtobin, data = tobin, scale = TRUE, check = FALSE)
+
+survregtobin <- survreg(Surv(durable, durable > 0, type = "left") ~ age + quant,
+       data = tobin, dist = "gaussian")
+
+ttobin <- subset(tobin, durable > 0)
+library("truncreg")
+(truncregtobin <- truncreg(durable ~ age + quant, data = ttobin))
+
+ttobin$durable <- R(ttobin$durable, tleft = 0)
+pd <- as.basis(~ durable, data = tobin, ui = matrix(c(0, 1), nr  = 1), ci = 0)
+mtobin <- ctm(pd, shift = ~ age + quant, data = tobin, todistr = "Normal")
+mlttobin <- mlt(mtobin, data = ttobin, scale = TRUE, check = FALSE)
+
+logLik(truncregtobin)
+logLik(mlttobin)	
+
+-coef(mlttobin)[c("(Intercept)", "age", "quant")] / coef(mlttobin)["durable"]
+@
 
 \subsection{Stratified Linear Transformation Models}
 
