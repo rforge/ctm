@@ -179,6 +179,8 @@ using the \pkg{mlt} add-on package. Before we start looking at details,
 we illustrate the workflow by means of an example from unconditional density 
 estimation.
 
+\paragraph{Density Estimation: Old Faithful Geyser Data}
+
 The duration of eruptions and the waiting time between eruptions of the Old
 Faithful geyser in the Yellowstone national park became a standard benchmark
 for non-parametric density estimation \citep[the original data were given
@@ -258,7 +260,7 @@ workflow sketched in this section.
 <<geyser-plot, echo = FALSE, fig.width = 5, fig.height = 4>>=
 plot(d ~ duration, data = ndd, type = "l", ylab = "Density", xlab = "Duration time")
 @
-\caption{Geyser data: Estimated density for duration time obtained from
+\caption{Old Faithful Geyser. Estimated density for duration time obtained from
          an unconditional transformation model where the transformation function
          was parameterised by means of a Bernstein polynomial. \label{fig:geyser-plot}}
 \end{center}
@@ -286,7 +288,7 @@ is called transformation model.
 The choice of the basis function $\basisy$ depends on the measurement 
 scale of $\rY$ and we can differentiate between the following situations.
 
-\paragraph{Discrete Models for Categorical Responses}
+\subsubsection{Discrete Models for Categorical Responses}
 
 For ordered categorical responses $\rY$ from a
 finite sample space $\samY = \{\ry_1, \dots, \ry_K\}$ we assign one
@@ -304,64 +306,46 @@ $\pY(\ry_k) = \pZ(\eparm_k)$. Note that monotonicity of $\h$ is guaranteed by th
 $K - 2$ linear constraints $\eparm_2 - \eparm_1 > 0, \dots, \eparm_{K -1} -
 \eparm_{K -2} > 0$ when constrained optimisation is performed.
 
-For an ordered categorical variable at five levels with density $(.15, .25, .18, .23, .19)$
-<<ctm-uncon-disc-var>>=
-yvar <- ordered_var("y", levels = LETTERS[1:5])
-(gy <- mkgrid(yvar))
-dy <- c(.15, .25, .18, .23, .19)
+\paragraph{Categorical Data Analysis: Copenhagen Housing Conditions Survey}
+
+We can specify the discrete basis function $\basisy$ as
+<<housing-uncond>>=
+library("MASS")
+polr_housing_1 <- polr(Sat ~ 1, weights = Freq, data = housing)
+b_Sat <- as.basis(~ Sat, data = housing, remove_intercept = TRUE,
+              contrasts.arg = list(Sat = function(n) 
+                  contr.treatment(n, base = 3)),
+              ui = diff(diag(2)), ci = 0)
+mod_housing_1 <- ctm(b_Sat, todist = "Logistic")
+mlt_housing_1 <- mlt(mod_housing_1, data = housing, weights = housing$Freq, check = FALSE)
+
+model.matrix(mod_housing_1, data = data.frame(Sat = unique(housing$Sat)))
+
+logLik(polr_housing_1)
+logLik(mlt_housing_1)
+
+cbind(polr = polr_housing_1$zeta, mlt = coef(mlt_housing_1))
+
+cbind(polr = sqrt(diag(vcov(polr_housing_1))),
+      mlt = sqrt(diag(vcov(mlt_housing_1))))
+
+predict(polr_housing_1, newdata = data.frame(1), type = "prob")
+xtabs(Freq ~ Sat, data = housing) / sum(housing$Freq)
 @
-we can specify the discrete basis function $\basisy$ as
-<<ctm-uncon-disc-basis>>=
-a <- as.basis(~ y, data = yvar, remove_intercept = TRUE,
-              contrasts.arg = list(y = function(n)
-                  contr.treatment(n, base = 5)),
-              ui = diff(diag(4)), ci = rep(0, 3))
-model.matrix(a, data = as.data.frame(gy))
-@
+
 The basis function evaluated at the levels of the factor can
 be obtained from the \code{model.matrix} method, along with
 the linear constraints imposed by this basis function.
 
 The conditional transformation model (although being unconditional here) 
 is defined using the \code{ctm} function.
-<<ctm-uncon-disc-ctm>>=
-my <- ctm(a)
-@
-An unfitted model can be set-up by a call to the fitting function
-\code{mlt} with argument \code{dofit = FALSE}. A model with exactly
-the density defined above only requires the corresponding coefficients
-to be given to the resulting object
-<<ctm-uncon-disc-mlt>>=
-mlty <- mlt(my, data = as.data.frame(gy), dofit = FALSE)
-coef(mlty) <- qnorm(cumsum(dy[-5L]))
-@
-Because the model is now fully defined, we can draw random samples
-from this model and refit the model
-<<ctm-uncon-disc-sim, message = FALSE>>=
-ry <- do.call("c", simulate(mlty, nsim = 10000))
-ry <- ordered(ry, levels = 1:nlevels(yvar), labels = levels(yvar))
-nd <- data.frame(y = ry)
-mltnd <- mlt(my, data = nd, check = FALSE)
-@
-The true and estimated distribution and density functions can 
-now be compared
-<<ctm-uncon-disc-output>>=
-cumsum(dy)
-c(pnorm(coef(mltnd)), 1)
-predict(mltnd, q = gy, type = "distribution")
-pnorm(confint(mltnd))
-cbind(dy, diff(c(0, c(pnorm(coef(mltnd)), 1))))
-@
+
 Of course, the above exercise is an extremely cumbersome way
 of estimating a discrete density those maximum likelihood estimator
-simply is
-<<ctm-uncon-table>>=
-prop.table(table(ry))
-@
-but, as we will see in the rest of this paper, a generalisation
+simply is the relative frequency but, as we will see in the rest of this paper, a generalisation
 to the conditional case strongly relies on this parameterisation.
 
-\paragraph{Continuous Models for Continuous Responses}
+\subsubsection{Continuous Models for Continuous Responses}
 
 For continuous responses $\rY$ the
 parameterisation $\h(\ry) = \basisy(\ry)^\top \parm$, and thus also
@@ -386,6 +370,8 @@ strict monotonicity can be formulated as a set of $M$ linear constraints on the
 parameters $\eparm_m < \eparm_{m + 1}$ for all $m = 0, \dots, M$
 \citep{Curtis_Ghosh_2011}.  Therefore, application of constrained optimisation guarantees
 monotone estimates $\hat{\h}_N$. The basis contains an intercept.  
+
+\paragraph{Density Estimation: Geyser Data}
 
 As an example, we want to estimate the unconditional distribution of
 waiting times in the Old Faithful data. The Bernstein polynomial
@@ -431,7 +417,7 @@ plot(ndw$waiting, predict(mltw, q = ndw$waiting, type = "density"), type = "l",
      ylim = c(0, .04), xlab = "Waiting times", ylab = "Density")
 lines(ndw$waiting, predict(mltw40, q = ndw$waiting, type = "density"), lty = 2)
 @
-\caption{Geyser data: Estimated distribution (left, also featuring the empirical
+\caption{Old Faithful Geyser. Estimated distribution (left, also featuring the empirical
          cumulative distribution function) and density (right) function for 
          two transformation models parameterised in terms of Bernstein polynomials
          of order $8$ and $40$.  \label{fig:geyser-w-plot}}
@@ -464,13 +450,13 @@ for $M = 8$ and $\Sexpr{round(AIC(mltw40),1)}$ for $M = 40$ in favor of the smal
 \basisyx = (\basisy^\top, -\basisx_\text{shift}^\top)^\top
 \end{eqnarray*}
 
-\paragraph{Discrete Response}
+\subsubsection{Discrete Response}
 
-Proportional odds models
+\paragraph{Categorical Data Analysis: Copenhagen Housing Conditions Survey}
 
 <<housing>>=
 library("MASS")
-polr_housing <- polr(Sat ~ Infl, weights = Freq, data = housing)
+polr_housing_2 <- polr(Sat ~ Infl, weights = Freq, data = housing)
 b_Infl <- as.basis(~ Infl, data = housing, remove_intercept = TRUE, 
               negative = TRUE)
 b_Sat <- as.basis(~ Sat, data = housing, remove_intercept = TRUE,
@@ -480,18 +466,38 @@ b_Sat <- as.basis(~ Sat, data = housing, remove_intercept = TRUE,
 mod_housing_1 <- ctm(b_Sat, shift = b_Infl, todist = "Logi")
 mlt_housing_1 <- mlt(mod_housing_1, data = housing, weights = housing$Freq, check = FALSE)
 
-logLik(polr_housing)
+logLik(polr_housing_2)
 logLik(mlt_housing_1)
 
-cbind(polr = c(polr_housing$zeta, coef(polr_housing)), mlt = coef(mlt_housing_1))
+cbind(polr = c(polr_housing_2$zeta, coef(polr_housing_2)), mlt = coef(mlt_housing_1))
 
-cbind(polr = sqrt(diag(vcov(polr_housing)))[c(3, 4, 1, 2)],
+cbind(polr = sqrt(diag(vcov(polr_housing_2)))[c(3, 4, 1, 2)],
       mlt = sqrt(diag(vcov(mlt_housing_1))))
 @
 
-\paragraph{Continuous Responses}
+\subsubsection{Continuous Responses}
 
-Cox model for GBSG-2
+\paragraph{Survival Analysis: German Breast Cancer Study Group-2 (GBSG-2) Trial} 
+
+This prospective, controlled clinical trial on the treatment of node positive
+breast cancer patients was conducted by the German Breast Cancer Study 
+Group \citep[GBSG-2,][]{gbsg2:1994}.  Patients not older than $65$ years with
+positive regional lymph nodes but no distant metastases were included in
+the study.  Out of $686$ women, $246$ received hormonal therapy whereas the
+control group of $440$ women did not receive hormonal therapy.  Additional
+variables include age, menopausal status, tumor size, tumor grade, number of
+positive lymph nodes, progesterone receptor and estrogen receptor.  The
+right-censored recurrence-free survival time is the response variable of
+interest.
+
+First, we fitted the Cox model $(\pMEV, (\bern{5}^\top, \tilde{\rx}^\top)^\top,
+\parm)$ to the data, where $\tilde{\rx}$ contains the treatment indicator
+and all other variables in the transformation function $\h(\ry | \rx) =
+\bern{5}(\ry)^\top \parm_1 + \tilde{\rx}^\top \shiftparm$.  In contrast to the
+classical Cox model where only $\shiftparm$ is estimated by the partial
+likelihood, we estimated all model parameters simultaneously under five linear constraints.  
+The results obtained for $\shiftparm$ from the partial and the exact log-likelihood are practically
+equivalent:
 
 <<GBSG2-Cox, echo = TRUE>>=
 data("GBSG2", package = "TH.data")
@@ -549,6 +555,8 @@ cbind(survreg = coef(survreg_GBSG2_3)[names(cf)] / survreg_GBSG2_3$scale,
       mlt = coef(mlt_GBSG2_3)[names(cf)])
 @
 
+\paragraph{Truncated Regression: Tobin's Data}
+
 Tobit, see truncreg
 
 <<tobin>>=
@@ -566,6 +574,8 @@ logLik(mlt_tobin)
 
 -coef(mlt_tobin)[c("(Intercept)", "age", "quant")] / coef(mlt_tobin)["durable"]
 @
+
+\paragraph{Robust Regression: Boston Housing Data}
 
 lm; Boston Housing
 <<BostonHousing>>=
@@ -612,12 +622,10 @@ pfun <- function(x, y, z, subscripts, at, ...) {
 p2 <- contourplot(d ~ lp + q, data = nd, panel = pfun, xlab = "Linear predictor", ylab = "Observed", main = "Linear Transformation Model")
 grid.arrange(p1, p2, nrow = 1)
 @
-\caption{BostonHousing data: Predicted vs.~observed for the normal linear model (left) and the linear
+\caption{Boston Housing. Predicted vs.~observed for the normal linear model (left) and the linear
          transformation model with smooth baseline transformation (right).\label{fig:BostonHousing-plot}}
 \end{center}
 \end{figure}
-
-
 
 
 \subsection{Stratified Linear Transformation Models}
@@ -627,6 +635,10 @@ grid.arrange(p1, p2, nrow = 1)
 \pZ(\h(\ry | s) - \rx^\top \shiftparm) = \pZ(\basisyx(\ry, s, \rx)^\top \parm)
 \basisyx = (\basisy^\top \otimes \basisx_\text{stratum}^\top, -\basisx_\text{shift}^\top)^\top                                       
 \end{eqnarray*}
+
+\subsubsection{Discrete Response}
+
+\paragraph{Categorical Data Analysis: Housing Survey}
 
 <<housing-strat>>=
 b_Infl <- as.basis(~ Infl - 1, data = housing)
@@ -640,6 +652,14 @@ predict(mlt_housing_2, newdata = data.frame(Infl = unique(housing$Infl)),
         q = unique(housing$Sat), type = "distribution")
 @
 
+\subsubsection{Continuous Response}
+
+\paragraph{Survival Analysis: GBSG-2 Trial}
+
+\begin{eqnarray*}
+(\pMEV, (\bern{5}(\ry)^\top \otimes
+       (\I(\text{hormonal therapy}), 1 - \I(\text{hormonal therapy})))^\top, c(\parm_1, \parm_2))
+\end{eqnarray*}
 
 <<GBSG2-strat>>=
 ### two separate transformation functions
@@ -665,13 +685,23 @@ legend("bottomright", lty = c(1, 1, 2, 2), col = c("black", "grey", "black", "gr
        legend = c("hormonal therapy, KM", "no hormonal therapy, KM", 
                   "hormonal therapy, MLT", "no hormonal therapy, MLT"), bty = "n", cex = .6)
 @
-\caption{GBSG-2 data. Estimated survivor functions 
+\caption{GBSG-2 Trial. Estimated survivor functions 
          by the most likely transformation model (MLT) and the Kaplan-Meier (KM) estimator in the two 
          treatment groups. \label{GBSG2-strat-plot}}
 \end{center}
 \end{figure}
 
-<<GBSG2-strat-aga>>=
+In a second step, we allowed a treatment-specific baseline hazard functions
+for estimating the age effect
+in the model 
+\begin{eqnarray*}
+(\pMEV, (\bern{5}(\ry)^\top \otimes
+       (\I(\text{hormonal therapy}), 1 - \I(\text{hormonal therapy})),
+       \text{age})^\top, (\parm_1, \beta)).
+\end{eqnarray*}
+
+
+<<GBSG2-strat-age>>=
 mod_GBSG2_5 <- ctm(B_GBSG2y, interacting = b_horTh, shifting = ~ age, data = GBSG2, todistr = "MinExtrVal")
 (mlt_GBSG2_5 <- mlt(mod_GBSG2_5, data = GBSG2, check = FALSE, scale = TRUE))
 
@@ -693,6 +723,9 @@ cbind(coxph = sqrt(diag(vcov(coxph_GBSG2_5))),
 printfun(ctm)
 @
 
+\subsubsection{Discrete Response}
+
+\paragraph{Categorical Data Analysis: Housing Survey}
 
 <<housing-deviation>>=
 b_Infl <- as.basis(~ Infl, data = housing)
@@ -707,35 +740,78 @@ predict(mlt_housing_3, newdata = data.frame(Infl = unique(housing$Infl)),
 cftest(mlt_housing_3)
 @
 
+\paragraph{Continuous Response}
 
-timevarying deviation transformation
+\paragraph{Survival Analysis: GBSG-2 Trial}
+
+The Cox model $(\pMEV, (\bern{5}^\top, \I(\text{hormonal
+therapy}))^\top, \parm)$ implements the transformation function $\h(\ry |
+\text{treatment}) = \bern{5}(\ry)^\top \parm_1 + \I(\text{hormonal therapy})
+\beta$ where $\bern{5}^\top \parm_1$ is the log-cumulative baseline hazard function
+parameterised by a Bernstein polynomial and $\beta \in \RR$ is the
+log-hazard ratio of hormonal therapy. 
+
+<<GBSG2-Cox-simple>>=
+B_GBSG2y_5 <- Bernstein_basis(var = GBSG2y, order = 5, ui = "incre")
+mod_GBSG2_6 <- ctm(B_GBSG2y_5, shift = ~ horTh, data = GBSG2, todistr = "MinExtrVal")
+mlt_GBSG2_6 <- mlt(mod_GBSG2_6, data = GBSG2, check = FALSE)
+@
+
+This is the classical Cox model with one treatment parameter $\beta$ 
+but fully parameterised baseline transformation function which was fitted by the exact
+log-likelihood under five linear constraints. The model assumes proportional hazards, an assumption whose
+appropriateness we wanted to assess using the non-proportional hazards model
+$(\pMEV, (\bern{5}^\top \otimes (1, \I(\text{hormonal therapy})))^{\top}, \parm)$ with
+transformation function 
+\begin{eqnarray*}
+\h(\ry | \text{treatment}) = \bern{5}(\ry)^\top \parm_1 + \I(\text{hormonal therapy}) \bern{5}(\ry)^\top \parm_2. 
+\end{eqnarray*}
+The function $\bern{5}^\top \parm_2$ is the time-varying treatment effect
+and can be interpreted as the deviation, on the scale of the transformation
+function, induced by the hormonal therapy.  Under the null hypothesis of no
+treatment effect, we would expect $\parm_2 \equiv \bold{0}$.  This monotone
+deviation function adds five linear constraints to the model. We first
+compared the fitted survivor functions obtained from the model including 
+a time-varying treatment effect with the Kaplan-Meier
+estimators in both treatment groups.  The left panel of
+Figure~\ref{fig_5_logrank} shows a nicely smoothed version of the survivor
+functions obtained from this transformation model.  The right
+panel of Figure~\ref{fig_5_logrank} shows the time-varying treatment effect
+$\bern{5}^\top \hat{\parm}_2$, together with a $95\%$ confidence band
+computed from the joint normal distribution of $\hat{\parm}_2$ for a grid
+over time as described by \cite{Hothorn_Bretz_Westfall_2008}; 
+the method is
+much simpler than other methods for inference on time-varying
+effects \citep[for example][]{Sun_Sundaram_Zhao_2009}.  The $95\%$
+confidence interval around the log-hazard ratio $\hat{\beta}$ is plotted in
+addition and since the latter is fully covered by the confidence band for
+the time-varying treatment effect there is no reason to question the
+treatment effect computed under the proportional hazards assumption.
 
 <<GBSG2-deviation>>=
 B_GBSG2y_5 <- Bernstein_basis(var = GBSG2y, order = 5, ui = "incre")
 b_horTh <- as.basis(~ horTh, data = GBSG2)
-mod_GBSG2_6 <- ctm(B_GBSG2y_5, interacting = b_horTh, todistr = "MinExtrVal")
-mlt_GBSG2_6 <- mlt(mod_GBSG2_6, data = GBSG2, check = FALSE)
+mod_GBSG2_7 <- ctm(B_GBSG2y_5, interacting = b_horTh, todistr = "MinExtrVal")
+mlt_GBSG2_7 <- mlt(mod_GBSG2_7, data = GBSG2, check = FALSE)
 @
 
 \begin{figure}
 \begin{center} 
 <<GBSG2-deviation-plot, echo = FALSE, results = "hide">>=
 
-s <- mkgrid(mlt_GBSG2_6, 15)
+s <- mkgrid(mlt_GBSG2_7, 15)
 s$y <- s$y[s$y > 100 & s$y < 2400]
 nd <- expand.grid(s)
-K <- model.matrix(mod_GBSG2_6, data = nd)
+K <- model.matrix(mod_GBSG2_7, data = nd)
 Kyes <- K[nd$horTh == "yes",]
 Kyes[,1:6] <- 0  
-gh <- glht(parm(coef(mlt_GBSG2_6), vcov(mlt_GBSG2_6)), Kyes)
+gh <- glht(parm(coef(mlt_GBSG2_7), vcov(mlt_GBSG2_7)), Kyes)
 ci <- confint(gh)
 coxy <- s$y
 
-m <- ctm(B_GBSG2y, shifting = ~ horTh, todistr = "MinExtrVal", data = GBSG2)
-coxmod <- mlt(m, data = GBSG2, check = FALSE)
-K <- matrix(0, nrow = 1, ncol = length(coef(coxmod)))
-K[,length(coef(coxmod))] <- 1
-ci2 <- confint(glht(coxmod, K))
+K <- matrix(0, nrow = 1, ncol = length(coef(mlt_GBSG2_6)))
+K[,length(coef(mlt_GBSG2_6))] <- 1
+ci2 <- confint(glht(mlt_GBSG2_6, K))
 
 plot(coxy, ci$confint[, "Estimate"], ylim = range(ci$confint), type = "n",
      xlab = "Survival time (days)", ylab = "Transformation deviation", las = 1)
@@ -750,8 +826,7 @@ polygon(c(coxy[c(1, length(coxy))], rev(coxy[c(1, length(coxy))])),
 legend("bottomright", lty = 1:2, lwd = 1, legend = c("time-varying treatment effect",
        "time-constant log-hazard ratio"), bty = "n", cex = .6)
 @
-\caption{GBSG-2 data. 
-         Verification of proportional hazards: The log-hazard ratio $\hat{\beta}$
+\caption{GBSG-2 Trial. Verification of proportional hazards: The log-hazard ratio $\hat{\beta}$
          (dashed line) with $95\%$ confidence interval (dark grey) is fully 
          covered by a $95\%$ confidence band for the time-varying treatment effect (light grey,
          the estimate is the solid line)
@@ -759,7 +834,24 @@ legend("bottomright", lty = 1:2, lwd = 1, legend = c("time-varying treatment eff
 \end{center}
 \end{figure}   
 
-age varying treatment effect
+In a second step, we allowed an age-varying treatment effect 
+in the model $(\pMEV, (\bern{5}(\ry)^\top \otimes
+       (\I(\text{hormonal therapy}), 1 - \I(\text{hormonal therapy}))
+       \otimes \bernx{5}(\text{age})^\top)^\top, \parm)$. For both treatment
+groups, we estimated a conditional transformation function of survival time
+$\ry$ given age parameterised as the tensor basis of two Bernstein bases. Each of the
+two basis functions comes with $5 \times 6$ linear constraints, so the model
+was fitted under $60$ linear constraints. 
+Figure~\ref{fig_6_GBSG2} allows an assessment of the prognostic and
+predictive properties of age.  As the surivor functions were clearly larger
+under hormonal treatment for all patients, the positive treatment effect
+applied to all patients.  However, the size of the treatment effect varied
+greatly.  For women younger than $30$, the effect was most pronounced and
+levelled-off a little for older patients.  In general, the survival times were
+longest for women between $40$ and $60$ years old.  Younger women suffered
+the highest risk; for women older than $60$ years, the risk started to
+increase again.  This effect was shifted towards younger women by the
+application of hormonal treatment.
 
 <<GBSG2-agevarying, echo = TRUE, cache = TRUE>>=
 B_age <- Bernstein_basis(order = 3, var = numeric_var("age", support = range(GBSG2$age)))
@@ -780,23 +872,11 @@ contourplot(s ~ age + y | horTh, data = nd, at = 1:9 / 10,
             ylab = "Survival time (days)", xlab = "Age (years)",
             scales = list(x = list(alternating = c(1, 1))))
 @
-\caption{GBSG-2. Prognostic and predictive effect of age. The contours depict the
+\caption{GBSG-2 Trial. Prognostic and predictive effect of age. The contours depict the
          conditional survivor functions given treatment and age of the patient. 
          \label{fig_6_GBSG2}}
 \end{center}
 \end{figure}
-
-
-
-\section{Estimating Most Likely Transformations}
-
-\section{Looking at Transformation Models}
-
-\section{Classical Likelihood Inference for Most Likely Transformations}
-
-\section{Simulation Likelihood Inference for Most Likely Transformations}
-
-\section{Applications}
 
 \paragraph{Quantile Regression: Head Circumference}
 
@@ -854,89 +934,7 @@ print(contourplot(p ~ lage + head | cut, data = pr, panel = pfun, region = FALSE
 \end{center}
 \end{figure}
 
-\paragraph{Survival Analysis: German Breast Cancer Study Group-2 Trial} 
-
-This prospective, controlled clinical trial on the treatment of node positive
-breast cancer patients was conducted by the German Breast Cancer Study 
-Group \citep[GBSG-2,][]{gbsg2:1994}.  Patients not older than $65$ years with
-positive regional lymph nodes but no distant metastases were included in
-the study.  Out of $686$ women, $246$ received hormonal therapy whereas the
-control group of $440$ women did not receive hormonal therapy.  Additional
-variables include age, menopausal status, tumor size, tumor grade, number of
-positive lymph nodes, progesterone receptor and estrogen receptor.  The
-right-censored recurrence-free survival time is the response variable of
-interest.
-
-The Cox model $(\pMEV, (\bern{5}^\top, \I(\text{hormonal
-therapy}))^\top, \parm)$ implements the transformation function $\h(\ry |
-\text{treatment}) = \bern{5}(\ry)^\top \parm_1 + \I(\text{hormonal therapy})
-\beta$ where $\bern{5}^\top \parm_1$ is the log-cumulative baseline hazard function
-parameterised by a Bernstein polynomial and $\beta \in \RR$ is the
-log-hazard ratio of hormonal therapy. 
-
-
-
-
-This is the classical Cox model with one treatment parameter $\beta$ 
-but fully parameterised baseline transformation function which was fitted by the exact
-log-likelihood under five linear constraints. The model assumes proportional hazards, an assumption whose
-appropriateness we wanted to assess using the non-proportional hazards model
-$(\pMEV, (\bern{5}^\top \otimes (1, \I(\text{hormonal therapy})))^{\top}, \parm)$ with
-transformation function 
-\begin{eqnarray*}
-\h(\ry | \text{treatment}) = \bern{5}(\ry)^\top \parm_1 + \I(\text{hormonal therapy}) \bern{5}(\ry)^\top \parm_2. 
-\end{eqnarray*}
-The function $\bern{5}^\top \parm_2$ is the time-varying treatment effect
-and can be interpreted as the deviation, on the scale of the transformation
-function, induced by the hormonal therapy.  Under the null hypothesis of no
-treatment effect, we would expect $\parm_2 \equiv \bold{0}$.  This monotone
-deviation function adds five linear constraints to the model. We first
-compared the fitted survivor functions obtained from the model including 
-a time-varying treatment effect with the Kaplan-Meier
-estimators in both treatment groups.  The left panel of
-Figure~\ref{fig_5_logrank} shows a nicely smoothed version of the survivor
-functions obtained from this transformation model.  The right
-panel of Figure~\ref{fig_5_logrank} shows the time-varying treatment effect
-$\bern{5}^\top \hat{\parm}_2$, together with a $95\%$ confidence band
-computed from the joint normal distribution of $\hat{\parm}_2$ for a grid
-over time as described by \cite{Hothorn_Bretz_Westfall_2008}; 
-the method is
-much simpler than other methods for inference on time-varying
-effects \citep[for example][]{Sun_Sundaram_Zhao_2009}.  The $95\%$
-confidence interval around the log-hazard ratio $\hat{\beta}$ is plotted in
-addition and since the latter is fully covered by the confidence band for
-the time-varying treatment effect there is no reason to question the
-treatment effect computed under the proportional hazards assumption.
-
-In a second step, we allowed an age-varying treatment effect 
-in the model $(\pMEV, (\bern{5}(\ry)^\top \otimes
-       (\I(\text{hormonal therapy}), 1 - \I(\text{hormonal therapy}))
-       \otimes \bernx{5}(\text{age})^\top)^\top, \parm)$. For both treatment
-groups, we estimated a conditional transformation function of survival time
-$\ry$ given age parameterised as the tensor basis of two Bernstein bases. Each of the
-two basis functions comes with $5 \times 6$ linear constraints, so the model
-was fitted under $60$ linear constraints. 
-Figure~\ref{fig_6_GBSG2} allows an assessment of the prognostic and
-predictive properties of age.  As the surivor functions were clearly larger
-under hormonal treatment for all patients, the positive treatment effect
-applied to all patients.  However, the size of the treatment effect varied
-greatly.  For women younger than $30$, the effect was most pronounced and
-levelled-off a little for older patients.  In general, the survival times were
-longest for women between $40$ and $60$ years old.  Younger women suffered
-the highest risk; for women older than $60$ years, the risk started to
-increase again.  This effect was shifted towards younger women by the
-application of hormonal treatment.
-
-
-Finally, we fitted the Cox model $(\pMEV, (\bern{5}^\top, \tilde{\rx}^\top)^\top,
-\parm)$ to the data, where $\tilde{\rx}$ contains the treatment indicator
-and all other variables in the transformation function $\h(\ry | \rx) =
-\bern{5}(\ry)^\top \parm_1 + \tilde{\rx}^\top \shiftparm$.  In contrast to the
-classical Cox model where only $\shiftparm$ is estimated by the partial
-likelihood, we estimated all model parameters simultaneously under five linear constraints.  
-The results obtained from the partial and the exact log-likelihood are practically
-equivalent, Figure~\ref{fig_7_cox} shows the corresponding $z$-statistics for
-$\hat{\shiftparm}$.
+\subsubsection{Count Response}
 
 \paragraph{Count Regression: Tree Pipit Counts}
 
@@ -1045,6 +1043,16 @@ abline(h = 1, lty = 6)
          GAM, right panel). \label{fig_8_treepipit}}
 \end{center}
 \end{figure}
+
+
+\section{Estimating Most Likely Transformations}
+
+\section{Looking at Transformation Models}
+
+\section{Classical Likelihood Inference for Most Likely Transformations}
+
+\section{Simulation Likelihood Inference for Most Likely Transformations}
+
 
 \section*{Computational Details}
 
