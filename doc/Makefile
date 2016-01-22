@@ -3,6 +3,10 @@ all:	mlt.pdf
 
 mlt.tex:	mlt.Rnw
 	echo "library(\"knitr\"); knit(\"mlt.Rnw\")" | R --vanilla 
+
+mlt.R:	mlt.Rnw
+	echo "library(\"knitr\"); knit(\"mlt.Rnw\", tangle = TRUE)" | R --vanilla 
+
 	
 mlt.pdf:	mlt.tex
 	texi2dvi --pdf mlt.tex

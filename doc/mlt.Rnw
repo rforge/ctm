@@ -26,6 +26,9 @@ printfun <- function(fun) {
 }
 library("mlt")
 library("survival")
+library("eha")
+library("prodlim")
+library("truncreg")
 library("lattice")
 library("gridExtra")
 library("grid") ### for textGrob
@@ -39,6 +42,9 @@ ltheme$strip.background$col <- "transparent" ## change strip bg
 lattice.options(default.theme = ltheme)
 library("colorspace")
 library("multcomp")
+logLik.phreg <- function(object) object$loglik[2]
+vcov.phreg <- function(object) object$var
+opts_chunk$set(warning = FALSE, message = FALSE, fig.width=6, fig.height=6)
 @
 
 \newcommand{\TODO}[1]{{\color{red} #1}}
@@ -464,23 +470,23 @@ Proportional odds models
 
 <<housing>>=
 library("MASS")
-polrhousing <- polr(Sat ~ Infl, weights = Freq, data = housing)
-s <- as.basis(~ Infl, data = housing, remove_intercept = TRUE, 
+polr_housing <- polr(Sat ~ Infl, weights = Freq, data = housing)
+b_Infl <- as.basis(~ Infl, data = housing, remove_intercept = TRUE, 
               negative = TRUE)
-r <- as.basis(~ Sat, data = housing, remove_intercept = TRUE,
+b_Sat <- as.basis(~ Sat, data = housing, remove_intercept = TRUE,
               contrasts.arg = list(Sat = function(n) 
                   contr.treatment(n, base = 3)),
               ui = diff(diag(2)), ci = 0)
-mhousing <- ctm(r, shift = s, todist = "Logi")
-mlthousing <- mlt(mhousing, data = housing, weights = housing$Freq, check = FALSE)
+mod_housing_1 <- ctm(b_Sat, shift = b_Infl, todist = "Logi")
+mlt_housing_1 <- mlt(mod_housing_1, data = housing, weights = housing$Freq, check = FALSE)
 
-logLik(polrhousing)
-logLik(mlthousing)
+logLik(polr_housing)
+logLik(mlt_housing_1)
 
-cbind(polr = c(polrhousing$zeta, coef(polrhousing)), mlt = coef(mlthousing))
+cbind(polr = c(polr_housing$zeta, coef(polr_housing)), mlt = coef(mlt_housing_1))
 
-cbind(polr = sqrt(diag(vcov(polrhousing)))[c(3, 4, 1, 2)],
-      mlt = sqrt(diag(vcov(mlthousing))))
+cbind(polr = sqrt(diag(vcov(polr_housing)))[c(3, 4, 1, 2)],
+      mlt = sqrt(diag(vcov(mlt_housing_1))))
 @
 
 \paragraph{Continuous Responses}
@@ -490,58 +496,57 @@ Cox model for GBSG-2
 <<GBSG2-Cox, echo = TRUE>>=
 data("GBSG2", package = "TH.data")
 GBSG2$y <- with(GBSG2, Surv(time, cens))
-dist <- "Min"
-yvar <- numeric_var("y", support = c(100.0, max(GBSG2$time)), bounds = c(0, Inf))
+GBSG2y <- numeric_var("y", support = c(100.0, max(GBSG2$time)), bounds = c(0, Inf))
 ### Cox model
-By <- Bernstein_basis(var = yvar, order = 10, ui = "incre")
-fmGBSG2 <- Surv(time, cens) ~ horTh + age + menostat + tsize + tgrade + pnodes + progrec + estrec
-mGBSG2 <- ctm(By, shift = fmGBSG2[-2L], todistr = dist, data = GBSG2)
-mltGBSG2 <- mlt(mGBSG2, data = GBSG2, maxit = 3000, scale = TRUE, check = FALSE)
+B_GBSG2y <- Bernstein_basis(var = GBSG2y, order = 10, ui = "incre")
+fm_GBSG2 <- Surv(time, cens) ~ horTh + age + menostat + tsize + tgrade + pnodes + progrec + estrec
+mod_GBSG2_1 <- ctm(B_GBSG2y, shift = fm_GBSG2[-2L], todistr = "MinExtrVal", data = GBSG2)
+mlt_GBSG2_1 <- mlt(mod_GBSG2_1, data = GBSG2, maxit = 3000, scale = TRUE, check = FALSE)
 
-coxphGBSG2 <- coxph(fmGBSG2, data = GBSG2)
+coxph_GBSG2_1 <- coxph(fm_GBSG2, data = GBSG2)
 
-cf <- coef(coxphGBSG2)
-cbind(coxph = cf, mlt = coef(mltGBSG2)[names(cf)])
-cbind(coxph = sqrt(diag(vcov(coxphGBSG2))), 
-      mlt = sqrt(diag(vcov(mltGBSG2)))[names(cf)])
+cf <- coef(coxph_GBSG2_1)
+cbind(coxph = cf, mlt = coef(mlt_GBSG2_1)[names(cf)])
+cbind(coxph = sqrt(diag(vcov(coxph_GBSG2_1))), 
+      mlt = sqrt(diag(vcov(mlt_GBSG2_1)))[names(cf)])
 @
 
 AFT Models
 
 <<GBSG2-exponential>>=
-ly <- log_basis(yvar, ui = "increasing")
-mGBSG2 <- ctm(ly, shift = as.basis(fmGBSG2[-2L], data = GBSG2, negative = TRUE), todistr = dist)
-mltGBSG2 <- mlt(mGBSG2, data = GBSG2, fixed = c("log(y)" = 1), scale = TRUE, check = FALSE)
+ly <- log_basis(GBSG2y, ui = "increasing")
+mod_GBSG2_2 <- ctm(ly, shift = as.basis(fm_GBSG2[-2L], data = GBSG2, negative = TRUE), todistr = "MinExtrVal")
+mlt_GBSG2_2 <- mlt(mod_GBSG2_2, data = GBSG2, fixed = c("log(y)" = 1), scale = TRUE, check = FALSE)
 
-survregGBSG2 <- survreg(fmGBSG2, data = GBSG2, dist = "exponential")
-library("eha")
-phregGBSG2 <- phreg(fmGBSG2, data = GBSG2, dist = "weibull", shape = 1)
+survreg_GBSG2_2 <- survreg(fm_GBSG2, data = GBSG2, dist = "exponential")
+phreg_GBSG2_2 <- phreg(fm_GBSG2, data = GBSG2, dist = "weibull", shape = 1)
 
-logLik(mltGBSG2)
-logLik(survregGBSG2)
-phregGBSG2$loglik[2]
+logLik(mlt_GBSG2_2)
+logLik(survreg_GBSG2_2)
+logLik(phreg_GBSG2_2)
 
-cbind(survreg = coef(survregGBSG2)[names(cf)], phreg = coef(phregGBSG2)[names(cf)], 
-      mlt = coef(mltGBSG2)[names(cf)])
+cbind(survreg = coef(survreg_GBSG2_2)[names(cf)], 
+      phreg = coef(phreg_GBSG2_2)[names(cf)], 
+      mlt = coef(mlt_GBSG2_2)[names(cf)])
 
-cbind(survreg = sqrt(diag(vcov(survregGBSG2))[names(cf)]), 
-      phreg = sqrt(diag(phregGBSG2$var)[names(cf)]),
-      mlt = sqrt(diag(vcov(mltGBSG2)))[names(cf)])
+cbind(survreg = sqrt(diag(vcov(survreg_GBSG2_2))[names(cf)]), 
+      phreg = sqrt(diag(vcov(phreg_GBSG2_2))[names(cf)]),
+      mlt = sqrt(diag(vcov(mlt_GBSG2_2)))[names(cf)])
 @
 
 <<GBSG2-weibull>>=
-mltGBSG2 <- mlt(mGBSG2, data = GBSG2, scale = TRUE, check = FALSE)
+mlt_GBSG2_3 <- mlt(mod_GBSG2_2, data = GBSG2, scale = TRUE, check = FALSE)
 
-survregGBSG2 <- survreg(fmGBSG2, data = GBSG2, dist = "weibull")
-library("eha")
-phregGBSG2 <- phreg(fmGBSG2, data = GBSG2, dist = "weibull")
+survreg_GBSG2_3 <- survreg(fm_GBSG2, data = GBSG2, dist = "weibull")
+phreg_GBSG2_3 <- phreg(fm_GBSG2, data = GBSG2, dist = "weibull")
 
-logLik(mltGBSG2)
-logLik(survregGBSG2)
-phregGBSG2$loglik[2]
+logLik(mlt_GBSG2_3)
+logLik(survreg_GBSG2_3)
+logLik(phreg_GBSG2_3)
 
-cbind(survreg = coef(survregGBSG2)[names(cf)] / survregGBSG2$scale, phreg = coef(phregGBSG2)[names(cf)], 
-      mlt = coef(mltGBSG2)[names(cf)])
+cbind(survreg = coef(survreg_GBSG2_3)[names(cf)] / survreg_GBSG2_3$scale, 
+      phreg = coef(phreg_GBSG2_3)[names(cf)], 
+      mlt = coef(mlt_GBSG2_3)[names(cf)])
 @
 
 Tobit, see truncreg
@@ -549,61 +554,41 @@ Tobit, see truncreg
 <<tobin>>=
 data("tobin", package = "survival")
 ttobin <- subset(tobin, durable > 0)
-library("truncreg")
-(truncregtobin <- truncreg(durable ~ age + quant, data = ttobin))
+(truncreg_tobin <- truncreg(durable ~ age + quant, data = ttobin))
 
 ttobin$durable <- R(ttobin$durable, tleft = 0)
-pd <- as.basis(~ durable, data = tobin, ui = matrix(c(0, 1), nr  = 1), ci = 0)
-mtobin <- ctm(pd, shift = ~ age + quant, data = tobin, todistr = "Normal")
-mlttobin <- mlt(mtobin, data = ttobin, scale = TRUE, check = FALSE)
+b_d <- as.basis(~ durable, data = tobin, ui = matrix(c(0, 1), nr  = 1), ci = 0)
+mod_tobin <- ctm(b_d, shift = ~ age + quant, data = tobin, todistr = "Normal")
+mlt_tobin <- mlt(mod_tobin, data = ttobin, scale = TRUE, check = FALSE)
 
-logLik(truncregtobin)
-logLik(mlttobin)	
+logLik(truncreg_tobin)
+logLik(mlt_tobin)	
 
--coef(mlttobin)[c("(Intercept)", "age", "quant")] / coef(mlttobin)["durable"]
+-coef(mlt_tobin)[c("(Intercept)", "age", "quant")] / coef(mlt_tobin)["durable"]
 @
 
 lm; Boston Housing
 <<BostonHousing>>=
 data("BostonHousing", package = "mlbench")
-lmBostonHousing <- lm(medv ~ ., data = BostonHousing)
-
-coef(lmBostonHousing)
-summary(lmBostonHousing)$sigma
-logLik(lmBostonHousing)
-
+(lm_BH <- lm(medv ~ ., data = BostonHousing))
 BostonHousing$medvc <- with(BostonHousing, Surv(medv, medv < 50))
 mvar <- numeric_var("medvc", support = c(10.0, 40.0), bounds = c(0, Inf))
-Bm <- Bernstein_basis(mvar, order = 6, ui = "increasing")
-fmBostonHousing <- medvc ~ crim + zn + indus + chas + nox + rm + age + 
+B_m <- Bernstein_basis(mvar, order = 6, ui = "increasing")
+fm_BH <- medvc ~ crim + zn + indus + chas + nox + rm + age + 
     dis + rad + tax + ptratio + b + lstat
-mBostonHousing <- ctm(Bm, shift = as.basis(fmBostonHousing[-2L], data = BostonHousing, 
+mod_BH <- ctm(B_m, shift = as.basis(fm_BH[-2L], data = BostonHousing, 
                                            remove_intercept = TRUE, negative = TRUE),
                       todistr = "Normal")
-mltBostonHousing <- mlt(mBostonHousing, data = BostonHousing, scale = TRUE, 
+mlt_BH <- mlt(mod_BH, data = BostonHousing, scale = TRUE, 
                         check = FALSE)
-logLik(mltBostonHousing)
-
-survregBostonHousing <- survreg(fmBostonHousing, data = BostonHousing, dist = "gaussian")
-logLik(survregBostonHousing)
-cf <- coef(survregBostonHousing)
-xv <- names(cf)[-1]
-cbind(lm = coef(lmBostonHousing)[xv] / summary(lmBostonHousing)$sigma,
-      survreg = cf[xv] / survregBostonHousing$scale,
-      mlt = coef(mltBostonHousing)[xv])
-
-cbind(lm = sqrt(diag(vcov(lmBostonHousing))[xv]),
-survreg = sqrt(diag(vcov(survregBostonHousing))[xv]),
-mlt = sqrt(diag(vcov(mltBostonHousing))[xv]))
-
 @
 
 \begin{figure}
 \begin{center}
-<<BostonHousing-plot, echo = FALSE, fig.width = 6, fig.height = 4>>=
+<<BostonHousing-plot, echo = FALSE, results = "hide", fig.width = 6, fig.height = 4>>=
 q <- 3:52
-m <- predict(lmBostonHousing, data = BostonHousing)
-s <- summary(lmBostonHousing)$sigma
+m <- predict(lm_BH, data = BostonHousing)
+s <- summary(lm_BH)$sigma
 d <- sapply(m, function(m) pnorm(q, mean = m, sd = s))
 nd <- expand.grid(q = q, lp = m)
 nd$d <- c(d)
@@ -615,8 +600,8 @@ pfun <- function(x, y, z, subscripts, at, ...) {
 }
 p1 <- contourplot(d ~ lp + q, data = nd, panel = pfun, xlab = "Linear predictor", ylab = "Observed", main = "Normal Linear Model")
 
-d <- predict(mltBostonHousing, newdata = BostonHousing, q = q, type="distribution")
-lp <- c(predict(mltBostonHousing, newdata = BostonHousing, q = 0, terms = "bshift"))
+d <- predict(mlt_BH, newdata = BostonHousing, q = q, type="distribution")
+lp <- c(predict(mlt_BH, newdata = BostonHousing, q = 0, terms = "bshift"))
 nd <- expand.grid(q = q, lp = -lp)
 nd$d <- c(d)
 pfun <- function(x, y, z, subscripts, at, ...) {
@@ -643,24 +628,59 @@ grid.arrange(p1, p2, nrow = 1)
 \basisyx = (\basisy^\top \otimes \basisx_\text{stratum}^\top, -\basisx_\text{shift}^\top)^\top                                       
 \end{eqnarray*}
 
-<<ovarian>>=
-yvar <- numeric_var("time", support = range(ovarian$futime), bounds = c(0, Inf))
-ovarian$time <- with(ovarian, Surv(futime, fustat))
-ly <- log_basis(yvar, ui = "incre")
-fmovarian <- Surv(futime, fustat) ~ age
-movarian <- ctm(ly, interacting = as.basis(~ as.factor(rx) - 1, data = ovarian), 
-                shift = as.basis(fmovarian[-2L], data = ovarian, remove_intercept = FALSE, negative = TRUE), todistr = dist)
-mltovarian <- mlt(movarian, data = ovarian, scale = TRUE, check = FALSE)
+<<housing-strat>>=
+b_Infl <- as.basis(~ Infl - 1, data = housing)
+b_Sat <- as.basis(~ Sat, data = housing, remove_intercept = TRUE,
+              contrasts.arg = list(Sat = function(n) 
+                  contr.treatment(n, base = 3)),
+              ui = diff(diag(2)), ci = 0)
+mod_housing_2 <- ctm(b_Sat, interacting = b_Infl, todist = "Logistic")
+mlt_housing_2 <- mlt(mod_housing_2, data = housing, weights = housing$Freq, check = FALSE)
+predict(mlt_housing_2, newdata = data.frame(Infl = unique(housing$Infl)), 
+        q = unique(housing$Sat), type = "distribution")
+@
 
-survregovarian <- survreg(Surv(futime, fustat) ~ age + strata(rx), data=ovarian,
-                          dist = "weibull")
 
-logLik(mltovarian)
-logLik(survregovarian)
+<<GBSG2-strat>>=
+### two separate transformation functions
+b_horTh <- as.basis(~ horTh - 1, data = GBSG2, remove_intercept = FALSE)
+mod_GBSG2_4 <- ctm(B_GBSG2y, interacting = b_horTh, todistr = "MinExtrVal")
+mlt_GBSG2_4 <- mlt(mod_GBSG2_4, data = GBSG2, check = FALSE)
+@
 
-cftest(mltovarian)
-cftest(survregovarian)
+\begin{figure}
+\begin{center}
+<<GBSG2-strat-plot, echo = FALSE, results = "hide">>=
+nd <- expand.grid(s <- mkgrid(mlt_GBSG2_4, 100))
+nd$mlt_S <- c(predict(mlt_GBSG2_4, newdata = s, type = "survivor"))
+nd$KM_S <- unlist(predict(prodlim(Surv(time, cens) ~ horTh, data = GBSG2), 
+     	             newdata = data.frame(horTh = s$horTh), times = s$y))
+plot(nd$y, nd$mlt_S, ylim = c(0, 1), xlab = "Survival time (days)",
+     ylab = "Probability", type = "n", las = 1)
+with(subset(nd, horTh == "no"), lines(y, mlt_S, col = "grey", lty = 2))
+with(subset(nd, horTh == "yes"), lines(y, mlt_S, lty = 2))
+with(subset(nd, horTh == "no"), lines(y, KM_S, type = "s", col = "grey"))
+with(subset(nd, horTh == "yes"), lines(y, KM_S, type = "s"))
+legend("bottomright", lty = c(1, 1, 2, 2), col = c("black", "grey", "black", "grey"),
+       legend = c("hormonal therapy, KM", "no hormonal therapy, KM", 
+                  "hormonal therapy, MLT", "no hormonal therapy, MLT"), bty = "n", cex = .6)
+@
+\caption{GBSG-2 data. Estimated survivor functions 
+         by the most likely transformation model (MLT) and the Kaplan-Meier (KM) estimator in the two 
+         treatment groups. \label{GBSG2-strat-plot}}
+\end{center}
+\end{figure}
 
+<<GBSG2-strat-aga>>=
+mod_GBSG2_5 <- ctm(B_GBSG2y, interacting = b_horTh, shifting = ~ age, data = GBSG2, todistr = "MinExtrVal")
+(mlt_GBSG2_5 <- mlt(mod_GBSG2_5, data = GBSG2, check = FALSE, scale = TRUE))
+
+coxph_GBSG2_5 <- coxph(Surv(time, cens) ~ age + strata(horTh), data = GBSG2)
+
+cf <- coef(coxph_GBSG2_5)
+cbind(coxph = cf, mlt = coef(mlt_GBSG2_5)[names(cf)])
+cbind(coxph = sqrt(diag(vcov(coxph_GBSG2_5))),
+      mlt = sqrt(diag(vcov(mlt_GBSG2_5)))[names(cf)])
 @
 
 \subsection{Conditional Transformation Models}
@@ -672,6 +692,101 @@ cftest(survregovarian)
 <<ctm-fun, echo = FALSE>>=
 printfun(ctm)
 @
+
+
+<<housing-deviation>>=
+b_Infl <- as.basis(~ Infl, data = housing)
+b_Sat <- as.basis(~ Sat, data = housing, remove_intercept = TRUE,
+              contrasts.arg = list(Sat = function(n) 
+                  contr.treatment(n, base = 3)),
+              ui = diff(diag(2)), ci = 0)
+mod_housing_3 <- ctm(b_Sat, interacting = b_Infl, todist = "Logistic")
+mlt_housing_3 <- mlt(mod_housing_3, data = housing, weights = housing$Freq, check = FALSE)
+predict(mlt_housing_3, newdata = data.frame(Infl = unique(housing$Infl)), 
+        q = unique(housing$Sat), type = "distribution")
+cftest(mlt_housing_3)
+@
+
+
+timevarying deviation transformation
+
+<<GBSG2-deviation>>=
+B_GBSG2y_5 <- Bernstein_basis(var = GBSG2y, order = 5, ui = "incre")
+b_horTh <- as.basis(~ horTh, data = GBSG2)
+mod_GBSG2_6 <- ctm(B_GBSG2y_5, interacting = b_horTh, todistr = "MinExtrVal")
+mlt_GBSG2_6 <- mlt(mod_GBSG2_6, data = GBSG2, check = FALSE)
+@
+
+\begin{figure}
+\begin{center} 
+<<GBSG2-deviation-plot, echo = FALSE, results = "hide">>=
+
+s <- mkgrid(mlt_GBSG2_6, 15)
+s$y <- s$y[s$y > 100 & s$y < 2400]
+nd <- expand.grid(s)
+K <- model.matrix(mod_GBSG2_6, data = nd)
+Kyes <- K[nd$horTh == "yes",]
+Kyes[,1:6] <- 0  
+gh <- glht(parm(coef(mlt_GBSG2_6), vcov(mlt_GBSG2_6)), Kyes)
+ci <- confint(gh)
+coxy <- s$y
+
+m <- ctm(B_GBSG2y, shifting = ~ horTh, todistr = "MinExtrVal", data = GBSG2)
+coxmod <- mlt(m, data = GBSG2, check = FALSE)
+K <- matrix(0, nrow = 1, ncol = length(coef(coxmod)))
+K[,length(coef(coxmod))] <- 1
+ci2 <- confint(glht(coxmod, K))
+
+plot(coxy, ci$confint[, "Estimate"], ylim = range(ci$confint), type = "n",
+     xlab = "Survival time (days)", ylab = "Transformation deviation", las = 1)
+polygon(c(coxy, rev(coxy)), c(ci$confint[,"lwr"], rev(ci$confint[, "upr"])),
+        border = NA, col = rgb(.1, .1, .1, .1))
+lines(coxy, ci$confint[, "Estimate"], lty = 1, lwd = 1)
+lines(coxy, rep(ci2$confint[,"Estimate"], length(coxy)), lty = 2, lwd = 1) 
+lines(coxy, rep(0, length(coxy)), lty = 3)
+polygon(c(coxy[c(1, length(coxy))], rev(coxy[c(1, length(coxy))])),
+        rep(ci2$confint[,c("lwr", "upr")], c(2, 2)),
+        border = NA, col = rgb(.1, .1, .1, .1))
+legend("bottomright", lty = 1:2, lwd = 1, legend = c("time-varying treatment effect",
+       "time-constant log-hazard ratio"), bty = "n", cex = .6)
+@
+\caption{GBSG-2 data. 
+         Verification of proportional hazards: The log-hazard ratio $\hat{\beta}$
+         (dashed line) with $95\%$ confidence interval (dark grey) is fully 
+         covered by a $95\%$ confidence band for the time-varying treatment effect (light grey,
+         the estimate is the solid line)
+         computed from a non-proportional hazards model. \label{GBSG2-deviation-plot}}
+\end{center}
+\end{figure}   
+
+age varying treatment effect
+
+<<GBSG2-agevarying, echo = TRUE, cache = TRUE>>=
+B_age <- Bernstein_basis(order = 3, var = numeric_var("age", support = range(GBSG2$age)))
+b_horTh <- as.basis(~ horTh - 1, data = GBSG2)
+mod_GBSG2_7 <- ctm(B_GBSG2y, interacting = b(horTh = b_horTh, age = B_age), todistr = "MinExtrVal")
+mlt_GBSG2_7  <- mlt(mod_GBSG2_7, data = GBSG2, check = FALSE)
+@
+
+\begin{figure}[t]
+\begin{center}
+<<fig_6_GBSG2, echo = FALSE>>=
+nlev <- c(no = "without hormonal therapy", yes = "with hormonal therapy")
+levels(nd$horTh) <- nlev[match(levels(nd$horTh), names(nlev))]
+s <- mkgrid(mlt_GBSG2_7, 100)
+nd <- expand.grid(s)
+nd$s <- c(predict(mlt_GBSG2_7, newdata = s, type = "survivor"))
+contourplot(s ~ age + y | horTh, data = nd, at = 1:9 / 10,
+            ylab = "Survival time (days)", xlab = "Age (years)",
+            scales = list(x = list(alternating = c(1, 1))))
+@
+\caption{GBSG-2. Prognostic and predictive effect of age. The contours depict the
+         conditional survivor functions given treatment and age of the patient. 
+         \label{fig_6_GBSG2}}
+\end{center}
+\end{figure}
+
+
 
 \section{Estimating Most Likely Transformations}
 
@@ -793,93 +908,6 @@ addition and since the latter is fully covered by the confidence band for
 the time-varying treatment effect there is no reason to question the
 treatment effect computed under the proportional hazards assumption.
 
-<<GBSG2-timevarying, echo = TRUE, cache = TRUE>>=
-### two separate transformation functions
-BhorTh <- as.basis(~ horTh - 1, data = GBSG2, remove_intercept = FALSE)
-By <- Bernstein_basis(order = 5, ui = "incre", var = yvar)
-m <- ctm(By, interacting = BhorTh, todistr = dist)
-mod <- mlt(m, data = GBSG2, check = FALSE)
-AIC(mod)
-
-s <- mkgrid(mod, 100)
-nd <- expand.grid(s)
-nd$h <- c(predict(mod, newdata = s))
-nd$p <- c(predict(mod, newdata = s, type = "distribution"))
-
-### deviation transformation
-BhorTh <- as.basis(~ horTh, data = GBSG2)
-m <- ctm(By, interacting = BhorTh, todistr = dist)
-mod <- mlt(m, data = GBSG2, check = FALSE)
-AIC(mod)
-
-s <- mkgrid(mod, 15)
-s$y <- s$y[s$y > 100 & s$y < 2400]
-nd <- expand.grid(s)
-K <- model.matrix(m, data = nd)
-Kyes <- K[nd$horTh == "yes",]
-Kyes[,1:6] <- 0
-gh <- glht(parm(coef(mod), vcov(mod)), Kyes)
-ci <- confint(gh)
-
-m <- ctm(By, shifting = ~ horTh, todistr = dist, data = GBSG2)
-coxmod <- mlt(m, data = GBSG2, check = FALSE)
-AIC(coxmod)
-
-K <- matrix(0, nrow = 1, ncol = length(coef(coxmod)))
-K[,length(coef(coxmod))] <- 1
-ci2 <- confint(glht(coxmod, K))
-coxy <- s$y
-
-### 2 separate KM curves
-s <- mkgrid(mod, 50)
-s$y <- s$y[s$y > 100 & s$y < 2400]
-coxnd <- expand.grid(s)
-coxnd$p <- c(predict(coxmod, newdata = s, type = "survivor"))
-library("prodlim")
-coxnd$pp <- unlist(predict(prodlim(Surv(time, cens) ~ horTh, data = GBSG2), 
-                 newdata = data.frame(horTh = s$horTh), times = s$y))
-@
-
-\begin{figure}[t]
-\begin{center}
-<<fig_5_logrank, echo = FALSE>>=
-layout(matrix(1:2, nrow = 1))
-par("mai" = par("mai") * c(1, .95, 1, .85))
-plot(coxnd$y, coxnd$p, ylim = c(0, 1), xlab = "Survival time (days)",
-     ylab = "Probability", type = "n", las = 1)
-with(subset(coxnd, horTh == "no"), lines(y, p, col = "grey", lty = 2))
-with(subset(coxnd, horTh == "yes"), lines(y, p, lty = 2))
-with(subset(coxnd, horTh == "no"), lines(y, pp, type = "s", col = "grey"))
-with(subset(coxnd, horTh == "yes"), lines(y, pp, type = "s"))
-legend("bottomright", lty = c(1, 1, 2, 2), col = c("black", "grey", "black", "grey"),
-       legend = c("hormonal therapy, KM", "no hormonal therapy, KM",
-                  "hormonal therapy, MLT", "no hormonal therapy, MLT"), bty = "n", cex = .6)
-plot(coxy, ci$confint[, "Estimate"], ylim = range(ci$confint), type = "n",
-     xlab = "Survival time (days)", ylab = "Transformation deviation", las = 1)
-polygon(c(coxy, rev(coxy)), c(ci$confint[,"lwr"], rev(ci$confint[, "upr"])),
-        border = NA, col = rgb(.1, .1, .1, .1))
-lines(coxy, ci$confint[, "Estimate"], lty = 1, lwd = 1)
-lines(coxy, rep(ci2$confint[,"Estimate"], length(coxy)), lty = 2, lwd = 1)
-lines(coxy, rep(0, length(coxy)), lty = 3)
-polygon(c(coxy[c(1, length(coxy))], rev(coxy[c(1, length(coxy))])), 
-        rep(ci2$confint[,c("lwr", "upr")], c(2, 2)), 
-        border = NA, col = rgb(.1, .1, .1, .1))
-legend("bottomright", lty = 1:2, lwd = 1, legend = c("time-varying treatment effect", 
-       "time-constant log-hazard ratio"), bty = "n", cex = .6)
-
-@
-\caption{GBSG-2. Estimated survivor functions 
-         by the most likely transformation model (MLT) and the Kaplan-Meier (KM) estimator in the two 
-         treatment groups (left panel). 
-         Verification of proportional hazards (right panel): The log-hazard ratio $\hat{\beta}$
-         (dashed line) with $95\%$ confidence interval (dark grey) is fully 
-         covered by a $95\%$ confidence band for the time-varying treatment effect (light grey,
-         the estimate is the solid line)
-         computed from a non-proportional hazards model. \label{fig_5_logrank}}
-\end{center}
-\end{figure}
-
-
 In a second step, we allowed an age-varying treatment effect 
 in the model $(\pMEV, (\bern{5}(\ry)^\top \otimes
        (\I(\text{hormonal therapy}), 1 - \I(\text{hormonal therapy}))
@@ -899,36 +927,6 @@ the highest risk; for women older than $60$ years, the risk started to
 increase again.  This effect was shifted towards younger women by the
 application of hormonal treatment.
 
-<<GBSG2-agevarying, echo = TRUE, cache = TRUE>>=
-### age-varying treatment effect
-Bage <- Bernstein_basis(order = 3, var = numeric_var("age", support = range(GBSG2$age)))
-BhorTh <- as.basis(~ horTh - 1, data = GBSG2)
-
-m <- ctm(By, interacting = b(horTh = BhorTh, age = Bage), todistr = dist)
-mod <- mlt(m, data = GBSG2, check = FALSE)
-
-s <- mkgrid(m, 100)
-nd <- expand.grid(s)
-nd$h <- c(predict(mod, newdata = s))
-nd$d <- c(predict(mod, newdata = s, type = "density"))
-nd$p <- c(predict(mod, newdata = s, type = "distribution"))
-nd$l <- c(predict(mod, newdata = s, type = "hazard"))
-@
-
-\begin{figure}[t]
-\begin{center}
-<<fig_6_GBSG2, echo = FALSE>>=
-nlev <- c(no = "without hormonal therapy", yes = "with hormonal therapy")
-levels(nd$horTh) <- nlev[match(levels(nd$horTh), names(nlev))]
-contourplot(I(1 - p) ~ age + y | horTh, data = nd, at = 1:9 / 10,
-            ylab = "Survival time (days)", xlab = "Age (years)",
-            scales = list(x = list(alternating = c(1, 1))))
-@
-\caption{GBSG-2. Prognostic and predictive effect of age. The contours depict the
-         conditional survivor functions given treatment and age of the patient. 
-         \label{fig_6_GBSG2}}
-\end{center}
-\end{figure}
 
 Finally, we fitted the Cox model $(\pMEV, (\bern{5}^\top, \tilde{\rx}^\top)^\top,
 \parm)$ to the data, where $\tilde{\rx}$ contains the treatment indicator
