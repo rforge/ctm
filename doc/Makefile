@@ -6,6 +6,8 @@ mlt.tex:	mlt.Rnw
 
 mlt.R:	mlt.Rnw
 	echo "library(\"knitr\"); knit(\"mlt.Rnw\", tangle = TRUE)" | R --vanilla 
+	grep -v "^opts" mlt.R > tmp.R
+	mv tmp.R mlt.R
 
 	
 mlt.pdf:	mlt.tex
