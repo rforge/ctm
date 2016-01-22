@@ -592,16 +592,47 @@ cbind(lm = coef(lmBostonHousing)[xv] / summary(lmBostonHousing)$sigma,
       survreg = cf[xv] / survregBostonHousing$scale,
       mlt = coef(mltBostonHousing)[xv])
 
-q <- mkgrid(mvar, 100)
-plot(q[[1]], predict(mltBostonHousing, newdata = data.frame(1), q = q[[1]], 
-                     terms = "bresponse"))
-abline(a = -cf["(Intercept)"] / survregBostonHousing$scale, 1 / survregBostonHousing$scale)
-
 cbind(lm = sqrt(diag(vcov(lmBostonHousing))[xv]),
 survreg = sqrt(diag(vcov(survregBostonHousing))[xv]),
 mlt = sqrt(diag(vcov(mltBostonHousing))[xv]))
 
 @
+
+\begin{figure}
+\begin{center}
+<<BostonHousing-plot, echo = FALSE, fig.width = 6, fig.height = 4>>=
+q <- 3:52
+m <- predict(lmBostonHousing, data = BostonHousing)
+s <- summary(lmBostonHousing)$sigma
+d <- sapply(m, function(m) pnorm(q, mean = m, sd = s))
+nd <- expand.grid(q = q, lp = m)
+nd$d <- c(d)
+
+pfun <- function(x, y, z, subscripts, at, ...) {
+    panel.contourplot(x, y, z, subscripts, at = 1:9/10, ...)
+    panel.xyplot(x = m, y = BostonHousing$medv, pch = 20,   
+                 col = rgb(.1, .1, .1, .1),  ...)   
+}
+p1 <- contourplot(d ~ lp + q, data = nd, panel = pfun, xlab = "Linear predictor", ylab = "Observed", main = "Normal Linear Model")
+
+d <- predict(mltBostonHousing, newdata = BostonHousing, q = q, type="distribution")
+lp <- c(predict(mltBostonHousing, newdata = BostonHousing, q = 0, terms = "bshift"))
+nd <- expand.grid(q = q, lp = -lp)
+nd$d <- c(d)
+pfun <- function(x, y, z, subscripts, at, ...) {
+    panel.contourplot(x, y, z, subscripts, at = 1:9/10, ...)
+    panel.xyplot(x = -lp, y = BostonHousing$medv, pch = 20, 
+                 col = rgb(.1, .1, .1, .1), ...)   
+}
+p2 <- contourplot(d ~ lp + q, data = nd, panel = pfun, xlab = "Linear predictor", ylab = "Observed", main = "Linear Transformation Model")
+grid.arrange(p1, p2, nrow = 1)
+@
+\caption{BostonHousing data: Predicted vs.~observed for the normal linear model (left) and the linear
+         transformation model with smooth baseline transformation (right).\label{fig:BostonHousing-plot}}
+\end{center}
+\end{figure}
+
+
 
 
 \subsection{Stratified Linear Transformation Models}
