@@ -18,3 +18,12 @@ clean:
 	rm -rf mlt.aux
 	rm -rf mlt.tex
 	rm -rf mlt.pdf
+	rm -rf mlt.R
+	rm -rf *~
+	rm -rf packages.bib
+	
+dist-clean:
+	make clean
+	rm -rf cache
+	rm -rf figure
+	
