@@ -11,6 +11,8 @@
 %% need no \usepackage{Sweave.sty}
 %%\usepackage[nolists]{endfloat}
 
+\newcommand{\cmd}[1]{\texttt{#1()}}
+
 <<setup, echo = FALSE, results = "hide", message = FALSE>>=
 printfun <- function(fun) {
     f <- formals(fun)
@@ -31,6 +33,8 @@ library("prodlim")
 library("truncreg")
 library("lattice")
 library("gridExtra")
+library("MASS")
+library("HSAUR3")
 library("grid") ### for textGrob
 library("latticeExtra")
 trellis.par.set(list(plot.symbol = list(col=1,pch=20, cex=0.7),
@@ -199,7 +203,7 @@ $\parm$ in the transformation model
 by maximisation of the exact likelihood as follows. After loading package
 \pkg{mlt} we specify the \code{duration} variable we are interested in
 <<geyser-var, echo = TRUE>>=
-dvar <- numeric_var("duration", support = c(1.0, 5.0), bound = c(0, Inf))
+dvar <- numeric_var("duration", support = c(1.0, 5.0), add = c(-1, 1), bound = c(0, Inf))
 @
 This abstract representation refers to a positive and conceptually
 continuous variable \code{duration}.  We then set-up a basis function
@@ -309,36 +313,37 @@ $K - 2$ linear constraints $\eparm_2 - \eparm_1 > 0, \dots, \eparm_{K -1} -
 \paragraph{Categorical Data Analysis: Copenhagen Housing Conditions Survey}
 
 We can specify the discrete basis function $\basisy$ as
-<<housing-1>>=
-library("MASS")
-polr_housing_1 <- polr(Sat ~ 1, weights = Freq, data = housing)
-b_Sat <- as.basis(~ Sat, data = housing, remove_intercept = TRUE,
-              contrasts.arg = list(Sat = function(n) 
-                  contr.treatment(n, base = 3)),
-              ui = diff(diag(2)), ci = 0)
-ctm_housing_1 <- ctm(b_Sat, todist = "Logistic")
-mlt_housing_1 <- mlt(ctm_housing_1, data = housing, weights = housing$Freq, check = FALSE)
+<<CHFLS-1>>=
+data("CHFLS", package = "HSAUR3")
+polr_CHFLS_1 <- polr(R_happy ~ 1, data = CHFLS)
+nl <- nlevels(CHFLS$R_happy)
+b_happy <- as.basis(~ R_happy, data = CHFLS, remove_intercept = TRUE,
+                    contrasts.arg = list(R_happy = function(n) 
+                        contr.treatment(n, base = nl)),
+                    ui = diff(diag(nl - 1)), ci = rep(0, nl - 2))
+ctm_CHFLS_1 <- ctm(b_happy, todist = "Logistic")
+mlt_CHFLS_1 <- mlt(ctm_CHFLS_1, data = CHFLS, check = FALSE)
 
-model.matrix(ctm_housing_1, data = data.frame(Sat = unique(housing$Sat)))
+model.matrix(ctm_CHFLS_1, data = data.frame(R_happy = unique(CHFLS$R_happy)))
 
-logLik(polr_housing_1)
-logLik(mlt_housing_1)
+logLik(polr_CHFLS_1)
+logLik(mlt_CHFLS_1)
 
-cbind(polr = polr_housing_1$zeta, mlt = coef(mlt_housing_1))
+cbind(polr = polr_CHFLS_1$zeta, mlt = coef(mlt_CHFLS_1))
 
-cbind(polr = sqrt(diag(vcov(polr_housing_1))),
-      mlt = sqrt(diag(vcov(mlt_housing_1))))
+cbind(polr = sqrt(diag(vcov(polr_CHFLS_1))),
+      mlt = sqrt(diag(vcov(mlt_CHFLS_1))))
 
-predict(polr_housing_1, newdata = data.frame(1), type = "prob")
-xtabs(Freq ~ Sat, data = housing) / sum(housing$Freq)
+predict(polr_CHFLS_1, newdata = data.frame(1), type = "prob")
+xtabs(~ R_happy, data = CHFLS) / nrow(CHFLS)
 @
 
 The basis function evaluated at the levels of the factor can
-be obtained from the \code{model.matrix} method, along with
+be obtained from the \cmd{model.matrix} method, along with
 the linear constraints imposed by this basis function.
 
 The conditional transformation model (although being unconditional here) 
-is defined using the \code{ctm} function.
+is defined using the \cmd{ctm} function.
 
 Of course, the above exercise is an extremely cumbersome way
 of estimating a discrete density those maximum likelihood estimator
@@ -377,7 +382,7 @@ As an example, we want to estimate the unconditional distribution of
 waiting times in the Old Faithful data. The Bernstein polynomial
 for \code{waiting} is defined as
 <<geyser-w>>=
-wvar <- numeric_var("waiting", support = c(40.0, 100), bound = c(35, 115))
+wvar <- numeric_var("waiting", support = c(40.0, 100), add = c(-5, 15), bound = c(0, Inf))
 B_w <- Bernstein_basis(order = 8, var = wvar, ui = "incre")
 @
 The (in our case unconditional) transformation model is now fully described by
@@ -456,21 +461,20 @@ for $M = 8$ and $\Sexpr{round(AIC(mlt_w_40),1)}$ for $M = 40$ in favor of the sm
 
 Estimate a proportional odds model
 
-<<housing-2>>=
-library("MASS")
-polr_housing_2 <- polr(Sat ~ Infl, weights = Freq, data = housing)
-b_Infl <- as.basis(~ Infl, data = housing, remove_intercept = TRUE, 
-              negative = TRUE)
-ctm_housing_2 <- ctm(b_Sat, shift = b_Infl, todist = "Logi")
-mlt_housing_2 <- mlt(ctm_housing_2, data = housing, weights = housing$Freq, check = FALSE)
+<<CHFLS-2, cache = TRUE>>=
+polr_CHFLS_2 <- polr(R_happy ~ R_age + R_income, data = CHFLS)
+b_R <- as.basis(~ R_age + R_income, data = CHFLS, remove_intercept = TRUE, 
+                   negative = TRUE)
+ctm_CHFLS_2 <- ctm(b_happy, shift = b_R, todist = "Logi")
+mlt_CHFLS_2 <- mlt(ctm_CHFLS_2, data = CHFLS, check = FALSE, scale = TRUE)
 
-logLik(polr_housing_2)
-logLik(mlt_housing_2)
+logLik(polr_CHFLS_2)
+logLik(mlt_CHFLS_2)
 
-cbind(polr = c(polr_housing_2$zeta, coef(polr_housing_2)), mlt = coef(mlt_housing_2))
+cbind(polr = c(polr_CHFLS_2$zeta, coef(polr_CHFLS_2)), mlt = coef(mlt_CHFLS_2))
 
-cbind(polr = sqrt(diag(vcov(polr_housing_2)))[c(3, 4, 1, 2)],
-      mlt = sqrt(diag(vcov(mlt_housing_2))))
+#cbind(polr = sqrt(diag(vcov(polr_CHFLS_2)))[c(3, 4, 1, 2)],
+#      mlt = sqrt(diag(vcov(mlt_CHFLS_2))))
 @
 
 \subsubsection{Continuous Responses}
@@ -637,17 +641,26 @@ grid.arrange(p1, p2, nrow = 1)
 
 \paragraph{Categorical Data Analysis: Housing Survey}
 
-We estimate the conditional distribution of housholder satisfaction
-for each level of the perceived degree of influence householders have on the
-management of the property. Non-proportional odds model.
+Non-proportional odds model.
 
-<<housing-3>>=
-b_Infl <- as.basis(~ Infl - 1, data = housing)
-ctm_housing_3 <- ctm(b_Sat, interacting = b_Infl, todist = "Logistic")
-mlt_housing_3 <- mlt(ctm_housing_3, data = housing, weights = housing$Freq, check = FALSE)
-predict(mlt_housing_3, newdata = data.frame(Infl = unique(housing$Infl)), 
-        q = unique(housing$Sat), type = "distribution")
+<<CHFLS-3, cache = TRUE>>=
+b_health <- as.basis(~ R_health - 1, data = CHFLS)
+ctm_CHFLS_3 <- ctm(b_happy, interacting = b_health, todist = "Logistic")
+mlt_CHFLS_3 <- mlt(ctm_CHFLS_3, data = CHFLS, scale = TRUE,
+                   check = FALSE, maxit = 5000)
+predict(mlt_CHFLS_3, newdata = data.frame(R_health = sort(unique(CHFLS$R_health))), 
+        q = sort(unique(CHFLS$R_happy)), type = "distribution")
 @
+
+With covariates
+
+<<CHFLS-4, cache = TRUE>>=
+ctm_CHFLS_4 <- ctm(b_happy, interacting = b_health, shift = b_R, todist = "Logistic")
+mlt_CHFLS_4 <- mlt(ctm_CHFLS_4, data = CHFLS, scale = TRUE,
+                   check = FALSE)
+cftest(mlt_CHFLS_4)
+@
+
 
 \subsubsection{Continuous Response}
 
@@ -726,17 +739,27 @@ printfun(ctm)
 
 \paragraph{Categorical Data Analysis: Housing Survey}
 
-Estimate the deviation of the conditional distribution of householder satisfaction
-compared to the baseline distribution of householder statisfaction with \code{low}
-influence on property management.
+Estimate the deviation of the conditional distribution of happiness
+compared to the baseline distribution of happiness with very poor health.
 
-<<housing-4>>=
-b_Infl <- as.basis(~ Infl, data = housing)
-ctm_housing_4 <- ctm(b_Sat, interacting = b_Infl, todist = "Logistic")
-mlt_housing_4 <- mlt(ctm_housing_4, data = housing, weights = housing$Freq, check = FALSE)
-predict(mlt_housing_4, newdata = data.frame(Infl = unique(housing$Infl)), 
-        q = unique(housing$Sat), type = "distribution")
-cftest(mlt_housing_3)
+<<CHFLS-5, cache = TRUE>>=
+contrasts(CHFLS$R_health) <- "contr.treatment"
+b_health <- as.basis(~ R_health, data = CHFLS)
+ctm_CHFLS_5 <- ctm(b_happy, interacting = b_health, todist = "Logistic")
+mlt_CHFLS_5 <- mlt(ctm_CHFLS_5, data = CHFLS, check = FALSE, scale = TRUE, maxit = 10000)
+predict(mlt_CHFLS_5, newdata = data.frame(R_health = sort(unique(CHFLS$R_health))), 
+        q = sort(unique(CHFLS$R_happy)), type = "distribution")
+cftest(mlt_CHFLS_5)
+
+ctm_CHFLS_6 <- ctm(b_happy, interacting = b_R, todist = "Logistic")  
+mlt_CHFLS_6 <- mlt(ctm_CHFLS_6, data = CHFLS, scale = TRUE,
+                   check = FALSE, maxit = 5000)
+cftest(mlt_CHFLS_6)
+
+ctm_CHFLS_7 <- ctm(b_happy, interacting = c(h = b_health, R = b_R), todist = "Logistic")  
+mlt_CHFLS_7 <- mlt(ctm_CHFLS_7, data = CHFLS, scale = TRUE,
+                   check = FALSE, maxit = 5000)
+cftest(mlt_CHFLS_7)
 @
 
 \subsubsection{Continuous Response}
@@ -1037,7 +1060,7 @@ abline(h = 1, lty = 6)
 \caption{Tree Pipit Counts. Observations (left panel, the size of the points is
          proportional to the number of observations) and estimated conditional distribution
          of number of tree pipits given cover storey by the most likely transformation model (MLT, center panel)
-         and a generalised additive Poisson model (function \code{gam()} in package \pkg{mgcv}, 
+         and a generalised additive Poisson model (function \cmd{gam} in package \pkg{mgcv}, 
          GAM, right panel). \label{fig:treepipit-plot}}
 \end{center}
 \end{figure}
@@ -1080,15 +1103,29 @@ mlt <- c("@Manual{pkg:mlt, \n
           title = {mlt: Most Likely Transformations},\n
           author = {Torsten Hothorn},\n
           url = {https://r-forge.r-project.org/projects/ctm/},\n
-          year = {2015},\n
+          year = {2016},\n
+          note = {R package version 0.0-15, svn revision 313}}\n")
+variables <- c("@Manual{pkg:variables, \n
+          title = {variables: Variable Descriptions},\n
+          author = {Torsten Hothorn},\n
+          url = {https://r-forge.r-project.org/projects/ctm/},\n
+          year = {2016},\n
+          note = {R package version 0.0-15, svn revision 313}}\n")
+basefun <- c("@Manual{pkg:basefun, \n
+          title = {basefun: Infrastructure for Computing with Basis Functions},\n
+          author = {Torsten Hothorn},\n
+          url = {https://r-forge.r-project.org/projects/ctm/},\n
+          year = {2016},\n
           note = {R package version 0.0-15, svn revision 313}}\n")
 cat(mlt, sep = "\n", file = "packages.bib", append = TRUE)
+cat(variables, sep = "\n", file = "packages.bib", append = TRUE)
+cat(basefun, sep = "\n", file = "packages.bib", append = TRUE)
 @
 
 A reference implementation of most likely transformation models is available
 in the \pkg{mlt} package \citep{pkg:mlt}. 
 The spectral projected gradient method implemented
-in the \code{spg()} function of package \pkg{BB} \citep{Varadhan_Gilbert_2009}
+in the \cmd{spg} function of package \pkg{BB} \citep{Varadhan_Gilbert_2009}
 was used for optimising the log-likelihood.
 \citep{R}.
 
@@ -1096,9 +1133,209 @@ was used for optimising the log-likelihood.
 
 \begin{appendix}
 
-\section{variables}
+\section{variables} \label{app:variables}
+
+The \pkg{variables} packages \citep{pkg:variables} offers a small collection
+of classes and methods for specifying and dealing with variable
+descriptions.  The main purpose is to allow querying properties of variables
+without having access to observations.  A variable description allows to
+extract the name (\cmd{variable.name}), description (\cmd{desc}) and unit
+(\cmd{unit}) of the variable along with the support (\cmd{support}) and
+possible bounds (\cmd{bouds}) of the measurements. The \cmd{mkgrid} method
+generates values from the variable description. The package differentiates between
+factors, ordered factors and numeric variables.
+
+\subsection{Unordered Factors}
+
+Let eye color denote an unordered factor. The corresponding variable description is defined
+by the name, description and levels of this factor:
+<<variables-factor>>=
+f_eye <- factor_var("eye", desc = "eye color", 
+                    levels = c("blue", "brown", "green", "grey", "mixed"))
+@
+The properties of this factor are
+<<variables-factor-methods>>=
+variable.names(f_eye)
+desc(f_eye)
+units(f_eye)
+support(f_eye)
+bounds(f_eye)
+is.bounded(f_eye)
+@
+and we can generate values via
+<<variables-factor-mkgrid>>=
+mkgrid(f_eye)
+@
+
+\subsection{Ordered Factors}
+
+An ordered factor, temperature in categories is used here as an example, is defined as
+in the unordered case:
+<<variables-ordered>>=
+o_temp <- ordered_var("temp", desc = "temperature", 
+                      levels = c("cold", "lukewarm", "warm", "hot"))
+@
+and the only difference is that explicit bounds are known
+<<variables-ordered-methods>>=
+variable.names(o_temp)
+desc(o_temp)
+units(o_temp)
+support(o_temp)
+bounds(o_temp) 
+is.bounded(o_temp)
+mkgrid(o_temp)
+@
+
+\subsection{Discrete Numeric Variables}
+
+Discrete numeric variables are defined by \cmd{numeric\_var} with integer-valued
+\code{support} argument, here using age of a patient as example:
+<<variables-fd>>=
+v_age <- numeric_var("age", desc = "age of patient", 
+                     unit = "years", support = 25:75)
+@
+The variable is bounded with finite support
+<<variables-fd-methods>>=
+variable.names(v_age)
+desc(v_age)
+units(v_age)
+support(v_age)
+bounds(v_age) 
+is.bounded(v_age)
+@
+and the support is returned in
+<<variables-fd-mkgrid>>=
+mkgrid(v_age)
+@
+
+\subsection{Continuous Numeric Variables}
+
+For conceptually continuous variables the \code{support} argument is a double vector
+with two elements representing an interval with high density. The variable may or may not be bounded. 
+For generating equally-spaced grids, \code{support + add} is used for unbounded variables or 
+the corresponding finite boundaried if \code{add} is zero. Using the daytime temperature at Zurich
+one could use
+<<variables-c>>=
+v_temp <- numeric_var("ztemp", desc = "Zurich daytime temperature", unit = "Celsius", 
+                      support = c(-10.0, 35.0), add = c(-5, 5), 
+                      bound = c(-273.15, Inf))
+@
+where any model shall focus on temperatures between $-10$ and $35$ degrees Celsius.
+<<variables-c-methods>>=
+variable.names(v_temp)
+desc(v_temp)
+units(v_temp)
+support(v_temp)
+bounds(v_temp) 
+is.bounded(v_temp)
+mkgrid(v_temp, n = 20)
+@
+
+\subsection{Multiple Variables}
+
+We can join multiple variable descriptions via \cmd{c}
+<<variables-vars>>=
+vars <- c(f_eye, o_temp, v_age, v_temp)
+@
+and all methods discussed above work accordingly
+<<variables-vars-methods>>=
+variable.names(vars)
+desc(vars) 
+units(vars)
+support(vars)
+bounds(vars)
+is.bounded(vars)
+mkgrid(vars, n = 20)
+@
+Calling
+<<variables-vars-expand, eval = FALSE>>=
+expand.grid(mkgrid(vars))
+@
+generates a \code{data.frame} with all possible values of the
+variables and all combinations thereof.
+
 
 \section{basefun}
+
+The \pkg{basefun} package \citep{pkg:basefun} implements Bernstein, Legendre, log and 
+polynomial basis functions. In addition, facilities for treating arbitrary model
+matrices as basis function are available. Basis functions can be joined columnwise 
+using \cmd{c} or the box product can be generated using \cmd{b}. The definition of
+basis functions does not require any actual observations, only variable descriptions
+(see Appendix~\ref{app:variables}) are necessary. Each basis offers
+\cmd{model.matrix} and \cmd{predict} methods.
+
+\subsection{Polynomial Basis}
+
+<<basefun-polynom>>=
+xvar <- numeric_var("x", support = c(0.1, pi), bound = c(0, Inf))
+x <- as.data.frame(mkgrid(xvar, n = 20))
+### set-up basis of order 3 ommiting the quadratic term
+pb <- polynomial_basis(xvar, coef = c(TRUE, TRUE, FALSE, TRUE))
+head(model.matrix(pb, data = x))
+### evaluate polynomial defined by basis and coefficients
+predict(pb, newdata = x, coef = c(1, 2, 0, 1.75))
+### evaluate 1st derivative
+predict(pb, newdata = x, coef = c(1, 2, 0, 1.75), deriv = c(x = 1L))
+@
+
+\subsection{Logarithmis Basis}
+
+<<basefun-log>>=
+### set-up log-basis with intercept for positive variable
+lb <- log_basis(xvar, remove_intercept = FALSE, ui = "increasing")
+head(X <- model.matrix(lb, data = x))
+attr(X, "constraint")
+predict(lb, newdata = x, coef = c(1, 2))
+predict(lb, newdata = x, coef = c(1, 2), deriv = c(x = 1L))
+@
+
+\subsection{Bernstein Basis}
+
+<<basefun-Bernstein>>=
+bb <- Bernstein_basis(xvar, order = 3, ui = "increasing")
+cf <- c(1, 2, 2.5, 2.6)
+head(X <- model.matrix(bb, data = x), 10)
+### check constraints
+(cnstr <- attr(X, "constraint"))
+all(cnstr$ui %*% cf > cnstr$ci)
+### evaluate Bernstein polynomial defined by basis and coefficients
+predict(bb, newdata = x, coef = cf)
+### evaluate first derivative 
+predict(bb, newdata = x, coef = cf, deriv = c(x = 1))
+@
+
+\subsection{Model Matrices}
+
+<<basefun-as.basis>>=
+iv <- as.vars(iris)
+fb <- as.basis(~ Species + Sepal.Length + Sepal.Width,  data = iv,
+               remove_intercept = TRUE, negative = TRUE, 
+               contrasts.args =  list(Species = "contr.sum"))
+head(model.matrix(fb, data = iris))
+@
+
+\subsection{Combining Bases}
+
+<<basefun-c>>=
+blb <- c(bern = bb, log = lb)
+head(X <- model.matrix(blb, data = x), 10)
+attr(X, "constraint")
+@
+
+<<basefun-b>>=
+fb <- as.basis(~ g, data = factor_var("g", levels = LETTERS[1:2]))
+### join them: we get one intercept and one deviation _functions_
+bfb <- b(bern = bb, f = fb)
+nd <- expand.grid(mkgrid(bfb, n = 10))
+### evaluate bases
+head(X <- model.matrix(bfb, data = nd), 10)
+attr(X, "constraint")
+bfb <- b(bern = bb, f = fb, sumconstr = TRUE)
+### evaluate bases
+head(X <- model.matrix(bfb, data = nd), 10)
+attr(X, "constraint")
+@
 
 \end{appendix}
 
