@@ -266,7 +266,8 @@ plot(d ~ duration, data = ndd, type = "l", ylab = "Density", xlab = "Duration ti
 @
 \caption{Old Faithful Geyser. Estimated density for duration time obtained from
          an unconditional transformation model where the transformation function
-         was parameterised by means of a Bernstein polynomial. \label{fig:geyser-plot}}
+         was parameterised by means of a Bernstein polynomial. The plot reproduces
+         Figure~1 (right panel) in \cite{Hothorn_Moest_Buehlmann_2016}. \label{fig:geyser-plot}}
 \end{center}
 \end{figure}
 
@@ -310,7 +311,7 @@ $\pY(\ry_k) = \pZ(\eparm_k)$. Note that monotonicity of $\h$ is guaranteed by th
 $K - 2$ linear constraints $\eparm_2 - \eparm_1 > 0, \dots, \eparm_{K -1} -
 \eparm_{K -2} > 0$ when constrained optimisation is performed.
 
-\paragraph{Categorical Data Analysis: Copenhagen Housing Conditions Survey}
+\paragraph{Categorical Data Analysis: Chinese Health and Family Life Survey}
 
 We can specify the discrete basis function $\basisy$ as
 <<CHFLS-1>>=
@@ -425,7 +426,8 @@ lines(ndw$waiting, predict(mlt_w_40, q = ndw$waiting, type = "density"), lty = 2
 \caption{Old Faithful Geyser. Estimated distribution (left, also featuring the empirical
          cumulative distribution function) and density (right) function for 
          two transformation models parameterised in terms of Bernstein polynomials
-         of order $8$ and $40$.  \label{fig:geyser-w-plot}}
+         of order $8$ and $40$.  The plot reproduces
+         Figure~1 (left panel) in \cite{Hothorn_Moest_Buehlmann_2016}. \label{fig:geyser-w-plot}}
 \end{center}
 \end{figure}
 
@@ -457,7 +459,7 @@ for $M = 8$ and $\Sexpr{round(AIC(mlt_w_40),1)}$ for $M = 40$ in favor of the sm
 
 \subsubsection{Discrete Response}
 
-\paragraph{Categorical Data Analysis: Housing Survey}
+\paragraph{Categorical Data Analysis: Chinese Survey}
 
 Estimate a proportional odds model
 
@@ -639,7 +641,7 @@ grid.arrange(p1, p2, nrow = 1)
 
 \subsubsection{Discrete Response}
 
-\paragraph{Categorical Data Analysis: Housing Survey}
+\paragraph{Categorical Data Analysis: Chinese Survey}
 
 Non-proportional odds model.
 
@@ -699,7 +701,8 @@ legend("bottomright", lty = c(1, 1, 2, 2), col = c("black", "grey", "black", "gr
 @
 \caption{GBSG-2 Trial. Estimated survivor functions 
          by the most likely transformation model (MLT) and the Kaplan-Meier (KM) estimator in the two 
-         treatment groups. \label{GBSG2-strata-plot}}
+         treatment groups. The plot reproduces
+         Figure~4 (left panel) in \cite{Hothorn_Moest_Buehlmann_2016}. \label{GBSG2-strata-plot}}
 \end{center}
 \end{figure}
 
@@ -737,7 +740,7 @@ printfun(ctm)
 
 \subsubsection{Discrete Response}
 
-\paragraph{Categorical Data Analysis: Housing Survey}
+\paragraph{Categorical Data Analysis: Chinese Survey}
 
 Estimate the deviation of the conditional distribution of happiness
 compared to the baseline distribution of happiness with very poor health.
@@ -792,13 +795,8 @@ The function $\bern{5}^\top \parm_2$ is the time-varying treatment effect
 and can be interpreted as the deviation, on the scale of the transformation
 function, induced by the hormonal therapy.  Under the null hypothesis of no
 treatment effect, we would expect $\parm_2 \equiv \bold{0}$.  This monotone
-deviation function adds five linear constraints to the model. We first
-compared the fitted survivor functions obtained from the model including 
-a time-varying treatment effect with the Kaplan-Meier
-estimators in both treatment groups.  The left panel of
-Figure~\ref{fig_5_logrank} shows a nicely smoothed version of the survivor
-functions obtained from this transformation model.  The right
-panel of Figure~\ref{fig_5_logrank} shows the time-varying treatment effect
+deviation function adds five linear constraints to the model. 
+Figure~\ref{GBSG2-deviation-plot} shows the time-varying treatment effect
 $\bern{5}^\top \hat{\parm}_2$, together with a $95\%$ confidence band
 computed from the joint normal distribution of $\hat{\parm}_2$ for a grid
 over time as described by \cite{Hothorn_Bretz_Westfall_2008}; 
@@ -851,7 +849,9 @@ legend("bottomright", lty = 1:2, lwd = 1, legend = c("time-varying treatment eff
          (dashed line) with $95\%$ confidence interval (dark grey) is fully 
          covered by a $95\%$ confidence band for the time-varying treatment effect (light grey,
          the estimate is the solid line)
-         computed from a non-proportional hazards model. \label{GBSG2-deviation-plot}}
+         computed from a non-proportional hazards model. 
+         The plot reproduces
+         Figure~4 (right panel) in \cite{Hothorn_Moest_Buehlmann_2016}. \label{GBSG2-deviation-plot}}
 \end{center}
 \end{figure}   
 
@@ -895,6 +895,8 @@ contourplot(s ~ age + y | horTh, data = nd, at = 1:9 / 10,
 @
 \caption{GBSG-2 Trial. Prognostic and predictive effect of age. The contours depict the
          conditional survivor functions given treatment and age of the patient. 
+         The plot reproduces
+         Figure~5 in \cite{Hothorn_Moest_Buehlmann_2016}.
          \label{fig:GBSG2-8-plot}}
 \end{center}
 \end{figure}
@@ -951,6 +953,8 @@ print(contourplot(p ~ lage + head | cut, data = pr, panel = pfun, region = FALSE
 \caption{Head Circumference Growth. Observed head circumference and age for
          $7040$ boys with estimated quantile curves for
          $\tau = 0.04, 0.02, 0.1, 0.25, 0.5, 0.75, 0.9, 0.98, 0.996$.
+         The plot reproduces
+         Figure~3 in \cite{Hothorn_Moest_Buehlmann_2016}.
          \label{fig:head-plot}}
 \end{center}
 \end{figure}
@@ -1061,16 +1065,216 @@ abline(h = 1, lty = 6)
          proportional to the number of observations) and estimated conditional distribution
          of number of tree pipits given cover storey by the most likely transformation model (MLT, center panel)
          and a generalised additive Poisson model (function \cmd{gam} in package \pkg{mgcv}, 
-         GAM, right panel). \label{fig:treepipit-plot}}
+         GAM, right panel). The plot reproduces
+         Figure~7 in \cite{Hothorn_Moest_Buehlmann_2016}. \label{fig:treepipit-plot}}
 \end{center}
 \end{figure}
 
 
 \section{Estimating Most Likely Transformations}
 
+
+For a given transformation function $h$, the likelihood contribution of a
+datum $\esAY = (\ubar{\ry},\bar{\ry}] \in \sAY$ is defined in terms of the
+distribution function \citep{Lindsey_1996}: 
+\begin{eqnarray*} 
+\lik(\h | \rY \in \esAY) := \int_{\esAY} \dY(y | \h) d\measureY(y) =
+\pZ(\h(\bar{\ry})) - \pZ(\h(\ubar{\ry})).
+\end{eqnarray*}
+This ``exact'' definition of the likelihood applies to most practically interesting
+situations and, in particular, allows discrete and (conceptually) continuous as well as
+censored or truncated observations $\esAY$. For a discrete response $\ry_k$ we have $\bar{\ry} = \ry_k$ and $\ubar{\ry}
+= \ry_{k -1}$ such that $\lik(\h | \rY = \ry_k) = \dY(\ry_k | \h) =
+\pZ(\h(\bar{\ry})) - \pZ(\h(\ubar{\ry}))$.  For absolutely continuous random
+variables $\rY$ we always practically observe an imprecise datum $(\ubar{\ry},\bar{\ry}]
+\subset \RR$ and, for short intervals $(\ubar{\ry},\bar{\ry}]$, approximate
+the exact likelihood $\lik(\h | \rY \in (\ubar{\ry},\bar{\ry}])$ by the term
+$(\bar{\ry} - \ubar{\ry}) \dY(\ry | \h)$ or simply $\dY(\ry | \h)$ with $\ry
+= (\ubar{\ry} + \bar{\ry})/2$ \citep{Lindsey_1999}. This approximation only
+works for relatively precise measurements, \ie short intervals. If longer intervals 
+are observed, one speaks of ``censoring'' and relies on the exact definition
+of the likelihood contribution instead of using the above approximation \citep{Klein_Moeschberger_2003}. 
+In summary, the likelihood contribution of a conceptually ``exact
+continuous'' or left, right or interval-censored continuous or discrete 
+observation $(\ubar{\ry}, \bar{\ry}]$ is given by 
+\begin{eqnarray*}
+\lik(\h | \rY \in (\ubar{\ry}, \bar{\ry}]) \left\{ \begin{array}{ll}
+    \approx \dZ(\h(\ry)) \h^\prime(\ry) & \ry = (\ubar{\ry} + \bar{\ry})/2 \in \samY \quad \text{```exact continuous'''}\\
+    = 1 - \pZ(\h(\ubar{\ry})) & \ry \in (\ubar{\ry}, \infty) \cap \samY \quad \text{`right-censored'} \\
+    = \pZ(\h(\bar{\ry})) & \ry \in (-\infty, \bar{\ry}] \cap \samY \quad \text{`left-censored'} \\
+    = \pZ(\h(\bar{\ry})) - \pZ(\h(\ubar{\ry})) & \ry \in (\ubar{\ry},\bar{\ry}] \cap \samY \quad    \text{`interval-censored',}
+\end{array} \right. 
+\end{eqnarray*}
+under the assumption of random censoring.
+The likelihood is more complex under dependent censoring
+\citep{Klein_Moeschberger_2003} but we do not elaborate on this issue further. 
+The likelihood contribution $\lik(\h | \rY \in (\ry_k, \ry_{k-1}])$
+of an ordered factor in category $\ry_k$ is equivalent to the term 
+$\lik(\h | \rY \in (\ubar{\ry}, \bar{\ry}])$
+contributed by an interval-censored observation $(\ubar{\ry},\bar{\ry}]$
+when category $\ry_k$ was defined by the interval $(\ubar{\ry},\bar{\ry}]$. Thus,
+the expression $\pZ(\h(\bar{\ry})) - \pZ(\h(\ubar{\ry}))$ for the likelihood
+contribution reflects the equivalence of interval-censoring 
+and categorisation at corresponding cut-off points. 
+
+For truncated observations in the interval $(\ry_l, \ry_r] \subset \samY$,
+the above likelihood contribution is defined in terms of the 
+distribution function conditional on the truncation
+\begin{eqnarray*}
+\pY(\ry | \rY \in (\ry_l, \ry_r]) = \pZ(\h(\ry) | \rY \in (\ry_l, \ry_r]) = 
+\frac{\pZ(\h(\ry))}{\pZ(\h(\ry_r)) - \pZ(\h(\ry_l))}  
+\quad \forall \ry \in (\ry_l, \ry_r]
+\end{eqnarray*}
+and thus the likelihood contribution changes to \citep{Klein_Moeschberger_2003}
+\begin{eqnarray*}
+\frac{\lik(\h | \rY \in (\ubar{\ry}, \bar{\ry}])}{\pZ(\h(\ry_r)) -
+\pZ(\h(\ry_l))} = \frac{\lik(\h | \rY \in (\ubar{\ry}, \bar{\ry}])}{\lik(\h
+| \rY \in (\ry_l, \ry_r])} \quad \text{when } \ry_l < \ubar{\ry} < \bar{\ry} \le \ry_r.
+\end{eqnarray*}
+It is important to note that the likelihood is always \textit{defined} in
+terms of a distribution function \citep{Lindsey_1999} and it therefore makes
+sense to directly model the distribution function of interest.  The ability
+to uniquely characterise this distribution function by the
+transformation function $\h$ gives rise to the following definition of an
+estimator $\hat{\h}_N$.
+
+\begin{defn}[Most likely transformation]
+Let $\esAY_1, \dots, \esAY_N$ denote an independent sample of possibly
+censored or truncated observations from $\Prob_\rY$. The estimator
+\begin{eqnarray*}
+\hat{\h}_N := \argmax_{\tilde{\h} \in \hs} \sum_{i = 1}^{N} \log(\lik(\tilde{\h} |
+\rY \in \esAY_i)) 
+\end{eqnarray*}
+is called the most likely transformation (MLT).
+\end{defn}
+Log-concavity of $\dZ$ ensures concavity of the log-likelihood (except 
+when all observations are right-censored) and thus
+existence and uniqueness of $\hat{\h}_N$.
+
+We parameterise the transformation function $\h(\ry)$ as a linear function of its
+basis-transformed argument $\ry$ using a basis function $\basisy: \samY
+\rightarrow \RR^\dimparm$ such that $\h(\ry) = \basisy(\ry)^\top \parm,
+\parm \in \RR^\dimparm$.  The choice of the basis function $\basisy$ is
+problem-specific and will be discussed in Section~\ref{sec:appl}.  The
+likelihood $\lik$ only requires evaluation of $\h$, and only an
+approximation thereof using the Lebesgue density of ``exact continuous'' observations 
+makes the evaluation of the 
+first derivative of $\h(\ry)$ with respect to $\ry$ necessary.  In this
+case, the derivative with respect to $\ry$ is given by
+$\h^\prime(\ry) = \basisy^\prime(\ry)^\top \parm$ and we assume that
+$\basisy^\prime$ is available.
+In the following we write $\h = \basisy^\top
+\parm$ and $\h^\prime = {\basisy^\prime}^\top \parm$ for the transformation
+function and its first derivative omitting the argument $\ry$
+and we assume that both functions are bounded away from $-\infty$ and
+$\infty$. 
+
+\begin{defn}[Maximum likelihood estimator]
+\begin{eqnarray*}
+\hat{\parm}_N := \argmax_{\parm \in \Theta} \sum_{i = 1}^N
+\log(\lik(\basisy^\top \parm | \rY \in \esAY_i))
+\end{eqnarray*}
+\end{defn}
+
+
+
+
 \section{Looking at Transformation Models}
 
-\section{Classical Likelihood Inference for Most Likely Transformations}
+Based on the maximum likelihood estimator $\hat{\parm}_N$, we
+define plug-in estimators of the most likely transformation function and
+the corresponding estimator of our target distribution $\pY$ as 
+$\hat{\h}_N := \basisy^\top \hat{\parm}_N$ and 
+$\hatpY := \pZ \circ \hat{\h}_N$.
+
+
+\section{Classical Likelihood Inference}
+
+
+Because the problem of estimating an unknown distribution function is now
+embedded in the maximum likelihood framework, the asymptotic analysis
+benefits from standard results on the asymptotic behaviour of maximum likelihood
+estimators.
+We begin with deriving the score function and Fisher information.
+The score contribution of an ``exact continuous'' 
+observation $\ry = (\ubar{\ry} +
+\bar{\ry})/2$ from an absolutely continuous distribution is approximated by the
+gradient of the log-density
+\begin{eqnarray}
+\s(\parm | \rY \in (\ubar{\ry}, \bar{\ry}]) \approx
+\frac{\partial \log(\dY(\ry | \parm))}{\partial \parm} & = & 
+\frac{\partial \log(\dZ(\basisy(\ry)^\top \parm))) +
+\log({\basisy^\prime(\ry)}^\top \parm)}{\partial \parm} \nonumber \\
+& = & \basisy(\ry) \frac{\dZ^\prime(\basisy(\ry)^\top \parm)}{\dZ(\basisy(\ry)^\top \parm)}
+    + \frac{\basisy^\prime(\ry)}{{\basisy^\prime(\ry)}^\top \parm}. \label{f:s_exact}
+\end{eqnarray}
+For an interval censored or discrete observation $\ubar{\ry}$ and
+$\bar{\ry}$ (the constant terms $\pZ(\basisy(\pm \infty)^\top \parm) =
+\pZ(\pm \infty) = 1$ or $0$ vanish) the score contribution is
+\begin{eqnarray}
+\s(\parm | \rY \in (\ubar{\ry}, \bar{\ry}]) & = & \frac{\partial \log(\lik(\basisy^\top \parm | \rY \in (\ubar{\ry},
+\bar{\ry}]))}{\partial \parm} \nonumber \\
+& = & \frac{\partial \log(\pZ(\basisy(\bar{\ry})^\top \parm) - \pZ(\basisy(\ubar{\ry})^\top \parm))}{\partial \parm}  \nonumber \\
+& = & \frac{\dZ(\basisy(\bar{\ry})^\top \parm)\basisy(\bar{\ry}) - \dZ(\basisy(\ubar{\ry})^\top
+\parm) \basisy(\ubar{\ry})}{\pZ(\basisy(\bar{\ry})^\top \parm) - \pZ(\basisy(\ubar{\ry})^\top
+\parm)}. \label{f:s_interval}
+\end{eqnarray}
+For a truncated observation, the score function is $\s(\parm | \rY \in
+(\ubar{\ry}, \bar{\ry}]) - \s(\parm | \rY \in (\ry_l, \ry_r])$.
+%\begin{eqnarray*}
+%\frac{\partial -\log[\pZ(\basisy(\ry_r)^\top \parm) - \pZ(\basisy(\ry_l)^\top
+%\parm)]}{\partial \parm} & = &
+%-\frac{\dZ(\basisy(\ry_r)^\top \parm)\basisy(\ry_r) - \dZ(\basisy(\ry_l)^\top \parm)\basisy(\ry_l)}
+%     {\pZ(\basisy(\ry_r)^\top \parm) - \pZ(\basisy(\ry_l)^\top \parm)}
+%\end{eqnarray*}
+%has to be added to the score contribution $\s(\parm | \rY \in (\ubar{\ry},
+%\bar{\ry}])$.
+
+The contribution of an ``exact continuous''  observation $\ry$ from an
+absolutely
+continuous distribution to the Fisher information is approximately
+\begin{eqnarray}
+\mF(\parm | \rY \in (\ubar{\ry}, \bar{\ry}]) & \approx & 
+-\frac{\partial^2 \log(\dY(\ry | \parm))}{\partial \parm
+\partial \parm^\top} \nonumber \\
+& = & - \left(
+\basisy(\ry) \basisy(\ry)^\top \left\{
+    \frac{\dZ^{\prime\prime}(\basisy(\ry)^\top \parm)}{\dZ(\basisy(\ry)^\top \parm)}
+   -\left[\frac{\dZ^{\prime}(\basisy(\ry)^\top \parm)}{\dZ(\basisy(\ry)^\top \parm)}\right]^2\right\}
+   - \frac{\basisy^\prime(\ry){\basisy^\prime(\ry)}^\top}{{(\basisy^\prime(\ry)}^\top\parm)^2}\right) \label{f:F_exact}
+\end{eqnarray}
+(NB: the weight to $\basisy(\ry) \basisy(\ry)^\top$ is constant one for
+$\pZ = \Phi$). 
+For a censored or discrete observation, we have the following
+contribution to the Fisher information
+\begin{eqnarray}
+\mF(\parm | \rY \in (\ubar{\ry}, \bar{\ry}]) & = & -\frac{\partial^2 \log(\lik(\basisy^\top \parm |
+\rY \in (\ubar{\ry}, \bar{\ry}]))}{\partial \parm \partial \parm^\top} \nonumber \\
+& = & 
+- \left\{\frac{\dZ^\prime(\basisy(\bar{\ry})^\top \parm)\basisy(\bar{\ry})\basisy(\bar{\ry})^\top -
+      \dZ^\prime(\basisy(\ubar{\ry})^\top \parm) \basisy(\ubar{\ry}) \basisy(\ubar{\ry})^\top}
+     {\pZ(\basisy(\bar{\ry})^\top \parm) - \pZ(\basisy(\ubar{\ry})^\top \parm)}
+\right. \label{f:F_interval} \\
+& &  \quad -\frac{[\dZ(\basisy(\bar{\ry})^\top \parm)\basisy(\bar{\ry}) - 
+       \dZ(\basisy(\ubar{\ry})^\top \parm) \basisy(\ubar{\ry})] }
+     {[\pZ(\basisy(\bar{\ry})^\top \parm) - \pZ(\basisy(\ubar{\ry})^\top \parm]^2} \times \nonumber \\
+& & \left. \qquad      [\dZ(\basisy(\bar{\ry})^\top \parm)\basisy(\bar{\ry})^\top - 
+       \dZ(\basisy(\ubar{\ry})^\top \parm) \basisy(\ubar{\ry})^\top]
+\right\}. \nonumber
+\end{eqnarray}
+For a truncated observation, the Fisher information is given by
+$\mF(\parm | \rY \in (\ubar{\ry}, \bar{\ry}]) - \mF(\parm | \rY \in (\ry_l,
+\ry_r])$.
+
+In particular, we can construct confidence
+intervals and confidence bands for the conditional distribution function
+from confidence intervals and bands for the linear functions $\basisy^\top
+\parm$. We complete the theoretical part by formally defining the class of
+transformation models.
+\begin{defn}[Transformation model]
+The triple $(\pZ, \basisy, \parm)$ is called transformation model.
+\end{defn}
+
 
 \section{Simulation Likelihood Inference for Most Likely Transformations}
 
