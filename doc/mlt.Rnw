@@ -1216,9 +1216,9 @@ For generating equally-spaced grids, \code{support + add} is used for unbounded 
 the corresponding finite boundaried if \code{add} is zero. Using the daytime temperature at Zurich
 one could use
 <<variables-c>>=
-v_temp <- numeric_var("ztemp", desc = "Zurich daytime temperature", unit = "Celsius", 
-                      support = c(-10.0, 35.0), add = c(-5, 5), 
-                      bound = c(-273.15, Inf))
+v_temp <- numeric_var("ztemp", desc = "Zurich daytime temperature", 
+                      unit = "Celsius", support = c(-10.0, 35.0), 
+                      add = c(-5, 5), bounds = c(-273.15, Inf))
 @
 where any model shall focus on temperatures between $-10$ and $35$ degrees Celsius.
 <<variables-c-methods>>=
@@ -1257,22 +1257,39 @@ variables and all combinations thereof.
 
 \section{basefun}
 
-The \pkg{basefun} package \citep{pkg:basefun} implements Bernstein, Legendre, log and 
-polynomial basis functions. In addition, facilities for treating arbitrary model
-matrices as basis function are available. Basis functions can be joined columnwise 
-using \cmd{c} or the box product can be generated using \cmd{b}. The definition of
-basis functions does not require any actual observations, only variable descriptions
-(see Appendix~\ref{app:variables}) are necessary. Each basis offers
-\cmd{model.matrix} and \cmd{predict} methods.
+The \pkg{basefun} package \citep{pkg:basefun} implements Bernstein,
+Legendre, log and polynomial basis functions.  In addition, facilities for
+treating arbitrary model matrices as basis function are available.  Basis
+functions can be joined columnwise using \cmd{c} or the box product can be
+generated using \cmd{b}.  The definition of basis functions does not require
+any actual observations, only variable descriptions (see
+Appendix~\ref{app:variables}) are necessary.  Each basis offers
+\cmd{model.matrix} and \cmd{predict} methods.  We illustrate how one can
+set-up some of these basis functions in the following.
 
 \subsection{Polynomial Basis}
 
+For some positive variable $x$ we want to deal with the polynomial
+$\alpha + \beta_1 x + \beta_3 x^3$ and first set-up a variable description
+(see Appendix~\ref{app:variables}) and the basis function
 <<basefun-polynom>>=
 xvar <- numeric_var("x", support = c(0.1, pi), bound = c(0, Inf))
 x <- as.data.frame(mkgrid(xvar, n = 20))
 ### set-up basis of order 3 ommiting the quadratic term
 class(pb <- polynomial_basis(xvar, coef = c(TRUE, TRUE, FALSE, TRUE)))
+@
+The basis function \code{pb} is a \code{function}, therefore we can
+evaluate the basis as
+<<basefun-polynom-fun>>=
+head(pb(x))
+@
+or, equivalently, using the corresponding \cmd{model.matrix} method
+<<basefun-polynom-mm>>=
 head(model.matrix(pb, data = x))
+@
+Evaluating the polynomial for some coefficients is done by the
+\cmd{predict} method, which also allows derivatives to be computed
+<<basefun-polynom-pred>>=
 ### evaluate polynomial defined by basis and coefficients
 predict(pb, newdata = x, coef = c(1, 2, 0, 1.75))
 ### evaluate 1st derivative
@@ -1281,22 +1298,34 @@ predict(pb, newdata = x, coef = c(1, 2, 0, 1.75), deriv = c(x = 1L))
 
 \subsection{Logarithmic Basis}
 
+The monotone increasing logarithmic basis $\alpha + \beta \log(x)$ being 
+subject to $\beta > 0$ is defined as
 <<basefun-log>>=
 ### set-up log-basis with intercept for positive variable
 class(lb <- log_basis(xvar, remove_intercept = FALSE, ui = "increasing"))
 head(X <- model.matrix(lb, data = x))
+@
+The model matrix contains a \code{constraint} attribute
+<<basefun-log-constr>>=
 attr(X, "constraint")
+@
+where the linear constraints $\mA \parm \ge \mvec$ are represented by
+a matrix $\mA$ (\code{ui}) and a vector $\mvec$ (\code{ci}). For 
+$(\alpha, \beta) = (1, 2)$ the function and its derivative can be computed
+as
+<<basefun-log-pred>>=
 predict(lb, newdata = x, coef = c(1, 2))
 predict(lb, newdata = x, coef = c(1, 2), deriv = c(x = 1L))
 @
 
 \subsection{Bernstein Basis}
-
+As an example, a monotone increasing Bernstein polynomial $\bern{3}$ can be defined and
+evaluated as
 <<basefun-Bernstein>>=
 class(bb <- Bernstein_basis(xvar, order = 3, ui = "increasing"))
-cf <- c(1, 2, 2.5, 2.6)
-head(X <- model.matrix(bb, data = x), 10)
+head(X <- model.matrix(bb, data = x))
 ### check constraints
+cf <- c(1, 2, 2.5, 2.6)
 (cnstr <- attr(X, "constraint"))
 all(cnstr$ui %*% cf > cnstr$ci)
 ### evaluate Bernstein polynomial defined by basis and coefficients
@@ -1307,6 +1336,14 @@ predict(bb, newdata = x, coef = cf, deriv = c(x = 1))
 
 \subsection{Model Matrices}
 
+Model matrices are basis functions evaluated at some data. The \pkg{basefun}
+package offers an \cmd{as.basis} method for \code{formula} objects which
+basically represents unevaluated calls to \cmd{model.matrix} with two
+additonal argments (\code{remove_intercept} removes the intercept
+\textit{after} appropriate contrasts where computed and \code{negative}
+multiplies the model matrix with $-1$).  Note that the \code{data} argument
+does not need to be a \code{data.frame} with observations, a variable
+description is sufficent:
 <<basefun-as.basis>>=
 iv <- as.vars(iris)
 fb <- as.basis(~ Species + Sepal.Length + Sepal.Width,  data = iv,
@@ -1318,23 +1355,31 @@ head(model.matrix(fb, data = iris))
 
 \subsection{Combining Bases}
 
+Two (or more) basis functions can be concatenated by simply joining the corresponding
+model matrices columnwise. If constraints $\mA_i \parm_i \ge \mvec_i$ are present for $i = 1, 2, \dots$ 
+the overall constraints are given by a block-diagonal matrix $\mA = \text{blockdiag}(\mA_1, \mA_2, \dots)$,
+$\parm = (\parm_1^\top, \parm_2^\top, \dots)^\top$ and $\mvec = (\mvec_1^\top, \mvec_2^\top, \dots)^\top$. As
+an example we add a positive log-transformation to a Bernstein polynomial:
 <<basefun-c>>=
-class(blb <- c(bern = bb, log = lb))
-head(X <- model.matrix(blb, data = x), 10)
+class(blb <- c(bern = bb, log = log_basis(xvar, ui = "increasing")))
+head(X <- model.matrix(blb, data = x))
 attr(X, "constraint")
 @
 
+The box product of two basis functions is defined by the row-wise Kronecker product of the
+corresponding model matrices but \textit{not} the Kronecker product of the model matrices (which
+would result in a matrix with the same number of columns but squared number of rows).
 <<basefun-b>>=
 fb <- as.basis(~ g, data = factor_var("g", levels = LETTERS[1:2]))
-### join them: we get one intercept and one deviation _functions_
+### join them: we get one intercept and one deviation _function_
 class(bfb <- b(bern = bb, f = fb))
 nd <- expand.grid(mkgrid(bfb, n = 10))
 ### evaluate bases
-head(X <- model.matrix(bfb, data = nd), 10)
+head(X <- model.matrix(bfb, data = nd))
 attr(X, "constraint")
 bfb <- b(bern = bb, f = fb, sumconstr = TRUE)
 ### evaluate bases
-head(X <- model.matrix(bfb, data = nd), 10)
+head(X <- model.matrix(bfb, data = nd))
 attr(X, "constraint")
 @
 
