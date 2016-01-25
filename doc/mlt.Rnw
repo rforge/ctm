@@ -1271,7 +1271,7 @@ basis functions does not require any actual observations, only variable descript
 xvar <- numeric_var("x", support = c(0.1, pi), bound = c(0, Inf))
 x <- as.data.frame(mkgrid(xvar, n = 20))
 ### set-up basis of order 3 ommiting the quadratic term
-pb <- polynomial_basis(xvar, coef = c(TRUE, TRUE, FALSE, TRUE))
+class(pb <- polynomial_basis(xvar, coef = c(TRUE, TRUE, FALSE, TRUE)))
 head(model.matrix(pb, data = x))
 ### evaluate polynomial defined by basis and coefficients
 predict(pb, newdata = x, coef = c(1, 2, 0, 1.75))
@@ -1279,11 +1279,11 @@ predict(pb, newdata = x, coef = c(1, 2, 0, 1.75))
 predict(pb, newdata = x, coef = c(1, 2, 0, 1.75), deriv = c(x = 1L))
 @
 
-\subsection{Logarithmis Basis}
+\subsection{Logarithmic Basis}
 
 <<basefun-log>>=
 ### set-up log-basis with intercept for positive variable
-lb <- log_basis(xvar, remove_intercept = FALSE, ui = "increasing")
+class(lb <- log_basis(xvar, remove_intercept = FALSE, ui = "increasing"))
 head(X <- model.matrix(lb, data = x))
 attr(X, "constraint")
 predict(lb, newdata = x, coef = c(1, 2))
@@ -1293,7 +1293,7 @@ predict(lb, newdata = x, coef = c(1, 2), deriv = c(x = 1L))
 \subsection{Bernstein Basis}
 
 <<basefun-Bernstein>>=
-bb <- Bernstein_basis(xvar, order = 3, ui = "increasing")
+class(bb <- Bernstein_basis(xvar, order = 3, ui = "increasing"))
 cf <- c(1, 2, 2.5, 2.6)
 head(X <- model.matrix(bb, data = x), 10)
 ### check constraints
@@ -1312,13 +1312,14 @@ iv <- as.vars(iris)
 fb <- as.basis(~ Species + Sepal.Length + Sepal.Width,  data = iv,
                remove_intercept = TRUE, negative = TRUE, 
                contrasts.args =  list(Species = "contr.sum"))
+class(fb)
 head(model.matrix(fb, data = iris))
 @
 
 \subsection{Combining Bases}
 
 <<basefun-c>>=
-blb <- c(bern = bb, log = lb)
+class(blb <- c(bern = bb, log = lb))
 head(X <- model.matrix(blb, data = x), 10)
 attr(X, "constraint")
 @
@@ -1326,7 +1327,7 @@ attr(X, "constraint")
 <<basefun-b>>=
 fb <- as.basis(~ g, data = factor_var("g", levels = LETTERS[1:2]))
 ### join them: we get one intercept and one deviation _functions_
-bfb <- b(bern = bb, f = fb)
+class(bfb <- b(bern = bb, f = fb))
 nd <- expand.grid(mkgrid(bfb, n = 10))
 ### evaluate bases
 head(X <- model.matrix(bfb, data = nd), 10)
