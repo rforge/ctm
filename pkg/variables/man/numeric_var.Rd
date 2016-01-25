@@ -7,7 +7,7 @@
   Formal description of numeric variable
 }
 \usage{
-numeric_var(name, desc = NULL, unit = NULL, support = c(0, 1), bounds = NULL)
+numeric_var(name, desc = NULL, unit = NULL, support = c(0, 1), add = c(0, 0), bounds = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -15,6 +15,8 @@ numeric_var(name, desc = NULL, unit = NULL, support = c(0, 1), bounds = NULL)
   \item{desc}{character, a description of what is measured}
   \item{unit}{character, the measurement unit}
   \item{support}{the support of the measurements, see below}
+  \item{add}{add these values to the support before generating a 
+             grid via \code{\link{mkgrid}}}
   \item{bounds}{an interval defining the bounds of a real sample space}
 }
 \details{

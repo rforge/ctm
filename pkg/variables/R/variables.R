@@ -20,7 +20,7 @@ ordered_var <- function(name, desc = NULL, levels) {
 }
 
 numeric_var <- function(name, desc = NULL, unit = NULL,
-                        support = c(0.0, 1.0), bounds = NULL) {
+                        support = c(0.0, 1.0), add = c(0, 0), bounds = NULL) {
     ret <- .var(name = name, desc = desc)
     ret$unit <- unit
     stopifnot(length(support) >= 2L)
@@ -40,6 +40,8 @@ numeric_var <- function(name, desc = NULL, unit = NULL,
     stopifnot(bounds[1] <= min(support))
     stopifnot(max(support) <= bounds[2])
     ret$bounds <- bounds
+    stopifnot(add[1] <= 0 && add[2] >= 0)
+    ret$add <- add
     class(ret) <- c("continuous_var", "numeric_var", class(ret))
     ret
 }
@@ -143,9 +145,12 @@ mkgrid.var <- function(object, ...)
 
 mkgrid.continuous_var <- function(object, n = 2, ...) {
     s <- support(object)[[variable.names(object)]]
+    add <- object$add
+    if (any(max(abs(add)) > 0))
+        s <- s + add
     b <- bounds(object)[[variable.names(object)]]
-    if (is.finite(b[1])) s[1] <- b[1]
-    if (is.finite(b[2])) s[2] <- b[2]
+    if (is.finite(b[1]) & (add[1] == 0)) s[1] <- b[1]
+    if (is.finite(b[2]) & (add[2] == 0)) s[2] <- b[2]
     stopifnot(n > 0)
     if (n == 1L) return(structure(list(diff(s)), 
                                   names = variable.names(object)))    
