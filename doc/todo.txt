@@ -1,0 +1,9 @@
+
+\section{ToDo}
+
+\pkg{mlt}
+\begin{enumerate}
+\item make check = FALSE default
+\item make scale = TRUE default
+\item check predict(type = "density") for ordered factors
+\end{enumerate}
