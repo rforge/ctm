@@ -10,7 +10,7 @@ mlt.R:	mlt.Rnw
 	mv tmp.R mlt.R
 
 	
-mlt.pdf:	mlt.tex
+mlt.pdf:	mlt.tex todo.tex mlt.Rnw
 	texi2dvi --pdf mlt.tex
 	pdflatex mlt.tex
 
