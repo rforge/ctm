@@ -120,15 +120,15 @@ theory course?  Let's perform a small experiment: Pick, at random, a
 statistics book from your book shelf and look-up how the general linear
 model is introduced. Most probably you will find something not unlike
 \begin{eqnarray*}
-\rY = \alpha + \rx^\top \shiftparm + \varepsilon, \quad \varepsilon \sim \ND(0, \sigma^2)
+\rY = \alpha + \tilde{\rx}^\top \shiftparm + \varepsilon, \quad \varepsilon \sim \ND(0, \sigma^2)
 \end{eqnarray*}
-where model interpretation relies on $\Ex(\rY | \rX = \rx) = \alpha + \rx^\top \shiftparm$ and
+where model interpretation relies on $\Ex(\rY | \rX = \rx) = \alpha + \tilde{\rx}^\top \shiftparm$ and
 one estimates the intercept $\alpha$ and the 
 regression parameters $\shiftparm$ by minimisation of the squared error 
-$(\rY - \alpha - \rx^\top \shiftparm)^2$. With some touch-up in notation, the model 
+$(\rY - \alpha - \tilde{\rx}^\top \shiftparm)^2$. With some touch-up in notation, the model 
 can be equivalently written as a model for a conditional distribution
 \begin{eqnarray*}
-\Prob(\rY \le \ry | \rX = \rx) = \Phi\left(\frac{\ry - \alpha - \rx^\top \shiftparm}{\sigma}\right) \text{ or } (\rY | \rX = \rx) \sim \ND(\alpha + \rx^\top\shiftparm, \sigma^2).
+\Prob(\rY \le \ry | \rX = \rx) = \Phi\left(\frac{\ry - \alpha - \tilde{\rx}^\top \shiftparm}{\sigma}\right) \text{ or } (\rY | \rX = \rx) \sim \ND(\alpha + \tilde{\rx}^\top\shiftparm, \sigma^2).
 \end{eqnarray*}
 This little change highlights that the model is, in fact, a model for a
 conditional distribution and not just a model for a conditional mean. It also
@@ -139,35 +139,35 @@ intervals $(\ubar{\ry}, \bar{\ry}]$ and never real numbers $\ry$, the exact like
 is, as originally \textit{defined} by \cite{Fisher_1934} \citep[another example of the approximation winning over the basic concept][]{Lindsey_1996}
 \begin{eqnarray*}
 \Prob(\ubar{\ry} < \rY \le \bar{\ry} | \rX = \rx) = 
-\Phi\left(\frac{\bar{\ry} - \alpha - \rx^\top \shiftparm}{\sigma}\right) - \Phi\left(\frac{\ubar{\ry} - \alpha - \rx^\top \shiftparm}{\sigma}\right)
+\Phi\left(\frac{\bar{\ry} - \alpha - \tilde{\rx}^\top \shiftparm}{\sigma}\right) - \Phi\left(\frac{\ubar{\ry} - \alpha - \tilde{\rx}^\top \shiftparm}{\sigma}\right)
 \end{eqnarray*}
 which requires simultaneous optimisation of all three model parameters $\alpha$, $\shiftparm$ and $\sigma$ but
 is exact also under other forms of random censoring. If we were going to reformulate the model
 a little further to
 \begin{eqnarray*}
-\Prob(\rY \le \ry | \rX = \rx) = \Phi(\tilde{\alpha}_1 + \tilde{\alpha}_2 \ry - \rx^\top \tilde{\shiftparm})
+\Prob(\rY \le \ry | \rX = \rx) = \Phi(\tilde{\alpha}_1 + \tilde{\alpha}_2 \ry - \tilde{\rx}^\top \tilde{\shiftparm})
 \end{eqnarray*}
 with $\tilde{\alpha}_1 = -\alpha / \sigma, \tilde{\alpha}_2 = 1 / \sigma$ and $\tilde{\shiftparm} = \shiftparm / \sigma$
 we see that the model is of the form
 \begin{eqnarray*}
-\Prob(\rY \le \ry | \rX = \rx) = \pZ(\h_\rY(\ry) - \rx^\top \tilde{\shiftparm})
+\Prob(\rY \le \ry | \rX = \rx) = \pZ(\h_\rY(\ry) - \tilde{\rx}^\top \tilde{\shiftparm})
 \end{eqnarray*}
 with distribution function $\pZ = \Phi$ and linear transformation $\h_\rY(\ry) = \tilde{\alpha}_1 + \tilde{\alpha}_2 \ry$
-such that $\Ex(\h_\rY(\rY) | \rX = \rx) = \rx^\top \shiftparm$. If we now change $\pZ$ to the distribution
+such that $\Ex(\h_\rY(\rY) | \rX = \rx) = \tilde{\rx}^\top \shiftparm$. If we now change $\pZ$ to the distribution
 function of the minimum extreme value distribution and allow a non-linear monotone transformation
 $\h_\rY$ we get
 \begin{eqnarray*}
-\Prob(\rY \le \ry | \rX = \rx) = 1 - \exp(-\exp(\h_\rY(\ry) - \rx^\top \tilde{\shiftparm}))
+\Prob(\rY \le \ry | \rX = \rx) = 1 - \exp(-\exp(\h_\rY(\ry) - \tilde{\rx}^\top \tilde{\shiftparm}))
 \end{eqnarray*}
 which is the continuous proportional hazards, or Cox, model. From this point
 of view, the linear and the Cox model are two instances of so-called linear
 transformation models (a misleading name, because the transformation
-$\h_\rY$ is non-linear in the latter case and only the shift $\rx^\top
-\tilde{\shiftparm}$ is linear in $\rx$).  It is now also obvious that the Cox
+$\h_\rY$ is non-linear in the latter case and only the shift $\tilde{\rx}^\top
+\tilde{\shiftparm}$ is linear in $\tilde{\rx}$).  It is now also obvious that the Cox
 model has nothing to do with censoring, let alone survival times $\rY > 0$. 
 It is a model for the conditional distribution of a continuous responses
 $\rY \in \RR$ when it is appropriate to assume that the conditional hazard
-function is scaled by $\exp(\rx^\top \tilde{\shiftparm})$.  For both the linear
+function is scaled by $\exp(\tilde{\rx}^\top \tilde{\shiftparm})$.  For both the linear
 and the Cox model, application of the exact likelihood allows the models to
 be fitted to imprecise, or ``censored'', observations $(\ubar{\ry},
 \bar{\ry}]$.
@@ -497,22 +497,22 @@ of the response $Y$ and is the simplest form of a regression model in the class 
 conditional transformation models. The conditional distribution function is
 \begin{eqnarray*}
 \Prob(\rY \le \ry | \rX = \rx) = \pZ(\h(\ry | \rx)) = 
-\pZ(\h(\ry) - \rx^\top \shiftparm).
+\pZ(\h(\ry) - \tilde{\rx}^\top \shiftparm).
 \end{eqnarray*}
 The transformation $\h$, sometimes called ``baseline transformation'' can be parameterised
 as discussed in the unconditional situation:
 \begin{eqnarray*}
-\pZ(\h(\ry) - \rx^\top \shiftparm) = \pZ(\basisy(\ry)^\top \parm_1 - \rx^\top \shiftparm)
+\pZ(\h(\ry) - \tilde{\rx}^\top \shiftparm) = \pZ(\basisy(\ry)^\top \parm_1 - \tilde{\rx}^\top \shiftparm)
 \end{eqnarray*}
 The connection to more complex models is highlighted by the introduction of a 
 basis function $\basisyx$ being conditional on the explanatory variables $\rx$, \ie
 \begin{eqnarray*}
-\pZ(\h(\ry | \rx)) = \pZ(\basisyx(\ry, \rx)^\top \parm) = \pZ(\basisy(\ry)^\top \parm_1 - \rx^\top \shiftparm) \, \text{with} \, \basisyx = (\basisy^\top, -\rx^\top)^\top.
+\pZ(\h(\ry | \rx)) = \pZ(\basisyx(\ry, \rx)^\top \parm) = \pZ(\basisy(\ry)^\top \parm_1 - \tilde{\rx}^\top \shiftparm) \, \text{with} \, \basisyx = (\basisy^\top, -\tilde{\rx}^\top)^\top.
 \end{eqnarray*}
 The definition of a linear transformation model only requires the basis $\basisy$, 
 the explanatory variables $\rx$ and a distribution $\pZ$. The latter choice is now important,
 as additivity of the linear predictor is assumed on the scale of $\pZ$. It is convenient to
-supply negative linear predictors as $\Ex(\h(\rY) | \rX = \rx) = \rx^\top \shiftparm$.
+supply negative linear predictors as $\Ex(\h(\rY) | \rX = \rx) = \tilde{\rx}^\top \shiftparm$.
 
 \subsubsection{Discrete Response}
 
@@ -565,29 +565,38 @@ control group of $440$ women did not receive hormonal therapy.  Additional
 variables include age, menopausal status, tumor size, tumor grade, number of
 positive lymph nodes, progesterone receptor and estrogen receptor.  The
 right-censored recurrence-free survival time is the response variable of
-interest.
-
-First, we fitted the Cox model $(\pMEV, (\bern{5}^\top, \tilde{\rx}^\top)^\top,
-\parm)$ to the data, where $\tilde{\rx}$ contains the treatment indicator
-and all other variables in the transformation function $\h(\ry | \rx) =
-\bern{5}(\ry)^\top \parm_1 + \tilde{\rx}^\top \shiftparm$.  In contrast to the
-classical Cox model where only $\shiftparm$ is estimated by the partial
-likelihood, we estimated all model parameters simultaneously under five linear constraints.  
-The results obtained for $\shiftparm$ from the partial and the exact log-likelihood are practically
-equivalent:
-
+interest
 <<GBSG2-1, echo = TRUE>>=
 data("GBSG2", package = "TH.data")
 GBSG2$y <- with(GBSG2, Surv(time, cens))
 GBSG2y <- numeric_var("y", support = c(100.0, max(GBSG2$time)), bounds = c(0, Inf))
-### Cox model
-B_GBSG2y <- Bernstein_basis(var = GBSG2y, order = 10, ui = "incre")
-fm_GBSG2 <- Surv(time, cens) ~ horTh + age + menostat + tsize + tgrade + pnodes + progrec + estrec
-ctm_GBSG2_1 <- ctm(B_GBSG2y, shift = fm_GBSG2[-2L], todistr = "MinExtrVal", data = GBSG2)
+@
+
+We start with the Cox model $(\pMEV, (\bern{10}^\top,
+\tilde{\rx}^\top)^\top, \parm)$, where $\tilde{\rx}$ contains the treatment
+indicator and all other explanatory variables in the transformation function
+$\h(\ry | \rx) = \bern{10}(\ry)^\top \parm_1 + \tilde{\rx}^\top \shiftparm$
+(the positive shift being in line with the implementation in \cmd{coxph})
+<<GBSG2-1-Cox>>=
+B_GBSG2y <- Bernstein_basis(var = GBSG2y, order = 10, ui = "increasing")
+fm_GBSG2 <- Surv(time, cens) ~ horTh + age + menostat + tsize + tgrade +
+                               pnodes + progrec + estrec
+ctm_GBSG2_1 <- ctm(B_GBSG2y, shift = fm_GBSG2[-2L], 
+                   todistr = "MinExtrVal", data = GBSG2)
+@
+The distribution function $\pZ$ is the distribution function of the minimum
+extreme value distribution.
+
+In contrast to the classical Cox model where only $\shiftparm$ is estimated
+by the partial likelihood, we estimate all model parameters simultaneously
+under ten linear constraints
+<<GBSG2-1-mlt>>=
 mlt_GBSG2_1 <- mlt(ctm_GBSG2_1, data = GBSG2, maxit = 3000, scale = TRUE, check = FALSE)
-
+@
+The results obtained for $\shiftparm$ from
+the partial and the exact log-likelihood are practically equivalent
+<<GBSG2-1-coxph>>=
 coxph_GBSG2_1 <- coxph(fm_GBSG2, data = GBSG2)
-
 cf <- coef(coxph_GBSG2_1)
 cbind(coxph = cf, mlt = coef(mlt_GBSG2_1)[names(cf)])
 cbind(coxph = sqrt(diag(vcov(coxph_GBSG2_1))), 
