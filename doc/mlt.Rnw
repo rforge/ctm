@@ -34,6 +34,7 @@ library("truncreg")
 library("lattice")
 library("gridExtra")
 library("MASS")
+library("nnet")
 library("HSAUR3")
 library("grid") ### for textGrob
 library("latticeExtra")
@@ -325,7 +326,9 @@ $k$th element being one.  The transformation function $\h$ is
 with $\h(\ry_K) = \infty$,  and the unconditional distribution function of $\pY$ is
 $\pY(\ry_k) = \pZ(\eparm_k)$. Note that monotonicity of $\h$ is guaranteed by the
 $K - 2$ linear constraints $\eparm_2 - \eparm_1 > 0, \dots, \eparm_{K -1} -
-\eparm_{K -2} > 0$ when constrained optimisation is performed.
+\eparm_{K -2} > 0$ when constrained optimisation is performed. The density of
+a nominal variable $\rY$ can be estimated in the very same way because it is
+invariant with respect to the ordering of the levels.
 
 \paragraph{Categorical Data Analysis: Chinese Health and Family Life Survey}
 
@@ -744,6 +747,23 @@ mlt_CHFLS_4 <- mlt(ctm_CHFLS_4, data = CHFLS, scale = TRUE,
                    check = FALSE)
 cftest(mlt_CHFLS_4)
 @
+
+\subsubsection{Categorical Data Analysis: Iris Data}
+
+<<iris-1>>=
+multinom_iris <- multinom(Species ~ ., data = iris)
+iris$oSpecies <- ordered(iris$Species)
+b_Species <- as.basis(~ oSpecies, data = iris, remove_intercept = TRUE,
+              contrasts.arg = list(oSpecies = function(n)
+                  contr.treatment(n, base = 3)),
+              ui = diff(diag(2)), ci = rep(0, 1))
+ctm_iris <- ctm(b_Species, interacting = as.basis(~ Sepal.Length + Sepal.Width + 
+                Petal.Length + Petal.Width, data = iris), todistr = "Logistic")
+mlt_iris <- mlt(ctm_iris, data = iris, scale = TRUE, trace = TRUE, maxit = 5000)
+predict(mlt_iris, newdata = iris, q = sort(unique(iris$oSpecies)), type = "density")
+predict(multinom_iris, newdata = iris, type = "prob")
+@
+
 
 
 \subsubsection{Continuous Response}
