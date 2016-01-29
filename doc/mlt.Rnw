@@ -606,20 +606,24 @@ cbind(coxph = sqrt(diag(vcov(coxph_GBSG2_1))),
       mlt = sqrt(diag(vcov(mlt_GBSG2_1)))[names(cf)])
 @
 
-AFT Models
-
+Accelerated Failure Time (AFT) models arise when one restricts the 
+baseline transformation $\h(ry)$ to a possibly scaled log-transformation. With
+$\h(\ry) = \log(\ry)$ and $\pZ = \pMEV$ the exponential AFT model arises
+which can be specified as the Cox model above, only the Bernstein basis for time 
+needs to be replaced with a log-transformation
 <<GBSG2-2>>=
 ly <- log_basis(GBSG2y, ui = "increasing")
 ctm_GBSG2_2 <- ctm(ly, shift = as.basis(fm_GBSG2[-2L], data = GBSG2, negative = TRUE), todistr = "MinExtrVal")
 mlt_GBSG2_2 <- mlt(ctm_GBSG2_2, data = GBSG2, fixed = c("log(y)" = 1), scale = TRUE, check = FALSE)
-
+@
+The \cmd{survreg} and \cmd{phreg} functions fit the same model, the results
+are again equivalent
+<<GBSG2-2-exp>>=
 survreg_GBSG2_2 <- survreg(fm_GBSG2, data = GBSG2, dist = "exponential")
 phreg_GBSG2_2 <- phreg(fm_GBSG2, data = GBSG2, dist = "weibull", shape = 1)
-
 logLik(mlt_GBSG2_2)
 logLik(survreg_GBSG2_2)
 logLik(phreg_GBSG2_2)
-
 cbind(survreg = coef(survreg_GBSG2_2)[names(cf)], 
       phreg = coef(phreg_GBSG2_2)[names(cf)], 
       mlt = coef(mlt_GBSG2_2)[names(cf)])
@@ -628,21 +632,112 @@ cbind(survreg = sqrt(diag(vcov(survreg_GBSG2_2))[names(cf)]),
       phreg = sqrt(diag(vcov(phreg_GBSG2_2))[names(cf)]),
       mlt = sqrt(diag(vcov(mlt_GBSG2_2)))[names(cf)])
 @
-
+If we allow for a scaled log-transformation $\h(\ry) = \eparm_1 \log(\ry)$, the Weibull
+AFT model is fitted by \cmd{mlt}, \cmd{survreg} and \cmd{phreg} using
 <<GBSG2-3>>=
 mlt_GBSG2_3 <- mlt(ctm_GBSG2_2, data = GBSG2, scale = TRUE, check = FALSE)
-
 survreg_GBSG2_3 <- survreg(fm_GBSG2, data = GBSG2, dist = "weibull")
 phreg_GBSG2_3 <- phreg(fm_GBSG2, data = GBSG2, dist = "weibull")
-
 logLik(mlt_GBSG2_3)
 logLik(survreg_GBSG2_3)
 logLik(phreg_GBSG2_3)
-
 cbind(survreg = coef(survreg_GBSG2_3)[names(cf)] / survreg_GBSG2_3$scale, 
       phreg = coef(phreg_GBSG2_3)[names(cf)], 
       mlt = coef(mlt_GBSG2_3)[names(cf)])
 @
+
+
+\paragraph{Non-normal Linear Regression: Boston Housing Data}
+
+The Boston Housing data are a prominent test-bed for parametric and
+non-parametric alternatives to a normal linear regression model.
+Assuming a conditional normal distribution for the 
+median value of owner-occupied homes (medv, in USD $1000$'s) 
+in the normal linear model with constant variance
+\begin{eqnarray*}
+\text{medv} | \rX = \rx \sim \ND(\tilde{x}^\top \shiftparm, \sigma^2)
+\end{eqnarray*}
+is rather restrictive. We relax the model formulation without sacrificing
+the simplicity of a linear predictor of the explanatory variables
+in the linear transformation model
+\begin{eqnarray*}
+\Prob(\text{medv} \le \ry | \rX = \rx) = \Phi(\h(\ry) - \tilde{\rx}^\top \shiftparm)
+= \Phi(\bern{6}(\ry)^\top \parm_1 - \tilde{\rx}^\top \shiftparm)
+\end{eqnarray*}
+and estimate \emph{all} model parameters $(\parm_1, \beta)$ simulaneously, \ie both the
+regression coefficients \emph{and} the error distribution. Because it is 
+sraightforward to evaluate the conditional distribution function, the likelihood
+can deal with right-censored medv observations ($\ge 50$). This censoring
+was mostly ignored in other parametric or non-parametric analyses of this data set.
+
+We start with a suitable definition of median value of owner-occupied homes,
+set-up a \code{Surv} object for this response and a model formula
+<<BostonHousing>>=
+data("BostonHousing", package = "mlbench")
+lm_BH <- lm(medv ~ ., data = BostonHousing)
+BostonHousing$medvc <- with(BostonHousing, Surv(medv, medv < 50))
+mvar <- numeric_var("medvc", support = c(10.0, 40.0), bounds = c(0, Inf))
+fm_BH <- medvc ~ crim + zn + indus + chas + nox + rm + age + 
+    dis + rad + tax + ptratio + b + lstat
+@
+We are interested in a possibly non-linear transformation of the response
+and use a Bernstein polynomial of order $6$. The conditional transformation
+model is now given by this transformation of the response, a linear predictor
+of the explanatory variables the model and the normal probability function; the \cmd{mlt}
+function fits the model to the data
+<<BostonHousing-ctm>>=
+B_m <- Bernstein_basis(mvar, order = 6, ui = "increasing")
+ctm_BH <- ctm(B_m, shift = fm_BH[-2L], data = BostonHousing, 
+              todistr = "Normal")
+mlt_BH <- mlt(ctm_BH, data = BostonHousing, scale = TRUE, 
+              check = FALSE)
+@
+The model can be compared with a normal linear model (fitted by \cmd{lm}) on the
+scale of the fitted conditional distribution functions. Figure~\ref{fig:BostonHousing-plot}
+shows the fitted values, \ie the linear predictor for each observation, and the observed response
+overlayed with the conditional distribution function for the corresponding observations.
+For the normal linear model, the fit seems appropriate for observations with linear predictor 
+less than $30$. For larger values, the linear predictor underestimates the observations.
+The conditional distribution obtained from the linear transformation model captures
+observations with large values of the response better. For smaller values of the response,
+the fit resembles the normal linear model, although with a smaller conditional variance.
+
+\begin{figure}
+\begin{center}
+<<BostonHousing-plot, echo = FALSE, results = "hide", fig.width = 6, fig.height = 4>>=
+q <- 3:52
+m <- predict(lm_BH, data = BostonHousing)
+s <- summary(lm_BH)$sigma
+d <- sapply(m, function(m) pnorm(q, mean = m, sd = s))
+nd <- expand.grid(q = q, lp = m)
+nd$d <- c(d)
+
+pfun <- function(x, y, z, subscripts, at, ...) {
+    panel.contourplot(x, y, z, subscripts, at = 1:9/10, ...)
+    panel.xyplot(x = m, y = BostonHousing$medv, pch = 20,   
+                 col = rgb(.1, .1, .1, .1),  ...)   
+}
+p1 <- contourplot(d ~ lp + q, data = nd, panel = pfun, 
+                  xlab = "Linear predictor", ylab = "Observed", 
+                  main = "Normal Linear Model")
+
+d <- predict(mlt_BH, newdata = BostonHousing, q = q, type="distribution")
+lp <- c(predict(mlt_BH, newdata = BostonHousing, q = 0, terms = "bshift"))
+nd <- expand.grid(q = q, lp = -lp)
+nd$d <- c(d)
+pfun <- function(x, y, z, subscripts, at, ...) {
+    panel.contourplot(x, y, z, subscripts, at = 1:9/10, ...)
+    panel.xyplot(x = -lp, y = BostonHousing$medv, pch = 20, 
+                 col = rgb(.1, .1, .1, .1), ...)   
+}
+p2 <- contourplot(d ~ lp + q, data = nd, panel = pfun, xlab = "Linear predictor", ylab = "Observed", main = "Linear Transformation Model")
+grid.arrange(p1, p2, nrow = 1)
+@
+\caption{Boston Housing. Predicted vs.~observed for the normal linear model (left) and the linear
+         transformation model with smooth baseline transformation (right).\label{fig:BostonHousing-plot}}
+\end{center}
+\end{figure}
+
 
 \paragraph{Truncated Regression: Tobin's Data}
 
@@ -663,58 +758,6 @@ logLik(mlt_tobin)
 
 -coef(mlt_tobin)[c("(Intercept)", "age", "quant")] / coef(mlt_tobin)["durable"]
 @
-
-\paragraph{Robust Regression: Boston Housing Data}
-
-lm; Boston Housing
-<<BostonHousing>>=
-data("BostonHousing", package = "mlbench")
-lm_BH <- lm(medv ~ ., data = BostonHousing)
-BostonHousing$medvc <- with(BostonHousing, Surv(medv, medv < 50))
-mvar <- numeric_var("medvc", support = c(10.0, 40.0), bounds = c(0, Inf))
-B_m <- Bernstein_basis(mvar, order = 6, ui = "increasing")
-fm_BH <- medvc ~ crim + zn + indus + chas + nox + rm + age + 
-    dis + rad + tax + ptratio + b + lstat
-ctm_BH <- ctm(B_m, shift = fm_BH[-2L], data = BostonHousing, 
-              todistr = "Normal")
-mlt_BH <- mlt(ctm_BH, data = BostonHousing, scale = TRUE, 
-                        check = FALSE)
-@
-
-\begin{figure}
-\begin{center}
-<<BostonHousing-plot, echo = FALSE, results = "hide", fig.width = 6, fig.height = 4>>=
-q <- 3:52
-m <- predict(lm_BH, data = BostonHousing)
-s <- summary(lm_BH)$sigma
-d <- sapply(m, function(m) pnorm(q, mean = m, sd = s))
-nd <- expand.grid(q = q, lp = m)
-nd$d <- c(d)
-
-pfun <- function(x, y, z, subscripts, at, ...) {
-    panel.contourplot(x, y, z, subscripts, at = 1:9/10, ...)
-    panel.xyplot(x = m, y = BostonHousing$medv, pch = 20,   
-                 col = rgb(.1, .1, .1, .1),  ...)   
-}
-p1 <- contourplot(d ~ lp + q, data = nd, panel = pfun, xlab = "Linear predictor", ylab = "Observed", main = "Normal Linear Model")
-
-d <- predict(mlt_BH, newdata = BostonHousing, q = q, type="distribution")
-lp <- c(predict(mlt_BH, newdata = BostonHousing, q = 0, terms = "bshift"))
-nd <- expand.grid(q = q, lp = -lp)
-nd$d <- c(d)
-pfun <- function(x, y, z, subscripts, at, ...) {
-    panel.contourplot(x, y, z, subscripts, at = 1:9/10, ...)
-    panel.xyplot(x = -lp, y = BostonHousing$medv, pch = 20, 
-                 col = rgb(.1, .1, .1, .1), ...)   
-}
-p2 <- contourplot(d ~ lp + q, data = nd, panel = pfun, xlab = "Linear predictor", ylab = "Observed", main = "Linear Transformation Model")
-grid.arrange(p1, p2, nrow = 1)
-@
-\caption{Boston Housing. Predicted vs.~observed for the normal linear model (left) and the linear
-         transformation model with smooth baseline transformation (right).\label{fig:BostonHousing-plot}}
-\end{center}
-\end{figure}
-
 
 \subsection{Stratified Linear Transformation Models}
 
@@ -759,9 +802,11 @@ b_Species <- as.basis(~ oSpecies, data = iris, remove_intercept = TRUE,
               ui = diff(diag(2)), ci = rep(0, 1))
 ctm_iris <- ctm(b_Species, interacting = as.basis(~ Sepal.Length + Sepal.Width + 
                 Petal.Length + Petal.Width, data = iris), todistr = "Logistic")
-mlt_iris <- mlt(ctm_iris, data = iris, scale = TRUE, trace = TRUE, maxit = 5000)
-predict(mlt_iris, newdata = iris, q = sort(unique(iris$oSpecies)), type = "density")
-predict(multinom_iris, newdata = iris, type = "prob")
+mlt_iris <- mlt(ctm_iris, data = iris, scale = TRUE, check = FALSE)
+p1 <- predict(mlt_iris, newdata = iris, q = sort(unique(iris$oSpecies)), 
+              type = "density")
+p2 <- predict(multinom_iris, newdata = iris, type = "prob")
+max(abs(t(p1) - p2))
 @
 
 
@@ -1603,8 +1648,8 @@ predict(pb, newdata = x, coef = c(1, 2, 0, 1.75), deriv = c(x = 1L))
 
 \subsection{Logarithmic Basis}
 
-The monotone increasing logarithmic basis $\alpha + \beta \log(x)$ being 
-subject to $\beta > 0$ is defined as
+The monotone increasing logarithmic basis $\eparm_1 + \eparm_2 \log(x)$ being 
+subject to $\eparm_2 > 0$ is defined as
 <<basefun-log>>=
 ### set-up log-basis with intercept for positive variable
 class(lb <- log_basis(xvar, remove_intercept = FALSE, ui = "increasing"))
@@ -1616,7 +1661,7 @@ attr(X, "constraint")
 @
 where the linear constraints $\mA \parm \ge \mvec$ are represented by
 a matrix $\mA$ (\code{ui}) and a vector $\mvec$ (\code{ci}). For 
-$(\alpha, \beta) = (1, 2)$ the function and its derivative can be computed
+$\parm = (1, 2)$ the function and its derivative can be computed
 as
 <<basefun-log-pred>>=
 predict(lb, newdata = x, coef = c(1, 2))
