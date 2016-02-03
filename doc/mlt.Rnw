@@ -14,6 +14,7 @@
 \newcommand{\cmd}[1]{\texttt{#1()}}
 
 <<setup, echo = FALSE, results = "hide", message = FALSE>>=
+set.seed(290875)
 printfun <- function(fun) {
     f <- formals(fun)
     cf <- sapply(f, function(x) {
@@ -1484,7 +1485,7 @@ was used for optimising the log-likelihood.
 
 \begin{appendix}
 
-\section{variables} \label{app:variables}
+\section{The variables Package} \label{app:variables}
 
 The \pkg{variables} packages \citep{pkg:variables} offers a small collection
 of classes and methods for specifying and dealing with variable
@@ -1605,7 +1606,43 @@ expand.grid(mkgrid(vars))
 generates a \code{data.frame} with all possible values of the
 variables and all combinations thereof.
 
-\section{basefun} \label{app:basefun}
+\section{Responses} \label{app:R}
+
+The generic \cmd{R} is an extention of \cmd{Surv} to possibly truncated
+or categorical response variables with methods for objects of class 
+\code{Surv}, \code{ordered}, \code{factor}, \code{integer} and \code{numeric}. The main
+purpose is to set-up the interval $(\ubar{\ry}, \bar{\ry}]$ for the evaluation
+of the likelihood contribution $\pZ(\h(\bar{\ry})) - \pZ(\h(\ubar{\ry}))$.
+For ordered categorical responses, $\bar{\ry}$ is the observed level and
+$\ubar{\ry}$ the level preceeding $\bar{\ry}$ (which is missing when the
+first level was observed)
+<<R-ordered>>=
+head(R(sort(unique(CHFLS$R_happy))))
+@
+For integers, $\bar{\ry}$ is the observation and $\ubar{\ry} = \bar{\ry} - 1$
+<<R-integer>>=
+R(1:10)
+@
+Numeric observations can be ``exact'' (meaning that the likelihood is
+approximated by the density evaluated at the observation), interval censored
+(with left- and right-censoring as special cases) and left- or right-truncated
+in arbitrary combinations thereof. For example, consider ten draws from
+the standard normal, truncated to $(-1, 2]$ and possibly censored:
+<<R-numeric>>=
+x <- rnorm(10)
+xt <- round(x[x > -1 & x <= 2], 3)
+xl <- xt - sample(c(Inf, (0:(length(xt) - 2)) / length(xt)), replace = FALSE)
+xr <- xt + sample(c(Inf, (0:(length(xt) - 2)) / length(xt)), replace = FALSE)
+R(c(1.2, rep(NA, length(xt))), cleft = c(NA, xl), cright = c(NA, xr), 
+  tleft = -1, tright = 2)
+@
+\code{Surv} objects are simply converted to the alternative format
+<<R-Surv>>=
+head(geyser$duration)
+head(R(geyser$duration))
+@
+
+\section{The basefun Package} \label{app:basefun}
 
 The \pkg{basefun} package \citep{pkg:basefun} implements Bernstein,
 Legendre, log and polynomial basis functions.  In addition, facilities for

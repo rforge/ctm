@@ -19,6 +19,8 @@ clean:
 	rm -rf mlt.tex
 	rm -rf mlt.pdf
 	rm -rf mlt.R
+	rm -rf *aux
+	rm -rf *out
 	rm -rf *~
 	rm -rf packages.bib
 	
