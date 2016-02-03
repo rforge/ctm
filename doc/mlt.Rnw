@@ -38,6 +38,7 @@ library("MASS")
 library("nnet")
 library("HSAUR3")
 library("sandwich")
+library("flexsurv")
 library("grid") ### for textGrob
 library("latticeExtra")
 trellis.par.set(list(plot.symbol = list(col=1,pch=20, cex=0.7),
@@ -548,11 +549,8 @@ cbind(polr = c(polr_CHFLS_2$zeta, coef(polr_CHFLS_2)),
 The regression coefficients $\shiftparm$ are the log-odds ratios, \ie 
 the odds-ratio between any two subsequent happiness categories is
 $\Sexpr{round(exp(coef(mlt_CHFLS_2)["R_age"]), 4)}$ for each year of age and
-$\Sexpr{round(exp(coef(mlt_CHFLS_2)["R_income"]), 4)}$ for each additional Yuan earned,
-only the latter positive effect of income being ``significant'' by standard measures
-<<CHFLS-2-cftest>>=
-cftest(mlt_CHFLS_2)
-@
+$\Sexpr{round(exp(coef(mlt_CHFLS_2)["R_income"]), 4)}$ for each additional Yuan earned.
+
 
 \subsubsection{Continuous Responses}
 
@@ -593,7 +591,7 @@ In contrast to the classical Cox model where only $\shiftparm$ is estimated
 by the partial likelihood, we estimate all model parameters simultaneously
 under ten linear constraints
 <<GBSG2-1-mlt>>=
-mlt_GBSG2_1 <- mlt(ctm_GBSG2_1, data = GBSG2, maxit = 3000, scale = TRUE, check = FALSE)
+system.time(mlt_GBSG2_1 <- mlt(ctm_GBSG2_1, data = GBSG2, maxit = 3000, scale = TRUE, check = FALSE))
 @
 The results obtained for $\shiftparm$ from
 the partial and the exact log-likelihood are practically equivalent
@@ -602,6 +600,41 @@ coxph_GBSG2_1 <- coxph(fm_GBSG2, data = GBSG2)
 cf <- coef(coxph_GBSG2_1)
 cbind(coxph = cf, mlt = coef(mlt_GBSG2_1)[names(cf)])
 @
+A comparison with the \cite{Royston_Parmar_2002} spline model as implemented in the
+\pkg{flexsurv} package \cite{pkg:flexsurv} shows that the two spline parameterisations
+of the log cumulative hazard function are practically equivalent (see Figure~\ref{GBSG2-1-fss-plot} also), although
+\cmd{mlt} is ten times faster than \cmd{flexsurvspline} for this simple Cox model
+<<GBSG2-1-fss, cache = TRUE>>=
+system.time(fss_GBSG2_1 <- flexsurvspline(fm_GBSG2, data = GBSG2, scale = "hazard", k = 9,
+                              bknots = log(support(GBSG2y)$y)))
+logLik(fss_GBSG2_1)
+logLik(mlt_GBSG2_1)
+cbind(coxph = cf, mlt = coef(mlt_GBSG2_1)[names(cf)],
+      fss = coef(fss_GBSG2_1)[names(cf)])
+diag(vcov(mlt_GBSG2_1))[names(cf)]
+diag(vcov(fss_GBSG2_1))[names(cf)]
+@
+
+
+\begin{figure}
+\begin{center}
+<<GBSG2-1-fss-plot, fig.width = 5, fig.height = 4, echo = FALSE>>=
+p1 <- summary(fss_GBSG2_1, newdata = GBSG2[1,], ci = FALSE)
+p2 <- predict(mlt_GBSG2_1, newdata = GBSG2[1, all.vars(fm_GBSG2[-2L])], 
+              q = p1[[1]]$time, type = "survivor")
+plot(p1[[1]]$time, p1[[1]]$est, type = "l", lty = 1, xlab = "Survival Time (days)", 
+     ylab = "Probability", ylim = c(0, 1))
+lines(p1[[1]]$time, p2[,1], lty = 2)
+legend("topright", lty = 1:2, legend = c("flexsurvspline", "mlt"), bty = "n")
+@
+\caption{GBSG-2 Trial. Estimated survivor functions for patient 1  
+         by the most likely transformation model (MLT) and the \cite{Royston_Parmar_2002} spline
+         model fitted using \cmd{flexsurvspline}. \label{GBSG2-1-fss-plot}}
+\end{center}
+\end{figure}
+
+
+
 
 Accelerated Failure Time (AFT) models arise when one restricts the 
 baseline transformation $\h(ry)$ to a possibly scaled log-transformation. With
@@ -781,7 +814,7 @@ With covariates
 ctm_CHFLS_4 <- ctm(b_happy, interacting = b_health, shift = b_R, todist = "Logistic")
 mlt_CHFLS_4 <- mlt(ctm_CHFLS_4, data = CHFLS, scale = TRUE,
                    check = FALSE)
-cftest(mlt_CHFLS_4)
+coef(mlt_CHFLS_4)
 @
 
 \subsubsection{Categorical Data Analysis: Iris Data}
@@ -1411,6 +1444,7 @@ intervals and confidence bands for the conditional distribution function
 from confidence intervals and bands for the linear functions $\basisy^\top
 \parm$. 
 
+\paragraph{Categorical Data Analysis: Chinese Survey (Cont'd)}
 
 <<CHFLS-1-cmpr-2>>=
 max(abs(estfun(polr_CHFLS_1) - (-estfun(mlt_CHFLS_1))))
@@ -1418,6 +1452,7 @@ cbind(polr = sqrt(diag(vcov(polr_CHFLS_1))),
       mlt = sqrt(diag(vcov(mlt_CHFLS_1))))
 @
 
+The positive effect of income is ``significant'' by standard measures
 <<CHFLS-2-cmpr-2>>=
 max(abs(estfun(polr_CHFLS_2) - (-estfun(mlt_CHFLS_2)[,c(4, 5, 1:3)])))
 cbind(polr = sqrt(diag(vcov(polr_CHFLS_2))),
@@ -1425,6 +1460,8 @@ cbind(polr = sqrt(diag(vcov(polr_CHFLS_2))),
 cftest(polr_CHFLS_2)
 cftest(mlt_CHFLS_2, parm = names(coef(polr_CHFLS_2)))
 @
+
+\paragraph{Survival Analysis: GBSG-2 Trial (Cont'd)}
 
 <<GBSG2-1-coxph-cmpr>>=  
 cf <- coef(coxph_GBSG2_1)
@@ -1449,6 +1486,39 @@ cbind(coxph = sqrt(diag(vcov(coxph_GBSG2_5))),
 cftest(coxph_GBSG2_5)
 cftest(mlt_GBSG2_5, parm = names(cf))
 @
+
+\paragraph{Density Estimation: Geyser Data (Cont'd)}
+
+<<geyser-w-band>>=
+head(cb_w <- confband(mlt_w, newdata = data.frame(1), ncheat = 100))
+@
+
+
+\begin{figure}
+\begin{center}
+<<geyser-w-cbplot, echo = FALSE, cache = TRUE, fig.height = 4, fig.width = 6, results = "hide">>=
+layout(matrix(1:2, ncol = 2))
+#i <- (cb_w[, "q"] > 45 & cb_w[, "q"] < 110)
+#cb_w[-i, "lwr"] <- NA
+#cb_w[-i, "upr"] <- NA
+plot(cb_w[, "q"], cb_w[, "Estimate"], xlab = "Waiting times", ylab = "Transformation", 
+     main = "", type = "l")
+lines(cb_w[, "q"], cb_w[, "lwr"])
+lines(cb_w[, "q"], cb_w[, "upr"])
+rug(geyser$waiting, col = rgb(.1, .1, .1, .1))
+plot(ecdf(geyser$waiting), col = "grey", xlab = "Waiting times", ylab = "Distribution", 
+     main = "")
+lines(cb_w[, "q"], pnorm(cb_w[, "Estimate"]))
+lines(cb_w[, "q"], pnorm(cb_w[, "lwr"]))
+lines(cb_w[, "q"], pnorm(cb_w[, "upr"]))
+rug(geyser$waiting, col = rgb(.1, .1, .1, .1))
+@
+\caption{Old Faithful Geyser. Estimated transformation (left)
+         and distribution function (right, also featuring the empirical
+         cumulative distribution function) with confidence bands.
+         \label{fig:geyser-w-cbplot}}
+\end{center}
+\end{figure}
 
 
 \section{Simulation-based Likelihood Inference} \label{sec:sim}
@@ -1481,6 +1551,7 @@ pkg("gamlss")
 pkg("MASS")
 pkg("np")
 pkg("prodlim")
+pkg("flexsurv")
 mlt <- c("@Manual{pkg:mlt, \n
           title = {mlt: Most Likely Transformations},\n
           author = {Torsten Hothorn},\n
@@ -1636,50 +1707,6 @@ expand.grid(mkgrid(vars))
 generates a \code{data.frame} with all possible values of the
 variables and all combinations thereof.
 
-\section{Responses} \label{app:R}
-
-The generic \cmd{R} is an extention of \cmd{Surv} to possibly truncated
-or categorical response variables with methods for objects of class 
-\code{Surv}, \code{ordered}, \code{factor}, \code{integer} and \code{numeric}. The main
-purpose is to set-up the interval $(\ubar{\ry}, \bar{\ry}]$ for the evaluation
-of the likelihood contribution $\pZ(\h(\bar{\ry})) - \pZ(\h(\ubar{\ry}))$.
-For ordered categorical responses, $\bar{\ry}$ is the observed level and
-$\ubar{\ry}$ the level preceeding $\bar{\ry}$ (which is missing when the
-first or last level was observed)
-<<R-ordered>>=
-head(R(sort(unique(CHFLS$R_happy))))
-@
-For integers, $\bar{\ry}$ is the observation and $\ubar{\ry} = \bar{\ry} - 1$
-<<R-integer>>=
-R(1:5, bounds = c(1, 5))
-@
-Numeric observations can be ``exact'' (meaning that the likelihood is
-approximated by the density evaluated at the observation), interval censored
-(with left- and right-censoring as special cases) and left- or right-truncated
-in arbitrary combinations thereof. For example, consider ten draws from
-the standard normal, truncated to $(-1, 2]$ and possibly censored:
-<<R-numeric>>=
-x <- rnorm(10)
-xt <- round(x[x > -1 & x <= 2], 3)
-xl <- xt - sample(c(Inf, (0:(length(xt) - 2)) / length(xt)), replace = FALSE)
-xr <- xt + sample(c(Inf, (0:(length(xt) - 2)) / length(xt)), replace = FALSE)
-R(c(1.2, rep(NA, length(xt))), cleft = c(NA, xl), cright = c(NA, xr), 
-  tleft = -1, tright = 2)
-@
-Censoring and truncation (via the \code{cleft}, \code{cright}, \code{tleft}
-and \code{tright} arguments) are also implemented for ordered categorical
-and integer responses. \code{Surv} objects are simply converted to the 
-alternative format without the possibility to define extra arguments
-<<R-Surv>>=
-head(geyser$duration)
-head(R(geyser$duration))
-@
-It should be noted that the measurement scale of the observations has
-nothing to do with the measurement scale of the response $\rY$ in the model
-and the corresponding basis functions.  Discrete or continuous models are
-specified based on the abstract variable description
-(Appendix~\ref{app:variables}).
-
 
 \section{The basefun Package} \label{app:basefun}
 
@@ -1808,6 +1835,54 @@ bfb <- b(bern = bb, f = fb, sumconstr = TRUE)
 head(X <- model.matrix(bfb, data = nd))
 attr(X, "constraint")
 @
+
+\section{The mlt Package} \label{app:mlt}
+
+\subsection{Specifying Response Observations} \label{subapp:R}
+
+The generic \cmd{R} is an extention of \cmd{Surv} to possibly truncated
+or categorical response variables with methods for objects of class 
+\code{Surv}, \code{ordered}, \code{factor}, \code{integer} and \code{numeric}. The main
+purpose is to set-up the interval $(\ubar{\ry}, \bar{\ry}]$ for the evaluation
+of the likelihood contribution $\pZ(\h(\bar{\ry})) - \pZ(\h(\ubar{\ry}))$.
+For ordered categorical responses, $\bar{\ry}$ is the observed level and
+$\ubar{\ry}$ the level preceeding $\bar{\ry}$ (which is missing when the
+first or last level was observed)
+<<R-ordered>>=
+head(R(sort(unique(CHFLS$R_happy))))
+@
+For integers, $\bar{\ry}$ is the observation and $\ubar{\ry} = \bar{\ry} - 1$
+<<R-integer>>=
+R(1:5, bounds = c(1, 5))
+@
+Numeric observations can be ``exact'' (meaning that the likelihood is
+approximated by the density evaluated at the observation), interval censored
+(with left- and right-censoring as special cases) and left- or right-truncated
+in arbitrary combinations thereof. For example, consider ten draws from
+the standard normal, truncated to $(-1, 2]$ and possibly censored:
+<<R-numeric>>=
+x <- rnorm(10)
+xt <- round(x[x > -1 & x <= 2], 3)
+xl <- xt - sample(c(Inf, (0:(length(xt) - 2)) / length(xt)), replace = FALSE)
+xr <- xt + sample(c(Inf, (0:(length(xt) - 2)) / length(xt)), replace = FALSE)
+R(c(1.2, rep(NA, length(xt))), cleft = c(NA, xl), cright = c(NA, xr), 
+  tleft = -1, tright = 2)
+@
+Censoring and truncation (via the \code{cleft}, \code{cright}, \code{tleft}
+and \code{tright} arguments) are also implemented for ordered categorical
+and integer responses. \code{Surv} objects are simply converted to the 
+alternative format without the possibility to define extra arguments
+<<R-Surv>>=
+head(geyser$duration)
+head(R(geyser$duration))
+@
+It should be noted that the measurement scale of the observations has
+nothing to do with the measurement scale of the response $\rY$ in the model
+and the corresponding basis functions.  Discrete or continuous models are
+specified based on the abstract variable description
+(Appendix~\ref{app:variables}).
+
+
 
 \end{appendix}
 
