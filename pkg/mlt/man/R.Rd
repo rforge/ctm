@@ -4,6 +4,7 @@
 \alias{R.factor}
 \alias{R.ordered}
 \alias{R.numeric}
+\alias{R.integer}
 \title{
     Response variable
 }
@@ -13,9 +14,9 @@
 \usage{
 R(object, ...)
 \method{R}{numeric}(object = NA, cleft = NA, cright = NA,
-                    tleft = NA, tright = NA, tol = sqrt(.Machine$double.eps),
-                    ...)
+   tleft = NA, tright = NA, tol = sqrt(.Machine$double.eps), ...)
 \method{R}{ordered}(object, cleft = NA, cright = NA, ...)
+\method{R}{integer}(object, cleft = NA, cright = NA, ...)
 \method{R}{factor}(object, ...)
 \method{R}{Surv}(object, ...)
 }
@@ -34,7 +35,7 @@ R(object, ...)
   Tolerance for checking if \code{cleft} < \code{cright}}
   \item{\dots}{
   other arguments, ignored except for \code{tleft} and \code{tright} to
-  \code{R.ordered}}
+  \code{R.ordered} and \code{R.integer}}
 }
 \details{
   \code{R} is basically an extention of \code{\link[survival]{Surv}} for the
