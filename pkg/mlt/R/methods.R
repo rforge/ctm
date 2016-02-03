@@ -154,21 +154,24 @@ bounds.mlt <- function(object)
 print.response <- function(x, ...) {
 
     ac <- as.character
-    obs <- paste(ifelse(is.na(x$cleft) & !is.factor(x$cleft), "", 
-                        paste("(", ac(x$cleft), ", ", sep = "")),
-                 ifelse(is.na(x$exact), "", ac(x$exact)),
-                 ifelse(is.na(x$cright) & !is.factor(x$cright) , "", 
-                        paste(ac(x$cright), "]", sep = "")), sep = "")
+    obs <- paste(ifelse(!is.na(x$exact), ac(x$exact), 
+                 paste("(", ac(x$cleft), ", ", ac(x$cright), "]", sep = "")))
 
     if (all(is.na(x$tleft) & is.na(x$tright))) {
         print(obs, quote = FALSE, ...)
         return(invisible(obs))
     }
 
-    trc <- paste(ifelse(is.na(x$tleft), "", 
-                        paste(" | (", ac(x$tleft), ", ", sep = "")),
-                 ifelse(is.na(x$tright), "", 
-                        paste(ac(x$tright), ")", sep = "")), sep = "")
+    trc <- character(length(obs))
+    i <- (!is.na(x$tleft) & is.na(x$tright))
+    if (sum(i) > 0)
+        trc[i] <- paste("| >", x$tleft[i])
+    i <- (is.na(x$tleft) & !is.na(x$tright))
+    if (sum(i) > 0)
+        trc[i] <- paste("| <", x$tright[i])
+    i <- (!is.na(x$tleft) & !is.na(x$tright))
+    if (sum(i) > 0)
+        trc[i] <- paste("| (", x$tleft[i], ", ", x$tright[i], "]", sep = "")
     ret <- paste("{", obs, trc, "}", sep = "")
     print(ret, quote = FALSE, ...)
 }

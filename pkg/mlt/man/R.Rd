@@ -16,7 +16,7 @@ R(object, ...)
 \method{R}{numeric}(object = NA, cleft = NA, cright = NA,
    tleft = NA, tright = NA, tol = sqrt(.Machine$double.eps), ...)
 \method{R}{ordered}(object, cleft = NA, cright = NA, ...)
-\method{R}{integer}(object, cleft = NA, cright = NA, ...)
+\method{R}{integer}(object, cleft = NA, cright = NA, bounds = c(0L, Inf), ...)
 \method{R}{factor}(object, ...)
 \method{R}{Surv}(object, ...)
 }
@@ -33,6 +33,8 @@ R(object, ...)
   A vector of right truncations}
   \item{tol}{
   Tolerance for checking if \code{cleft} < \code{cright}}
+  \item{bounds}{
+  Range of possible values for integers}
   \item{\dots}{
   other arguments, ignored except for \code{tleft} and \code{tright} to
   \code{R.ordered} and \code{R.integer}}

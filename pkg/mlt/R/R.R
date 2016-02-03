@@ -70,12 +70,13 @@ R.ordered <- function(object, cleft = NA, cright = NA, ...) {
     ret
 }
 
-R.integer <- function(object, cleft = NA, cright = NA, ...) {
+R.integer <- function(object, cleft = NA, cright = NA, bounds = c(0L, Inf), ...) {
 
     ret <- .mkR(exact = object, cleft = cleft, cright = cright, ...)
     ret$cright[is.na(ret$cright)] <- ret$exact[is.na(ret$cright)]
+    ret$cright[ret$cright == bounds[2]] <- NA
     ret$cleft[is.na(ret$cleft)] <- ret$exact[is.na(ret$cleft)] - 1
-    ret$cleft[ret$cleft < 0] <- NA
+    ret$cleft[ret$cleft < bounds[1]] <- NA
     ret$exact <- NA
     ret
 }
