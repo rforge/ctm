@@ -292,8 +292,9 @@ plot(d ~ duration, data = ndd, type = "l", ylab = "Density", xlab = "Duration ti
 
 In this section we introduce a cascade of increasingly complex
 transformation models and discuss how one can specify such models using the
-infrastructure provided by the \pkg{mlt} package.  The models are
-illustrated by a applications from different domains.  We start with the
+\cmd{ctm} function provided by the \pkg{mlt} package.  The models are fitted
+via maximum likelihood by the \cmd{mlt} function (details are given in
+Section~\ref{sec:mlt}) to studies from different domains.  We start with the
 simplest case of models for unconditional distribution functions.
 
 \subsection{Unconditional Transformation Models}
@@ -419,7 +420,7 @@ parameters $\eparm_m < \eparm_{m + 1}$ for all $m = 0, \dots, M$
 \citep{Curtis_Ghosh_2011}.  Therefore, application of constrained optimisation guarantees
 monotone estimates $\hat{\h}_N$. The basis contains an intercept.  
 
-\paragraph{Density Estimation: Geyser Data}
+\paragraph{Density Estimation: Geyser Data (Cont'd)}
 We continue the analysis of the Old Faithful data by estimating the unconditional distribution of
 waiting times, a positive variable those abstract representation can be used to generate
 an equidistant grid of $100$ values
@@ -520,7 +521,7 @@ supply negative linear predictors as $\Ex(\h(\rY) | \rX = \rx) = \tilde{\rx}^\to
 
 \subsubsection{Discrete Response}
 
-\paragraph{Categorical Data Analysis: Chinese Survey} We want to study the impact of
+\paragraph{Categorical Data Analysis: Chinese Survey (Cont'd)} We want to study the impact of
 age and income on happiness in a proportional odds model, here fitted using \cmd{polr} first
 <<CHFLS-2, cache = TRUE>>=
 polr_CHFLS_2 <- polr(R_happy ~ R_age + R_income, data = CHFLS)
@@ -770,7 +771,7 @@ logLik(mlt_tobin)
 
 \subsubsection{Discrete Response}
 
-\paragraph{Categorical Data Analysis: Chinese Survey}
+\paragraph{Categorical Data Analysis: Chinese Survey (Cont'd)}
 
 Non-proportional odds model.
 
@@ -814,7 +815,7 @@ max(abs(t(p1) - p2))
 
 \subsubsection{Continuous Response}
 
-\paragraph{Survival Analysis: GBSG-2 Trial}
+\paragraph{Survival Analysis: GBSG-2 Trial (Cont'd)}
 
 Estimate survivor function separately for the two treatment regimes
 
@@ -888,7 +889,7 @@ printfun(ctm)
 
 \subsubsection{Discrete Response}
 
-\paragraph{Categorical Data Analysis: Chinese Survey}
+\paragraph{Categorical Data Analysis: Chinese Survey (Cont'd)}
 
 Estimate the deviation of the conditional distribution of happiness
 compared to the baseline distribution of happiness with very poor health.
@@ -915,7 +916,7 @@ cftest(mlt_CHFLS_7)
 
 \subsubsection{Continuous Response}
 
-\paragraph{Survival Analysis: GBSG-2 Trial}
+\paragraph{Survival Analysis: GBSG-2 Trial (Cont'd)}
 
 The Cox model $(\pMEV, (\bern{5}^\top, \I(\text{hormonal
 therapy}))^\top, \parm)$ implements the transformation function $\h(\ry |
@@ -1224,7 +1225,9 @@ abline(h = 1, lty = 6)
 
 \section{Estimating Most Likely Transformations} \label{sec:mlt}
 
-
+In this Section we review the underpinnings of the \cmd{mlt} function 
+implementing the \emph{most likely transformation} estimator following
+\cite{Hothorn_Moest_Buehlmann_2016} closely.
 For a given transformation function $h$, the likelihood contribution of a
 datum $\esAY = (\ubar{\ry},\bar{\ry}] \in \sAY$ is defined in terms of the
 distribution function \citep{Lindsey_1996}: 
@@ -1287,54 +1290,48 @@ terms of a distribution function \citep{Lindsey_1999} and it therefore makes
 sense to directly model the distribution function of interest.  The ability
 to uniquely characterise this distribution function by the
 transformation function $\h$ gives rise to the following definition of an
-estimator $\hat{\h}_N$.
-
-\begin{defn}[Most likely transformation]
-Let $\esAY_1, \dots, \esAY_N$ denote an independent sample of possibly
-censored or truncated observations from $\Prob_\rY$. The estimator
+estimator $\hat{\h}_N$. For an independent sample of possibly
+censored or truncated observations $\esAY_1, \dots, \esAY_N$ 
+from $\Prob_\rY$ the estimator
 \begin{eqnarray*}
 \hat{\h}_N := \argmax_{\tilde{\h} \in \hs} \sum_{i = 1}^{N} \log(\lik(\tilde{\h} |
 \rY \in \esAY_i)) 
 \end{eqnarray*}
-is called the most likely transformation (MLT).
-\end{defn}
-Log-concavity of $\dZ$ ensures concavity of the log-likelihood (except 
-when all observations are right-censored) and thus
-existence and uniqueness of $\hat{\h}_N$.
-
-We parameterise the transformation function $\h(\ry)$ as a linear function of its
-basis-transformed argument $\ry$ using a basis function $\basisy: \samY
+is called the most likely transformation (MLT). In \pkg{mlt}, we
+parameterise the transformation function $\h(\ry)$ as a linear function of
+its basis-transformed argument $\ry$ using a basis function $\basisy: \samY
 \rightarrow \RR^\dimparm$ such that $\h(\ry) = \basisy(\ry)^\top \parm,
 \parm \in \RR^\dimparm$.  The choice of the basis function $\basisy$ is
-problem-specific and will be discussed in Section~\ref{sec:appl}.  The
+problem-specific, examples are discussed in Section~\ref{sec:trafo}.  The
 likelihood $\lik$ only requires evaluation of $\h$, and only an
-approximation thereof using the Lebesgue density of ``exact continuous'' observations 
-makes the evaluation of the 
-first derivative of $\h(\ry)$ with respect to $\ry$ necessary.  In this
-case, the derivative with respect to $\ry$ is given by
-$\h^\prime(\ry) = \basisy^\prime(\ry)^\top \parm$ and we assume that
-$\basisy^\prime$ is available.
-In the following we write $\h = \basisy^\top
-\parm$ and $\h^\prime = {\basisy^\prime}^\top \parm$ for the transformation
-function and its first derivative omitting the argument $\ry$
+approximation thereof using the Lebesgue density of ``exact continuous''
+observations makes the evaluation of the first derivative of $\h(\ry)$ with
+respect to $\ry$ necessary.  In this case, the derivative with respect to
+$\ry$ is given by $\h^\prime(\ry) = \basisy^\prime(\ry)^\top \parm$ and we
+assume that $\basisy^\prime$ is available.  In the following we write $\h =
+\basisy^\top \parm$ and $\h^\prime = {\basisy^\prime}^\top \parm$ for the
+transformation function and its first derivative omitting the argument $\ry$
 and we assume that both functions are bounded away from $-\infty$ and
-$\infty$. 
-
-\begin{defn}[Maximum likelihood estimator]
+$\infty$. Using this parameterisation we obtain the maximum likelihood estimator
+for $\parm$ as
 \begin{eqnarray*}
 \hat{\parm}_N := \argmax_{\parm \in \Theta} \sum_{i = 1}^N
 \log(\lik(\basisy^\top \parm | \rY \in \esAY_i))
 \end{eqnarray*}
-\end{defn}
+and the most likely transformation is $\hat{\h}_N := \basisy^\top \hat{\parm}_N$.
 
 \section{Looking at Transformation Models} \label{sec:predict}
 
-Based on the maximum likelihood estimator $\hat{\parm}_N$, we
-define plug-in estimators of the most likely transformation function and
-the corresponding estimator of our target distribution $\pY$ as 
-$\hat{\h}_N := \basisy^\top \hat{\parm}_N$ and 
-$\hatpY := \pZ \circ \hat{\h}_N$.
-
+Based on the maximum likelihood estimator $\hat{\parm}_N$ and the most
+likely transformation is $\hat{\h}_N$, plug-in estimators for the
+distribution and cumulative hazard functions are given by $\hatpY = \pZ
+\circ \basisy^\top \hat{\parm}_N$ and $\hatHazY = -\log(1 - \hatpY)$.  For a
+continuous model, the density is given by $\hatdY = \dZ \circ \basisy^\top
+\hat{\parm}_N \times {\basisy^\prime}^\top \hat{\parm}_N$, for a discrete model
+we get $\hatdY(\ry_k) = \pZ(\basisy(\ry_k)^\top \hat{\parm}_N) - 
+\pZ(\basisy(\ry_{k - 1})^\top \hat{\parm}_N)$ (with $\pZ(\basisy(\ry_{0})^\top \hat{\parm}_N) := 0$ and
+\pZ(\basisy(\ry_{K})^\top \hat{\parm}_N) := 1$). The hazard function is 
+$\hathazY = \hatdY / (1 - \hatpY)$.
 
 \section{Classical Likelihood Inference} \label{sec:asympt}
 
