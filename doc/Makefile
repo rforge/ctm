@@ -9,6 +9,8 @@ mlt.R:	mlt.Rnw
 	grep -v "^opts" mlt.R > tmp.R
 	mv tmp.R mlt.R
 
+mlt.Rout:	mlt.R
+	R CMD BATCH mlt.R
 	
 mlt.pdf:	mlt.tex todo.tex mlt.Rnw
 	texi2dvi --pdf mlt.tex

@@ -27,20 +27,9 @@ printfun <- function(fun) {
           cf, collapse = ", ", sep = ""), ")", sep = "")
     cat(ret, "\n")
 }
-library("mlt")
-library("survival")
-library("eha")
-library("prodlim")
-library("truncreg")
-library("lattice")
-library("gridExtra")
-library("MASS")
-library("nnet")
-library("HSAUR3")
-library("sandwich")
-library("flexsurv")
-library("grid") ### for textGrob
-library("latticeExtra")
+sapply(c("mlt", "survival", "eha", "prodlim", "truncreg", "lattice", "gridExtra",
+         "MASS", "nnet", "HSAUR3", "sandwich", "flexsurv", "grid", "latticeExtra", 
+         "colorspace", "multcomp"), library, char = TRUE)
 trellis.par.set(list(plot.symbol = list(col=1,pch=20, cex=0.7),
                      box.rectangle = list(col=1),
                      box.umbrella = list(lty=1, col=1),
@@ -48,8 +37,6 @@ trellis.par.set(list(plot.symbol = list(col=1,pch=20, cex=0.7),
 ltheme <- canonical.theme(color = FALSE)     ## in-built B&W theme
 ltheme$strip.background$col <- "transparent" ## change strip bg
 lattice.options(default.theme = ltheme)
-library("colorspace")
-library("multcomp")
 logLik.phreg <- function(object) object$loglik[2]
 vcov.phreg <- function(object) object$var
 opts_chunk$set(warning = FALSE, message = FALSE, fig.width=4, fig.height=4)
@@ -1582,6 +1569,7 @@ in the \cmd{spg} function of package \pkg{BB} \citep{Varadhan_Gilbert_2009}
 was used for optimising the log-likelihood.
 \citep{R}.
 
+
 \bibliography{mlt,packages}
 
 \begin{appendix}
@@ -1882,6 +1870,9 @@ and the corresponding basis functions.  Discrete or continuous models are
 specified based on the abstract variable description
 (Appendix~\ref{app:variables}).
 
+<<sessionInfo, echo = FALSE>>=
+sessionInfo()
+@
 
 
 \end{appendix}
