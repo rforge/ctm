@@ -1138,6 +1138,9 @@ data("treepipit", package = "coin")
 
 tmp <- treepipit
 tmp$counts <- ordered(tmp$counts)
+### we want
+#tmp$counts <- R(tmp$counts)
+#cv <- numeric_var("counts", support = 0:5)
 
 B_cs <- Bernstein_basis(order = 4, var = numeric_var("coverstorey", support = 1:110))
 B_c <- as.basis(~ counts, data = tmp, remove_intercept = TRUE,
@@ -1615,13 +1618,13 @@ purpose is to set-up the interval $(\ubar{\ry}, \bar{\ry}]$ for the evaluation
 of the likelihood contribution $\pZ(\h(\bar{\ry})) - \pZ(\h(\ubar{\ry}))$.
 For ordered categorical responses, $\bar{\ry}$ is the observed level and
 $\ubar{\ry}$ the level preceeding $\bar{\ry}$ (which is missing when the
-first level was observed)
+first or last level was observed)
 <<R-ordered>>=
 head(R(sort(unique(CHFLS$R_happy))))
 @
 For integers, $\bar{\ry}$ is the observation and $\ubar{\ry} = \bar{\ry} - 1$
 <<R-integer>>=
-R(1:10)
+R(1:5, bounds = c(1, 5))
 @
 Numeric observations can be ``exact'' (meaning that the likelihood is
 approximated by the density evaluated at the observation), interval censored
@@ -1636,11 +1639,20 @@ xr <- xt + sample(c(Inf, (0:(length(xt) - 2)) / length(xt)), replace = FALSE)
 R(c(1.2, rep(NA, length(xt))), cleft = c(NA, xl), cright = c(NA, xr), 
   tleft = -1, tright = 2)
 @
-\code{Surv} objects are simply converted to the alternative format
+Censoring and truncation (via the \code{cleft}, \code{cright}, \code{tleft}
+and \code{tright} arguments) are also implemented for ordered categorical
+and integer responses. \code{Surv} objects are simply converted to the 
+alternative format without the possibility to define extra arguments
 <<R-Surv>>=
 head(geyser$duration)
 head(R(geyser$duration))
 @
+It should be noted that the measurement scale of the observations has
+nothing to do with the measurement scale of the response $\rY$ in the model
+and the corresponding basis functions.  Discrete or continuous models are
+specified based on the abstract variable description
+(Appendix~\ref{app:variables}).
+
 
 \section{The basefun Package} \label{app:basefun}
 
