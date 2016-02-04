@@ -1417,7 +1417,7 @@ for $i = 1, \dots, N_\text{new}$ and $\mB_\text{shift}$ the matrix with rows
 $\basisx(\rx_i)^\top$ for $i = 1, \dots, N_\text{new}$, the transformation function can
 be simultaneously evaluated for all $k = 1, \dots, K$ and $i = 1, \dots, N_\text{new}$ as
 \begin{eqnarray*}
-(\mA \otimes \mB - \bold{1}_K \otimes \mB_\text{shift})^\top \hat{\parm}_N.
+(\mA \otimes \mB | \bold{1}_K \otimes \mB_\text{shift})^\top \hat{\parm}_N.
 \end{eqnarray*}
 This product is in the special form of an array model \citep{Currie_Durban_Eilers_2006} and
 can be computed very quickly using the tricks described by \cite{Currie_Durban_Eilers_2006}.
