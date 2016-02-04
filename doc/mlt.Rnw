@@ -344,7 +344,7 @@ polr_CHFLS_1 <- polr(R_happy ~ 1, data = CHFLS)
 The basis function introduced above corresponds to a model matrix for
 the ordered factor \code{R\_happy} with treatment contrasts using the largest level
 (``very happy'') as baseline group. In addition, the parameters must satisfy
-the linear constraint $\mA \parm \ge \mvec$, $\mA$ (argument \code{ui}) 
+the linear constraint $\mC \parm \ge \mvec$, $\mC$ (argument \code{ui}) 
 being the difference matrix and $\mvec = \bold{0}$ (argument \code{ci})
 <<CHFLS-1-basefun>>=
 nl <- nlevels(CHFLS$R_happy)
@@ -1327,35 +1327,17 @@ assume that $\basisy^\prime$ is available.  In the following we write $\h =
 \basisy^\top \parm$ and $\h^\prime = {\basisy^\prime}^\top \parm$ for the
 transformation function and its first derivative omitting the argument $\ry$
 and we assume that both functions are bounded away from $-\infty$ and
-$\infty$. Using this parameterisation we obtain the maximum likelihood estimator
-for $\parm$ as
+$\infty$. For the basis functions discussed in Section~\ref{sec:trafo}, the 
+constraint $\parm \in \Theta$ can be written as $\mC \parm \ge \bold{0}$, thus
+the solution to the optimisation problem
 \begin{eqnarray*}
-\hat{\parm}_N := \argmax_{\parm \in \Theta} \sum_{i = 1}^N
+\hat{\parm}_N := \argmax_{\mC \parm \ge \bold{0}} \sum_{i = 1}^N
 \log(\lik(\basisy^\top \parm | \rY \in \esAY_i))
 \end{eqnarray*}
-and the most likely transformation is $\hat{\h}_N := \basisy^\top \hat{\parm}_N$.
+is the maximum likelihood estimator. The plug-in estimator for the most
+likely transformation is $\hat{\h}_N := \basisy^\top \hat{\parm}_N$.  
 
-\section{Looking at Transformation Models} \label{sec:predict}
-
-Based on the maximum likelihood estimator $\hat{\parm}_N$ and the most
-likely transformation is $\hat{\h}_N$, plug-in estimators for the
-distribution and cumulative hazard functions are given by $\hatpY = \pZ
-\circ \basisy^\top \hat{\parm}_N$ and $\hatHazY = -\log(1 - \hatpY)$.  For a
-continuous model, the density is given by $\hatdY = \dZ \circ \basisy^\top
-\hat{\parm}_N \times {\basisy^\prime}^\top \hat{\parm}_N$, for a discrete model
-we get $\hatdY(\ry_k) = \pZ(\basisy(\ry_k)^\top \hat{\parm}_N) - 
-\pZ(\basisy(\ry_{k - 1})^\top \hat{\parm}_N)$ (with $\pZ(\basisy(\ry_{0})^\top \hat{\parm}_N) := 0$ and
-$\pZ(\basisy(\ry_{K})^\top \hat{\parm}_N) := 1$). The hazard function is 
-$\hathazY = \hatdY / (1 - \hatpY)$.
-
-\section{Classical Likelihood Inference} \label{sec:asympt}
-
-
-Because the problem of estimating an unknown distribution function is now
-embedded in the maximum likelihood framework, the asymptotic analysis
-benefits from standard results on the asymptotic behaviour of maximum likelihood
-estimators.
-We begin with deriving the score function and Fisher information.
+The gradient is available from the score functions.
 The score contribution of an ``exact continuous'' 
 observation $\ry = (\ubar{\ry} +
 \bar{\ry})/2$ from an absolutely continuous distribution is approximated by the
@@ -1389,6 +1371,64 @@ For a truncated observation, the score function is $\s(\parm | \rY \in
 %\end{eqnarray*}
 %has to be added to the score contribution $\s(\parm | \rY \in (\ubar{\ry},
 %\bar{\ry}])$.
+
+The \cmd{mlt} function uses convenience interface \cmd{BB} to the spectral
+projected gradient method implemented in the \code{spg()} function of
+package \pkg{BB} \citep{Varadhan_Gilbert_2009} for maximising this
+log-likelihood.
+
+
+\section{Looking at Transformation Models} \label{sec:predict}
+
+Based on the maximum likelihood estimator $\hat{\parm}_N$ and the most
+likely transformation is $\hat{\h}_N$, plug-in estimators for the
+distribution and cumulative hazard functions are given by $\hatpY = \pZ
+\circ \basisy^\top \hat{\parm}_N$ and $\hatHazY = -\log(1 - \hatpY)$.  For a
+continuous model, the density is given by $\hatdY = \dZ \circ \basisy^\top
+\hat{\parm}_N \times {\basisy^\prime}^\top \hat{\parm}_N$ and the 
+quantile function is obtained by numerical inversion of the distribution
+function. For a discrete model
+we get $\hatdY(\ry_k) = \pZ(\basisy(\ry_k)^\top \hat{\parm}_N) - 
+\pZ(\basisy(\ry_{k - 1})^\top \hat{\parm}_N)$ (with $\pZ(\basisy(\ry_{0})^\top \hat{\parm}_N) := 0$ and
+$\pZ(\basisy(\ry_{K})^\top \hat{\parm}_N) := 1$). The hazard function is 
+$\hathazY = \hatdY / (1 - \hatpY)$.
+
+The \cmd{predict} method for \code{mlt} objects is the main user interface 
+for the evaluation of these functions, the type of which is selected
+by its \code{type} argument. Conceptually, all functions are evaluated
+on the support of $\rY$, \ie on a grid $\ry_1, \dots, \ry_K$ 
+(arguments \code{q} or \code{n}) for continuous 
+responses for observations with explanatory variables as given in the
+\code{newdata} argument. That means the transformation function
+\begin{eqnarray*}
+\hat{\h}_N(\ry_k | \rx_i) = \basisyx(\ry_k, \rx_i)^\top \hat{\parm}_N, 
+\quad k = 1, \dots, K; i = 1, \dots, N_\text{new}
+\end{eqnarray*}
+is evaluated for potentially large numbers $K$ ad $N_\text{new}$. Because in the
+most general case of a conditional distribution function the transformation
+function is 
+\begin{eqnarray*}
+\hat{\h}_N(\ry_k | \rx_i) = 
+(\basisy_1(\ry_k)^\top \otimes (\basisx_1(\rx_i)^\top,\dots, \basisx(\rx_i)_J^\top), -\basisx(\rx_i)_\text{shift}^\top)^\top \hat{\parm}_N
+\end{eqnarray*}
+With $\mA$ being the matrix with rows $\basisy_1(\ry_k)$ for $k = 1, \dots, K$, 
+$\mB$ the matrix with rows $(\basisx_1(\rx_i)^\top,\dots, \basisx(\rx_i)_J^\top)$
+for $i = 1, \dots, N_\text{new}$ and $\mB_\text{shift}$ the matrix with rows 
+$\basisx(\rx_i)^\top$ for $i = 1, \dots, N_\text{new}$, the transformation function can
+be simultaneously evaluated for all $k = 1, \dots, K$ and $i = 1, \dots, N_\text{new}$ as
+\begin{eqnarray*}
+(\mA \otimes \mB - \bold{1}_K \otimes \mB_\text{shift})^\top \hat{\parm}_N.
+\end{eqnarray*}
+This product is in the special form of an array model \citep{Currie_Durban_Eilers_2006} and
+can be computed very quickly using the tricks described by \cite{Currie_Durban_Eilers_2006}.
+
+
+\section{Classical Likelihood Inference} \label{sec:asympt}
+
+Because the problem of estimating an unknown distribution function is now
+embedded in the maximum likelihood framework, the asymptotic analysis
+benefits from standard results on the asymptotic behaviour of maximum likelihood
+estimators.
 
 The contribution of an ``exact continuous''  observation $\ry$ from an
 absolutely
