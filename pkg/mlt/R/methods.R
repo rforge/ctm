@@ -39,7 +39,8 @@ vcov.mlt <- function(object, parm = coef(object, fixed = FALSE), ...)
 
 logLik.mlt <- function(object, parm = coef(object, fixed = FALSE), ...) {
     ret <- -object$loglik(parm, weights = weights(object))
-    attr(ret, "df") <- length(coef(object, fixed = FALSE))
+    ###    attr(ret, "df") <- length(coef(object, fixed = FALSE))
+    attr(ret, "df") <- object$df
     class(ret) <- "logLik"
     ret
 }
