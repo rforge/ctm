@@ -1,10 +1,10 @@
 Package: basefun
 Title: Infrastructure for Computing with Basis Functions
-Version: 0.0-19
-Date: 2015-11-18
+Version: 0.0-20
+Date: 2015-02-05
 Authors@R: person("Torsten", "Hothorn", role = c("aut", "cre"),
                   email = "Torsten.Hothorn@R-project.org")  
 Description: Some very simple infrastructure for basis functions.
-Depends: variables (>= 0.0-19)
+Depends: variables (>= 0.0-20)
 Imports: stats, polynom, Matrix, orthopolynom
 License: GPL-2
