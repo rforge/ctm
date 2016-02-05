@@ -918,6 +918,7 @@ predict(mlt_CHFLS_5, newdata = data.frame(R_health = sort(unique(CHFLS$R_health)
         q = sort(unique(CHFLS$R_happy)), type = "distribution")
 cftest(mlt_CHFLS_5)
 
+b_R <- as.basis(~ R_age + R_income, data = CHFLS, remove_intercept = TRUE)
 ctm_CHFLS_6 <- ctm(b_happy, interacting = b_R, todist = "Logistic")  
 mlt_CHFLS_6 <- mlt(ctm_CHFLS_6, data = CHFLS, scale = TRUE,
                    check = FALSE, maxit = 5000)
@@ -1133,10 +1134,13 @@ Response-varying coefficient model, or distribution regression:
 \end{eqnarray*}
 with, or other words, using the basis function 
 $\basisyx = (\bern{6}^\top \otimes (1, \tilde{\rx}^\top))^\top$. Conditional on $\rx$, the transformation
-function must be monotone increasing and thus it makes sense to restrict all functions to be monotone.
+function must be monotone increasing for all configurations of the explanatory variables
+(argument \code{sumconstr} in \cmd{cmt}). Because the number of linear constraints is very
+large depending on the number of explanatory variables, it makes sense to restrict all functions 
+to be monotone (\code{sumconstr = FALSE}).
 <<BostonHousing-dr, cache = TRUE>>=
-b <- as.basis(fm_BH[-2L], data = BostonHousing2, scale = TRUE)
-ctm_BHi <- ctm(B_m, interacting = b, sumconstr = FALSE)
+b_BH_s <- as.basis(fm_BH[-2L], data = BostonHousing2, scale = TRUE)
+ctm_BHi <- ctm(B_m, interacting = b_BH_s, sumconstr = FALSE)
 mlt_BHi <- mlt(ctm_BHi, data = BostonHousing2, scale = TRUE,
                check = FALSE)
 logLik(mlt_BHi)
