@@ -63,7 +63,7 @@ max(abs(H3 - H2))
 
 cov2cor(vcov(mod))
 
-if (TRUE) {
+if (FALSE) {
 library("multcomp") ### since 1.0-3
 
 mp <- parm(coef(mod), vcov(mod))
