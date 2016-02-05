@@ -59,7 +59,11 @@ model.matrix.box_bases <- function(object, data, model.matrix = TRUE,
         s1 <- mkgrid(object[[1]], 2)
         X1 <- model.matrix(object[[1]], data = expand.grid(s1))
         s2 <- mkgrid(object[[2]], 2) ### min/max for numerics; all levels for factors
+        if (any(sapply(s2, function(x) is.integer(x))))
+            warning("integer-valued variable with sumcontr = TRUE")
         X2 <- model.matrix(object[[2]], data = expand.grid(s2))
+        if (min(X2, na.rm = TRUE) < 0)
+            stop("negative values in model matrix not allowed for sumconstr = TRUE")
         ui <- attr(X1, "constraint")$ui
         ci <- attr(X1, "constraint")$ci
         ui <- kronecker(X2, ui)
