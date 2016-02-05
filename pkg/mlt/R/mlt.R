@@ -103,8 +103,10 @@
         }
         ### degrees of freedom: number of free parameters, ie #parm NOT meeting the constraints
         ret$df <- length(ret$par)
-        if (!is.null(ui)) 
-            ret$df <- ret$df - sum(ui %*% ret$par - ci < .Machine$double.eps)
+        ### <FIXME> check on alternative degrees of freedom
+#        if (!is.null(ui)) 
+#            ret$df <- ret$df - sum(ui %*% ret$par - ci < .Machine$double.eps)
+        ### </FIXME>
         if (scale) ret$par <- ret$par * sc
         return(ret)
     }
