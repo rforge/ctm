@@ -10,7 +10,7 @@
 \usage{
 as.basis(object, ...)
 \method{as.basis}{formula}(object, data = NULL, remove_intercept = FALSE, 
-                ui = NULL, ci = NULL, negative = FALSE, ...)
+                ui = NULL, ci = NULL, negative = FALSE, scale = FALSE, ...)
 }
 \arguments{
   \item{object}{a formula}
@@ -19,6 +19,8 @@ as.basis(object, ...)
   \item{ui}{a matrix defining constraints}
   \item{ci}{a vector defining constraints}
   \item{negative}{a logical indicating negative basis functions}
+  \item{scale}{a logical indicating a scaling of each column of the
+               model matrix to the unit interval (based on observations in \code{data})}
   \item{\dots}{additional arguments to \code{\link{model.matrix}}, for
                example contrasts}
 }

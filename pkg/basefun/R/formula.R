@@ -1,11 +1,12 @@
 
 as.basis.formula <- function(object, data = NULL, remove_intercept = FALSE, 
-                             ui = NULL, ci = NULL, negative = FALSE,
+                             ui = NULL, ci = NULL, negative = FALSE, scale = FALSE,
                              ...) {
 
     if (inherits(data, "data.frame")) {
         vars <- as.vars(data[all.vars(object)])
     } else {
+        stopifnot(!scale)
         if (inherits(data, "var")) data <- c(data)
         vars <- do.call("c", data[all.vars(object)])
         data <- as.data.frame(vars, n = 10)
@@ -21,6 +22,13 @@ as.basis.formula <- function(object, data = NULL, remove_intercept = FALSE,
         X <- model.matrix(mt, data = mf, ...)
         contr <- attr(X, "contrasts")
         xlevels <- .getXlevels(mt, mf)
+        if (scale) {
+            mins <- apply(X, 2, min, na.rm = TRUE)
+            maxs <- apply(X, 2, max, na.rm = TRUE)
+            if (attr(mt, "intercept") == 1)
+                mins["(Intercept)"] <- 0
+            maxs <- maxs - mins
+        }
     }
 
     ret <- function(data, deriv = 0L) {
@@ -36,6 +44,10 @@ as.basis.formula <- function(object, data = NULL, remove_intercept = FALSE,
         } else {
             mf <- model.frame(object, data)
             X <- model.matrix(attr(mf, "terms"), data = mf, ...)
+        }
+        if (scale) {
+            X <- X - matrix(mins, nrow = nrow(X), ncol = length(mins), byrow = TRUE)
+            X <- X / matrix(maxs, nrow = nrow(X), ncol = length(mins), byrow = TRUE)
         }
         if (remove_intercept) {
             a <- attr(X, "assign")
