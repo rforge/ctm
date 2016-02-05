@@ -665,7 +665,7 @@ cbind(survreg = coef(survreg_GBSG2_3)[names(cf)] / survreg_GBSG2_3$scale,
 The Boston Housing data are a prominent test-bed for parametric and
 non-parametric alternatives to a normal linear regression model.
 Assuming a conditional normal distribution for the 
-median value of owner-occupied homes (medv, in USD $1000$'s) 
+median value of owner-occupied homes (medv, in USD $1000$'s, we use the corrected version) 
 in the normal linear model with constant variance
 \begin{eqnarray*}
 \text{medv} | \rX = \rx \sim \ND(\tilde{x}^\top \shiftparm, \sigma^2)
@@ -686,9 +686,10 @@ was mostly ignored in other parametric or non-parametric analyses of this data s
 We start with a suitable definition of median value of owner-occupied homes,
 set-up a \code{Surv} object for this response and a model formula
 <<BostonHousing>>=
-data("BostonHousing", package = "mlbench")
-lm_BH <- lm(medv ~ ., data = BostonHousing)
-BostonHousing$medvc <- with(BostonHousing, Surv(medv, medv < 50))
+data("BostonHousing2", package = "mlbench")
+lm_BH <- lm(cmedv ~ crim + zn + indus + chas + nox + rm + age + 
+    dis + rad + tax + ptratio + b + lstat, data = BostonHousing2)
+BostonHousing2$medvc <- with(BostonHousing2, Surv(cmedv, cmedv < 50))
 mvar <- numeric_var("medvc", support = c(10.0, 40.0), bounds = c(0, Inf))
 fm_BH <- medvc ~ crim + zn + indus + chas + nox + rm + age + 
     dis + rad + tax + ptratio + b + lstat
@@ -700,9 +701,9 @@ of the explanatory variables the model and the normal probability function; the 
 function fits the model to the data
 <<BostonHousing-ctm>>=
 B_m <- Bernstein_basis(mvar, order = 6, ui = "increasing")
-ctm_BH <- ctm(B_m, shift = fm_BH[-2L], data = BostonHousing, 
+ctm_BH <- ctm(B_m, shift = fm_BH[-2L], data = BostonHousing2, 
               todistr = "Normal")
-mlt_BH <- mlt(ctm_BH, data = BostonHousing, scale = TRUE, 
+mlt_BH <- mlt(ctm_BH, data = BostonHousing2, scale = TRUE, 
               check = FALSE)
 @
 The model can be compared with a normal linear model (fitted by \cmd{lm}) on the
@@ -719,7 +720,7 @@ the fit resembles the normal linear model, although with a smaller conditional v
 \begin{center}
 <<BostonHousing-plot, echo = FALSE, results = "hide", fig.width = 6, fig.height = 4>>=
 q <- 3:52
-m <- predict(lm_BH, data = BostonHousing)
+m <- predict(lm_BH, data = BostonHousing2)
 s <- summary(lm_BH)$sigma
 d <- sapply(m, function(m) pnorm(q, mean = m, sd = s))
 nd <- expand.grid(q = q, lp = m)
@@ -727,20 +728,20 @@ nd$d <- c(d)
 
 pfun <- function(x, y, z, subscripts, at, ...) {
     panel.contourplot(x, y, z, subscripts, at = 1:9/10, ...)
-    panel.xyplot(x = m, y = BostonHousing$medv, pch = 20,   
+    panel.xyplot(x = m, y = BostonHousing2$cmedv, pch = 20,   
                  col = rgb(.1, .1, .1, .1),  ...)   
 }
 p1 <- contourplot(d ~ lp + q, data = nd, panel = pfun, 
                   xlab = "Linear predictor", ylab = "Observed", 
                   main = "Normal Linear Model")
 
-d <- predict(mlt_BH, newdata = BostonHousing, q = q, type="distribution")
-lp <- c(predict(mlt_BH, newdata = BostonHousing, q = 0, terms = "bshift"))
+d <- predict(mlt_BH, newdata = BostonHousing2, q = q, type="distribution")
+lp <- c(predict(mlt_BH, newdata = BostonHousing2, q = 0, terms = "bshift"))
 nd <- expand.grid(q = q, lp = -lp)
 nd$d <- c(d)
 pfun <- function(x, y, z, subscripts, at, ...) {
     panel.contourplot(x, y, z, subscripts, at = 1:9/10, ...)
-    panel.xyplot(x = -lp, y = BostonHousing$medv, pch = 20, 
+    panel.xyplot(x = -lp, y = BostonHousing2$cmedv, pch = 20, 
                  col = rgb(.1, .1, .1, .1), ...)   
 }
 p2 <- contourplot(d ~ lp + q, data = nd, panel = pfun, xlab = "Linear predictor", ylab = "Observed", main = "Linear Transformation Model")
@@ -1121,6 +1122,52 @@ print(contourplot(p ~ lage + head | cut, data = pr, panel = pfun, region = FALSE
          \label{fig:head-plot}}
 \end{center}
 \end{figure}
+
+\paragraph{Non-normal Linear Regression: Boston Housing Data (Cont'd)}
+
+Response-varying coefficient model, or distribution regression:
+\begin{eqnarray*}
+\Prob(\text{medv} \le \ry | \rX = \rx) & = &  
+  \Phi\left(\h(\ry) - \sum_{j = 1}^J \shiftparm_j(\text{medv}) \tilde{\rx}_j\right) \\
+& = & \Phi\left(\bern{6}(\ry)^\top \parm_1 - \sum_{j = 1}^J \bern{6}(\ry)^\top \parm_{j + 1} \tilde{\rx}_j\right)
+\end{eqnarray*}
+with, or other words, using the basis function 
+$\basisyx = (\bern{6}^\top \otimes (1, \tilde{\rx}^\top))^\top$. Conditional on $\rx$, the transformation
+function must be monotone increasing and thus it makes sense to restrict all functions to be monotone.
+<<BostonHousing-dr, cache = TRUE>>=
+b <- as.basis(fm_BH[-2L], data = BostonHousing2, scale = TRUE)
+ctm_BHi <- ctm(B_m, interacting = b, sumconstr = FALSE)
+mlt_BHi <- mlt(ctm_BHi, data = BostonHousing2, scale = TRUE,
+               check = FALSE)
+logLik(mlt_BHi)
+AIC(mlt_BHi)
+@
+Figure~\ref{fig:Boston-Housing-dr-plot} compares the fitted densities for the linear transformation
+model with constant regression coefficients and this distribution regression model.
+
+\begin{figure}[t]
+\begin{center}
+<<Boston-Housing-dr-plot, echo = FALSE, fig.width = 6, fig.heigth = 4>>=
+q <- mkgrid(mvar, 100)[[1]]
+tr <- predict(mlt_BH, newdata = BostonHousing2[, all.vars(fm_BH[-2L])],
+              q = q, type = "density")
+tri <- predict(mlt_BHi, newdata = BostonHousing2[, all.vars(fm_BH[-2L])],
+              q = q, type = "density")
+layout(matrix(1:2, ncol = 2))
+Q <- matrix(q, nrow = length(q), ncol = ncol(tr))
+ylim <- range(c(tr, tri))
+matplot(Q, tr, ylim = ylim, xlab = "Median Value", ylab = "Density",
+        type = "l", col = rgb(.1, .1, .1, .1), lty = 1) 
+matplot(Q, tri, ylim = ylim, xlab = "Median Value", ylab = "Density",
+        type = "l", col = rgb(.1, .1, .1, .1), lty = 1)
+@
+\caption{Boston Housing. Fitted conditional densities for the linear transformation model
+         with constant regression coefficients (left) and the response-varying
+         coefficient model (right).
+         \label{fig:Boston-Housing-dr-plot}}
+\end{center}
+\end{figure}
+
 
 \subsubsection{Count Response}
 
