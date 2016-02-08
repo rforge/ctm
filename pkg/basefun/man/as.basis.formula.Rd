@@ -1,19 +1,28 @@
 \name{as.basis}
 \alias{as.basis}
 \alias{as.basis.formula}
+\alias{as.basis.factor_var}
+\alias{as.basis.ordered_var}
+\alias{as.basis.factor}
+\alias{as.basis.ordered}
 \title{
-    Formula to basis function
+    Formula or factor to basis function
 }
 \description{
-    Convert a formula to basis functions
+    Convert a formula or factor to basis functions
 }
 \usage{
 as.basis(object, ...)
 \method{as.basis}{formula}(object, data = NULL, remove_intercept = FALSE, 
                 ui = NULL, ci = NULL, negative = FALSE, scale = FALSE, ...)
+\method{as.basis}{factor_var}(object, ...)
+\method{as.basis}{ordered_var}(object, ...)
+\method{as.basis}{factor}(object, ...)
+\method{as.basis}{ordered}(object, ...)
 }
 \arguments{
-  \item{object}{a formula}
+  \item{object}{a formula or an object of class \code{factor}, \code{factor_var},
+                \code{ordered} or \code{ordered_var}}
   \item{data}{either a \code{\link[variables]{vars}} object or a \code{data.frame}}
   \item{remove_intercept}{a logical indicating if any intercept term shall be removed}
   \item{ui}{a matrix defining constraints}
@@ -28,6 +37,11 @@ as.basis(object, ...)
   \code{as.basis} returns a function for the evaluation of
   the basis functions with corresponding \code{model.matrix} and \code{predict}
   methods.
+
+  Unordered factors (classes \code{factor} and \code{factor_var}) use a dummy coding and
+  ordered factor (classes \code{ordered} or \code{ordered_var}) lead to a treatment contrast
+  to the last level and removal of the intercept term with monotonicity constraint.
+  Additional arguments (\code{\dots}) are ignored for ordered factors.
 }
 \examples{
 
@@ -40,5 +54,13 @@ as.basis(object, ...)
   model.matrix(fb, data = as.data.frame(v, n = 10))
   ## basically the same as (but wo intercept and times -1)
   model.matrix(~ x + y, data = as.data.frame(v, n = 10))
+
+  ### factor
+  xf <- gl(3, 1)
+  model.matrix(as.basis(xf), data = data.frame(xf = xf))
+
+  ### ordered
+  xf <- gl(3, 1, ordered = TRUE)
+  model.matrix(as.basis(xf), data = data.frame(xf = unique(xf)))
 
 }

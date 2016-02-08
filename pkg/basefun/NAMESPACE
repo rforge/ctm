@@ -13,6 +13,10 @@ export(Bernstein_basis, as.basis, b,
 ##     cyclic_basis,
 
 S3method("as.basis", "formula")
+S3method("as.basis", "factor_var")
+S3method("as.basis", "ordered_var")
+S3method("as.basis", "factor")
+S3method("as.basis", "ordered")
 S3method("mkgrid", "basis")
 S3method("mkgrid", "bases")
 S3method("c", "basis")

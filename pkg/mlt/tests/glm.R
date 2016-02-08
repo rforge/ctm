@@ -29,10 +29,11 @@ coef(m1)
 oiris <- iris
 oiris$Species <- ordered(oiris$Species)
 
-r <- as.basis(~ Species, data = oiris, remove_intercept = TRUE,
-              contrasts.arg = list(Species = function(n)
-                  contr.treatment(n, base = 3)),
-              ui = diff(diag(2)), ci = rep(0, 1))
+r <- as.basis(oiris$Species)
+#r <- as.basis(~ Species, data = oiris, remove_intercept = TRUE,
+#              contrasts.arg = list(Species = function(n)
+#                  contr.treatment(n, base = 3)),
+#              ui = diff(diag(2)), ci = rep(0, 1))
 
 m <- ctm(r, interacting = as.basis(~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width, data = oiris),
            todistr = "Logis")

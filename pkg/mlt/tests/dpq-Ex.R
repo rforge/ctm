@@ -32,10 +32,10 @@ simulate(mod, nsim = 1, seed = 291, interpolate = FALSE)
 
 d$y <- gl(3, 1, ordered = TRUE)[rep(1:3, length = n)]
 
-r <- as.basis(~ y, data = d, remove_intercept = TRUE,
-              contrasts.arg = list(y = function(n)
-                  contr.treatment(n, base = 3)),
-              ui = diff(diag(2)), ci = 0)
+r <- as.basis(d$y) #as.basis(~ y, data = d, remove_intercept = TRUE,
+#              contrasts.arg = list(y = function(n)
+#                  contr.treatment(n, base = 3)),
+#              ui = diff(diag(2)), ci = 0)
 
 mod2 <- mlt(ctm(r, shift = ~ x1 + x2, data = d), data = d)
 
