@@ -28,6 +28,7 @@ clean:
 	
 dist-clean:
 	make clean
+	rm -rf analysis
 	rm -rf cache
 	rm -rf figure
 	
