@@ -65,9 +65,9 @@ opts_chunk$set(warning = FALSE, message = FALSE, fig.width=4, fig.height=4)
 \author{Torsten Hothorn \\ Universit\"at Z\"urich}
 \Plainauthor{Hothorn}
 
-\title{\pkg{mlt}: Transformation Analysis in R} 
-\Plaintitle{mlt: Transformation Analysis in R}
-\Shorttitle{Transformation Analysis}
+\title{Most Likely Transformations: The \pkg{mlt} Package}
+\Plaintitle{Most Likely Transformations: The mlt Package}
+\Shorttitle{The \pkg{mlt} Package}
 
 \Abstract{
 tbd
@@ -133,7 +133,7 @@ This little change highlights that the model is, in fact, a model for a
 conditional distribution and not just a model for a conditional mean. It also
 stresses the fact that the variance $\sigma^2$ is a model parameter in its own right. The usual
 treatment of $\sigma^2$ as a nuisance parameter only works when the likelihood 
-is approximated by the density of the normal distribtion. Because we always observe
+is approximated by the density of the normal distribution. Because we always observe
 intervals $(\ubar{\ry}, \bar{\ry}]$ and never real numbers $\ry$, the exact likelihood
 is, as originally \textit{defined} by \cite{Fisher_1934} \citep[another example of the approximation winning over the basic concept][]{Lindsey_1996}
 \begin{eqnarray*}
@@ -164,7 +164,7 @@ transformation models (a misleading name, because the transformation
 $\h_\rY$ is non-linear in the latter case and only the shift $\tilde{\rx}^\top
 \tilde{\shiftparm}$ is linear in $\tilde{\rx}$).  It is now also obvious that the Cox
 model has nothing to do with censoring, let alone survival times $\rY > 0$. 
-It is a model for the conditional distribution of a continuous responses
+It is a model for the conditional distribution of a continuous response
 $\rY \in \RR$ when it is appropriate to assume that the conditional hazard
 function is scaled by $\exp(\tilde{\rx}^\top \tilde{\shiftparm})$.  For both the linear
 and the Cox model, application of the exact likelihood allows the models to
@@ -172,17 +172,19 @@ be fitted to imprecise, or ``censored'', observations $(\ubar{\ry},
 \bar{\ry}]$.
 
 The class of linear transformation models is a subclass of conditional 
-transformation models. In this latter class, the conditional distribution function is 
+transformation models \citep{Hothorn_Kneib_Buehlmann_2014}. In this latter class, the conditional distribution function is 
 \begin{eqnarray*}
 \Prob(\rY \le \ry | \rX = \rx) = \pZ(\h(\ry | \rx))
 \end{eqnarray*}
-where the transformation function $\h$ depends on both $\ry$ and $\rx$. Because
-we are interested in analysing, \ie estimating and interpreting, the transformation
-function $\h$, we refer to the methods presented in this paper as \textit{transformation analysis}.
-We describe how conditional transformation models can be specified, fitted and analysed in \proglang{R}
-using the \pkg{mlt} add-on package. Before we start looking at details,
-we illustrate the workflow by means of an example from unconditional density 
-estimation.
+where the transformation function $\h$ depends on both $\ry$ and $\rx$. 
+Because we are interested in analysing, \ie estimating and interpreting, the
+transformation function $\h$, we refer to the methods presented in this
+paper as \textit{transformation analysis}.  We describe how conditional
+transformation models can be specified, fitted by maximising the likelihood
+\citep[using the estimator developed by][]{Hothorn_Moest_Buehlmann_2016}
+and analysed in \proglang{R} using the \pkg{mlt} add-on package.  Before we
+start looking at details, we illustrate the workflow by means of an example
+from unconditional density estimation.
 
 \paragraph{Density Estimation: Old Faithful Geyser Data}
 
@@ -361,6 +363,10 @@ b_happy <- as.basis(~ R_happy, data = CHFLS, remove_intercept = TRUE,
                         contr.treatment(n, base = nl)),
                     ui = diff(diag(nl - 1)), ci = rep(0, nl - 2))
 @
+A short-cut for ordered factors is
+<<CHFLS-1-basefun-basis>>=
+b_happy <- as.basis(CHFLS$R_happy)
+@
 We are now ready to set-up the (unconditional) transformation model by a call to
 \cmd{ctm} using the basis function and a character defining the standard 
 logistic distribution function for $\pZ$:
@@ -500,7 +506,7 @@ for example for count data with potentially large number of counts, one might
 use a continuous parameterisation of the transformation function $\bern{M}^\top \parm$
 which is evaluated at the observed counts only.
 
-\paragraph{Distribution Estimation: Deer-vehicle Collisions}
+\paragraph{Analysis of Count Data: Deer-vehicle Collisions}
 
 \cite{Hothorn_Mueller_Held_2015} analyse roe deer-vehicle collisions reported to the police
 in Bavaria, Germany, between 2002-01-01 and 2011-12-13. The daily counts range between
@@ -514,6 +520,8 @@ dvc_mlt <- mlt(ctm(B_dvc), data = data.frame(dvc = dvc), check = FALSE)
 The discrete distribution function (evaluated for all integers between
 $\Sexpr{min(dvc)}$ and $\Sexpr{max(dvc)}$) along with the distribution 
 function of the Poisson distribution are given in Figure~\ref{fig:dvc-plot}.
+There is clear evidence for overdispersion as the variance of the Poisson
+model is much smaller than the variance estimated by the transformation model.
 
 \begin{figure}
 \begin{center}
@@ -529,7 +537,9 @@ legend("bottomright", pch = c(17, 18),
        legend = c("Transformation Model", "Poisson"), bty = "n",
        cex = .5, col = "grey")
 @
-\caption{Deer-vehicle Collisions. \label{fig:dvc-plot}}
+\caption{Deer-vehicle Collisions. Unconditional distribution 
+of daily number of roe deer-vehicle collisions in Bavaria, Germany,
+between 2002 and 2011. \label{fig:dvc-plot}}
 \end{center}
 \end{figure}
 
@@ -544,7 +554,7 @@ $\ry \in (\ry_{k - 1}, \ry_k]$ enter the likelihood.
 
 
 
-\subsection{Linear Transformation Models}
+\subsection{Linear Transformation Models} \label{subsec:ltm}
 
 A linear transformation model features a linear shift of a (usually) non-linear transformation
 of the response $Y$ and is the simplest form of a regression model in the class of
@@ -837,18 +847,28 @@ logLik(mlt_tobin)
 
 \subsection{Stratified Linear Transformation Models}
 
+Stratification in linear transformation models refers to a 
+strata-specific transformation function but a shift term those
+regression coefficients are constant across strata. The model then
+reads
 \begin{eqnarray*}
 \Prob(\rY \le \ry | \text{stratum} = s, \rX = \rx) = \pZ(\h(\ry | s, \rx)) =
 \pZ(\h(\ry | s) - \rx^\top \shiftparm) = \pZ(\basisyx(\ry, s, \rx)^\top \parm)
-\basisyx = (\basisy^\top \otimes \basisx_\text{stratum}^\top, -\basisx_\text{shift}^\top)^\top                                       
 \end{eqnarray*}
+with basis function $\basisyx = (\basisy^\top \otimes
+\basisx_\text{stratum}^\top, -\basisx_\text{shift}^\top)^\top$.  The basis
+function $\basisx_\text{stratum}^\top$ is a dummy coding for the stratum
+variable and is defined using the \code{interacting} argument of \cmd{ctm}. 
+The constraints for the parameters of $\basisy$ have to be met for each
+single stratum, \ie the total number of linear constraints is the number of
+constraints for $\basisy$ multiplied by the number of strata.
 
 \subsubsection{Discrete Response}
 
-\paragraph{Categorical Data Analysis: Chinese Survey (Cont'd)}
-
-Non-proportional odds model.
-
+\paragraph{Categorical Data Analysis: Chinese Survey (Cont'd)} We first
+estimate the distribution of happiness given health without taking any other
+explanatory variables into account, \ie by treating health as a stratum variable but
+without any regression coefficients $\shiftparm$ in the model:
 <<CHFLS-3, cache = TRUE>>=
 b_health <- as.basis(~ R_health - 1, data = CHFLS)
 ctm_CHFLS_3 <- ctm(b_happy, interacting = b_health, todist = "Logistic")
@@ -857,53 +877,43 @@ mlt_CHFLS_3 <- mlt(ctm_CHFLS_3, data = CHFLS, scale = TRUE,
 predict(mlt_CHFLS_3, newdata = data.frame(R_health = sort(unique(CHFLS$R_health))), 
         q = sort(unique(CHFLS$R_happy)), type = "distribution")
 @
-
-With covariates
-
+There is a clear tendency of people being happier with better health. We now `adjust'
+for age and income
 <<CHFLS-4, cache = TRUE>>=
 ctm_CHFLS_4 <- ctm(b_happy, interacting = b_health, shift = b_R, todist = "Logistic")
 mlt_CHFLS_4 <- mlt(ctm_CHFLS_4, data = CHFLS, scale = TRUE,
                    check = FALSE)
-coef(mlt_CHFLS_4)
+coef(mlt_CHFLS_4)[c("R_age", "R_income")]
 @
-
-\subsubsection{Categorical Data Analysis: Iris Data}
-
-<<iris-1>>=
-multinom_iris <- multinom(Species ~ ., data = iris)
-iris$oSpecies <- ordered(iris$Species)
-b_Species <- as.basis(~ oSpecies, data = iris, remove_intercept = TRUE,
-              contrasts.arg = list(oSpecies = function(n)
-                  contr.treatment(n, base = 3)),
-              ui = diff(diag(2)), ci = rep(0, 1))
-ctm_iris <- ctm(b_Species, interacting = as.basis(~ Sepal.Length + Sepal.Width + 
-                Petal.Length + Petal.Width, data = iris), todistr = "Logistic")
-mlt_iris <- mlt(ctm_iris, data = iris, scale = TRUE, check = FALSE)
-p1 <- predict(mlt_iris, newdata = iris, q = sort(unique(iris$oSpecies)), 
-              type = "density")
-p2 <- predict(multinom_iris, newdata = iris, type = "prob")
-max(abs(t(p1) - p2))
-@
-
-
+Because the shift basis \code{b\_R} is negative, the effects of both age and income 
+on the happiness distribution are towards larger values of happiness, \ie older and richer
+people are happier for all health levels (this, of course, due to the restrictive model
+not allowing for interactions between health and the other two variables).
 
 \subsubsection{Continuous Response}
 
 \paragraph{Survival Analysis: GBSG-2 Trial (Cont'd)}
 
-Estimate survivor function separately for the two treatment regimes
-
+The Cox model presented in Subsection~\ref{subsec:ltm} features one baseline
+function for all observations, an assumption which we're now going to relax. As
+a first simple example, we want to estimate two separate survivor functions 
+for the two treatment regimes in the model
 \begin{eqnarray*}
 (\pMEV, (\bern{5}(\ry)^\top \otimes
-       (\I(\text{hormonal therapy}), 1 - \I(\text{hormonal therapy})))^\top, c(\parm_1, \parm_2))
+       (\I(\text{hormonal therapy}), 1 - \I(\text{hormonal therapy})))^\top, (\parm_1^\top, \parm_2^\top)^\top)
 \end{eqnarray*}
-
+Here, the transformation function $\bern{5}(\ry)^\top \parm_1$ and 
+$\bern{5}(\ry)^\top \parm_2$ correspond to the untreated and treated groups,
+respectively:
 <<GBSG2-4>>=
 ### two separate transformation functions
-b_horTh <- as.basis(~ horTh - 1, data = GBSG2, remove_intercept = FALSE)
+b_horTh <- as.basis(GBSG2$horTh)
 ctm_GBSG2_4 <- ctm(B_GBSG2y, interacting = b_horTh, todistr = "MinExtrVal")
 mlt_GBSG2_4 <- mlt(ctm_GBSG2_4, data = GBSG2, check = FALSE)
 @
+The two survivor functions, along with the corresponding Kaplan-Meier estimates,
+are show in Figure~\ref{GBSG2-strata-plot}, the low-dimensional Bernstein polynomials
+produce a nicely smoothed version of the Kaplan-Meier step-functions.
 
 \begin{figure}
 \begin{center}
@@ -929,40 +939,39 @@ legend("bottomright", lty = c(1, 1, 2, 2), col = c("black", "grey", "black", "gr
 \end{center}
 \end{figure}
 
-In a second step, we allowed a treatment-specific baseline hazard functions
-for estimating the age effect
-in the model 
+In a second step, we allow treatment-specific baseline hazard functions while
+estimating a constant age effect in the model 
 \begin{eqnarray*}
 (\pMEV, (\bern{5}(\ry)^\top \otimes
        (\I(\text{hormonal therapy}), 1 - \I(\text{hormonal therapy})),
-       \text{age})^\top, (\parm_1, \beta)).
+       \text{age})^\top, (\parm_1^\top, \parm_2^\top, \beta)).
 \end{eqnarray*}
 
-
 <<GBSG2-5>>=
-ctm_GBSG2_5 <- ctm(B_GBSG2y, interacting = b_horTh, shifting = ~ age, data = GBSG2, todistr = "MinExtrVal")
-(mlt_GBSG2_5 <- mlt(ctm_GBSG2_5, data = GBSG2, check = FALSE, scale = TRUE))
-
+ctm_GBSG2_5 <- ctm(B_GBSG2y, interacting = b_horTh, shifting = ~ age, 
+    data = GBSG2, todistr = "MinExtrVal")
+mlt_GBSG2_5 <- mlt(ctm_GBSG2_5, data = GBSG2, check = FALSE, scale = TRUE)
 coxph_GBSG2_5 <- coxph(Surv(time, cens) ~ age + strata(horTh), data = GBSG2)
-
 cf <- coef(coxph_GBSG2_5)
 cbind(coxph = cf, mlt = coef(mlt_GBSG2_5)[names(cf)])
 @
+The Cox model fitted via the stratified partial likelihood (\cmd{coxph}) and
+the transformation model agree on a positive age effect $\hat{\shiftparm}$, 
+\ie older patients seem to survive longer (note that \cmd{coxph} estimates 
+a positive shift effect as does the transformation model specified above).
 
 \subsection{Conditional Transformation Models}
 
+The most complex class of models currently supported by the \cmd{ctm} function
+is defined by basis functions of the form
 \begin{eqnarray*}
-\basisyx = (\basisy_1^\top \otimes (\basisx_1^\top,\dots, \basisx_J^\top), -\basisx_\text{shift}^\top)
+\basisyx = (\basisy^\top \otimes (\basisx_1^\top,\dots, \basisx_J^\top), -\basisx_\text{shift}^\top).
 \end{eqnarray*}
 
-\begin{defn}[Transformation model]
-The triple $(\pZ, \basisy, \parm)$ is called transformation model.
-\end{defn}
 
-
-<<ctm-fun, echo = FALSE>>=
-printfun(ctm)
-@
+%\begin{defn}[Transformation model]
+%The triple $(\pZ, \basisy, \parm)$ is called transformation model.
+%\end{defn}
 
 \subsubsection{Discrete Response}
 
@@ -990,6 +999,23 @@ ctm_CHFLS_7 <- ctm(b_happy, interacting = c(h = b_health, R = b_R), todist = "Lo
 mlt_CHFLS_7 <- mlt(ctm_CHFLS_7, data = CHFLS, scale = TRUE,
                    check = FALSE, maxit = 5000)
 cftest(mlt_CHFLS_7)
+@
+
+\paragraph{Categorical Data Analysis: Iris Data}
+
+For an unordered response in a multi-class problem, the conditional distribution 
+can be estimated using a multinomial regression.  
+<<iris-1>>=
+multinom_iris <- multinom(Species ~ ., data = iris, trace = FALSE)
+iris$oSpecies <- ordered(iris$Species)
+b_Species <- as.basis(iris$oSpecies)
+ctm_iris <- ctm(b_Species, interacting = as.basis(~ Sepal.Length + Sepal.Width + 
+                Petal.Length + Petal.Width, data = iris), todistr = "Logistic")
+mlt_iris <- mlt(ctm_iris, data = iris, scale = TRUE, check = FALSE)
+p1 <- predict(mlt_iris, newdata = iris, q = sort(unique(iris$oSpecies)), 
+              type = "density")
+p2 <- predict(multinom_iris, newdata = iris, type = "prob")
+max(abs(t(p1) - p2))
 @
 
 \subsubsection{Continuous Response}
@@ -1103,7 +1129,7 @@ application of hormonal treatment.
 
 <<GBSG2-8, echo = TRUE, cache = TRUE>>=
 B_age <- Bernstein_basis(order = 3, var = numeric_var("age", support = range(GBSG2$age)))
-b_horTh <- as.basis(~ horTh - 1, data = GBSG2)
+b_horTh <- as.basis(GBSG2$horTh)
 ctm_GBSG2_8 <- ctm(B_GBSG2y_5, interacting = b(horTh = b_horTh, age = B_age), todistr = "MinExtrVal")
 mlt_GBSG2_8  <- mlt(ctm_GBSG2_8, data = GBSG2, check = FALSE)
 @
@@ -1271,10 +1297,7 @@ tmp$counts <- ordered(tmp$counts)
 #cv <- numeric_var("counts", support = 0:5)
 
 B_cs <- Bernstein_basis(order = 4, var = numeric_var("coverstorey", support = 1:110))
-B_c <- as.basis(~ counts, data = tmp, remove_intercept = TRUE,
-                contrasts.arg = list(counts = function(n)
-                    contr.treatment(n, base = 6)),
-                ui = diff(diag(5)), ci = rep(0, 4))
+B_c <- as.basis(tmp$counts)
 
 ctm_treepipit <- ctm(B_c, interacting = B_cs)
 mlt_treepipit <- mlt(ctm_treepipit, data = tmp, maxit = 10000, check = FALSE)
