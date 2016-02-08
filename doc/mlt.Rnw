@@ -30,6 +30,14 @@ printfun <- function(fun) {
 sapply(c("mlt", "survival", "eha", "prodlim", "truncreg", "lattice", "gridExtra",
          "MASS", "nnet", "HSAUR3", "sandwich", "flexsurv", "grid", "latticeExtra", 
          "colorspace", "multcomp"), library, char = TRUE)
+
+if (!file.exists("analysis/DVC.rda")) {
+    download.file("https://zenodo.org/record/17179/files/DVC.tgz", "DVC.tgz")
+    untar("DVC.tgz", file = "analysis/DVC.rda", compressed = "gzip")
+}
+load("analysis/DVC.rda")
+dvc <- c(margin.table(obs, 2))
+
 trellis.par.set(list(plot.symbol = list(col=1,pch=20, cex=0.7),
                      box.rectangle = list(col=1),
                      box.umbrella = list(lty=1, col=1),
@@ -407,6 +415,7 @@ parameters $\eparm_m < \eparm_{m + 1}$ for all $m = 0, \dots, M$
 \citep{Curtis_Ghosh_2011}.  Therefore, application of constrained optimisation guarantees
 monotone estimates $\hat{\h}_N$. The basis contains an intercept.  
 
+
 \paragraph{Density Estimation: Geyser Data (Cont'd)}
 We continue the analysis of the Old Faithful data by estimating the unconditional distribution of
 waiting times, a positive variable those abstract representation can be used to generate
@@ -480,6 +489,59 @@ function (right panel). It is hardly possible to notice the difference in probab
 but the more flexible model features a more erratic density estimate, but not overly so.
 The corresponding AIC values are $\Sexpr{round(AIC(mlt_w),1)}$ 
 for $M = 8$ and $\Sexpr{round(AIC(mlt_w_40),1)}$ for $M = 40$ favoring the smaller model.
+
+
+\subsubsection{Continuous Models for Discrete Responses}
+
+Although a model for $\rY$ can assume an absolutely continuous distribution,
+observations from such a model will always be discrete. This fact is taken 
+into account by the exact likelihood (Section~\ref{sec:mlt}). In some cases, 
+for example for count data with potentially large number of counts, one might
+use a continuous parameterisation of the transformation function $\bern{M}^\top \parm$
+which is evaluated at the observed counts only.
+
+\paragraph{Distribution Estimation: Deer-vehicle Collisions}
+
+\cite{Hothorn_Mueller_Held_2015} analyse roe deer-vehicle collisions reported to the police
+in Bavaria, Germany, between 2002-01-01 and 2011-12-13. The daily counts range between
+$\Sexpr{min(dvc)}$ and $\Sexpr{max(dvc)}$. A model for the daily number of roe deer-vehicle collision
+using a Bernstein polynomial of order $6$ as basis function is fitted using
+<<dvc>>=
+dvcvar <- numeric_var("dvc", support = min(dvc):max(dvc))
+B_dvc <- Bernstein_basis(dvcvar, order = 6, ui = "increasing")
+dvc_mlt <- mlt(ctm(B_dvc), data = data.frame(dvc = dvc), check = FALSE)
+@
+The discrete distribution function (evaluated for all integers between
+$\Sexpr{min(dvc)}$ and $\Sexpr{max(dvc)}$) along with the distribution 
+function of the Poisson distribution are given in Figure~\ref{fig:dvc-plot}.
+
+\begin{figure}
+\begin{center}
+<<dvc-plot, echo = FALSE, fig.width = 5>>=
+q <- support(dvcvar)[[1]]
+p <- predict(dvc_mlt, newdata = data.frame(1), q = q,
+             type = "distribution")
+plot(q, p, pch = 17, cex = .5, xlab = "Number of Roe Deer-Vehicle Collisions", 
+     ylab = "Distribution", col = "grey")
+points(q, ppois(q, lambda = mean(dvc)), pch = 18, cex = .5,
+       col = "grey")
+legend("bottomright", pch = c(17, 18), 
+       legend = c("Transformation Model", "Poisson"), bty = "n",
+       cex = .5, col = "grey")
+@
+\caption{Deer-vehicle Collisions. \label{fig:dvc-plot}}
+\end{center}
+\end{figure}
+
+\subsubsection{Discrete Models for Continuous Responses}
+
+In some applications one might not be interested in estimating the whole distribution 
+function $\pY$ for a conceptually absolutely continuous response $\rY$ 
+but in probabilities $\pY(\ry_k)$ for some $\ry_1, \dots, \ry_K$ only. The discrete 
+basis function $\h(\ry_k) = \evec_{K - 1}(k)^\top \parm = \eparm_k$ can be used in this
+case. For model estimation, only the discretised observations 
+$\ry \in (\ry_{k - 1}, \ry_k]$ enter the likelihood.
+
 
 
 \subsection{Linear Transformation Models}
