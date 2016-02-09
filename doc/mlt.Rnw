@@ -529,13 +529,13 @@ model is much smaller than the variance estimated by the transformation model.
 q <- support(dvcvar)[[1]]
 p <- predict(dvc_mlt, newdata = data.frame(1), q = q,
              type = "distribution")
-plot(q, p, pch = 17, cex = .5, xlab = "Number of Roe Deer-Vehicle Collisions", 
-     ylab = "Distribution", col = "grey")
-points(q, ppois(q, lambda = mean(dvc)), pch = 18, cex = .5,
-       col = "grey")
-legend("bottomright", pch = c(17, 18), 
-       legend = c("Transformation Model", "Poisson"), bty = "n",
-       cex = .5, col = "grey")
+plot(ecdf(dvc), col = "grey", xlab = "Number of Roe Deer-Vehicle Collisions",
+     ylab = "Distribution", main = "", cex = .75)
+lines(q, p, col = "blue")
+lines(q, ppois(q, lambda = mean(dvc)), col = "darkred")
+legend(400, .3, pch = c(20, NA, NA), lty = c(NA, 1, 1), 
+       legend = c("ECDF", "Transformation Model", "Poisson"), bty = "n", cex = .8,
+       col = c("grey", "blue", "darkred"))
 @
 \caption{Deer-vehicle Collisions. Unconditional distribution 
 of daily number of roe deer-vehicle collisions in Bavaria, Germany,
@@ -932,6 +932,7 @@ b_health <- as.basis(~ R_health - 1, data = CHFLS)
 ctm_CHFLS_3 <- ctm(b_happy, interacting = b_health, todist = "Logistic")
 mlt_CHFLS_3 <- mlt(ctm_CHFLS_3, data = CHFLS, scale = TRUE,
                    check = FALSE, maxit = 5000)
+logLik(mlt_CHFLS_3)
 predict(mlt_CHFLS_3, newdata = data.frame(R_health = sort(unique(CHFLS$R_health))), 
         q = sort(unique(CHFLS$R_happy)), type = "distribution")
 @
@@ -1025,6 +1026,15 @@ is defined by basis functions of the form
 \begin{eqnarray*}
 \basisyx = (\basisy^\top \otimes (\basisx_1^\top,\dots, \basisx_J^\top), -\basisx_\text{shift}^\top).
 \end{eqnarray*}
+The model allows for response-varying coefficients (as defined by the basis $\basisy$) corresponding
+to the bases $(\basisx_1^\top,\dots, \basisx_J^\top)$ and constant shift effects. Such a model
+is set-up using \cmd{ctm} with arguments \code{response} ($\basisy$), \code{interacting} ($(\basisx_1^\top,\dots, \basisx_J^\top)$)
+and \code{shifting} ($-\basisx_\text{shift}^\top$). It would be conceptually possible
+to fit conditional transformation models of the form
+\begin{eqnarray*}
+\basisyx = (\basisy_1^\top \otimes \basisx_1^\top, \dots, \basisy_J^\top \otimes \basisx_J^\top)
+\end{eqnarray*}
+with a less restrictive user interface.
 
 
 %\begin{defn}[Transformation model]
@@ -1033,43 +1043,60 @@ is defined by basis functions of the form
 
 \subsubsection{Discrete Response}
 
-\paragraph{Categorical Data Analysis: Chinese Survey (Cont'd)}
-
-Estimate the deviation of the conditional distribution of happiness
-compared to the baseline distribution of happiness with very poor health.
-
+\paragraph{Categorical Data Analysis: Chinese Survey (Cont'd)} 
+In a series of non-proportional odds models for the conditional distribution of happiness
+we study the impact of health, age and income on happiness. Similar to the stratified
+model \code{ctm_CHFLS_3}, we estimate the conditional distribution of happiness separately
+for each health level, but instead of using a dummy coding we use treatment contrasts
 <<CHFLS-5, cache = TRUE>>=
 contrasts(CHFLS$R_health) <- "contr.treatment"
 b_health <- as.basis(~ R_health, data = CHFLS)
 ctm_CHFLS_5 <- ctm(b_happy, interacting = b_health, todist = "Logistic")
-mlt_CHFLS_5 <- mlt(ctm_CHFLS_5, data = CHFLS, check = FALSE, scale = TRUE, maxit = 10000)
+mlt_CHFLS_5 <- mlt(ctm_CHFLS_5, data = CHFLS, check = FALSE, 
+    scale = TRUE, maxit = 10000)
 predict(mlt_CHFLS_5, newdata = data.frame(R_health = sort(unique(CHFLS$R_health))), 
         q = sort(unique(CHFLS$R_happy)), type = "distribution")
-cftest(mlt_CHFLS_5)
-
+logLik(mlt_CHFLS_5)
+@
+The log-likelihood and the fitted distribution are, of course, equivalent but the parameters
+allow for a direct interpretation of the effect of health relative to the baseline 
+category \code{Poor}. In a second step, we fit a non-proportional odds model where the 
+effects of age and income are allowed to vary with happiness
+<<CHFLS-6, cache = TRUE>>=
 b_R <- as.basis(~ R_age + R_income, data = CHFLS, remove_intercept = TRUE)
 ctm_CHFLS_6 <- ctm(b_happy, interacting = b_R, todist = "Logistic")  
 mlt_CHFLS_6 <- mlt(ctm_CHFLS_6, data = CHFLS, scale = TRUE,
                    check = FALSE, maxit = 5000)
-cftest(mlt_CHFLS_6)
-
-ctm_CHFLS_7 <- ctm(b_happy, interacting = c(h = b_health, R = b_R), todist = "Logistic")  
+logLik(mlt_CHFLS_6)
+@
+and finally we include all three variables (health, age and income) allowing for
+happiness-varying effects as
+<<CHFLS-7, cache = TRUE>>=
+ctm_CHFLS_7 <- ctm(b_happy, interacting = c(h = b_health, R = b_R), 
+    todist = "Logistic")  
 mlt_CHFLS_7 <- mlt(ctm_CHFLS_7, data = CHFLS, scale = TRUE,
                    check = FALSE, maxit = 5000)
-cftest(mlt_CHFLS_7)
+logLik(mlt_CHFLS_7)
 @
 
 \paragraph{Categorical Data Analysis: Iris Data}
 
 For an unordered response in a multi-class problem, the conditional distribution 
-can be estimated using a multinomial regression.  
+can be estimated using a multinomial regression. In a non-proportional odds
+model allowing for response-specific regression coefficients, the ordering of the response
+levels only affects the corresponding regression coefficients but the fitted density
+is invariant with respect to the ordering applied as a comparison with
+\cmd{multinom} from package \pkg{nnet} shows
 <<iris-1>>=
-multinom_iris <- multinom(Species ~ ., data = iris, trace = FALSE)
+fm_iris <- Species ~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width
+multinom_iris <- multinom(fm_iris, data = iris, trace = FALSE)
+logLik(multinom_iris)
 iris$oSpecies <- ordered(iris$Species)
 b_Species <- as.basis(iris$oSpecies)
-ctm_iris <- ctm(b_Species, interacting = as.basis(~ Sepal.Length + Sepal.Width + 
-                Petal.Length + Petal.Width, data = iris), todistr = "Logistic")
+ctm_iris <- ctm(b_Species, interacting = as.basis(fm_iris[-2L], data = iris), 
+    todistr = "Logistic")
 mlt_iris <- mlt(ctm_iris, data = iris, scale = TRUE, check = FALSE)
+logLik(mlt_iris)
 p1 <- predict(mlt_iris, newdata = iris, q = sort(unique(iris$oSpecies)), 
               type = "density")
 p2 <- predict(multinom_iris, newdata = iris, type = "prob")
@@ -1080,8 +1107,9 @@ max(abs(t(p1) - p2))
 
 \paragraph{Survival Analysis: GBSG-2 Trial (Cont'd)}
 
-The Cox model $(\pMEV, (\bern{5}^\top, \I(\text{hormonal
-therapy}))^\top, \parm)$ implements the transformation function $\h(\ry |
+The Cox model for the comparison of the survivor distribution between the untreated and treated
+group assuming proportional hazards, \ie the model $(\pMEV, (\bern{5}^\top, \I(\text{hormonal
+therapy}))^\top, \parm)$, implements the transformation function $\h(\ry |
 \text{treatment}) = \bern{5}(\ry)^\top \parm_1 + \I(\text{hormonal therapy})
 \beta$ where $\bern{5}^\top \parm_1$ is the log-cumulative baseline hazard function
 parameterised by a Bernstein polynomial and $\beta \in \RR$ is the
@@ -1089,7 +1117,8 @@ log-hazard ratio of hormonal therapy.
 
 <<GBSG2-6>>=
 B_GBSG2y_5 <- Bernstein_basis(var = GBSG2y, order = 5, ui = "incre")
-ctm_GBSG2_6 <- ctm(B_GBSG2y_5, shift = ~ horTh, data = GBSG2, todistr = "MinExtrVal")
+ctm_GBSG2_6 <- ctm(B_GBSG2y_5, shift = ~ horTh, data = GBSG2, 
+    todistr = "MinExtrVal")
 mlt_GBSG2_6 <- mlt(ctm_GBSG2_6, data = GBSG2, check = FALSE)
 @
 
@@ -1186,13 +1215,15 @@ increase again.  This effect was shifted towards younger women by the
 application of hormonal treatment.
 
 <<GBSG2-8, echo = TRUE, cache = TRUE>>=
-B_age <- Bernstein_basis(order = 3, var = numeric_var("age", support = range(GBSG2$age)))
+avar <- numeric_var("age", support = range(GBSG2$age))
+B_age <- Bernstein_basis(avar, order = 3)
 b_horTh <- as.basis(GBSG2$horTh)
-ctm_GBSG2_8 <- ctm(B_GBSG2y_5, interacting = b(horTh = b_horTh, age = B_age), todistr = "MinExtrVal")
+ctm_GBSG2_8 <- ctm(B_GBSG2y_5, interacting = b(horTh = b_horTh, age = B_age), 
+    todistr = "MinExtrVal")
 mlt_GBSG2_8  <- mlt(ctm_GBSG2_8, data = GBSG2, check = FALSE)
 @
 
-\begin{figure}[t]
+\begin{figure}
 \begin{center}
 <<GBSG2-8-plot, echo = FALSE, fig.width = 6>>=
 nlev <- c(no = "without hormonal therapy", yes = "with hormonal therapy")
@@ -1230,16 +1261,14 @@ log-likelihood under $3 \times 4$ linear constraints.
 data("db", package = "gamlss.data")
 db$lage <- with(db, age^(1/3))
 B_h <- Bernstein_basis(order = 3, ui = "incre",
-                      var = numeric_var("head", support = quantile(db$head, c(.1, .9)), bounds = range(db$head)))
+    var = numeric_var("head", support = quantile(db$head, c(.1, .9)), 
+                      bounds = range(db$head)))
 B_a <- Bernstein_basis(order = 3, ui = "none",
-                      var = numeric_var("lage", support = quantile(db$lage, c(.1, .9)), bounds = range(db$lage)))
+    var = numeric_var("lage", support = quantile(db$lage, c(.1, .9)), 
+                      bounds = range(db$lage)))
 ctm_head <- ctm(B_h, interacting = B_a)
-mlt_head <- mlt(ctm_head, data = db, maxit = 5000, check = FALSE, scale = TRUE)
-pr <- expand.grid(s <- mkgrid(ctm_head, 100))
-pr$p <- c(predict(mlt_head, newdata = s, type = "distribution"))
-pr$lage <- pr$lage^3
-pr$cut <- factor(pr$lage > 2.5)
-levels(pr$cut) <- c("Age < 2.5 yrs", "Age > 2.5 yrs")
+mlt_head <- mlt(ctm_head, data = db, maxit = 5000, check = FALSE, 
+                scale = TRUE)
 @
 
 Figure~\ref{fig:head-plot} shows the
@@ -1248,9 +1277,14 @@ conditional distributions.  The figure very closely reproduces the growth
 curves presented in Figure~16 of \cite{Stasinopoulos_Rigby_2007} and also
 indicates a certain asymmetry towards older boys.
 
-\begin{figure}[t]
+\begin{figure}
 \begin{center}
 <<head-plot, echo = FALSE, fig.width = 6>>=
+pr <- expand.grid(s <- mkgrid(ctm_head, 100))
+pr$p <- c(predict(mlt_head, newdata = s, type = "distribution"))
+pr$lage <- pr$lage^3
+pr$cut <- factor(pr$lage > 2.5)
+levels(pr$cut) <- c("Age < 2.5 yrs", "Age > 2.5 yrs")
 pfun <- function(x, y, z, subscripts, at, ...) {
     panel.contourplot(x, y, z, subscripts,
         at = c(0.4, 2, 10, 25, 50, 75, 90, 98, 99.6)/ 100, ...)
@@ -1295,7 +1329,7 @@ AIC(mlt_BHi)
 Figure~\ref{fig:Boston-Housing-dr-plot} compares the fitted densities for the linear transformation
 model with constant regression coefficients and this distribution regression model.
 
-\begin{figure}[t]
+\begin{figure}
 \begin{center}
 <<Boston-Housing-dr-plot, echo = FALSE, fig.width = 6, fig.heigth = 4>>=
 q <- mkgrid(mvar, 100)[[1]]
@@ -1321,7 +1355,7 @@ matplot(Q, tri, ylim = ylim, xlab = "Median Value", ylab = "Density",
 
 \subsubsection{Count Response}
 
-\paragraph{Count Regression: Tree Pipit Counts}
+\paragraph{Analysis of Count Data: Tree Pipit Counts}
 
 \cite{Mueller_Hothorn_2004} reported data on the number of tree pipits
 \textit{Anthus trivialis}, a small passerine bird, counted on $86$ forest plots at a light gradient
@@ -1354,19 +1388,29 @@ tmp$counts <- ordered(tmp$counts)
 #tmp$counts <- R(tmp$counts)
 #cv <- numeric_var("counts", support = 0:5)
 
-B_cs <- Bernstein_basis(order = 4, var = numeric_var("coverstorey", support = 1:110))
+B_cs <- Bernstein_basis(order = 4, 
+    var = numeric_var("coverstorey", support = 1:110))
 B_c <- as.basis(tmp$counts)
 
 ctm_treepipit <- ctm(B_c, interacting = B_cs)
-mlt_treepipit <- mlt(ctm_treepipit, data = tmp, maxit = 10000, check = FALSE)
+mlt_treepipit <- mlt(ctm_treepipit, data = tmp, maxit = 10000, 
+    check = FALSE)
 
+library("mgcv")
+gam_treepipit <- gam(counts ~ s(coverstorey), data = treepipit, 
+                     family = "poisson")
+@
+
+\begin{figure}
+\begin{center}
+<<treepipit-plot, fig.width=6, fig.height=3, echo = FALSE>>=
 s <- mkgrid(ctm_treepipit, 100)
 s$counts <- s$counts[1:5]
 nd <- expand.grid(s)
 nd$p <- c(predict(mlt_treepipit, newdata = s, type = "distribution"))
 
 ### produce a table
-(tpt <- xtabs(~ counts + coverstorey, data = treepipit))
+tpt <- xtabs(~ counts + coverstorey, data = treepipit)
 
 ### construct a data frame with frequencies
 treepipit2 <- sapply(as.data.frame(tpt, stringsAsFactors = FALSE),
@@ -1377,16 +1421,8 @@ s$counts <- s$counts[1]
 K <- model.matrix(ctm_treepipit, data = expand.grid(s))
 #g <- glht(parm(coef(mod), vcov(mod)), linfct = K)
 #confint(g)
+nd$lambda <- predict(gam_treepipit, newdata = nd, type = "response")
 
-library("mgcv")
-pmod <- gam(counts ~ s(coverstorey), data = treepipit, 
-            family = "poisson")
-nd$lambda <- predict(pmod, newdata = nd, type = "response")
-@
-
-\begin{figure}[t]
-\begin{center}
-<<treepipit-plot, fig.width=6, fig.height=3, echo = FALSE>>=
 layout(matrix(1:3, nr = 1))
 par("mai" = par("mai") * c(1, .95, 1, .85))
 xlim <- range(treepipit[, "coverstorey"]) * c(0.98, 1.05)
