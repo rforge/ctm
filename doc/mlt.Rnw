@@ -47,7 +47,19 @@ ltheme$strip.background$col <- "transparent" ## change strip bg
 lattice.options(default.theme = ltheme)
 logLik.phreg <- function(object) object$loglik[2]
 vcov.phreg <- function(object) object$var
-opts_chunk$set(warning = FALSE, message = FALSE, fig.width=4, fig.height=4)
+
+knitr::opts_chunk$set(echo = TRUE, results = 'markup', error = FALSE,
+                      warning = FALSE, message = FALSE,
+                      tidy = FALSE, cache = FALSE, size = "small",
+                      fig.width = 5, fig.height = 4, fig.align = "center",
+                      # out.width = '.6\\linewidth', 
+                      fig.scap = NA)
+knitr::render_sweave()  # use Sweave environments
+knitr::set_header(highlight = '')  # do not \usepackage{Sweave}
+## R settings
+options(prompt = "R> ", continue = "+  ", useFancyQuotes = FALSE)  # JSS style
+options(width = 75)
+# opts_chunk$set(warning = FALSE, message = FALSE, fig.width=4, fig.height=4)
 @
 
 \newcommand{\TODO}[1]{{\color{red} #1}}
@@ -276,7 +288,7 @@ workflow sketched in this section.
 
 \begin{figure}
 \begin{center}
-<<geyser-plot, echo = FALSE, fig.width = 5, fig.height = 4>>=
+<<geyser-plot, echo = FALSE>>=
 plot(d ~ duration, data = ndd, type = "l", ylab = "Density", xlab = "Duration time")
 @
 \caption{Old Faithful Geyser. Estimated density for duration time obtained from
@@ -455,7 +467,7 @@ in the left panel of Figure~\ref{fig:geyser-w-plot}.
 
 \begin{figure}
 \begin{center}
-<<geyser-w-plot, echo = FALSE, cache = TRUE, fig.height = 4, fig.width = 6, results = "hide">>=
+<<geyser-w-plot, echo = FALSE, cache = TRUE, fig.width = 6, results = "hide">>=
 layout(matrix(1:2, ncol = 2))
 plot(ecdf(geyser$waiting), col = "grey", xlab = "Waiting times", ylab = "Distribution", 
      main = "")
@@ -525,7 +537,7 @@ model is much smaller than the variance estimated by the transformation model.
 
 \begin{figure}
 \begin{center}
-<<dvc-plot, echo = FALSE, fig.width = 5>>=
+<<dvc-plot, echo = FALSE>>=
 q <- support(dvcvar)[[1]]
 p <- predict(dvc_mlt, newdata = data.frame(1), q = q,
              type = "distribution")
@@ -677,7 +689,7 @@ diag(vcov(fss_GBSG2_1))[names(cf)]
 
 \begin{figure}
 \begin{center}
-<<GBSG2-1-fss-plot, fig.width = 5, fig.height = 4, echo = FALSE>>=
+<<GBSG2-1-fss-plot, echo = FALSE>>=
 p1 <- summary(fss_GBSG2_1, newdata = GBSG2[1,], ci = FALSE)
 p2 <- predict(mlt_GBSG2_1, newdata = GBSG2[1, all.vars(fm_GBSG2[-2L])], 
               q = p1[[1]]$time, type = "survivor")
@@ -790,7 +802,7 @@ the fit resembles the normal linear model, although with a smaller conditional v
 
 \begin{figure}
 \begin{center}
-<<BostonHousing-plot, echo = FALSE, results = "hide", fig.width = 6, fig.height = 4>>=
+<<BostonHousing-plot, echo = FALSE, results = "hide", fig.width = 6>>=
 q <- 3:52
 m <- predict(lm_BH, data = BostonHousing2)
 s <- summary(lm_BH)$sigma
@@ -987,9 +999,9 @@ with(subset(nd, horTh == "no"), lines(y, mlt_S, col = "grey", lty = 2))
 with(subset(nd, horTh == "yes"), lines(y, mlt_S, lty = 2))
 with(subset(nd, horTh == "no"), lines(y, KM_S, type = "s", col = "grey"))
 with(subset(nd, horTh == "yes"), lines(y, KM_S, type = "s"))
-legend("bottomright", lty = c(1, 1, 2, 2), col = c("black", "grey", "black", "grey"),
+legend(250, 0.4, lty = c(1, 1, 2, 2), col = c("black", "grey", "black", "grey"),
        legend = c("hormonal therapy, KM", "no hormonal therapy, KM", 
-                  "hormonal therapy, MLT", "no hormonal therapy, MLT"), bty = "n", cex = .6)
+                  "hormonal therapy, MLT", "no hormonal therapy, MLT"), bty = "n", cex = .75)
 @
 \caption{GBSG-2 Trial. Estimated survivor functions 
          by the most likely transformation model (MLT) and the Kaplan-Meier (KM) estimator in the two 
@@ -1089,7 +1101,7 @@ is invariant with respect to the ordering applied as a comparison with
 \cmd{multinom} from package \pkg{nnet} shows
 <<iris-1>>=
 fm_iris <- Species ~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width
-multinom_iris <- multinom(fm_iris, data = iris, trace = FALSE)
+multinom_iris <- nnet::multinom(fm_iris, data = iris, trace = TRUE)
 logLik(multinom_iris)
 iris$oSpecies <- ordered(iris$Species)
 b_Species <- as.basis(iris$oSpecies)
@@ -1183,7 +1195,7 @@ polygon(c(coxy[c(1, length(coxy))], rev(coxy[c(1, length(coxy))])),
         rep(ci2$confint[,c("lwr", "upr")], c(2, 2)),
         border = NA, col = rgb(.1, .1, .1, .1))
 legend("bottomright", lty = 1:2, lwd = 1, legend = c("time-varying treatment effect",
-       "time-constant log-hazard ratio"), bty = "n", cex = .6)
+       "time-constant log-hazard ratio"), bty = "n", cex = .75)
 @
 \caption{GBSG-2 Trial. Verification of proportional hazards: The log-hazard ratio $\hat{\beta}$
          (dashed line) with $95\%$ confidence interval (dark grey) is fully 
@@ -1331,7 +1343,7 @@ model with constant regression coefficients and this distribution regression mod
 
 \begin{figure}
 \begin{center}
-<<Boston-Housing-dr-plot, echo = FALSE, fig.width = 6, fig.heigth = 4>>=
+<<Boston-Housing-dr-plot, echo = FALSE, fig.width = 6>>=
 q <- mkgrid(mvar, 100)[[1]]
 tr <- predict(mlt_BH, newdata = BostonHousing2[, all.vars(fm_BH[-2L])],
               q = q, type = "density")
@@ -1766,7 +1778,7 @@ transformation and distribution function.
 
 \begin{figure}
 \begin{center}
-<<geyser-w-cbplot, echo = FALSE, cache = TRUE, fig.height = 4, fig.width = 6, results = "hide">>=
+<<geyser-w-cbplot, echo = FALSE, cache = TRUE, fig.width = 6, results = "hide">>=
 layout(matrix(1:2, ncol = 2))
 #i <- (cb_w[, "q"] > 45 & cb_w[, "q"] < 110)
 #cb_w[-i, "lwr"] <- NA
@@ -1804,28 +1816,69 @@ rug(geyser$waiting, col = rgb(.1, .1, .1, .1))
 
 \section{Simulation-based Likelihood Inference} \label{sec:sim}
 
+The fully specified probabilistic model $(\pZ, \basisy, \hat{\parm}_N)$
+allows sampling from the distribution $\hat{\Prob}_\rY$.
+For estimated parameters $\hat{\parm}_N$, this model-based or 
+``parametric'' bootstrap from $\hat{\Prob}_\rY$ can be implemented by the
+probability integral transform, \ie $\rZ_1, \dots, \rZ_N \stackrel{\text{iid}}{\sim} \Prob_\rZ$ is
+drawn and then $\rY_i^\star = \inf\{\ry \in \samY | \basisy(\ry)^\top \hat{\parm}_N \ge
+\rZ_i\}$ is determined by numerical inversion of the distribution function.
+The \cmd{simulation} method for \code{mlt} objects first computes the
+distribution function over a grid of \code{n} response values, draws \code{nsim} times
+\code{nrow(newdata)} random sample from $\Prob_\rZ$ and returns 
+the intervals $\ry_k < \rZ < \ry_{k + 1}$ (\code{interpolate = FALSE}) or
+a linear interpolation thereof (\code{interpolate = TRUE}). 
 
+
+\paragraph{Density Estimation: Geyser Data (Cont'd)}
+
+The model-based bootstrap analogon of the confidence band for the
+distribution function of waiting times (Figure~\ref{fig:geyser-w-cbplot},
+right panel) based on $100$ bootstrap samples is generated from the
+following code.  First, $100$ samples of size $N = \Sexpr{nrow(geyser)}$ are
+drawn.  For each sample, the model \code{ctm_w} is refitted, using the
+parameters $\hat{\parm}_N$ as starting values (\code{theta}) to speed-up the
+computations.  Next, the log-likelihood ratio
+\begin{eqnarray*}
+\sum_{i = 1}^N \log(\lik(\basisy^\top \hat{\parm}^\star_N | \rY_i^\star) - 
+\sum_{i = 1}^N \log(\lik(\basisy^\top \hat{\parm}_N | \rY_i^\star)
+\end{eqnarray*}
+is computed for each sample. Last, distribution and density functions are obtained
+for each of the models.  
 <<geyser-w-simulate, results = "hide", cache = TRUE>>=
 new_w <- simulate(mlt_w, nsim = 100)
-ll <- numeric(length(new_w))
+llr <- numeric(length(new_w))
 pdist <- vector(mode = "list", length = length(new_w))
 pdens <- vector(mode = "list", length = length(new_w))
 ngeyser <- geyser
 q <- mkgrid(wvar, 100)[[1]]
 for (i in 1:length(new_w)) {
     ngeyser$waiting <- new_w[[i]]
-    tmpmlt <- mlt(ctm_w, data = ngeyser, check = FALSE, scale = TRUE, theta = coef(mlt_w))
-    ll[[i]] <- logLik(tmpmlt) - logLik(tmpmlt, parm = coef(mlt_w))
-    pdist[[i]] <- predict(tmpmlt, newdata = data.frame(1), type = "distribution", q = q)
-    pdens[[i]] <- predict(tmpmlt, newdata = data.frame(1), type = "density", q = q)
+    mlt_i <- mlt(ctm_w, data = ngeyser, check = FALSE, scale = TRUE, 
+                 theta = coef(mlt_w))
+    llr[[i]] <- logLik(mlt_i) - logLik(mlt_i, parm = coef(mlt_w))
+    pdist[[i]] <- predict(mlt_i, newdata = data.frame(1), 
+                          type = "distribution", q = q)
+    pdens[[i]] <- predict(mlt_i, newdata = data.frame(1), 
+                          type = "density", q = q)
 }
 @
 
+These functions corresponding to log-likelihood ratios less then the $95\%$
+quantile of the $100$ log-likelihood ratios, \ie after removal of extreme
+curves, are plotted in Figure~\ref{geyser-w-simulate-plot} and can be
+interpreted as a band around the distribution and density function.  The
+asymptotic band for the distribution function nicely fits the band obtained
+from the bootstrap sample but does not deteriorate for probabilities close
+to zero and one.
+
+In the conditional case, \code{nsim} samples from the $N$ conditional distributions
+$\hat{\Prob}_{\rY | \rX = \rx_i}, i = 1, \dots, N$ are drawn by \cmd{simulate}. 
 
 \begin{figure}
 \begin{center}
 <<geyser-w-simulate-plot, fig.width = 6, echo = FALSE>>=
-i <- which(ll < quantile(ll, prob = .95))
+i <- which(llr < quantile(llr, prob = .95))
 tpdist <- pdist[i]
 tpdens <- pdens[i]
 layout(matrix(1:2, ncol = 2))
@@ -1837,11 +1890,17 @@ plot(q, tpdens[[1]], type = "n", ylim = range(unlist(pdens)),
      xlab = "Waiting times", ylab = "Density")
 tmp <- sapply(tpdens, function(x) lines(q, x, col = rgb(.1, .1, .1, .1)))
 @
-\caption{}
+\caption{Old Faithful Geyser. Model-based bootstrap for distribution (left, the green area depicts the
+         asymptotic confidence band from Figure~\ref{}) and density (right) function for 
+         the unconditional transformation model parameterised in terms of a Bernstein polynomials
+         of order $8$. \label{geyser-w-simulate-plot}}
 \end{center}
 \end{figure}
 
+\section{Summary}
 
+$250$ (\pkg{variables}), $920$ (\pkg{basefun}), $1520$ (\pkg{mlt})
+lines of \proglang{R} code
 
 
 \bibliography{mlt,packages}
@@ -2143,6 +2202,93 @@ nothing to do with the measurement scale of the response $\rY$ in the model
 and the corresponding basis functions.  Discrete or continuous models are
 specified based on the abstract variable description
 (Appendix~\ref{app:variables}).
+
+\subsection{Methods for Conditional Transformation Models}
+
+bounds
+variable.names
+model.matrix
+mkgrid
+
+\subsection{Methods for Fitted Transformation Models}
+
+update
+estfun
+predict
+simulate
+coef
+variable.names
+mkgrid
+logLik
+vcov
+coef<-
+summary
+print
+bounds
+confband
+plot
+
+
+<<mlt-Ex>>=
+### one-sample example
+## Y ~ Chisq(df = 5)
+pY <- function(x) pchisq(x, df = 20)
+dY <- function(x) dchisq(x, df = 20)
+qY <- function(p) qchisq(p, df = 20)
+## Bernstein polynom order ord
+ord <- 15
+## support for distribition
+yvar <- numeric_var("y", support = qY(c(.001, 1 - .001)), bounds = c(0, Inf))
+By <- Bernstein_basis(yvar, order = ord, ui = "increasing")
+
+## set-up model with Z ~ N(0, 1)
+m <- ctm(By, todistr = "Normal")
+d <- as.data.frame(mkgrid(yvar, n = 500))
+mod <- mlt(m, data = d, dofit = FALSE)
+
+## compute _true_ transformation function
+h <- function(x) qnorm(pY(x))
+x <- seq(from = support(yvar)[["y"]][1], to = support(yvar)[["y"]][2], length.out = ord + 1)
+## coefs for Bernstein are f(v / ord) v = 0...ord
+## coef(mod) defines a Bernstein polynomial
+## approximating h
+### new mod is a real model (although not data-based!)
+mlt::coef(mod) <- h(x)
+
+## compute true density
+d$dtrue <- dY(d$y)
+
+### simulate from _approximated_ distribution; so this is
+### the new "true" one
+d$grid <- d$y
+d$y <- simulate(mod)
+fmod <- mlt(m, data = d, check = FALSE, scale = TRUE)
+
+print(fmod)
+summary(fmod)
+
+### compare; should be more or less the same
+coef(mod)
+coef(fmod)
+
+logLik(fmod)
+logLik(fmod, parm = coef(mod))
+@
+
+
+\begin{figure}
+\begin{center}
+<<mlt-Ex-plot>>=
+### plot "true" (red line) and "approximated" density (green)
+plot(mod, newdata = d, type = "density", col = "black", xlab = "y", ylab = "Density")
+lines(d$grid, d$dtrue, col = "red")
+lines(sort(d$grid), predict(fmod, q = sort(d$grid), type = "density"), col = "blue")
+@
+\caption{}
+\end{center}
+\end{figure}
+
+
 
 \section{Computational Details}
 
