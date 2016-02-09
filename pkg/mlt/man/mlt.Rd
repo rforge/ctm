@@ -10,8 +10,8 @@
 }
 \usage{
 mlt(model, data, weights = NULL, offset = NULL, fixed = NULL, theta = NULL, 
-    pstart = NULL, scale = FALSE, check = TRUE, checkGrad = FALSE, 
-    trace = FALSE, quiet = FALSE, dofit = TRUE, ...)
+    pstart = NULL, scale = FALSE, check = FALSE, checkGrad = FALSE, 
+    trace = FALSE, quiet = TRUE, dofit = TRUE, ...)
 coef(object) <- value
 }
 \arguments{

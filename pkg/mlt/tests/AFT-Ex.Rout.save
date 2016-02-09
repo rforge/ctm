@@ -1,5 +1,5 @@
 
-R version 3.2.2 (2015-08-14) -- "Fire Safety"
+R version 3.2.3 (2015-12-10) -- "Wooden Christmas-Tree"
 Copyright (C) 2015 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -43,9 +43,6 @@ Loading required package: survival
 > 
 > ## Estimate coefficients
 > coef(opt <- mlt(m, data = mydata, fixed = c("log(y)" = 1)))
-  Successful convergence.
-Gradient[1] "Mean relative difference: 0.0148713"
-Hessian:[1] TRUE
      log(y) (Intercept)          g2          g3 
   1.0000000  -0.1230066   0.7915161   1.1190543 
 > 
@@ -88,9 +85,6 @@ Hessian:[1] TRUE
 > 
 > ## Estimate coefficients
 > (cf <- coef(opt2 <- mlt(m, data = mydata)))
-  Successful convergence.
-Gradient[1] "Mean relative difference: 7.326023e-05"
-Hessian:[1] TRUE
      log(y) (Intercept)          g2          g3 
  0.92384445 -0.07597016  0.72340493  1.02745662 
 > cf[-1] / cf[1]
@@ -127,9 +121,6 @@ Hessian:[1] TRUE
 > 
 > mydata <- data.frame(y = Surv(y, sample(0:1, length(y), replace = TRUE)), g = g)
 > coef(opt <- mlt(m, data = mydata, fixed = c("log(y)" = 1)))
-  Successful convergence.
-Gradient[1] "Mean relative difference: 1.385574e-05"
-Hessian:[1] TRUE
      log(y) (Intercept)          g2          g3 
   1.0000000  -0.9905075   1.0241384   1.2525854 
 > 
@@ -167,9 +158,6 @@ Hessian:[1] TRUE
 > 
 > ## Estimate coefficients
 > coef(opt <- mlt(m, data = mydata,  fixed = c("log(y)" = 1)))
-  Successful convergence.
-Gradient[1] "Mean relative difference: 5.737639e-06"
-Hessian:[1] TRUE
      log(y) (Intercept)          g2          g3 
   1.0000000   0.2828846   0.7853484   1.1284807 
 > 
@@ -202,9 +190,6 @@ Error in phreg(y ~ g, data = mydata, dist = "weibull", shape = 1) :
 +                      type = "interval"), g = g)
 > 
 > coef(opt<- mlt(m, data = mydata, fixed = c("log(y)" = 1)))
-  Successful convergence.
-Gradient[1] "Mean relative difference: 7.624493e-05"
-Hessian:[1] TRUE
      log(y) (Intercept)          g2          g3 
   1.0000000  -0.5531934   0.8600643   1.2789399 
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "expo"))
@@ -256,9 +241,6 @@ Error in phreg(y ~ g, data = mydata, dist = "weibull", shape = 1) :
 > 
 > ## PH-scale
 > (cf <- coef(opt <- mlt(m, data = mydata)))
-  Successful convergence.
-Gradient[1] "Mean relative difference: 0.002448189"
-Hessian:[1] TRUE
      log(y) (Intercept)          g2          g3 
  3.10039985 -0.02638593 -2.12855989 -3.37407495 
 > 
@@ -322,9 +304,6 @@ log(shape)
 > 
 > ## Estimate coefficients
 > (cf <- coef(opt <- mlt(m, data = mydata)))
-  Successful convergence.
-Gradient[1] "Mean relative difference: 0.0001447135"
-Hessian:[1] TRUE
      log(y) (Intercept)          g2          g3 
   2.9704381  -0.5337429  -2.1300102  -3.3635878 
 > cf[-1] / cf[1]
@@ -370,9 +349,6 @@ Hessian:[1] TRUE
 > 
 > ## Estimate coefficients
 > (cf <- coef(opt <- mlt(m, data = mydata)))
-  Successful convergence.
-Gradient[1] "Mean relative difference: 1.87366e-05"
-Hessian:[1] TRUE
      log(y) (Intercept)          g2          g3 
   2.1201729   0.5300828  -1.5420722  -2.3381631 
 > cf[-1] / cf[1]
@@ -397,9 +373,6 @@ Hessian:[1] TRUE
 > 
 > ## Estimate coefficients
 > (cf <- coef(opt <- mlt(m, data = mydata)))
-  Successful convergence.
-Gradient[1] "Mean relative difference: 4.504007e-05"
-Hessian:[1] TRUE
      log(y) (Intercept)          g2          g3 
   2.7086358  -0.4274816  -1.7414315  -2.7584113 
 > cf[-1] / cf[1]
@@ -419,4 +392,4 @@ Hessian:[1] TRUE
 > 
 > proc.time()
    user  system elapsed 
-  1.900   0.054   1.971 
+  1.572   0.048   1.617 

@@ -34,9 +34,6 @@ Loading required package: variables
 > m <- ctm(r, shift = s, todist = "Logi")
 > 
 > mod <- mlt(m, data = housing, weights = housing$Freq)
-  Successful convergence.
-Gradient[1] "Mean relative difference: 0.001977726"
-Hessian:[1] TRUE
 > 
 > logLik(mp)
 'log Lik.' -1771.708 (df=4)
@@ -65,4 +62,4 @@ Re-fitting to get Hessian
 > 
 > proc.time()
    user  system elapsed 
-  1.120   0.024   1.142 
+  1.068   0.048   1.111 

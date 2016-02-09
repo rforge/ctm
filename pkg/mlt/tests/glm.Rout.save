@@ -35,9 +35,6 @@ Loading required package: variables
 > 
 > m <- ctm(~ y, shift = ~ X1 + X2, todist = "Logis", data = df)
 > m2 <- mlt(m, data = df, fixed = c("y1" = 0))
-  Successful convergence.
-Gradient[1] "Mean relative difference: 1.46906e-05"
-Hessian:[1] TRUE
 Warning message:
 In R.factor(object = data[[response]]) : response is unordered factor;
              results may depend on order of levels
@@ -87,9 +84,6 @@ virginica    -23.83628    -7.923634  -15.370769     23.65978   15.135301
 > m <- ctm(r, interacting = as.basis(~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width, data = oiris),
 +            todistr = "Logis")
 > m2 <- mlt(m, data = oiris)
-  Successful convergence.
-Gradient[1] "Mean relative difference: 1.524831e-06"
-Hessian:[1] "Mean relative difference: 0.0004797978"
 > coef(m2)
  Species1:(Intercept)  Species2:(Intercept) Species1:Sepal.Length 
             0.5416538            42.6378203             2.3437298 
@@ -112,4 +106,4 @@ Species1:Petal.Length Species2:Petal.Length  Species1:Petal.Width
 > 
 > proc.time()
    user  system elapsed 
-  1.396   0.032   1.424 
+  1.344   0.032   1.374 

@@ -75,7 +75,7 @@
         ### ci <- ci + sqrt(.Machine$double.eps) ### we need ui %*% theta > ci, not >= ci
     }
 
-    optimfct <- function(theta, weights, scale = FALSE, quiet = FALSE, ...) {
+    optimfct <- function(theta, weights, scale = FALSE, quiet = TRUE, ...) {
         control <- list(...)
         if (scale) {
             Ytmp <- Y
@@ -101,6 +101,8 @@
         } else {
             ret <- BBoptim(par = theta, fn = f, gr = g, control = control, quiet = quiet)
         }
+        if (quiet & (ret$convergence != 0))
+            warning("Optimisation did not converge")
         ### degrees of freedom: number of free parameters, ie #parm NOT meeting the constraints
         ret$df <- length(ret$par)
         ### <FIXME> check on alternative degrees of freedom
@@ -200,7 +202,7 @@
 }
 
 .mlt_fit <- function(object, weights, theta = NULL, scale = FALSE, check = TRUE, trace = FALSE, 
-                     quiet = FALSE, ...) {
+                     quiet = TRUE, ...) {
 
     if (is.null(theta))
         stop(sQuote("mlt"), "needs suitable starting values")
@@ -238,8 +240,8 @@
 }
 
 mlt <- function(model, data, weights = NULL, offset = NULL, fixed = NULL,
-                theta = NULL, pstart = NULL, scale = FALSE, check = TRUE, 
-                checkGrad = FALSE, trace = FALSE, quiet = FALSE, dofit = TRUE, ...) {
+                theta = NULL, pstart = NULL, scale = FALSE, check = FALSE, 
+                checkGrad = FALSE, trace = FALSE, quiet = TRUE, dofit = TRUE, ...) {
 
     vars <- as.vars(model)
     response <- model$response

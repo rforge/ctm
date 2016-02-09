@@ -1,5 +1,5 @@
 
-R version 3.2.2 (2015-08-14) -- "Fire Safety"
+R version 3.2.3 (2015-12-10) -- "Wooden Christmas-Tree"
 Copyright (C) 2015 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -29,9 +29,6 @@ Loading required package: variables
 > m <- ctm(lin)
 > 
 > o <- mlt(m, data = d)
-  Successful convergence.
-Gradient[1] "Mean relative difference: 6.015761e-05"
-Hessian:[1] TRUE
 > 
 > s2ml <- sqrt(var(y) * (n - 1) / n)
 > 1 / coef(o)[2] - s2ml
@@ -55,9 +52,9 @@ In c.basis(bresponse = response, bshifting = shifting) :
   more than one basis contains an intercept term
 > 
 > o <- mlt(m, data = d)
-  Unsuccessful convergence.
-Gradient[1] "Mean relative difference: 7.08799e-07"
-Hessian:[1] TRUE
+Warning message:
+In object$optimfct(theta, weights = weights, trace = trace, scale = scale,  :
+  Optimisation did not converge
 > 1 / coef(o)[2]
         y 
 0.2608465 
@@ -88,9 +85,9 @@ Note: method with signature 'Matrix#numLike' chosen for function '%*%',
 Note: method with signature 'sparseMatrix#matrix' chosen for function '%*%',
  target signature 'dgTMatrix#matrix'.
  "TsparseMatrix#ANY" would also be valid
-  Unsuccessful convergence.
-Gradient[1] "Mean relative difference: 2.063975e-07"
-Hessian:[1] "Mean relative difference: 4.584995e-07"
+Warning message:
+In object$optimfct(theta, weights = weights, trace = trace, scale = scale,  :
+  Optimisation did not converge
 > 
 > nd <- data.frame(x = sort(x))
 > layout(matrix(1:2, nr = 2))
@@ -101,4 +98,4 @@ Hessian:[1] "Mean relative difference: 4.584995e-07"
 > 
 > proc.time()
    user  system elapsed 
- 30.883   0.154  31.103 
+ 28.212   0.144  28.336 

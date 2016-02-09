@@ -23,6 +23,11 @@ clean:
 	rm -rf mlt.R
 	rm -rf *aux
 	rm -rf *out
+	rm -rf *.blg  
+	rm -rf *.log  
+	rm -rf *.tpt
+	rm -rf *.bbl
+	rm -rf *.fff
 	rm -rf *~
 	rm -rf packages.bib
 	
@@ -31,4 +36,5 @@ dist-clean:
 	rm -rf analysis
 	rm -rf cache
 	rm -rf figure
+	rm -rf DVC.tgz 
 	

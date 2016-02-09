@@ -29,9 +29,6 @@ Loading required package: variables
 +                             coef = c(TRUE, TRUE), ci = c(-Inf, 0)),
 +            shift = ~ x1 + x2, data = d)
 > mod <- mlt(m, data = d)
-  Successful convergence.
-Gradient[1] "Mean relative difference: 0.001782236"
-Hessian:[1] TRUE
 > 
 > p <- predict(mod, newdata = d)
 > 
@@ -3460,9 +3457,6 @@ p                1          2           3
 > #              ui = diff(diag(2)), ci = 0)
 > 
 > mod2 <- mlt(ctm(r, shift = ~ x1 + x2, data = d), data = d)
-  Successful convergence.
-Gradient[1] "Mean relative difference: 0.000195899"
-Hessian:[1] TRUE
 > 
 > predict(mod2, q = unique(d$y))
    
@@ -3541,4 +3535,4 @@ Levels: 1 < 2 < 3
 > 
 > proc.time()
    user  system elapsed 
-  1.184   0.200   1.381 
+  1.144   0.204   1.345 

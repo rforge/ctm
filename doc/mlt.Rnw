@@ -249,7 +249,7 @@ head(geyser)
 The most likely transformation (MLT) $\hat{\h}(\ry) = \basisy(\ry)^\top \hat{\parm}$ is 
 now obtained from the maximum likelihood estimate $\hat{\parm}$ computed as
 <<geyser-fit, echo = TRUE>>=
-mlt_d <- mlt(ctm_d, data = geyser, check = FALSE)
+mlt_d <- mlt(ctm_d, data = geyser)
 logLik(mlt_d)
 coef(mlt_d)
 @
@@ -389,7 +389,7 @@ Note that the choice of $\pZ$ is completely arbitrary as the estimated distribut
 function is invariant with respect to $\pZ$.
 The model is fitted by calling the \cmd{mlt} function with model and data as arguments
 <<CHFLS-1-mlt>>=
-mlt_CHFLS_1 <- mlt(ctm_CHFLS_1, data = CHFLS, check = FALSE)
+mlt_CHFLS_1 <- mlt(ctm_CHFLS_1, data = CHFLS)
 @
 The results are equivalent to the results obtained from \cmd{polr}:
 <<CHFLS-1-cmpr>>=
@@ -456,7 +456,7 @@ ctm_w <- ctm(response = B_w, todistr = "Normal")
 The most likely transformation $\hat{\h}(\ry) = \basisy(\ry)^\top \hat{\parm}$ is 
 now obtained from the maximum likelihood estimate $\hat{\parm}$ computed as
 <<geyser-w-fit, echo = TRUE>>=
-mlt_w <- mlt(ctm_w, data = geyser, check = FALSE)
+mlt_w <- mlt(ctm_w, data = geyser)
 @
 and we compare the estimated distribution function 
 <<geyser-w-distribution, echo = TRUE>>=
@@ -474,7 +474,7 @@ plot(ecdf(geyser$waiting), col = "grey", xlab = "Waiting times", ylab = "Distrib
 lines(ndw$waiting, ndw$d)
 B_w_40 <- Bernstein_basis(order = 40, var = wvar, ui = "incre")
 ctm_w_40 <- ctm(B_w_40, todistr = "Normal")
-mlt_w_40 <- mlt(ctm_w_40, data = geyser, check = FALSE)
+mlt_w_40 <- mlt(ctm_w_40, data = geyser)
 ndw$d2 <- predict(mlt_w_40, q = ndw$waiting, type = "distribution")
 lines(ndw$waiting, ndw$d2, lty = 2)
 legend("bottomright", lty = 1:2, legend = c("M = 8", "M = 40"), bty = "n")
@@ -527,7 +527,7 @@ using a Bernstein polynomial of order $6$ as basis function is fitted using
 <<dvc>>=
 dvcvar <- numeric_var("dvc", support = min(dvc):max(dvc))
 B_dvc <- Bernstein_basis(dvcvar, order = 6, ui = "increasing")
-dvc_mlt <- mlt(ctm(B_dvc), data = data.frame(dvc = dvc), check = FALSE)
+dvc_mlt <- mlt(ctm(B_dvc), data = data.frame(dvc = dvc))
 @
 The discrete distribution function (evaluated for all integers between
 $\Sexpr{min(dvc)}$ and $\Sexpr{max(dvc)}$) along with the distribution 
@@ -608,7 +608,7 @@ The model is now defined by two basis functions, one of the response and one for
 shift in addition to $\pZ$ and fitted using the \cmd{mlt} function
 <<CHFLS-2-ctm>>=
 ctm_CHFLS_2 <- ctm(response = b_happy, shift = b_R, todist = "Logistic")
-mlt_CHFLS_2 <- mlt(ctm_CHFLS_2, data = CHFLS, check = FALSE, scale = TRUE)
+mlt_CHFLS_2 <- mlt(ctm_CHFLS_2, data = CHFLS, scale = TRUE)
 @
 Again, the results of \cmd{polr} and \cmd{mlt} are equivalent
 <<CHFLS-2-cmpr>>=
@@ -662,7 +662,7 @@ In contrast to the classical Cox model where only $\shiftparm$ is estimated
 by the partial likelihood, we estimate all model parameters simultaneously
 under ten linear constraints
 <<GBSG2-1-mlt>>=
-system.time(mlt_GBSG2_1 <- mlt(ctm_GBSG2_1, data = GBSG2, maxit = 3000, scale = TRUE, check = FALSE))
+system.time(mlt_GBSG2_1 <- mlt(ctm_GBSG2_1, data = GBSG2, maxit = 3000, scale = TRUE))
 @
 The results obtained for $\shiftparm$ from
 the partial and the exact log-likelihood are practically equivalent
@@ -715,7 +715,7 @@ needs to be replaced with a log-transformation
 <<GBSG2-2>>=
 ly <- log_basis(GBSG2y, ui = "increasing")
 ctm_GBSG2_2 <- ctm(ly, shift = as.basis(fm_GBSG2[-2L], data = GBSG2, negative = TRUE), todistr = "MinExtrVal")
-mlt_GBSG2_2 <- mlt(ctm_GBSG2_2, data = GBSG2, fixed = c("log(y)" = 1), scale = TRUE, check = FALSE)
+mlt_GBSG2_2 <- mlt(ctm_GBSG2_2, data = GBSG2, fixed = c("log(y)" = 1), scale = TRUE)
 @
 The \cmd{survreg} and \cmd{phreg} functions fit the same model, the results
 are again equivalent
@@ -732,7 +732,7 @@ cbind(survreg = coef(survreg_GBSG2_2)[names(cf)],
 If we allow for a scaled log-transformation $\h(\ry) = \eparm_1 \log(\ry)$, the Weibull
 AFT model is fitted by \cmd{mlt}, \cmd{survreg} and \cmd{phreg} using
 <<GBSG2-3>>=
-mlt_GBSG2_3 <- mlt(ctm_GBSG2_2, data = GBSG2, scale = TRUE, check = FALSE)
+mlt_GBSG2_3 <- mlt(ctm_GBSG2_2, data = GBSG2, scale = TRUE)
 survreg_GBSG2_3 <- survreg(fm_GBSG2, data = GBSG2, dist = "weibull")
 phreg_GBSG2_3 <- phreg(fm_GBSG2, data = GBSG2, dist = "weibull")
 logLik(mlt_GBSG2_3)
@@ -787,8 +787,7 @@ function fits the model to the data
 B_m <- Bernstein_basis(mvar, order = 6, ui = "increasing")
 ctm_BH <- ctm(B_m, shift = fm_BH[-2L], data = BostonHousing2, 
               todistr = "Normal")
-mlt_BH <- mlt(ctm_BH, data = BostonHousing2, scale = TRUE, 
-              check = FALSE)
+mlt_BH <- mlt(ctm_BH, data = BostonHousing2, scale = TRUE)
 @
 The model can be compared with a normal linear model (fitted by \cmd{lm}) on the
 scale of the fitted conditional distribution functions. Figure~\ref{fig:BostonHousing-plot}
@@ -847,7 +846,7 @@ grid.arrange(p1, p2, nrow = 1)
 %ttobin$durable <- R(ttobin$durable, tleft = 0)
 %b_d <- as.basis(~ durable, data = tobin, ui = matrix(c(0, 1), nr  = 1), ci = 0)
 %ctm_tobin <- ctm(b_d, shift = ~ age + quant, data = tobin, todistr = "Normal")
-%mlt_tobin <- mlt(ctm_tobin, data = ttobin, scale = TRUE, check = FALSE)
+%mlt_tobin <- mlt(ctm_tobin, data = ttobin, scale = TRUE)
 %logLik(truncreg_tobin)
 %logLik(mlt_tobin)	
 %-coef(mlt_tobin)[c("(Intercept)", "age", "quant")] / coef(mlt_tobin)["durable"]
@@ -888,7 +887,7 @@ b_hours <- as.basis(~ hours, data = PSID1976,
 ctm_PSID1976_1 <- ctm(b_hours, shift = fm_PSID1976[-2L], 
     data = PSID1976_0, todistr = "Normal") 
 mlt_PSID1976_1 <- mlt(ctm_PSID1976_1, data = PSID1976_0, 
-    scale = TRUE, check = FALSE)
+    scale = TRUE)
 @
 The \cmd{mlt} function does a slightly better job at maximising the likelihood which explains
 the differences in the estimated coefficients:
@@ -908,7 +907,7 @@ B_hours <- Bernstein_basis(hvar, order = 6, ui = "increasing")
 ctm_PSID1976_2 <- ctm(B_hours, shift = fm_PSID1976[-2L], 
     data = PSID1976_0, todistr = "Normal")
 mlt_PSID1976_2 <- mlt(ctm_PSID1976_2, data = PSID1976_0, 
-    scale = TRUE, check = FALSE)
+    scale = TRUE)
 logLik(mlt_PSID1976_2)
 AIC(mlt_PSID1976_1)
 AIC(mlt_PSID1976_2)
@@ -943,7 +942,7 @@ without any regression coefficients $\shiftparm$ in the model:
 b_health <- as.basis(~ R_health - 1, data = CHFLS)
 ctm_CHFLS_3 <- ctm(b_happy, interacting = b_health, todist = "Logistic")
 mlt_CHFLS_3 <- mlt(ctm_CHFLS_3, data = CHFLS, scale = TRUE,
-                   check = FALSE, maxit = 5000)
+                   maxit = 5000)
 logLik(mlt_CHFLS_3)
 predict(mlt_CHFLS_3, newdata = data.frame(R_health = sort(unique(CHFLS$R_health))), 
         q = sort(unique(CHFLS$R_happy)), type = "distribution")
@@ -952,8 +951,7 @@ There is a clear tendency of people being happier with better health. We now `ad
 for age and income
 <<CHFLS-4, cache = TRUE>>=
 ctm_CHFLS_4 <- ctm(b_happy, interacting = b_health, shift = b_R, todist = "Logistic")
-mlt_CHFLS_4 <- mlt(ctm_CHFLS_4, data = CHFLS, scale = TRUE,
-                   check = FALSE)
+mlt_CHFLS_4 <- mlt(ctm_CHFLS_4, data = CHFLS, scale = TRUE)
 coef(mlt_CHFLS_4)[c("R_age", "R_income")]
 @
 Because the shift basis \code{b\_R} is negative, the effects of both age and income 
@@ -980,7 +978,7 @@ respectively:
 ### two separate transformation functions
 b_horTh <- as.basis(GBSG2$horTh)
 ctm_GBSG2_4 <- ctm(B_GBSG2y, interacting = b_horTh, todistr = "MinExtrVal")
-mlt_GBSG2_4 <- mlt(ctm_GBSG2_4, data = GBSG2, check = FALSE)
+mlt_GBSG2_4 <- mlt(ctm_GBSG2_4, data = GBSG2)
 @
 The two survivor functions, along with the corresponding Kaplan-Meier estimates,
 are show in Figure~\ref{GBSG2-strata-plot}, the low-dimensional Bernstein polynomials
@@ -1021,7 +1019,7 @@ estimating a constant age effect in the model
 <<GBSG2-5>>=
 ctm_GBSG2_5 <- ctm(B_GBSG2y, interacting = b_horTh, shifting = ~ age, 
     data = GBSG2, todistr = "MinExtrVal")
-mlt_GBSG2_5 <- mlt(ctm_GBSG2_5, data = GBSG2, check = FALSE, scale = TRUE)
+mlt_GBSG2_5 <- mlt(ctm_GBSG2_5, data = GBSG2, scale = TRUE)
 coxph_GBSG2_5 <- coxph(Surv(time, cens) ~ age + strata(horTh), data = GBSG2)
 cf <- coef(coxph_GBSG2_5)
 cbind(coxph = cf, mlt = coef(mlt_GBSG2_5)[names(cf)])
@@ -1064,7 +1062,7 @@ for each health level, but instead of using a dummy coding we use treatment cont
 contrasts(CHFLS$R_health) <- "contr.treatment"
 b_health <- as.basis(~ R_health, data = CHFLS)
 ctm_CHFLS_5 <- ctm(b_happy, interacting = b_health, todist = "Logistic")
-mlt_CHFLS_5 <- mlt(ctm_CHFLS_5, data = CHFLS, check = FALSE, 
+mlt_CHFLS_5 <- mlt(ctm_CHFLS_5, data = CHFLS, 
     scale = TRUE, maxit = 10000)
 predict(mlt_CHFLS_5, newdata = data.frame(R_health = sort(unique(CHFLS$R_health))), 
         q = sort(unique(CHFLS$R_happy)), type = "distribution")
@@ -1078,7 +1076,7 @@ effects of age and income are allowed to vary with happiness
 b_R <- as.basis(~ R_age + R_income, data = CHFLS, remove_intercept = TRUE)
 ctm_CHFLS_6 <- ctm(b_happy, interacting = b_R, todist = "Logistic")  
 mlt_CHFLS_6 <- mlt(ctm_CHFLS_6, data = CHFLS, scale = TRUE,
-                   check = FALSE, maxit = 5000)
+                   maxit = 5000)
 logLik(mlt_CHFLS_6)
 @
 and finally we include all three variables (health, age and income) allowing for
@@ -1087,7 +1085,7 @@ happiness-varying effects as
 ctm_CHFLS_7 <- ctm(b_happy, interacting = c(h = b_health, R = b_R), 
     todist = "Logistic")  
 mlt_CHFLS_7 <- mlt(ctm_CHFLS_7, data = CHFLS, scale = TRUE,
-                   check = FALSE, maxit = 5000)
+                   maxit = 5000)
 logLik(mlt_CHFLS_7)
 @
 
@@ -1107,7 +1105,7 @@ iris$oSpecies <- ordered(iris$Species)
 b_Species <- as.basis(iris$oSpecies)
 ctm_iris <- ctm(b_Species, interacting = as.basis(fm_iris[-2L], data = iris), 
     todistr = "Logistic")
-mlt_iris <- mlt(ctm_iris, data = iris, scale = TRUE, check = FALSE)
+mlt_iris <- mlt(ctm_iris, data = iris, scale = TRUE)
 logLik(mlt_iris)
 p1 <- predict(mlt_iris, newdata = iris, q = sort(unique(iris$oSpecies)), 
               type = "density")
@@ -1131,7 +1129,7 @@ log-hazard ratio of hormonal therapy.
 B_GBSG2y_5 <- Bernstein_basis(var = GBSG2y, order = 5, ui = "incre")
 ctm_GBSG2_6 <- ctm(B_GBSG2y_5, shift = ~ horTh, data = GBSG2, 
     todistr = "MinExtrVal")
-mlt_GBSG2_6 <- mlt(ctm_GBSG2_6, data = GBSG2, check = FALSE)
+mlt_GBSG2_6 <- mlt(ctm_GBSG2_6, data = GBSG2)
 @
 
 This is the classical Cox model with one treatment parameter $\beta$ 
@@ -1163,7 +1161,7 @@ treatment effect computed under the proportional hazards assumption.
 <<GBSG2-7>>=
 b_horTh <- as.basis(~ horTh, data = GBSG2)
 ctm_GBSG2_7 <- ctm(B_GBSG2y_5, interacting = b_horTh, todistr = "MinExtrVal")
-mlt_GBSG2_7 <- mlt(ctm_GBSG2_7, data = GBSG2, check = FALSE)
+mlt_GBSG2_7 <- mlt(ctm_GBSG2_7, data = GBSG2)
 @
 
 \begin{figure}
@@ -1232,7 +1230,7 @@ B_age <- Bernstein_basis(avar, order = 3)
 b_horTh <- as.basis(GBSG2$horTh)
 ctm_GBSG2_8 <- ctm(B_GBSG2y_5, interacting = b(horTh = b_horTh, age = B_age), 
     todistr = "MinExtrVal")
-mlt_GBSG2_8  <- mlt(ctm_GBSG2_8, data = GBSG2, check = FALSE)
+mlt_GBSG2_8  <- mlt(ctm_GBSG2_8, data = GBSG2)
 @
 
 \begin{figure}
@@ -1279,7 +1277,7 @@ B_a <- Bernstein_basis(order = 3, ui = "none",
     var = numeric_var("lage", support = quantile(db$lage, c(.1, .9)), 
                       bounds = range(db$lage)))
 ctm_head <- ctm(B_h, interacting = B_a)
-mlt_head <- mlt(ctm_head, data = db, maxit = 5000, check = FALSE, 
+mlt_head <- mlt(ctm_head, data = db, maxit = 5000, 
                 scale = TRUE)
 @
 
@@ -1333,8 +1331,7 @@ to be monotone (\code{sumconstr = FALSE}).
 <<BostonHousing-dr, cache = TRUE>>=
 b_BH_s <- as.basis(fm_BH[-2L], data = BostonHousing2, scale = TRUE)
 ctm_BHi <- ctm(B_m, interacting = b_BH_s, sumconstr = FALSE)
-mlt_BHi <- mlt(ctm_BHi, data = BostonHousing2, scale = TRUE,
-               check = FALSE)
+mlt_BHi <- mlt(ctm_BHi, data = BostonHousing2, scale = TRUE)
 logLik(mlt_BHi)
 AIC(mlt_BHi)
 @
@@ -1405,8 +1402,7 @@ B_cs <- Bernstein_basis(order = 4,
 B_c <- as.basis(tmp$counts)
 
 ctm_treepipit <- ctm(B_c, interacting = B_cs)
-mlt_treepipit <- mlt(ctm_treepipit, data = tmp, maxit = 10000, 
-    check = FALSE)
+mlt_treepipit <- mlt(ctm_treepipit, data = tmp, maxit = 10000)
 
 library("mgcv")
 gam_treepipit <- gam(counts ~ s(coverstorey), data = treepipit, 
@@ -1854,7 +1850,7 @@ ngeyser <- geyser
 q <- mkgrid(wvar, 100)[[1]]
 for (i in 1:length(new_w)) {
     ngeyser$waiting <- new_w[[i]]
-    mlt_i <- mlt(ctm_w, data = ngeyser, check = FALSE, scale = TRUE, 
+    mlt_i <- mlt(ctm_w, data = ngeyser, scale = TRUE, 
                  theta = coef(mlt_w))
     llr[[i]] <- logLik(mlt_i) - logLik(mlt_i, parm = coef(mlt_w))
     pdist[[i]] <- predict(mlt_i, newdata = data.frame(1), 
@@ -2264,7 +2260,7 @@ d$dtrue <- dY(d$y)
 ### the new "true" one
 d$grid <- d$y
 d$y <- simulate(mod)
-fmod <- mlt(m, data = d, check = FALSE, scale = TRUE)
+fmod <- mlt(m, data = d, scale = TRUE)
 
 print(fmod)
 summary(fmod)
