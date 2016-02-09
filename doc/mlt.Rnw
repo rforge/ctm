@@ -391,7 +391,7 @@ simply is the relative frequency but, as we will see in the rest of this paper, 
 to the conditional case strongly relies on this parameterisation
 <<CHFLS-1-pred>>=
 predict(polr_CHFLS_1, newdata = data.frame(1), type = "prob")
-### predict(mlt_CHFLS_1, newdata = data.frame(1), type = "density")
+predict(mlt_CHFLS_1, newdata = data.frame(1), type = "density", q = mkgrid(b_happy)[[1]])
 xtabs(~ R_happy, data = CHFLS) / nrow(CHFLS)
 @
 
@@ -1605,8 +1605,11 @@ For a truncated observation, the score function is $\s(\parm | \rY \in
 The \cmd{mlt} function uses convenience interface \cmd{BB} to the spectral
 projected gradient method implemented in the \code{spg()} function of
 package \pkg{BB} \citep{Varadhan_Gilbert_2009} for maximising this
-log-likelihood.
-
+log-likelihood.  Starting values are obtained from an estimate of the
+unconditional distribution function $\Prob(\rY \le \ry)$ (for example, the
+empricial cumulative distribtion function or a Turnbull estimator) via a
+(constrained) linear regression of $Z = \pZ^{-1}(\Prob(\rY \le \ry))$ on the
+design matrix of the transformation model.
 
 \section{Looking at Transformation Models} \label{sec:predict}
 
@@ -1703,13 +1706,10 @@ from confidence intervals and bands for the linear functions $\basisy^\top
 
 \paragraph{Categorical Data Analysis: Chinese Survey (Cont'd)}
 
-<<CHFLS-1-cmpr-2>>=
-max(abs(estfun(polr_CHFLS_1) - (-estfun(mlt_CHFLS_1))))
-cbind(polr = sqrt(diag(vcov(polr_CHFLS_1))),
-      mlt = sqrt(diag(vcov(mlt_CHFLS_1))))
-@
-
-The positive effect of income is ``significant'' by standard measures
+For the proportional odds model for happiness given age and income, we compare the score function (
+using the \cmd{estfun} method from package \pkg{sandwich}) and the standard errors of the
+regression coefficients. The positive effect of income is ``significant'' by standard measures
+(the classical coefficient table was obtained using \cmd{cftest} from package \pkg{multcomp})
 <<CHFLS-2-cmpr-2>>=
 max(abs(estfun(polr_CHFLS_2) - (-estfun(mlt_CHFLS_2)[,c(4, 5, 1:3)])))
 cbind(polr = sqrt(diag(vcov(polr_CHFLS_2))),
@@ -1720,36 +1720,49 @@ cftest(mlt_CHFLS_2, parm = names(coef(polr_CHFLS_2)))
 
 \paragraph{Survival Analysis: GBSG-2 Trial (Cont'd)}
 
+For the ``classical'' Cox model \code{mlt_GBSG2_1}, the standard errors
+of all three methods applied (\cmd{coxph}, \cmd{mlt}, \cmd{flexsurvspline})
+are more or less identical as are the coefficient tables
 <<GBSG2-1-coxph-cmpr>>=  
 cf <- coef(coxph_GBSG2_1)
 cbind(coxph = sqrt(diag(vcov(coxph_GBSG2_1))),
-      mlt = sqrt(diag(vcov(mlt_GBSG2_1)))[names(cf)])
+      mlt = sqrt(diag(vcov(mlt_GBSG2_1)))[names(cf)],
+      fss = sqrt(diag(vcov(fss_GBSG2_1)))[names(cf)])
 cftest(coxph_GBSG2_1)
 cftest(mlt_GBSG2_1, parm = names(cf))
+cftest(fss_GBSG2_1, parm = names(cf))
 @
 
-<<GBSG2-2-survreg-cmpr>>=
-cbind(survreg = sqrt(diag(vcov(survreg_GBSG2_2))[names(cf)]),
-      phreg = sqrt(diag(vcov(phreg_GBSG2_2))[names(cf)]),
-      mlt = sqrt(diag(vcov(mlt_GBSG2_2)))[names(cf)])
-cftest(survreg_GBSG2_2, parm = names(cf))
-# cftest(mlt_GBSG2_2, parm = names(cf))
-@
+%<<GBSG2-2-survreg-cmpr>>=
+%cbind(survreg = sqrt(diag(vcov(survreg_GBSG2_2))[names(cf)]),
+%      phreg = sqrt(diag(vcov(phreg_GBSG2_2))[names(cf)]),
+%      mlt = sqrt(diag(vcov(mlt_GBSG2_2)))[names(cf)])
+%cftest(survreg_GBSG2_2, parm = names(cf))
+%# cftest(mlt_GBSG2_2, parm = names(cf))
+%@
 
-<<GBSG2-5-cmpr>>=
-cf <- coef(coxph_GBSG2_5)
-cbind(coxph = sqrt(diag(vcov(coxph_GBSG2_5))),
-      mlt = sqrt(diag(vcov(mlt_GBSG2_5)))[names(cf)])
-cftest(coxph_GBSG2_5)
-cftest(mlt_GBSG2_5, parm = names(cf))
-@
+%<<GBSG2-5-cmpr>>=
+%cf <- coef(coxph_GBSG2_5)
+%cbind(coxph = sqrt(diag(vcov(coxph_GBSG2_5))),
+%      mlt = sqrt(diag(vcov(mlt_GBSG2_5)))[names(cf)])
+%cftest(coxph_GBSG2_5)
+%cftest(mlt_GBSG2_5, parm = names(cf))
+%@
 
 \paragraph{Density Estimation: Geyser Data (Cont'd)}
 
+A relatively simple method for the construction of asymptotic confidence bands
+is based on the multivariate joint normal distribution of the model coefficients
+$\hat{\parm}_N$. A confidence band for the unconditional transformation function 
+of waiting times is derived from simultaneous confidence intervals for the 
+linear function $\mA \hat{\parm}_N$ as implemented in package \cmd{multcomp}. Here $\mA$ is
+the matrix of Bernstein basis functions evaluated on a grid of waiting times
+$\ry_1, \dots, \ry_K$. 
 <<geyser-w-band>>=
 head(cb_w <- confband(mlt_w, newdata = data.frame(1), ncheat = 100))
 @
-
+The result is shown in Figure~\ref{fig:geyser-w-cbplot} on the scale of the
+transformation and distribution function.
 
 \begin{figure}
 \begin{center}
@@ -1760,14 +1773,25 @@ layout(matrix(1:2, ncol = 2))
 #cb_w[-i, "upr"] <- NA
 plot(cb_w[, "q"], cb_w[, "Estimate"], xlab = "Waiting times", ylab = "Transformation", 
      main = "", type = "l")
-lines(cb_w[, "q"], cb_w[, "lwr"])
-lines(cb_w[, "q"], cb_w[, "upr"])
+
+q <- cb_w[, "q"]
+lwr <- cb_w[, "lwr"]
+upr <-  cb_w[, "upr"]
+polygon(c(q, rev(q)), c(lwr, rev(upr)),
+        border = NA, col = rgb(.1, .1, .1, .1))
+
+#lines(cb_w[, "q"], cb_w[, "lwr"])
+#lines(cb_w[, "q"], cb_w[, "upr"])
 rug(geyser$waiting, col = rgb(.1, .1, .1, .1))
 plot(ecdf(geyser$waiting), col = "grey", xlab = "Waiting times", ylab = "Distribution", 
-     main = "")
+     main = "", cex = .5)
 lines(cb_w[, "q"], pnorm(cb_w[, "Estimate"]))
-lines(cb_w[, "q"], pnorm(cb_w[, "lwr"]))
-lines(cb_w[, "q"], pnorm(cb_w[, "upr"]))
+
+polygon(c(q, rev(q)), c(pnorm(lwr), rev(pnorm(upr))),                                     
+        border = NA, col = rgb(.1, .1, .1, .1))
+
+# lines(cb_w[, "q"], pnorm(cb_w[, "lwr"]))
+# lines(cb_w[, "q"], pnorm(cb_w[, "upr"]))
 rug(geyser$waiting, col = rgb(.1, .1, .1, .1))
 @
 \caption{Old Faithful Geyser. Estimated transformation (left)
@@ -1781,63 +1805,43 @@ rug(geyser$waiting, col = rgb(.1, .1, .1, .1))
 \section{Simulation-based Likelihood Inference} \label{sec:sim}
 
 
-\section*{Computational Details}
-
-<<funs, echo = FALSE, results='hide'>>=
-if (file.exists("packages.bib")) file.remove("packages.bib")
-pkgversion <- function(pkg) {
-    pkgbib(pkg)
-    packageDescription(pkg)$Version
+<<geyser-w-simulate, results = "hide", cache = TRUE>>=
+new_w <- simulate(mlt_w, nsim = 100)
+ll <- numeric(length(new_w))
+pdist <- vector(mode = "list", length = length(new_w))
+pdens <- vector(mode = "list", length = length(new_w))
+ngeyser <- geyser
+q <- mkgrid(wvar, 100)[[1]]
+for (i in 1:length(new_w)) {
+    ngeyser$waiting <- new_w[[i]]
+    tmpmlt <- mlt(ctm_w, data = ngeyser, check = FALSE, scale = TRUE, theta = coef(mlt_w))
+    ll[[i]] <- logLik(tmpmlt) - logLik(tmpmlt, parm = coef(mlt_w))
+    pdist[[i]] <- predict(tmpmlt, newdata = data.frame(1), type = "distribution", q = q)
+    pdens[[i]] <- predict(tmpmlt, newdata = data.frame(1), type = "density", q = q)
 }
-pkgbib <- function(pkg) {
-    x <- citation(package = pkg, auto = TRUE)[[1]]
-    b <- toBibtex(x)
-    b <- gsub("Buehlmann", "B{\\\\\"u}hlmann", b)
-    b[1] <- paste("@Manual{pkg:", pkg, ",", sep = "")
-    if (is.na(b["url"])) {
-        b[length(b)] <- paste("   URL = {http://CRAN.R-project.org/package=",
-                              pkg, "}", sep = "")
-        b <- c(b, "}")
-    }
-    cat(b, sep = "\n", file = "packages.bib", append = TRUE)
-}
-pkg <- function(pkg)
-    paste("\\\\pkg{", pkg, "} \\\\citep[version~",
-          pkgversion(pkg), ",][]{pkg:", pkg, "}", sep = "")
-pkg("gamlss")
-pkg("MASS")
-pkg("np")
-pkg("prodlim")
-pkg("flexsurv")
-mlt <- c("@Manual{pkg:mlt, \n
-          title = {mlt: Most Likely Transformations},\n
-          author = {Torsten Hothorn},\n
-          url = {https://r-forge.r-project.org/projects/ctm/},\n
-          year = {2016},\n
-          note = {R package version 0.0-15, svn revision 313}}\n")
-variables <- c("@Manual{pkg:variables, \n
-          title = {variables: Variable Descriptions},\n
-          author = {Torsten Hothorn},\n
-          url = {https://r-forge.r-project.org/projects/ctm/},\n
-          year = {2016},\n
-          note = {R package version 0.0-15, svn revision 313}}\n")
-basefun <- c("@Manual{pkg:basefun, \n
-          title = {basefun: Infrastructure for Computing with Basis Functions},\n
-          author = {Torsten Hothorn},\n
-          url = {https://r-forge.r-project.org/projects/ctm/},\n
-          year = {2016},\n
-          note = {R package version 0.0-15, svn revision 313}}\n")
-cat(mlt, sep = "\n", file = "packages.bib", append = TRUE)
-cat(variables, sep = "\n", file = "packages.bib", append = TRUE)
-cat(basefun, sep = "\n", file = "packages.bib", append = TRUE)
 @
 
-A reference implementation of most likely transformation models is available
-in the \pkg{mlt} package \citep{pkg:mlt}. 
-The spectral projected gradient method implemented
-in the \cmd{spg} function of package \pkg{BB} \citep{Varadhan_Gilbert_2009}
-was used for optimising the log-likelihood.
-\citep{R}.
+
+\begin{figure}
+\begin{center}
+<<geyser-w-simulate-plot, fig.width = 6, echo = FALSE>>=
+i <- which(ll < quantile(ll, prob = .95))
+tpdist <- pdist[i]
+tpdens <- pdens[i]
+layout(matrix(1:2, ncol = 2))
+plot(q, tpdist[[1]], type = "n", xlab = "Waiting times", ylab = "Distribution")
+polygon(c(q, rev(q)), c(pnorm(lwr), rev(pnorm(upr))),
+        border = NA, col = "greenyellow")
+tmp <- sapply(tpdist, function(x) lines(q, x, col = rgb(.1, .1, .1, .1)))
+plot(q, tpdens[[1]], type = "n", ylim = range(unlist(pdens)),
+     xlab = "Waiting times", ylab = "Density")
+tmp <- sapply(tpdens, function(x) lines(q, x, col = rgb(.1, .1, .1, .1)))
+@
+\caption{}
+\end{center}
+\end{figure}
+
+
 
 
 \bibliography{mlt,packages}
@@ -2139,6 +2143,60 @@ nothing to do with the measurement scale of the response $\rY$ in the model
 and the corresponding basis functions.  Discrete or continuous models are
 specified based on the abstract variable description
 (Appendix~\ref{app:variables}).
+
+\section{Computational Details}
+
+<<funs, echo = FALSE, results='hide'>>=
+if (file.exists("packages.bib")) file.remove("packages.bib")
+pkgversion <- function(pkg) {
+    pkgbib(pkg)
+    packageDescription(pkg)$Version
+}
+pkgbib <- function(pkg) {
+    x <- citation(package = pkg, auto = TRUE)[[1]]
+    b <- toBibtex(x)
+    b <- gsub("Buehlmann", "B{\\\\\"u}hlmann", b)
+    b[1] <- paste("@Manual{pkg:", pkg, ",", sep = "")
+    if (is.na(b["url"])) {
+        b[length(b)] <- paste("   URL = {http://CRAN.R-project.org/package=",
+                              pkg, "}", sep = "")
+        b <- c(b, "}")
+    }
+    cat(b, sep = "\n", file = "packages.bib", append = TRUE)
+}
+pkg <- function(pkg)
+    paste("\\\\pkg{", pkg, "} \\\\citep[version~",
+          pkgversion(pkg), ",][]{pkg:", pkg, "}", sep = "")
+pkg("gamlss")
+pkg("MASS")
+pkg("np")
+pkg("prodlim")
+pkg("flexsurv")
+mlt <- c("@Manual{pkg:mlt, \n
+          title = {mlt: Most Likely Transformations},\n
+          author = {Torsten Hothorn},\n
+          url = {https://r-forge.r-project.org/projects/ctm/},\n
+          year = {2016},\n
+          note = {R package version 0.0-15, svn revision 313}}\n")
+variables <- c("@Manual{pkg:variables, \n
+          title = {variables: Variable Descriptions},\n
+          author = {Torsten Hothorn},\n
+          url = {https://r-forge.r-project.org/projects/ctm/},\n
+          year = {2016},\n
+          note = {R package version 0.0-15, svn revision 313}}\n")
+basefun <- c("@Manual{pkg:basefun, \n
+          title = {basefun: Infrastructure for Computing with Basis Functions},\n
+          author = {Torsten Hothorn},\n
+          url = {https://r-forge.r-project.org/projects/ctm/},\n
+          year = {2016},\n
+          note = {R package version 0.0-15, svn revision 313}}\n")
+cat(mlt, sep = "\n", file = "packages.bib", append = TRUE)
+cat(variables, sep = "\n", file = "packages.bib", append = TRUE)
+cat(basefun, sep = "\n", file = "packages.bib", append = TRUE)
+@
+
+A reference implementation of most likely transformation models is available
+in the \pkg{mlt} package \citep{pkg:mlt}. 
 
 <<sessionInfo, echo = FALSE>>=
 sessionInfo()
