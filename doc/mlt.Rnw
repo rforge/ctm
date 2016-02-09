@@ -825,68 +825,83 @@ grid.arrange(p1, p2, nrow = 1)
 \end{figure}
 
 
-\paragraph{Truncated Regression: Tobin's Data}
+\paragraph{Truncated Regression: Panel Study of Income Dynamics}
 
-Tobit, see truncreg
+%<<tobin>>=
+%data("tobin", package = "survival")
+%ttobin <- subset(tobin, durable > 0)
+%(truncreg_tobin <- truncreg(durable ~ age + quant, data = ttobin))
+%
+%ttobin$durable <- R(ttobin$durable, tleft = 0)
+%b_d <- as.basis(~ durable, data = tobin, ui = matrix(c(0, 1), nr  = 1), ci = 0)
+%ctm_tobin <- ctm(b_d, shift = ~ age + quant, data = tobin, todistr = "Normal")
+%mlt_tobin <- mlt(ctm_tobin, data = ttobin, scale = TRUE, check = FALSE)
+%logLik(truncreg_tobin)
+%logLik(mlt_tobin)	
+%-coef(mlt_tobin)[c("(Intercept)", "age", "quant")] / coef(mlt_tobin)["durable"]
+%@
 
-<<tobin>>=
-data("tobin", package = "survival")
-ttobin <- subset(tobin, durable > 0)
-(truncreg_tobin <- truncreg(durable ~ age + quant, data = ttobin))
-
-ttobin$durable <- R(ttobin$durable, tleft = 0)
-b_d <- as.basis(~ durable, data = tobin, ui = matrix(c(0, 1), nr  = 1), ci = 0)
-ctm_tobin <- ctm(b_d, shift = ~ age + quant, data = tobin, todistr = "Normal")
-mlt_tobin <- mlt(ctm_tobin, data = ttobin, scale = TRUE, check = FALSE)
-
-logLik(truncreg_tobin)
-logLik(mlt_tobin)	
-
--coef(mlt_tobin)[c("(Intercept)", "age", "quant")] / coef(mlt_tobin)["durable"]
-@
-
+\cite{Mroz_1976} analysed the University of Michigan Panel Study of Income
+Dynamics (PSID) for the year 1975 (interview year 1976).  The data consists
+of 753 married white women between the ages of 30 and 60 in 1975, with 428
+working at some time during the year.  The dependent variable is the wife's
+annual hours of work and we are interested in modelling the distribution
+of hours of work conditional on participation in the labor
+force, \ie more than zero hours of work in 1975. We first set-up
+a subset consisting of those who actually worked (for money!) in 1975
+and a model formula:
 <<PSID1976>>=
 data("PSID1976", package = "AER")
 PSID1976$nwincome <- with(PSID1976, (fincome - hours * wage)/1000)
 PSID1976$hours <- as.double(PSID1976$hours)
+PSID1976_0 <- subset(PSID1976, participation == "yes")
 fm_PSID1976 <- hours ~ nwincome + education +
   experience + I(experience^2) + age + youngkids + oldkids
-library("truncreg")
-PSID1976_0 <- subset(PSID1976, participation == "yes")
+@
+We use a 
+linear regression model for left-truncated data and compare the
+results to \cmd{truncreg} from package \pkg{truncreg}
+<<PSID1976-truncreg>>=
 tr_PSID1976 <- truncreg(fm_PSID1976, data = PSID1976_0)
-
-PSID1976_0$hours <- R(PSID1976_0$hours, tleft = 0)
-b_hours <- as.basis(~ hours, data = PSID1976, ui = matrix(c(0, 1), nr  = 1), ci = 0)
-ctm_PSID1976 <- ctm(b_hours, shift = fm_PSID1976[-2L], data = PSID1976_0, todistr = "Normal") 
-mlt_PSID1976 <- mlt(ctm_PSID1976, data = PSID1976_0, scale = TRUE, check = FALSE)
-
-logLik(tr_PSID1976)
-logLik(mlt_PSID1976)
-
-(cf2 <- coef(tr_PSID1976))
-cf <- coef(mlt_PSID1976)
-c(-cf[-grep("hours", names(cf))] / cf["hours"], 1 / cf["hours"])
-
-cf3 <- c(-cf2[-grep("sigma", names(cf2))] / cf2["sigma"], 1 / cf2["sigma"])
-cf3 <- cf3[c(1, length(cf3), 2:(length(cf3) - 1))]
-
-logLik(mlt_PSID1976, parm = cf3)
-
-tmp1 <- tmp2 <- PSID1976_0
-tmp1$hours <- tmp1$hours$exact
-tmp2$hours <- 0
-
-h1 <- model.matrix(ctm_PSID1976, data = tmp1) %*% cf
-# h11 <- predict(mlt_PSID1976)
-h2 <- model.matrix(ctm_PSID1976, data = tmp1, deriv = c(hours = 1)) %*% cf
-h3 <- model.matrix(ctm_PSID1976, data = tmp2) %*% cf
-
-sum(log((dnorm(h1) * h2) / (1 - pnorm(h3))))
-
-sum(dnorm(h1, log = TRUE) + log(h2) - log(1 - pnorm(h3)))
-logLik(mlt_PSID1976, parm = cf)
 @
 
+We use the \cmd{R} function (see Appendix~\ref{subapp:R}) to
+specify left-truncation at zero, set-up a linear transformation
+function for the response (we want to stay within the normal family)
+and a shift term
+<<PSID1976-mlt>>=
+PSID1976_0$hours <- R(PSID1976_0$hours, tleft = 0)
+b_hours <- as.basis(~ hours, data = PSID1976, 
+    ui = matrix(c(0, 1), nr  = 1), ci = 0)
+ctm_PSID1976_1 <- ctm(b_hours, shift = fm_PSID1976[-2L], 
+    data = PSID1976_0, todistr = "Normal") 
+mlt_PSID1976_1 <- mlt(ctm_PSID1976_1, data = PSID1976_0, 
+    scale = TRUE, check = FALSE)
+@
+The \cmd{mlt} function does a slightly better job at maximising the likelihood which explains
+the differences in the estimated coefficients:
+<<PSID1976-cmpr>>=
+logLik(tr_PSID1976)
+logLik(mlt_PSID1976_1)
+cf <- coef(mlt_PSID1976_1)
+cbind(truncreg = coef(tr_PSID1976),
+      mlt = c(-cf[-grep("hours", names(cf))] / cf["hours"], 1 / cf["hours"]))
+@
+Of course, we might want to question the normal assumption by allowing a potentially
+non-linear transformation function
+<<PSID1976-mlt-ctm>>=
+hvar <- numeric_var("hours", support = range(PSID1976_0$hours$exact),
+                    bounds = c(0, Inf))
+B_hours <- Bernstein_basis(hvar, order = 6, ui = "increasing")
+ctm_PSID1976_2 <- ctm(B_hours, shift = fm_PSID1976[-2L], 
+    data = PSID1976_0, todistr = "Normal")
+mlt_PSID1976_2 <- mlt(ctm_PSID1976_2, data = PSID1976_0, 
+    scale = TRUE, check = FALSE)
+logLik(mlt_PSID1976_2)
+AIC(mlt_PSID1976_1)
+AIC(mlt_PSID1976_2)
+@
+and it seems the non-normal model is slightly better.
 
 \subsection{Stratified Linear Transformation Models}
 
