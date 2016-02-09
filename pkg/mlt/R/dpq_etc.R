@@ -273,7 +273,7 @@ dmlt <- function(object, newdata = object$data, q = NULL, log = FALSE) {
             pfirst <- pmlt(object, newdata = newdata, q = qfirst)
             pwo1 <- pmlt(object, newdata = newdata, q = qwo1)
             pwoK <- pmlt(object, newdata = newdata, q = qwoK)
-            ret <- matrix(0, nrow = length(first), ncol = ncol(pfirst))
+            ret <- matrix(0, nrow = length(first), ncol = NCOL(pfirst))
             ret[!first,] <- pwo1 - pwoK
             ret[first,] <- pfirst
        }
