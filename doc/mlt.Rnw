@@ -853,7 +853,7 @@ grid.arrange(p1, p2, nrow = 1)
 %-coef(mlt_tobin)[c("(Intercept)", "age", "quant")] / coef(mlt_tobin)["durable"]
 %@
 
-\cite{Mroz_1976} analysed the University of Michigan Panel Study of Income
+\cite{Mroz_1987} analysed the University of Michigan Panel Study of Income
 Dynamics (PSID) for the year 1975 (interview year 1976).  The data consists
 of 753 married white women between the ages of 30 and 60 in 1975, with 428
 working at some time during the year.  The dependent variable is the wife's
@@ -1891,7 +1891,7 @@ plot(q, tpdens[[1]], type = "n", ylim = range(unlist(pdens)),
 tmp <- sapply(tpdens, function(x) lines(q, x, col = rgb(.1, .1, .1, .1)))
 @
 \caption{Old Faithful Geyser. Model-based bootstrap for distribution (left, the green area depicts the
-         asymptotic confidence band from Figure~\ref{}) and density (right) function for 
+         asymptotic confidence band from Figure~\ref{fig:geyser-w-cbplot}) and density (right) function for 
          the unconditional transformation model parameterised in terms of a Bernstein polynomials
          of order $8$. \label{geyser-w-simulate-plot}}
 \end{center}
@@ -1906,6 +1906,8 @@ lines of \proglang{R} code
 \bibliography{mlt,packages}
 
 \begin{appendix}
+
+\section*{Appendix}
 
 \section{The variables Package} \label{app:variables}
 
