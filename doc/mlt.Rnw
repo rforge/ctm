@@ -1005,10 +1005,10 @@ function for all observations, an assumption which we're now going to relax. As
 a first simple example, we want to estimate two separate survivor functions 
 for the two treatment regimes in the model
 \begin{eqnarray*}
-(\pMEV, (\bern{5}(\ry)^\top \otimes
+(\pMEV, (\bern{10}(\ry)^\top \otimes
        (\I(\text{hormonal therapy}), 1 - \I(\text{hormonal therapy})))^\top, (\parm_1^\top, \parm_2^\top)^\top)
 \end{eqnarray*}
-Here, the transformation function $\bern{5}(\ry)^\top \parm_1$ and 
+Here, the transformation function $\bern{10}(\ry)^\top \parm_1$ and 
 $\bern{5}(\ry)^\top \parm_2$ correspond to the untreated and treated groups,
 respectively:
 <<GBSG2-4>>=
@@ -1018,7 +1018,7 @@ ctm_GBSG2_4 <- ctm(B_GBSG2y, interacting = b_horTh, todistr = "MinExtrVal")
 mlt_GBSG2_4 <- mlt(ctm_GBSG2_4, data = GBSG2)
 @
 The two survivor functions, along with the corresponding Kaplan-Meier estimates,
-are show in Figure~\ref{GBSG2-strata-plot}, the low-dimensional Bernstein polynomials
+are shown in Figure~\ref{GBSG2-strata-plot}, the low-dimensional Bernstein polynomials
 produce a nicely smoothed version of the Kaplan-Meier step-functions.
 
 \begin{figure}
@@ -1057,23 +1057,28 @@ estimating a constant age effect in the model
 ctm_GBSG2_5 <- ctm(B_GBSG2y, interacting = b_horTh, shifting = ~ age, 
                    data = GBSG2, todistr = "MinExtrVal")
 mlt_GBSG2_5 <- mlt(ctm_GBSG2_5, data = GBSG2, scale = TRUE)
-coxph_GBSG2_5 <- coxph(Surv(time, cens) ~ age + strata(horTh), data = GBSG2)
+@
+The corresponding stratified Cox model with parameter estimation based
+on the partial likelihood is
+<<GBSG2-5-coxph>>=
+coxph_GBSG2_5 <- coxph(Surv(time, cens) ~ age + strata(horTh), 
+                       data = GBSG2)
 cf <- coef(coxph_GBSG2_5)
 cbind(coxph = cf, mlt = coef(mlt_GBSG2_5)[names(cf)])
 @
 The Cox model fitted via the stratified partial likelihood (\cmd{coxph}) and
-the transformation model agree on a positive age effect $\hat{\shiftparm}$, 
+the transformation model agree on a positive age effect $\hat{\beta}$, 
 \ie older patients seem to survive longer (note that \cmd{coxph} estimates 
 a positive shift effect as does the transformation model specified above).
 
 \subsection{Conditional Transformation Models}
 
 The most complex class of models currently supported by the \cmd{ctm} function
-is defined by basis functions of the form
+allows basis functions of the form
 \begin{eqnarray*}
 \basisyx = (\basisy^\top \otimes (\basisx_1^\top,\dots, \basisx_J^\top), -\basisx_\text{shift}^\top).
 \end{eqnarray*}
-The model allows for response-varying coefficients (as defined by the basis $\basisy$) corresponding
+The model may include for response-varying coefficients (as defined by the basis $\basisy$) corresponding
 to the bases $(\basisx_1^\top,\dots, \basisx_J^\top)$ and constant shift effects. Such a model
 is set-up using \cmd{ctm} with arguments \code{response} ($\basisy$), \code{interacting} ($(\basisx_1^\top,\dots, \basisx_J^\top)$)
 and \code{shifting} ($-\basisx_\text{shift}^\top$). It would be conceptually possible
@@ -1101,8 +1106,8 @@ b_health <- as.basis(~ R_health, data = CHFLS)
 ctm_CHFLS_5 <- ctm(b_happy, interacting = b_health, todist = "Logistic")
 mlt_CHFLS_5 <- mlt(ctm_CHFLS_5, data = CHFLS, 
     scale = TRUE, maxit = 10000)
-predict(mlt_CHFLS_5, newdata = data.frame(R_health = sort(unique(CHFLS$R_health))), 
-        q = sort(unique(CHFLS$R_happy)), type = "distribution")
+predict(mlt_CHFLS_5, newdata = mkgrid(mlt_CHFLS_5), 
+        type = "distribution")
 logLik(mlt_CHFLS_5)
 @
 The log-likelihood and the fitted distribution are, of course, equivalent but the parameters
@@ -1133,15 +1138,17 @@ can be estimated using a multinomial regression. In a non-proportional odds
 model allowing for response-specific regression coefficients, the ordering of the response
 levels only affects the corresponding regression coefficients but the fitted density
 is invariant with respect to the ordering applied as a comparison with
-\cmd{multinom} from package \pkg{nnet} shows
+\cmd{multinom} from package \pkg{nnet} for the iris data shows
 <<iris-1>>=
-fm_iris <- Species ~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width
-multinom_iris <- nnet::multinom(fm_iris, data = iris, trace = TRUE)
+fm_iris <- Species ~ Sepal.Length + Sepal.Width + 
+                     Petal.Length + Petal.Width
+multinom_iris <- nnet::multinom(fm_iris, data = iris, trace = FALSE)
 logLik(multinom_iris)
 iris$oSpecies <- ordered(iris$Species)
 b_Species <- as.basis(iris$oSpecies)
-ctm_iris <- ctm(b_Species, interacting = as.basis(fm_iris[-2L], data = iris), 
-    todistr = "Logistic")
+ctm_iris <- ctm(b_Species, 
+                interacting = as.basis(fm_iris[-2L], data = iris), 
+                todistr = "Logistic")
 mlt_iris <- mlt(ctm_iris, data = iris, scale = TRUE)
 logLik(mlt_iris)
 p1 <- predict(mlt_iris, newdata = iris, q = sort(unique(iris$oSpecies)), 
@@ -1154,16 +1161,17 @@ max(abs(t(p1) - p2))
 
 \paragraph{Survival Analysis: GBSG-2 Trial (Cont'd)}
 
-The Cox model for the comparison of the survivor distribution between the untreated and treated
-group assuming proportional hazards, \ie the model $(\pMEV, (\bern{5}^\top, \I(\text{hormonal
-therapy}))^\top, \parm)$, implements the transformation function $\h(\ry |
-\text{treatment}) = \bern{5}(\ry)^\top \parm_1 + \I(\text{hormonal therapy})
-\beta$ where $\bern{5}^\top \parm_1$ is the log-cumulative baseline hazard function
+The Cox model for the comparison of the survivor distribution between the
+untreated and treated group assuming proportional hazards, \ie the model
+$(\pMEV, (\bern{5}^\top, \I(\text{hormonal therapy}))^\top, (\parm_1^\top, \beta)^\top)$,
+implements the transformation function $\h(\ry | \text{treatment}) =
+\bern{5}(\ry)^\top \parm_1 + \I(\text{hormonal therapy}) \beta$ where
+$\bern{5}^\top \parm_1$ is the log-cumulative baseline hazard function
 parameterised by a Bernstein polynomial and $\beta \in \RR$ is the
-log-hazard ratio of hormonal therapy. 
-
+log-hazard ratio of hormonal therapy.  The choice $M = 5$ is used to exactly
+reproduce the results presented in \cite{Hothorn_Moest_Buehlmann_2016}
 <<GBSG2-6>>=
-B_GBSG2y_5 <- Bernstein_basis(var = GBSG2y, order = 5, ui = "incre")
+B_GBSG2y_5 <- Bernstein_basis(var = GBSG2y, order = 5, ui = "increasing")
 ctm_GBSG2_6 <- ctm(B_GBSG2y_5, shifting = ~ horTh, data = GBSG2, 
                    todistr = "MinExtrVal")
 mlt_GBSG2_6 <- mlt(ctm_GBSG2_6, data = GBSG2)
@@ -1171,8 +1179,9 @@ mlt_GBSG2_6 <- mlt(ctm_GBSG2_6, data = GBSG2)
 
 This is the classical Cox model with one treatment parameter $\beta$ 
 but fully parameterised baseline transformation function which was fitted by the exact
-log-likelihood under five linear constraints. The model assumes proportional hazards, an assumption whose
-appropriateness we wanted to assess using the non-proportional hazards model
+log-likelihood under five linear constraints. The model assumes proportional hazards, 
+an assumption whose
+appropriateness we want to assess using the non-proportional hazards model
 $(\pMEV, (\bern{5}^\top \otimes (1, \I(\text{hormonal therapy})))^{\top}, \parm)$ with
 transformation function 
 \begin{eqnarray*}
@@ -1185,11 +1194,7 @@ treatment effect, we would expect $\parm_2 \equiv \bold{0}$.  This monotone
 deviation function adds five linear constraints to the model. 
 Figure~\ref{GBSG2-deviation-plot} shows the time-varying treatment effect
 $\bern{5}^\top \hat{\parm}_2$, together with a $95\%$ confidence band
-computed from the joint normal distribution of $\hat{\parm}_2$ for a grid
-over time as described by \cite{Hothorn_Bretz_Westfall_2008}; 
-the method is
-much simpler than other methods for inference on time-varying
-effects \citep[for example][]{Sun_Sundaram_Zhao_2009}.  The $95\%$
+(see Section~\ref{sec:asympt}). The $95\%$
 confidence interval around the log-hazard ratio $\hat{\beta}$ is plotted in
 addition and since the latter is fully covered by the confidence band for
 the time-varying treatment effect there is no reason to question the
@@ -1242,33 +1247,32 @@ legend("bottomright", lty = 1:2, lwd = 1, legend = c("time-varying treatment eff
 \end{center}
 \end{figure}   
 
-In a second step, we allowed an age-varying treatment effect 
+In a second step, we allow an age-varying treatment effect 
 in the model $(\pMEV, (\bern{5}(\ry)^\top \otimes
        (\I(\text{hormonal therapy}), 1 - \I(\text{hormonal therapy}))
        \otimes \bernx{5}(\text{age})^\top)^\top, \parm)$. For both treatment
-groups, we estimated a conditional transformation function of survival time
+groups, we estimate a conditional transformation function of survival time
 $\ry$ given age parameterised as the tensor basis of two Bernstein bases. Each of the
 two basis functions comes with $5 \times 6$ linear constraints, so the model
-was fitted under $60$ linear constraints. 
-Figure~\ref{fig:GBSG2-8-plot} allows an assessment of the prognostic and
-predictive properties of age.  As the surivor functions were clearly larger
-under hormonal treatment for all patients, the positive treatment effect
-applied to all patients.  However, the size of the treatment effect varied
-greatly.  For women younger than $30$, the effect was most pronounced and
-levelled-off a little for older patients.  In general, the survival times were
-longest for women between $40$ and $60$ years old.  Younger women suffered
-the highest risk; for women older than $60$ years, the risk started to
-increase again.  This effect was shifted towards younger women by the
-application of hormonal treatment.
-
+was fitted under $60$ linear constraints
 <<GBSG2-8, echo = TRUE, cache = TRUE>>=
-avar <- numeric_var("age", support = range(GBSG2$age))
-B_age <- Bernstein_basis(avar, order = 3)
+var_a <- numeric_var("age", support = range(GBSG2$age))
+B_age <- Bernstein_basis(var_a, order = 3)
 b_horTh <- as.basis(GBSG2$horTh)
 ctm_GBSG2_8 <- ctm(B_GBSG2y_5, interacting = b(horTh = b_horTh, age = B_age), 
     todistr = "MinExtrVal")
 mlt_GBSG2_8  <- mlt(ctm_GBSG2_8, data = GBSG2)
 @
+Figure~\ref{fig:GBSG2-8-plot} allows an assessment of the prognostic and
+predictive properties of age.  As the surivor functions are clearly larger
+under hormonal treatment for all patients, the positive treatment effect
+applies to all patients.  However, the size of the treatment effect varies
+greatly.  For women younger than $30$, the effect is most pronounced and
+levels-off a little for older patients.  In general, the survival times are
+longest for women between $40$ and $60$ years old.  Younger women suffer
+the highest risk; for women older than $60$ years, the risk starts to
+increase again.  This effect is shifted towards younger women by the
+application of hormonal treatment.
 
 \begin{figure}
 \begin{center}
@@ -1292,18 +1296,16 @@ contourplot(s ~ age + y | horTh, data = nd, at = 1:9 / 10,
 
 \paragraph{Quantile Regression: Head Circumference}
 
-The Fourth Dutch Growth Study \citep{Fredriks_Buuren_Burgmeijer_2000} 
-is a
+The Fourth Dutch Growth Study \citep{Fredriks_Buuren_Burgmeijer_2000} is a
 cross-sectional study on growth and development of the Dutch population
-younger than $22$ years.  \cite{Stasinopoulos_Rigby_2007} fitted
-a growth curve to head circumferences (HC) of $7040$ boys using a GAMLSS
-model with a Box-Cox $t$ distribution describing the first four moments of
-head circumference conditionally on age.  The model showed evidence of
-kurtosis, especially for older boys.  We fitted the same growth curves by the
+younger than $22$ years.  \cite{Stasinopoulos_Rigby_2007} fitted a growth
+curve to head circumferences (HC) of $7040$ boys using a GAMLSS model with a
+Box-Cox $t$ distribution describing the first four moments of head
+circumference conditionally on age.  The model showed evidence of kurtosis,
+especially for older boys.  We fit the same growth curves by the
 conditional transformation model $(\Phi, (\bern{3}(\text{HC})^\top \otimes
-\bernx{3}(\text{age}^{1/3})^\top)^\top, \parm)$ by maximisation of the approximate
-log-likelihood under $3 \times 4$ linear constraints. 
-
+\bernx{3}(\text{age}^{1/3})^\top)^\top, \parm)$ by maximisation of the
+approximate log-likelihood under $3 \times 4$ linear constraints
 <<head, echo = TRUE, cache = TRUE>>=
 data("db", package = "gamlss.data")
 db$lage <- with(db, age^(1/3))
@@ -1314,10 +1316,8 @@ B_a <- Bernstein_basis(order = 3, ui = "none",
     var = numeric_var("lage", support = quantile(db$lage, c(.1, .9)), 
                       bounds = range(db$lage)))
 ctm_head <- ctm(B_h, interacting = B_a)
-mlt_head <- mlt(ctm_head, data = db, maxit = 5000, 
-                scale = TRUE)
+mlt_head <- mlt(ctm_head, data = db, maxit = 5000, scale = TRUE)
 @
-
 Figure~\ref{fig:head-plot} shows the
 data overlaid with quantile curves obtained via inversion of the estimated
 conditional distributions.  The figure very closely reproduces the growth
@@ -1353,13 +1353,14 @@ print(contourplot(p ~ lage + head | cut, data = pr, panel = pfun, region = FALSE
 
 \paragraph{Non-normal Linear Regression: Boston Housing Data (Cont'd)}
 
-Response-varying coefficient model, or distribution regression:
+A response-varying coefficient model, also called distribution regression \citep{Foresi_Peracchi_1995,
+Chernozhukov_2013,Koenker_Leorato_Peracchi_2013}, for the Boston Housing data is 
 \begin{eqnarray*}
 \Prob(\text{medv} \le \ry | \rX = \rx) & = &  
   \Phi\left(\h_\rY(\ry) - \sum_{j = 1}^J \shiftparm_j(\text{medv}) \tilde{\rx}_j\right) \\
 & = & \Phi\left(\bern{6}(\ry)^\top \parm_1 - \sum_{j = 1}^J \bern{6}(\ry)^\top \parm_{j + 1} \tilde{\rx}_j\right)
 \end{eqnarray*}
-with, or other words, using the basis function 
+The model is implemented using the basis function 
 $\basisyx = (\bern{6}^\top \otimes (1, \tilde{\rx}^\top))^\top$. Conditional on $\rx$, the transformation
 function must be monotone increasing for all configurations of the explanatory variables
 (argument \code{sumconstr} in \cmd{cmt}). Because the number of linear constraints is very
@@ -1373,7 +1374,9 @@ logLik(mlt_BHi)
 AIC(mlt_BHi)
 @
 Figure~\ref{fig:Boston-Housing-dr-plot} compares the fitted densities for the linear transformation
-model with constant regression coefficients and this distribution regression model.
+model with constant regression coefficients and this distribution regression model. For some
+observations, the variance of the conditional distribution funtions seems to be smaller in this
+more complex model.
 
 \begin{figure}
 \begin{center}
@@ -1406,45 +1409,44 @@ matplot(Q, tri, ylim = ylim, xlab = "Median Value", ylab = "Density",
 \cite{Mueller_Hothorn_2004} reported data on the number of tree pipits
 \textit{Anthus trivialis}, a small passerine bird, counted on $86$ forest plots at a light gradient
 ranging from open and sunny stands (small cover storey) to dense and dark
-stands (large cover storey).  We modelled the conditional distribution of the
+stands (large cover storey).  We model the conditional distribution of the
 number of tree pipits at one plot given the cover storey at this plot 
 by the transformation
 model $(\Phi, (\basisy^\top \otimes \bernx{4}(\text{cover storey})^\top)^\top,
 \parm)$, where $\basisy(y) = \evec_5(y + 1), y = 0, \dots, 4$; the model
-was fitted under $4 \times 5$ linear constraints. In this
+is fitted under $4 \times 5$ linear constraints. In this
 model for count data, the conditional distribution depends on
 both the number of counted birds and the cover storey and the effect of
-cover storey may change with different numbers of birds observed.  The left
-panel of Figure~\ref{fig:treepipit-plot} depicts the observations and the
-center panel shows the conditional distribution function evaluated for $0,
-\dots, 5$ observed birds.  The conditional distribution function obtained
-from a generalised additive Poisson (GAM) model with smooth mean effect of cover
-storey is given in the right panel.  Despite some overfitting, this model is
-more restrictive than our transformation model because one mean function determines the whole distribution
-(the local minima of the conditional distributions as a function of cover storey were
-constant in the right panel whereas they were shifted towards higher values of
-cover storey in the center panel).
-
+cover storey may change with different numbers of birds observed.  
 <<treepipit, echo = TRUE, cache = TRUE>>=
 data("treepipit", package = "coin")
-
 tmp <- treepipit
 tmp$counts <- ordered(tmp$counts)
 ### we want
 #tmp$counts <- R(tmp$counts)
 #cv <- numeric_var("counts", support = 0:5)
-
-B_cs <- Bernstein_basis(order = 4, 
-    var = numeric_var("coverstorey", support = 1:110))
+B_cs <- Bernstein_basis(var = numeric_var("coverstorey", support = 1:110), 
+                        order = 4)
 B_c <- as.basis(tmp$counts)
-
 ctm_treepipit <- ctm(B_c, interacting = B_cs)
 mlt_treepipit <- mlt(ctm_treepipit, data = tmp, maxit = 10000)
-
+@
+The left
+panel of Figure~\ref{fig:treepipit-plot} depicts the observations and the
+center panel shows the conditional distribution function evaluated for $0,
+\dots, 5$ observed birds.  The conditional distribution function obtained
+from a generalised additive Poisson (GAM) model with smooth mean effect of cover
+storey is given in the right panel  
+<<treepipit-gam>>=
 library("mgcv")
 gam_treepipit <- gam(counts ~ s(coverstorey), data = treepipit, 
                      family = "poisson")
 @
+Despite some overfitting, this model is
+more restrictive than our transformation model because one mean function determines the whole distribution
+(the local minima of the conditional distributions as a function of cover storey are
+constant in the right panel whereas they are shifted towards higher values of
+cover storey in the center panel).
 
 \begin{figure}
 \begin{center}
@@ -1512,7 +1514,7 @@ abline(h = 1, lty = 6)
 \end{figure}
 
 
-\section{Estimating Most Likely Transformations} \label{sec:mlt}
+\section{Most Likely Transformations} \label{sec:mlt}
 
 In this Section we review the underpinnings of the \cmd{mlt} function 
 implementing the \emph{most likely transformation} estimator following
@@ -1617,25 +1619,25 @@ The score contribution of an ``exact continuous''
 observation $\ry = (\ubar{\ry} +
 \bar{\ry})/2$ from an absolutely continuous distribution is approximated by the
 gradient of the log-density
-\begin{eqnarray}
+\begin{eqnarray*}
 \s(\parm | \rY \in (\ubar{\ry}, \bar{\ry}]) \approx
 \frac{\partial \log(\dY(\ry | \parm))}{\partial \parm} & = & 
 \frac{\partial \log(\dZ(\basisy(\ry)^\top \parm))) +
 \log({\basisy^\prime(\ry)}^\top \parm)}{\partial \parm} \nonumber \\
 & = & \basisy(\ry) \frac{\dZ^\prime(\basisy(\ry)^\top \parm)}{\dZ(\basisy(\ry)^\top \parm)}
     + \frac{\basisy^\prime(\ry)}{{\basisy^\prime(\ry)}^\top \parm}. \label{f:s_exact}
-\end{eqnarray}
+\end{eqnarray*}
 For an interval censored or discrete observation $\ubar{\ry}$ and
 $\bar{\ry}$ (the constant terms $\pZ(\basisy(\pm \infty)^\top \parm) =
 \pZ(\pm \infty) = 1$ or $0$ vanish) the score contribution is
-\begin{eqnarray}
+\begin{eqnarray*}
 \s(\parm | \rY \in (\ubar{\ry}, \bar{\ry}]) & = & \frac{\partial \log(\lik(\basisy^\top \parm | \rY \in (\ubar{\ry},
 \bar{\ry}]))}{\partial \parm} \nonumber \\
 & = & \frac{\partial \log(\pZ(\basisy(\bar{\ry})^\top \parm) - \pZ(\basisy(\ubar{\ry})^\top \parm))}{\partial \parm}  \nonumber \\
 & = & \frac{\dZ(\basisy(\bar{\ry})^\top \parm)\basisy(\bar{\ry}) - \dZ(\basisy(\ubar{\ry})^\top
 \parm) \basisy(\ubar{\ry})}{\pZ(\basisy(\bar{\ry})^\top \parm) - \pZ(\basisy(\ubar{\ry})^\top
 \parm)}. \label{f:s_interval}
-\end{eqnarray}
+\end{eqnarray*}
 For a truncated observation, the score function is $\s(\parm | \rY \in
 (\ubar{\ry}, \bar{\ry}]) - \s(\parm | \rY \in (\ry_l, \ry_r])$.
 %\begin{eqnarray*}
@@ -1652,15 +1654,15 @@ projected gradient method implemented in the \code{spg()} function of
 package \pkg{BB} \citep{Varadhan_Gilbert_2009} for maximising this
 log-likelihood.  Starting values are obtained from an estimate of the
 unconditional distribution function $\Prob(\rY \le \ry)$ (for example, the
-empricial cumulative distribtion function or a Turnbull estimator) via a
+empricial cumulative distribtion function, a Kaplan-Meier or Turnbull estimate) via a
 (constrained) linear regression of $Z = \pZ^{-1}(\Prob(\rY \le \ry))$ on the
 design matrix of the transformation model.
 
-\section{Looking at Transformation Models} \label{sec:predict}
+\section{Transformation Analysis} \label{sec:predict}
 
 Based on the maximum likelihood estimator $\hat{\parm}_N$ and the most
-likely transformation is $\hat{\h}_N$, plug-in estimators for the
-distribution and cumulative hazard functions are given by $\hatpY = \pZ
+likely transformation is $\hat{\h}_N$, transformation models can be analysed on different scales.
+Plug-in estimators for the distribution and cumulative hazard functions are given by $\hatpY = \pZ
 \circ \basisy^\top \hat{\parm}_N$ and $\hatHazY = -\log(1 - \hatpY)$.  For a
 continuous model, the density is given by $\hatdY = \dZ \circ \basisy^\top
 \hat{\parm}_N \times {\basisy^\prime}^\top \hat{\parm}_N$ and the 
@@ -1705,13 +1707,11 @@ can be computed very quickly using the tricks described by \cite{Currie_Durban_E
 
 Because the problem of estimating an unknown distribution function is now
 embedded in the maximum likelihood framework, the asymptotic analysis
-benefits from standard results on the asymptotic behaviour of maximum likelihood
-estimators.
-
-The contribution of an ``exact continuous''  observation $\ry$ from an
-absolutely
-continuous distribution to the Fisher information is approximately
-\begin{eqnarray}
+benefits from standard results on the asymptotic behaviour of maximum
+likelihood estimators.  The contribution of an ``exact continuous''
+observation $\ry$ from an absolutely continuous distribution to the Fisher
+information is approximately
+\begin{eqnarray*}
 \mF(\parm | \rY \in (\ubar{\ry}, \bar{\ry}]) & \approx & 
 -\frac{\partial^2 \log(\dY(\ry | \parm))}{\partial \parm
 \partial \parm^\top} \nonumber \\
@@ -1720,12 +1720,12 @@ continuous distribution to the Fisher information is approximately
     \frac{\dZ^{\prime\prime}(\basisy(\ry)^\top \parm)}{\dZ(\basisy(\ry)^\top \parm)}
    -\left[\frac{\dZ^{\prime}(\basisy(\ry)^\top \parm)}{\dZ(\basisy(\ry)^\top \parm)}\right]^2\right\}
    - \frac{\basisy^\prime(\ry){\basisy^\prime(\ry)}^\top}{{(\basisy^\prime(\ry)}^\top\parm)^2}\right) \label{f:F_exact}
-\end{eqnarray}
+\end{eqnarray*}
 (NB: the weight to $\basisy(\ry) \basisy(\ry)^\top$ is constant one for
 $\pZ = \Phi$). 
 For a censored or discrete observation, we have the following
 contribution to the Fisher information
-\begin{eqnarray}
+\begin{eqnarray*}
 \mF(\parm | \rY \in (\ubar{\ry}, \bar{\ry}]) & = & -\frac{\partial^2 \log(\lik(\basisy^\top \parm |
 \rY \in (\ubar{\ry}, \bar{\ry}]))}{\partial \parm \partial \parm^\top} \nonumber \\
 & = & 
@@ -1739,7 +1739,7 @@ contribution to the Fisher information
 & & \left. \qquad      [\dZ(\basisy(\bar{\ry})^\top \parm)\basisy(\bar{\ry})^\top - 
        \dZ(\basisy(\ubar{\ry})^\top \parm) \basisy(\ubar{\ry})^\top]
 \right\}. \nonumber
-\end{eqnarray}
+\end{eqnarray*}
 For a truncated observation, the Fisher information is given by
 $\mF(\parm | \rY \in (\ubar{\ry}, \bar{\ry}]) - \mF(\parm | \rY \in (\ry_l,
 \ry_r])$.
@@ -1773,26 +1773,14 @@ cf <- coef(coxph_GBSG2_1)
 cbind(coxph = sqrt(diag(vcov(coxph_GBSG2_1))),
       mlt = sqrt(diag(vcov(mlt_GBSG2_1)))[names(cf)],
       fss = sqrt(diag(vcov(fss_GBSG2_1)))[names(cf)])
+@
+As a consequence, the corresponding coefficient tables, here produced
+using \cmd{multcomp::cftest} are also rather similar
+<<GBSG2-1-coxph-cmpr-cftest>>=  
 cftest(coxph_GBSG2_1)
 cftest(mlt_GBSG2_1, parm = names(cf))
 cftest(fss_GBSG2_1, parm = names(cf))
 @
-
-%<<GBSG2-2-survreg-cmpr>>=
-%cbind(survreg = sqrt(diag(vcov(survreg_GBSG2_2))[names(cf)]),
-%      phreg = sqrt(diag(vcov(phreg_GBSG2_2))[names(cf)]),
-%      mlt = sqrt(diag(vcov(mlt_GBSG2_2)))[names(cf)])
-%cftest(survreg_GBSG2_2, parm = names(cf))
-%# cftest(mlt_GBSG2_2, parm = names(cf))
-%@
-
-%<<GBSG2-5-cmpr>>=
-%cf <- coef(coxph_GBSG2_5)
-%cbind(coxph = sqrt(diag(vcov(coxph_GBSG2_5))),
-%      mlt = sqrt(diag(vcov(mlt_GBSG2_5)))[names(cf)])
-%cftest(coxph_GBSG2_5)
-%cftest(mlt_GBSG2_5, parm = names(cf))
-%@
 
 \paragraph{Density Estimation: Geyser Data (Cont'd)}
 
@@ -1801,13 +1789,15 @@ is based on the multivariate joint normal distribution of the model coefficients
 $\hat{\parm}_N$. A confidence band for the unconditional transformation function 
 of waiting times is derived from simultaneous confidence intervals for the 
 linear function $\mA \hat{\parm}_N$ as implemented in package \cmd{multcomp}. Here $\mA$ is
-the matrix of Bernstein basis functions evaluated on a grid of waiting times
-$\ry_1, \dots, \ry_K$. 
+the matrix of Bernstein basis functions evaluated on a grid of \code{n} waiting times
+$\ry_1, \dots, \ry_K$. The quantile adjusted for multiplicity is then used
+in a finer grid of \code{ncheat} values for plotting purposes
 <<geyser-w-band>>=
-head(cb_w <- confband(mlt_w, newdata = data.frame(1), ncheat = 100))
+head(cb_w <- confband(mlt_w, newdata = data.frame(1), n = 20, ncheat = 100))
 @
 The result is shown in Figure~\ref{fig:geyser-w-cbplot} on the scale of the
 transformation and distribution function.
+
 
 \begin{figure}
 \begin{center}
@@ -1898,7 +1888,7 @@ for (i in 1:length(new_w)) {
 @
 
 These functions corresponding to log-likelihood ratios less then the $95\%$
-quantile of the $100$ log-likelihood ratios, \ie after removal of extreme
+quantile of the $100$ log-likelihood ratios, \ie after removal of $5$ extreme
 curves, are plotted in Figure~\ref{geyser-w-simulate-plot} and can be
 interpreted as a band around the distribution and density function.  The
 asymptotic band for the distribution function nicely fits the band obtained
