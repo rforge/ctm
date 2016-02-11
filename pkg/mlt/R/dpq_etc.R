@@ -254,8 +254,8 @@ dmlt <- function(object, newdata = object$data, q = NULL, log = FALSE) {
             stopifnot(is.atomic(newdata[[y]]))
             q <- newdata[[y]]
             first <- q == lev[1]
-            qwoK <- factor(lev[pmax(unclass(q) - 1), 1], 
-                           levels = lev, labels = lev)
+            qwoK <- factor(lev[pmax(unclass(q) - 1, 1)], 
+                           levels = lev, labels = lev, ordered = is.ordered(q))
             p <- pmlt(object, newdata = newdata)
             newdata[[y]] <- qwoK
             pwoK <- pmlt(object, newdata = newdata)
@@ -276,6 +276,7 @@ dmlt <- function(object, newdata = object$data, q = NULL, log = FALSE) {
             ret <- matrix(0, nrow = length(first), ncol = NCOL(pfirst))
             ret[!first,] <- pwo1 - pwoK
             ret[first,] <- pfirst
+            rownames(ret) <- as.character(q)
        }
     } else {
 
