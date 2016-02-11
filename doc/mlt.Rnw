@@ -45,7 +45,12 @@ trellis.par.set(list(plot.symbol = list(col=1,pch=20, cex=0.7),
 ltheme <- canonical.theme(color = FALSE)     ## in-built B&W theme
 ltheme$strip.background$col <- "transparent" ## change strip bg
 lattice.options(default.theme = ltheme)
-logLik.phreg <- function(object) object$loglik[2]
+logLik.phreg <- function(object) {
+    ret <- object$loglik[2]
+    attr(ret, "df") <- length(coef(object))
+    class(ret) <- "logLik"
+    ret
+}
 vcov.phreg <- function(object) object$var
 
 knitr::opts_chunk$set(echo = TRUE, results = 'markup', error = FALSE,
@@ -133,21 +138,29 @@ model is introduced. Most probably you will find something not unlike
 \begin{eqnarray*}
 \rY = \alpha + \tilde{\rx}^\top \shiftparm + \varepsilon, \quad \varepsilon \sim \ND(0, \sigma^2)
 \end{eqnarray*}
-where model interpretation relies on $\Ex(\rY | \rX = \rx) = \alpha + \tilde{\rx}^\top \shiftparm$ and
-one estimates the intercept $\alpha$ and the 
-regression parameters $\shiftparm$ by minimisation of the squared error 
-$(\rY - \alpha - \tilde{\rx}^\top \shiftparm)^2$. With some touch-up in notation, the model 
-can be equivalently written as a model for a conditional distribution
+where $\rY$ is an absolutely continuous response, $\tilde{\rx}$ a suitable
+representation of a vector of explanator variables $\rx$ (\eg contrasts
+etc.), $\shiftparm$ a vector of regression coefficients, $\alpha$ an
+intercept term and $\varepsilon$ a normal error term.  Model interpretation
+relies on the conditional expectation $\Ex(\rY | \rX = \rx) = \alpha +
+\tilde{\rx}^\top \shiftparm$ and one estimates the intercept $\alpha$ and
+the regression parameters $\shiftparm$ by minimisation of the squared error
+$(\rY - \alpha - \tilde{\rx}^\top \shiftparm)^2$.  With some touch-up in
+notation, the model can be equivalently written as a model for a conditional
+distribution
 \begin{eqnarray*}
-\Prob(\rY \le \ry | \rX = \rx) = \Phi\left(\frac{\ry - \alpha - \tilde{\rx}^\top \shiftparm}{\sigma}\right) \text{ or } (\rY | \rX = \rx) \sim \ND(\alpha + \tilde{\rx}^\top\shiftparm, \sigma^2).
+\Prob(\rY \le \ry | \rX = \rx) = \Phi\left(\frac{\ry - \alpha - \tilde{\rx}^\top \shiftparm}{\sigma}\right) 
+  \text{ or } (\rY | \rX = \rx) \sim \ND(\alpha + \tilde{\rx}^\top\shiftparm, \sigma^2).
 \end{eqnarray*}
-This little change highlights that the model is, in fact, a model for a
-conditional distribution and not just a model for a conditional mean. It also
-stresses the fact that the variance $\sigma^2$ is a model parameter in its own right. The usual
-treatment of $\sigma^2$ as a nuisance parameter only works when the likelihood 
-is approximated by the density of the normal distribution. Because we always observe
-intervals $(\ubar{\ry}, \bar{\ry}]$ and never real numbers $\ry$, the exact likelihood
-is, as originally \textit{defined} by \cite{Fisher_1934} \citep[another example of the approximation winning over the basic concept][]{Lindsey_1996}
+This formulation highlights that the model is, in fact, a model for a
+conditional distribution and not just a model for a conditional mean.  It
+also stresses the fact that the variance $\sigma^2$ is a model parameter in
+its own right.  The usual treatment of $\sigma^2$ as a nuisance parameter
+only works when the likelihood is approximated by the density of the normal
+distribution.  Because in real life we always observe intervals $(\ubar{\ry}, \bar{\ry}]$
+and never real numbers $\ry$, the exact likelihood is, as originally
+\textit{defined} by \cite{Fisher_1934} \citep[another example of the
+approximation winning over the basic concept, see][]{Lindsey_1996, Lindsey_1999}
 \begin{eqnarray*}
 \Prob(\ubar{\ry} < \rY \le \bar{\ry} | \rX = \rx) = 
 \Phi\left(\frac{\bar{\ry} - \alpha - \tilde{\rx}^\top \shiftparm}{\sigma}\right) - \Phi\left(\frac{\ubar{\ry} - \alpha - \tilde{\rx}^\top \shiftparm}{\sigma}\right)
@@ -170,21 +183,24 @@ $\h_\rY$ we get
 \begin{eqnarray*}
 \Prob(\rY \le \ry | \rX = \rx) = 1 - \exp(-\exp(\h_\rY(\ry) - \tilde{\rx}^\top \tilde{\shiftparm}))
 \end{eqnarray*}
-which is the continuous proportional hazards, or Cox, model. From this point
-of view, the linear and the Cox model are two instances of so-called linear
-transformation models (a misleading name, because the transformation
-$\h_\rY$ is non-linear in the latter case and only the shift $\tilde{\rx}^\top
-\tilde{\shiftparm}$ is linear in $\tilde{\rx}$).  It is now also obvious that the Cox
-model has nothing to do with censoring, let alone survival times $\rY > 0$. 
-It is a model for the conditional distribution of a continuous response
-$\rY \in \RR$ when it is appropriate to assume that the conditional hazard
-function is scaled by $\exp(\tilde{\rx}^\top \tilde{\shiftparm})$.  For both the linear
-and the Cox model, application of the exact likelihood allows the models to
-be fitted to imprecise, or ``censored'', observations $(\ubar{\ry},
-\bar{\ry}]$.
+which is the continuous proportional hazards, or Cox, model (typically
+defined with a positive shift term).  From this point of view, the linear
+and the Cox model are two instances of so-called linear transformation
+models (a misleading name, because the transformation $\h_\rY$ is non-linear
+in the latter case and only the shift $\tilde{\rx}^\top \tilde{\shiftparm}$
+is linear in $\tilde{\rx}$).  It is now also obvious that the Cox model has
+nothing to do with censoring, let alone survival times $\rY > 0$.  It is a
+model for the conditional distribution of a continuous response $\rY \in
+\RR$ when it is appropriate to assume that the conditional hazard function
+is scaled by $\exp(\tilde{\rx}^\top \tilde{\shiftparm})$.  For both the
+linear and the Cox model, application of the exact likelihood allows the
+models to be fitted to imprecise, or ``censored'', observations
+$(\ubar{\ry}, \bar{\ry}]$. The generality of the class of linear transformation
+models comes from the ability to alter $\pZ$ and $\h_\rY$.
 
-The class of linear transformation models is a subclass of conditional 
-transformation models \citep{Hothorn_Kneib_Buehlmann_2014}. In this latter class, the conditional distribution function is 
+The class of linear transformation models is a subclass of conditional
+transformation models \citep{Hothorn_Kneib_Buehlmann_2014}.  In this latter
+class, the conditional distribution function is
 \begin{eqnarray*}
 \Prob(\rY \le \ry | \rX = \rx) = \pZ(\h(\ry | \rx))
 \end{eqnarray*}
@@ -198,6 +214,9 @@ and analysed in \proglang{R} using the \pkg{mlt} add-on package.  Before we
 start looking at details, we illustrate the workflow by means of an example
 from unconditional density estimation.
 
+%% <FIXME> explain that theory is in two other papers and technical stuff
+%% in appendices </FIXME>
+
 \paragraph{Density Estimation: Old Faithful Geyser Data}
 
 The duration of eruptions and the waiting time between eruptions of the Old
@@ -210,7 +229,7 @@ time, the observations were either left-censored (``short'' eruption),
 interval-censored (``medium'' eruption) or right-censored (``long''
 eruption) as explained by \cite{Azzalini_Bowman_1990}.  This fact was widely
 ignored in analyses of the Old Faithful data because most non-parametric
-kernel techniques cannot deal with censoring. We fit the parameters
+density estimators cannot deal with censoring. We fit the parameters
 $\parm$ in the transformation model
 \begin{eqnarray*}
 \Prob(\rY \le \ry) = \Phi(\h(\ry)) = \Phi(\basisy(\ry)^\top \parm)
@@ -218,8 +237,9 @@ $\parm$ in the transformation model
 by maximisation of the exact likelihood as follows. After loading package
 \pkg{mlt} we specify the \code{duration} variable we are interested in
 <<geyser-var, echo = TRUE>>=
-dvar <- numeric_var("duration", support = c(1.0, 5.0), 
-                    add = c(-1, 1), bound = c(0, Inf))
+library("mlt")
+var_d <- numeric_var("duration", support = c(1.0, 5.0), 
+                     add = c(-1, 1), bounds = c(0, Inf))
 @
 This abstract representation refers to a positive and conceptually
 continuous variable \code{duration} and is explained in more detail in Appendix~\ref{app:variables}.  
@@ -227,18 +247,20 @@ We then set-up a basis function
 $\basisy$ for this variable in the interval $[1, 5]$, in our case a monotone
 increasing Bernstein polynomial of order eight
 <<geyser-basis, echo = TRUE>>=
-B_d <- Bernstein_basis(order = 8, var = dvar, ui = "incre")
+B_d <- Bernstein_basis(var = var_d, order = 8, ui = "increasing")
 @
 This and other basis functions are described in Appendix~\ref{app:basefun}.
 The (in our case unconditional) transformation model is now fully defined by
 the parameterisation $\h(\ry) = \basisy(\ry)^\top \parm$ and $\pZ = \Phi$
-which will be discussed in Section~\ref{sec:trafo}
+which will be discussed in Section~\ref{sec:trafo} and is specified using the 
+\cmd{ctm} function as
 <<geyser-ctm, echo = TRUE>>=
 ctm_d <- ctm(response = B_d, todistr = "Normal")
 @
-and we can generate a grid of duration times from
+An equidistant grid of $200$ duration times in the interval \code{support + add} is
+generated by 
 <<geyser-grid, echo = TRUE>>=
-str(ndd <- mkgrid(ctm_d, 200))
+str(nd_d <- mkgrid(ctm_d, 200))
 @
 Only after the model was specified we need to load the data frame containing the
 observations of \code{duration} as a \code{Surv} object: 
@@ -246,39 +268,38 @@ observations of \code{duration} as a \code{Surv} object:
 data("geyser", package = "TH.data")
 head(geyser)
 @
-The most likely transformation (MLT) $\hat{\h}(\ry) = \basisy(\ry)^\top \hat{\parm}$ is 
-now obtained from the maximum likelihood estimate $\hat{\parm}$ computed as
+The most likely transformation (MLT) $\hat{\h}_N(\ry) = \basisy(\ry)^\top \hat{\parm}_N$ is 
+now obtained from the maximum likelihood estimate $\hat{\parm}_N$ computed as
 <<geyser-fit, echo = TRUE>>=
 mlt_d <- mlt(ctm_d, data = geyser)
 logLik(mlt_d)
-coef(mlt_d)
 @
 Details on the estimation procedure will be presented in Section~\ref{sec:mlt}.
 The model is best visualised in terms of the corresponding density
-$\phi(\basisy(\ry)^\top \hat{\parm}) \basisy^\prime(\ry)^\top \hat{\parm}$,
+$\phi(\basisy(\ry)^\top \hat{\parm}_N) \basisy^\prime(\ry)^\top \hat{\parm}_N$,
 extracted from the fitted model as
 <<geyser-density, echo = TRUE>>=
-ndd$d <- predict(mlt_d, newdata = ndd, type = "density")
+nd_d$d <- predict(mlt_d, newdata = nd_d, type = "density")
 @
-Model inspection by various ways at looking at the estimated transformation
-function will by introduced in Section~\ref{sec:predict}.  The result is
-depicted in Figure~\ref{fig:geyser-plot}.  The plot shows the well-known
-bimodal distribution in a nice smooth way.  Several things are quite unusual
-in this short example.  First, the model was specified without reference to
-the actual observations, maybe with the exception of the domain of the
-Bernstein polynomial (Section~\ref{sec:trafo}).  Second, although the model
-is fully parametric, the resulting density resembles a non-parametric
-flexibility.  Third, the exact likelihood as defined by the
+The estimated density is depicted in Figure~\ref{fig:geyser-plot}.  The plot
+shows the well-known bimodal distribution in a nice smooth way.  Several
+things are quite unusual in this short example.  First, the model was
+specified without reference to the actual observations, maybe with the
+exception of the domain of the Bernstein polynomial, and second, although
+the model is fully parametric, the resulting density resembles the
+flexibility of a non-parametric approach (details in
+Section~\ref{sec:trafo}).  Third, the exact likelihood as defined by the
 interval-censored observations, was used to obtain the model
 (Section~\ref{sec:mlt}).  Fourth, inspection of the parameter estimates is
 uninteresting, the model is better looked at by means of the estimated
 distribution, density, quantile, hazard or cumulative hazard functions
 (Section~\ref{sec:predict}).  Fifth, no regularisation was necessary due to
-the monotonicity constraint (implemented as linear constraints for maximum
-likelihood estimation) and thus standard likelihood asymptotics work for
-$\hat{\parm}$ (Section~\ref{sec:asympt}).  Sixth, because the model is a
-model for a full distribution, we can easily draw random samples from the
-model and refit its parameters using the parametric or model-based bootstrap
+the monotonicity constraint on the estimated transformation function
+(implemented as linear constraints for maximum likelihood estimation) and
+thus standard likelihood asymptotics work for $\hat{\parm}$
+(Section~\ref{sec:asympt}).  Sixth, because the model is a model for a full
+distribution, we can easily draw random samples from the model and refit its
+parameters using the parametric or model-based bootstrap
 (Section~\ref{sec:sim}).  Seventh, all of this is not only possible
 theoretically but readily implemented in package \pkg{mlt}.  The only
 remaining question is ``Do all this nice properties carry over to the
@@ -289,7 +310,7 @@ workflow sketched in this section.
 \begin{figure}
 \begin{center}
 <<geyser-plot, echo = FALSE>>=
-plot(d ~ duration, data = ndd, type = "l", ylab = "Density", xlab = "Duration time")
+plot(d ~ duration, data = nd_d, type = "l", ylab = "Density", xlab = "Duration time")
 @
 \caption{Old Faithful Geyser. Estimated density for duration time obtained from
          an unconditional transformation model where the transformation function
@@ -305,12 +326,15 @@ In this section we introduce a cascade of increasingly complex
 transformation models and discuss how one can specify such models using the
 \cmd{ctm} function provided by the \pkg{mlt} package.  The models are fitted
 via maximum likelihood by the \cmd{mlt} function (details are given in
-Section~\ref{sec:mlt}) to studies from different domains.  We start with the
-simplest case of models for unconditional distribution functions.
+Section~\ref{sec:mlt}) to studies from different domains.  Results obtained
+from established implementations of the corresponding models in the
+\proglang{R} universe are used to evaluate the implementation in package
+\pkg{mlt} whenever possible.  We start with the simplest case of models for
+unconditional distribution functions.
 
 \subsection{Unconditional Transformation Models}
 
-The distribution function on an at least ordered response $\rY$ is
+The distribution function on an at least ordered response $\rY \in \samY$ is
 defined in terms of a transformation function $\h$ and a distribution
 function $\pZ$. The transformation function is parameterised in terms
 of a basis function $\basisy$:
@@ -318,7 +342,7 @@ of a basis function $\basisy$:
 \Prob(\rY \le \ry) = \pZ(\h(\ry)) = \pZ(\basisy(\ry)^\top \parm).
 \end{eqnarray*}
 The triple $(\pZ, \basisy, \parm)$ fully defines the distribution of $\rY$ and
-is called transformation model.
+is called \emph{transformation model}.
 The choice of the basis function $\basisy$ depends on the measurement 
 scale of $\rY$ and we can differentiate between the following situations.
 
@@ -341,7 +365,7 @@ $\pY(\ry_k) = \pZ(\eparm_k)$. Note that monotonicity of $\h$ is guaranteed by th
 $K - 2$ linear constraints $\eparm_2 - \eparm_1 > 0, \dots, \eparm_{K -1} -
 \eparm_{K -2} > 0$ when constrained optimisation is performed. The density of
 a nominal variable $\rY$ can be estimated in the very same way because it is
-invariant with respect to the ordering of the levels.
+invariant with respect to the ordering of the levels (see Section~\ref{sec:mlt}).
 
 \paragraph{Categorical Data Analysis: Chinese Health and Family Life Survey}
 
@@ -358,7 +382,7 @@ variables: \code{R\_edu} (level of education of the responding woman),
 \code{R\_health} (health status of the responding woman in the last year) and
 \code{R\_happy} (how happy was the responding woman in the last year).
 We first estimate the unconditional distribution of happiness using a
-proportional odds model \citep[\cmd{polr} from package \pkg{MASS}][]{pkg:MASS}
+proportional odds model \citep[\cmd{polr} from package \pkg{MASS},][]{pkg:MASS}
 <<CHFLS-1>>=
 data("CHFLS", package = "HSAUR3")
 polr_CHFLS_1 <- polr(R_happy ~ 1, data = CHFLS)
@@ -403,18 +427,18 @@ simply is the relative frequency but, as we will see in the rest of this paper, 
 to the conditional case strongly relies on this parameterisation
 <<CHFLS-1-pred>>=
 predict(polr_CHFLS_1, newdata = data.frame(1), type = "prob")
-predict(mlt_CHFLS_1, newdata = data.frame(1), type = "density", q = mkgrid(b_happy)[[1]])
+c(predict(mlt_CHFLS_1, newdata = data.frame(1), type = "density", 
+          q = mkgrid(b_happy)[[1]]))
 xtabs(~ R_happy, data = CHFLS) / nrow(CHFLS)
 @
 
 \subsubsection{Continuous Models for Continuous Responses}
 
 For continuous responses $\rY$ the
-parameterisation $\h(\ry) = \basisy(\ry)^\top \parm$, and thus also
-$\hatpY$, should be smooth in $\ry$, so any polynomial or spline basis is a
+parameterisation $\h(\ry) = \basisy(\ry)^\top \parm$ should be smooth in $\ry$, so any polynomial or spline basis is a
 suitable choice for $\basisy$.  We apply Bernstein polynomials \citep[for an
 overview see][]{Farouki_2012} of order $M$
-($\dimparm = M + 1$) defined on the interval $[\ubar{\imath}, \bar{\imath}]$ with
+(with $M + 1$ parameters) defined on the interval $[\ubar{\imath}, \bar{\imath}]$ with
 \begin{eqnarray*}
 \bern{M}(\ry) & = & (M + 1)^{-1}(f_{\text{Be}(1, M + 1)}(\tilde{\ry}), \dots,
                             f_{\text{Be}(m, M - m + 1)}(\tilde{\ry}), \dots,
@@ -439,28 +463,28 @@ We continue the analysis of the Old Faithful data by estimating the unconditiona
 waiting times, a positive variable those abstract representation can be used to generate
 an equidistant grid of $100$ values
 <<geyser-w>>=
-wvar <- numeric_var("waiting", support = c(40.0, 100), add = c(-5, 15), 
-                    bound = c(0, Inf))
-c(sapply(ndw <- mkgrid(wvar, 100), range))
+var_w <- numeric_var("waiting", support = c(40.0, 100), add = c(-5, 15), 
+                     bounds = c(0, Inf))
+c(sapply(nd_w <- mkgrid(var_w, 100), range))
 @
 A monotone increasing Bernstein polynomial of order $8$ for \code{waiting} is defined as
 <<geyser-bernstein>>=
-B_w <- Bernstein_basis(wvar, order = 8, ui = "increasing")
+B_w <- Bernstein_basis(var_w, order = 8, ui = "increasing")
 @
-The (in again unconditional) transformation model is now fully described by
+The (here again unconditional) transformation model is now fully described by
 the parameterisation $\h(\ry) = \basisy(\ry)^\top \parm$ and $\pZ = \Phi$, the latter 
-choice again being not important)
+choice again being not important for larger $M$)
 <<geyser-w-ctm, echo = TRUE>>=
 ctm_w <- ctm(response = B_w, todistr = "Normal")
 @
-The most likely transformation $\hat{\h}(\ry) = \basisy(\ry)^\top \hat{\parm}$ is 
+The most likely transformation $\hat{\h}_N(\ry) = \basisy(\ry)^\top \hat{\parm}_N$ is 
 now obtained from the maximum likelihood estimate $\hat{\parm}$ computed as
 <<geyser-w-fit, echo = TRUE>>=
 mlt_w <- mlt(ctm_w, data = geyser)
 @
 and we compare the estimated distribution function 
 <<geyser-w-distribution, echo = TRUE>>=
-ndw$d <- predict(mlt_w, newdata = ndw, type = "distribution")
+nd_w$d <- predict(mlt_w, newdata = nd_w, type = "distribution")
 @
 with the empirical cumulative distribution function (the non-parametric maximum likelihood estimator) 
 in the left panel of Figure~\ref{fig:geyser-w-plot}.
@@ -470,17 +494,17 @@ in the left panel of Figure~\ref{fig:geyser-w-plot}.
 <<geyser-w-plot, echo = FALSE, cache = TRUE, fig.width = 6, results = "hide">>=
 layout(matrix(1:2, ncol = 2))
 plot(ecdf(geyser$waiting), col = "grey", xlab = "Waiting times", ylab = "Distribution", 
-     main = "")
-lines(ndw$waiting, ndw$d)
-B_w_40 <- Bernstein_basis(order = 40, var = wvar, ui = "incre")
+     main = "", cex = .75)
+lines(nd_w$waiting, nd_w$d)
+B_w_40 <- Bernstein_basis(order = 40, var = var_w, ui = "incre")
 ctm_w_40 <- ctm(B_w_40, todistr = "Normal")
 mlt_w_40 <- mlt(ctm_w_40, data = geyser)
-ndw$d2 <- predict(mlt_w_40, q = ndw$waiting, type = "distribution")
-lines(ndw$waiting, ndw$d2, lty = 2)
+nd_w$d2 <- predict(mlt_w_40, q = nd_w$waiting, type = "distribution")
+lines(nd_w$waiting, nd_w$d2, lty = 2)
 legend("bottomright", lty = 1:2, legend = c("M = 8", "M = 40"), bty = "n")
-plot(ndw$waiting, predict(mlt_w, q = ndw$waiting, type = "density"), type = "l",
+plot(nd_w$waiting, predict(mlt_w, q = nd_w$waiting, type = "density"), type = "l",
      ylim = c(0, .04), xlab = "Waiting times", ylab = "Density")
-lines(ndw$waiting, predict(mlt_w_40, q = ndw$waiting, type = "density"), lty = 2)
+lines(nd_w$waiting, predict(mlt_w_40, q = nd_w$waiting, type = "density"), lty = 2)
 rug(geyser$waiting, col = rgb(.1, .1, .1, .1))
 @
 \caption{Old Faithful Geyser. Estimated distribution (left, also featuring the empirical
@@ -525,20 +549,22 @@ in Bavaria, Germany, between 2002-01-01 and 2011-12-13. The daily counts range b
 $\Sexpr{min(dvc)}$ and $\Sexpr{max(dvc)}$. A model for the daily number of roe deer-vehicle collision
 using a Bernstein polynomial of order $6$ as basis function is fitted using
 <<dvc>>=
-dvcvar <- numeric_var("dvc", support = min(dvc):max(dvc))
-B_dvc <- Bernstein_basis(dvcvar, order = 6, ui = "increasing")
+var_dvc <- numeric_var("dvc", support = min(dvc):max(dvc))
+B_dvc <- Bernstein_basis(var_dvc, order = 6, ui = "increasing")
 dvc_mlt <- mlt(ctm(B_dvc), data = data.frame(dvc = dvc))
 @
 The discrete distribution function (evaluated for all integers between
-$\Sexpr{min(dvc)}$ and $\Sexpr{max(dvc)}$) along with the distribution 
-function of the Poisson distribution are given in Figure~\ref{fig:dvc-plot}.
-There is clear evidence for overdispersion as the variance of the Poisson
-model is much smaller than the variance estimated by the transformation model.
+$\Sexpr{min(dvc)}$ and $\Sexpr{max(dvc)}$) along with the distribution
+function of the Poisson distribution are given in Figure~\ref{fig:dvc-plot}. 
+The empirical cumulative distribution function is smoothly approximated
+using only seven parameters.  There is clear evidence for overdispersion as
+the variance of the Poisson model is much smaller than the variance
+estimated by the transformation model.
 
 \begin{figure}
 \begin{center}
 <<dvc-plot, echo = FALSE>>=
-q <- support(dvcvar)[[1]]
+q <- support(var_dvc)[[1]]
 p <- predict(dvc_mlt, newdata = data.frame(1), q = q,
              type = "distribution")
 plot(ecdf(dvc), col = "grey", xlab = "Number of Roe Deer-Vehicle Collisions",
@@ -551,7 +577,9 @@ legend(400, .3, pch = c(20, NA, NA), lty = c(NA, 1, 1),
 @
 \caption{Deer-vehicle Collisions. Unconditional distribution 
 of daily number of roe deer-vehicle collisions in Bavaria, Germany,
-between 2002 and 2011. \label{fig:dvc-plot}}
+between 2002 and 2011. Grey circles represent the empirical cumulative
+distribution function, the blue line the unconditional transformation function
+and the red line the Poisson distribution fitted to the data.\label{fig:dvc-plot}}
 \end{center}
 \end{figure}
 
@@ -559,7 +587,7 @@ between 2002 and 2011. \label{fig:dvc-plot}}
 
 In some applications one might not be interested in estimating the whole distribution 
 function $\pY$ for a conceptually absolutely continuous response $\rY$ 
-but in probabilities $\pY(\ry_k)$ for some $\ry_1, \dots, \ry_K$ only. The discrete 
+but in probabilities $\pY(\ry_k)$ for some grid $\ry_1, \dots, \ry_K$ only. The discrete 
 basis function $\h(\ry_k) = \evec_{K - 1}(k)^\top \parm = \eparm_k$ can be used in this
 case. For model estimation, only the discretised observations 
 $\ry \in (\ry_{k - 1}, \ry_k]$ enter the likelihood.
@@ -568,17 +596,17 @@ $\ry \in (\ry_{k - 1}, \ry_k]$ enter the likelihood.
 
 \subsection{Linear Transformation Models} \label{subsec:ltm}
 
-A linear transformation model features a linear shift of a (usually) non-linear transformation
+A linear transformation model features a linear shift of a typically non-linear transformation
 of the response $Y$ and is the simplest form of a regression model in the class of
 conditional transformation models. The conditional distribution function is
 \begin{eqnarray*}
 \Prob(\rY \le \ry | \rX = \rx) = \pZ(\h(\ry | \rx)) = 
-\pZ(\h(\ry) - \tilde{\rx}^\top \shiftparm).
+\pZ(\h_\rY(\ry) - \tilde{\rx}^\top \shiftparm).
 \end{eqnarray*}
-The transformation $\h$, sometimes called ``baseline transformation'' can be parameterised
+The transformation $\h_\rY$, sometimes called ``baseline transformation'' can be parameterised
 as discussed in the unconditional situation:
 \begin{eqnarray*}
-\pZ(\h(\ry) - \tilde{\rx}^\top \shiftparm) = \pZ(\basisy(\ry)^\top \parm_1 - \tilde{\rx}^\top \shiftparm)
+\pZ(\h_\rY(\ry) - \tilde{\rx}^\top \shiftparm) = \pZ(\basisy(\ry)^\top \parm_1 - \tilde{\rx}^\top \shiftparm)
 \end{eqnarray*}
 The connection to more complex models is highlighted by the introduction of a 
 basis function $\basisyx$ being conditional on the explanatory variables $\rx$, \ie
@@ -588,7 +616,9 @@ basis function $\basisyx$ being conditional on the explanatory variables $\rx$, 
 The definition of a linear transformation model only requires the basis $\basisy$, 
 the explanatory variables $\rx$ and a distribution $\pZ$. The latter choice is now important,
 as additivity of the linear predictor is assumed on the scale of $\pZ$. It is convenient to
-supply negative linear predictors as $\Ex(\h(\rY) | \rX = \rx) = \tilde{\rx}^\top \shiftparm$.
+supply negative linear predictors as $\Ex(\h_\rY(\rY) | \rX = \rx) = \tilde{\rx}^\top \shiftparm$.
+One exception is the Cox model with positive shift and $\Ex(\h_\rY(\rY) | \rX = \rx) = -\tilde{\rx}^\top \shiftparm$. 
+Large positive values of the linear predictor correspond to low expected survival times and thus a high risk.
 
 \subsubsection{Discrete Response}
 
@@ -597,17 +627,17 @@ age and income on happiness in a proportional odds model, here fitted using \cmd
 <<CHFLS-2, cache = TRUE>>=
 polr_CHFLS_2 <- polr(R_happy ~ R_age + R_income, data = CHFLS)
 @
-In addition to the basis function for happiness (\code{b\_happy}) we need to 
-set-up the basis function for a negative linear predictor without intercept (which is already
-included in \code{b\_happy})
+In order to fit the model using the \pkg{mlt} package, we need to 
+set-up the basis function for a negative linear predictor without intercept 
+in addition to the basis function for happiness (\code{b\_happy})
 <<CHFLS-2-base>>=
 b_R <- as.basis(~ R_age + R_income, data = CHFLS, remove_intercept = TRUE, 
-                   negative = TRUE)
+                negative = TRUE)
 @
 The model is now defined by two basis functions, one of the response and one for the
 shift in addition to $\pZ$ and fitted using the \cmd{mlt} function
 <<CHFLS-2-ctm>>=
-ctm_CHFLS_2 <- ctm(response = b_happy, shift = b_R, todist = "Logistic")
+ctm_CHFLS_2 <- ctm(response = b_happy, shifting = b_R, todistr = "Logistic")
 mlt_CHFLS_2 <- mlt(ctm_CHFLS_2, data = CHFLS, scale = TRUE)
 @
 Again, the results of \cmd{polr} and \cmd{mlt} are equivalent
@@ -636,33 +666,37 @@ control group of $440$ women did not receive hormonal therapy.  Additional
 variables include age, menopausal status, tumor size, tumor grade, number of
 positive lymph nodes, progesterone receptor and estrogen receptor.  The
 right-censored recurrence-free survival time is the response variable of
-interest
+interest, \ie a positive continuous variable
 <<GBSG2-1, echo = TRUE>>=
 data("GBSG2", package = "TH.data")
-GBSG2$y <- with(GBSG2, Surv(time, cens))
 GBSG2y <- numeric_var("y", support = c(100.0, max(GBSG2$time)), bounds = c(0, Inf))
+GBSG2$y <- with(GBSG2, Surv(time, cens))
 @
-
 We start with the Cox model $(\pMEV, (\bern{10}^\top,
-\tilde{\rx}^\top)^\top, \parm)$, where $\tilde{\rx}$ contains the treatment
+\tilde{\rx}^\top)^\top, (\parm_1^\top, \shiftparm^\top)^\top)$, where $\tilde{\rx}$ contains the treatment
 indicator and all other explanatory variables in the transformation function
 $\h(\ry | \rx) = \bern{10}(\ry)^\top \parm_1 + \tilde{\rx}^\top \shiftparm$
-(the positive shift being in line with the implementation in \cmd{coxph})
+(the positive shift being in line with the implementation in \cmd{coxph} in package \pkg{survival})
 <<GBSG2-1-Cox>>=
 B_GBSG2y <- Bernstein_basis(var = GBSG2y, order = 10, ui = "increasing")
 fm_GBSG2 <- Surv(time, cens) ~ horTh + age + menostat + tsize + tgrade +
                                pnodes + progrec + estrec
-ctm_GBSG2_1 <- ctm(B_GBSG2y, shift = fm_GBSG2[-2L], 
-                   todistr = "MinExtrVal", data = GBSG2)
+ctm_GBSG2_1 <- ctm(B_GBSG2y, shifting = fm_GBSG2[-2L], data = GBSG2,
+                   todistr = "MinExtrVal")
 @
 The distribution function $\pZ$ is the distribution function of the minimum
-extreme value distribution.
+extreme value distribution. The specification of the right-hand side of the
+formula as argument \code{shifting} along with the data (argument \code{data})
+is equivalent to a basis function
+<<GBSG2-1-xbasis, eval = FALSE>>=
+as.basis(fm_GBSG2[-2L], data = GBSG2, remove_intercept)
+@
 
 In contrast to the classical Cox model where only $\shiftparm$ is estimated
-by the partial likelihood, we estimate all model parameters simultaneously
-under ten linear constraints
+by the partial likelihood, we estimate all model parameters $(\parm_1^\top, \shiftparm^\top)$ simultaneously
+under ten linear constraints, here with at most $3000$ iterations (argument to \cmd{BB::spg})
 <<GBSG2-1-mlt>>=
-system.time(mlt_GBSG2_1 <- mlt(ctm_GBSG2_1, data = GBSG2, maxit = 3000, scale = TRUE))
+mlt_GBSG2_1 <- mlt(ctm_GBSG2_1, data = GBSG2, maxit = 3000, scale = TRUE)
 @
 The results obtained for $\shiftparm$ from
 the partial and the exact log-likelihood are practically equivalent
@@ -672,20 +706,16 @@ cf <- coef(coxph_GBSG2_1)
 cbind(coxph = cf, mlt = coef(mlt_GBSG2_1)[names(cf)])
 @
 A comparison with the \cite{Royston_Parmar_2002} spline model as implemented in the
-\pkg{flexsurv} package \cite{pkg:flexsurv} shows that the two spline parameterisations
-of the log cumulative hazard function are practically equivalent (see Figure~\ref{GBSG2-1-fss-plot} also), although
-\cmd{mlt} is ten times faster than \cmd{flexsurvspline} for this simple Cox model
+\pkg{flexsurv} package \citep{pkg:flexsurv} shows that the two spline parameterisations
+of the log cumulative hazard function are practically equivalent (see Figure~\ref{GBSG2-1-fss-plot} also)
 <<GBSG2-1-fss, cache = TRUE>>=
-system.time(fss_GBSG2_1 <- flexsurvspline(fm_GBSG2, data = GBSG2, scale = "hazard", k = 9,
-                              bknots = log(support(GBSG2y)$y)))
+fss_GBSG2_1 <- flexsurvspline(fm_GBSG2, data = GBSG2, scale = "hazard", k = 9,
+                              bknots = log(support(GBSG2y)$y))
 logLik(fss_GBSG2_1)
 logLik(mlt_GBSG2_1)
 cbind(coxph = cf, mlt = coef(mlt_GBSG2_1)[names(cf)],
       fss = coef(fss_GBSG2_1)[names(cf)])
-diag(vcov(mlt_GBSG2_1))[names(cf)]
-diag(vcov(fss_GBSG2_1))[names(cf)]
 @
-
 
 \begin{figure}
 \begin{center}
@@ -705,31 +735,34 @@ legend("topright", lty = 1:2, legend = c("flexsurvspline", "mlt"), bty = "n")
 \end{figure}
 
 
-
-
 Accelerated Failure Time (AFT) models arise when one restricts the 
-baseline transformation $\h(ry)$ to a possibly scaled log-transformation. With
-$\h(\ry) = \log(\ry)$ and $\pZ = \pMEV$ the exponential AFT model arises
+baseline transformation $\h_\rY(\ry)$ to a possibly scaled log-transformation. With
+$\h_\rY(\ry) = \log(\ry)$ and $\pZ = \pMEV$ the exponential AFT model arises
 which can be specified as the Cox model above, only the Bernstein basis for time 
-needs to be replaced with a log-transformation
+needs to be replaced with a log-transformation and the corresponding parameter is restricted
+to one in the estimation
 <<GBSG2-2>>=
 ly <- log_basis(GBSG2y, ui = "increasing")
-ctm_GBSG2_2 <- ctm(ly, shift = as.basis(fm_GBSG2[-2L], data = GBSG2, negative = TRUE), todistr = "MinExtrVal")
-mlt_GBSG2_2 <- mlt(ctm_GBSG2_2, data = GBSG2, fixed = c("log(y)" = 1), scale = TRUE)
+ctm_GBSG2_2 <- ctm(ly, shifting = fm_GBSG2[-2L], data = GBSG2, 
+                   negative = TRUE, todistr = "MinExtrVal")
+mlt_GBSG2_2 <- mlt(ctm_GBSG2_2, data = GBSG2, fixed = c("log(y)" = 1), 
+                   scale = TRUE)
 @
-The \cmd{survreg} and \cmd{phreg} functions fit the same model, the results
-are again equivalent
+The \cmd{survreg} (package \pkg{survival}) and \cmd{phreg} (package \pkg{eha}) functions 
+fit the same model, the results are again equivalent up to the sign of the regression 
+coefficients
 <<GBSG2-2-exp>>=
 survreg_GBSG2_2 <- survreg(fm_GBSG2, data = GBSG2, dist = "exponential")
-phreg_GBSG2_2 <- phreg(fm_GBSG2, data = GBSG2, dist = "weibull", shape = 1)
+phreg_GBSG2_2 <- phreg(fm_GBSG2, data = GBSG2, dist = "weibull", 
+                       shape = 1)
 logLik(mlt_GBSG2_2)
 logLik(survreg_GBSG2_2)
 logLik(phreg_GBSG2_2)
 cbind(survreg = coef(survreg_GBSG2_2)[names(cf)], 
-      phreg = coef(phreg_GBSG2_2)[names(cf)], 
+      phreg = -coef(phreg_GBSG2_2)[names(cf)], 
       mlt = coef(mlt_GBSG2_2)[names(cf)])
 @
-If we allow for a scaled log-transformation $\h(\ry) = \eparm_1 \log(\ry)$, the Weibull
+If we allow for a scaled log-transformation $\h_\rY(\ry) = \eparm_1 \log(\ry)$, the Weibull
 AFT model is fitted by \cmd{mlt}, \cmd{survreg} and \cmd{phreg} using
 <<GBSG2-3>>=
 mlt_GBSG2_3 <- mlt(ctm_GBSG2_2, data = GBSG2, scale = TRUE)
@@ -739,7 +772,7 @@ logLik(mlt_GBSG2_3)
 logLik(survreg_GBSG2_3)
 logLik(phreg_GBSG2_3)
 cbind(survreg = coef(survreg_GBSG2_3)[names(cf)] / survreg_GBSG2_3$scale, 
-      phreg = coef(phreg_GBSG2_3)[names(cf)], 
+      phreg = - coef(phreg_GBSG2_3)[names(cf)], 
       mlt = coef(mlt_GBSG2_3)[names(cf)])
 @
 
@@ -752,46 +785,50 @@ Assuming a conditional normal distribution for the
 median value of owner-occupied homes (medv, in USD $1000$'s, we use the corrected version) 
 in the normal linear model with constant variance
 \begin{eqnarray*}
-\text{medv} | \rX = \rx \sim \ND(\tilde{x}^\top \shiftparm, \sigma^2)
+\text{medv} | \rX = \rx \sim \ND(\tilde{\rx}^\top \shiftparm, \sigma^2)
 \end{eqnarray*}
-is rather restrictive. We relax the model formulation without sacrificing
+is rather restrictive
+<<BostonHousing-lm>>=
+data("BostonHousing2", package = "mlbench")
+lm_BH <- lm(cmedv ~ crim + zn + indus + chas + nox + rm + age + 
+    dis + rad + tax + ptratio + b + lstat, data = BostonHousing2)
+@
+We relax the model formulation without sacrificing
 the simplicity of a linear predictor of the explanatory variables
 in the linear transformation model
 \begin{eqnarray*}
-\Prob(\text{medv} \le \ry | \rX = \rx) = \Phi(\h(\ry) - \tilde{\rx}^\top \shiftparm)
+\Prob(\text{medv} \le \ry | \rX = \rx) = \Phi(\h_\rY(\ry) - \tilde{\rx}^\top \shiftparm)
 = \Phi(\bern{6}(\ry)^\top \parm_1 - \tilde{\rx}^\top \shiftparm)
 \end{eqnarray*}
 and estimate \emph{all} model parameters $(\parm_1, \beta)$ simulaneously, \ie both the
 regression coefficients \emph{and} the error distribution. Because it is 
-sraightforward to evaluate the conditional distribution function, the likelihood
+straightforward to evaluate the conditional distribution function, the likelihood
 can deal with right-censored medv observations ($\ge 50$). This censoring
 was mostly ignored in other parametric or non-parametric analyses of this data set.
 
 We start with a suitable definition of median value of owner-occupied homes,
 set-up a \code{Surv} object for this response and a model formula
-<<BostonHousing>>=
-data("BostonHousing2", package = "mlbench")
-lm_BH <- lm(cmedv ~ crim + zn + indus + chas + nox + rm + age + 
-    dis + rad + tax + ptratio + b + lstat, data = BostonHousing2)
+<<BostonHousing-mlt>>=
 BostonHousing2$medvc <- with(BostonHousing2, Surv(cmedv, cmedv < 50))
-mvar <- numeric_var("medvc", support = c(10.0, 40.0), bounds = c(0, Inf))
+var_m <- numeric_var("medvc", support = c(10.0, 40.0), bounds = c(0, Inf))
 fm_BH <- medvc ~ crim + zn + indus + chas + nox + rm + age + 
     dis + rad + tax + ptratio + b + lstat
 @
 We are interested in a possibly non-linear transformation of the response
 and use a Bernstein polynomial of order $6$. The conditional transformation
 model is now given by this transformation of the response, a linear predictor
-of the explanatory variables the model and the normal probability function; the \cmd{mlt}
+of the explanatory variables the model and the normal distribution function; the \cmd{mlt}
 function fits the model to the data
 <<BostonHousing-ctm>>=
-B_m <- Bernstein_basis(mvar, order = 6, ui = "increasing")
+B_m <- Bernstein_basis(var_m, order = 6, ui = "increasing")
 ctm_BH <- ctm(B_m, shift = fm_BH[-2L], data = BostonHousing2, 
               todistr = "Normal")
 mlt_BH <- mlt(ctm_BH, data = BostonHousing2, scale = TRUE)
 @
 The model can be compared with a normal linear model (fitted by \cmd{lm}) on the
 scale of the fitted conditional distribution functions. Figure~\ref{fig:BostonHousing-plot}
-shows the fitted values, \ie the linear predictor for each observation, and the observed response
+shows the fitted values, \ie the linear predictor $\tilde{\rx}_i^\top \hat{\shiftparm}_N$ 
+for each observation, and the observed response
 overlayed with the conditional distribution function for the corresponding observations.
 For the normal linear model, the fit seems appropriate for observations with linear predictor 
 less than $30$. For larger values, the linear predictor underestimates the observations.
@@ -878,8 +915,8 @@ tr_PSID1976 <- truncreg(fm_PSID1976, data = PSID1976_0)
 
 We use the \cmd{R} function (see Appendix~\ref{subapp:R}) to
 specify left-truncation at zero, set-up a linear transformation
-function for the response (we want to stay within the normal family)
-and a shift term
+function with positive slope for the response (we want to stay within 
+the normal family) and a shift term
 <<PSID1976-mlt>>=
 PSID1976_0$hours <- R(PSID1976_0$hours, tleft = 0)
 b_hours <- as.basis(~ hours, data = PSID1976, 
@@ -889,21 +926,21 @@ ctm_PSID1976_1 <- ctm(b_hours, shift = fm_PSID1976[-2L],
 mlt_PSID1976_1 <- mlt(ctm_PSID1976_1, data = PSID1976_0, 
     scale = TRUE)
 @
-The \cmd{mlt} function does a slightly better job at maximising the likelihood which explains
-the differences in the estimated coefficients:
+The \cmd{mlt} function does a slightly better job at maximising the likelihood 
+than \cmd{truncreg} which explains the differences in the estimated coefficients
 <<PSID1976-cmpr>>=
 logLik(tr_PSID1976)
 logLik(mlt_PSID1976_1)
 cf <- coef(mlt_PSID1976_1)
 cbind(truncreg = coef(tr_PSID1976),
-      mlt = c(-cf[-grep("hours", names(cf))] / cf["hours"], 1 / cf["hours"]))
+      mlt = c(-cf[-grep("hours", names(cf))], 1) / cf["hours"])
 @
 Of course, we might want to question the normal assumption by allowing a potentially
 non-linear transformation function
 <<PSID1976-mlt-ctm>>=
-hvar <- numeric_var("hours", support = range(PSID1976_0$hours$exact),
-                    bounds = c(0, Inf))
-B_hours <- Bernstein_basis(hvar, order = 6, ui = "increasing")
+var_h <- numeric_var("hours", support = range(PSID1976_0$hours$exact),
+                     bounds = c(0, Inf))
+B_hours <- Bernstein_basis(var_h, order = 6, ui = "increasing")
 ctm_PSID1976_2 <- ctm(B_hours, shift = fm_PSID1976[-2L], 
     data = PSID1976_0, todistr = "Normal")
 mlt_PSID1976_2 <- mlt(ctm_PSID1976_2, data = PSID1976_0, 
@@ -922,7 +959,7 @@ regression coefficients are constant across strata. The model then
 reads
 \begin{eqnarray*}
 \Prob(\rY \le \ry | \text{stratum} = s, \rX = \rx) = \pZ(\h(\ry | s, \rx)) =
-\pZ(\h(\ry | s) - \rx^\top \shiftparm) = \pZ(\basisyx(\ry, s, \rx)^\top \parm)
+\pZ(\h_\rY(\ry | s) - \tilde{\rx}^\top \shiftparm) = \pZ(\basisyx(\ry, s, \rx)^\top \parm)
 \end{eqnarray*}
 with basis function $\basisyx = (\basisy^\top \otimes
 \basisx_\text{stratum}^\top, -\basisx_\text{shift}^\top)^\top$.  The basis
@@ -944,20 +981,20 @@ ctm_CHFLS_3 <- ctm(b_happy, interacting = b_health, todist = "Logistic")
 mlt_CHFLS_3 <- mlt(ctm_CHFLS_3, data = CHFLS, scale = TRUE,
                    maxit = 5000)
 logLik(mlt_CHFLS_3)
-predict(mlt_CHFLS_3, newdata = data.frame(R_health = sort(unique(CHFLS$R_health))), 
-        q = sort(unique(CHFLS$R_happy)), type = "distribution")
+predict(mlt_CHFLS_3, newdata = mkgrid(mlt_CHFLS_3), type = "distribution")
 @
 There is a clear tendency of people being happier with better health. We now `adjust'
 for age and income
 <<CHFLS-4, cache = TRUE>>=
-ctm_CHFLS_4 <- ctm(b_happy, interacting = b_health, shift = b_R, todist = "Logistic")
+ctm_CHFLS_4 <- ctm(b_happy, interacting = b_health, shifting = b_R, 
+                   todist = "Logistic")
 mlt_CHFLS_4 <- mlt(ctm_CHFLS_4, data = CHFLS, scale = TRUE)
 coef(mlt_CHFLS_4)[c("R_age", "R_income")]
 @
 Because the shift basis \code{b\_R} is negative, the effects of both age and income 
 on the happiness distribution are towards larger values of happiness, \ie older and richer
-people are happier for all health levels (this, of course, due to the restrictive model
-not allowing for interactions between health and the other two variables).
+people are happier for all health levels (this is, of course, due to the restrictive model
+not allowing interactions between health and the other two variables).
 
 \subsubsection{Continuous Response}
 
@@ -1018,7 +1055,7 @@ estimating a constant age effect in the model
 
 <<GBSG2-5>>=
 ctm_GBSG2_5 <- ctm(B_GBSG2y, interacting = b_horTh, shifting = ~ age, 
-    data = GBSG2, todistr = "MinExtrVal")
+                   data = GBSG2, todistr = "MinExtrVal")
 mlt_GBSG2_5 <- mlt(ctm_GBSG2_5, data = GBSG2, scale = TRUE)
 coxph_GBSG2_5 <- coxph(Surv(time, cens) ~ age + strata(horTh), data = GBSG2)
 cf <- coef(coxph_GBSG2_5)
@@ -1127,8 +1164,8 @@ log-hazard ratio of hormonal therapy.
 
 <<GBSG2-6>>=
 B_GBSG2y_5 <- Bernstein_basis(var = GBSG2y, order = 5, ui = "incre")
-ctm_GBSG2_6 <- ctm(B_GBSG2y_5, shift = ~ horTh, data = GBSG2, 
-    todistr = "MinExtrVal")
+ctm_GBSG2_6 <- ctm(B_GBSG2y_5, shifting = ~ horTh, data = GBSG2, 
+                   todistr = "MinExtrVal")
 mlt_GBSG2_6 <- mlt(ctm_GBSG2_6, data = GBSG2)
 @
 
@@ -1319,7 +1356,7 @@ print(contourplot(p ~ lage + head | cut, data = pr, panel = pfun, region = FALSE
 Response-varying coefficient model, or distribution regression:
 \begin{eqnarray*}
 \Prob(\text{medv} \le \ry | \rX = \rx) & = &  
-  \Phi\left(\h(\ry) - \sum_{j = 1}^J \shiftparm_j(\text{medv}) \tilde{\rx}_j\right) \\
+  \Phi\left(\h_\rY(\ry) - \sum_{j = 1}^J \shiftparm_j(\text{medv}) \tilde{\rx}_j\right) \\
 & = & \Phi\left(\bern{6}(\ry)^\top \parm_1 - \sum_{j = 1}^J \bern{6}(\ry)^\top \parm_{j + 1} \tilde{\rx}_j\right)
 \end{eqnarray*}
 with, or other words, using the basis function 
@@ -1341,7 +1378,7 @@ model with constant regression coefficients and this distribution regression mod
 \begin{figure}
 \begin{center}
 <<Boston-Housing-dr-plot, echo = FALSE, fig.width = 6>>=
-q <- mkgrid(mvar, 100)[[1]]
+q <- mkgrid(var_m, 100)[[1]]
 tr <- predict(mlt_BH, newdata = BostonHousing2[, all.vars(fm_BH[-2L])],
               q = q, type = "density")
 tri <- predict(mlt_BHi, newdata = BostonHousing2[, all.vars(fm_BH[-2L])],
@@ -1847,7 +1884,7 @@ llr <- numeric(length(new_w))
 pdist <- vector(mode = "list", length = length(new_w))
 pdens <- vector(mode = "list", length = length(new_w))
 ngeyser <- geyser
-q <- mkgrid(wvar, 100)[[1]]
+q <- mkgrid(var_w, 100)[[1]]
 for (i in 1:length(new_w)) {
     ngeyser$waiting <- new_w[[i]]
     mlt_i <- mlt(ctm_w, data = ngeyser, scale = TRUE, 
@@ -2045,7 +2082,7 @@ For some positive variable $x$ we want to deal with the polynomial
 $\alpha + \beta_1 x + \beta_3 x^3$ and first set-up a variable description
 (see Appendix~\ref{app:variables}) and the basis function
 <<basefun-polynom>>=
-xvar <- numeric_var("x", support = c(0.1, pi), bound = c(0, Inf))
+xvar <- numeric_var("x", support = c(0.1, pi), bounds= c(0, Inf))
 x <- as.data.frame(mkgrid(xvar, n = 20))
 ### set-up basis of order 3 ommiting the quadratic term
 class(pb <- polynomial_basis(xvar, coef = c(TRUE, TRUE, FALSE, TRUE)))
