@@ -1,7 +1,7 @@
 
 ctm <- function(response, interacting = NULL, shifting = NULL, data = NULL,
                 todistr = c("Normal", "Logistic", "MinExtrVal"),
-                sumconstr = inherits(interacting, c("formula", "formula_basis"))) {
+                sumconstr = inherits(interacting, c("formula", "formula_basis")), ...) {
 
     ### mkgrid() will not work if data is missing
     if (.is.formula(response)) 
@@ -9,7 +9,7 @@ ctm <- function(response, interacting = NULL, shifting = NULL, data = NULL,
     if (.is.formula(interacting)) 
         interacting <- as.basis(interacting, data = data)
     if (.is.formula(shifting)) 
-        shifting <- as.basis(shifting, data = data, remove_intercept = TRUE)
+        shifting <- as.basis(shifting, data = data, remove_intercept = TRUE, ...)
 
     if (is.character(todistr))
         todistr <- .distr(todistr)
