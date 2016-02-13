@@ -63,7 +63,8 @@ Loading required package: variables
 > lines(survfit(cph, newdata = data.frame(g = gf[3])))
 > 
 > ### h = c(log, bernstein)
-> lb <- log_basis(numeric_var("y", support = c(.Machine$double.eps, max(y))), ui = "increasing")
+> lb <- log_basis(numeric_var("y", support = c(.Machine$double.eps, max(y))), 
++                 ui = "increasing", remove_intercept = TRUE)
 > m <- ctm(response = c(blog = lb, bBern = Bb), shifting = s, todist = "MinExtrVal")
 > (cf1 <- coef(opt <- mlt(m, data = mydata)))
       log(y)       Bs1(y)       Bs2(y)       Bs3(y)       Bs4(y)       Bs5(y) 
@@ -161,4 +162,4 @@ There were 14 warnings (use warnings() to see them)
 > 
 > proc.time()
    user  system elapsed 
-  8.916   0.052   8.960 
+  9.888   0.060   9.944 

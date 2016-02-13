@@ -17,7 +17,8 @@ mydata <- data.frame(y = y, g = g)
 
 boxplot(y ~ g, data = mydata)
 
-Bb <- log_basis(numeric_var("y", support = range(y)), ui = "increasing")
+Bb <- log_basis(numeric_var("y", support = range(y)), ui = "increasing",
+                remove_intercept = TRUE)
 Bx <- as.basis(~ g, data = mydata)
 m <- ctm(Bb, shifting = Bx, todist = "MinExtrVal")
 
@@ -144,7 +145,8 @@ mydata <- data.frame(y = y, g = g)
 
 boxplot(y ~ g, data = mydata)
 
-Bb <- log_basis(numeric_var("y", support = range(y)), ui = "increasing")
+Bb <- log_basis(numeric_var("y", support = range(y)), ui = "increasing", 
+                remove_intercept = TRUE)
 Bx <- as.basis(~ g, data = mydata)
 m <- ctm(Bb, shifting = Bx, todist = "MinExtrVal")
 

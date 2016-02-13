@@ -8,7 +8,7 @@
 }
 \usage{
 log_basis(var, ui = c("none", "increasing", "decreasing"),
-          remove_intercept = TRUE)
+          remove_intercept = FALSE)
 }
 \arguments{
   \item{var}{a \code{\link[variables]{numeric_var}} object}
@@ -29,7 +29,7 @@ log_basis(var, ui = c("none", "increasing", "decreasing"),
   ### generate data + coefficients
   x <- as.data.frame(mkgrid(lb, n = 100))
 
-  ### 2 * log(x) 
-  max(abs(predict(lb, newdata = x, coef = 2) - 2 * log(x$x)))
+  ### 1 + 2 * log(x) 
+  max(abs(predict(lb, newdata = x, coef = c(1, 2)) - (1 + 2 * log(x$x))))
 
 }

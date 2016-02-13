@@ -23,7 +23,7 @@
   ### set-up Bernstein and log basis functions
   xv <- numeric_var("x", support = c(1, pi))
   bb <- Bernstein_basis(xv, order = 3, ui = "increasing")
-  lb <- log_basis(xv)
+  lb <- log_basis(xv, remove_intercept = TRUE)
   
   ### join them
   blb <- c(bern = bb, log = lb)

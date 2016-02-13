@@ -1,6 +1,6 @@
 
 log_basis <- function(var, ui = c("none", "increasing", "decreasing"), 
-                      remove_intercept = TRUE) {
+                      remove_intercept = FALSE) {
 
     stopifnot(inherits(var, "numeric_var"))
     varname <- variable.names(var)

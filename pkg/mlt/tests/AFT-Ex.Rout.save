@@ -37,7 +37,8 @@ Loading required package: survival
 > 
 > boxplot(y ~ g, data = mydata)
 > 
-> Bb <- log_basis(numeric_var("y", support = range(y)), ui = "increasing")
+> Bb <- log_basis(numeric_var("y", support = range(y)), ui = "increasing",
++                 remove_intercept = TRUE)
 > Bx <- as.basis(~ g, data = mydata)
 > m <- ctm(Bb, shifting = Bx, todist = "MinExtrVal")
 > 
@@ -233,7 +234,8 @@ Error in phreg(y ~ g, data = mydata, dist = "weibull", shape = 1) :
 > 
 > boxplot(y ~ g, data = mydata)
 > 
-> Bb <- log_basis(numeric_var("y", support = range(y)), ui = "increasing")
+> Bb <- log_basis(numeric_var("y", support = range(y)), ui = "increasing", 
++                 remove_intercept = TRUE)
 > Bx <- as.basis(~ g, data = mydata)
 > m <- ctm(Bb, shifting = Bx, todist = "MinExtrVal")
 > 
@@ -392,4 +394,4 @@ log(shape)
 > 
 > proc.time()
    user  system elapsed 
-  1.572   0.048   1.617 
+  1.740   0.072   1.807 

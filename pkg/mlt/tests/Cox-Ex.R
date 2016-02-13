@@ -38,7 +38,8 @@ plot(yn, a[,3], type = "l", col = "red", ylim = c(0, 1))
 lines(survfit(cph, newdata = data.frame(g = gf[3])))
 
 ### h = c(log, bernstein)
-lb <- log_basis(numeric_var("y", support = c(.Machine$double.eps, max(y))), ui = "increasing")
+lb <- log_basis(numeric_var("y", support = c(.Machine$double.eps, max(y))), 
+                ui = "increasing", remove_intercept = TRUE)
 m <- ctm(response = c(blog = lb, bBern = Bb), shifting = s, todist = "MinExtrVal")
 (cf1 <- coef(opt <- mlt(m, data = mydata)))
 ## sample from this model
