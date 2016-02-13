@@ -1656,7 +1656,10 @@ log-likelihood.  Starting values are obtained from an estimate of the
 unconditional distribution function $\Prob(\rY \le \ry)$ (for example, the
 empricial cumulative distribtion function, a Kaplan-Meier or Turnbull estimate) via a
 (constrained) linear regression of $Z = \pZ^{-1}(\Prob(\rY \le \ry))$ on the
-design matrix of the transformation model.
+design matrix of the transformation model. Optionally, columns of the
+underlying model matrices are scaled to $[-1, 1]$ (argument \code{scale = TRUE}
+to \cmd{mlt}) which leads to considerable faster optimisation in many cases.
+
 
 \section{Transformation Analysis} \label{sec:predict}
 
@@ -2339,7 +2342,7 @@ lines(sort(d$grid), d$dest[order(d$grid)], lty = 3)
 legend("topright", lty = 1:3, bty = "n", 
        legend = c("True", "Approximated", "Estimated"))
 @
-\caption{$chi^2_{20}$ Data. Density of a $\chi^2_{20}$ (true), 
+\caption{$\chi^2_{20}$ Data. Density of a $\chi^2_{20}$ (true), 
          an approximating unconditional transformation model and
          the density fitted to a sample from the approximating model.
          \label{fig:mlt-chi-plot}}
@@ -2402,7 +2405,7 @@ cat(basefun, sep = "\n", file = "packages.bib", append = TRUE)
 A reference implementation of most likely transformation models is available
 in the \pkg{mlt} package \citep{pkg:mlt}. 
 
-<<sessionInfo, echo = FALSE>>=
+<<sessionInfo, echo = FALSE, results = "hide">>=
 sessionInfo()
 @
 
