@@ -67,7 +67,7 @@ sltm <- function(formula, data, subset, weights, na.action = na.omit,
         if (is.null(match.call()$trafo)) trafo <- "Bernstein"
         trafo <- match.arg(trafo, several.ok = TRUE)
         rtrafo <- lapply(trafo, function(tr) switch(tr, 
-            "fixed log" = log_basis(ui = "increasing", var = response),
+            "fixed log" = log_basis(ui = "increasing", var = response, remove_intercept = TRUE),
             "log" = log_basis(ui = "increasing", var = response),
             "Bernstein" = Bernstein_basis(order = order, var = response, 
                                           ui = "increasing"),

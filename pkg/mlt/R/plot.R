@@ -3,10 +3,12 @@ plot.mlt <- function(x, newdata, type = c("distribution",
     "survivor", "density", "logdensity", "hazard", "loghazard", "cumhazard", "quantile", "trafo"),
     q = NULL, p = 1:(n-1) / n, n = 50, col = rgb(.1, .1, .1, .1), add = FALSE, ...) {
 
+    args <- list(...)
+
     if (is.null(q))
         q <- mkgrid(x, n = n)[[x$response]]
     type <- match.arg(type)
-    pr <- predict(x, newdata = newdata, type = type, q = q, p = p, ...)
+    pr <- predict(x, newdata = newdata, type = type, q = q, p = p)
     pr[!is.finite(pr)] <- NA
     rpr <- range(pr, na.rm = TRUE)
     if (is.null(dim(pr))) pr <- matrix(pr, ncol = 1)
@@ -16,12 +18,19 @@ plot.mlt <- function(x, newdata, type = c("distribution",
                          "hazard" = c(0, rpr[2]),
                          "cumhazard" = c(0, rpr[2]),
                          rpr)
+    if (!is.null(args$ylim)) ylim <- args$ylim
     if (type == "quantile")  q <- p
     if (length(col) == 1) col <- rep(col, ncol(pr))
     
     if (!add) {
-        plot(unclass(q), rep(rpr[1], length(q)), ylim = ylim, xlab = x$response,
-             ylab = type, type = "n", axes = FALSE)
+        args$x <- unclass(q)
+        args$y <- rep(rpr[1], length(q))
+        args$ylim <- ylim
+        args$xlab <- ifelse(is.null(args$xlab), x$response, args$xlab)
+        args$ylab <- ifelse(is.null(args$ylab), type, args$ylab)
+        args$type <- "n"
+        args$axes <- FALSE
+        do.call("plot", args)
         if (is.factor(q)) {
             axis(1, at = unclass(q), labels = levels(q))
         } else {
