@@ -1680,7 +1680,8 @@ The \cmd{predict} method for \code{mlt} objects is the main user interface
 for the evaluation of these functions, the type of which is selected
 by its \code{type} argument. Conceptually, all functions are evaluated
 on the support of $\rY$, \ie on a grid $\ry_1, \dots, \ry_K$ 
-(arguments \code{q} or \code{n}) for continuous 
+(arguments \code{q} for the vector of grid poins or \code{K} for the number
+of grid point to be generated) for continuous 
 responses for observations with explanatory variables as given in the
 \code{newdata} argument. That means the transformation function
 \begin{eqnarray*}
@@ -1792,11 +1793,11 @@ is based on the multivariate joint normal distribution of the model coefficients
 $\hat{\parm}_N$. A confidence band for the unconditional transformation function 
 of waiting times is derived from simultaneous confidence intervals for the 
 linear function $\mA \hat{\parm}_N$ as implemented in package \cmd{multcomp}. Here $\mA$ is
-the matrix of Bernstein basis functions evaluated on a grid of \code{n} waiting times
+the matrix of Bernstein basis functions evaluated on a grid of \code{K} waiting times
 $\ry_1, \dots, \ry_K$. The quantile adjusted for multiplicity is then used
 in a finer grid of \code{ncheat} values for plotting purposes
 <<geyser-w-band>>=
-head(cb_w <- confband(mlt_w, newdata = data.frame(1), n = 20, ncheat = 100))
+head(cb_w <- confband(mlt_w, newdata = data.frame(1), K = 20, cheat = 100))
 @
 The result is shown in Figure~\ref{fig:geyser-w-cbplot} on the scale of the
 transformation and distribution function.
@@ -1850,7 +1851,7 @@ probability integral transform, \ie $\rZ_1, \dots, \rZ_N \stackrel{\text{iid}}{\
 drawn and then $\rY_i^\star = \inf\{\ry \in \samY | \basisy(\ry)^\top \hat{\parm}_N \ge
 \rZ_i\}$ is determined by numerical inversion of the distribution function.
 The \cmd{simulation} method for \code{mlt} objects first computes the
-distribution function over a grid of \code{n} response values, draws \code{nsim} times
+distribution function over a grid of \code{K} response values, draws \code{nsim} times
 \code{nrow(newdata)} random sample from $\Prob_\rZ$ and returns 
 the intervals $\ry_k < \rZ < \ry_{k + 1}$ (\code{interpolate = FALSE}) or
 a linear interpolation thereof (\code{interpolate = TRUE}). 
