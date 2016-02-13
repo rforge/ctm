@@ -2269,79 +2269,80 @@ objects are returned by \cmd{ctm}.
 
 \subsection{Methods for Fitted Transformation Models}
 
-update
-estfun
-predict
-simulate
-coef
-variable.names
-mkgrid
-logLik
-vcov
-coef<-
-summary
-print
-bounds
-confband
-plot
-
-
-<<mlt-Ex>>=
-### one-sample example
-## Y ~ Chisq(df = 5)
+For transformation models fitted using \cmd{mlt}, the following methods are
+available \cmd{update} (for refitting the model), \cmd{logLik} (the
+log-likelihood, optionally also as a \code{function}), \cmd{estfun} (the
+scores), \cmd{coef} and \cmd{vcov} (model parameters and their covariance),
+\code{predict} (model predictions at various scales), \cmd{confband}
+(confidence bands for the transformation and distribution function),
+\cmd{simulate} (sampling from the model) as well as \cmd{print},
+\cmd{summary} and \cmd{plot}.  In addition, \cmd{variable.names},
+\cmd{mkgrid} and \cmd{bounds} are also implemented. The 
+\cmd{coef<-} method changes the parameters in the model. One last example,
+the approximation of a $\chi^2_{20}$ distribution by an unconditonal
+transformation model, shall illustrate how one interacts with
+\code{mlt} objects. We first define the ``true'' distribution
+<<mlt-chi-p>>=
 pY <- function(x) pchisq(x, df = 20)
 dY <- function(x) dchisq(x, df = 20)
 qY <- function(p) qchisq(p, df = 20)
-## Bernstein polynom order ord
-ord <- 15
+@
+and set-up a Bernstein polynomial for the transformation function
+<<mlt-chi-B>>=
 ## support for distribition
 yvar <- numeric_var("y", support = qY(c(.001, 1 - .001)), bounds = c(0, Inf))
-By <- Bernstein_basis(yvar, order = ord, ui = "increasing")
-
-## set-up model with Z ~ N(0, 1)
-m <- ctm(By, todistr = "Normal")
+By <- Bernstein_basis(yvar, order = ord <- 15, ui = "increasing")
+@
+The \emph{unfitted} model is now
+<<mlt-chi-mlt>>=
+m <- ctm(By)
 d <- as.data.frame(mkgrid(yvar, n = 500))
 mod <- mlt(m, data = d, dofit = FALSE)
-
-## compute _true_ transformation function
+@
+and we compute the true transformation function
+<<mlt-chi-trafo>>=
 h <- function(x) qnorm(pY(x))
-x <- seq(from = support(yvar)[["y"]][1], to = support(yvar)[["y"]][2], length.out = ord + 1)
-## coefs for Bernstein are f(v / ord) v = 0...ord
-## coef(mod) defines a Bernstein polynomial
-## approximating h
-### new mod is a real model (although not data-based!)
+x <- seq(from = support(yvar)[["y"]][1], to = support(yvar)[["y"]][2], 
+         length.out = ord + 1)
 mlt::coef(mod) <- h(x)
-
-## compute true density
-d$dtrue <- dY(d$y)
-
-### simulate from _approximated_ distribution; so this is
-### the new "true" one
+@
+We can now simulate from this model
+<<mlt-chi-sim>>=
 d$grid <- d$y
 d$y <- simulate(mod)
 fmod <- mlt(m, data = d, scale = TRUE)
-
-print(fmod)
-summary(fmod)
-
-### compare; should be more or less the same
+@
+and compare the true (\code{mod}) and fitted
+(\code{fmod}) models by looking at the coefficients
+and log-likelhood (evaluated for the estimated and
+true coefficients)
+<<mlt-chi-model>>=
 coef(mod)
 coef(fmod)
-
 logLik(fmod)
 logLik(fmod, parm = coef(mod))
 @
-
+The corresponding density functions of the $\chi^2_{20}$ distribution, the
+approximating true transformation model and the estimated transformation
+model are plotted in Figure~\ref{fig:mlt-chi-plot}.
 
 \begin{figure}
 \begin{center}
-<<mlt-Ex-plot>>=
-### plot "true" (red line) and "approximated" density (green)
-plot(mod, newdata = d, type = "density", col = "black", xlab = "y", ylab = "Density")
-lines(d$grid, d$dtrue, col = "red")
-lines(sort(d$grid), predict(fmod, q = sort(d$grid), type = "density"), col = "blue")
+<<mlt-chi-plot>>=
+## compute true density
+d$dtrue <- dY(d$grid)
+d$dest <- predict(fmod, q = sort(d$grid), type = "density")
+plot(mod, newdata = d, type = "density", col = "black", 
+     xlab = "y", ylab = "Density", ylim = c(0, max(d$dest)))
+lines(d$grid, d$dtrue, lty = 2)
+lines(sort(d$grid), d$dest[order(d$grid)], lty = 3)
+legend("topright", lty = 1:3, bty = "n", 
+       legend = c("True", "Approximated", "Estimated"))
 @
-\caption{}
+\caption{$chi^2_{20}$ Data. Density of a $\chi^2_{20}$ (true), 
+         an approximating unconditional transformation model and
+         the density fitted to a sample from the approximating model.
+         \label{fig:mlt-chi-plot}}
 \end{center}
 \end{figure}
 
