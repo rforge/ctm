@@ -1,7 +1,8 @@
 \name{access}
 \alias{variable.names.var}
 \alias{desc}
-\alias{units.var}
+\alias{unit.var}
+\alias{unit}
 \alias{support}
 \alias{bounds}
 \alias{is.bounded}
@@ -14,7 +15,8 @@
 \usage{
 \method{variable.names}{var}(object, ...)
 desc(object)
-\method{units}{var}(x)
+unit(x)
+\method{unit}{var}(x)
 support(object)
 bounds(object)
 is.bounded(object)

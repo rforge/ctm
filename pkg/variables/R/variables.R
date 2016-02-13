@@ -71,14 +71,17 @@ desc.var <- function(object)
 desc.vars <- function(object)
     sapply(object, desc)
 
-units.numeric_var <- function(x)
+unit <- function(x)
+    UseMethod("unit")
+
+unit.numeric_var <- function(x)
     x$unit
 
-units.var <- function(x)
+unit.var <- function(x)
     return(NA)
 
-units.vars <- function(x)
-    sapply(x, units)
+unit.vars <- function(x)
+    sapply(x, unit)
 
 support <- function(object)
     UseMethod("support")

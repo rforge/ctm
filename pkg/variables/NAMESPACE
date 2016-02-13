@@ -1,7 +1,7 @@
 
 importFrom("stats", "variable.names")
 
-export(factor_var, ordered_var, numeric_var, desc, support, bounds,
+export(factor_var, ordered_var, numeric_var, desc, unit, support, bounds,
        is.bounded, mkgrid, as.vars, check)
 
 S3method("c", "var")
@@ -9,9 +9,9 @@ S3method("variable.names", "var")
 S3method("variable.names", "vars")
 S3method("desc", "var")
 S3method("desc", "vars")
-S3method("units", "numeric_var")
-S3method("units", "var")
-S3method("units", "vars")
+S3method("unit", "numeric_var")
+S3method("unit", "var")
+S3method("unit", "vars")
 S3method("support", "var")
 S3method("support", "vars")
 S3method("levels", "factor_var")

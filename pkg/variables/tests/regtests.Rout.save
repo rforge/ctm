@@ -23,7 +23,7 @@ Type 'q()' to quit R.
 [1] "d_vari"
 > desc(x1)
 [1] "double"
-> units(x1)
+> unit(x1)
 [1] "cm"
 > support(x1)
 $d_vari
@@ -50,7 +50,7 @@ $d_vari
 [1] "i_vari"
 > desc(x2)
 [1] "integer"
-> units(x2)
+> unit(x2)
 [1] "cm"
 > support(x2)
 $i_vari
@@ -86,7 +86,7 @@ $i_vari
 [1] "dd_vari"
 > desc(x3)
 [1] "discrete double"
-> units(x3)
+> unit(x3)
 [1] "cm"
 > support(x3)
 $dd_vari
@@ -116,7 +116,7 @@ $dd_vari
 [1] "db_vari"
 > desc(x4)
 [1] "bounded double"
-> units(x4)
+> unit(x4)
 [1] "cm"
 > support(x4)
 $db_vari
@@ -143,7 +143,7 @@ $db_vari
 [1] "o_vari"
 > desc(x5)
 [1] "ordered"
-> units(x5)
+> unit(x5)
 [1] NA
 > support(x5)
 $o_vari
@@ -170,7 +170,7 @@ Levels: A < B < C
 [1] "f_vari"
 > desc(x6)
 [1] "unordered"
-> units(x6)
+> unit(x6)
 [1] NA
 > support(x6)
 $f_vari
@@ -199,7 +199,7 @@ $f_vari
          "double"         "integer" "discrete double"  "bounded double" 
            o_vari            f_vari 
         "ordered"       "unordered" 
-> units(xy)
+> unit(xy)
  d_vari  i_vari dd_vari db_vari  o_vari  f_vari 
    "cm"    "cm"    "cm"    "cm"      NA      NA 
 > support(xy)
