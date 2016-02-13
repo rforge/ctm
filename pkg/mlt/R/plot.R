@@ -1,12 +1,12 @@
 
 plot.mlt <- function(x, newdata, type = c("distribution",
     "survivor", "density", "logdensity", "hazard", "loghazard", "cumhazard", "quantile", "trafo"),
-    q = NULL, p = 1:(n-1) / n, n = 50, col = rgb(.1, .1, .1, .1), add = FALSE, ...) {
+    q = NULL, p = 1:(K - 1) / K, K = 50, col = rgb(.1, .1, .1, .1), add = FALSE, ...) {
 
     args <- list(...)
 
     if (is.null(q))
-        q <- mkgrid(x, n = n)[[x$response]]
+        q <- mkgrid(x, n = K)[[x$response]]
     type <- match.arg(type)
     pr <- predict(x, newdata = newdata, type = type, q = q, p = p)
     pr[!is.finite(pr)] <- NA

@@ -42,7 +42,7 @@ lines(rug(faithful$waiting))
 abline(h = 0)
 
 p <- 1:99 / 100
-q <- predict(mod, p = p, n = 100, type = "quantile")
+q <- predict(mod, p = p, K = 100, type = "quantile")
 
 plot(p, q)
 lines(p, quantile(faithful$waiting, p))

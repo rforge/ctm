@@ -1,7 +1,7 @@
 
 predict.mlt <- function(object, newdata = object$data, type = c("trafo", "distribution", "survivor", 
     "density", "logdensity", "hazard", "loghazard", "cumhazard", "quantile"), 
-    terms = c("bresponse", "binteracting", "bshifting"), q = NULL, p = NULL, n = 50,
+    terms = c("bresponse", "binteracting", "bshifting"), q = NULL, p = NULL, K = 50,
     interpolate = TRUE, ...) {
 
     type <- match.arg(type)
@@ -24,7 +24,7 @@ predict.mlt <- function(object, newdata = object$data, type = c("trafo", "distri
         "hazard" = hmlt(object = object, newdata = newdata, q = q, log = FALSE),
         "loghazard" = hmlt(object = object, newdata = newdata, q = q, log = TRUE),
         "cumhazard" = Hmlt(object = object, newdata = newdata, q = q),
-        "quantile" = qmlt(object = object, newdata = newdata, n = n,
+        "quantile" = qmlt(object = object, newdata = newdata, n = K,
                           p = p, interpolate = interpolate))
 
     return(ret)

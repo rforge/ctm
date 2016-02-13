@@ -61,7 +61,7 @@ Loading required package: variables
 > abline(h = 0)
 > 
 > p <- 1:99 / 100
-> q <- predict(mod, p = p, n = 100, type = "quantile")
+> q <- predict(mod, p = p, K = 100, type = "quantile")
 > 
 > plot(p, q)
 > lines(p, quantile(faithful$waiting, p))
@@ -130,4 +130,4 @@ Bs9(waiting)   -0.7427120    0.8292216   -0.9214160    1.0000000
 > 
 > proc.time()
    user  system elapsed 
- 11.340   0.032  11.363 
+ 11.484   0.052  11.530 

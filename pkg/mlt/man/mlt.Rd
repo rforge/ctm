@@ -67,7 +67,7 @@ coef(object) <- value
   plot(cars)
   ### predict quantiles and overlay data with model via a "quantile sheet"
   q <- predict(mltm, newdata = data.frame(speed = 0:24), type = "quantile", 
-               p = 2:8 / 10, n = 500)
+               p = 2:8 / 10, K = 500)
   tmp <- apply(q, 1, function(x) lines(0:24, x, type = "l"))
 
 }
