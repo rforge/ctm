@@ -742,7 +742,7 @@ which can be specified as the Cox model above, only the Bernstein basis for time
 needs to be replaced with a log-transformation and the corresponding parameter is restricted
 to one in the estimation
 <<GBSG2-2>>=
-ly <- log_basis(GBSG2y, ui = "increasing")
+ly <- log_basis(GBSG2y, ui = "increasing", remove_intercept = TRUE)
 ctm_GBSG2_2 <- ctm(ly, shifting = fm_GBSG2[-2L], data = GBSG2, 
                    negative = TRUE, todistr = "MinExtrVal")
 mlt_GBSG2_2 <- mlt(ctm_GBSG2_2, data = GBSG2, fixed = c("log(y)" = 1), 
@@ -1925,8 +1925,11 @@ tmp <- sapply(tpdens, function(x) lines(q, x, col = rgb(.1, .1, .1, .1)))
 $250$ (\pkg{variables}), $920$ (\pkg{basefun}), $1520$ (\pkg{mlt})
 lines of \proglang{R} code
 
+Compare with other packages
 
 \bibliography{mlt,packages}
+
+\newpage
 
 \begin{appendix}
 
@@ -1935,19 +1938,21 @@ lines of \proglang{R} code
 \section{The variables Package} \label{app:variables}
 
 The \pkg{variables} packages \citep{pkg:variables} offers a small collection
-of classes and methods for specifying and dealing with variable
+of classes and methods for specifying and computing on abstract variable
 descriptions.  The main purpose is to allow querying properties of variables
 without having access to observations.  A variable description allows to
 extract the name (\cmd{variable.name}), description (\cmd{desc}) and unit
 (\cmd{unit}) of the variable along with the support (\cmd{support}) and
-possible bounds (\cmd{bouds}) of the measurements. The \cmd{mkgrid} method
-generates values from the variable description. The package differentiates between
-factors, ordered factors and numeric variables.
+possible bounds (\cmd{bounds}) of the measurements.  The \cmd{mkgrid} method
+generates a grid of observations from the variable description.  The package
+differentiates between factors, ordered factors, discrete and continuous
+numeric variables.
 
 \subsection{Unordered Factors}
 
-Let eye color denote an unordered factor. The corresponding variable description is defined
-by the name, description and levels of this factor:
+We use eye color as an example of an unordered factor. The corresponding
+variable description is defined by the name, description and levels of this
+factor
 <<variables-factor>>=
 f_eye <- factor_var("eye", desc = "eye color", 
                     levels = c("blue", "brown", "green", "grey", "mixed"))
@@ -1956,12 +1961,12 @@ The properties of this factor are
 <<variables-factor-methods>>=
 variable.names(f_eye)
 desc(f_eye)
-units(f_eye)
+variables::unit(f_eye)
 support(f_eye)
 bounds(f_eye)
 is.bounded(f_eye)
 @
-and we can generate values via
+and we can generate values, \ie an instance of this factor with unique levels, via
 <<variables-factor-mkgrid>>=
 mkgrid(f_eye)
 @
@@ -1978,7 +1983,7 @@ and the only difference is that explicit bounds are known
 <<variables-ordered-methods>>=
 variable.names(o_temp)
 desc(o_temp)
-units(o_temp)
+variables::unit(o_temp)
 support(o_temp)
 bounds(o_temp) 
 is.bounded(o_temp)
@@ -1997,7 +2002,7 @@ The variable is bounded with finite support
 <<variables-fd-methods>>=
 variable.names(v_age)
 desc(v_age)
-units(v_age)
+variables::unit(v_age)
 support(v_age)
 bounds(v_age) 
 is.bounded(v_age)
@@ -2009,24 +2014,32 @@ mkgrid(v_age)
 
 \subsection{Continuous Numeric Variables}
 
-For conceptually continuous variables the \code{support} argument is a double vector
-with two elements representing an interval with high density. The variable may or may not be bounded. 
-For generating equally-spaced grids, \code{support + add} is used for unbounded variables or 
-the corresponding finite boundaried if \code{add} is zero. Using the daytime temperature at Zurich
-one could use
+For conceptually continuous variables the \code{support} argument is a
+double vector with two elements representing an interval acting as the
+support for any basis function to be defined later.  The variable may or may
+not be bounded ($\pm \infty$ is allowed).  For generating equally-spaced
+grids, \code{support + add} is used for unbounded variables or the
+corresponding finite boundaries if \code{add} is zero.  Daytime temperature
+at Zurich, for example, could be presented as
 <<variables-c>>=
 v_temp <- numeric_var("ztemp", desc = "Zurich daytime temperature", 
                       unit = "Celsius", support = c(-10.0, 35.0), 
                       add = c(-5, 5), bounds = c(-273.15, Inf))
 @
-where any model shall focus on temperatures between $-10$ and $35$ degrees Celsius.
+Basis functions for this variable shall be defined 
+for temperatures between $-10$ and $35$ degrees Celsius
 <<variables-c-methods>>=
 variable.names(v_temp)
 desc(v_temp)
-units(v_temp)
+variables::unit(v_temp)
 support(v_temp)
 bounds(v_temp) 
 is.bounded(v_temp)
+@
+One might be interested in evaluating model predictions outside \code{support} as
+defined by the \code{add} argument, so \cmd{mkgrid} generates a equidistant grid
+between $-15$ and $40$ degrees Celsius
+<<variables-c-mkgrid>>=
 mkgrid(v_temp, n = 20)
 @
 
@@ -2040,35 +2053,42 @@ and all methods discussed above work accordingly
 <<variables-vars-methods>>=
 variable.names(vars)
 desc(vars) 
-units(vars)
+variables::unit(vars)
 support(vars)
 bounds(vars)
 is.bounded(vars)
 mkgrid(vars, n = 20)
 @
 Calling
-<<variables-vars-expand, eval = FALSE>>=
-expand.grid(mkgrid(vars))
+<<variables-vars-expand>>=
+nd <- expand.grid(mkgrid(vars))
 @
 generates a \code{data.frame} with all possible values of the
-variables and all combinations thereof.
+variables and all combinations thereof. The generic \cmd{as.vars}
+takes a data frame of observations as input and derives abstract
+variable descriptions using the available information. The generic
+function \cmd{check} returns \code{TRUE} if \code{data} matches
+the abstract description
+<<variables-check>>=
+check(vars, data = nd)
+@
 
 
 \section{The basefun Package} \label{app:basefun}
 
 The \pkg{basefun} package \citep{pkg:basefun} implements Bernstein,
 Legendre, log and polynomial basis functions.  In addition, facilities for
-treating arbitrary model matrices as basis function are available.  Basis
-functions can be joined columnwise using \cmd{c} or the box product can be
-generated using \cmd{b}.  The definition of basis functions does not require
-any actual observations, only variable descriptions (see
-Appendix~\ref{app:variables}) are necessary.  Each basis offers
-\cmd{model.matrix} and \cmd{predict} methods.  We illustrate how one can
-set-up some of these basis functions in the following.
+treating arbitrary model matrices as basis functions evaluated on some data
+are available.  Basis functions can be joined columnwise using \cmd{c} or
+the box product can be generated using \cmd{b}.  The definition of basis
+functions does not require any actual observations, only variable
+descriptions (see Appendix~\ref{app:variables}) are necessary.  Each basis
+offers \cmd{model.matrix} and \cmd{predict} methods.  We illustrate how one
+can set-up some of these basis functions in the following sections.
 
 \subsection{Polynomial Basis}
 
-For some positive variable $x$ we want to deal with the polynomial
+For some positive continuous variable $x$ we want to deal with the polynomial
 $\alpha + \beta_1 x + \beta_3 x^3$ and first set-up a variable description
 (see Appendix~\ref{app:variables}) and the basis function
 <<basefun-polynom>>=
@@ -2101,7 +2121,7 @@ The monotone increasing logarithmic basis $\eparm_1 + \eparm_2 \log(x)$ being
 subject to $\eparm_2 > 0$ is defined as
 <<basefun-log>>=
 ### set-up log-basis with intercept for positive variable
-class(lb <- log_basis(xvar, remove_intercept = FALSE, ui = "increasing"))
+class(lb <- log_basis(xvar, ui = "increasing"))
 head(X <- model.matrix(lb, data = x))
 @
 The model matrix contains a \code{constraint} attribute
@@ -2118,18 +2138,25 @@ predict(lb, newdata = x, coef = c(1, 2), deriv = c(x = 1L))
 @
 
 \subsection{Bernstein Basis}
-As an example, a monotone increasing Bernstein polynomial $\bern{3}$ can be defined and
-evaluated as
+As an example, a monotone increasing Bernstein polynomial $\bern{3}$ can 
+be defined and evaluated as
 <<basefun-Bernstein>>=
 class(bb <- Bernstein_basis(xvar, order = 3, ui = "increasing"))
 head(X <- model.matrix(bb, data = x))
-### check constraints
+@
+We can check if the constraints are met for some parameters
+<<basefun-Bernstein-constr>>=
 cf <- c(1, 2, 2.5, 2.6)
 (cnstr <- attr(X, "constraint"))
 all(cnstr$ui %*% cf > cnstr$ci)
-### evaluate Bernstein polynomial defined by basis and coefficients
+@
+Other constraints include a decreasing function (\code{ui = "decreasing"}), 
+positive and negative functions (\code{ui = "positive"} or \code{ui = "negative"}),
+as well as cyclic or integral zero functions (\code{ui = "cyclic"} or \code{ui = "zerointegral"}).
+The polynomial defined by the basis functions and parameters and the first
+derivative can be evaluated using \cmd{predict}
+<<basefun-Bernstein-predict>>=
 predict(bb, newdata = x, coef = cf)
-### evaluate first derivative 
 predict(bb, newdata = x, coef = cf, deriv = c(x = 1))
 @
 
@@ -2142,7 +2169,9 @@ additonal argments (\code{remove_intercept} removes the intercept
 \textit{after} appropriate contrasts where computed and \code{negative}
 multiplies the model matrix with $-1$).  Note that the \code{data} argument
 does not need to be a \code{data.frame} with observations, a variable
-description is sufficent:
+description is sufficent. If \code{data} is given, \code{scale = TRUE}
+scales each columns of the model matrix to the unit interval. Here is
+an example using the iris data
 <<basefun-as.basis>>=
 iv <- as.vars(iris)
 fb <- as.basis(~ Species + Sepal.Length + Sepal.Width,  data = iv,
@@ -2160,7 +2189,8 @@ the overall constraints are given by a block-diagonal matrix $\mA = \text{blockd
 $\parm = (\parm_1^\top, \parm_2^\top, \dots)^\top$ and $\mvec = (\mvec_1^\top, \mvec_2^\top, \dots)^\top$. As
 an example we add a positive log-transformation to a Bernstein polynomial:
 <<basefun-c>>=
-class(blb <- c(bern = bb, log = log_basis(xvar, ui = "increasing")))
+class(blb <- c(bern = bb, 
+               log = log_basis(xvar, ui = "increasing", remove_intercept = TRUE)))
 head(X <- model.matrix(blb, data = x))
 attr(X, "constraint")
 @
@@ -2168,16 +2198,18 @@ attr(X, "constraint")
 The box product of two basis functions is defined by the row-wise Kronecker product of the
 corresponding model matrices but \textit{not} the Kronecker product of the model matrices (which
 would result in a matrix with the same number of columns but squared number of rows).
+The following definition leads to one intercept and one deviation function
 <<basefun-b>>=
 fb <- as.basis(~ g, data = factor_var("g", levels = LETTERS[1:2]))
-### join them: we get one intercept and one deviation _function_
 class(bfb <- b(bern = bb, f = fb))
 nd <- expand.grid(mkgrid(bfb, n = 10))
-### evaluate bases
 head(X <- model.matrix(bfb, data = nd))
 attr(X, "constraint")
+@
+If \code{sumconstr = TRUE}, only the sum of the two functions
+is expected to meet the monotonicity constraint
+<<basefun-b-sumconstr>>=
 bfb <- b(bern = bb, f = fb, sumconstr = TRUE)
-### evaluate bases
 head(X <- model.matrix(bfb, data = nd))
 attr(X, "constraint")
 @
@@ -2186,7 +2218,7 @@ attr(X, "constraint")
 
 \subsection{Specifying Response Observations} \label{subapp:R}
 
-The generic \cmd{R} is an extention of \cmd{Surv} to possibly truncated
+The generic function \cmd{R} is an extention of \cmd{Surv} (package \pkg{survival}) to possibly truncated
 or categorical response variables with methods for objects of class 
 \code{Surv}, \code{ordered}, \code{factor}, \code{integer} and \code{numeric}. The main
 purpose is to set-up the interval $(\ubar{\ry}, \bar{\ry}]$ for the evaluation
@@ -2230,10 +2262,10 @@ specified based on the abstract variable description
 
 \subsection{Methods for Conditional Transformation Models}
 
-bounds
-variable.names
-model.matrix
-mkgrid
+Methods for the generic functions \cmd{bounds},
+\cmd{variable.names}, \cmd{model.matrix}, \cmd{mkgrid}
+are available for abstract model descriptions in \code{ctm}
+objects are returned by \cmd{ctm}.
 
 \subsection{Methods for Fitted Transformation Models}
 
