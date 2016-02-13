@@ -77,7 +77,23 @@ options(width = 75)
 \Shorttitle{The \pkg{mlt} Package}
 
 \Abstract{
-tbd
+The \pkg{mlt} package implements maximum likelihood estimation in the class
+of conditional transformation models.  Based on a suitable explicit
+parameterisation of the unconditional or conditional transformation function
+using infrastructure from package \pkg{basefun}, we show how one can define
+a cascade of increasingly complex transformation models that can be
+estimated, compared and analysed in the maximum likelihood framework. 
+Models for the unconditional or conditional distribution function of any
+univariate response variable can be set-up and estimated in the same
+computational framework simply by choosing an appropriate transformation
+function and parameterisation thereof.  As it is computationally cheap to
+evaluate the distribution function, models can be estimated by maximisation
+of the exact likelihood, especially in the presence of random censoring or
+truncation. The relatively dense highlevel implementation in the \proglang{R}
+system for statistical computing allows generalisation of many established
+implementations of linear transformation models, such as the Cox model or other
+parametric models for the analysis of survival or ordered categorical data,
+to the more complex situations illustrated in this paper.
 }
 
 \Keywords{transformation model, distribution regression, conditional
