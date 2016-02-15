@@ -4,7 +4,11 @@ import("Formula")
 import("multcomp")
 import("basefun")
 importFrom(sandwich, estfun)
-importFrom(stats, coef, logLik, AIC, vcov, predict, confint)
+importFrom("stats", "coef", "logLik", "AIC", "vcov", "predict", "confint",
+           "as.formula", "contr.treatment", "delete.response", 
+           "model.frame", "model.matrix", "model.weights", "na.omit",
+           "printCoefmat", "quantile", "terms", "update",
+           "variable.names")
 importFrom(variables, mkgrid, as.vars, bounds)
 
 export("sltm", "as.mlt")

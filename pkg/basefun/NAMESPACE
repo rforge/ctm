@@ -2,11 +2,13 @@
 useDynLib("basefun")
 
 import("variables")
-
 import("Matrix")#, rBind, Diagonal, bdiag)
 import("polynom")
-importFrom(orthopolynom, legendre.polynomials)
-importFrom(stats, variable.names, model.matrix, predict)
+importFrom("orthopolynom", "legendre.polynomials")
+importFrom("methods", "as")
+importFrom("stats", ".checkMFClasses", ".getXlevels", "as.formula",
+           "contr.treatment", "dbeta", "model.frame", "pbeta",
+           "variable.names", "model.matrix", "predict")
 
 export(Bernstein_basis, as.basis, b, 
        log_basis, polynomial_basis, Legendre_basis)
