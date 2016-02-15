@@ -1,5 +1,5 @@
 
-library("sltm")
+library("trm")
 library("multcomp")
 library("MASS")
 

@@ -1,11 +1,11 @@
-Package: sltm
-Title: Stratified Linear Transformation Models
+Package: trm
+Title: Transformation Models
 Version: 0.0-20
 Date: 2015-02-05
 Authors@R: person("Torsten", "Hothorn", role = c("aut", "cre"),
                   email = "Torsten.Hothorn@R-project.org")
-Description: Unified specification and estimation of stratified 
-  linear transformation models for arbitrary responses, censoring 
+Description: Simple user-interfaces to specific transformation models
+  implemented in package mlt.
   and truncation schemes.
 Depends: mlt (>= 0.0-20)
 Imports: stats, Formula, multcomp, sandwich, basefun, variables

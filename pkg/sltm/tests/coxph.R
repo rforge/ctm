@@ -1,5 +1,5 @@
 
-library("sltm")
+library("trm")
 library("multcomp")
 library("survival")
 data("GBSG2", package = "TH.data")

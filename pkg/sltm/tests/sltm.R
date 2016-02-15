@@ -1,5 +1,5 @@
 	
-library("sltm")
+library("trm")
 library("multcomp")
 
 (a <- sltm(Sepal.Length | Species ~ Sepal.Width, data = iris, trafo = "log"))
