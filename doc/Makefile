@@ -16,19 +16,22 @@ mlt.pdf:	mlt.tex todo.tex mlt.Rnw
 	texi2dvi --pdf mlt.tex
 	pdflatex mlt.tex
 
-clean:	
+texclean:
 	rm -rf mlt.aux
-	rm -rf mlt.tex
 	rm -rf mlt.pdf
-	rm -rf mlt.R
-	rm -rf *aux
-	rm -rf *out
+	rm -rf *.aux
+	rm -rf *.out
 	rm -rf *.blg  
 	rm -rf *.log  
 	rm -rf *.tpt
 	rm -rf *.bbl
 	rm -rf *.fff
 	rm -rf *~
+
+clean:	
+	make texclean
+	rm -rf mlt.tex
+	rm -rf mlt.R
 	rm -rf packages.bib
 	
 dist-clean:

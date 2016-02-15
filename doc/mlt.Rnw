@@ -18,7 +18,7 @@ set.seed(290875)
 
 sapply(c("mlt", "survival", "eha", "prodlim", "truncreg", "lattice", "gridExtra",
          "MASS", "nnet", "HSAUR3", "sandwich", "flexsurv", "grid", "latticeExtra", 
-         "colorspace", "multcomp"), library, char = TRUE)
+         "colorspace", "multcomp", "mgcv"), library, char = TRUE)
 
 if (!file.exists("analysis/DVC.rda")) {
     download.file("https://zenodo.org/record/17179/files/DVC.tgz", "DVC.tgz")
@@ -684,7 +684,7 @@ We start with the Cox model $(\pMEV, (\bern{10}^\top,
 \tilde{\rx}^\top)^\top, (\parm_1^\top, \shiftparm^\top)^\top)$, where $\tilde{\rx}$ contains the treatment
 indicator and all other explanatory variables in the transformation function
 $\h(\ry | \rx) = \bern{10}(\ry)^\top \parm_1 + \tilde{\rx}^\top \shiftparm$
-(the positive shift being in line with the implementation in \cmd{coxph} in package \pkg{survival})
+\citep[the positive shift being in line with the implementation in \cmd{coxph} in package \pkg{survival}][]{Therneau_Grambsch_2000,pkg:survival}
 <<GBSG2-1-Cox>>=
 B_GBSG2y <- Bernstein_basis(var = GBSG2y, order = 10, ui = "increasing")
 fm_GBSG2 <- Surv(time, cens) ~ horTh + age + menostat + tsize + tgrade +
@@ -1146,7 +1146,7 @@ can be estimated using a multinomial regression. In a non-proportional odds
 model allowing for response-specific regression coefficients, the ordering of the response
 levels only affects the corresponding regression coefficients but the fitted density
 is invariant with respect to the ordering applied as a comparison with
-\cmd{multinom} from package \pkg{nnet} for the iris data shows
+\cmd{multinom} from package \pkg{nnet} \citep{Venables_Ripley_2002,pkg:nnet} for the iris data shows
 <<iris-1>>=
 fm_iris <- Species ~ Sepal.Length + Sepal.Width + 
                      Petal.Length + Petal.Width
@@ -1445,9 +1445,8 @@ panel of Figure~\ref{fig:treepipit-plot} depicts the observations and the
 center panel shows the conditional distribution function evaluated for $0,
 \dots, 5$ observed birds.  The conditional distribution function obtained
 from a generalised additive Poisson (GAM) model with smooth mean effect of cover
-storey is given in the right panel  
+storey \citep[computed using \pkg{mgcv}][]{Wood_2006,pkg:mgcv} is given in the right panel  
 <<treepipit-gam>>=
-library("mgcv")
 gam_treepipit <- gam(counts ~ s(coverstorey), data = treepipit, 
                      family = "poisson")
 @
@@ -1764,10 +1763,11 @@ from confidence intervals and bands for the linear functions $\basisy^\top
 
 \paragraph{Categorical Data Analysis: Chinese Survey (Cont'd)}
 
-For the proportional odds model for happiness given age and income, we compare the score function (
-using the \cmd{estfun} method from package \pkg{sandwich}) and the standard errors of the
+For the proportional odds model for happiness given age and income, we compare the score function 
+\citep[using the \cmd{estfun} method from package \pkg{sandwich}][]{Zeileis_2004,pkg:sandwich} and the standard errors of the
 regression coefficients. The positive effect of income is ``significant'' by standard measures
-(the classical coefficient table was obtained using \cmd{cftest} from package \pkg{multcomp})
+\citep[the classical coefficient table was obtained using \cmd{cftest} from package 
+\pkg{multcomp}][]{Hothorn_Bretz_Westfall_2008,pkg:multcomp}
 <<CHFLS-2-cmpr-2>>=
 max(abs(estfun(polr_CHFLS_2) - (-estfun(mlt_CHFLS_2)[,c(4, 5, 1:3)])))
 cbind(polr = sqrt(diag(vcov(polr_CHFLS_2))),
@@ -1939,6 +1939,18 @@ $250$ (\pkg{variables}), $920$ (\pkg{basefun}), $1520$ (\pkg{mlt})
 lines of \proglang{R} code
 
 Compare with other packages
+
+\pkg{intcox} \citep{pkg_intcox}, \pkg{coxinterval} \citep{pkg:coxinterval} \pkg{ICsurv} \citep{pkg:ICsurv}
+
+\pkg{polspline} \citep{pkg:polspline}, \pkg{logspline} \citep{pkg:logspline}, \pkg{bshazard} \citep{pkg:bshazard}
+
+\pkg{gss} \citep{Gu_2014,pkg:gss} \pkg{MIICD} \citep{pkg:MIICD}
+
+\pkg{TransModel} \citep{pkg:TransModel}
+
+\pkg{dynsurv}, \pkg{timereg} \citep{Scheike_Martinussen_2006,Scheike_Zhang_2011,pkg:timereg}
+
+\pkg{survivalMPL} \citep{pkg:survivalMPL}
 
 \bibliography{mlt,packages}
 
@@ -2385,11 +2397,13 @@ pkgbib <- function(pkg) {
 pkg <- function(pkg)
     paste("\\\\pkg{", pkg, "} \\\\citep[version~",
           pkgversion(pkg), ",][]{pkg:", pkg, "}", sep = "")
-pkg("gamlss")
-pkg("MASS")
-pkg("np")
-pkg("prodlim")
-pkg("flexsurv")
+
+pkgs <- c("survival", "eha", "prodlim", "truncreg", "MASS", "nnet", "HSAUR3", "sandwich", 
+  "flexsurv", "multcomp", "mgcv", "intcox", "coxinterval", "ICsurv",
+  "polspline", "logspline", "bshazard", "gss", "MIICD", "TransModel",
+  "dynsurv", "timereg", "survivalMPL", "np", "gamlss")
+out <- sapply(pkgs, pkg)
+
 mlt <- c("@Manual{pkg:mlt, \n
           title = {mlt: Most Likely Transformations},\n
           author = {Torsten Hothorn},\n
