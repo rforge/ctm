@@ -1,13 +1,13 @@
 Package: mlt
 Title: Most Likely Transformations
-Version: 0.0-20
-Date: 2015-02-05
+Version: 0.0-21
+Date: 2015-02-15
 Authors@R: person("Torsten", "Hothorn", role = c("aut", "cre"),
                   email = "Torsten.Hothorn@R-project.org")  
 Description: Likelihood-based estimation of conditional transformation
   models via the most likely transformation approach.
-Depends: basefun (>= 0.0-20), variables (>= 0.0-20)
+Depends: basefun (>= 0.0-21), variables (>= 0.0-21)
 Imports: BB, sandwich, stats, numDeriv, quadprog, multcomp
-Enhances: np, eha, survival, nnet, truncreg
-Suggests: lattice, MASS, TH.data
+Enhances: MASS, nnet, survival
+Suggests: TH.data
 License: GPL-2

@@ -1,7 +1,7 @@
 Package: variables
 Title: Variable Descriptions
-Version: 0.0-20
-Date: 2015-02-05
+Version: 0.0-21
+Date: 2015-02-15
 Authors@R: person("Torsten", "Hothorn", role = c("aut", "cre"),
                   email = "Torsten.Hothorn@R-project.org")
 Description: Names and properties of yet unobserved variables.

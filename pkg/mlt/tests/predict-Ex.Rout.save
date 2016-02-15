@@ -88,7 +88,7 @@ Loading required package: variables
 > max(abs(c(p1) - c(p2)))
 [1] 3.552714e-15
 > 
-> p1 <- predict(mod, newdata = nd, type = "quantile", p = 1:9 / 10, n = 50000)
+> p1 <- predict(mod, newdata = nd, type = "quantile", p = 1:9 / 10, K = 50000)
 > 
 > min(apply(matrix(p1, nrow = 9), 2, diff))
 [1] 0.02533471
@@ -96,4 +96,4 @@ Loading required package: variables
 > 
 > proc.time()
    user  system elapsed 
-  1.980   0.052   2.028 
+  2.216   0.036   2.246 
