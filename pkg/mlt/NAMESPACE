@@ -45,6 +45,7 @@ S3method("mkgrid", "ctm")
 S3method("model.matrix", "ctm")
 S3method("confband", "mlt")
 S3method("plot", "mlt")
+S3method("weights", "mlt")
 
 #S3method("model.matrix", "mlt")
 #S3method("Hessian", "mlt")
