@@ -1,5 +1,5 @@
 
-ttree <- function(object, part, data, parm, weights, modelsplit = FALSE, 
+trtree <- function(object, part, data, parm, weights, modelsplit = FALSE, 
                   control = ctree_control(), ...) {
 
     if (missing(parm)) parm <- 1:length(coef(object))
@@ -10,7 +10,6 @@ ttree <- function(object, part, data, parm, weights, modelsplit = FALSE,
 
     split <- function(x, response, weights, mb) {
 
-        xin <- x
         if (is.ordered(x)) x <- unclass(x)
         if (is.factor(x)) {
             if(nlevels(x) == 2) return(1:2)
@@ -40,7 +39,6 @@ ttree <- function(object, part, data, parm, weights, modelsplit = FALSE,
                                             theta = coef(rmod)))
         }
         xsplit <- c(suxl, suxr)[which.max(c(lll, llr))]
-        if (is.ordered(xin)) return(as.integer(c(rep(1, xsplit), rep(2, nlevels(xin) - xsplit))))
         xsplit
     }
 
@@ -67,11 +65,11 @@ ttree <- function(object, part, data, parm, weights, modelsplit = FALSE,
 
     ct$coefficients <- cf
     ct$model <- object
-    class(ct) <- c("ttree", class(ct))
+    class(ct) <- c("trtree", class(ct))
     ct
 }
 
-predict.ttree <- function(object, newdata, K = 20, 
+predict.trtree <- function(object, newdata, K = 20, 
     type = c("node", "trafo", "distribution", 
              "survivor", "density", "logdensity", 
              "hazard", "loghazard", 
@@ -185,5 +183,5 @@ node_mlt <- function(obj, col = "black", bg = "white", ylines = 2,
 }
 class(node_mlt) <- "grapcon_generator"
 
-plot.ttree <- function(x, ...)
+plot.trtree <- function(x, ...)
     partykit:::plot.constparty(x, terminal_panel = node_mlt, ...)
