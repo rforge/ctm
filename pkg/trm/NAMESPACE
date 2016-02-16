@@ -3,6 +3,8 @@ import("mlt")
 import("Formula")
 import("multcomp")
 import("basefun")
+import("partykit")
+import("grid")
 importFrom(sandwich, estfun)
 importFrom("stats", "coef", "logLik", "AIC", "vcov", "predict", "confint",
            "as.formula", "contr.treatment", "delete.response", 
@@ -11,7 +13,7 @@ importFrom("stats", "coef", "logLik", "AIC", "vcov", "predict", "confint",
            "variable.names")
 importFrom(variables, mkgrid, as.vars, bounds)
 
-export("sltm", "as.mlt")
+export("sltm", "as.mlt", "ttree")
 
 S3method("coef", "sltm")
 S3method("logLik", "sltm")
@@ -25,5 +27,8 @@ S3method("confband", "sltm")
 S3method("summary", "sltm")
 S3method("print", "summary.sltm")
 S3method("as.mlt", "sltm")
+
+S3method("predict", "ttree")
+S3method("plot", "ttree")
 
 # S3method("paraboot", "sltm")

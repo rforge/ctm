@@ -8,6 +8,6 @@ Description: Simple user-interfaces to specific transformation models
   implemented in package mlt.
   and truncation schemes.
 Depends: mlt (>= 0.0-21)
-Imports: Formula, multcomp, variables, basefun, sandwich
+Imports: Formula, multcomp, variables, basefun, sandwich, partykit, grid
 Suggests: survival, MASS, TH.data
 License: GPL-2
