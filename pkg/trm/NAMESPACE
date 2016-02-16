@@ -13,7 +13,7 @@ importFrom("stats", "coef", "logLik", "AIC", "vcov", "predict", "confint",
            "variable.names")
 importFrom(variables, mkgrid, as.vars, bounds)
 
-export("sltm", "as.mlt", "ttree")
+export("sltm", "as.mlt", "trtree", "trforest")
 
 S3method("coef", "sltm")
 S3method("logLik", "sltm")
@@ -28,7 +28,9 @@ S3method("summary", "sltm")
 S3method("print", "summary.sltm")
 S3method("as.mlt", "sltm")
 
-S3method("predict", "ttree")
-S3method("plot", "ttree")
+S3method("predict", "trtree")
+S3method("plot", "trtree")
+S3method("predict", "trforest")
+S3method("logLik", "trforest")
 
 # S3method("paraboot", "sltm")
