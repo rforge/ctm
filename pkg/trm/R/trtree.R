@@ -1,6 +1,6 @@
 
-trtree <- function(object, part, data, parm, weights, modelsplit = FALSE, 
-                  control = ctree_control(), ...) {
+.trparty <- function(object, part, data, parm, weights, modelsplit, 
+                     control, FUN, ...) {
 
     if (missing(parm)) parm <- 1:length(coef(object))
 
@@ -53,27 +53,36 @@ trtree <- function(object, part, data, parm, weights, modelsplit = FALSE,
     fm[[3L]] <- part[[2L]]
 
     if (modelsplit) control$splitfun <- split
-    ct <- ctree(fm, data = mf, ytrafo = trfo, weights = weights, 
-                control = control, ...)
+    ct <- FUN(fm, data = mf, ytrafo = trfo, weights = weights, 
+              control = control, ...)
 
-    nf <- predict(ct, type = "node")
-
-    cf <- tapply(1:nrow(mf), nf, function(nd) {
-        coef(update(object, 
-                    weights = weights * (1:nrow(mf) %in% nd))) 
-    })
-
-    ct$coefficients <- cf
     ct$model <- object
-    class(ct) <- c("trtree", class(ct))
     ct
 }
 
+trtree <- function(object, part, data, parm, weights, modelsplit = FALSE, 
+                   control = ctree_control(), ...) {
+
+    ret <- .trparty(object = object, part = part, data = data,
+                    weights = weights, modelsplit = modelsplit,
+                    control = control, FUN = ctree, ...)
+
+    nf <- predict(ret, type = "node")
+    if (missing(weights)) weights <- rep(1, length(nf))
+    cf <- tapply(1:length(nf), nf, function(nd) {
+        coef(update(object, 
+                    weights = weights * (1:length(nf) %in% nd))) 
+    })
+
+    ret$coefficients <- cf
+    class(ret) <- c("trtree", class(ret))
+    ret
+}
+
 predict.trtree <- function(object, newdata, K = 20, 
-    type = c("node", "trafo", "distribution", 
-             "survivor", "density", "logdensity", 
-             "hazard", "loghazard", 
-             "cumhazard", "quantile"), ...) {
+    type = c("node", "trafo", "distribution", "survivor", "density", 
+             "logdensity", "hazard", "loghazard", "cumhazard", "quantile"), 
+    ...) {
 
     type <- match.arg(type)
     if (missing(newdata)) {
@@ -183,5 +192,7 @@ node_mlt <- function(obj, col = "black", bg = "white", ylines = 2,
 }
 class(node_mlt) <- "grapcon_generator"
 
-plot.trtree <- function(x, ...)
-    partykit:::plot.constparty(x, terminal_panel = node_mlt, ...)
+plot.trtree <- function(x, ...) {
+    class(x) <- class(x)[-1L]
+    plot(x, terminal_panel = node_mlt, ...)
+}

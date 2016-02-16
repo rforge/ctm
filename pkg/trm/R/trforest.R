@@ -1,76 +1,27 @@
 
 trforest <- function(object, part, data, parm, weights, modelsplit = FALSE, 
              control = ctree_control(teststat = "quad",
-                                     testtype = "Univ", mincriterion = 0, ...), 
+                                     testtype = "Univ", mincriterion = 0), 
              ...) {
 
-    if (missing(parm)) parm <- 1:length(coef(object))
-
-    trfo <- function(data, weights)
-        estfun(update(object, weights = weights,
-                      theta = coef(object)))[, parm, drop = FALSE]
-
-    split <- function(x, response, weights, mb) {
-
-        if (is.ordered(x)) x <- unclass(x)
-        if (is.factor(x)) {
-            if(nlevels(x) == 2) return(1:2)
-            stop("not yet implemented")
-        }
-        ox <- order(x)
-        w <- cumsum(weights[ox])
-        ux <- x[ox][(w > mb) & (w < (sum(weights) - mb))]
-        sux <- sort(unique(ux))
-        suxl <- rev(sux[sux <= median(sux)])
-        suxr <- sux[sux > median(sux)]
-
-        lll <- numeric(length(suxl))
-        lmod <- rmod <- object
-        for (i in 1:length(suxl)) {
-            lll[i] <- logLik(lmod <- update(object, weights = weights * (x <= suxl[i]),
-                                        theta = coef(lmod))) +
-                  logLik(rmod <- update(object, weights = weights * (x > suxl[i]),
-                                        theta = coef(rmod)))
-        }
-        llr <- numeric(length(suxr))
-        lmod <- rmod <- object
-        for (i in 1:length(suxr)) {
-            llr[i] <- logLik(lmod <- update(object, weights = weights * (x <= suxr[i]),
-                                            theta = coef(lmod))) +
-                      logLik(rmod <- update(object, weights = weights * (x > suxr[i]),
-                                            theta = coef(rmod)))
-        }
-        xsplit <- c(suxl, suxr)[which.max(c(lll, llr))]
-        xsplit
-    }
-
-
-    mf <- model.frame(part, data = data)
-    stopifnot(all(!names(mf) %in% variable.names(object)))
-    if (missing(weights)) weights <- rep(1, NROW(mf))
-    tmp <- trfo(data, weights)
-
-    mf$response <- 0
-    fm <- response ~ x
-    fm[[3L]] <- part[[2L]]
-
-    if (modelsplit) control$splitfun <- split
-    cf <- cforest(fm, data = mf, ytrafo = trfo, weights = weights, 
-                  control = control, ...)
-
-    cf$model <- object
-    class(cf) <- c("trforest", class(cf))
-    cf
+    ret <- .trparty(object = object, part = part, data = data,
+                    weights = weights, modelsplit = modelsplit,
+                    control = control, FUN = cforest, ...)
+    class(ret) <- c("trforest", class(ret))
+    ret
 }
 
 predict.trforest <- function(object, newdata, K = 20, 
     type = c("node", "coef", "trafo", "distribution", 
              "survivor", "density", "logdensity", 
-             "hazard", "loghazard", "cumhazard", "quantile"), FUN = NULL, ...) {
+             "hazard", "loghazard", "cumhazard", "quantile"), 
+    OOB = FALSE, FUN = NULL, ...) {
 
     class(object) <- class(object)[-1L]
     type <- match.arg(type)
-    if (type == "node") return(predict(object, newdata = newdata, type = "node", ...))
+    if (type == "node") 
+        return(predict(object, newdata = newdata, type = "node", 
+                       OOB = OOB))
 
     q <- mkgrid(object$model, n = K)[[object$model$response]]
 
@@ -80,10 +31,11 @@ predict.trforest <- function(object, newdata, K = 20,
                 coef(update(object$model, weights = weights))
         } else {
             FUN <- function(response, weights)
-                  predict(update(object$model, weights = weights), q = q, type = type, ...)
+                predict(update(object$model, weights = weights), q = q, 
+                        type = type, ...)
         }
     }
-    predict(object, newdata = newdata, FUN = FUN, ...)
+    predict(object, newdata = newdata, FUN = FUN, OOB = TRUE)
 }
 
 logLik.trforest <- function(object, newdata, ...) {
