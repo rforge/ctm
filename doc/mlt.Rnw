@@ -46,15 +46,15 @@ lattice.options(default.theme = ltheme)
 knitr::opts_chunk$set(echo = TRUE, results = 'markup', error = FALSE,
                       warning = FALSE, message = FALSE,
                       tidy = FALSE, cache = FALSE, size = "small",
-                      fig.width = 5, fig.height = 4, fig.align = "center",
-                      # out.width = '.6\\linewidth', 
+                      fig.width = 6, fig.height = 4, fig.align = "center",
+                      out.width = NULL, ###'.6\\linewidth', 
+                      out.height = NULL,
                       fig.scap = NA)
 knitr::render_sweave()  # use Sweave environments
 knitr::set_header(highlight = '')  # do not \usepackage{Sweave}
 ## R settings
 options(prompt = "R> ", continue = "+  ", useFancyQuotes = FALSE)  # JSS style
 options(width = 75)
-# opts_chunk$set(warning = FALSE, message = FALSE, fig.width=4, fig.height=4)
 @
 
 \newcommand{\TODO}[1]{{\color{red} #1}}
@@ -498,7 +498,7 @@ in the left panel of Figure~\ref{fig:geyser-w-plot}.
 
 \begin{figure}
 \begin{center}
-<<geyser-w-plot, echo = FALSE, cache = TRUE, fig.width = 6, results = "hide">>=
+<<geyser-w-plot, echo = FALSE>>=
 layout(matrix(1:2, ncol = 2))
 plot(ecdf(geyser$waiting), col = "grey", xlab = "Waiting times", ylab = "Distribution", 
      main = "", cex = .75)
@@ -846,7 +846,7 @@ the fit resembles the normal linear model, although with a smaller conditional v
 
 \begin{figure}
 \begin{center}
-<<BostonHousing-plot, echo = FALSE, results = "hide", fig.width = 6, fig.height = 4>>=
+<<BostonHousing-plot, echo = FALSE, results = "hide">>=
 q <- 3:52
 m <- predict(lm_BH, data = BostonHousing2)
 s <- summary(lm_BH)$sigma
@@ -1285,7 +1285,7 @@ application of hormonal treatment.
 
 \begin{figure}
 \begin{center}
-<<GBSG2-8-plot, echo = FALSE, fig.width = 6>>=
+<<GBSG2-8-plot, echo = FALSE>>=
 nlev <- c(no = "without hormonal therapy", yes = "with hormonal therapy")
 levels(nd$horTh) <- nlev[match(levels(nd$horTh), names(nlev))]
 s <- mkgrid(mlt_GBSG2_8, 100)
@@ -1335,7 +1335,7 @@ indicates a certain asymmetry towards older boys.
 
 \begin{figure}
 \begin{center}
-<<head-plot, echo = FALSE, fig.width = 6>>=
+<<head-plot, echo = FALSE>>=
 pr <- expand.grid(s <- mkgrid(ctm_head, 100))
 pr$p <- c(predict(mlt_head, newdata = s, type = "distribution"))
 pr$lage <- pr$lage^3
@@ -1389,7 +1389,7 @@ more complex model.
 
 \begin{figure}
 \begin{center}
-<<Boston-Housing-dr-plot, echo = FALSE, fig.width = 6>>=
+<<Boston-Housing-dr-plot, echo = FALSE>>=
 q <- mkgrid(var_m, 100)[[1]]
 tr <- predict(mlt_BH, newdata = BostonHousing2[, all.vars(fm_BH[-2L])],
               q = q, type = "density")
@@ -1458,7 +1458,7 @@ cover storey in the center panel).
 
 \begin{figure}
 \begin{center}
-<<treepipit-plot, fig.width=6, fig.height=3, echo = FALSE>>=
+<<treepipit-plot, echo = FALSE, fig.height = 3>>=
 s <- mkgrid(ctm_treepipit, 100)
 s$counts <- s$counts[1:5]
 nd <- expand.grid(s)
@@ -1814,7 +1814,7 @@ transformation and distribution function.
 
 \begin{figure}
 \begin{center}
-<<geyser-w-cbplot, echo = FALSE, cache = TRUE, fig.width = 6, fig.height = 4, results = "hide">>=
+<<geyser-w-cbplot, echo = FALSE>>=
 layout(matrix(1:2, ncol = 2))
 #i <- (cb_w[, "q"] > 45 & cb_w[, "q"] < 110)
 #cb_w[-i, "lwr"] <- NA
@@ -1913,7 +1913,7 @@ $\hat{\Prob}_{\rY | \rX = \rx_i}, i = 1, \dots, N$ are drawn by \cmd{simulate}.
 
 \begin{figure}
 \begin{center}
-<<geyser-w-simulate-plot, fig.width = 6, fig.height = 4, echo = FALSE>>=
+<<geyser-w-simulate-plot, echo = FALSE>>=
 i <- which(llr < quantile(llr, prob = .95))
 tpdist <- pdist[i]
 tpdens <- pdens[i]
@@ -2149,7 +2149,7 @@ subject to $\eparm_2 > 0$ is defined as
 class(lb <- log_basis(xvar, ui = "increasing"))
 head(X <- model.matrix(lb, data = x))
 @
-The model matrix contains a \code{constraint} attribute
+The model matrix contains a \code{constraint} attribute \citep[using package \pkg{Matrix}][]{pkg:Matrix}
 <<basefun-log-constr>>=
 attr(X, "constraint")
 @
@@ -2401,7 +2401,7 @@ pkg <- function(pkg)
 pkgs <- c("survival", "eha", "prodlim", "truncreg", "MASS", "nnet", "HSAUR3", "sandwich", 
   "flexsurv", "multcomp", "mgcv", "intcox", "coxinterval", "ICsurv",
   "polspline", "logspline", "bshazard", "gss", "MIICD", "TransModel",
-  "dynsurv", "timereg", "survivalMPL", "np", "gamlss")
+  "dynsurv", "timereg", "survivalMPL", "np", "gamlss", "Matrix")
 out <- sapply(pkgs, pkg)
 
 mlt <- c("@Manual{pkg:mlt, \n
@@ -2429,6 +2429,13 @@ cat(basefun, sep = "\n", file = "packages.bib", append = TRUE)
 
 <<sessionInfo, echo = FALSE, results = "hide">>=
 sessionInfo()
+@
+
+<<mlt-coef, echo = FALSE, results = "hide">>= 
+### print coefs for regression tests
+objs <- ls()
+mltobj <- objs[grep("^mlt_", objs)]
+sapply(mltobj, function(m) eval(parse(text = paste("coef(", m, ")"))))
 @
 
 \end{appendix}
