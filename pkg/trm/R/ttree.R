@@ -1,11 +1,49 @@
 
-ttree <- function(object, part, data, parm, weights, ...) {
+ttree <- function(object, part, data, parm, weights, modelsplit = FALSE, 
+                  control = ctree_control(), ...) {
 
     if (missing(parm)) parm <- 1:length(coef(object))
 
     trfo <- function(data, weights)
         estfun(update(object, weights = weights,
                       theta = coef(object)))[, parm, drop = FALSE]
+
+    split <- function(x, response, weights, mb) {
+
+        xin <- x
+        if (is.ordered(x)) x <- unclass(x)
+        if (is.factor(x)) {
+            if(nlevels(x) == 2) return(1:2)
+            stop("not yet implemented")
+        }
+        ox <- order(x)
+        w <- cumsum(weights[ox])
+        ux <- x[ox][(w > mb) & (w < (sum(weights) - mb))]
+        sux <- sort(unique(ux))
+        suxl <- rev(sux[sux <= median(sux)])
+        suxr <- sux[sux > median(sux)]
+
+        lll <- numeric(length(suxl))
+        lmod <- rmod <- object
+        for (i in 1:length(suxl)) {
+            lll[i] <- logLik(lmod <- update(object, weights = weights * (x <= suxl[i]),
+                                        theta = coef(lmod))) +
+                  logLik(rmod <- update(object, weights = weights * (x > suxl[i]),
+                                        theta = coef(rmod)))
+        }
+        llr <- numeric(length(suxr))
+        lmod <- rmod <- object
+        for (i in 1:length(suxr)) {
+            llr[i] <- logLik(lmod <- update(object, weights = weights * (x <= suxr[i]),
+                                            theta = coef(lmod))) +
+                      logLik(rmod <- update(object, weights = weights * (x > suxr[i]),
+                                            theta = coef(rmod)))
+        }
+        xsplit <- c(suxl, suxr)[which.max(c(lll, llr))]
+        if (is.ordered(xin)) return(as.integer(c(rep(1, xsplit), rep(2, nlevels(xin) - xsplit))))
+        xsplit
+    }
+
 
     mf <- model.frame(part, data = data)
     stopifnot(all(!names(mf) %in% variable.names(object)))
@@ -16,8 +54,9 @@ ttree <- function(object, part, data, parm, weights, ...) {
     fm <- response ~ x
     fm[[3L]] <- part[[2L]]
 
+    if (modelsplit) control$splitfun <- split
     ct <- ctree(fm, data = mf, ytrafo = trfo, weights = weights, 
-                ...)
+                control = control, ...)
 
     nf <- predict(ct, type = "node")
 
@@ -96,10 +135,10 @@ node_mlt <- function(obj, col = "black", bg = "white", ylines = 2,
         y <- as.vector(predict(mod, q = q, type = type, ))
 
         ## set up plot
-        q <- q - min(q)
-        q <- q / max(q)
-        y <- y - min(y)
-        y <- y / max(y)
+        q <- q - xscale[1]
+        q <- q / xscale[2]
+        y <- y - yscale[1]
+        y <- y / yscale[2]
 
         top_vp <- viewport(layout = grid.layout(nrow = 2, ncol = 3,
                            widths = unit(c(ylines, 1, 1),
