@@ -1935,22 +1935,95 @@ tmp <- sapply(tpdens, function(x) lines(q, x, col = rgb(.1, .1, .1, .1)))
 
 \section{Summary}
 
-$250$ (\pkg{variables}), $920$ (\pkg{basefun}), $1520$ (\pkg{mlt})
-lines of \proglang{R} code
 
-Compare with other packages
+The computation framework implemented in package \pkg{mlt} allows fitting of
+a large class of transformation models.  Many established \proglang{R}
+add-on packages implement special cases, mostly in the context of survival
+times.  The most prominent is the \pkg{survival} package
+\citep{Therneau_Grambsch_2000,pkg:survival} with partial likelihood
+estimation of the Cox model in \cmd{coxph} and parametric linear transformation models
+in \cmd{survreg}.  Parametric proportional hazards (\cmd{eha}) and accelerated failure time
+models are also available from package \pkg{eha} \citep{pkg:eha}.
+The results obtained using these functions are
+practically identical to those obtained from the unified implementation of
+transformation models in \pkg{mlt} as shown in the various examples
+presented in Section~\ref{sec:trafo}.  Other packages offer estimation of
+the Cox model for interval censored responses, for example \pkg{intcox}
+\citep{pkg:intcox}, \pkg{coxinterval} \citep{pkg:coxinterval}, \pkg{MIICD}
+\citep{pkg:MIICD} and \pkg{ICsurv} \citep{pkg:ICsurv}.  No special treatment
+of this situation is necessary in \pkg{mlt} as the likelihood maximised by
+\cmd{mlt} allows arbitrary schemes of random censoring and also truncation.
 
-\pkg{intcox} \citep{pkg_intcox}, \pkg{coxinterval} \citep{pkg:coxinterval} \pkg{ICsurv} \citep{pkg:ICsurv}
+Alternative likelihood approaches to transformation models often parameterise
+the hazard or log-hazard function by some spline, including the 
+\proglang{R} add-on packages \pkg{polspline} \citep{pkg:polspline}, 
+\pkg{logspline} \citep{pkg:logspline}, \pkg{bshazard} \citep{pkg:bshazard} and
+\pkg{gss} \citep{Gu_2014,pkg:gss}. Packages \pkg{muhaz} \citep{pkg:muhaz} 
+and \pkg{ICE} \citep{pkg:ICE} implement kernel smoothing for hazard function
+estimation, the latter package allows for interval censored responses. The
+penalised maximum likelihood estimation procedure for simultaneous estimation
+of the baseline hazard function and the regression coefficients in a Cox model
+is available from package \pkg{survivalMPL} \citep{pkg:survivalMPL}.
 
-\pkg{polspline} \citep{pkg:polspline}, \pkg{logspline} \citep{pkg:logspline}, \pkg{bshazard} \citep{pkg:bshazard}
+Based on the estimation equation procedure by \cite{Chenetal_2002},
+\pkg{TransModel} \citep{pkg:TransModel} implements continuous time
+proportional hazards and proportional odds linear transformation models. 
+Time-varying coefficients can be estimated using packages \pkg{dynsurv}
+\citep{pkg:dynsurv} and \pkg{timereg}
+\citep{Scheike_Martinussen_2006,Scheike_Zhang_2011,pkg:timereg}
 
-\pkg{gss} \citep{Gu_2014,pkg:gss} \pkg{MIICD} \citep{pkg:MIICD}
+Discrete proportional odds or proportional hazards models for the analysis
+of ordered categorical responses are implemented in packages
+\pkg{MASS} \citep{Venables_Ripley_2002, pkg:MASS}, \pkg{ordinal} \citep{pkg:ordinal}
+and \pkg{VGAM} \citep{Yee_2010, pkg:VGAM}. 
 
-\pkg{TransModel} \citep{pkg:TransModel}
+Maximum likelihood estimators for a fair share of the models implemented in
+these packages can be re-implemented using the computational infrastructure
+offered by package \pkg{mlt}.  The availability of (at least) two
+independent implementations allows package developers to validate their
+implementation.  In fact, some errors in earlier development versions of
+\pkg{mlt} could be detected by comparing model outputs.  Because the
+implementation of maximum likelihood estimation for conditional
+transformation models presented in this paper relies on a rather dense code
+base ($200$ lines of pure \proglang{R} code in \pkg{variables}, $860$ lines
+in \pkg{basefun} and $1450$ lines in \pkg{mlt}, all convenience functions
+and user interfaces included), the likelihood of implementation errors is
+smaller compared the likelihood of errors in any of the plethora of
+alternative implementations of special linear transformation models (but not
+zero, of course).
 
-\pkg{dynsurv}, \pkg{timereg} \citep{Scheike_Martinussen_2006,Scheike_Zhang_2011,pkg:timereg}
+The modelling abilities of \pkg{mlt} go beyond what is currently available
+in \proglang{R}.  Maybe the practically most interesting example is
+distribution regression, \ie transformation models with response-varying
+regression coefficients.  The only special case available in \proglang{R} we
+are aware of are Cox models with time-varying effects in packages
+\pkg{dynsurv} and \pkg{timereg}.  For other models, such as the distribution
+regression analysis of the Boston Housing data presented here, or for
+non-proportional odds or non-proportional hazards models, implementations
+are lacking.  Our analysis of the bird counts example is novel also from a
+modelling point of view as linear transformation models for count data are
+still waiting to be kissed awake.
 
-\pkg{survivalMPL} \citep{pkg:survivalMPL}
+One feature of \pkg{mlt} is the strict separation of model specification
+(using \cmd{ctm}) and model estimation (using \cmd{mlt}) allowing
+computations on unfitted models.  In addition, model coefficients can be
+altered by the user, for example for computing conditional distribution or
+density functions or for the evaluation of the log-likelihood at arbitrary
+values of the parameters.  The \cmd{simulate} method for \code{mlt} objects
+can always be used to draw samples from fitted (or unfitted) transformation
+models.  Thus, the implementation of parametric bootstrap procedures is a
+straighforward exercise.
+
+The very flexible and powerful user interface of \pkg{mlt} will,
+however, be incomprehensible for most of its potential users.  Because
+transformation models seldomly receive the attention they deserve in
+statistics courses, the documentation of \pkg{mlt} will likely also confuse
+many statisticians, let alone ``data scientists''.  Future efforts will
+concentrate on the implementation of convenience interfaces, \ie higher
+level user interfaces for special forms of transformation models, that
+resemble the traditional notational and naming conventions the statistical
+modelling literature.
+
 
 \bibliography{mlt,packages}
 
@@ -2401,7 +2474,8 @@ pkg <- function(pkg)
 pkgs <- c("survival", "eha", "prodlim", "truncreg", "MASS", "nnet", "HSAUR3", "sandwich", 
   "flexsurv", "multcomp", "mgcv", "intcox", "coxinterval", "ICsurv",
   "polspline", "logspline", "bshazard", "gss", "MIICD", "TransModel",
-  "dynsurv", "timereg", "survivalMPL", "np", "gamlss", "Matrix")
+  "dynsurv", "timereg", "survivalMPL", "np", "gamlss", "Matrix", "muhaz", "ICE",
+  "ordinal", "VGAM")
 out <- sapply(pkgs, pkg)
 
 mlt <- c("@Manual{pkg:mlt, \n
