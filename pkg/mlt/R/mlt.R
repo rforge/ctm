@@ -201,7 +201,7 @@
     ret
 }
 
-.mlt_fit <- function(object, weights, theta = NULL, scale = FALSE, check = TRUE, trace = FALSE, 
+.mlt_fit <- function(object, weights, theta = NULL, scale = FALSE, trace = FALSE, 
                      quiet = TRUE, ...) {
 
     if (is.null(theta))
@@ -223,24 +223,11 @@
     object$quiet <- quiet
     class(object) <- c("mlt_fit", cls)
     
-    if (check) {
-        ### check gradient  and hessian
-        gr <- numDeriv::grad(object$loglik, ret$par, weights = weights)
-        s <- Gradient(object)
-        cat("Gradient")
-        print(all.equal(gr, s, check.attributes = FALSE))
-
-        H1 <- numDeriv::hessian(object$loglik, ret$par, weights = weights)
-        H2 <- Hessian(object)
-        cat("Hessian:")
-        print(all.equal(H1, H2, check.attributes = FALSE))
-    }
-
     return(object)
 }
 
 mlt <- function(model, data, weights = NULL, offset = NULL, fixed = NULL,
-                theta = NULL, pstart = NULL, scale = FALSE, check = FALSE, 
+                theta = NULL, pstart = NULL, scale = FALSE,
                 checkGrad = FALSE, trace = FALSE, quiet = TRUE, dofit = TRUE, ...) {
 
     vars <- as.vars(model)

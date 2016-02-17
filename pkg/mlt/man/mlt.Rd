@@ -10,7 +10,7 @@
 }
 \usage{
 mlt(model, data, weights = NULL, offset = NULL, fixed = NULL, theta = NULL, 
-    pstart = NULL, scale = FALSE, check = FALSE, checkGrad = FALSE, 
+    pstart = NULL, scale = FALSE, checkGrad = FALSE, 
     trace = FALSE, quiet = TRUE, dofit = TRUE, ...)
 coef(object) <- value
 }
@@ -26,8 +26,6 @@ coef(object) <- value
                 evaluated at the data}
   \item{scale}{a logical indicating if scaling shall be applied to the
                linear part of the model (if any)}
-  \item{check}{a logical triggering a comparison of the analytic and approximated
-               gradients and hessians for the fitted model}
   \item{checkGrad}{a logical triggering checks of the analytic gradient
                    during optimisation}
   \item{trace}{a logical triggering status messages of the optimiser}

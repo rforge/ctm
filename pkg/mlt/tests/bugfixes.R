@@ -14,7 +14,7 @@ ctmm2 <- ctm(response = Bernstein_basis(y, order = 4, ui = "increasing"),
               interacting = c(x1=Bernstein_basis(x1, order = 3),
                               x2=Bernstein_basis(x2, order= 3)))
 ### fit model
-mltm2 <- mlt(ctmm2, data = dat, check = FALSE)
+mltm2 <- mlt(ctmm2, data = dat)
 (p <- predict(mltm2, newdata = data.frame(x1=0, x2 = 0), q = mkgrid(mltm2, n = 10)[["y"]]))
 ### plot data
 plot(mltm2,newdata=expand.grid(x1=0:1, x2 = 0:1))
@@ -47,5 +47,5 @@ basis_y <- Bernstein_basis(y, order = 2, ui = "incre")
 x <- names(bodyfat)[-2]
 xfm <- as.formula(paste("~", x, collapse = "+"))
 m <- ctm(basis_y, shift = xfm, data = bodyfat)
-mod <- mlt(m, data = bodyfat, scale = TRUE, check = FALSE, checkGrad = FALSE)
+mod <- mlt(m, data = bodyfat, scale = TRUE, checkGrad = FALSE)
 summary(mod)
