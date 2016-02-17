@@ -30,7 +30,7 @@ ctm(response, interacting = NULL, shifting = NULL, data = NULL,
 }
 \references{
 
-  Torsten Hothorn, Lisa Moest, Peter Buehlmann (2015), Most Likely
+  Torsten Hothorn, Lisa Moest, Peter Buehlmann (2016), Most Likely
   Transformations, http://arxiv.org/abs/1508.06749
 
 }

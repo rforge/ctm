@@ -1,7 +1,7 @@
     
 ### simulate from model object with data newdata
 simulate.mlt <- function(object, nsim = 1, seed = NULL, 
-                         newdata = object$data, n = 50, 
+                         newdata = object$data, K = 50, 
                          interpolate = TRUE, ...) {
 
     ### from stats:::simulate.lm
@@ -18,7 +18,7 @@ simulate.mlt <- function(object, nsim = 1, seed = NULL,
 
     y <- object$response
     ### don't accept user-generated quantiles
-    q <- mkgrid(object, n = n)[[y]]
+    q <- mkgrid(object, n = K)[[y]]
     if (is.data.frame(newdata)) {
         p <- runif(nsim * NROW(newdata))
         ### basically compute quantiles for p; see qmlt

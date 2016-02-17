@@ -1,7 +1,5 @@
 \name{mlt}
 \alias{mlt}
-\alias{coef<-}
-\alias{coef<-.mlt}
 \title{
   Most likely transformations
 }
@@ -12,7 +10,6 @@
 mlt(model, data, weights = NULL, offset = NULL, fixed = NULL, theta = NULL, 
     pstart = NULL, scale = FALSE, checkGrad = FALSE, 
     trace = FALSE, quiet = TRUE, dofit = TRUE, ...)
-coef(object) <- value
 }
 \arguments{
   \item{model}{a conditional transformation model as specified by \code{\link{ctm}}}
@@ -33,19 +30,17 @@ coef(object) <- value
   \item{dofit}{a logical indicating if the model shall be fitted to the
                data (\code{TRUE}) or not}
   \item{\dots}{additional arguments to \code{\link[BB]{BBoptim}}}
-  \item{object}{an object of class \code{mlt}}
-  \item{value}{coefficients to be assigned to the model}
 }
 \details{
   This function fits a conditional transformation model by searching for 
-  the most likely transformation as described in Hothorn et al. (2015).
+  the most likely transformation as described in Hothorn et al. (2016).
 }
 \value{
   An object of class \code{mlt} with corresponding methods.
 }
 \references{
 
-  Torsten Hothorn, Lisa Moest, Peter Buehlmann (2015), Most Likely 
+  Torsten Hothorn, Lisa Moest, Peter Buehlmann (2016), Most Likely 
   Transformations, http://arxiv.org/abs/1508.06749
 
 }

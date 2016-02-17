@@ -33,7 +33,7 @@ Loading required package: variables
 +               interacting = c(x1=Bernstein_basis(x1, order = 3),
 +                               x2=Bernstein_basis(x2, order= 3)))
 > ### fit model
-> mltm2 <- mlt(ctmm2, data = dat, check = FALSE)
+> mltm2 <- mlt(ctmm2, data = dat)
 Note: method with signature 'diagonalMatrix#Matrix' chosen for function 'kronecker',
  target signature 'ddiMatrix#dgCMatrix'.
  "ANY#sparseMatrix" would also be valid
@@ -102,11 +102,11 @@ Note: method with signature 'TsparseMatrix#sparseMatrix' chosen for function 'kr
 > x <- names(bodyfat)[-2]
 > xfm <- as.formula(paste("~", x, collapse = "+"))
 > m <- ctm(basis_y, shift = xfm, data = bodyfat)
-> mod <- mlt(m, data = bodyfat, scale = TRUE, check = FALSE, checkGrad = FALSE)
+> mod <- mlt(m, data = bodyfat, scale = TRUE, checkGrad = FALSE)
 > summary(mod)
 
 Call:
-mlt(model = m, data = bodyfat, scale = TRUE, check = FALSE, checkGrad = FALSE)
+mlt(model = m, data = bodyfat, scale = TRUE, checkGrad = FALSE)
 
 Type:  continuous linear transformation model (transformed normal distribution)
 AIC:  366.2854

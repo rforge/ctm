@@ -218,7 +218,6 @@
     object$theta <- theta ### starting value
     object$scale <- scale ### scaling yes/no
     object$weights <- weights
-    object$check <- check
     object$trace <- trace
     object$quiet <- quiet
     class(object) <- c("mlt_fit", cls)
@@ -258,7 +257,6 @@ mlt <- function(model, data, weights = NULL, offset = NULL, fixed = NULL,
     args$weights <- weights
     args$theta <- theta
     args$scale <- scale
-    args$check <- check
     args$trace <- trace
     args$checkGrad <- checkGrad
     args$quiet <- quiet
@@ -286,7 +284,6 @@ update.mlt_fit <- function(object, weights, theta, ...) {
         args$theta <- theta
     }
     args$scale <- object$scale
-    args$check <- object$check
     args$trace <- object$trace
     args$checkGrad <- object$checkGrad
     args$quiet <- object$quiet

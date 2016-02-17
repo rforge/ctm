@@ -17,7 +17,7 @@ confband(object, newdata, level = 0.95, ...)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{object}{an object of class \code{\link{mlt}}}
-  \item{newdata}{a data frame}
+  \item{newdata}{a data frame of observations}
   \item{level}{the confidence level}
   \item{type}{the function to compute the confidence band for}
   \item{K}{number of grid points the function is evaluated at}
