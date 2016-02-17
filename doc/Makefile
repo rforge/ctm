@@ -32,7 +32,10 @@ clean:
 	make texclean
 	rm -rf mlt.tex
 	rm -rf mlt.R
+	rm -rf mlt.Rout
 	rm -rf packages.bib
+	rm -rf .Rdata
+	rm -rf Rplots.pdf
 	
 dist-clean:
 	make clean
