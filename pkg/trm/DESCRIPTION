@@ -1,13 +1,13 @@
 Package: trm
 Title: Transformation Models
-Version: 0.0-21
-Date: 2015-02-15
+Version: 0.0-22
+Date: 2015-02-16
 Authors@R: person("Torsten", "Hothorn", role = c("aut", "cre"),
                   email = "Torsten.Hothorn@R-project.org")
 Description: Simple user-interfaces to specific transformation models
   implemented in package mlt.
   and truncation schemes.
-Depends: mlt (>= 0.0-21)
+Depends: mlt (>= 0.0-22)
 Imports: Formula, multcomp, variables, basefun, sandwich, partykit, grid
 Suggests: survival, MASS, TH.data
 License: GPL-2
