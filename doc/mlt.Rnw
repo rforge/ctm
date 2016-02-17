@@ -1,4 +1,7 @@
 
+%\VignetteEngine{knitr::knitr}
+%\VignetteIndexEntry{mlt}
+
 \documentclass[article,nojss,shortnames]{jss}
 
 %% packages
@@ -8,6 +11,7 @@
 \usepackage{color}
 \usepackage{rotating}
 \usepackage{verbatim}
+\usepackage[utf8]{inputenc}
 %% need no \usepackage{Sweave.sty}
 %%\usepackage[nolists]{endfloat}
 
