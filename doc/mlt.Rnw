@@ -509,7 +509,7 @@ plot(ecdf(geyser$waiting), col = "grey", xlab = "Waiting times", ylab = "Distrib
 lines(nd_w$waiting, nd_w$d)
 B_w_40 <- Bernstein_basis(order = 40, var = var_w, ui = "incre")
 ctm_w_40 <- ctm(B_w_40, todistr = "Normal")
-mlt_w_40 <- mlt(ctm_w_40, data = geyser)
+mlt_w_40 <- mlt(ctm_w_40, data = geyser, maxit = 5000)
 nd_w$d2 <- predict(mlt_w_40, q = nd_w$waiting, type = "distribution")
 lines(nd_w$waiting, nd_w$d2, lty = 2)
 legend("bottomright", lty = 1:2, legend = c("M = 8", "M = 40"), bty = "n")
@@ -916,7 +916,7 @@ PSID1976$nwincome <- with(PSID1976, (fincome - hours * wage)/1000)
 PSID1976$hours <- as.double(PSID1976$hours)
 PSID1976_0 <- subset(PSID1976, participation == "yes")
 fm_PSID1976 <- hours ~ nwincome + education +
-  experience + I(experience^2) + age + youngkids + oldkids
+    experience + I(experience^2) + age + youngkids + oldkids
 @
 We use a 
 linear regression model for left-truncated data and compare the
@@ -936,7 +936,7 @@ b_hours <- as.basis(~ hours, data = PSID1976,
 ctm_PSID1976_1 <- ctm(b_hours, shift = fm_PSID1976[-2L], 
     data = PSID1976_0, todistr = "Normal") 
 mlt_PSID1976_1 <- mlt(ctm_PSID1976_1, data = PSID1976_0, 
-    scale = TRUE)
+                      scale = TRUE)
 @
 The \cmd{mlt} function does a slightly better job at maximising the likelihood 
 than \cmd{truncreg} which explains the differences in the estimated coefficients
@@ -991,7 +991,7 @@ without any regression coefficients $\shiftparm$ in the model:
 b_health <- as.basis(~ R_health - 1, data = CHFLS)
 ctm_CHFLS_3 <- ctm(b_happy, interacting = b_health, todist = "Logistic")
 mlt_CHFLS_3 <- mlt(ctm_CHFLS_3, data = CHFLS, scale = TRUE,
-                   maxit = 5000)
+                   maxit = 5000, gtol = 1e-3)
 logLik(mlt_CHFLS_3)
 predict(mlt_CHFLS_3, newdata = mkgrid(mlt_CHFLS_3), type = "distribution")
 @
@@ -1117,7 +1117,7 @@ contrasts(CHFLS$R_health) <- "contr.treatment"
 b_health <- as.basis(~ R_health, data = CHFLS)
 ctm_CHFLS_5 <- ctm(b_happy, interacting = b_health, todist = "Logistic")
 mlt_CHFLS_5 <- mlt(ctm_CHFLS_5, data = CHFLS, 
-    scale = TRUE, maxit = 10000)
+    scale = TRUE, maxit = 10000, gtol = 1e-3)
 predict(mlt_CHFLS_5, newdata = mkgrid(mlt_CHFLS_5), 
         type = "distribution")
 logLik(mlt_CHFLS_5)
@@ -1130,7 +1130,7 @@ effects of age and income are allowed to vary with happiness
 b_R <- as.basis(~ R_age + R_income, data = CHFLS, remove_intercept = TRUE)
 ctm_CHFLS_6 <- ctm(b_happy, interacting = b_R, todist = "Logistic")  
 mlt_CHFLS_6 <- mlt(ctm_CHFLS_6, data = CHFLS, scale = TRUE,
-                   maxit = 5000)
+                   maxit = 5000, gtol = 1e-3)
 logLik(mlt_CHFLS_6)
 @
 and finally we include all three variables (health, age and income) allowing for
@@ -1139,7 +1139,7 @@ happiness-varying effects as
 ctm_CHFLS_7 <- ctm(b_happy, interacting = c(h = b_health, R = b_R), 
     todist = "Logistic")  
 mlt_CHFLS_7 <- mlt(ctm_CHFLS_7, data = CHFLS, scale = TRUE,
-                   maxit = 5000)
+                   maxit = 10000, gtol = 1e-3)
 logLik(mlt_CHFLS_7)
 @
 
@@ -1382,7 +1382,7 @@ to be monotone (\code{sumconstr = FALSE}).
 <<BostonHousing-dr, cache = TRUE>>=
 b_BH_s <- as.basis(fm_BH[-2L], data = BostonHousing2, scale = TRUE)
 ctm_BHi <- ctm(B_m, interacting = b_BH_s, sumconstr = FALSE)
-mlt_BHi <- mlt(ctm_BHi, data = BostonHousing2, scale = TRUE)
+mlt_BHi <- mlt(ctm_BHi, data = BostonHousing2, scale = TRUE, maxit = 5000, gtol = 1e-3)
 logLik(mlt_BHi)
 AIC(mlt_BHi)
 @
@@ -1442,7 +1442,7 @@ B_cs <- Bernstein_basis(var = numeric_var("coverstorey", support = 1:110),
                         order = 4)
 B_c <- as.basis(tmp$counts)
 ctm_treepipit <- ctm(B_c, interacting = B_cs)
-mlt_treepipit <- mlt(ctm_treepipit, data = tmp, maxit = 10000)
+mlt_treepipit <- mlt(ctm_treepipit, data = tmp, maxit = 10000, gtol = 1e-3)
 @
 The left
 panel of Figure~\ref{fig:treepipit-plot} depicts the observations and the
@@ -2542,6 +2542,8 @@ cat(basefun, sep = "\n", file = "packages.bib", append = TRUE)
 objs <- ls()
 mltobj <- objs[grep("^mlt_", objs)]
 sapply(mltobj, function(m) eval(parse(text = paste("coef(", m, ")"))))
+#library("mlt.docreg")
+#sapply(mltobj, function(m) eval(parse(text = paste("checkGH(", m, ")"))))
 @
 
 <<sessionInfo, echo = FALSE, results = "hide">>=
