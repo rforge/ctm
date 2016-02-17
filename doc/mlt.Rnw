@@ -2449,7 +2449,7 @@ legend("topright", lty = 1:3, bty = "n",
 
 %\section{Computational Details}
 
-<<funs, echo = FALSE, results='hide'>>=
+<<funs, echo = FALSE, results='hide', purl = FALSE>>=
 if (file.exists("packages.bib")) file.remove("packages.bib")
 pkgversion <- function(pkg) {
     pkgbib(pkg)
@@ -2459,6 +2459,29 @@ pkgbib <- function(pkg) {
     x <- citation(package = pkg, auto = TRUE)[[1]]
     b <- toBibtex(x)
     b <- gsub("Buehlmann", "B{\\\\\"u}hlmann", b)
+
+    i <- grep("title = \\{ICsurv", b)
+    if (length(i) == 1)
+       b[i] <- "  title = {ICsurv: A Package for Semiparametric Regression Analysis of Interval-censored Data},"
+
+    i <- grep("title = \\{dynsurv", b)
+    if (length(i) == 1)
+       b[i] <- "  title = {dynsurv: Dynamic Models for Survival Data},"
+
+    i <- grep("title = \\{np", b)
+    if (length(i) == 1)
+       b[i] <- "  title = {np: Nonparametric Kernel Smoothing Methods for Mixed Data Types},"
+
+    i <- grep("Kenneth Hess", b)
+    if (length(i) == 1)
+       b[i] <- "  author = {Kenneth Hess and Robert Gentleman},"
+
+    b <- gsub("with contributions from", "and", b)
+
+    b <- gsub("Göran Broström", "G\\\\\"oran Brostr\\\\\"om", b)
+
+    b <- gsub("R package", "\\\\proglang{R} package", b)
+
     b[1] <- paste("@Manual{pkg:", pkg, ",", sep = "")
     if (is.na(b["url"])) {
         b[length(b)] <- paste("   URL = {http://CRAN.R-project.org/package=",
@@ -2477,6 +2500,11 @@ pkgs <- c("survival", "eha", "prodlim", "truncreg", "MASS", "nnet", "HSAUR3", "s
   "dynsurv", "timereg", "survivalMPL", "np", "gamlss", "Matrix", "muhaz", "ICE",
   "ordinal", "VGAM")
 out <- sapply(pkgs, pkg)
+
+x <- readLines("packages.bib")
+for (p in pkgs)
+    x <- gsub(paste("\\{", p, ":", sep = ""), paste("\\{\\\\pkg{", p, "}:", sep = ""), x)
+cat(x, sep = "\n", file = "packages.bib", append = FALSE)
 
 mlt <- c("@Manual{pkg:mlt, \n
           title = {mlt: Most Likely Transformations},\n
@@ -2501,9 +2529,9 @@ cat(variables, sep = "\n", file = "packages.bib", append = TRUE)
 cat(basefun, sep = "\n", file = "packages.bib", append = TRUE)
 @
 
-<<sessionInfo, echo = FALSE, results = "hide">>=
-sessionInfo()
-@
+
+\end{appendix}
+
 
 <<mlt-coef, echo = FALSE, results = "hide">>= 
 ### print coefs for regression tests
@@ -2512,7 +2540,9 @@ mltobj <- objs[grep("^mlt_", objs)]
 sapply(mltobj, function(m) eval(parse(text = paste("coef(", m, ")"))))
 @
 
-\end{appendix}
+<<sessionInfo, echo = FALSE, results = "hide">>=
+sessionInfo()
+@
 
 \clearpage
 

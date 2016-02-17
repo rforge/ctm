@@ -12,7 +12,7 @@ mlt.R:	mlt.Rnw
 mlt.Rout:	mlt.R
 	R CMD BATCH mlt.R
 	
-mlt.pdf:	mlt.tex todo.tex mlt.Rnw
+mlt.pdf:	mlt.tex todo.tex mlt.bib
 	texi2dvi --pdf mlt.tex
 	pdflatex mlt.tex
 
