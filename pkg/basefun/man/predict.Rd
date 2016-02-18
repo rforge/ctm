@@ -3,7 +3,7 @@
 \alias{predict.cbind_bases}
 \alias{predict.box_bases}
 \title{
-  Evaluate functions
+  Evaluate Basis Functions
 }
 \description{
   Evaluate basis functions and compute the function defined by the corresponding basis

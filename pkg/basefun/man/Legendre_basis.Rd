@@ -1,7 +1,7 @@
 \name{Legendre_basis}
 \alias{Legendre_basis}
 \title{
-    Legendre basis functions
+    Legendre Basis Functions
 }
 \description{
     Basis functions defining a Legendre polynomial

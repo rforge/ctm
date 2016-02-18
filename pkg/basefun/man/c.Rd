@@ -1,7 +1,7 @@
 \name{c.basis}
 \alias{c.basis}
 \title{
-    Join basis functions
+    Join Basis Functions
 }
 \description{
     Concatenate basis functions column-wise

@@ -6,7 +6,7 @@
 \alias{as.basis.factor}
 \alias{as.basis.ordered}
 \title{
-    Formula or factor to basis function
+    Convert Formula or Factor to Basis Function
 }
 \description{
     Convert a formula or factor to basis functions
@@ -14,7 +14,7 @@
 \usage{
 as.basis(object, ...)
 \method{as.basis}{formula}(object, data = NULL, remove_intercept = FALSE, 
-                ui = NULL, ci = NULL, negative = FALSE, scale = FALSE, ...)
+         ui = NULL, ci = NULL, negative = FALSE, scale = FALSE, ...)
 \method{as.basis}{factor_var}(object, ...)
 \method{as.basis}{ordered_var}(object, ...)
 \method{as.basis}{factor}(object, ...)
@@ -42,6 +42,8 @@ as.basis(object, ...)
   ordered factor (classes \code{ordered} or \code{ordered_var}) lead to a treatment contrast
   to the last level and removal of the intercept term with monotonicity constraint.
   Additional arguments (\code{\dots}) are ignored for ordered factors.
+
+  Linear constraints on parameters \code{parm} are defined by \code{ui \%*\% parm >= ci}.
 }
 \examples{
 

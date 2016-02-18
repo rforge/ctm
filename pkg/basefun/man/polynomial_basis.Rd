@@ -1,7 +1,7 @@
 \name{polynomial_basis}
 \alias{polynomial_basis}
 \title{
-    Polynomial basis functions
+    Polynomial Basis Functions
 }
 \description{
     Basis functions defining a polynomial

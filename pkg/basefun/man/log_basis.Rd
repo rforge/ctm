@@ -1,7 +1,7 @@
 \name{log_basis}
 \alias{log_basis}
 \title{
-    Logarithmic basis function
+    Logarithmic Basis Function
 }
 \description{
     The logarithmic basis function

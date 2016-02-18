@@ -9,6 +9,8 @@
 
   The package was written to support the \pkg{mlt}
   package and will be of limited use outside this package.
+  The user interface is not yet stable, so please be careful using 
+  \pkg{basefun} in your package.
 }
 \author{
   This package is authored by Torsten Hothorn <Torsten.Hothorn@R-project.org>.

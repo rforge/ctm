@@ -1,7 +1,7 @@
 \name{Bernstein_basis}
 \alias{Bernstein_basis}
 \title{
-    Bernstein basis functions
+    Bernstein Basis Functions
 }
 \description{
     Basis functions defining a Bernstein polynomial

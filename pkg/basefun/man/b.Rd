@@ -1,7 +1,7 @@
 \name{b}
 \alias{b}
 \title{
-    Box product 
+    Box Product of Basis Functions
 }
 \description{
     Box product of two basis functions
@@ -15,7 +15,7 @@ b(..., sumconstr = FALSE)
 }
 \details{
   \code{b()} joins the corresponding design matrices 
-  by the Kronecker (or box) product.
+  by the row-wise Kronecker (or box) product.
 }
 \examples{
 
