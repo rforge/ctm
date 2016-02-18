@@ -6,6 +6,9 @@
 \description{
   The \pkg{mlt} implements maximum likelihood estimation in 
   conditional transformation models as introduced by Hothorn et al. (2016).
+
+  An introduction to the package is available in the \code{mlt} package
+  vignette from package \code{mlt.docreg}.
 }
 \references{
 

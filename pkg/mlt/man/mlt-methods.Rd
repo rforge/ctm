@@ -31,7 +31,7 @@ Hessian(object, ...)
 Gradient(object, ...)
 \method{Gradient}{mlt}(object, parm = coef(object, fixed = FALSE), ...)
 \method{estfun}{mlt}(object, parm = coef(object, fixed = FALSE),
-                     w = weights(object), ...)
+       w = weights(object), ...)
 \method{mkgrid}{mlt}(object, n, ...)
 \method{bounds}{mlt}(object)
 \method{variable.names}{mlt}(object, ...)
@@ -58,5 +58,5 @@ Gradient(object, ...)
   and \code{estfun} the score contribution by each observation. \code{mkgrid}
   generates a grid of all variables (as returned by \code{variable.names}) in the model.
   \code{update} allows refitting the model with alternative weights and potentially
-  different starting values
+  different starting values. \code{bounds} gets bounds for bounded variables in the model.
 }

@@ -22,7 +22,7 @@ confband(object, newdata, level = 0.95, ...)
   \item{type}{the function to compute the confidence band for}
   \item{K}{number of grid points the function is evaluated at}
   \item{cheat}{number of grid points the function is evaluated at when
-               using the quantile obtained for \code{K} number of grid points}
+               using the quantile obtained for \code{K} grid points}
   \item{\dots}{additional arguments to \code{\link[multcomp]{confint.glht}}}
 }
 \details{

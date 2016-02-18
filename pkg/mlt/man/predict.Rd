@@ -1,4 +1,4 @@
-\name{predict-simulate-plot}
+\name{plot-predict-simulate}
 \alias{predict.mlt}
 \alias{simulate.mlt}
 \alias{plot.mlt}
@@ -10,14 +10,15 @@
 }
 \usage{
 \method{plot}{mlt}(x, newdata, type = c("distribution", "survivor", "density", 
-      "logdensity", "hazard", "loghazard", "cumhazard", "quantile", "trafo"),
-      q = NULL, p = 1:(K - 1) / K, K = 50, col = rgb(.1, .1, .1, .1), add = FALSE, ...)
+     "logdensity", "hazard", "loghazard", "cumhazard", "quantile", "trafo"),
+     q = NULL, p = 1:(K - 1) / K, K = 50, col = rgb(.1, .1, .1, .1), add = FALSE, 
+     ...)
 \method{predict}{mlt}(object, newdata = object$data, type = c("trafo", "distribution", 
-      "survivor", "density", "logdensity", "hazard", "loghazard", "cumhazard", "quantile"),
-      terms = c("bresponse", "binteracting", "bshifting"), q = NULL, p = NULL, K = 50,
-      interpolate = TRUE, ...)
+         "survivor", "density", "logdensity", "hazard", "loghazard", "cumhazard", 
+         "quantile"), terms = c("bresponse", "binteracting", "bshifting"), 
+         q = NULL, p = NULL, K = 50, interpolate = TRUE, ...)
 \method{simulate}{mlt}(object, nsim = 1, seed = NULL, newdata = object$data, K = 50, 
-      interpolate = TRUE, ...)
+         interpolate = TRUE, ...)
 }
 \arguments{
   \item{object}{a fitted conditional transformation model as returned by \code{\link{mlt}}}

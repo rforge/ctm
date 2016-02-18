@@ -4,7 +4,7 @@
   Conditional Transformation Models
 }
 \description{
-  Specify conditional transformation models
+  Specification of conditional transformation models
 }
 \usage{
 ctm(response, interacting = NULL, shifting = NULL, data = NULL, 
