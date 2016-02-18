@@ -1,7 +1,6 @@
 \name{mlt-package}
 \docType{package}
 \alias{mlt-package}
-\alias{mlt}
 \title{General Information on the \pkg{mlt} Package}
 \description{
   The \pkg{mlt} implements maximum likelihood estimation in 
