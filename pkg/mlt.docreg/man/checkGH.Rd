@@ -1,7 +1,7 @@
 \name{checkGH}
 \alias{checkGH}
 \title{
-  Check gradient and hessian
+  Check Gradient and Hessian
 }
 \description{
   Check analytic gradient and hessian against their numerical approximation
