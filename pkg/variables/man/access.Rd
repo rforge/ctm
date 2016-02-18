@@ -1,13 +1,12 @@
 \name{access}
 \alias{variable.names.var}
 \alias{desc}
-\alias{unit.var}
 \alias{unit}
 \alias{support}
 \alias{bounds}
 \alias{is.bounded}
 \title{
-    Accessor functions
+    Accessor Functions
 }
 \description{
     Access properties of variable objects
@@ -15,15 +14,13 @@
 \usage{
 \method{variable.names}{var}(object, ...)
 desc(object)
-unit(x)
-\method{unit}{var}(x)
+unit(object)
 support(object)
 bounds(object)
 is.bounded(object)
 }
 \arguments{
   \item{object}{a variable object}
-  \item{x}{a variable object}
   \item{\dots}{additional arguments, currently not used}
 }
 \details{

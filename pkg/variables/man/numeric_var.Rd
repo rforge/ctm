@@ -1,13 +1,14 @@
 \name{numeric_var}
 \alias{numeric_var}
 \title{
-  Numeric variable
+  Numeric Variable
 }
 \description{
   Formal description of numeric variable
 }
 \usage{
-numeric_var(name, desc = NULL, unit = NULL, support = c(0, 1), add = c(0, 0), bounds = NULL)
+numeric_var(name, desc = NULL, unit = NULL, support = c(0, 1), add = c(0, 0), 
+            bounds = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -21,7 +22,7 @@ numeric_var(name, desc = NULL, unit = NULL, support = c(0, 1), add = c(0, 0), bo
 }
 \details{
   A numeric variable can be discrete (support is then the set of all
-  possible values, either either integer or double; integers of length 2
+  possible values, either integer or double; integers of length 2
   are interpreted as all integers inbetween) or continuous (support is
   a double of length 2 giving the support of the data).
 
@@ -38,6 +39,7 @@ numeric_var(name, desc = NULL, unit = NULL, support = c(0, 1), add = c(0, 0), bo
 
   numeric_var("time", "survival time", "days", support = 0:365)
 
-  numeric_var("time", "survival time", "days", support = c(0.0, 365), bounds = c(0, Inf))
+  numeric_var("time", "survival time", "days", support = c(0.0, 365), 
+              bounds = c(0, Inf))
 
 }

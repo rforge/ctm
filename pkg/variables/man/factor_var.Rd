@@ -1,7 +1,7 @@
 \name{factor_var}
 \alias{factor_var}
 \title{
-    Unordered categorical variable
+    Unordered Categorical Variable
 }
 \description{
     Formal description of an unordered categorical variable

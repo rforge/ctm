@@ -2,10 +2,10 @@
 \alias{as.vars}
 \alias{c.var}
 \title{
-    Collections of variables
+    Multiple Abstract Descriptions
 }
 \description{
-    Collect multiple variable objects
+    Concatenate or generate multiple variable descriptions
 }
 \usage{
 \method{c}{var}(...)
@@ -17,7 +17,8 @@ as.vars(object)
 }
 \details{
   \code{c()} can be used to concatenate multiple variable objects; the corresponding
-   generics also work for the resulting object.
+   generics also work for the resulting object. \code{as.vars()} tries to infer a 
+  formal description from data.
 }
 \examples{
 
@@ -30,4 +31,5 @@ as.vars(object)
    is.bounded(fn)
    mkgrid(fn, n = 9)
 
+   as.vars(iris)
 }

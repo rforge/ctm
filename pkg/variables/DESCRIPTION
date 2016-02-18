@@ -4,6 +4,6 @@ Version: 0.0-22
 Date: 2015-02-17
 Authors@R: person("Torsten", "Hothorn", role = c("aut", "cre"),
                   email = "Torsten.Hothorn@R-project.org")
-Description: Names and properties of yet unobserved variables.
+Description: Abstract descriptions of (yet) unobserved variables.
 Imports: stats
 License: GPL-2

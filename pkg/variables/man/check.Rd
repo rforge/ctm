@@ -1,7 +1,7 @@
 \name{check}
 \alias{check}
 \title{
-  Check formal description against observations
+  Check Observations Against Formal Description
 }
 \description{
   Check if observations correspond to their formal descriptions

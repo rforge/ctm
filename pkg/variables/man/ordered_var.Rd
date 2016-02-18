@@ -1,7 +1,7 @@
 \name{ordered_var}
 \alias{ordered_var}
 \title{
-    Ordered categorical variable
+    Ordered Categorical Variable
 }
 \description{
     Formal description of an ordered categorical variable

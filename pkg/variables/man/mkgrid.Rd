@@ -2,7 +2,7 @@
 \alias{mkgrid}
 \alias{mkgrid.continuous_var}
 \title{
-  Make grid
+  Generate Grids of Observations
 }
 \description{
   Make a grid of values

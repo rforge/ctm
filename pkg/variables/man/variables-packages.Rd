@@ -9,7 +9,9 @@
   a grid of values for a (yet) unmeasured variable.
 
   The package was written to support the \pkg{basefun} and \pkg{mlt}
-  packages and will be of limited use outside these packages.
+  packages and will be of limited use outside these packages. The user interface
+  is not yet stable, so please be careful using \pkg{variables} in 
+  your package.
 }
 \author{
   This package is authored by Torsten Hothorn <Torsten.Hothorn@R-project.org>.
