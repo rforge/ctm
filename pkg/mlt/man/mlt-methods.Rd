@@ -11,6 +11,7 @@
 \alias{Gradient.mlt}
 \alias{estfun.mlt}
 \alias{mkgrid.mlt}
+\alias{bounds.mlt}
 \alias{variable.names.mlt}
 \alias{update.mlt_fit}
 \title{
@@ -32,6 +33,7 @@ Gradient(object, ...)
 \method{estfun}{mlt}(object, parm = coef(object, fixed = FALSE),
                      w = weights(object), ...)
 \method{mkgrid}{mlt}(object, n, ...)
+\method{bounds}{mlt}(object)
 \method{variable.names}{mlt}(object, ...)
 \method{update}{mlt_fit}(object, weights, theta, ...)
 }
