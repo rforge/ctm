@@ -1,7 +1,7 @@
 \name{mlt}
 \alias{mlt}
 \title{
-  Most likely transformations
+  Most Likely Transformations
 }
 \description{
   Likelihood-based model estimation in conditional transformation models

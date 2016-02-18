@@ -2,7 +2,7 @@
 \alias{confband}
 \alias{confband.mlt}
 \title{
-  Confidence bands
+  Confidence Bands
 }
 \description{
   Confidence bands for transformation, distribution, survivor or

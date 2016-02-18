@@ -1,7 +1,7 @@
 \name{ctm}
 \alias{ctm}
 \title{
-  Conditional transformation models
+  Conditional Transformation Models
 }
 \description{
   Specify conditional transformation models

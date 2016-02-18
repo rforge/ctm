@@ -1,0 +1,19 @@
+\name{mlt-package}
+\docType{package}
+\alias{mlt-package}
+\alias{mlt}
+\title{General Information on the \pkg{mlt} Package}
+\description{
+  The \pkg{mlt} implements maximum likelihood estimation in 
+  conditional transformation models as introduced by Hothorn et al. (2016).
+}
+\references{
+
+  Torsten Hothorn, Lisa Moest, Peter Buehlmann (2016), Most Likely 
+  Transformations, http://arxiv.org/abs/1508.06749
+
+}
+\author{
+  This package is authored by Torsten Hothorn <Torsten.Hothorn@R-project.org>.
+}
+\keyword{package}

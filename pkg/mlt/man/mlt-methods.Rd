@@ -15,7 +15,7 @@
 \alias{variable.names.mlt}
 \alias{update.mlt_fit}
 \title{
-  Methods for mlt objects
+  Methods for mlt Objects
 }
 \description{
   Methods for objects of class mlt

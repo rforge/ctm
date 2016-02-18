@@ -6,7 +6,7 @@
 \alias{R.numeric}
 \alias{R.integer}
 \title{
-    Response variable
+    Response Variable
 }
 \description{
     Represent a possibly censored or truncated response variable

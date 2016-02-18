@@ -3,7 +3,7 @@
 \alias{simulate.mlt}
 \alias{plot.mlt}
 \title{
-  Plots, predictions and samples from mlt objects
+  Plots, Predictions and Samples from mlt Objects
 }
 \description{
   Plot, predict and sample from objects of class mlt
