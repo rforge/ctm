@@ -8,9 +8,11 @@ mlt.R:	mlt.Rnw
 	echo "library(\"knitr\"); knit(\"mlt.Rnw\", tangle = TRUE)" | R --vanilla 
 	grep -v "^opts" mlt.R > tmp.R
 	mv tmp.R mlt.R
+	diff mlt.tex mlt.tex.save
 
 mlt.Rout:	mlt.R
 	R CMD BATCH mlt.R
+	diff mlt.Rout mlt.Rout.save
 	
 mlt.pdf:	mlt.tex mlt.bib
 	texi2dvi --pdf mlt.tex
