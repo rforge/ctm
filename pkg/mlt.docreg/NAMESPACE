@@ -1,0 +1,6 @@
+
+import(mlt)
+importFrom(numDeriv, grad, hessian)
+importFrom(stats, coef, weights)
+
+export(checkGH)
