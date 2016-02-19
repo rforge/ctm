@@ -7,6 +7,7 @@ Authors@R: person("Torsten", "Hothorn", role = c("aut", "cre"),
 Description: Likelihood-based estimation of conditional transformation
   models via the most likely transformation approach.
 Depends: basefun (>= 0.0-30), variables (>= 0.0-30)
-Imports: BB, stats, quadprog, graphics, methods, grDevices, sandwich
+Imports: BB, stats, quadprog, graphics, methods, grDevices, sandwich,
+  numDeriv
 Suggests: MASS, nnet, TH.data, survival, multcomp
 License: GPL-2

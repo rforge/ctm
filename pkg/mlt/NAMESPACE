@@ -1,12 +1,14 @@
 
 import(basefun)
 import(variables)
+import(numDeriv) ### needed by BB???
 importFrom(BB, spg, BBoptim)
 importFrom(sandwich, estfun)
 importFrom("stats", "simulate", "variable.names", "model.matrix", "logLik",
            "vcov", "AIC", "coef", "confint", "dlogis", "dnorm",
            "lm.fit", "plogis", "pnorm", "predict", "qlogis", "qnorm",
-           "runif", "stepfun", "weights")
+           "runif", "stepfun", "weights", "approxfun", "xtabs")
+
 importFrom(quadprog, solve.QP)
 importFrom("grDevices", "rgb")
 importFrom("graphics", "axis", "box", "lines")
