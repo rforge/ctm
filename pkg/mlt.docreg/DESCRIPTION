@@ -10,6 +10,9 @@ Depends: mlt (>= 0.0-30)
 Imports: numDeriv
 Suggests: np, eha, survival, nnet, truncreg, lattice, MASS, TH.data,
   multcomp (>= 1.4-4), knitr, survival, prodlim, gridExtra, nnet, 
-  HSAUR3, sandwich, flexsurv, grid, latticeExtra, colorspace, mgcv
+  HSAUR3, sandwich, flexsurv, grid, latticeExtra, colorspace, mgcv,
+  intcox, coxinterval, ICsurv, polspline, logspline, bshazard, gss, 
+  MIICD, TransModel, dynsurv, timereg, survivalMPL, gamlss, Matrix, 
+  muhaz, ICE, ordinal, VGAM      
 VignetteBuilder: knitr
 License: GPL-2
