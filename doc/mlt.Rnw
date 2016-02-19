@@ -1,12 +1,7 @@
 
 %\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{mlt}
-%\VignetteDepends{survival, eha, prodlim, truncreg, lattice, gridExtra, MASS, nnet, HSAUR3, sandwich, flexsurv, grid, latticeExtra, colorspace, multcomp, mgcv}
-
-intcox, coxinterval, ICsurv,
-polspline, logspline, bshazard, gss, MIICD, TransModel,
-dynsurv, timereg, survivalMPL, np, gamlss, Matrix, muhaz, ICE,
-ordinal, VGAM
+%\VignetteDepends{survival, eha, prodlim, truncreg, lattice, gridExtra, MASS, nnet, HSAUR3, sandwich, flexsurv, grid, latticeExtra, colorspace, multcomp, mgcv, intcox, coxinterval, ICsurv, polspline, logspline, bshazard, gss, MIICD, TransModel, dynsurv, timereg, survivalMPL, np, gamlss, Matrix, muhaz, ICE, ordinal, VGAM}
 
 \documentclass[article,nojss,shortnames]{jss}
 
