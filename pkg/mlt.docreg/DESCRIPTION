@@ -9,6 +9,7 @@ Description: The package contains a vignette and
 Depends: mlt (>= 0.0-30)
 Imports: numDeriv
 Suggests: np, eha, survival, nnet, truncreg, lattice, MASS, TH.data,
-  multcomp (>= 1.4-4), knitr
+  multcomp (>= 1.4-4), knitr, survival, prodlim, gridExtra, nnet, 
+  HSAUR3, sandwich, flexsurv, grid, latticeExtra, colorspace, mgcv
 VignetteBuilder: knitr
 License: GPL-2
