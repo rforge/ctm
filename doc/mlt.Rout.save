@@ -17,8 +17,6 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 'help.start()' for an HTML browser interface to help.
 Type 'q()' to quit R.
 
-[Previously saved workspace restored]
-
 > ## ----setup, echo = FALSE, results = "hide", message = FALSE--------------
 > set.seed(290875)
 > 
@@ -35,21 +33,7 @@ Henningsen, Arne and Toomet, Ott (2011). maxLik: A package for maximum likelihoo
 
 If you have questions, suggestions, or comments regarding the 'maxLik' package, please use a forum or 'tracker' at maxLik's R-Forge site:
 https://r-forge.r-project.org/projects/maxlik/
-
-Attaching package: ‘MASS’
-
-The following object is masked _by_ ‘.GlobalEnv’:
-
-    geyser
-
 Loading required package: tools
-
-Attaching package: ‘HSAUR3’
-
-The following object is masked _by_ ‘.GlobalEnv’:
-
-    CHFLS
-
 
 Attaching package: ‘flexsurv’
 
@@ -71,10 +55,6 @@ Loading required package: mvtnorm
 Loading required package: TH.data
 
 Attaching package: ‘TH.data’
-
-The following object is masked _by_ ‘.GlobalEnv’:
-
-    GBSG2
 
 The following object is masked from ‘package:HSAUR3’:
 
@@ -2088,9 +2068,9 @@ attached base packages:
 [8] methods   base     
 
 other attached packages:
- [1] mgcv_1.8-11         nlme_3.1-122        multcomp_1.4-4     
+ [1] mgcv_1.8-11         nlme_3.1-124        multcomp_1.4-4     
  [4] TH.data_1.0-7       mvtnorm_1.0-5       colorspace_1.2-6   
- [7] latticeExtra_0.6-26 RColorBrewer_1.1-2  flexsurv_0.7       
+ [7] latticeExtra_0.6-28 RColorBrewer_1.1-2  flexsurv_0.7       
 [10] sandwich_2.3-4      HSAUR3_1.0-5        nnet_7.3-12        
 [13] MASS_7.3-45         gridExtra_2.0.0     lattice_0.20-33    
 [16] truncreg_0.2-1      maxLik_1.3-4        miscTools_0.6-16   
@@ -2099,7 +2079,7 @@ other attached packages:
 
 loaded via a namespace (and not attached):
  [1] Rcpp_0.12.3        gtable_0.1.2       Matrix_1.2-3      
- [4] polynom_1.3-8      knitr_1.12.3       BB_2014.10-1      
+ [4] polynom_1.3-8      BB_2014.10-1       knitr_1.12.3      
  [7] deSolve_1.12       mstate_0.2.8       orthopolynom_1.0-5
 [10] lava_1.4.1         codetools_0.2-14   splines_3.2.3     
 [13] quadprog_1.5-5     muhaz_1.2.6        zoo_1.7-12        
@@ -2107,4 +2087,4 @@ R>
 R> 
 > proc.time()
    user  system elapsed 
-137.356   0.308 137.647 
+114.400   0.204 114.548 
