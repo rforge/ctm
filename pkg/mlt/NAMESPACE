@@ -8,7 +8,6 @@ importFrom("stats", "simulate", "variable.names", "model.matrix", "logLik",
            "lm.fit", "plogis", "pnorm", "predict", "qlogis", "qnorm",
            "runif", "stepfun", "weights")
 importFrom(quadprog, solve.QP)
-importFrom(multcomp, glht, parm)
 importFrom("grDevices", "rgb")
 importFrom("graphics", "axis", "box", "lines")
 importFrom("methods", "as")
