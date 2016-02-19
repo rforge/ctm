@@ -50,7 +50,11 @@ R.Surv <- function(object, ...) {
     attr(ret, "prob") <- function(weights) {
         w <- weights[weights > 0]
         sf <- survival::survfit(object ~ 1, subset = weights > 0, weights = w)
-        function(y) 1 - summary(sf, times = y)$surv[order(y)]
+        function(y) {
+            s <- summary(sf, times = y)$surv[order(y)]
+            s[is.na(s)] <- 0
+            1 - s
+        }
     }
     ret
 }
