@@ -48,7 +48,7 @@ InflMedium   InflHigh
  -0.2013727   0.9484658 
 > coef(mod)
       Sat1       Sat2 InflMedium   InflHigh 
--0.2013763  0.9484755 -0.5635788 -1.2486722 
+-0.2013768  0.9484750 -0.5635781 -1.2486713 
 > 
 > sqrt(diag(vcov(mp)))
 
@@ -58,8 +58,8 @@ Re-fitting to get Hessian
  0.10357053  0.12479361  0.07662596  0.08024304 
 > sqrt(diag(vcov(mod)))
       Sat1       Sat2 InflMedium   InflHigh 
-0.07662594 0.08024300 0.10357051 0.12479358 
+0.07662594 0.08024300 0.10357051 0.12479357 
 > 
 > proc.time()
    user  system elapsed 
-  1.068   0.048   1.111 
+  1.064   0.024   1.084 

@@ -98,4 +98,4 @@ In object$optimfct(theta, weights = weights, trace = trace, scale = scale,  :
 > 
 > proc.time()
    user  system elapsed 
- 28.212   0.144  28.336 
+ 27.356   0.168  27.503 

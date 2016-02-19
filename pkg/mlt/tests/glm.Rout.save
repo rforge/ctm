@@ -86,13 +86,13 @@ virginica    -23.83628    -7.923634  -15.370769     23.65978   15.135301
 > m2 <- mlt(m, data = oiris)
 > coef(m2)
  Species1:(Intercept)  Species2:(Intercept) Species1:Sepal.Length 
-            0.5416538            42.6378203             2.3437298 
+            0.5187355            42.6365416             2.4050022 
 Species2:Sepal.Length  Species1:Sepal.Width  Species2:Sepal.Width 
-            2.4652085             6.2379745             6.6809107 
+            2.4650765             6.2309485             6.6810458 
 Species1:Petal.Length Species2:Petal.Length  Species1:Petal.Width 
-          -10.6754435            -9.4293901            -5.2892198 
+          -10.7919931            -9.4289618            -5.3448419 
  Species2:Petal.Width 
-          -18.2861296 
+          -18.2863668 
 > 
 > s <- sort(unique(oiris$Species))
 > 
@@ -101,9 +101,9 @@ Species1:Petal.Length Species2:Petal.Length  Species1:Petal.Width
 > pp1 <- predict(m1, newdata = iris, type = "prob")
 > 
 > max(abs(pp1 - t(pp2)))
-[1] 0.001178595
+[1] 0.001194305
 > 
 > 
 > proc.time()
    user  system elapsed 
-  1.344   0.032   1.374 
+  1.272   0.060   1.329 

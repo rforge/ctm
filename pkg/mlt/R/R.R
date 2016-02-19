@@ -47,6 +47,11 @@ R.Surv <- function(object, ...) {
                        cright = ifelse(status != 1, Inf, NA),
                        tleft = object[, "start"])
     )
+    attr(ret, "prob") <- function(weights) {
+        w <- weights[weights > 0]
+        sf <- survival::survfit(object ~ 1, subset = weights > 0, weights = w)
+        function(y) 1 - summary(sf, times = y)$surv[order(y)]
+    }
     ret
 }
 
@@ -67,6 +72,10 @@ R.ordered <- function(object, cleft = NA, cright = NA, ...) {
         levels = 1:length(lev), labels = lev, exclude = 0, ordered = TRUE)
     ret$exact <- NA
     ret[ret$cright == lev[nlevels(object)], "cright"] <- NA
+    attr(ret, "prob") <- function(weights) {
+        prt <- prop.table(xtabs(weights ~ object))
+        function(y) prt[y]
+    }
     ret
 }
 
@@ -78,6 +87,8 @@ R.integer <- function(object, cleft = NA, cright = NA, bounds = c(0L, Inf), ...)
     ret$cleft[is.na(ret$cleft)] <- ret$exact[is.na(ret$cleft)] - 1
     ret$cleft[ret$cleft < bounds[1]] <- NA
     ret$exact <- NA
+    attr(ret, "prob") <- function(weights)
+        .wecdf(object, weights)
     ret
 }
 
@@ -96,8 +107,11 @@ R.numeric <- function(object = NA, cleft = NA, cright = NA,
             cleft[i] <- cright[i] <- NA
         }
     }
-    .mkR(exact = object, cleft = cleft, cright = cright,
-         tleft = tleft, tright = tright)
+    ret <- .mkR(exact = object, cleft = cleft, cright = cright,
+                tleft = tleft, tright = tright)
+    attr(ret, "prob") <- function(weights)
+         .wecdf(object, weights)
+    ret
 }
 
 ### for object = NA, ie censored observations only
@@ -138,22 +152,23 @@ R.default <- function(object, ...)
     if (is.null(ret$tright)) ret$tright <- NA
 
     if (all(is.finite(ret$exact))) {
-        ret$rank <- rank(ret$exact, ties.method = "max")
+#        ret$rank <- rank(ret$exact, ties.method = "max")
+        ret$approxy <- ret$exact
     } else {
         ### some meaningful ordering of observations
         tmpexact <- as.numeric(ret$exact)
         tmpleft <- as.numeric(ret$cleft)
         tmpright <- as.numeric(ret$cright)
-        tmpleft[is.na(tmpleft)] <-    
-            pmin(tmpleft, tmpexact, tmpright, na.rm = TRUE)[is.na(tmpleft)]
-        tmpright[is.na(tmpright)] <-
-            pmax(tmpleft, tmpexact, tmpright, na.rm = TRUE)[is.na(tmpright)]
+        tmpler <- c(tmpleft, tmpexact, tmpright)
+        tmpleft[!is.finite(tmpleft)] <- min(tmpler[is.finite(tmpler)])
+        tmpright[!is.finite(tmpright)] <- max(tmpler[is.finite(tmpler)])
         tmpexact[is.na(tmpexact)] <-
-            ((tmpright - tmpleft) / 2)[is.na(tmpexact)]
-        ret$rank <- rank(tmpexact, ties.method = "max")   
+            (tmpleft + ((tmpright - tmpleft) / 2))[is.na(tmpexact)]
+#        ret$rank <- rank(tmpexact, ties.method = "max")   
+        ret$approxy <- tmpexact
     }
     class(ret) <- c("response", class(ret))
-    ret[, c("tleft", "cleft", "exact", "cright", "tright", "rank"), drop = FALSE]
+    ret[, c("tleft", "cleft", "exact", "cright", "tright", "approxy"), drop = FALSE]
 }
 
 .exact <- function(object)
@@ -271,4 +286,18 @@ R.default <- function(object, ...)
     }
 
     list(Yleft = Yleft, Yright = Yright, trunc = trunc, which = which(i))
+}
+
+.wecdf <- function(x, weights) {
+    ### from: spatstat::ewcdf
+    ox <- order(x)
+    x <- x[ox]
+    w <- weights[ox]
+    vals <- sort(unique(x))
+    xmatch <- factor(match(x, vals), levels = seq_along(vals))
+    wmatch <- tapply(w, xmatch, sum)
+    wmatch[is.na(wmatch)] <- 0
+    cumwt <- cumsum(wmatch) / sum(wmatch)
+    approxfun(vals, cumwt, method = "constant", yleft = 0, 
+              yright = sum(wmatch), f = 0, ties = "ordered")
 }

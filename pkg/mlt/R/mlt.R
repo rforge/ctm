@@ -247,7 +247,8 @@ mlt <- function(model, data, weights = NULL, offset = NULL, fixed = NULL,
 
     if (is.null(theta)) {
         ### unconditional ECDF, essentially
-        if (is.null(pstart)) pstart <- y$rank / max(y$rank)
+###        if (is.null(pstart)) pstart <- y$rank / max(y$rank)
+        if (is.null(pstart)) pstart <- attr(y, "prob")(weights)(y$approxy) ### y$rank / max(y$rank)
         theta <- .mlt_start(model = model, data = data, y = y, 
                             pstart = pstart, offset = offset, fixed = fixed)
     }
