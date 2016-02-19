@@ -80,10 +80,10 @@ coef(opt <- mlt(m, data = mydata))
 
 ### uncensored, time-varying coefficints in both groups
 mydata <- data.frame(y = y, g = g)
-m <- ctm(response = c(blog = lb, bBern = Bb), 
+m <- ctm(response = Bb, 
            interacting = as.basis(~ g, data = mydata),
            todist = "MinExtrVal")
-coef(opt <- mlt(m, data = mydata))
+coef(opt <- mlt(m, data = mydata, maxit = 5000))
 coef(cph <- coxph(Surv(y, rep(TRUE, nrow(mydata))) ~ g, data = mydata))
 ## visualize
 a <- predict(opt, newdata = data.frame(g = gf[1]), q = yn)
