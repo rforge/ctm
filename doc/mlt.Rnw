@@ -2091,7 +2091,7 @@ The very flexible and powerful user interface of \pkg{mlt} will, however, be
 incomprehensible for most of its potential users.  Because transformation
 models seldomly receive the attention they deserve in statistics courses,
 the documentation of \pkg{mlt} will likely also confuse many statisticians,
-let alone ``data scientists'' or subject-matter specialists.  Future efforts
+let alone data or subject-matter scientists.  Future efforts
 will concentrate on the implementation of convenience interfaces, \ie higher
 level user interfaces for special forms of transformation models, that
 resemble the traditional notational and naming conventions from the
@@ -2557,6 +2557,9 @@ pkgbib <- function(pkg) {
 
     b <- gsub("Göran Broström", "G\\\\\"oran Brostr\\\\\"om", b)
 
+    b <- gsub(" The publishers web page is", "},", b)
+    b <- gsub("http://www.crcpress.com/product/isbn/9781584885740},", "", b)
+
     b <- gsub("R package", "\\\\proglang{R} package", b)
 
     b[1] <- paste("@Manual{pkg:", pkg, ",", sep = "")
@@ -2571,7 +2574,7 @@ pkg <- function(pkg)
     paste("\\\\pkg{", pkg, "} \\\\citep[version~",
           pkgversion(pkg), ",][]{pkg:", pkg, "}", sep = "")
 
-pkgs <- c("survival", "eha", "prodlim", "truncreg", "MASS", "nnet", "HSAUR3", "sandwich", 
+pkgs <- c("variables", "basefun", "survival", "eha", "prodlim", "truncreg", "MASS", "nnet", "HSAUR3", "sandwich", 
   "flexsurv", "multcomp", "mgcv", "intcox", "coxinterval", "ICsurv",
   "polspline", "logspline", "bshazard", "gss", "MIICD", "TransModel",
   "dynsurv", "timereg", "survivalMPL", "np", "gamlss", "Matrix", "muhaz", "ICE",
@@ -2589,21 +2592,7 @@ mlt <- c("@Manual{pkg:mlt, \n
           url = {https://r-forge.r-project.org/projects/ctm/},\n
           year = {2016},\n
           note = {R package version 0.0-15, svn revision 313}}\n")
-variables <- c("@Manual{pkg:variables, \n
-          title = {variables: Variable Descriptions},\n
-          author = {Torsten Hothorn},\n
-          url = {https://r-forge.r-project.org/projects/ctm/},\n
-          year = {2016},\n
-          note = {R package version 0.0-15, svn revision 313}}\n")
-basefun <- c("@Manual{pkg:basefun, \n
-          title = {basefun: Infrastructure for Computing with Basis Functions},\n
-          author = {Torsten Hothorn},\n
-          url = {https://r-forge.r-project.org/projects/ctm/},\n
-          year = {2016},\n
-          note = {R package version 0.0-15, svn revision 313}}\n")
 cat(mlt, sep = "\n", file = "packages.bib", append = TRUE)
-cat(variables, sep = "\n", file = "packages.bib", append = TRUE)
-cat(basefun, sep = "\n", file = "packages.bib", append = TRUE)
 @
 
 
