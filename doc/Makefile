@@ -36,6 +36,7 @@ clean:
 	rm -rf packages.bib
 	rm -rf .Rdata
 	rm -rf Rplots.pdf
+	rm -rf .RData
 	
 dist-clean:
 	make clean
