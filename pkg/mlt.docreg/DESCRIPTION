@@ -7,7 +7,7 @@ Authors@R: person("Torsten", "Hothorn", role = c("aut", "cre"),
 Description: Additional documentation, a package vignette and 
   regression tests for package mlt.
 Depends: mlt (>= 0.0-30)
-Imports: numDeriv
+Imports: numDeriv, stats
 Suggests: np, eha, truncreg, lattice, MASS, TH.data,
   multcomp (>= 1.4-4), knitr, survival, prodlim, gridExtra, nnet, 
   HSAUR3, sandwich, flexsurv, grid, latticeExtra, colorspace, mgcv,
