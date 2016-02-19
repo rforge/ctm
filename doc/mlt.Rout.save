@@ -1,0 +1,2110 @@
+
+R version 3.2.3 (2015-12-10) -- "Wooden Christmas-Tree"
+Copyright (C) 2015 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> ## ----setup, echo = FALSE, results = "hide", message = FALSE--------------
+> set.seed(290875)
+> 
+> sapply(c("mlt", "survival", "eha", "prodlim", "truncreg", "lattice", "gridExtra",
++          "MASS", "nnet", "HSAUR3", "sandwich", "flexsurv", "grid", "latticeExtra", 
++          "colorspace", "multcomp", "mgcv"), library, char = TRUE)
+Loading required package: basefun
+Loading required package: variables
+Loading required package: maxLik
+Loading required package: miscTools
+
+Please cite the 'maxLik' package as:
+Henningsen, Arne and Toomet, Ott (2011). maxLik: A package for maximum likelihood estimation in R. Computational Statistics 26(3), 443-458. DOI 10.1007/s00180-010-0217-1.
+
+If you have questions, suggestions, or comments regarding the 'maxLik' package, please use a forum or 'tracker' at maxLik's R-Forge site:
+https://r-forge.r-project.org/projects/maxlik/
+
+Attaching package: ‘MASS’
+
+The following object is masked _by_ ‘.GlobalEnv’:
+
+    geyser
+
+Loading required package: tools
+
+Attaching package: ‘HSAUR3’
+
+The following object is masked _by_ ‘.GlobalEnv’:
+
+    CHFLS
+
+
+Attaching package: ‘flexsurv’
+
+The following objects are masked from ‘package:eha’:
+
+    dgompertz, dllogis, hgompertz, Hgompertz, hllogis, Hllogis, hlnorm,
+    Hlnorm, hweibull, Hweibull, pgompertz, pllogis, qgompertz, qllogis,
+    rgompertz, rllogis
+
+
+Attaching package: ‘grid’
+
+The following object is masked from ‘package:variables’:
+
+    unit
+
+Loading required package: RColorBrewer
+Loading required package: mvtnorm
+Loading required package: TH.data
+
+Attaching package: ‘TH.data’
+
+The following object is masked _by_ ‘.GlobalEnv’:
+
+    GBSG2
+
+The following object is masked from ‘package:HSAUR3’:
+
+    birds
+
+The following object is masked from ‘package:MASS’:
+
+    geyser
+
+Loading required package: nlme
+
+Attaching package: ‘nlme’
+
+The following object is masked from ‘package:mlt’:
+
+    coef<-
+
+This is mgcv 1.8-11. For overview type 'help("mgcv-package")'.
+
+Attaching package: ‘mgcv’
+
+The following object is masked from ‘package:nnet’:
+
+    multinom
+
+$mlt
+ [1] "mlt"       "basefun"   "variables" "stats"     "graphics"  "grDevices"
+ [7] "utils"     "datasets"  "methods"   "base"     
+
+$survival
+ [1] "survival"  "mlt"       "basefun"   "variables" "stats"     "graphics" 
+ [7] "grDevices" "utils"     "datasets"  "methods"   "base"     
+
+$eha
+ [1] "eha"       "survival"  "mlt"       "basefun"   "variables" "stats"    
+ [7] "graphics"  "grDevices" "utils"     "datasets"  "methods"   "base"     
+
+$prodlim
+ [1] "prodlim"   "eha"       "survival"  "mlt"       "basefun"   "variables"
+ [7] "stats"     "graphics"  "grDevices" "utils"     "datasets"  "methods"  
+[13] "base"     
+
+$truncreg
+ [1] "truncreg"  "maxLik"    "miscTools" "prodlim"   "eha"       "survival" 
+ [7] "mlt"       "basefun"   "variables" "stats"     "graphics"  "grDevices"
+[13] "utils"     "datasets"  "methods"   "base"     
+
+$lattice
+ [1] "lattice"   "truncreg"  "maxLik"    "miscTools" "prodlim"   "eha"      
+ [7] "survival"  "mlt"       "basefun"   "variables" "stats"     "graphics" 
+[13] "grDevices" "utils"     "datasets"  "methods"   "base"     
+
+$gridExtra
+ [1] "gridExtra" "lattice"   "truncreg"  "maxLik"    "miscTools" "prodlim"  
+ [7] "eha"       "survival"  "mlt"       "basefun"   "variables" "stats"    
+[13] "graphics"  "grDevices" "utils"     "datasets"  "methods"   "base"     
+
+$MASS
+ [1] "MASS"      "gridExtra" "lattice"   "truncreg"  "maxLik"    "miscTools"
+ [7] "prodlim"   "eha"       "survival"  "mlt"       "basefun"   "variables"
+[13] "stats"     "graphics"  "grDevices" "utils"     "datasets"  "methods"  
+[19] "base"     
+
+$nnet
+ [1] "nnet"      "MASS"      "gridExtra" "lattice"   "truncreg"  "maxLik"   
+ [7] "miscTools" "prodlim"   "eha"       "survival"  "mlt"       "basefun"  
+[13] "variables" "stats"     "graphics"  "grDevices" "utils"     "datasets" 
+[19] "methods"   "base"     
+
+$HSAUR3
+ [1] "HSAUR3"    "tools"     "nnet"      "MASS"      "gridExtra" "lattice"  
+ [7] "truncreg"  "maxLik"    "miscTools" "prodlim"   "eha"       "survival" 
+[13] "mlt"       "basefun"   "variables" "stats"     "graphics"  "grDevices"
+[19] "utils"     "datasets"  "methods"   "base"     
+
+$sandwich
+ [1] "sandwich"  "HSAUR3"    "tools"     "nnet"      "MASS"      "gridExtra"
+ [7] "lattice"   "truncreg"  "maxLik"    "miscTools" "prodlim"   "eha"      
+[13] "survival"  "mlt"       "basefun"   "variables" "stats"     "graphics" 
+[19] "grDevices" "utils"     "datasets"  "methods"   "base"     
+
+$flexsurv
+ [1] "flexsurv"  "sandwich"  "HSAUR3"    "tools"     "nnet"      "MASS"     
+ [7] "gridExtra" "lattice"   "truncreg"  "maxLik"    "miscTools" "prodlim"  
+[13] "eha"       "survival"  "mlt"       "basefun"   "variables" "stats"    
+[19] "graphics"  "grDevices" "utils"     "datasets"  "methods"   "base"     
+
+$grid
+ [1] "grid"      "flexsurv"  "sandwich"  "HSAUR3"    "tools"     "nnet"     
+ [7] "MASS"      "gridExtra" "lattice"   "truncreg"  "maxLik"    "miscTools"
+[13] "prodlim"   "eha"       "survival"  "mlt"       "basefun"   "variables"
+[19] "stats"     "graphics"  "grDevices" "utils"     "datasets"  "methods"  
+[25] "base"     
+
+$latticeExtra
+ [1] "latticeExtra" "RColorBrewer" "grid"         "flexsurv"     "sandwich"    
+ [6] "HSAUR3"       "tools"        "nnet"         "MASS"         "gridExtra"   
+[11] "lattice"      "truncreg"     "maxLik"       "miscTools"    "prodlim"     
+[16] "eha"          "survival"     "mlt"          "basefun"      "variables"   
+[21] "stats"        "graphics"     "grDevices"    "utils"        "datasets"    
+[26] "methods"      "base"        
+
+$colorspace
+ [1] "colorspace"   "latticeExtra" "RColorBrewer" "grid"         "flexsurv"    
+ [6] "sandwich"     "HSAUR3"       "tools"        "nnet"         "MASS"        
+[11] "gridExtra"    "lattice"      "truncreg"     "maxLik"       "miscTools"   
+[16] "prodlim"      "eha"          "survival"     "mlt"          "basefun"     
+[21] "variables"    "stats"        "graphics"     "grDevices"    "utils"       
+[26] "datasets"     "methods"      "base"        
+
+$multcomp
+ [1] "multcomp"     "TH.data"      "mvtnorm"      "colorspace"   "latticeExtra"
+ [6] "RColorBrewer" "grid"         "flexsurv"     "sandwich"     "HSAUR3"      
+[11] "tools"        "nnet"         "MASS"         "gridExtra"    "lattice"     
+[16] "truncreg"     "maxLik"       "miscTools"    "prodlim"      "eha"         
+[21] "survival"     "mlt"          "basefun"      "variables"    "stats"       
+[26] "graphics"     "grDevices"    "utils"        "datasets"     "methods"     
+[31] "base"        
+
+$mgcv
+ [1] "mgcv"         "nlme"         "multcomp"     "TH.data"      "mvtnorm"     
+ [6] "colorspace"   "latticeExtra" "RColorBrewer" "grid"         "flexsurv"    
+[11] "sandwich"     "HSAUR3"       "tools"        "nnet"         "MASS"        
+[16] "gridExtra"    "lattice"      "truncreg"     "maxLik"       "miscTools"   
+[21] "prodlim"      "eha"          "survival"     "mlt"          "basefun"     
+[26] "variables"    "stats"        "graphics"     "grDevices"    "utils"       
+[31] "datasets"     "methods"      "base"        
+
+> 
+> if (!file.exists("analysis/DVC.rda")) {
++     download.file("https://zenodo.org/record/17179/files/DVC.tgz", "DVC.tgz")
++     untar("DVC.tgz", file = "analysis/DVC.rda", compressed = "gzip")
++ }
+> load("analysis/DVC.rda")
+> dvc <- c(margin.table(obs, 2))
+> 
+> logLik.phreg <- function(object) {
++     ret <- object$loglik[2]
++     attr(ret, "df") <- length(coef(object))
++     class(ret) <- "logLik"
++     ret
++ }
+> vcov.phreg <- function(object) object$var
+> 
+> trellis.par.set(list(plot.symbol = list(col=1,pch=20, cex=0.7),
++                      box.rectangle = list(col=1),
++                      box.umbrella = list(lty=1, col=1),
++                      strip.background = list(col = "white")))
+Warning message:
+In trellis.par.set(list(plot.symbol = list(col = 1, pch = 20, cex = 0.7),  :
+  Note: The default device has been opened to honour attempt to modify trellis settings
+> ltheme <- canonical.theme(color = FALSE)     ## in-built B&W theme
+> ltheme$strip.background$col <- "transparent" ## change strip bg
+> lattice.options(default.theme = ltheme)
+> 
+> knitr::opts_chunk$set(echo = TRUE, results = 'markup', error = FALSE,
++                       warning = FALSE, message = FALSE,
++                       tidy = FALSE, cache = FALSE, size = "small",
++                       fig.width = 6, fig.height = 4, fig.align = "center",
++                       out.width = NULL, ###'.6\\linewidth', 
++                       out.height = NULL,
++                       fig.scap = NA)
+> knitr::render_sweave()  # use Sweave environments
+> knitr::set_header(highlight = '')  # do not \usepackage{Sweave}
+> ## R settings
+> options(prompt = "R> ", continue = "+  ", useFancyQuotes = FALSE)  # JSS style
+R> options(width = 75)
+R> 
+R> ## ----geyser-var, echo = TRUE---------------------------------------------
+R> library("mlt")
+R> var_d <- numeric_var("duration", support = c(1.0, 5.0), 
++                       add = c(-1, 1), bounds = c(0, Inf))
+R> 
+R> ## ----geyser-basis, echo = TRUE-------------------------------------------
+R> B_d <- Bernstein_basis(var = var_d, order = 8, ui = "increasing")
+R> 
+R> ## ----geyser-ctm, echo = TRUE---------------------------------------------
+R> ctm_d <- ctm(response = B_d, todistr = "Normal")
+R> 
+R> ## ----geyser-grid, echo = TRUE--------------------------------------------
+R> str(nd_d <- mkgrid(ctm_d, 200))
+List of 1
+ $ duration: num [1:200] 0 0.0302 0.0603 0.0905 0.1206 ...
+R> 
+R> ## ----geyser-data, echo = TRUE--------------------------------------------
+R> data("geyser", package = "TH.data")
+R> head(geyser)
+  waiting        duration
+1      80        4.016667
+2      71        2.150000
+3      57 [4.000000, Inf]
+4      80 [4.000000, Inf]
+5      75 [4.000000, Inf]
+6      77 [0.000000,   2]
+R> 
+R> ## ----geyser-fit, echo = TRUE---------------------------------------------
+R> mlt_d <- mlt(ctm_d, data = geyser)
+R> logLik(mlt_d)
+'log Lik.' -317.766 (df=9)
+R> 
+R> ## ----geyser-density, echo = TRUE-----------------------------------------
+R> nd_d$d <- predict(mlt_d, newdata = nd_d, type = "density")
+R> 
+R> ## ----geyser-plot, echo = FALSE-------------------------------------------
+R> plot(d ~ duration, data = nd_d, type = "l", ylab = "Density", xlab = "Duration time")
+R> 
+R> ## ----CHFLS-1-------------------------------------------------------------
+R> data("CHFLS", package = "HSAUR3")
+R> polr_CHFLS_1 <- polr(R_happy ~ 1, data = CHFLS)
+R> 
+R> ## ----CHFLS-1-basefun-----------------------------------------------------
+R> nl <- nlevels(CHFLS$R_happy)
+R> b_happy <- as.basis(~ R_happy, data = CHFLS, remove_intercept = TRUE,
++                      contrasts.arg = list(R_happy = function(n) 
++                          contr.treatment(n, base = nl)),
++                      ui = diff(diag(nl - 1)), ci = rep(0, nl - 2))
+R> 
+R> ## ----CHFLS-1-basefun-basis-----------------------------------------------
+R> b_happy <- as.basis(CHFLS$R_happy)
+R> 
+R> ## ----CHFLS-1-ctm---------------------------------------------------------
+R> ctm_CHFLS_1 <- ctm(response = b_happy, todist = "Logistic")
+R> 
+R> ## ----CHFLS-1-mlt---------------------------------------------------------
+R> mlt_CHFLS_1 <- mlt(model = ctm_CHFLS_1, data = CHFLS)
+R> 
+R> ## ----CHFLS-1-cmpr--------------------------------------------------------
+R> logLik(polr_CHFLS_1)
+'log Lik.' -1328.241 (df=3)
+R> logLik(mlt_CHFLS_1)
+'log Lik.' -1328.241 (df=3)
+R> cbind(polr = polr_CHFLS_1$zeta, mlt = coef(mlt_CHFLS_1))
+                                  polr       mlt
+Very unhappy|Not too happy   -4.687408 -4.687408
+Not too happy|Somewhat happy -1.903382 -1.903382
+Somewhat happy|Very happy     1.499304  1.499304
+R> 
+R> ## ----CHFLS-1-pred--------------------------------------------------------
+R> predict(polr_CHFLS_1, newdata = data.frame(1), type = "prob")
+  Very unhappy  Not too happy Somewhat happy     Very happy 
+   0.009126466    0.120599751    0.687744449    0.182529334 
+R> c(predict(mlt_CHFLS_1, newdata = data.frame(1), type = "density", 
++            q = mkgrid(b_happy)[[1]]))
+[1] 0.009126469 0.120599738 0.687744458 0.182529335
+R> xtabs(~ R_happy, data = CHFLS) / nrow(CHFLS)
+R_happy
+  Very unhappy  Not too happy Somewhat happy     Very happy 
+   0.009126467    0.120599739    0.687744459    0.182529335 
+R> 
+R> ## ----geyser-w------------------------------------------------------------
+R> var_w <- numeric_var("waiting", support = c(40.0, 100), add = c(-5, 15), 
++                       bounds = c(0, Inf))
+R> c(sapply(nd_w <- mkgrid(var_w, 100), range))
+[1]  35 115
+R> 
+R> ## ----geyser-bernstein----------------------------------------------------
+R> B_w <- Bernstein_basis(var_w, order = 8, ui = "increasing")
+R> 
+R> ## ----geyser-w-ctm, echo = TRUE-------------------------------------------
+R> ctm_w <- ctm(response = B_w, todistr = "Normal")
+R> 
+R> ## ----geyser-w-fit, echo = TRUE-------------------------------------------
+R> mlt_w <- mlt(ctm_w, data = geyser)
+R> 
+R> ## ----geyser-w-distribution, echo = TRUE----------------------------------
+R> nd_w$d <- predict(mlt_w, newdata = nd_w, type = "distribution")
+R> 
+R> ## ----geyser-w-plot, echo = FALSE-----------------------------------------
+R> layout(matrix(1:2, ncol = 2))
+R> plot(ecdf(geyser$waiting), col = "grey", xlab = "Waiting times", ylab = "Distribution", 
++       main = "", cex = .75)
+R> lines(nd_w$waiting, nd_w$d)
+R> B_w_40 <- Bernstein_basis(order = 40, var = var_w, ui = "incre")
+R> ctm_w_40 <- ctm(B_w_40, todistr = "Normal")
+R> mlt_w_40 <- mlt(ctm_w_40, data = geyser, maxit = 5000)
+R> nd_w$d2 <- predict(mlt_w_40, q = nd_w$waiting, type = "distribution")
+R> lines(nd_w$waiting, nd_w$d2, lty = 2)
+R> legend("bottomright", lty = 1:2, legend = c("M = 8", "M = 40"), bty = "n")
+R> plot(nd_w$waiting, predict(mlt_w, q = nd_w$waiting, type = "density"), type = "l",
++       ylim = c(0, .04), xlab = "Waiting times", ylab = "Density")
+R> lines(nd_w$waiting, predict(mlt_w_40, q = nd_w$waiting, type = "density"), lty = 2)
+R> rug(geyser$waiting, col = rgb(.1, .1, .1, .1))
+R> 
+R> ## ----dvc-----------------------------------------------------------------
+R> var_dvc <- numeric_var("dvc", support = min(dvc):max(dvc))
+R> B_dvc <- Bernstein_basis(var_dvc, order = 6, ui = "increasing")
+R> dvc_mlt <- mlt(ctm(B_dvc), data = data.frame(dvc = dvc))
+R> 
+R> ## ----dvc-plot, echo = FALSE----------------------------------------------
+R> q <- support(var_dvc)[[1]]
+R> p <- predict(dvc_mlt, newdata = data.frame(1), q = q,
++               type = "distribution")
+R> plot(ecdf(dvc), col = "grey", xlab = "Number of Roe Deer-Vehicle Collisions",
++       ylab = "Distribution", main = "", cex = .75)
+R> lines(q, p, col = "blue")
+R> lines(q, ppois(q, lambda = mean(dvc)), col = "darkred")
+R> legend(400, .3, pch = c(20, NA, NA), lty = c(NA, 1, 1), 
++         legend = c("ECDF", "Transformation Model", "Poisson"), bty = "n", cex = .8,
++         col = c("grey", "blue", "darkred"))
+R> 
+R> ## ----CHFLS-2, cache = TRUE-----------------------------------------------
+R> polr_CHFLS_2 <- polr(R_happy ~ R_age + R_income, data = CHFLS)
+R> 
+R> ## ----CHFLS-2-base--------------------------------------------------------
+R> b_R <- as.basis(~ R_age + R_income, data = CHFLS, remove_intercept = TRUE, 
++                  negative = TRUE)
+R> 
+R> ## ----CHFLS-2-ctm---------------------------------------------------------
+R> ctm_CHFLS_2 <- ctm(response = b_happy, shifting = b_R, 
++                     todistr = "Logistic")
+R> mlt_CHFLS_2 <- mlt(ctm_CHFLS_2, data = CHFLS, scale = TRUE)
+R> 
+R> ## ----CHFLS-2-cmpr--------------------------------------------------------
+R> logLik(polr_CHFLS_2)
+'log Lik.' -1322.021 (df=5)
+R> logLik(mlt_CHFLS_2)
+'log Lik.' -1322.021 (df=5)
+R> cbind(polr = c(polr_CHFLS_2$zeta, coef(polr_CHFLS_2)), 
++        mlt = coef(mlt_CHFLS_2))
+                                     polr           mlt
+Very unhappy|Not too happy   -4.801592360 -4.8015820561
+Not too happy|Somewhat happy -2.011695585 -2.0117019514
+Somewhat happy|Very happy     1.412707129  1.4127041170
+R_age                        -0.006278962 -0.0062791163
+R_income                      0.000235009  0.0002350097
+R> 
+R> ## ----GBSG2-1, echo = TRUE------------------------------------------------
+R> data("GBSG2", package = "TH.data")
+R> GBSG2y <- numeric_var("y", support = c(100.0, max(GBSG2$time)), 
++                        bounds = c(0, Inf))
+R> GBSG2$y <- with(GBSG2, Surv(time, cens))
+R> 
+R> ## ----GBSG2-1-Cox---------------------------------------------------------
+R> B_GBSG2y <- Bernstein_basis(var = GBSG2y, order = 10, ui = "increasing")
+R> fm_GBSG2 <- Surv(time, cens) ~ horTh + age + menostat + tsize + tgrade +
++                                 pnodes + progrec + estrec
+R> ctm_GBSG2_1 <- ctm(B_GBSG2y, shifting = fm_GBSG2[-2L], data = GBSG2,
++                     todistr = "MinExtrVal")
+R> 
+R> ## ----GBSG2-1-xbasis, eval = FALSE----------------------------------------
+R> ## as.basis(fm_GBSG2[-2L], data = GBSG2, remove_intercept)
+R> 
+R> ## ----GBSG2-1-mlt---------------------------------------------------------
+R> mlt_GBSG2_1 <- mlt(ctm_GBSG2_1, data = GBSG2, maxit = 3000, scale = TRUE)
+R> 
+R> ## ----GBSG2-1-coxph-------------------------------------------------------
+R> coxph_GBSG2_1 <- coxph(fm_GBSG2, data = GBSG2)
+R> cf <- coef(coxph_GBSG2_1)
+R> cbind(coxph = cf, mlt = coef(mlt_GBSG2_1)[names(cf)])
+                     coxph           mlt
+horThyes     -0.3462784276 -0.3489205601
+age          -0.0094592389 -0.0099113611
+menostatPost  0.2584448409  0.2675484077
+tsize         0.0077960839  0.0077694009
+tgrade.L      0.5512988021  0.5600329425
+tgrade.Q     -0.2010905201 -0.2018734495
+pnodes        0.0487886004  0.0487581396
+progrec      -0.0022172357 -0.0022104961
+estrec        0.0001973107  0.0001828489
+R> 
+R> ## ----GBSG2-1-fss, cache = TRUE-------------------------------------------
+R> fss_GBSG2_1 <- flexsurvspline(fm_GBSG2, data = GBSG2, scale = "hazard", 
++                                k = 9, bknots = log(support(GBSG2y)$y))
+R> logLik(fss_GBSG2_1)
+'log Lik.' -2555.856 (df=20)
+R> logLik(mlt_GBSG2_1)
+'log Lik.' -2559.151 (df=20)
+R> cbind(coxph = cf, mlt = coef(mlt_GBSG2_1)[names(cf)],
++        fss = coef(fss_GBSG2_1)[names(cf)])
+                     coxph           mlt           fss
+horThyes     -0.3462784276 -0.3489205601 -0.3473363292
+age          -0.0094592389 -0.0099113611 -0.0097895841
+menostatPost  0.2584448409  0.2675484077  0.2672204916
+tsize         0.0077960839  0.0077694009  0.0079051625
+tgrade.L      0.5512988021  0.5600329425  0.5554284931
+tgrade.Q     -0.2010905201 -0.2018734495 -0.2078499581
+pnodes        0.0487886004  0.0487581396  0.0485933666
+progrec      -0.0022172357 -0.0022104961 -0.0022112350
+estrec        0.0001973107  0.0001828489  0.0001891311
+R> 
+R> ## ----GBSG2-1-fss-plot, echo = FALSE--------------------------------------
+R> p1 <- summary(fss_GBSG2_1, newdata = GBSG2[1,], ci = FALSE)
+R> p2 <- predict(mlt_GBSG2_1, newdata = GBSG2[1, all.vars(fm_GBSG2[-2L])], 
++                q = p1[[1]]$time, type = "survivor")
+R> plot(p1[[1]]$time, p1[[1]]$est, type = "l", lty = 1, xlab = "Survival Time (days)", 
++       ylab = "Probability", ylim = c(0, 1))
+R> lines(p1[[1]]$time, p2[,1], lty = 2)
+R> legend("topright", lty = 1:2, legend = c("flexsurvspline", "mlt"), bty = "n")
+R> 
+R> ## ----GBSG2-2-------------------------------------------------------------
+R> ly <- log_basis(GBSG2y, ui = "increasing", remove_intercept = TRUE)
+R> ctm_GBSG2_2 <- ctm(ly, shifting = fm_GBSG2[-2L], data = GBSG2, 
++                     negative = TRUE, todistr = "MinExtrVal")
+R> mlt_GBSG2_2 <- mlt(ctm_GBSG2_2, data = GBSG2, fixed = c("log(y)" = 1), 
++                     scale = TRUE)
+R> 
+R> ## ----GBSG2-2-exp---------------------------------------------------------
+R> survreg_GBSG2_2 <- survreg(fm_GBSG2, data = GBSG2, dist = "exponential")
+R> phreg_GBSG2_2 <- phreg(fm_GBSG2, data = GBSG2, dist = "weibull", 
++                         shape = 1)
+R> logLik(survreg_GBSG2_2)
+'log Lik.' -2599.383 (df=10)
+R> logLik(phreg_GBSG2_2)
+'log Lik.' -2599.383 (df=10)
+R> logLik(mlt_GBSG2_2)
+'log Lik.' -2803.57 (df=9)
+R> cbind(survreg = coef(survreg_GBSG2_2)[names(cf)], 
++        phreg = -coef(phreg_GBSG2_2)[names(cf)], 
++        mlt = coef(mlt_GBSG2_2)[names(cf)])
+                   survreg         phreg          mlt
+horThyes      0.3321617406  0.3321617406  0.265021122
+age           0.0094196671  0.0094196671  0.174429753
+menostatPost -0.2685358867 -0.2685358867 -2.344659825
+tsize        -0.0073179443 -0.0073179443  0.011117652
+tgrade.L     -0.5193521191 -0.5193521191  0.012150743
+tgrade.Q      0.2139217558  0.2139217558 -0.069961072
+pnodes       -0.0461664688 -0.0461664688 -0.040139513
+progrec       0.0020670894  0.0020670894  0.003552464
+estrec       -0.0001788501 -0.0001788501 -0.001190315
+R> 
+R> ## ----GBSG2-3-------------------------------------------------------------
+R> ctm_GBSG2_3 <- ctm(log_basis(GBSG2y, ui = "increasing"), 
++                     shifting = fm_GBSG2[-2L], data = GBSG2, 
++                     negative = TRUE, todistr = "MinExtrVal")
+R> mlt_GBSG2_3 <- mlt(ctm_GBSG2_3, data = GBSG2, scale = TRUE)
+R> survreg_GBSG2_3 <- survreg(fm_GBSG2, data = GBSG2, dist = "weibull")
+R> phreg_GBSG2_3 <- phreg(fm_GBSG2, data = GBSG2, dist = "weibull")
+R> logLik(survreg_GBSG2_3)
+'log Lik.' -2579.695 (df=11)
+R> logLik(phreg_GBSG2_3)
+'log Lik.' -2579.695 (df=11)
+R> logLik(mlt_GBSG2_3)
+'log Lik.' -2579.695 (df=11)
+R> cbind(survreg = coef(survreg_GBSG2_3)[names(cf)] / survreg_GBSG2_3$scale, 
++        phreg = - coef(phreg_GBSG2_3)[names(cf)], 
++        mlt = coef(mlt_GBSG2_3)[names(cf)])
+                   survreg         phreg           mlt
+horThyes      0.3730909205  0.3730909205  0.3730886675
+age           0.0094799262  0.0094799262  0.0094818287
+menostatPost -0.2709027409 -0.2709027409 -0.2709283349
+tsize        -0.0080149047 -0.0080149047 -0.0080148112
+tgrade.L     -0.5727992624 -0.5727992624 -0.5727950941
+tgrade.Q      0.2050597169  0.2050597169  0.2050579224
+pnodes       -0.0528016503 -0.0528016503 -0.0528015383
+progrec       0.0022848557  0.0022848557  0.0022848500
+estrec       -0.0002484315 -0.0002484315 -0.0002484469
+R> 
+R> ## ----BostonHousing-lm----------------------------------------------------
+R> data("BostonHousing2", package = "mlbench")
+R> lm_BH <- lm(cmedv ~ crim + zn + indus + chas + nox + rm + age + dis + 
++              rad + tax + ptratio + b + lstat, data = BostonHousing2)
+R> 
+R> ## ----BostonHousing-mlt---------------------------------------------------
+R> BostonHousing2$medvc <- with(BostonHousing2, Surv(cmedv, cmedv < 50))
+R> var_m <- numeric_var("medvc", support = c(10.0, 40.0), bounds = c(0, Inf))
+R> fm_BH <- medvc ~ crim + zn + indus + chas + nox + rm + age + 
++      dis + rad + tax + ptratio + b + lstat
+R> 
+R> ## ----BostonHousing-ctm---------------------------------------------------
+R> B_m <- Bernstein_basis(var_m, order = 6, ui = "increasing")
+R> ctm_BH <- ctm(B_m, shift = fm_BH[-2L], data = BostonHousing2, 
++                todistr = "Normal")
+R> mlt_BH <- mlt(ctm_BH, data = BostonHousing2, scale = TRUE)
+R> 
+R> ## ----BostonHousing-plot, echo = FALSE, results = "hide"------------------
+R> q <- 3:52
+R> m <- predict(lm_BH, data = BostonHousing2)
+R> s <- summary(lm_BH)$sigma
+R> d <- sapply(m, function(m) pnorm(q, mean = m, sd = s))
+R> nd <- expand.grid(q = q, lp = m)
+R> nd$d <- c(d)
+R> 
+R> pfun <- function(x, y, z, subscripts, at, ...) {
++      panel.contourplot(x, y, z, subscripts, at = 1:9/10, ...)
++      panel.xyplot(x = m, y = BostonHousing2$cmedv, pch = 20,   
++                   col = rgb(.1, .1, .1, .1),  ...)   
++  }
+R> p1 <- contourplot(d ~ lp + q, data = nd, panel = pfun, 
++                    xlab = "Linear predictor", ylab = "Observed", 
++                    main = "Normal Linear Model")
+R> 
+R> d <- predict(mlt_BH, newdata = BostonHousing2, q = q, type="distribution")
+R> lp <- c(predict(mlt_BH, newdata = BostonHousing2, q = 0, terms = "bshift"))
+R> nd <- expand.grid(q = q, lp = -lp)
+R> nd$d <- c(d)
+R> pfun <- function(x, y, z, subscripts, at, ...) {
++      panel.contourplot(x, y, z, subscripts, at = 1:9/10, ...)
++      panel.xyplot(x = -lp, y = BostonHousing2$cmedv, pch = 20, 
++                   col = rgb(.1, .1, .1, .1), ...)   
++  }
+R> p2 <- contourplot(d ~ lp + q, data = nd, panel = pfun, xlab = "Linear predictor", ylab = "Observed", main = "Linear Transformation Model")
+R> grid.arrange(p1, p2, nrow = 1)
+R> 
+R> ## ----PSID1976------------------------------------------------------------
+R> data("PSID1976", package = "AER")
+R> PSID1976$nwincome <- with(PSID1976, (fincome - hours * wage)/1000)
+R> PSID1976$hours <- as.double(PSID1976$hours)
+R> PSID1976_0 <- subset(PSID1976, participation == "yes")
+R> fm_PSID1976 <- hours ~ nwincome + education + experience + 
++                 I(experience^2) + age + youngkids + oldkids
+R> 
+R> ## ----PSID1976-truncreg---------------------------------------------------
+R> tr_PSID1976 <- truncreg(fm_PSID1976, data = PSID1976_0)
+R> 
+R> ## ----PSID1976-mlt--------------------------------------------------------
+R> PSID1976_0$hours <- R(PSID1976_0$hours, tleft = 0)
+R> b_hours <- as.basis(~ hours, data = PSID1976, 
++                     ui = matrix(c(0, 1), nr  = 1), ci = 0)
+R> ctm_PSID1976_1 <- ctm(b_hours, shift = fm_PSID1976[-2L], 
++                        data = PSID1976_0, todistr = "Normal") 
+R> mlt_PSID1976_1 <- mlt(ctm_PSID1976_1, data = PSID1976_0, 
++                        scale = TRUE)
+R> 
+R> ## ----PSID1976-cmpr-------------------------------------------------------
+R> logLik(tr_PSID1976)
+'log Lik.' -3391.478 (df=9)
+R> logLik(mlt_PSID1976_1)
+'log Lik.' -3390.648 (df=9)
+R> cf <- coef(mlt_PSID1976_1)
+R> cbind(truncreg = coef(tr_PSID1976),
++        mlt = c(-cf[-grep("hours", names(cf))], 1) / cf["hours"])
+                    truncreg          mlt
+(Intercept)     2055.7127740 2123.5209244
+nwincome          -0.5011526    0.1534437
+education        -31.2696497  -29.8525973
+experience        73.0066075   72.6223511
+I(experience^2)   -0.9695106   -0.9439834
+age              -25.3359778  -27.4439187
+youngkids       -318.8521247 -484.7131259
+oldkids          -91.6195316 -102.6578164
+sigma            822.4792934  850.7683745
+R> 
+R> ## ----PSID1976-mlt-ctm----------------------------------------------------
+R> var_h <- numeric_var("hours", support = range(PSID1976_0$hours$exact),
++                       bounds = c(0, Inf))
+R> B_hours <- Bernstein_basis(var_h, order = 6, ui = "increasing")
+R> ctm_PSID1976_2 <- ctm(B_hours, shift = fm_PSID1976[-2L], 
++                        data = PSID1976_0, todistr = "Normal")
+R> mlt_PSID1976_2 <- mlt(ctm_PSID1976_2, data = PSID1976_0, 
++                        scale = TRUE)
+R> logLik(mlt_PSID1976_2)
+'log Lik.' -3375.477 (df=14)
+R> AIC(mlt_PSID1976_1)
+[1] 6799.295
+R> AIC(mlt_PSID1976_2)
+[1] 6778.953
+R> 
+R> ## ----CHFLS-3, cache = TRUE-----------------------------------------------
+R> b_health <- as.basis(~ R_health - 1, data = CHFLS)
+R> ctm_CHFLS_3 <- ctm(b_happy, interacting = b_health, todist = "Logistic")
+R> mlt_CHFLS_3 <- mlt(ctm_CHFLS_3, data = CHFLS, scale = TRUE,
++                     maxit = 5000, gtol = 1e-3)
+R> logLik(mlt_CHFLS_3)
+'log Lik.' -1192.227 (df=15)
+R> predict(mlt_CHFLS_3, newdata = mkgrid(mlt_CHFLS_3), type = "distribution")
+                R_health
+R_happy               Poor   Not good        Fair        Good    Excellent
+  Very unhappy   0.1999998 0.05036713 0.008676719 0.001718226 2.625274e-06
+  Not too happy  0.5999999 0.38130160 0.154013152 0.073883243 7.602604e-02
+  Somewhat happy 0.9000000 0.93525413 0.913232655 0.862542981 5.614049e-01
+  Very happy     1.0000000 1.00000000 1.000000000 1.000000000 1.000000e+00
+R> 
+R> ## ----CHFLS-4, cache = TRUE-----------------------------------------------
+R> ctm_CHFLS_4 <- ctm(b_happy, interacting = b_health, shifting = b_R, 
++                     todist = "Logistic")
+R> mlt_CHFLS_4 <- mlt(ctm_CHFLS_4, data = CHFLS, scale = TRUE, 
++                     maxit = 5000)
+R> coef(mlt_CHFLS_4)[c("R_age", "R_income")]
+       R_age     R_income 
+0.0117390362 0.0002492703 
+R> 
+R> ## ----GBSG2-4-------------------------------------------------------------
+R> b_horTh <- as.basis(GBSG2$horTh)
+R> ctm_GBSG2_4 <- ctm(B_GBSG2y, interacting = b_horTh, todistr = "MinExtrVal")
+R> mlt_GBSG2_4 <- mlt(ctm_GBSG2_4, data = GBSG2)
+Note: method with signature 'dsparseMatrix#dsparseMatrix' chosen for function 'kronecker',
+ target signature 'dgTMatrix#dgCMatrix'.
+ "TsparseMatrix#sparseMatrix" would also be valid
+R> 
+R> ## ----GBSG2-strata-plot, echo = FALSE, results = "hide"-------------------
+R> nd <- expand.grid(s <- mkgrid(mlt_GBSG2_4, 100))
+R> nd$mlt_S <- c(predict(mlt_GBSG2_4, newdata = s, type = "survivor"))
+R> nd$KM_S <- unlist(predict(prodlim(Surv(time, cens) ~ horTh, data = GBSG2), 
++       	             newdata = data.frame(horTh = s$horTh), times = s$y))
+R> plot(nd$y, nd$mlt_S, ylim = c(0, 1), xlab = "Survival time (days)",
++       ylab = "Probability", type = "n", las = 1)
+R> with(subset(nd, horTh == "no"), lines(y, mlt_S, col = "grey", lty = 2))
+R> with(subset(nd, horTh == "yes"), lines(y, mlt_S, lty = 2))
+R> with(subset(nd, horTh == "no"), lines(y, KM_S, type = "s", col = "grey"))
+R> with(subset(nd, horTh == "yes"), lines(y, KM_S, type = "s"))
+R> legend(250, 0.4, lty = c(1, 1, 2, 2), col = c("black", "grey", "black", "grey"),
++         legend = c("hormonal therapy, KM", "no hormonal therapy, KM", 
++                    "hormonal therapy, MLT", "no hormonal therapy, MLT"), bty = "n", cex = .75)
+R> 
+R> ## ----GBSG2-5-------------------------------------------------------------
+R> ctm_GBSG2_5 <- ctm(B_GBSG2y, interacting = b_horTh, shifting = ~ age, 
++                     data = GBSG2, todistr = "MinExtrVal")
+R> mlt_GBSG2_5 <- mlt(ctm_GBSG2_5, data = GBSG2, scale = TRUE)
+R> 
+R> ## ----GBSG2-5-coxph-------------------------------------------------------
+R> coxph_GBSG2_5 <- coxph(Surv(time, cens) ~ age + strata(horTh), 
++                         data = GBSG2)
+R> cf <- coef(coxph_GBSG2_5)
+R> cbind(coxph = cf, mlt = coef(mlt_GBSG2_5)[names(cf)])
+            coxph           mlt
+age -0.0003695703 -0.0004621642
+R> 
+R> ## ----CHFLS-5, cache = TRUE-----------------------------------------------
+R> contrasts(CHFLS$R_health) <- "contr.treatment"
+R> b_health <- as.basis(~ R_health, data = CHFLS)
+R> ctm_CHFLS_5 <- ctm(b_happy, interacting = b_health, todist = "Logistic")
+R> mlt_CHFLS_5 <- mlt(ctm_CHFLS_5, data = CHFLS, scale = TRUE, 
++                     maxit = 10000, gtol = 1e-3)
+Warning messages:
+1: contrasts dropped from factor R_health 
+2: contrasts dropped from factor R_health 
+3: contrasts dropped from factor R_health 
+4: contrasts dropped from factor R_health 
+R> predict(mlt_CHFLS_5, newdata = mkgrid(mlt_CHFLS_5), type = "distribution")
+                R_health
+R_happy               Poor   Not good        Fair        Good    Excellent
+  Very unhappy   0.1998997 0.05035989 0.008676709 0.001718209 2.923172e-06
+  Not too happy  0.5999515 0.38129693 0.154012392 0.073883787 7.602638e-02
+  Somewhat happy 0.8999885 0.93525192 0.913232582 0.862543019 5.614050e-01
+  Very happy     1.0000000 1.00000000 1.000000000 1.000000000 1.000000e+00
+R> logLik(mlt_CHFLS_5)
+'log Lik.' -1192.227 (df=15)
+R> 
+R> ## ----CHFLS-6, cache = TRUE-----------------------------------------------
+R> b_R <- as.basis(~ R_age + R_income, data = CHFLS, remove_intercept = TRUE)
+R> ctm_CHFLS_6 <- ctm(b_happy, interacting = b_R, todist = "Logistic")  
+R> mlt_CHFLS_6 <- mlt(ctm_CHFLS_6, data = CHFLS, scale = TRUE,
++                     maxit = 5000, gtol = 1e-3)
+R> logLik(mlt_CHFLS_6)
+'log Lik.' -1359.731 (df=6)
+R> 
+R> ## ----CHFLS-7, cache = TRUE-----------------------------------------------
+R> ctm_CHFLS_7 <- ctm(b_happy, interacting = c(h = b_health, R = b_R), 
++      todist = "Logistic")  
+R> mlt_CHFLS_7 <- mlt(ctm_CHFLS_7, data = CHFLS, scale = TRUE,
++                     maxit = 10000, gtol = 1e-3)
+Note: method with signature 'Matrix#diagonalMatrix' chosen for function 'kronecker',
+ target signature 'dtCMatrix#ddiMatrix'.
+ "sparseMatrix#ANY" would also be valid
+Note: method with signature 'dsparseMatrix#dsparseMatrix' chosen for function 'kronecker',
+ target signature 'dtCMatrix#dtTMatrix'.
+ "sparseMatrix#TsparseMatrix" would also be valid
+Note: method with signature 'Matrix#numLike' chosen for function '%*%',
+ target signature 'dgTMatrix#numeric'.
+ "TsparseMatrix#ANY" would also be valid
+Note: method with signature 'sparseMatrix#matrix' chosen for function '%*%',
+ target signature 'dgTMatrix#matrix'.
+ "TsparseMatrix#ANY" would also be valid
+Warning messages:
+1: contrasts dropped from factor R_health 
+2: In matrix(paste(x[rep(1:nrow(x), length = nrow(y)), rep(1:ncol(x),  :
+  data length [63] is not a sub-multiple or multiple of the number of rows [2]
+3: contrasts dropped from factor R_health 
+4: In matrix(paste(x[rep(1:nrow(x), length = nrow(y)), rep(1:ncol(x),  :
+  data length [63] is not a sub-multiple or multiple of the number of rows [2]
+5: contrasts dropped from factor R_health 
+6: In matrix(paste(x[rep(1:nrow(x), length = nrow(y)), rep(1:ncol(x),  :
+  data length [63] is not a sub-multiple or multiple of the number of rows [2]
+7: contrasts dropped from factor R_health 
+8: In matrix(paste(x[rep(1:nrow(x), length = nrow(y)), rep(1:ncol(x),  :
+  data length [63] is not a sub-multiple or multiple of the number of rows [2]
+R> logLik(mlt_CHFLS_7)
+'log Lik.' -1182.779 (df=21)
+R> 
+R> ## ----CHFLS-AIC-----------------------------------------------------------
+R> c("1" = AIC(mlt_CHFLS_1), "2" = AIC(mlt_CHFLS_2), "3" = AIC(mlt_CHFLS_3),
++    "4" = AIC(mlt_CHFLS_4), "5" = AIC(mlt_CHFLS_5), "6" = AIC(mlt_CHFLS_6),
++    "7" = AIC(mlt_CHFLS_7))
+       1        2        3        4        5        6        7 
+2662.483 2654.042 2414.453 2404.135 2414.453 2731.461 2407.559 
+R> 
+R> ## ----iris-1--------------------------------------------------------------
+R> fm_iris <- Species ~ Sepal.Length + Sepal.Width + 
++                       Petal.Length + Petal.Width
+R> multinom_iris <- nnet::multinom(fm_iris, data = iris, trace = FALSE)
+R> logLik(multinom_iris)
+'log Lik.' -5.949867 (df=10)
+R> iris$oSpecies <- ordered(iris$Species)
+R> b_Species <- as.basis(iris$oSpecies)
+R> ctm_iris <- ctm(b_Species, 
++                  interacting = as.basis(fm_iris[-2L], data = iris), 
++                  todistr = "Logistic")
+R> mlt_iris <- mlt(ctm_iris, data = iris, scale = TRUE)
+R> logLik(mlt_iris)
+'log Lik.' -5.949436 (df=10)
+R> p1 <- predict(mlt_iris, newdata = iris, q = sort(unique(iris$oSpecies)), 
++                type = "density")
+R> p2 <- predict(multinom_iris, newdata = iris, type = "prob")
+R> max(abs(t(p1) - p2))
+[1] 0.001173088
+R> 
+R> ## ----GBSG2-6-------------------------------------------------------------
+R> B_GBSG2y_5 <- Bernstein_basis(var = GBSG2y, order = 5, ui = "increasing")
+R> ctm_GBSG2_6 <- ctm(B_GBSG2y_5, shifting = ~ horTh, data = GBSG2, 
++                     todistr = "MinExtrVal")
+R> mlt_GBSG2_6 <- mlt(ctm_GBSG2_6, data = GBSG2)
+R> 
+R> ## ----GBSG2-7-------------------------------------------------------------
+R> b_horTh <- as.basis(~ horTh, data = GBSG2)
+R> ctm_GBSG2_7 <- ctm(B_GBSG2y_5, interacting = b_horTh, 
++                     todistr = "MinExtrVal")
+R> mlt_GBSG2_7 <- mlt(ctm_GBSG2_7, data = GBSG2)
+R> 
+R> ## ----GBSG2-deviation-plot, echo = FALSE, results = "hide"----------------
+R> 
+R> s <- mkgrid(mlt_GBSG2_7, 15)
+R> s$y <- s$y[s$y > 100 & s$y < 2400]
+R> nd <- expand.grid(s)
+R> K <- model.matrix(ctm_GBSG2_7, data = nd)
+R> Kyes <- K[nd$horTh == "yes",]
+R> Kyes[,1:6] <- 0  
+R> gh <- glht(parm(coef(mlt_GBSG2_7), vcov(mlt_GBSG2_7)), Kyes)
+R> ci <- confint(gh)
+R> coxy <- s$y
+R> 
+R> K <- matrix(0, nrow = 1, ncol = length(coef(mlt_GBSG2_6)))
+R> K[,length(coef(mlt_GBSG2_6))] <- 1
+R> ci2 <- confint(glht(mlt_GBSG2_6, K))
+R> 
+R> plot(coxy, ci$confint[, "Estimate"], ylim = range(ci$confint), type = "n",
++       xlab = "Survival time (days)", ylab = "Transformation deviation", las = 1)
+R> polygon(c(coxy, rev(coxy)), c(ci$confint[,"lwr"], rev(ci$confint[, "upr"])),
++          border = NA, col = rgb(.1, .1, .1, .1))
+R> lines(coxy, ci$confint[, "Estimate"], lty = 1, lwd = 1)
+R> lines(coxy, rep(ci2$confint[,"Estimate"], length(coxy)), lty = 2, lwd = 1) 
+R> lines(coxy, rep(0, length(coxy)), lty = 3)
+R> polygon(c(coxy[c(1, length(coxy))], rev(coxy[c(1, length(coxy))])),
++          rep(ci2$confint[,c("lwr", "upr")], c(2, 2)),
++          border = NA, col = rgb(.1, .1, .1, .1))
+R> legend("bottomright", lty = 1:2, lwd = 1, legend = c("time-varying treatment effect",
++         "time-constant log-hazard ratio"), bty = "n", cex = .75)
+R> 
+R> ## ----GBSG2-8, echo = TRUE, cache = TRUE----------------------------------
+R> var_a <- numeric_var("age", support = range(GBSG2$age))
+R> B_age <- Bernstein_basis(var_a, order = 3)
+R> b_horTh <- as.basis(GBSG2$horTh)
+R> ctm_GBSG2_8 <- ctm(B_GBSG2y_5, 
++                     interacting = b(horTh = b_horTh, age = B_age), 
++                     todistr = "MinExtrVal")
+R> mlt_GBSG2_8  <- mlt(ctm_GBSG2_8, data = GBSG2)
+Note: method with signature 'diagonalMatrix#Matrix' chosen for function 'kronecker',
+ target signature 'ddiMatrix#ddiMatrix'.
+ "Matrix#diagonalMatrix" would also be valid
+Note: method with signature 'TsparseMatrix#sparseMatrix' chosen for function 'kronecker',
+ target signature 'dtTMatrix#ddiMatrix'.
+ "Matrix#diagonalMatrix" would also be valid
+Note: method with signature 'diagonalMatrix#Matrix' chosen for function 'kronecker',
+ target signature 'ddiMatrix#dgCMatrix'.
+ "ANY#sparseMatrix" would also be valid
+Note: method with signature 'dsparseMatrix#dsparseMatrix' chosen for function 'kronecker',
+ target signature 'dtTMatrix#dgCMatrix'.
+ "TsparseMatrix#sparseMatrix" would also be valid
+Note: method with signature 'Matrix#diagonalMatrix' chosen for function 'kronecker',
+ target signature 'dgCMatrix#ddiMatrix'.
+ "sparseMatrix#ANY" would also be valid
+Note: method with signature 'dsparseMatrix#dsparseMatrix' chosen for function 'kronecker',
+ target signature 'dgCMatrix#dtTMatrix'.
+ "sparseMatrix#TsparseMatrix" would also be valid
+R> 
+R> ## ----GBSG2-8-plot, echo = FALSE------------------------------------------
+R> nlev <- c(no = "without hormonal therapy", yes = "with hormonal therapy")
+R> levels(nd$horTh) <- nlev[match(levels(nd$horTh), names(nlev))]
+R> s <- mkgrid(mlt_GBSG2_8, 100)
+R> nd <- expand.grid(s)
+R> nd$s <- c(predict(mlt_GBSG2_8, newdata = s, type = "survivor"))
+R> contourplot(s ~ age + y | horTh, data = nd, at = 1:9 / 10,
++              ylab = "Survival time (days)", xlab = "Age (years)",
++              scales = list(x = list(alternating = c(1, 1))))
+R> 
+R> ## ----head, echo = TRUE, cache = TRUE-------------------------------------
+R> data("db", package = "gamlss.data")
+R> db$lage <- with(db, age^(1/3))
+R> var_head = numeric_var("head", support = quantile(db$head, c(.1, .9)),
++                         bounds = range(db$head))
+R> B_head <- Bernstein_basis(var_head, order = 3, ui = "increasing")
+R> var_lage <- numeric_var("lage", support = quantile(db$lage, c(.1, .9)),
++                          bounds = range(db$lage))
+R> B_age <- Bernstein_basis(var_lage, order = 3, ui = "none")
+R> ctm_head <- ctm(B_head, interacting = B_age)
+R> mlt_head <- mlt(ctm_head, data = db, maxit = 5000, scale = TRUE)
+R> 
+R> ## ----head-plot, echo = FALSE---------------------------------------------
+R> pr <- expand.grid(s <- mkgrid(ctm_head, 100))
+R> pr$p <- c(predict(mlt_head, newdata = s, type = "distribution"))
+R> pr$lage <- pr$lage^3
+R> pr$cut <- factor(pr$lage > 2.5)
+R> levels(pr$cut) <- c("Age < 2.5 yrs", "Age > 2.5 yrs")
+R> pfun <- function(x, y, z, subscripts, at, ...) {
++      panel.contourplot(x, y, z, subscripts,
++          at = c(0.4, 2, 10, 25, 50, 75, 90, 98, 99.6)/ 100, ...)
++      panel.xyplot(x = db$age, y = db$head, pch = 20,
++                   col = rgb(.1, .1, .1, .1), ...)
++  }
+R> print(contourplot(p ~ lage + head | cut, data = pr, panel = pfun, region = FALSE,
++              xlab = "Age (years)", ylab = "Head circumference (cm)",
++              scales = list(x = list(relation = "free"))))
+R> 
+R> ## ----BostonHousing-dr, cache = TRUE--------------------------------------
+R> b_BH_s <- as.basis(fm_BH[-2L], data = BostonHousing2, scale = TRUE)
+R> ctm_BHi <- ctm(B_m, interacting = b_BH_s, sumconstr = FALSE)
+R> mlt_BHi <- mlt(ctm_BHi, data = BostonHousing2, scale = TRUE, 
++                 maxit = 5000, gtol = 1e-3)
+R> logLik(mlt_BHi)
+'log Lik.' -1274.367 (df=98)
+R> AIC(mlt_BHi)
+[1] 2744.734
+R> AIC(mlt_BH)
+[1] 2689.396
+R> 
+R> ## ----Boston-Housing-dr-plot, echo = FALSE--------------------------------
+R> q <- mkgrid(var_m, 100)[[1]]
+R> tr <- predict(mlt_BH, newdata = BostonHousing2[, all.vars(fm_BH[-2L])],
++                q = q, type = "density")
+R> tri <- predict(mlt_BHi, newdata = BostonHousing2[, all.vars(fm_BH[-2L])],
++                q = q, type = "density")
+R> layout(matrix(1:2, ncol = 2))
+R> Q <- matrix(q, nrow = length(q), ncol = ncol(tr))
+R> ylim <- range(c(tr, tri))
+R> matplot(Q, tr, ylim = ylim, xlab = "Median Value", ylab = "Density",
++          type = "l", col = rgb(.1, .1, .1, .1), lty = 1) 
+R> matplot(Q, tri, ylim = ylim, xlab = "Median Value", ylab = "Density",
++          type = "l", col = rgb(.1, .1, .1, .1), lty = 1)
+R> 
+R> ## ----treepipit, echo = TRUE, cache = TRUE--------------------------------
+R> data("treepipit", package = "coin")
+R> tmp <- treepipit
+R> tmp$counts <- ordered(tmp$counts)
+R> ### we want
+R> #tmp$counts <- R(tmp$counts)
+R> #cv <- numeric_var("counts", support = 0:5)
+R> B_cs <- Bernstein_basis(var = numeric_var("coverstorey", support = 1:110), 
++                          order = 4)
+R> B_c <- as.basis(tmp$counts)
+R> ctm_treepipit <- ctm(B_c, interacting = B_cs)
+R> mlt_treepipit <- mlt(ctm_treepipit, data = tmp, maxit = 10000, 
++                       gtol = 1e-3)
+R> 
+R> ## ----treepipit-gam-------------------------------------------------------
+R> gam_treepipit <- gam(counts ~ s(coverstorey), data = treepipit, 
++                       family = "poisson")
+R> 
+R> ## ----treepipit-plot, echo = FALSE, fig.height = 3------------------------
+R> s <- mkgrid(ctm_treepipit, 100)
+R> s$counts <- s$counts[1:5]
+R> nd <- expand.grid(s)
+R> nd$p <- c(predict(mlt_treepipit, newdata = s, type = "distribution"))
+R> 
+R> ### produce a table
+R> tpt <- xtabs(~ counts + coverstorey, data = treepipit)
+R> 
+R> ### construct a data frame with frequencies
+R> treepipit2 <- sapply(as.data.frame(tpt, stringsAsFactors = FALSE),
++                       as.integer)
+R> 
+R> s <- mkgrid(ctm_treepipit, 10)
+R> s$counts <- s$counts[1]
+R> K <- model.matrix(ctm_treepipit, data = expand.grid(s))
+R> #g <- glht(parm(coef(mod), vcov(mod)), linfct = K)
+R> #confint(g)
+R> nd$lambda <- predict(gam_treepipit, newdata = nd, type = "response")
+R> 
+R> layout(matrix(1:3, nr = 1))
+R> par("mai" = par("mai") * c(1, .95, 1, .85))
+R> xlim <- range(treepipit[, "coverstorey"]) * c(0.98, 1.05)
+R> xlab <- "Cover storey"
+R> ylab <- "Number of tree pipits (TP)"
+R> ### scatterplot again; plots are proportional to number of plots
+R> plot(counts ~ coverstorey, data = treepipit2, cex = sqrt(Freq),
++       ylim = c(-.5, 5), xlab = xlab, ylab = ylab, col = "darkgrey", 
++       xlim = xlim, las = 1, main = "Observations")
+R> 
+R> plot(c(0, 110), c(0, 1), type = "n", xlab = xlab, ylab = "Conditional probability",
++       xlim = xlim, las = 1, main = "MLT")
+R> with(subset(nd, counts == "0"), lines(coverstorey, p, lty = 1))
+R> with(subset(nd, counts == "1"), lines(coverstorey, p, lty = 2))
+R> with(subset(nd, counts == "2"), lines(coverstorey, p, lty = 3))
+R> with(subset(nd, counts == "3"), lines(coverstorey, p, lty = 4))
+R> with(subset(nd, counts == "4"), lines(coverstorey, p, lty = 5))
+R> abline(h = 1, lty = 6)
+R> legend("bottomright", lty = 1:6, legend = c(expression(TP == 0),
++                                              expression(TP <= 1),
++                                              expression(TP <= 2),
++                                              expression(TP <= 3),
++                                              expression(TP <= 4),
++                                              expression(TP <= 5)), bty = "n")
+R> 
+R> plot(c(0, 110), c(0, 1), type = "n", xlab = xlab, ylab = "Conditional probability",
++       xlim = xlim, las = 1, main = "GAM")
+R> with(subset(nd, counts == "0"), lines(coverstorey, ppois(0, lambda), lty = 1))
+R> with(subset(nd, counts == "1"), lines(coverstorey, ppois(1, lambda), lty = 2))
+R> with(subset(nd, counts == "2"), lines(coverstorey, ppois(2, lambda), lty = 3))
+R> with(subset(nd, counts == "3"), lines(coverstorey, ppois(3, lambda), lty = 4))
+R> with(subset(nd, counts == "4"), lines(coverstorey, ppois(4, lambda), lty = 5))
+R> abline(h = 1, lty = 6)
+R> 
+R> ## ----CHFLS-2-cmpr-2------------------------------------------------------
+R> max(abs(estfun(polr_CHFLS_2) - (-estfun(mlt_CHFLS_2)[,c(4, 5, 1:3)])))
+[1] 0.008871258
+R> cbind(polr = sqrt(diag(vcov(polr_CHFLS_2))),
++        mlt = sqrt(diag(vcov(mlt_CHFLS_2)))[c(4, 5, 1:3)])
+
+Re-fitting to get Hessian
+
+                                     polr          mlt
+R_age                        5.684041e-03 5.684460e-03
+R_income                     8.509055e-05 7.099273e-05
+Very unhappy|Not too happy   3.536235e-01 3.522657e-01
+Not too happy|Somewhat happy 2.419643e-01 2.400504e-01
+Somewhat happy|Very happy    2.372414e-01 2.355000e-01
+R> cftest(polr_CHFLS_2)
+
+Re-fitting to get Hessian
+
+
+Re-fitting to get Hessian
+
+
+	 Simultaneous Tests for General Linear Hypotheses
+
+Fit: polr(formula = R_happy ~ R_age + R_income, data = CHFLS)
+
+Linear Hypotheses:
+                Estimate Std. Error z value Pr(>|z|)   
+R_age == 0    -6.279e-03  5.684e-03  -1.105  0.26930   
+R_income == 0  2.350e-04  8.509e-05   2.762  0.00575 **
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+(Univariate p values reported)
+
+R> cftest(mlt_CHFLS_2, parm = names(coef(polr_CHFLS_2)))
+
+	 Simultaneous Tests for General Linear Hypotheses
+
+Fit: mlt(model = ctm_CHFLS_2, data = CHFLS, scale = TRUE)
+
+Linear Hypotheses:
+                Estimate Std. Error z value Pr(>|z|)    
+R_age == 0    -6.279e-03  5.684e-03  -1.105 0.269328    
+R_income == 0  2.350e-04  7.099e-05   3.310 0.000932 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+(Univariate p values reported)
+
+R> 
+R> ## ----GBSG2-1-coxph-cmpr--------------------------------------------------
+R> cf <- coef(coxph_GBSG2_1)
+R> cbind(coxph = sqrt(diag(vcov(coxph_GBSG2_1))),
++        mlt = sqrt(diag(vcov(mlt_GBSG2_1)))[names(cf)],
++        fss = sqrt(diag(vcov(fss_GBSG2_1)))[names(cf)])
+                    coxph          mlt          fss
+horThyes     0.1290747352 0.1293760634 0.1290343235
+age          0.0093005948 0.0093124938 0.0092899409
+menostatPost 0.1834764517 0.1836840638 0.1833300012
+tsize        0.0039390177 0.0039383111 0.0039372592
+tgrade.L     0.1898441328 0.1898825492 0.1899068142
+tgrade.Q     0.1219653995 0.1220116627 0.1220298327
+pnodes       0.0074470895 0.0074156462 0.0074387203
+progrec      0.0005735286 0.0005740003 0.0005553729
+estrec       0.0004503679 0.0004515681 0.0004309581
+R> 
+R> ## ----GBSG2-1-coxph-cmpr-cftest-------------------------------------------
+R> cftest(coxph_GBSG2_1)
+
+	 Simultaneous Tests for General Linear Hypotheses
+
+Fit: coxph(formula = fm_GBSG2, data = GBSG2)
+
+Linear Hypotheses:
+                    Estimate Std. Error z value Pr(>|z|)    
+horThyes == 0     -0.3462784  0.1290747  -2.683 0.007301 ** 
+age == 0          -0.0094592  0.0093006  -1.017 0.309126    
+menostatPost == 0  0.2584448  0.1834765   1.409 0.158954    
+tsize == 0         0.0077961  0.0039390   1.979 0.047794 *  
+tgrade.L == 0      0.5512988  0.1898441   2.904 0.003685 ** 
+tgrade.Q == 0     -0.2010905  0.1219654  -1.649 0.099199 .  
+pnodes == 0        0.0487886  0.0074471   6.551  5.7e-11 ***
+progrec == 0      -0.0022172  0.0005735  -3.866 0.000111 ***
+estrec == 0        0.0001973  0.0004504   0.438 0.661307    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+(Univariate p values reported)
+
+R> cftest(mlt_GBSG2_1, parm = names(cf))
+
+	 Simultaneous Tests for General Linear Hypotheses
+
+Fit: mlt(model = ctm_GBSG2_1, data = GBSG2, scale = TRUE, maxit = 3000)
+
+Linear Hypotheses:
+                    Estimate Std. Error z value Pr(>|z|)    
+horThyes == 0     -0.3489206  0.1293761  -2.697 0.006998 ** 
+age == 0          -0.0099114  0.0093125  -1.064 0.287189    
+menostatPost == 0  0.2675484  0.1836841   1.457 0.145236    
+tsize == 0         0.0077694  0.0039383   1.973 0.048521 *  
+tgrade.L == 0      0.5600329  0.1898825   2.949 0.003184 ** 
+tgrade.Q == 0     -0.2018734  0.1220117  -1.655 0.098017 .  
+pnodes == 0        0.0487581  0.0074156   6.575 4.86e-11 ***
+progrec == 0      -0.0022105  0.0005740  -3.851 0.000118 ***
+estrec == 0        0.0001828  0.0004516   0.405 0.685536    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+(Univariate p values reported)
+
+R> cftest(fss_GBSG2_1, parm = names(cf))
+
+	 Simultaneous Tests for General Linear Hypotheses
+
+Fit: flexsurvspline(formula = fm_GBSG2, data = GBSG2, k = 9, bknots = log(support(GBSG2y)$y), 
+    scale = "hazard")
+
+Linear Hypotheses:
+                    Estimate Std. Error z value Pr(>|z|)    
+horThyes == 0     -0.3473363  0.1290343  -2.692  0.00711 ** 
+age == 0          -0.0097896  0.0092899  -1.054  0.29198    
+menostatPost == 0  0.2672205  0.1833300   1.458  0.14495    
+tsize == 0         0.0079052  0.0039373   2.008  0.04467 *  
+tgrade.L == 0      0.5554285  0.1899068   2.925  0.00345 ** 
+tgrade.Q == 0     -0.2078500  0.1220298  -1.703  0.08852 .  
+pnodes == 0        0.0485934  0.0074387   6.532 6.47e-11 ***
+progrec == 0      -0.0022112  0.0005554  -3.982 6.85e-05 ***
+estrec == 0        0.0001891  0.0004310   0.439  0.66076    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+(Univariate p values reported)
+
+R> 
+R> ## ----geyser-w-band-------------------------------------------------------
+R> cb_w <- confband(mlt_w, newdata = data.frame(1), K = 20, cheat = 100)
+R> 
+R> ## ----geyser-w-cbplot, echo = FALSE---------------------------------------
+R> layout(matrix(1:2, ncol = 2))
+R> #i <- (cb_w[, "q"] > 45 & cb_w[, "q"] < 110)
+R> #cb_w[-i, "lwr"] <- NA
+R> #cb_w[-i, "upr"] <- NA
+R> plot(cb_w[, "q"], cb_w[, "Estimate"], xlab = "Waiting times", ylab = "Transformation", 
++       main = "", type = "l")
+R> 
+R> q <- cb_w[, "q"]
+R> lwr <- cb_w[, "lwr"]
+R> upr <-  cb_w[, "upr"]
+R> polygon(c(q, rev(q)), c(lwr, rev(upr)),
++          border = NA, col = rgb(.1, .1, .1, .1))
+R> 
+R> #lines(cb_w[, "q"], cb_w[, "lwr"])
+R> #lines(cb_w[, "q"], cb_w[, "upr"])
+R> rug(geyser$waiting, col = rgb(.1, .1, .1, .1))
+R> plot(ecdf(geyser$waiting), col = "grey", xlab = "Waiting times", ylab = "Distribution", 
++       main = "", cex = .5)
+R> lines(cb_w[, "q"], pnorm(cb_w[, "Estimate"]))
+R> 
+R> polygon(c(q, rev(q)), c(pnorm(lwr), rev(pnorm(upr))),                                     
++          border = NA, col = rgb(.1, .1, .1, .1))
+R> 
+R> # lines(cb_w[, "q"], pnorm(cb_w[, "lwr"]))
+R> # lines(cb_w[, "q"], pnorm(cb_w[, "upr"]))
+R> rug(geyser$waiting, col = rgb(.1, .1, .1, .1))
+R> 
+R> ## ----geyser-w-simulate, results = "hide", cache = TRUE-------------------
+R> new_w <- simulate(mlt_w, nsim = 100)
+R> llr <- numeric(length(new_w))
+R> pdist <- vector(mode = "list", length = length(new_w))
+R> pdens <- vector(mode = "list", length = length(new_w))
+R> ngeyser <- geyser
+R> q <- mkgrid(var_w, 100)[[1]]
+R> for (i in 1:length(new_w)) {
++      ngeyser$waiting <- new_w[[i]]
++      mlt_i <- mlt(ctm_w, data = ngeyser, scale = TRUE, 
++                   theta = coef(mlt_w))
++      llr[[i]] <- logLik(mlt_i) - logLik(mlt_i, parm = coef(mlt_w))
++      pdist[[i]] <- predict(mlt_i, newdata = data.frame(1), 
++                            type = "distribution", q = q)
++      pdens[[i]] <- predict(mlt_i, newdata = data.frame(1), 
++                            type = "density", q = q)
++  }
+R> 
+R> ## ----geyser-w-simulate-plot, echo = FALSE--------------------------------
+R> i <- which(llr < quantile(llr, prob = .95))
+R> tpdist <- pdist[i]
+R> tpdens <- pdens[i]
+R> layout(matrix(1:2, ncol = 2))
+R> plot(q, tpdist[[1]], type = "n", xlab = "Waiting times", ylab = "Distribution")
+R> polygon(c(q, rev(q)), c(pnorm(lwr), rev(pnorm(upr))),
++          border = NA, col = "greenyellow")
+R> tmp <- sapply(tpdist, function(x) lines(q, x, col = rgb(.1, .1, .1, .1)))
+R> plot(q, tpdens[[1]], type = "n", ylim = range(unlist(pdens)),
++       xlab = "Waiting times", ylab = "Density")
+R> tmp <- sapply(tpdens, function(x) lines(q, x, col = rgb(.1, .1, .1, .1)))
+R> 
+R> ## ----variables-factor----------------------------------------------------
+R> f_eye <- factor_var("eye", desc = "eye color", 
++                      levels = c("blue", "brown", "green", "grey", "mixed"))
+R> 
+R> ## ----variables-factor-methods--------------------------------------------
+R> variable.names(f_eye)
+[1] "eye"
+R> desc(f_eye)
+[1] "eye color"
+R> variables::unit(f_eye)
+[1] NA
+R> support(f_eye)
+$eye
+[1] blue  brown green grey  mixed
+Levels: blue brown green grey mixed
+
+R> bounds(f_eye)
+$eye
+[1] NA
+
+R> is.bounded(f_eye)
+[1] TRUE
+R> 
+R> ## ----variables-factor-mkgrid---------------------------------------------
+R> mkgrid(f_eye)
+$eye
+[1] blue  brown green grey  mixed
+Levels: blue brown green grey mixed
+
+R> 
+R> ## ----variables-ordered---------------------------------------------------
+R> o_temp <- ordered_var("temp", desc = "temperature", 
++                        levels = c("cold", "lukewarm", "warm", "hot"))
+R> 
+R> ## ----variables-ordered-methods-------------------------------------------
+R> variable.names(o_temp)
+[1] "temp"
+R> desc(o_temp)
+[1] "temperature"
+R> variables::unit(o_temp)
+[1] NA
+R> support(o_temp)
+$temp
+[1] cold     lukewarm warm     hot     
+Levels: cold < lukewarm < warm < hot
+
+R> bounds(o_temp) 
+$temp
+[1] cold hot 
+Levels: cold < lukewarm < warm < hot
+
+R> is.bounded(o_temp)
+[1] TRUE
+R> mkgrid(o_temp)
+$temp
+[1] cold     lukewarm warm     hot     
+Levels: cold < lukewarm < warm < hot
+
+R> 
+R> ## ----variables-fd--------------------------------------------------------
+R> v_age <- numeric_var("age", desc = "age of patient", 
++                       unit = "years", support = 25:75)
+R> 
+R> ## ----variables-fd-methods------------------------------------------------
+R> variable.names(v_age)
+[1] "age"
+R> desc(v_age)
+[1] "age of patient"
+R> variables::unit(v_age)
+[1] "years"
+R> support(v_age)
+$age
+ [1] 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47
+[24] 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70
+[47] 71 72 73 74 75
+
+R> bounds(v_age) 
+$age
+[1] 25 75
+
+R> is.bounded(v_age)
+[1] TRUE
+R> 
+R> ## ----variables-fd-mkgrid-------------------------------------------------
+R> mkgrid(v_age)
+$age
+ [1] 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47
+[24] 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70
+[47] 71 72 73 74 75
+
+R> 
+R> ## ----variables-c---------------------------------------------------------
+R> v_temp <- numeric_var("ztemp", desc = "Zurich daytime temperature", 
++                        unit = "Celsius", support = c(-10.0, 35.0), 
++                        add = c(-5, 5), bounds = c(-273.15, Inf))
+R> 
+R> ## ----variables-c-methods-------------------------------------------------
+R> variable.names(v_temp)
+[1] "ztemp"
+R> desc(v_temp)
+[1] "Zurich daytime temperature"
+R> variables::unit(v_temp)
+[1] "Celsius"
+R> support(v_temp)
+$ztemp
+[1] -10  35
+
+R> bounds(v_temp) 
+$ztemp
+[1] -273.15     Inf
+
+R> is.bounded(v_temp)
+[1] TRUE
+R> 
+R> ## ----variables-c-mkgrid--------------------------------------------------
+R> mkgrid(v_temp, n = 20)
+$ztemp
+ [1] -15.0000000 -12.1052632  -9.2105263  -6.3157895  -3.4210526
+ [6]  -0.5263158   2.3684211   5.2631579   8.1578947  11.0526316
+[11]  13.9473684  16.8421053  19.7368421  22.6315789  25.5263158
+[16]  28.4210526  31.3157895  34.2105263  37.1052632  40.0000000
+
+R> 
+R> ## ----variables-vars------------------------------------------------------
+R> vars <- c(f_eye, o_temp, v_age, v_temp)
+R> 
+R> ## ----variables-vars-methods----------------------------------------------
+R> variable.names(vars)
+    eye    temp     age   ztemp 
+  "eye"  "temp"   "age" "ztemp" 
+R> desc(vars) 
+                         eye                         temp 
+                 "eye color"                "temperature" 
+                         age                        ztemp 
+            "age of patient" "Zurich daytime temperature" 
+R> variables::unit(vars)
+      eye      temp       age     ztemp 
+       NA        NA   "years" "Celsius" 
+R> support(vars)
+$eye
+[1] blue  brown green grey  mixed
+Levels: blue brown green grey mixed
+
+$temp
+[1] cold     lukewarm warm     hot     
+Levels: cold < lukewarm < warm < hot
+
+$age
+ [1] 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47
+[24] 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70
+[47] 71 72 73 74 75
+
+$ztemp
+[1] -10  35
+
+R> bounds(vars)
+$eye
+[1] NA
+
+$temp
+[1] cold hot 
+Levels: cold < lukewarm < warm < hot
+
+$age
+[1] 25 75
+
+$ztemp
+[1] -273.15     Inf
+
+R> is.bounded(vars)
+  eye  temp   age ztemp 
+ TRUE  TRUE  TRUE  TRUE 
+R> mkgrid(vars, n = 20)
+$eye
+[1] blue  brown green grey  mixed
+Levels: blue brown green grey mixed
+
+$temp
+[1] cold     lukewarm warm     hot     
+Levels: cold < lukewarm < warm < hot
+
+$age
+ [1] 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47
+[24] 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70
+[47] 71 72 73 74 75
+
+$ztemp
+ [1] -15.0000000 -12.1052632  -9.2105263  -6.3157895  -3.4210526
+ [6]  -0.5263158   2.3684211   5.2631579   8.1578947  11.0526316
+[11]  13.9473684  16.8421053  19.7368421  22.6315789  25.5263158
+[16]  28.4210526  31.3157895  34.2105263  37.1052632  40.0000000
+
+R> 
+R> ## ----variables-vars-expand-----------------------------------------------
+R> nd <- expand.grid(mkgrid(vars))
+R> 
+R> ## ----variables-check-----------------------------------------------------
+R> check(vars, data = nd)
+[1] TRUE
+R> 
+R> ## ----basefun-polynom-----------------------------------------------------
+R> xvar <- numeric_var("x", support = c(0.1, pi), bounds= c(0, Inf))
+R> x <- as.data.frame(mkgrid(xvar, n = 20))
+R> ### set-up basis of order 3 ommiting the quadratic term
+R> class(pb <- polynomial_basis(xvar, coef = c(TRUE, TRUE, FALSE, TRUE)))
+[1] "polynomial_basis" "basis"            "function"        
+R> 
+R> ## ----basefun-polynom-fun-------------------------------------------------
+R> head(pb(x))
+     (Intercept)         x x^2         x^3
+[1,]           1 0.0000000   0 0.000000000
+[2,]           1 0.1653470   0 0.004520524
+[3,]           1 0.3306940   0 0.036164195
+[4,]           1 0.4960409   0 0.122054158
+[5,]           1 0.6613879   0 0.289313560
+[6,]           1 0.8267349   0 0.565065547
+R> 
+R> ## ----basefun-polynom-mm--------------------------------------------------
+R> head(model.matrix(pb, data = x))
+     (Intercept)         x x^2         x^3
+[1,]           1 0.0000000   0 0.000000000
+[2,]           1 0.1653470   0 0.004520524
+[3,]           1 0.3306940   0 0.036164195
+[4,]           1 0.4960409   0 0.122054158
+[5,]           1 0.6613879   0 0.289313560
+[6,]           1 0.8267349   0 0.565065547
+R> 
+R> ## ----basefun-polynom-pred------------------------------------------------
+R> ### evaluate polynomial defined by basis and coefficients
+R> predict(pb, newdata = x, coef = c(1, 2, 0, 1.75))
+ [1]  1.000000  1.338605  1.724675  2.205677  2.829075  3.642335  4.692922
+ [8]  6.028303  7.695942  9.743305 12.217857 15.167065 18.638393 22.679308
+[15] 27.337274 32.659757 38.694222 45.488136 53.088963 61.544169
+R> ### evaluate 1st derivative
+R> predict(pb, newdata = x, coef = c(1, 2, 0, 1.75), deriv = c(x = 1L))
+ [1]  2.000000  2.143533  2.574132  3.291797  4.296528  5.588326  7.167189
+ [8]  9.033118 11.186114 13.626175 16.353303 19.367496 22.668756 26.257082
+[15] 30.132473 34.294931 38.744455 43.481045 48.504701 53.815423
+R> 
+R> ## ----basefun-log---------------------------------------------------------
+R> ### set-up log-basis with intercept for positive variable
+R> class(lb <- log_basis(xvar, ui = "increasing"))
+[1] "log_basis" "basis"     "function" 
+R> head(X <- model.matrix(lb, data = x))
+     (Intercept)      log(x)
+[1,]           1 -36.0436534
+[2,]           1  -1.7997091
+[3,]           1  -1.1065619
+[4,]           1  -0.7010968
+[5,]           1  -0.4134147
+[6,]           1  -0.1902712
+R> 
+R> ## ----basefun-log-constr--------------------------------------------------
+R> attr(X, "constraint")
+$ui
+         ci
+[1,] 0 -Inf
+[2,] 0    0
+
+$ci
+[1] -Inf    0
+
+R> 
+R> ## ----basefun-log-pred----------------------------------------------------
+R> predict(lb, newdata = x, coef = c(1, 2))
+ [1] -71.0873068  -2.5994182  -1.2131238  -0.4021936   0.1731705
+ [6]   0.6194576   0.9841008   1.2924021   1.5594649   1.7950310
+[11]   2.0057520   2.1963724   2.3703951   2.5304805   2.6786965
+[16]   2.8166822   2.9457593   3.0670085   3.1813253   3.2894598
+R> predict(lb, newdata = x, coef = c(1, 2), deriv = c(x = 1L))
+ [1]        Inf 12.0957757  6.0478878  4.0319252  3.0239439  2.4191551
+ [7]  2.0159626  1.7279680  1.5119720  1.3439751  1.2095776  1.0996160
+[13]  1.0079813  0.9304443  0.8639840  0.8063850  0.7559860  0.7115162
+[19]  0.6719875  0.6366198
+R> 
+R> ## ----basefun-Bernstein---------------------------------------------------
+R> class(bb <- Bernstein_basis(xvar, order = 3, ui = "increasing"))
+[1] "Bernstein_basis" "basis"           "function"       
+R> head(X <- model.matrix(bb, data = x))
+        Bs1(x)      Bs2(x)      Bs3(x)       Bs4(x)
+[1,] 1.0986325 -0.09863254 0.000000000 0.000000e+00
+[2,] 0.9369214  0.06171364 0.001354996 9.916843e-06
+[3,] 0.7892824  0.19433218 0.015949084 4.363204e-04
+[4,] 0.6580299  0.29552260 0.044239941 2.207583e-03
+[5,] 0.5421999  0.36817664 0.083335831 6.287617e-03
+[6,] 0.4408286  0.41518604 0.130345023 1.364033e-02
+R> 
+R> ## ----basefun-Bernstein-constr--------------------------------------------
+R> cf <- c(1, 2, 2.5, 2.6)
+R> (cnstr <- attr(X, "constraint"))
+$ui
+3 x 4 sparse Matrix of class "dgCMatrix"
+               
+[1,] -1  1  . .
+[2,]  . -1  1 .
+[3,]  .  . -1 1
+
+$ci
+[1] 0 0 0
+
+R> all(cnstr$ui %*% cf > cnstr$ci)
+[1] TRUE
+R> 
+R> ## ----basefun-Bernstein-predict-------------------------------------------
+R> predict(bb, newdata = x, coef = cf)
+ [1] 0.9013675 1.0637620 1.2189539 1.3654146 1.5032406 1.6325281 1.7533736
+ [8] 1.8658735 1.9701242 2.0662220 2.1542634 2.2343447 2.3065623 2.3710127
+[15] 2.4277922 2.4769972 2.5187240 2.5530692 2.5801291 2.6000000
+R> predict(bb, newdata = x, coef = cf, deriv = c(x = 1))
+ [1] 0.98632537 0.96518023 0.91208351 0.85956975 0.80763896 0.75629112
+ [7] 0.70552625 0.65534435 0.60574540 0.55672942 0.50829640 0.46044634
+[13] 0.41317925 0.36649512 0.32039395 0.27487574 0.22994050 0.18558821
+[19] 0.14181889 0.09863254
+R> 
+R> ## ----basefun-as.basis----------------------------------------------------
+R> iv <- as.vars(iris)
+R> fb <- as.basis(~ Species + Sepal.Length + Sepal.Width,  data = iv,
++                 remove_intercept = TRUE, negative = TRUE, 
++                 contrasts.args =  list(Species = "contr.sum"))
+R> class(fb)
+[1] "formula_basis" "basis"         "function"     
+R> head(model.matrix(fb, data = iris))
+  Speciesversicolor Speciesvirginica Sepal.Length Sepal.Width
+1                 0                0         -5.1        -3.5
+2                 0                0         -4.9        -3.0
+3                 0                0         -4.7        -3.2
+4                 0                0         -4.6        -3.1
+5                 0                0         -5.0        -3.6
+6                 0                0         -5.4        -3.9
+R> 
+R> ## ----basefun-c-----------------------------------------------------------
+R> class(blb <- c(bern = bb, 
++                 log = log_basis(xvar, ui = "increasing", 
++                                 remove_intercept = TRUE)))
+[1] "cbind_bases" "bases"      
+R> head(X <- model.matrix(blb, data = x))
+        Bs1(x)      Bs2(x)      Bs3(x)       Bs4(x)      log(x)
+[1,] 1.0986325 -0.09863254 0.000000000 0.000000e+00 -36.0436534
+[2,] 0.9369214  0.06171364 0.001354996 9.916843e-06  -1.7997091
+[3,] 0.7892824  0.19433218 0.015949084 4.363204e-04  -1.1065619
+[4,] 0.6580299  0.29552260 0.044239941 2.207583e-03  -0.7010968
+[5,] 0.5421999  0.36817664 0.083335831 6.287617e-03  -0.4134147
+[6,] 0.4408286  0.41518604 0.130345023 1.364033e-02  -0.1902712
+R> attr(X, "constraint")
+$ui
+4 x 5 sparse Matrix of class "dgCMatrix"
+                 
+[1,] -1  1  . . .
+[2,]  . -1  1 . .
+[3,]  .  . -1 1 .
+[4,]  .  .  . . 1
+
+$ci
+[1] 0 0 0 0
+
+R> 
+R> ## ----basefun-b-----------------------------------------------------------
+R> fb <- as.basis(~ g, data = factor_var("g", levels = LETTERS[1:2]))
+R> class(bfb <- b(bern = bb, f = fb))
+[1] "box_bases" "bases"    
+R> nd <- expand.grid(mkgrid(bfb, n = 10))
+R> head(X <- model.matrix(bfb, data = nd))
+     Bs1(x):(Intercept) Bs2(x):(Intercept) Bs3(x):(Intercept)
+[1,]          1.0986325        -0.09863254         0.00000000
+[2,]          0.7739072         0.20707468         0.01846902
+[3,]          0.5184574         0.38073757         0.09320027
+[4,]          0.3264921         0.44297161         0.20033547
+[5,]          0.1889422         0.42098449         0.31266696
+[6,]          0.0967384         0.34198388         0.40298705
+     Bs4(x):(Intercept) Bs1(x):gB Bs2(x):gB Bs3(x):gB Bs4(x):gB
+[1,]       0.0000000000         0         0         0         0
+[2,]       0.0005490848         0         0         0         0
+[3,]       0.0076047915         0         0         0         0
+[4,]       0.0302008070         0         0         0         0
+[5,]       0.0774063566         0         0         0         0
+[6,]       0.1582906656         0         0         0         0
+R> attr(X, "constraint")
+$ui
+14 x 8 sparse Matrix of class "dgCMatrix"
+                           
+ [1,] -1  1  . .  .  .  . .
+ [2,]  . -1  1 .  .  .  . .
+ [3,]  .  . -1 1  .  .  . .
+ [4,]  .  .  . . -1  1  . .
+ [5,]  .  .  . .  . -1  1 .
+ [6,]  .  .  . .  .  . -1 1
+ [7,]  1  .  . .  .  .  . .
+ [8,]  .  1  . .  .  .  . .
+ [9,]  .  .  1 .  .  .  . .
+[10,]  .  .  . 1  .  .  . .
+[11,]  .  .  . .  1  .  . .
+[12,]  .  .  . .  .  1  . .
+[13,]  .  .  . .  .  .  1 .
+[14,]  .  .  . .  .  .  . 1
+
+$ci
+ [1]    0    0    0    0    0    0 -Inf -Inf -Inf -Inf -Inf -Inf -Inf -Inf
+
+R> 
+R> ## ----basefun-b-sumconstr-------------------------------------------------
+R> bfb <- b(bern = bb, f = fb, sumconstr = TRUE)
+R> head(X <- model.matrix(bfb, data = nd))
+     Bs1(x):(Intercept) Bs2(x):(Intercept) Bs3(x):(Intercept)
+[1,]          1.0986325        -0.09863254         0.00000000
+[2,]          0.7739072         0.20707468         0.01846902
+[3,]          0.5184574         0.38073757         0.09320027
+[4,]          0.3264921         0.44297161         0.20033547
+[5,]          0.1889422         0.42098449         0.31266696
+[6,]          0.0967384         0.34198388         0.40298705
+     Bs4(x):(Intercept) Bs1(x):gB Bs2(x):gB Bs3(x):gB Bs4(x):gB
+[1,]       0.0000000000         0         0         0         0
+[2,]       0.0005490848         0         0         0         0
+[3,]       0.0076047915         0         0         0         0
+[4,]       0.0302008070         0         0         0         0
+[5,]       0.0774063566         0         0         0         0
+[6,]       0.1582906656         0         0         0         0
+R> attr(X, "constraint")
+$ui
+6 x 8 sparse Matrix of class "dgTMatrix"
+                          
+[1,] -1  1  . .  .  .  . .
+[2,]  . -1  1 .  .  .  . .
+[3,]  .  . -1 1  .  .  . .
+[4,] -1  1  . . -1  1  . .
+[5,]  . -1  1 .  . -1  1 .
+[6,]  .  . -1 1  .  . -1 1
+
+$ci
+[1] 0 0 0 0 0 0
+
+R> 
+R> ## ----R-ordered-----------------------------------------------------------
+R> head(R(sort(unique(CHFLS$R_happy))))
+[1] (NA, Very unhappy]              (Very unhappy, Not too happy]  
+[3] (Not too happy, Somewhat happy] (Somewhat happy, NA]           
+R> 
+R> ## ----R-integer-----------------------------------------------------------
+R> R(1:5, bounds = c(1, 5))
+[1] (NA, 1] (1, 2]  (2, 3]  (3, 4]  (4, NA]
+R> 
+R> ## ----R-numeric-----------------------------------------------------------
+R> x <- rnorm(10)
+R> xt <- round(x[x > -1 & x <= 2], 3)
+R> xl <- xt - sample(c(Inf, (0:(length(xt) - 2)) / length(xt)), 
++                    replace = FALSE)
+R> xr <- xt + sample(c(Inf, (0:(length(xt) - 2)) / length(xt)), 
++                    replace = FALSE)
+R> R(c(1.2, rep(NA, length(xt))), cleft = c(NA, xl), cright = c(NA, xr), 
++    tleft = -1, tright = 2)
+[1] {1.2| (-1, 2]}             {(0.025, 0.775]| (-1, 2]} 
+[3] {(-Inf, 0.102]| (-1, 2]}   {(-0.406, 0.844]| (-1, 2]}
+[5] {(0.577, Inf]| (-1, 2]}    {(-1.155, -0.78]| (-1, 2]}
+[7] {(1.056, 1.306]| (-1, 2]}  {(-1.104, 0.146]| (-1, 2]}
+[9] {(-0.835, 0.29]| (-1, 2]} 
+R> 
+R> ## ----R-Surv--------------------------------------------------------------
+R> head(geyser$duration)
+[1] 4.016667        2.150000        [4.000000, Inf] [4.000000, Inf]
+[5] [4.000000, Inf] [0.000000,   2]
+R> head(R(geyser$duration))
+[1] 4.0166667 2.15      (4, Inf]  (4, Inf]  (4, Inf]  (0, 2]   
+R> 
+R> ## ----mlt-chi-p-----------------------------------------------------------
+R> pY <- function(x) pchisq(x, df = 20)
+R> dY <- function(x) dchisq(x, df = 20)
+R> qY <- function(p) qchisq(p, df = 20)
+R> 
+R> ## ----mlt-chi-B-----------------------------------------------------------
+R> yvar <- numeric_var("y", support = qY(c(.001, 1 - .001)), 
++                      bounds = c(0, Inf))
+R> By <- Bernstein_basis(yvar, order = ord <- 15, ui = "increasing")
+R> 
+R> ## ----mlt-chi-mlt---------------------------------------------------------
+R> m <- ctm(By)
+R> d <- as.data.frame(mkgrid(yvar, n = 500))
+R> mod <- mlt(m, data = d, dofit = FALSE)
+R> 
+R> ## ----mlt-chi-trafo-------------------------------------------------------
+R> h <- function(x) qnorm(pY(x))
+R> x <- seq(from = support(yvar)[["y"]][1], to = support(yvar)[["y"]][2], 
++           length.out = ord + 1)
+R> mlt::coef(mod) <- h(x)
+R> 
+R> ## ----mlt-chi-sim---------------------------------------------------------
+R> d$grid <- d$y
+R> d$y <- simulate(mod)
+R> fmod <- mlt(m, data = d, scale = TRUE)
+R> 
+R> ## ----mlt-chi-model-------------------------------------------------------
+R> coef(mod)
+     Bs1(y)      Bs2(y)      Bs3(y)      Bs4(y)      Bs5(y)      Bs6(y) 
+-3.09023231 -2.24395775 -1.56832579 -0.99651738 -0.49547433 -0.04621458 
+     Bs7(y)      Bs8(y)      Bs9(y)     Bs10(y)     Bs11(y)     Bs12(y) 
+ 0.36325683  0.74104644  1.09291321  1.42310925  1.73487215  2.03072963 
+    Bs13(y)     Bs14(y)     Bs15(y)     Bs16(y) 
+ 2.31269685  2.58240889  2.84121268  3.09023231 
+R> coef(fmod)
+    Bs1(y)     Bs2(y)     Bs3(y)     Bs4(y)     Bs5(y)     Bs6(y) 
+-3.6453881 -2.0595627 -1.3023706 -1.3023706 -1.0253634  0.6128594 
+    Bs7(y)     Bs8(y)     Bs9(y)    Bs10(y)    Bs11(y)    Bs12(y) 
+ 0.6128594  0.6128594  0.6128594  1.1927210  2.1016691  2.1016691 
+   Bs13(y)    Bs14(y)    Bs15(y)    Bs16(y) 
+ 2.1016691  2.1016691  2.1016691  3.3074441 
+R> logLik(fmod)
+'log Lik.' -1619.449 (df=16)
+R> logLik(fmod, parm = coef(mod))
+'log Lik.' -1625.041 (df=16)
+R> 
+R> ## ----mlt-chi-plot--------------------------------------------------------
+R> ## compute true density
+R> d$dtrue <- dY(d$grid)
+R> d$dest <- predict(fmod, q = sort(d$grid), type = "density")
+R> plot(mod, newdata = d, type = "density", col = "black", 
++       xlab = "y", ylab = "Density", ylim = c(0, max(d$dest)))
+R> lines(d$grid, d$dtrue, lty = 2)
+R> lines(sort(d$grid), d$dest[order(d$grid)], lty = 3)
+R> legend("topright", lty = 1:3, bty = "n", 
++         legend = c("True", "Approximated", "Estimated"))
+R> 
+R> ## ----mlt-coef, echo = FALSE, results = "hide"----------------------------
+R> ### print coefs for regression tests
+R> objs <- ls()
+R> mltobj <- objs[grep("^mlt_", objs)]
+R> sapply(mltobj, function(m) eval(parse(text = paste("coef(", m, ")"))))
+$mlt_BH
+   Bs1(medvc)    Bs2(medvc)    Bs3(medvc)    Bs4(medvc)    Bs5(medvc) 
+-11.065772775  -9.169005799  -7.491975287  -4.460645082  -4.460645082 
+   Bs6(medvc)    Bs7(medvc)          crim            zn         indus 
+ -3.672147635  -3.407241222   0.043695230  -0.007385888  -0.011532401 
+        chas1           nox            rm           age           dis 
+ -0.604278179   4.854119372  -0.485074683   0.002666639   0.313179003 
+          rad           tax       ptratio             b         lstat 
+ -0.079214984   0.003680169   0.223955090  -0.002630245   0.164965521 
+
+$mlt_BHi
+Bs1(medvc):(Intercept) Bs2(medvc):(Intercept) Bs3(medvc):(Intercept) 
+            -3.3766430             -3.3766430             -3.3766430 
+Bs4(medvc):(Intercept) Bs5(medvc):(Intercept) Bs6(medvc):(Intercept) 
+            -3.3766430             -3.3766430             -3.3766430 
+Bs7(medvc):(Intercept)        Bs1(medvc):crim        Bs2(medvc):crim 
+            -3.3766430              2.9874535              3.7849503 
+       Bs3(medvc):crim        Bs4(medvc):crim        Bs5(medvc):crim 
+             3.7849503              3.7849503              3.7849503 
+       Bs6(medvc):crim        Bs7(medvc):crim          Bs1(medvc):zn 
+             3.7849503              3.7849503             -1.3696169 
+         Bs2(medvc):zn          Bs3(medvc):zn          Bs4(medvc):zn 
+            -1.3696169             -1.3696169             -1.3696169 
+         Bs5(medvc):zn          Bs6(medvc):zn          Bs7(medvc):zn 
+            -1.3696169             -0.6351902             -0.6351902 
+      Bs1(medvc):indus       Bs2(medvc):indus       Bs3(medvc):indus 
+            -1.3521336             -1.3521336             -0.2182461 
+      Bs4(medvc):indus       Bs5(medvc):indus       Bs6(medvc):indus 
+            -0.2182461             -0.2182461             -0.2182461 
+      Bs7(medvc):indus       Bs1(medvc):chas1       Bs2(medvc):chas1 
+            -0.2182461             -2.0547994             -0.4620740 
+      Bs3(medvc):chas1       Bs4(medvc):chas1       Bs5(medvc):chas1 
+            -0.4620740             -0.4620740             -0.4620740 
+      Bs6(medvc):chas1       Bs7(medvc):chas1         Bs1(medvc):nox 
+            -0.4620740             -0.4620740              2.0937296 
+        Bs2(medvc):nox         Bs3(medvc):nox         Bs4(medvc):nox 
+             2.0937296              2.0937296              2.0937296 
+        Bs5(medvc):nox         Bs6(medvc):nox         Bs7(medvc):nox 
+             2.0937296              2.0937296              2.0937296 
+         Bs1(medvc):rm          Bs2(medvc):rm          Bs3(medvc):rm 
+            -3.1583748             -3.1583748             -3.1583748 
+         Bs4(medvc):rm          Bs5(medvc):rm          Bs6(medvc):rm 
+            -3.1583748             -3.1583748             -3.1583748 
+         Bs7(medvc):rm         Bs1(medvc):age         Bs2(medvc):age 
+            -3.1305910              0.8575343              0.8575343 
+        Bs3(medvc):age         Bs4(medvc):age         Bs5(medvc):age 
+             0.8575343              0.8575343              0.8575343 
+        Bs6(medvc):age         Bs7(medvc):age         Bs1(medvc):dis 
+             0.8575343              0.8575343            -10.5248006 
+        Bs2(medvc):dis         Bs3(medvc):dis         Bs4(medvc):dis 
+             4.8230380              4.8230380              4.8230380 
+        Bs5(medvc):dis         Bs6(medvc):dis         Bs7(medvc):dis 
+             4.8230380              4.9803689              6.9620054 
+        Bs1(medvc):rad         Bs2(medvc):rad         Bs3(medvc):rad 
+            -2.0058736             -2.0058736             -2.0058736 
+        Bs4(medvc):rad         Bs5(medvc):rad         Bs6(medvc):rad 
+            -2.0058736             -2.0058736             -2.0058736 
+        Bs7(medvc):rad         Bs1(medvc):tax         Bs2(medvc):tax 
+            -2.0058736              2.1547011              2.1547011 
+        Bs3(medvc):tax         Bs4(medvc):tax         Bs5(medvc):tax 
+             2.1547011              2.1547011              2.1547011 
+        Bs6(medvc):tax         Bs7(medvc):tax     Bs1(medvc):ptratio 
+             2.1547011              2.1547011              2.0289097 
+    Bs2(medvc):ptratio     Bs3(medvc):ptratio     Bs4(medvc):ptratio 
+             2.0289097              2.0289097              2.0289097 
+    Bs5(medvc):ptratio     Bs6(medvc):ptratio     Bs7(medvc):ptratio 
+             2.0289097              2.0289097              2.0289097 
+          Bs1(medvc):b           Bs2(medvc):b           Bs3(medvc):b 
+            -1.4727669             -1.4727669             -1.4727669 
+          Bs4(medvc):b           Bs5(medvc):b           Bs6(medvc):b 
+             1.7858109              1.7858109              1.8377573 
+          Bs7(medvc):b       Bs1(medvc):lstat       Bs2(medvc):lstat 
+             1.8377573              3.5294971              5.1868782 
+      Bs3(medvc):lstat       Bs4(medvc):lstat       Bs5(medvc):lstat 
+             5.1868782              7.1421072              7.1421072 
+      Bs6(medvc):lstat       Bs7(medvc):lstat 
+            11.5714836             11.5714836 
+
+$mlt_CHFLS_1
+ R_happy1  R_happy2  R_happy3 
+-4.687408 -1.903382  1.499304 
+
+$mlt_CHFLS_2
+     R_happy1      R_happy2      R_happy3         R_age      R_income 
+-4.8015820561 -2.0117019514  1.4127041170 -0.0062791163  0.0002350097 
+
+$mlt_CHFLS_3
+     R_happy1:R_healthPoor      R_happy2:R_healthPoor 
+                -1.3862954                  0.4054648 
+     R_happy3:R_healthPoor  R_happy1:R_healthNot good 
+                 2.1972251                 -2.9367367 
+ R_happy2:R_healthNot good  R_happy3:R_healthNot good 
+                -0.4840273                  2.6703484 
+     R_happy1:R_healthFair      R_happy2:R_healthFair 
+                -4.7383972                 -1.7034658 
+     R_happy3:R_healthFair      R_happy1:R_healthGood 
+                 2.3537603                 -6.3647429 
+     R_happy2:R_healthGood      R_happy3:R_healthGood 
+                -2.5285143                  1.8365737 
+R_happy1:R_healthExcellent R_happy2:R_healthExcellent 
+               -12.8503226                 -2.4976080 
+R_happy3:R_healthExcellent 
+                 0.2468659 
+
+$mlt_CHFLS_4
+     R_happy1:R_healthPoor      R_happy2:R_healthPoor 
+             -7.877382e-01               1.036969e+00 
+     R_happy3:R_healthPoor  R_happy1:R_healthNot good 
+              2.842135e+00              -2.346310e+00 
+ R_happy2:R_healthNot good  R_happy3:R_healthNot good 
+              1.151354e-01               3.288206e+00 
+     R_happy1:R_healthFair      R_happy2:R_healthFair 
+             -4.130445e+00              -1.084914e+00 
+     R_happy3:R_healthFair      R_happy1:R_healthGood 
+              3.019161e+00              -5.768608e+00 
+     R_happy2:R_healthGood      R_happy3:R_healthGood 
+             -1.931189e+00               2.469549e+00 
+R_happy1:R_healthExcellent R_happy2:R_healthExcellent 
+             -1.432533e+01              -1.932587e+00 
+R_happy3:R_healthExcellent                      R_age 
+              8.231248e-01               1.173904e-02 
+                  R_income 
+              2.492703e-04 
+
+$mlt_CHFLS_5
+      R_happy1:(Intercept)       R_happy2:(Intercept) 
+                -1.3869212                  0.4052630 
+      R_happy3:(Intercept)  R_happy1:R_healthNot good 
+                 2.1970972                 -1.5499668 
+ R_happy2:R_healthNot good  R_happy3:R_healthNot good 
+                -0.8893100                  0.4732147 
+     R_happy1:R_healthFair      R_happy2:R_healthFair 
+                -3.3514771                 -2.1087346 
+     R_happy3:R_healthFair      R_happy1:R_healthGood 
+                 0.1566622                 -4.9778320 
+     R_happy2:R_healthGood      R_happy3:R_healthGood 
+                -2.9337693                 -0.3605232 
+R_happy1:R_healthExcellent R_happy2:R_healthExcellent 
+               -11.3559170                 -2.9028661 
+R_happy3:R_healthExcellent 
+                -1.9502311 
+
+$mlt_CHFLS_6
+   R_happy1:R_age    R_happy2:R_age    R_happy3:R_age R_happy1:R_income 
+    -9.588057e-02     -3.555227e-02      3.944646e-02     -2.122942e-03 
+R_happy2:R_income R_happy3:R_income 
+    -1.006456e-03     -7.264288e-05 
+
+$mlt_CHFLS_7
+      R_happy1:(Intercept)       R_happy2:(Intercept) 
+             -6.563814e-01               1.172743e+00 
+      R_happy3:(Intercept)  R_happy1:R_healthNot good 
+              2.803895e+00              -1.563070e+00 
+ R_happy2:R_healthNot good  R_happy3:R_healthNot good 
+             -9.325598e-01               4.474238e-01 
+     R_happy1:R_healthFair      R_happy2:R_healthFair 
+             -3.290400e+00              -2.086540e+00 
+     R_happy3:R_healthFair      R_happy1:R_healthGood 
+              1.585437e-01              -4.927471e+00 
+     R_happy2:R_healthGood      R_happy3:R_healthGood 
+             -2.937780e+00              -3.852942e-01 
+R_happy1:R_healthExcellent R_happy2:R_healthExcellent 
+             -1.133797e+01              -2.941486e+00 
+R_happy3:R_healthExcellent             R_happy1:R_age 
+             -2.022883e+00              -1.177666e-02 
+            R_happy2:R_age             R_happy3:R_age 
+             -1.177666e-02              -1.177666e-02 
+         R_happy1:R_income          R_happy2:R_income 
+             -6.182411e-04              -5.718425e-04 
+         R_happy3:R_income 
+             -1.801054e-04 
+
+$mlt_d
+Bs1(duration) Bs2(duration) Bs3(duration) Bs4(duration) Bs5(duration) 
+   -4.1807238    -0.5358892    -0.3758673    -0.3758673    -0.3758673 
+Bs6(duration) Bs7(duration) Bs8(duration) Bs9(duration) 
+   -0.3758673    -0.3758673    -0.2233621     2.0040127 
+
+$mlt_GBSG2_1
+       Bs1(y)        Bs2(y)        Bs3(y)        Bs4(y)        Bs5(y) 
+-5.5177099955 -1.0295159595 -1.0295159595 -1.0295159595 -0.7971271770 
+       Bs6(y)        Bs7(y)        Bs8(y)        Bs9(y)       Bs10(y) 
+-0.3466082626 -0.3466082626 -0.3466082626 -0.1249435775  0.2881056889 
+      Bs11(y)      horThyes           age  menostatPost         tsize 
+ 0.2881056889 -0.3489205601 -0.0099113611  0.2675484077  0.0077694009 
+     tgrade.L      tgrade.Q        pnodes       progrec        estrec 
+ 0.5600329425 -0.2018734495  0.0487581396 -0.0022104961  0.0001828489 
+
+$mlt_GBSG2_2
+      log(y)     horThyes          age menostatPost        tsize 
+ 1.000000000  0.265021122  0.174429753 -2.344659825  0.011117652 
+    tgrade.L     tgrade.Q       pnodes      progrec       estrec 
+ 0.012150743 -0.069961072 -0.040139513  0.003552464 -0.001190315 
+
+$mlt_GBSG2_3
+  (Intercept)        log(y)      horThyes           age  menostatPost 
+-1.065443e+01  1.390262e+00  3.730887e-01  9.481829e-03 -2.709283e-01 
+        tsize      tgrade.L      tgrade.Q        pnodes       progrec 
+-8.014811e-03 -5.727951e-01  2.050579e-01 -5.280154e-02  2.284850e-03 
+       estrec 
+-2.484469e-04 
+
+$mlt_GBSG2_4
+  Bs1(y):horThno   Bs2(y):horThno   Bs3(y):horThno   Bs4(y):horThno 
+     -5.18067421      -0.88125436      -0.88125436      -0.88125436 
+  Bs5(y):horThno   Bs6(y):horThno   Bs7(y):horThno   Bs8(y):horThno 
+     -0.80840734      -0.24095537      -0.24095537      -0.24095537 
+  Bs9(y):horThno  Bs10(y):horThno  Bs11(y):horThno  Bs1(y):horThyes 
+     -0.09117787      -0.09117787       0.56820919      -6.03038299 
+ Bs2(y):horThyes  Bs3(y):horThyes  Bs4(y):horThyes  Bs5(y):horThyes 
+     -1.23974287      -1.23974287      -1.23974287      -0.98614133 
+ Bs6(y):horThyes  Bs7(y):horThyes  Bs8(y):horThyes  Bs9(y):horThyes 
+     -0.75982585      -0.75982585      -0.75982585      -0.15739458 
+Bs10(y):horThyes Bs11(y):horThyes 
+     -0.15739458      -0.15739458 
+
+$mlt_GBSG2_5
+  Bs1(y):horThno   Bs2(y):horThno   Bs3(y):horThno   Bs4(y):horThno 
+   -5.1571959023    -0.8574456116    -0.8574456116    -0.8574456116 
+  Bs5(y):horThno   Bs6(y):horThno   Bs7(y):horThno   Bs8(y):horThno 
+   -0.7845984916    -0.2172065382    -0.2172065382    -0.2172065382 
+  Bs9(y):horThno  Bs10(y):horThno  Bs11(y):horThno  Bs1(y):horThyes 
+   -0.0673278869    -0.0673278869     0.5930550600    -6.0043210897 
+ Bs2(y):horThyes  Bs3(y):horThyes  Bs4(y):horThyes  Bs5(y):horThyes 
+   -1.2134337195    -1.2134337195    -1.2134337195    -0.9601851286 
+ Bs6(y):horThyes  Bs7(y):horThyes  Bs8(y):horThyes  Bs9(y):horThyes 
+   -0.7337958843    -0.7337958843    -0.7337958843    -0.1316448432 
+Bs10(y):horThyes Bs11(y):horThyes              age 
+   -0.1316448432    -0.1316448432    -0.0004621642 
+
+$mlt_GBSG2_6
+    Bs1(y)     Bs2(y)     Bs3(y)     Bs4(y)     Bs5(y)     Bs6(y) 
+-3.8517996 -0.3667677 -0.3667677 -0.3667677 -0.1710497  0.4162653 
+  horThyes 
+-0.3761094 
+
+$mlt_GBSG2_7
+Bs1(y):(Intercept) Bs2(y):(Intercept) Bs3(y):(Intercept) 
+        -3.8468162         -0.3458184         -0.3458184 
+Bs4(y):(Intercept) Bs5(y):(Intercept) Bs6(y):(Intercept) 
+        -0.3458184         -0.2663882          0.4687251 
+   Bs1(y):horThyes    Bs2(y):horThyes    Bs3(y):horThyes 
+        -0.4082456         -0.4421570         -0.4421570 
+   Bs4(y):horThyes    Bs5(y):horThyes    Bs6(y):horThyes 
+        -0.4421570         -0.1057730         -0.5135824 
+
+$mlt_GBSG2_8
+ Bs1(y):horThno:Bs1(age)  Bs2(y):horThno:Bs1(age)  Bs3(y):horThno:Bs1(age) 
+             -2.08236294               3.11028166               3.11028166 
+ Bs4(y):horThno:Bs1(age)  Bs5(y):horThno:Bs1(age)  Bs6(y):horThno:Bs1(age) 
+              3.11028166               3.11028166               3.11028166 
+Bs1(y):horThyes:Bs1(age) Bs2(y):horThyes:Bs1(age) Bs3(y):horThyes:Bs1(age) 
+             -3.69182447              -0.15728796              -0.15728796 
+Bs4(y):horThyes:Bs1(age) Bs5(y):horThyes:Bs1(age) Bs6(y):horThyes:Bs1(age) 
+             -0.15728796              -0.15728796              -0.15728796 
+ Bs1(y):horThno:Bs2(age)  Bs2(y):horThno:Bs2(age)  Bs3(y):horThno:Bs2(age) 
+             -4.37254275              -3.67086904              -3.67086904 
+ Bs4(y):horThno:Bs2(age)  Bs5(y):horThno:Bs2(age)  Bs6(y):horThno:Bs2(age) 
+             -3.67086904              -3.67086904              -2.28829165 
+Bs1(y):horThyes:Bs2(age) Bs2(y):horThyes:Bs2(age) Bs3(y):horThyes:Bs2(age) 
+             -2.47197700              -2.47197700              -2.47197700 
+Bs4(y):horThyes:Bs2(age) Bs5(y):horThyes:Bs2(age) Bs6(y):horThyes:Bs2(age) 
+             -2.47197700              -1.86543783              -1.86543783 
+ Bs1(y):horThno:Bs3(age)  Bs2(y):horThno:Bs3(age)  Bs3(y):horThno:Bs3(age) 
+             -4.42581621               1.34563790               1.34563790 
+ Bs4(y):horThno:Bs3(age)  Bs5(y):horThno:Bs3(age)  Bs6(y):horThno:Bs3(age) 
+              1.34563790               1.34563790               1.34563790 
+Bs1(y):horThyes:Bs3(age) Bs2(y):horThyes:Bs3(age) Bs3(y):horThyes:Bs3(age) 
+             -6.59764701               1.04882588               1.04882588 
+Bs4(y):horThyes:Bs3(age) Bs5(y):horThyes:Bs3(age) Bs6(y):horThyes:Bs3(age) 
+              1.04882588               1.79043577               1.79043577 
+ Bs1(y):horThno:Bs4(age)  Bs2(y):horThno:Bs4(age)  Bs3(y):horThno:Bs4(age) 
+             -3.73661692              -0.59805454              -0.59805454 
+ Bs4(y):horThno:Bs4(age)  Bs5(y):horThno:Bs4(age)  Bs6(y):horThno:Bs4(age) 
+             -0.59805454               0.03486138               1.07141119 
+Bs1(y):horThyes:Bs4(age) Bs2(y):horThyes:Bs4(age) Bs3(y):horThyes:Bs4(age) 
+             -2.95517175              -1.95736664              -1.95736664 
+Bs4(y):horThyes:Bs4(age) Bs5(y):horThyes:Bs4(age) Bs6(y):horThyes:Bs4(age) 
+             -1.95736664              -1.95334231              -0.86284669 
+
+$mlt_head
+Bs1(head):Bs1(lage) Bs2(head):Bs1(lage) Bs3(head):Bs1(lage) 
+        -0.23465422          2.92733835          6.33762464 
+Bs4(head):Bs1(lage) Bs1(head):Bs2(lage) Bs2(head):Bs2(lage) 
+         6.33762464         -8.13569039         -5.61019533 
+Bs3(head):Bs2(lage) Bs4(head):Bs2(lage) Bs1(head):Bs3(lage) 
+         0.04632097          3.96589309         -0.52825709 
+Bs2(head):Bs3(lage) Bs3(head):Bs3(lage) Bs4(head):Bs3(lage) 
+        -0.52825709          1.66340079          3.57855478 
+Bs1(head):Bs4(lage) Bs2(head):Bs4(lage) Bs3(head):Bs4(lage) 
+        -6.32573207         -6.32573207         -2.39943146 
+Bs4(head):Bs4(lage) 
+         0.29631915 
+
+$mlt_i
+Bs1(waiting) Bs2(waiting) Bs3(waiting) Bs4(waiting) Bs5(waiting) 
+  -4.9232671   -0.7525941   -0.5347803   -0.5347803   -0.5347803 
+Bs6(waiting) Bs7(waiting) Bs8(waiting) Bs9(waiting) 
+  -0.5347803    0.2936873    2.3083034    2.4897398 
+
+$mlt_iris
+ oSpecies1:(Intercept)  oSpecies2:(Intercept) oSpecies1:Sepal.Length 
+             7.9839930             42.6377894              0.1473498 
+oSpecies2:Sepal.Length  oSpecies1:Sepal.Width  oSpecies2:Sepal.Width 
+             2.4652181              5.7969976              6.6808850 
+oSpecies1:Petal.Length oSpecies2:Petal.Length  oSpecies1:Petal.Width 
+            -5.3266879             -9.4293878            -16.1140414 
+ oSpecies2:Petal.Width 
+           -18.2861317 
+
+$mlt_PSID1976_1
+    (Intercept)           hours        nwincome       education 
+   -2.496003599     0.001175408    -0.000180359     0.035088983 
+     experience I(experience^2)             age       youngkids 
+   -0.085360896     0.001109566     0.032257803     0.569735712 
+        oldkids 
+    0.120664824 
+
+$mlt_PSID1976_2
+     Bs1(hours)      Bs2(hours)      Bs3(hours)      Bs4(hours) 
+  -2.3463610343   -1.3210915337   -1.3210915337    0.8590640861 
+     Bs5(hours)      Bs6(hours)      Bs7(hours)        nwincome 
+   2.1429425254    2.1429425254    2.4937866867   -0.0000339552 
+      education      experience I(experience^2)             age 
+   0.0358518626   -0.0853550118    0.0010568844    0.0328811232 
+      youngkids         oldkids 
+   0.5512723855    0.1269310229 
+
+$mlt_treepipit
+counts1:Bs1(coverstorey) counts2:Bs1(coverstorey) counts3:Bs1(coverstorey) 
+                1.662028                 2.125463                 2.125463 
+counts4:Bs1(coverstorey) counts5:Bs1(coverstorey) counts1:Bs2(coverstorey) 
+                3.054433                 4.926525                -6.106105 
+counts2:Bs2(coverstorey) counts3:Bs2(coverstorey) counts4:Bs2(coverstorey) 
+               -6.106105                -5.295056                -5.295056 
+counts5:Bs2(coverstorey) counts1:Bs3(coverstorey) counts2:Bs3(coverstorey) 
+               -5.295056                12.203602                12.478610 
+counts3:Bs3(coverstorey) counts4:Bs3(coverstorey) counts5:Bs3(coverstorey) 
+               12.478610                12.478610                12.478610 
+counts1:Bs4(coverstorey) counts2:Bs4(coverstorey) counts3:Bs4(coverstorey) 
+               -7.552765                -7.552765                -7.552765 
+counts4:Bs4(coverstorey) counts5:Bs4(coverstorey) counts1:Bs5(coverstorey) 
+               -7.552765                -7.552765                 8.199416 
+counts2:Bs5(coverstorey) counts3:Bs5(coverstorey) counts4:Bs5(coverstorey) 
+                8.199416                12.552434                12.552434 
+counts5:Bs5(coverstorey) 
+               12.552434 
+
+$mlt_w
+Bs1(waiting) Bs2(waiting) Bs3(waiting) Bs4(waiting) Bs5(waiting) 
+  -4.8137857   -0.4972390   -0.4972390   -0.4972390   -0.4972390 
+Bs6(waiting) Bs7(waiting) Bs8(waiting) Bs9(waiting) 
+  -0.4972390    0.4987036    2.3184424    2.6377603 
+
+$mlt_w_40
+ Bs1(waiting)  Bs2(waiting)  Bs3(waiting)  Bs4(waiting)  Bs5(waiting) 
+   -5.6828063    -2.8047735    -2.8047735    -2.8047735    -2.8047735 
+ Bs6(waiting)  Bs7(waiting)  Bs8(waiting)  Bs9(waiting) Bs10(waiting) 
+   -2.7548052    -0.8958755    -0.8958755    -0.8958755    -0.8958755 
+Bs11(waiting) Bs12(waiting) Bs13(waiting) Bs14(waiting) Bs15(waiting) 
+   -0.8958755    -0.8958755    -0.8958755    -0.5497979    -0.4354278 
+Bs16(waiting) Bs17(waiting) Bs18(waiting) Bs19(waiting) Bs20(waiting) 
+   -0.4354278    -0.4354278    -0.4354278    -0.3884536    -0.3884536 
+Bs21(waiting) Bs22(waiting) Bs23(waiting) Bs24(waiting) Bs25(waiting) 
+   -0.3884536    -0.3884536    -0.3884536    -0.3884536    -0.3884536 
+Bs26(waiting) Bs27(waiting) Bs28(waiting) Bs29(waiting) Bs30(waiting) 
+   -0.1442738     0.6932666     0.6932666     0.6932666     0.6932666 
+Bs31(waiting) Bs32(waiting) Bs33(waiting) Bs34(waiting) Bs35(waiting) 
+    0.6932666     0.6932666     1.2456210     1.6905685     1.6905685 
+Bs36(waiting) Bs37(waiting) Bs38(waiting) Bs39(waiting) Bs40(waiting) 
+    1.6905685     1.6905685     2.4898429     2.6812017     2.6812017 
+Bs41(waiting) 
+    2.7384154 
+
+R> #library("mlt.docreg")
+R> #sapply(mltobj, function(m) eval(parse(text = paste("checkGH(", m, ")"))))
+R> 
+R> ## ----sessionInfo, echo = FALSE, results = "hide"-------------------------
+R> sessionInfo()
+R version 3.2.3 (2015-12-10)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Ubuntu 14.04.4 LTS
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=de_CH.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=de_CH.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=de_CH.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=de_CH.UTF-8 LC_IDENTIFICATION=C       
+
+attached base packages:
+[1] grid      tools     stats     graphics  grDevices utils     datasets 
+[8] methods   base     
+
+other attached packages:
+ [1] mgcv_1.8-11         nlme_3.1-122        multcomp_1.4-4     
+ [4] TH.data_1.0-7       mvtnorm_1.0-5       colorspace_1.2-6   
+ [7] latticeExtra_0.6-26 RColorBrewer_1.1-2  flexsurv_0.7       
+[10] sandwich_2.3-4      HSAUR3_1.0-5        nnet_7.3-12        
+[13] MASS_7.3-45         gridExtra_2.0.0     lattice_0.20-33    
+[16] truncreg_0.2-1      maxLik_1.3-4        miscTools_0.6-16   
+[19] prodlim_1.5.7       eha_2.4-3           survival_2.38-3    
+[22] mlt_0.0-30          basefun_0.0-30      variables_0.0-30   
+
+loaded via a namespace (and not attached):
+ [1] Rcpp_0.12.3        gtable_0.1.2       Matrix_1.2-3      
+ [4] polynom_1.3-8      knitr_1.12.3       BB_2014.10-1      
+ [7] deSolve_1.12       mstate_0.2.8       orthopolynom_1.0-5
+[10] lava_1.4.1         codetools_0.2-14   splines_3.2.3     
+[13] quadprog_1.5-5     muhaz_1.2.6        zoo_1.7-12        
+R> 
+R> 
+> proc.time()
+   user  system elapsed 
+137.356   0.308 137.647 

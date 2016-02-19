@@ -1,0 +1,3485 @@
+
+%\VignetteEngine{knitr::knitr}
+%\VignetteIndexEntry{mlt}
+
+\documentclass[article,nojss,shortnames]{jss}\usepackage[]{graphicx}\usepackage[]{color}
+%% maxwidth is the original width if it is less than linewidth
+%% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+
+
+
+
+%% packages
+\usepackage{thumbpdf}
+\usepackage{amsfonts,amstext,amsmath,amssymb,amsthm}
+\usepackage{accents}
+\usepackage{color}
+\usepackage{rotating}
+\usepackage{verbatim}
+\usepackage[utf8]{inputenc}
+%% need no \usepackage{Sweave.sty}
+%%\usepackage[nolists]{endfloat}
+
+\newcommand{\cmd}[1]{\texttt{#1()}}
+
+
+
+\newcommand{\TODO}[1]{{\color{red} #1}}
+
+\newcommand\Torsten[1]{{\color{blue}Torsten: ``#1''}}
+
+% File with math commands etc.
+\input{defs.tex}
+
+\renewcommand{\thefootnote}{}
+
+%% code commands
+\newcommand{\Rclass}[1]{`\code{#1}'}
+%% JSS
+\author{Torsten Hothorn \\ Universit\"at Z\"urich}
+\Plainauthor{Hothorn}
+
+\title{Most Likely Transformations: The \pkg{mlt} Package}
+\Plaintitle{Most Likely Transformations: The mlt Package}
+\Shorttitle{The \pkg{mlt} Package}
+
+\Abstract{
+The \pkg{mlt} package implements maximum likelihood estimation in the class
+of conditional transformation models.  Based on a suitable explicit
+parameterisation of the unconditional or conditional transformation function
+using infrastructure from package \pkg{basefun}, we show how one can define, 
+estimate and compare 
+a cascade of increasingly complex transformation models 
+in the maximum likelihood framework. 
+Models for the unconditional or conditional distribution function of any
+univariate response variable are set-up and estimated in the same
+computational framework simply by choosing an appropriate transformation
+function and parameterisation thereof.  As it is computationally cheap to
+evaluate the distribution function, models can be estimated by maximisation
+of the exact likelihood, especially in the presence of random censoring or
+truncation. The relatively dense highlevel implementation in the \proglang{R}
+system for statistical computing allows generalisation of many established
+implementations of linear transformation models, such as the Cox model or other
+parametric models for the analysis of survival or ordered categorical data,
+to the more complex situations illustrated in this paper.
+}
+
+\Keywords{transformation model, transformation analysis, distribution regression, conditional
+distribution function, conditional quantile function, censoring,
+truncation}
+\Plainkeywords{transformation model, transformation analysis, distribution regression, conditional
+distribution function, conditional quantile function, censoring,
+truncation}
+
+\Address{
+  Torsten Hothorn\\
+  Institut f\"ur Epidemiologie, Biostatistik und Pr\"avention \\
+  Universit\"at Z\"urich \\
+  Hirschengraben 84, CH-8001 Z\"urich, Switzerland \\
+  \texttt{Torsten.Hothorn@uzh.ch} \\
+  \url{http://tiny.uzh.ch/bh}
+}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+
+% \input{todo}
+
+\section{Introduction}
+
+The history of statistics can be told as a story of great conceptual ideas
+and contemporaneous computable approximations thereof.  As time went by, the
+computationally inaccessible concept often vanished from the collective
+consciousness of our profession and the approximation was taught and
+understood as the real thing.  Least squares regression emerged from
+Gau{\ss}' computational trick of changing Bo\v{s}covi{\'c}' absolute to squared
+error and it took more than 200 years for the original, and in many aspects
+advantageous, concept to surface again under the name ``quantile
+regression''.  This most prominent example of an idea got lost illustrates
+the impact computable approximations had and still have on our understanding
+of statistical methods and procedures.  In the early days of statistical
+computing, implementations of such approximations were a challenge.  With
+todays computing power and software infrastructure at our fingertips, our
+duty shall be to go back to the original concepts and search for ways how to
+reawake them for the benefit of a simpler understanding of statistical
+models and concepts.
+
+This paper describes an attempt to understand and unify a large class of
+statistical models as models for unconditional or conditional distributions.  This sounds like an
+implicitness, but do we really practice (in courses on applied statistics or
+while talking to our subject-matter collaborators) what we preach in a
+theory course?  Let's perform a small experiment: Pick, at random, a
+statistics book from your book shelf and look-up how the general linear
+model is introduced. Most probably you will find something not unlike
+\begin{eqnarray*}
+\rY = \alpha + \tilde{\rx}^\top \shiftparm + \varepsilon, \quad \varepsilon \sim \ND(0, \sigma^2)
+\end{eqnarray*}
+where $\rY$ is an absolutely continuous response, $\tilde{\rx}$ a suitable
+representation of a vector of explanator variables $\rx$ (\eg contrasts
+etc.), $\shiftparm$ a vector of regression coefficients, $\alpha$ an
+intercept term and $\varepsilon$ a normal error term.  Model interpretation
+relies on the conditional expectation $\Ex(\rY | \rX = \rx) = \alpha +
+\tilde{\rx}^\top \shiftparm$ and one estimates the intercept $\alpha$ and
+the regression parameters $\shiftparm$ by minimisation of the squared error
+$(\rY - \alpha - \tilde{\rx}^\top \shiftparm)^2$.  With some touch-up in
+notation, the model can be equivalently written as a model for a conditional
+distribution
+\begin{eqnarray*}
+\Prob(\rY \le \ry | \rX = \rx) = \Phi\left(\frac{\ry - \alpha - \tilde{\rx}^\top \shiftparm}{\sigma}\right) 
+  \text{ or } (\rY | \rX = \rx) \sim \ND(\alpha + \tilde{\rx}^\top\shiftparm, \sigma^2).
+\end{eqnarray*}
+This formulation highlights that the model is, in fact, a model for a
+conditional distribution and not just a model for a conditional mean.  It
+also stresses the fact that the variance $\sigma^2$ is a model parameter in
+its own right.  The usual treatment of $\sigma^2$ as a nuisance parameter
+only works when the likelihood is approximated by the density of the normal
+distribution.  Because in real life we always observe intervals $(\ubar{\ry}, \bar{\ry}]$
+and never real numbers $\ry$, the exact likelihood is, as originally
+\textit{defined} by \cite{Fisher_1934} [B
+\begin{eqnarray*}
+\Prob(\ubar{\ry} < \rY \le \bar{\ry} | \rX = \rx) = 
+\Phi\left(\frac{\bar{\ry} - \alpha - \tilde{\rx}^\top \shiftparm}{\sigma}\right) - \Phi\left(\frac{\ubar{\ry} - \alpha - \tilde{\rx}^\top \shiftparm}{\sigma}\right)
+\end{eqnarray*}
+which requires simultaneous optimisation of all three model parameters $\alpha$, 
+$\shiftparm$ and $\sigma$ but is exact also under other forms of random censoring. 
+This exact likelihood is another prominent example of the approximation (via the
+log-density $(y - \alpha - \tilde{\rx}^\top)^2$) winning over the basic
+concept, see \cite{Lindsey_1996, Lindsey_1999}. If we were going to reformulate the model
+a little further to
+\begin{eqnarray*}
+\Prob(\rY \le \ry | \rX = \rx) = \Phi(\tilde{\alpha}_1 + \tilde{\alpha}_2 \ry - \tilde{\rx}^\top \tilde{\shiftparm})
+\end{eqnarray*}
+with $\tilde{\alpha}_1 = -\alpha / \sigma, \tilde{\alpha}_2 = 1 / \sigma$ and $\tilde{\shiftparm} = \shiftparm / \sigma$
+we see that the model is of the form
+\begin{eqnarray*}
+\Prob(\rY \le \ry | \rX = \rx) = \pZ(\h_\rY(\ry) - \tilde{\rx}^\top \tilde{\shiftparm})
+\end{eqnarray*}
+with distribution function $\pZ = \Phi$ and linear transformation $\h_\rY(\ry) = \tilde{\alpha}_1 + \tilde{\alpha}_2 \ry$
+such that $\Ex(\h_\rY(\rY) | \rX = \rx) = \tilde{\rx}^\top \shiftparm$. If we now change $\pZ$ to the distribution
+function of the minimum extreme value distribution and allow a non-linear monotone transformation
+$\h_\rY$ we get
+\begin{eqnarray*}
+\Prob(\rY \le \ry | \rX = \rx) = 1 - \exp(-\exp(\h_\rY(\ry) - \tilde{\rx}^\top \tilde{\shiftparm}))
+\end{eqnarray*}
+which is the continuous proportional hazards, or Cox, model (typically
+defined with a positive shift term).  From this point of view, the linear
+and the Cox model are two instances of so-called linear transformation
+models (a misleading name, because the transformation $\h_\rY$ is non-linear
+in the latter case and only the shift $\tilde{\rx}^\top \tilde{\shiftparm}$
+is linear in $\tilde{\rx}$).  It is now also obvious that the Cox model has
+nothing to do with censoring, let alone survival times $\rY > 0$.  It is a
+model for the conditional distribution of a continuous response $\rY \in
+\RR$ when it is appropriate to assume that the conditional hazard function
+is scaled by $\exp(\tilde{\rx}^\top \tilde{\shiftparm})$.  For both the
+linear and the Cox model, application of the exact likelihood allows the
+models to be fitted to imprecise, or ``censored'', observations
+$(\ubar{\ry}, \bar{\ry}]$. The generality of the class of linear transformation
+models comes from the ability to change $\pZ$ and $\h_\rY$ in this flexible
+class of models.
+
+The class of linear transformation models is a subclass of conditional
+transformation models \citep{Hothorn_Kneib_Buehlmann_2014}.  In this latter
+class, the conditional distribution function is
+\begin{eqnarray*}
+\Prob(\rY \le \ry | \rX = \rx) = \pZ(\h(\ry | \rx))
+\end{eqnarray*}
+where the transformation function $\h$ depends on both $\ry$ and $\rx$. 
+Because we are interested in analysing, \ie estimating and interpreting, the
+transformation function $\h$, we refer to the methods presented in this
+paper as \textit{transformation analysis}.  We describe how conditional
+transformation models can be specified, fitted by maximising the likelihood
+\citep[using the estimator developed by][]{Hothorn_Moest_Buehlmann_2016} and
+analysed in \proglang{R} using the \pkg{mlt} add-on package \citep{pkg:mlt}. 
+In essense, the package is built around to important functions.  \cmd{ctm}
+specifies transformation models based on basis functions implemented in the
+\pkg{basefun} package \citep{pkg:basefun} for variable descriptions from the
+\pkg{variables} package \citep{pkg:variables}.  These models are then fitted
+to data by \cmd{mlt} where the log-likelihood function is maximised by the 
+\cmd{spg} optimiser from package \pkg{BB}
+\citep{{Varadhan_Gilbert_2009,pkg:BB}}.  Before we start looking at details,
+we illustrate the workflow by means of an example from unconditional density
+estimation.
+
+%% <FIXME> explain that theory is in two other papers and technical stuff
+%% in appendices </FIXME>
+
+\paragraph{Density Estimation: Old Faithful Geyser Data}
+
+The duration of eruptions and the waiting time between eruptions of the Old
+Faithful geyser in the Yellowstone national park became a standard benchmark
+for non-parametric density estimation \citep[the original data were given
+by][]{Azzalini_Bowman_1990}.  An unconditional density estimate for the
+duration of the eruptions needs to deal with censoring because exact
+duration times are only available for the day time measurements.  At night
+time, the observations were either left-censored (``short'' eruption),
+interval-censored (``medium'' eruption) or right-censored (``long''
+eruption) as explained by \cite{Azzalini_Bowman_1990}.  This fact was widely
+ignored in analyses of the Old Faithful data because most non-parametric
+density estimators cannot deal with censoring. We fit the parameters
+$\parm$ in the transformation model
+\begin{eqnarray*}
+\Prob(\rY \le \ry) = \Phi(\h(\ry)) = \Phi(\basisy(\ry)^\top \parm)
+\end{eqnarray*}
+by maximisation of the exact likelihood as follows. After loading package
+\pkg{mlt} we specify the \code{duration} variable we are interested in
+\begin{Schunk}
+\begin{Sinput}
+R> library("mlt")
+R> var_d <- numeric_var("duration", support = c(1.0, 5.0), 
++                       add = c(-1, 1), bounds = c(0, Inf))
+\end{Sinput}
+\end{Schunk}
+This abstract representation refers to a positive and conceptually
+continuous variable \code{duration}. We then set-up a basis function
+$\basisy$ for this variable in the interval $[1, 5]$, in our case a monotone
+increasing Bernstein polynomial of order eight
+\begin{Schunk}
+\begin{Sinput}
+R> B_d <- Bernstein_basis(var = var_d, order = 8, ui = "increasing")
+\end{Sinput}
+\end{Schunk}
+The (in our case unconditional) transformation model is now fully defined by
+the parameterisation $\h(\ry) = \basisy(\ry)^\top \parm$ and $\pZ = \Phi$
+which is specified using the \cmd{ctm} function as
+\begin{Schunk}
+\begin{Sinput}
+R> ctm_d <- ctm(response = B_d, todistr = "Normal")
+\end{Sinput}
+\end{Schunk}
+Because, in this simple case, the transformation function transforms
+$\rY \sim \pY$ to $\rZ \sim \pZ = \Phi$, the latter distribution is
+specified using the \code{todistr} argument.
+An equidistant grid of $200$ duration times in the interval \code{support + add} is
+generated by 
+\begin{Schunk}
+\begin{Sinput}
+R> str(nd_d <- mkgrid(ctm_d, 200))
+\end{Sinput}
+\begin{Soutput}
+List of 1
+ $ duration: num [1:200] 0 0.0302 0.0603 0.0905 0.1206 ...
+\end{Soutput}
+\end{Schunk}
+Note that the model \code{ctm_d} has no notion of the actual observations, 
+with the exception of the \code{support} argument which defines the domain 
+of the Bernstein polynomial. Only after the model was specified we need to
+load the data frame containing the observations of \code{duration} as a
+\code{Surv} object
+
+\begin{Schunk}
+\begin{Sinput}
+R> data("geyser", package = "TH.data")
+R> head(geyser)
+\end{Sinput}
+\begin{Soutput}
+  waiting        duration
+1      80        4.016667
+2      71        2.150000
+3      57 [4.000000, Inf]
+4      80 [4.000000, Inf]
+5      75 [4.000000, Inf]
+6      77 [0.000000,   2]
+\end{Soutput}
+\end{Schunk}
+The most likely transformation (MLT) $\hat{\h}_N(\ry) = \basisy(\ry)^\top \hat{\parm}_N$ is 
+now obtained from the maximum likelihood estimate $\hat{\parm}_N$ computed as
+\begin{Schunk}
+\begin{Sinput}
+R> mlt_d <- mlt(ctm_d, data = geyser)
+R> logLik(mlt_d)
+\end{Sinput}
+\begin{Soutput}
+'log Lik.' -317.766 (df=9)
+\end{Soutput}
+\end{Schunk}
+The model is best visualised in terms of the corresponding density
+$\phi(\basisy(\ry)^\top \hat{\parm}_N) \basisy^\prime(\ry)^\top \hat{\parm}_N$,
+extracted from the fitted model as
+\begin{Schunk}
+\begin{Sinput}
+R> nd_d$d <- predict(mlt_d, newdata = nd_d, type = "density")
+\end{Sinput}
+\end{Schunk}
+The estimated density is depicted in Figure~\ref{fig:geyser-plot}.  The plot
+shows the well-known bimodal distribution in a nice smooth way.  Several
+things are quite unusual in this short example.  First, the model was
+specified using \cmd{ctm} without reference to the actual observations, and
+second, although the model is fully parametric, the resulting density
+resembles the flexibility of a non-parametric approach (details in
+Section~\ref{sec:trafo}).  Third, the exact likelihood, as defined by the
+interval-censored observations, was used to obtain the model
+(Section~\ref{sec:mlt}).  Fourth, inspection of the parameter estimates is
+uninteresting, the model is better looked at by means of the estimated
+distribution, density, quantile, hazard or cumulative hazard functions
+(Section~\ref{sec:predict}).  Fifth, no regularisation is necessary due to
+the monotonicity constraint on the estimated transformation function
+(implemented as linear constraints for maximum likelihood estimation) and
+thus standard likelihood asymptotics work for $\hat{\parm}_N$
+(Section~\ref{sec:asympt}).  Sixth, because the model is a model for a full
+distribution, we can easily draw random samples from the model and refit its
+parameters using the parametric or model-based bootstrap
+(Section~\ref{sec:sim}).  Seventh, all of this is not only possible
+theoretically but readily implemented in package \pkg{mlt}.  The only
+remaining question is ``Do all these nice properties carry over to the
+conditional case, \ie to regression models?''.  The answer to this question
+is ``yes!'' and the rest of this paper describes the details following the
+workflow sketched in this section.  Technical issues about the three
+packages \pkg{variables}, \pkg{basefun} and \pkg{mlt} involved are explained
+in Appendices~\ref{app:variables}, \ref{app:basefun} and \ref{app:mlt}.
+
+
+\begin{figure}
+\begin{center}
+\begin{Schunk}
+
+
+{\centering \includegraphics{figure/geyser-plot-1} 
+
+}
+
+\end{Schunk}
+\caption{Old Faithful Geyser. Estimated density for duration time obtained from
+         an unconditional transformation model where the transformation function
+         was parameterised as a Bernstein polynomial. The plot reproduces
+         Figure~1 (right panel) in \cite{Hothorn_Moest_Buehlmann_2016}. \label{fig:geyser-plot}}
+\end{center}
+\end{figure}
+
+ 
+\section{Specifying Transformation Models} \label{sec:trafo}
+
+In this section we introduce a cascade of increasingly complex
+transformation models and discuss how one can specify such models using the
+\cmd{ctm} function provided by the \pkg{mlt} package.  The models are fitted
+via maximum likelihood by the \cmd{mlt} function (details are given in
+Section~\ref{sec:mlt}) to studies from different domains.  Results obtained
+from established implementations of the corresponding models in the
+\proglang{R} universe are used to evaluate the implementation in package
+\pkg{mlt} whenever possible.  We start with the simplest case of models for
+unconditional distribution functions.
+
+\subsection{Unconditional Transformation Models}
+
+The distribution function on an at least ordered response $\rY \in \samY$ is
+defined in terms of a transformation function $\h$ and a distribution
+function $\pZ$. The transformation function is parameterised in terms
+of a basis function $\basisy$
+\begin{eqnarray*}
+\Prob(\rY \le \ry) = \pZ(\h(\ry)) = \pZ(\basisy(\ry)^\top \parm).
+\end{eqnarray*}
+The triple $(\pZ, \basisy, \parm)$ fully defines the distribution of $\rY$ and
+is called \emph{transformation model}.
+The choice of the basis function $\basisy$ depends on the measurement 
+scale of $\rY$ and we can differentiate between the following situations.
+
+\subsubsection{Discrete Models for Categorical Responses}
+
+For ordered categorical responses $\rY$ from a
+finite sample space $\samY = \{\ry_1, \dots, \ry_K\}$ the distribution function
+$\pY$ is a step-function with jumps at $\ry_k$ only. We therefore
+assign one parameter to each jump, \ie each element of the sample space except $\ry_K$.  This
+corresponds to the basis function $\basisy(\ry_k) = \evec_{K - 1}(k)$, where
+$\evec_{K-1}(k)$ is the unit vector of length $K - 1$ with its
+$k$th element being one.  The transformation function $\h$ is
+\begin{eqnarray*}
+\h(\ry_k) & = & \evec_{K - 1}(k)^\top \parm = \eparm_k \in \RR, \quad 1 \le k < K, \quad
+\text{st} \quad \eparm_1 < \dots <
+\eparm_{K - 1}
+\end{eqnarray*}
+with $\h(\ry_K) = \infty$,  and the unconditional distribution function of $\pY$ is
+$\pY(\ry_k) = \pZ(\eparm_k)$. Note that monotonicity of $\h$ is guaranteed by the
+$K - 2$ linear constraints $\eparm_2 - \eparm_1 > 0, \dots, \eparm_{K -1} -
+\eparm_{K -2} > 0$ when constrained optimisation is performed. The density of
+a nominal variable $\rY$ can be estimated in the very same way because it is
+invariant with respect to the ordering of the levels (see Section~\ref{sec:mlt}).
+
+\paragraph{Categorical Data Analysis: Chinese Health and Family Life Survey}
+
+The Chinese Health and Family Life Survey \citep{Parish}, conducted 1999--2000 as a
+collaborative research project of the Universities of Chicago, Beijing, and
+North Carolina, sampled $60$ villages and urban neighborhoods in China. 
+Eighty-three individuals were chosen at random for each location from
+official registers of adults aged between $20$ and $64$ years to target a
+sample of $5000$ individuals in total.  Here, we restrict our attention to
+women with current male partners for whom no information was missing,
+leading to a sample of $1534$ women with the following
+variables: \code{R\_edu} (level of education of the responding woman),
+\code{R\_income} (monthly income in Yuan of the responding woman),
+\code{R\_health} (health status of the responding woman in the last year) and
+\code{R\_happy} (how happy was the responding woman in the last year).
+We first estimate the unconditional distribution of happiness using a
+proportional odds model \citep[\cmd{polr} from package \pkg{MASS},][]{pkg:MASS}
+\begin{Schunk}
+\begin{Sinput}
+R> data("CHFLS", package = "HSAUR3")
+R> polr_CHFLS_1 <- polr(R_happy ~ 1, data = CHFLS)
+\end{Sinput}
+\end{Schunk}
+The basis function introduced above corresponds to a model matrix for
+the ordered factor \code{R\_happy} with treatment contrasts using the largest level
+(``very happy'') as baseline group. In addition, the parameters must satisfy
+the linear constraint $\mC \parm \ge \mvec$, $\mC$ (argument \code{ui}) 
+being the difference matrix and $\mvec = \bold{0}$ (argument \code{ci})
+\begin{Schunk}
+\begin{Sinput}
+R> nl <- nlevels(CHFLS$R_happy)
+R> b_happy <- as.basis(~ R_happy, data = CHFLS, remove_intercept = TRUE,
++                      contrasts.arg = list(R_happy = function(n) 
++                          contr.treatment(n, base = nl)),
++                      ui = diff(diag(nl - 1)), ci = rep(0, nl - 2))
+\end{Sinput}
+\end{Schunk}
+A short-cut for ordered factors avoids this rather complex definition of the basis function
+\begin{Schunk}
+\begin{Sinput}
+R> b_happy <- as.basis(CHFLS$R_happy)
+\end{Sinput}
+\end{Schunk}
+We are now ready to set-up the (unconditional) transformation model by a call to
+\cmd{ctm} using the basis function and a character defining the standard 
+logistic distribution function for $\pZ$
+\begin{Schunk}
+\begin{Sinput}
+R> ctm_CHFLS_1 <- ctm(response = b_happy, todist = "Logistic")
+\end{Sinput}
+\end{Schunk}
+Note that the choice of $\pZ$ is completely arbitrary as the estimated distribution
+function is invariant with respect to $\pZ$.
+The model is fitted by calling the \cmd{mlt} function with arguments \code{model} 
+and \code{data}
+\begin{Schunk}
+\begin{Sinput}
+R> mlt_CHFLS_1 <- mlt(model = ctm_CHFLS_1, data = CHFLS)
+\end{Sinput}
+\end{Schunk}
+The results are equivalent to the results obtained from \cmd{polr}
+\begin{Schunk}
+\begin{Sinput}
+R> logLik(polr_CHFLS_1)
+\end{Sinput}
+\begin{Soutput}
+'log Lik.' -1328.241 (df=3)
+\end{Soutput}
+\begin{Sinput}
+R> logLik(mlt_CHFLS_1)
+\end{Sinput}
+\begin{Soutput}
+'log Lik.' -1328.241 (df=3)
+\end{Soutput}
+\begin{Sinput}
+R> cbind(polr = polr_CHFLS_1$zeta, mlt = coef(mlt_CHFLS_1))
+\end{Sinput}
+\begin{Soutput}
+                                  polr       mlt
+Very unhappy|Not too happy   -4.687408 -4.687408
+Not too happy|Somewhat happy -1.903382 -1.903382
+Somewhat happy|Very happy     1.499304  1.499304
+\end{Soutput}
+\end{Schunk}
+Of course, the above exercise is an extremely cumbersome way
+of estimating a discrete density those maximum likelihood estimator
+simply is the relative frequency but, as we will see in the rest of this paper, a generalisation
+to the conditional case strongly relies on this parameterisation
+\begin{Schunk}
+\begin{Sinput}
+R> predict(polr_CHFLS_1, newdata = data.frame(1), type = "prob")
+\end{Sinput}
+\begin{Soutput}
+  Very unhappy  Not too happy Somewhat happy     Very happy 
+   0.009126466    0.120599751    0.687744449    0.182529334 
+\end{Soutput}
+\begin{Sinput}
+R> c(predict(mlt_CHFLS_1, newdata = data.frame(1), type = "density", 
++            q = mkgrid(b_happy)[[1]]))
+\end{Sinput}
+\begin{Soutput}
+[1] 0.009126469 0.120599738 0.687744458 0.182529335
+\end{Soutput}
+\begin{Sinput}
+R> xtabs(~ R_happy, data = CHFLS) / nrow(CHFLS)
+\end{Sinput}
+\begin{Soutput}
+R_happy
+  Very unhappy  Not too happy Somewhat happy     Very happy 
+   0.009126467    0.120599739    0.687744459    0.182529335 
+\end{Soutput}
+\end{Schunk}
+
+\subsubsection{Continuous Models for Continuous Responses}
+
+For continuous responses $\rY \in \samY \subseteq \RR$ the
+parameterisation $\h(\ry) = \basisy(\ry)^\top \parm$ should be smooth in $\ry$, so any polynomial or spline basis is a
+suitable choice for $\basisy$.  We apply Bernstein polynomials \citep[for an
+overview see][]{Farouki_2012} of order $M$
+(with $M + 1$ parameters) defined on the interval $[\ubar{\imath}, \bar{\imath}]$ with
+\begin{eqnarray*}
+\bern{M}(\ry) & = & (M + 1)^{-1}(f_{\text{Be}(1, M + 1)}(\tilde{\ry}), \dots,
+                            f_{\text{Be}(m, M - m + 1)}(\tilde{\ry}), \dots,
+                            f_{\text{Be}(M + 1, 1)}(\tilde{\ry}))^\top \in \RR^{M + 1} \\
+\h(\ry) & = & \bern{M}(\ry)^\top \parm =
+              \sum_{m = 0}^{M} \eparm_m f_{\text{Be}(m + 1, M - m + 1)}(\tilde{\ry}) / (M + 1) \\
+\h^\prime(\ry) & = & \bern{M}^\prime(\ry)^\top \parm =
+              \sum_{m = 0}^{M - 1} (\eparm_{m + 1} - \eparm_m) f_{\text{Be}(m + 1, M - m)}(\tilde{\ry}) M /
+((M + 1) (\bar{\imath} - \ubar{\imath}))
+\end{eqnarray*}
+where $\tilde{\ry} = (\ry -\ubar{\imath}) / (\bar{\imath} - \ubar{\imath}) \in [0,
+1]$ and $f_{\text{Be}(m, M)}$ is the density of the Beta distribution with
+parameters $m$ and $M$.  This choice is computationally attractive because
+strict monotonicity can be formulated as a set of $M$ linear constraints on the
+parameters $\eparm_m < \eparm_{m + 1}$ for all $m = 0, \dots, M$
+\citep{Curtis_Ghosh_2011}.  Therefore, application of constrained optimisation guarantees
+monotone estimates $\hat{\h}_N$. The basis contains an intercept.  
+
+
+\paragraph{Density Estimation: Geyser Data (Cont'd)}
+We continue the analysis of the Old Faithful data by estimating the unconditional distribution of
+waiting times, a positive variable those abstract representation can be used to generate
+an equidistant grid of $100$ values
+\begin{Schunk}
+\begin{Sinput}
+R> var_w <- numeric_var("waiting", support = c(40.0, 100), add = c(-5, 15), 
++                       bounds = c(0, Inf))
+R> c(sapply(nd_w <- mkgrid(var_w, 100), range))
+\end{Sinput}
+\begin{Soutput}
+[1]  35 115
+\end{Soutput}
+\end{Schunk}
+A monotone increasing Bernstein polynomial of order $8$ for \code{waiting} in the interval 
+$[\ubar{\imath}, \bar{\imath}]$ \code{ = support(var_w)} is defined as
+\begin{Schunk}
+\begin{Sinput}
+R> B_w <- Bernstein_basis(var_w, order = 8, ui = "increasing")
+\end{Sinput}
+\end{Schunk}
+The (here again unconditional) transformation model is now fully described by
+the parameterisation $\h(\ry) = \basisy(\ry)^\top \parm$ and $\pZ = \Phi$, the latter 
+choice again being not important (for larger values of $M$)
+\begin{Schunk}
+\begin{Sinput}
+R> ctm_w <- ctm(response = B_w, todistr = "Normal")
+\end{Sinput}
+\end{Schunk}
+The most likely transformation $\hat{\h}_N(\ry) = \basisy(\ry)^\top \hat{\parm}_N$ is 
+now obtained from the maximum likelihood estimate $\hat{\parm}_N$ computed as
+\begin{Schunk}
+\begin{Sinput}
+R> mlt_w <- mlt(ctm_w, data = geyser)
+\end{Sinput}
+\end{Schunk}
+and we compare the estimated distribution function 
+\begin{Schunk}
+\begin{Sinput}
+R> nd_w$d <- predict(mlt_w, newdata = nd_w, type = "distribution")
+\end{Sinput}
+\end{Schunk}
+with the empirical cumulative distribution function (the non-parametric maximum likelihood estimator) 
+in the left panel of Figure~\ref{fig:geyser-w-plot}.
+
+\begin{figure}
+\begin{center}
+\begin{Schunk}
+
+
+{\centering \includegraphics{figure/geyser-w-plot-1} 
+
+}
+
+\end{Schunk}
+\caption{Old Faithful Geyser. Estimated distribution (left, also featuring the empirical
+         cumulative distribution function) and density (right) function for 
+         two transformation models parameterised in terms of Bernstein polynomials
+         of order $8$ and $40$.  The right plot reproduces the density for $M = 8$ shown in
+         Figure~1 (left panel) in \cite{Hothorn_Moest_Buehlmann_2016}. \label{fig:geyser-w-plot}}
+\end{center}
+\end{figure}
+
+The question arises how the degree of the polynomial affects the estimated
+distribution function.  On the one hand, the model $(\Phi, \bern{1}, \parm)$ only allows
+linear transformation functions of a standard normal and $\pY$ is restricted to the
+normal family.  On the other hand, $(\Phi, \bern{N - 1}, \parm)$ has one
+parameter for each observation and $\hatpY$ is the non-parametric maximum
+likelihood estimator $\text{ECDF}$ which, by the Glivenko-Cantelli lemma,
+converges to $\pY$.  In this sense, we cannot choose $M$ ``too large''. This
+is a consequence of the monotonicity constraint on the estimator
+$\basisy^\top \hat{\parm}_N$ which, in this extreme case, just interpolates
+the step-function $\pZ^{-1} \circ \text{ECDF}$. The practical effect can be inspected
+in Figure~\ref{fig:geyser-w-plot} where two Bernstein polynomials of order $M = 8$ and
+$M = 40$ are compared on the scale of the distribution function (left panel) and density
+function (right panel). It is hardly possible to notice the difference in probabilities
+but the more flexible model features a more erratic density estimate, but not overly so.
+The corresponding AIC values are $2328.6$ 
+for $M = 8$ and $2380.8$ for $M = 40$ favoring the smaller model.
+
+
+\subsubsection{Continuous Models for Discrete Responses}
+
+Although a model for $\rY$ can assume an absolutely continuous distribution,
+observations from such a model will always be discrete. This fact is taken 
+into account by the exact likelihood (Section~\ref{sec:mlt}). In some cases, 
+for example for count data with potentially large number of counts, one might
+use a continuous parameterisation of the transformation function $\bern{M}^\top \parm$
+which is evaluated at the observed counts only as in the next example.
+
+\paragraph{Analysis of Count Data: Deer-vehicle Collisions}
+
+\cite{Hothorn_Mueller_Held_2015} analyse roe deer-vehicle collisions reported to the police
+in Bavaria, Germany, between 2002-01-01 and 2011-12-31. The daily counts range between
+$135$ and $693$. A model for the daily number of roe deer-vehicle collision
+using a Bernstein polynomial of order $6$ as basis function is fitted using
+\begin{Schunk}
+\begin{Sinput}
+R> var_dvc <- numeric_var("dvc", support = min(dvc):max(dvc))
+R> B_dvc <- Bernstein_basis(var_dvc, order = 6, ui = "increasing")
+R> dvc_mlt <- mlt(ctm(B_dvc), data = data.frame(dvc = dvc))
+\end{Sinput}
+\end{Schunk}
+The discrete distribution function (evaluated for all integers between
+$135$ and $693$) along with the distribution
+function of the Poisson distribution are given in Figure~\ref{fig:dvc-plot}. 
+The empirical cumulative distribution function is smoothly approximated
+using only seven parameters.  There is clear evidence for overdispersion as
+the variance of the Poisson model is much smaller than the variance
+estimated by the transformation model.
+
+\begin{figure}
+\begin{center}
+\begin{Schunk}
+
+
+{\centering \includegraphics{figure/dvc-plot-1} 
+
+}
+
+\end{Schunk}
+\caption{Deer-vehicle Collisions. Unconditional distribution 
+of daily number of roe deer-vehicle collisions in Bavaria, Germany,
+between 2002 and 2011. Grey circles represent the empirical cumulative
+distribution function, the blue line the unconditional transformation function
+and the red line the Poisson distribution fitted to the data.\label{fig:dvc-plot}}
+\end{center}
+\end{figure}
+
+\subsubsection{Discrete Models for Continuous Responses}
+
+In some applications one might not be interested in estimating the whole distribution 
+function $\pY$ for a conceptually absolutely continuous response $\rY$ 
+but in probabilities $\pY(\ry_k)$ for some grid $\ry_1, \dots, \ry_K$ only. The discrete 
+basis function $\h(\ry_k) = \evec_{K - 1}(k)^\top \parm = \eparm_k$ can be used in this
+case. For model estimation, only the discretised observations 
+$\ry \in (\ry_{k - 1}, \ry_k]$ enter the likelihood.
+
+
+
+\subsection{Linear Transformation Models} \label{subsec:ltm}
+
+A linear transformation model features a linear shift of a typically non-linear transformation
+of the response $Y$ and is the simplest form of a regression model in the class of
+conditional transformation models. The conditional distribution function is
+\begin{eqnarray*}
+\Prob(\rY \le \ry | \rX = \rx) = \pZ(\h(\ry | \rx)) = 
+\pZ(\h_\rY(\ry) - \tilde{\rx}^\top \shiftparm).
+\end{eqnarray*}
+The transformation $\h_\rY$, sometimes called ``baseline transformation'' can be parameterised
+as discussed in the unconditional situation
+\begin{eqnarray*}
+\pZ(\h_\rY(\ry) - \tilde{\rx}^\top \shiftparm) = \pZ(\basisy(\ry)^\top \parm_1 - \tilde{\rx}^\top \shiftparm)
+\end{eqnarray*}
+The connection to more complex models is highlighted by the introduction of a 
+basis function $\basisyx$ being conditional on the explanatory variables $\rx$, \ie
+\begin{eqnarray*}
+\pZ(\h(\ry | \rx)) = \pZ(\h_\rY(\ry) - \tilde{\rx}^\top \shiftparm) = \pZ(\basisyx(\ry, \rx)^\top \parm) = \pZ(\basisy(\ry)^\top \parm_1 - \tilde{\rx}^\top \shiftparm)
+\end{eqnarray*}
+with $\basisyx = (\basisy^\top, -\tilde{\rx}^\top)^\top$. 
+The definition of a linear transformation model only requires the basis $\basisy$, 
+the explanatory variables $\rx$ and a distribution $\pZ$. The latter choice is now important,
+as additivity of the linear predictor is assumed on the scale of $\pZ$. It is convenient to
+supply negative linear predictors as $\Ex(\h_\rY(\rY) | \rX = \rx) = \tilde{\rx}^\top \shiftparm$.
+One exception is the Cox model with positive shift and $\Ex(\h_\rY(\rY) | \rX = \rx) = -\tilde{\rx}^\top \shiftparm$. 
+Large positive values of the linear predictor correspond to low expected survival times and thus a high risk.
+
+\subsubsection{Discrete Responses}
+
+\paragraph{Categorical Data Analysis: Chinese Survey (Cont'd)} We want to study the impact of
+age and income on happiness in a proportional odds model, here fitted using \cmd{polr} first
+\begin{Schunk}
+\begin{Sinput}
+R> polr_CHFLS_2 <- polr(R_happy ~ R_age + R_income, data = CHFLS)
+\end{Sinput}
+\end{Schunk}
+In order to fit this model using the \pkg{mlt} package, we need to 
+set-up the basis function for a negative linear predictor without intercept 
+in addition to the basis function for happiness (\code{b\_happy})
+\begin{Schunk}
+\begin{Sinput}
+R> b_R <- as.basis(~ R_age + R_income, data = CHFLS, remove_intercept = TRUE, 
++                  negative = TRUE)
+\end{Sinput}
+\end{Schunk}
+The model is now defined by two basis functions, one of the response and one for the
+shift in addition to $\pZ$ and fitted using the \cmd{mlt} function; the columns of the
+model matrices are scaled to $[-1, 1]$ before fitting the parameters by \code{scale = TRUE}
+\begin{Schunk}
+\begin{Sinput}
+R> ctm_CHFLS_2 <- ctm(response = b_happy, shifting = b_R, 
++                     todistr = "Logistic")
+R> mlt_CHFLS_2 <- mlt(ctm_CHFLS_2, data = CHFLS, scale = TRUE)
+\end{Sinput}
+\end{Schunk}
+Again, the results of \cmd{polr} and \cmd{mlt} are equivalent
+\begin{Schunk}
+\begin{Sinput}
+R> logLik(polr_CHFLS_2)
+\end{Sinput}
+\begin{Soutput}
+'log Lik.' -1322.021 (df=5)
+\end{Soutput}
+\begin{Sinput}
+R> logLik(mlt_CHFLS_2)
+\end{Sinput}
+\begin{Soutput}
+'log Lik.' -1322.021 (df=5)
+\end{Soutput}
+\begin{Sinput}
+R> cbind(polr = c(polr_CHFLS_2$zeta, coef(polr_CHFLS_2)), 
++        mlt = coef(mlt_CHFLS_2))
+\end{Sinput}
+\begin{Soutput}
+                                     polr           mlt
+Very unhappy|Not too happy   -4.801592360 -4.8015820561
+Not too happy|Somewhat happy -2.011695585 -2.0117019514
+Somewhat happy|Very happy     1.412707129  1.4127041170
+R_age                        -0.006278962 -0.0062791163
+R_income                      0.000235009  0.0002350097
+\end{Soutput}
+\end{Schunk}
+The regression coefficients $\shiftparm$ are the log-odds ratios, \ie 
+the odds-ratio between any two subsequent happiness categories is
+$0.9937$ for each year of age and
+$1.0002$ for each additional Yuan earned.
+Therefore, there seems to be a happyness conflict between getting older \emph{and} richer.
+
+\subsubsection{Continuous Responses}
+
+\paragraph{Survival Analysis: German Breast Cancer Study Group-2 (GBSG-2) Trial} 
+
+This prospective, controlled clinical trial on the treatment of node positive
+breast cancer patients was conducted by the German Breast Cancer Study 
+Group \citep[GBSG-2,][]{gbsg2:1994}.  Patients not older than $65$ years with
+positive regional lymph nodes but no distant metastases were included in
+the study.  Out of $686$ women, $246$ received hormonal therapy whereas the
+control group of $440$ women did not receive hormonal therapy.  Additional
+variables include age, menopausal status, tumor size, tumor grade, number of
+positive lymph nodes, progesterone receptor and estrogen receptor.  The
+right-censored recurrence-free survival time is the response variable of
+interest, \ie a positive absolutely continuous variable
+\begin{Schunk}
+\begin{Sinput}
+R> data("GBSG2", package = "TH.data")
+R> GBSG2y <- numeric_var("y", support = c(100.0, max(GBSG2$time)), 
++                        bounds = c(0, Inf))
+R> GBSG2$y <- with(GBSG2, Surv(time, cens))
+\end{Sinput}
+\end{Schunk}
+We start with the Cox model $(\pMEV, (\bern{10}^\top,
+\tilde{\rx}^\top)^\top, (\parm_1^\top, \shiftparm^\top)^\top)$, where $\tilde{\rx}$ contains the treatment
+indicator and all other explanatory variables in the transformation function
+$\h(\ry | \rx) = \bern{10}(\ry)^\top \parm_1 + \tilde{\rx}^\top \shiftparm$
+\citep[the positive shift being in line with the implementation in \cmd{coxph} in package 
+\pkg{survival},][]{Therneau_Grambsch_2000,pkg:survival}
+\begin{Schunk}
+\begin{Sinput}
+R> B_GBSG2y <- Bernstein_basis(var = GBSG2y, order = 10, ui = "increasing")
+R> fm_GBSG2 <- Surv(time, cens) ~ horTh + age + menostat + tsize + tgrade +
++                                 pnodes + progrec + estrec
+R> ctm_GBSG2_1 <- ctm(B_GBSG2y, shifting = fm_GBSG2[-2L], data = GBSG2,
++                     todistr = "MinExtrVal")
+\end{Sinput}
+\end{Schunk}
+\code{fm_GBSG2[-2L]} is the right hand side of the model formula and
+defines the basis function for the shift term in the classical formula language.
+The distribution function $\pZ$ is the distribution function of the minimum
+extreme value distribution. The specification of the right-hand side of the
+formula as argument \code{shifting} along with the data (argument \code{data})
+is equivalent to a basis function
+\begin{Schunk}
+\begin{Sinput}
+R> as.basis(fm_GBSG2[-2L], data = GBSG2, remove_intercept)
+\end{Sinput}
+\end{Schunk}
+
+In contrast to the classical Cox model where only $\shiftparm$ is estimated
+by the partial likelihood, we estimate all model parameters $(\parm_1^\top, \shiftparm^\top)$ simultaneously
+under ten linear constraints, here with at most $3000$ iterations 
+\citep[argument \code{maxit} to \cmd{spg} from the \pkg{BB} package,][]{Varadhan_Gilbert_2009,pkg:BB}
+\begin{Schunk}
+\begin{Sinput}
+R> mlt_GBSG2_1 <- mlt(ctm_GBSG2_1, data = GBSG2, maxit = 3000, scale = TRUE)
+\end{Sinput}
+\end{Schunk}
+The results obtained for $\shiftparm$ from
+the partial and the exact log-likelihood are practically equivalent
+\begin{Schunk}
+\begin{Sinput}
+R> coxph_GBSG2_1 <- coxph(fm_GBSG2, data = GBSG2)
+R> cf <- coef(coxph_GBSG2_1)
+R> cbind(coxph = cf, mlt = coef(mlt_GBSG2_1)[names(cf)])
+\end{Sinput}
+\begin{Soutput}
+                     coxph           mlt
+horThyes     -0.3462784276 -0.3489205601
+age          -0.0094592389 -0.0099113611
+menostatPost  0.2584448409  0.2675484077
+tsize         0.0077960839  0.0077694009
+tgrade.L      0.5512988021  0.5600329425
+tgrade.Q     -0.2010905201 -0.2018734495
+pnodes        0.0487886004  0.0487581396
+progrec      -0.0022172357 -0.0022104961
+estrec        0.0001973107  0.0001828489
+\end{Soutput}
+\end{Schunk}
+A comparison with the \cite{Royston_Parmar_2002} spline model as implemented in the
+\pkg{flexsurv} package \citep{pkg:flexsurv} shows that the two spline parameterisations
+of the log cumulative hazard function are practically equivalent (see Figure~\ref{GBSG2-1-fss-plot} also)
+\begin{Schunk}
+\begin{Sinput}
+R> fss_GBSG2_1 <- flexsurvspline(fm_GBSG2, data = GBSG2, scale = "hazard", 
++                                k = 9, bknots = log(support(GBSG2y)$y))
+R> logLik(fss_GBSG2_1)
+\end{Sinput}
+\begin{Soutput}
+'log Lik.' -2555.856 (df=20)
+\end{Soutput}
+\begin{Sinput}
+R> logLik(mlt_GBSG2_1)
+\end{Sinput}
+\begin{Soutput}
+'log Lik.' -2559.151 (df=20)
+\end{Soutput}
+\begin{Sinput}
+R> cbind(coxph = cf, mlt = coef(mlt_GBSG2_1)[names(cf)],
++        fss = coef(fss_GBSG2_1)[names(cf)])
+\end{Sinput}
+\begin{Soutput}
+                     coxph           mlt           fss
+horThyes     -0.3462784276 -0.3489205601 -0.3473363292
+age          -0.0094592389 -0.0099113611 -0.0097895841
+menostatPost  0.2584448409  0.2675484077  0.2672204916
+tsize         0.0077960839  0.0077694009  0.0079051625
+tgrade.L      0.5512988021  0.5600329425  0.5554284931
+tgrade.Q     -0.2010905201 -0.2018734495 -0.2078499581
+pnodes        0.0487886004  0.0487581396  0.0485933666
+progrec      -0.0022172357 -0.0022104961 -0.0022112350
+estrec        0.0001973107  0.0001828489  0.0001891311
+\end{Soutput}
+\end{Schunk}
+
+\begin{figure}
+\begin{center}
+\begin{Schunk}
+
+
+{\centering \includegraphics{figure/GBSG2-1-fss-plot-1} 
+
+}
+
+\end{Schunk}
+\caption{GBSG-2 Trial. Estimated survivor functions for patient 1  
+         by the most likely transformation model (MLT) and the \cite{Royston_Parmar_2002} spline
+         model fitted using \cmd{flexsurvspline}. \label{GBSG2-1-fss-plot}}
+\end{center}
+\end{figure}
+
+
+Accelerated Failure Time (AFT) models arise when one restricts the 
+baseline transformation $\h_\rY(\ry)$ to a possibly scaled log-transformation. With
+$\h_\rY(\ry) = \log(\ry)$ and $\pZ = \pMEV$ the exponential AFT model arises
+which can be specified as the Cox model above, only the Bernstein basis for time 
+needs to be replaced by a log-transformation and the corresponding parameter is restricted
+to one in the estimation
+\begin{Schunk}
+\begin{Sinput}
+R> ly <- log_basis(GBSG2y, ui = "increasing", remove_intercept = TRUE)
+R> ctm_GBSG2_2 <- ctm(ly, shifting = fm_GBSG2[-2L], data = GBSG2, 
++                     negative = TRUE, todistr = "MinExtrVal")
+R> mlt_GBSG2_2 <- mlt(ctm_GBSG2_2, data = GBSG2, fixed = c("log(y)" = 1), 
++                     scale = TRUE)
+\end{Sinput}
+\end{Schunk}
+The \cmd{survreg} (package \pkg{survival}) and \cmd{phreg} (package \pkg{eha}) functions 
+fit the same model, the results are again equivalent up to the sign of the regression 
+coefficients
+\begin{Schunk}
+\begin{Sinput}
+R> survreg_GBSG2_2 <- survreg(fm_GBSG2, data = GBSG2, dist = "exponential")
+R> phreg_GBSG2_2 <- phreg(fm_GBSG2, data = GBSG2, dist = "weibull", 
++                         shape = 1)
+R> logLik(survreg_GBSG2_2)
+\end{Sinput}
+\begin{Soutput}
+'log Lik.' -2599.383 (df=10)
+\end{Soutput}
+\begin{Sinput}
+R> logLik(phreg_GBSG2_2)
+\end{Sinput}
+\begin{Soutput}
+'log Lik.' -2599.383 (df=10)
+\end{Soutput}
+\begin{Sinput}
+R> logLik(mlt_GBSG2_2)
+\end{Sinput}
+\begin{Soutput}
+'log Lik.' -2803.57 (df=9)
+\end{Soutput}
+\begin{Sinput}
+R> cbind(survreg = coef(survreg_GBSG2_2)[names(cf)], 
++        phreg = -coef(phreg_GBSG2_2)[names(cf)], 
++        mlt = coef(mlt_GBSG2_2)[names(cf)])
+\end{Sinput}
+\begin{Soutput}
+                   survreg         phreg          mlt
+horThyes      0.3321617406  0.3321617406  0.265021122
+age           0.0094196671  0.0094196671  0.174429753
+menostatPost -0.2685358867 -0.2685358867 -2.344659825
+tsize        -0.0073179443 -0.0073179443  0.011117652
+tgrade.L     -0.5193521191 -0.5193521191  0.012150743
+tgrade.Q      0.2139217558  0.2139217558 -0.069961072
+pnodes       -0.0461664688 -0.0461664688 -0.040139513
+progrec       0.0020670894  0.0020670894  0.003552464
+estrec       -0.0001788501 -0.0001788501 -0.001190315
+\end{Soutput}
+\end{Schunk}
+If we allow a scaled log-transformation $\h_\rY(\ry) = \eparm_1 \log(\ry) + \eparm_2$ (the intercept
+$\eparm_2$ is included in the baseline transformation), the Weibull
+AFT model is fitted by \cmd{mlt}, \cmd{survreg} and \cmd{phreg} using
+\begin{Schunk}
+\begin{Sinput}
+R> ctm_GBSG2_3 <- ctm(log_basis(GBSG2y, ui = "increasing"), 
++                     shifting = fm_GBSG2[-2L], data = GBSG2, 
++                     negative = TRUE, todistr = "MinExtrVal")
+R> mlt_GBSG2_3 <- mlt(ctm_GBSG2_3, data = GBSG2, scale = TRUE)
+R> survreg_GBSG2_3 <- survreg(fm_GBSG2, data = GBSG2, dist = "weibull")
+R> phreg_GBSG2_3 <- phreg(fm_GBSG2, data = GBSG2, dist = "weibull")
+R> logLik(survreg_GBSG2_3)
+\end{Sinput}
+\begin{Soutput}
+'log Lik.' -2579.695 (df=11)
+\end{Soutput}
+\begin{Sinput}
+R> logLik(phreg_GBSG2_3)
+\end{Sinput}
+\begin{Soutput}
+'log Lik.' -2579.695 (df=11)
+\end{Soutput}
+\begin{Sinput}
+R> logLik(mlt_GBSG2_3)
+\end{Sinput}
+\begin{Soutput}
+'log Lik.' -2579.695 (df=11)
+\end{Soutput}
+\begin{Sinput}
+R> cbind(survreg = coef(survreg_GBSG2_3)[names(cf)] / survreg_GBSG2_3$scale, 
++        phreg = - coef(phreg_GBSG2_3)[names(cf)], 
++        mlt = coef(mlt_GBSG2_3)[names(cf)])
+\end{Sinput}
+\begin{Soutput}
+                   survreg         phreg           mlt
+horThyes      0.3730909205  0.3730909205  0.3730886675
+age           0.0094799262  0.0094799262  0.0094818287
+menostatPost -0.2709027409 -0.2709027409 -0.2709283349
+tsize        -0.0080149047 -0.0080149047 -0.0080148112
+tgrade.L     -0.5727992624 -0.5727992624 -0.5727950941
+tgrade.Q      0.2050597169  0.2050597169  0.2050579224
+pnodes       -0.0528016503 -0.0528016503 -0.0528015383
+progrec       0.0022848557  0.0022848557  0.0022848500
+estrec       -0.0002484315 -0.0002484315 -0.0002484469
+\end{Soutput}
+\end{Schunk}
+
+
+\paragraph{Non-normal Linear Regression: Boston Housing Data}
+
+The Boston Housing data are a prominent test-bed for parametric and
+non-parametric alternatives to a normal linear regression model.
+Assuming a conditional normal distribution for the 
+median value of owner-occupied homes (medv, in USD $1000$'s, we use the corrected version) 
+in the normal linear model with constant variance
+\begin{eqnarray*}
+\text{medv} | \rX = \rx \sim \ND(\tilde{\rx}^\top \shiftparm, \sigma^2)
+\end{eqnarray*}
+is rather restrictive
+\begin{Schunk}
+\begin{Sinput}
+R> data("BostonHousing2", package = "mlbench")
+R> lm_BH <- lm(cmedv ~ crim + zn + indus + chas + nox + rm + age + dis + 
++              rad + tax + ptratio + b + lstat, data = BostonHousing2)
+\end{Sinput}
+\end{Schunk}
+We relax the model formulation without sacrificing
+the simplicity of a linear predictor of the explanatory variables
+in the linear transformation model
+\begin{eqnarray*}
+\Prob(\text{medv} \le \ry | \rX = \rx) = \Phi(\h_\rY(\ry) - \tilde{\rx}^\top \shiftparm)
+= \Phi(\bern{6}(\ry)^\top \parm_1 - \tilde{\rx}^\top \shiftparm)
+\end{eqnarray*}
+and estimate \emph{all} model parameters $(\parm_1, \shiftparm)$ simulaneously, \ie both the
+regression coefficients \emph{and} the error distribution. Because it is 
+straightforward to evaluate the conditional distribution function, the likelihood
+can deal with right-censored medv observations ($\ge 50$). This censoring
+was mostly ignored in other parametric or non-parametric analyses of this data set.
+
+We start with a suitable definition of median value of owner-occupied homes,
+set-up a \code{Surv} object for this response and a model formula
+\begin{Schunk}
+\begin{Sinput}
+R> BostonHousing2$medvc <- with(BostonHousing2, Surv(cmedv, cmedv < 50))
+R> var_m <- numeric_var("medvc", support = c(10.0, 40.0), bounds = c(0, Inf))
+R> fm_BH <- medvc ~ crim + zn + indus + chas + nox + rm + age + 
++      dis + rad + tax + ptratio + b + lstat
+\end{Sinput}
+\end{Schunk}
+We are interested in a possibly non-linear transformation of the response
+and use a Bernstein polynomial of order $6$. In principle, this approach is equivalent
+to using a Box-Cox transformation but with a more flexible transformation function.
+In a sense, we don't need to worry too much about the error distribution $\pZ$
+as only the additivity assumption on our linear predictor depends on this choice (which
+may or may not be a strong assumption!).
+The conditional transformation model is now given by this transformation of the response, a linear predictor
+of the explanatory variables the model and the normal distribution function; the \cmd{mlt}
+function fits the model to the data
+\begin{Schunk}
+\begin{Sinput}
+R> B_m <- Bernstein_basis(var_m, order = 6, ui = "increasing")
+R> ctm_BH <- ctm(B_m, shift = fm_BH[-2L], data = BostonHousing2, 
++                todistr = "Normal")
+R> mlt_BH <- mlt(ctm_BH, data = BostonHousing2, scale = TRUE)
+\end{Sinput}
+\end{Schunk}
+The model can be compared with a normal linear model (fitted by \cmd{lm}) on the
+scale of the fitted conditional distribution functions. Figure~\ref{fig:BostonHousing-plot}
+shows the fitted values, \ie the linear predictor $\tilde{\rx}_i^\top \hat{\shiftparm}_N$ 
+for each observation, and the observed response
+overlayed with the conditional distribution function for the corresponding observations.
+For the normal linear model featuring a \emph{linear} baseline transformation
+$\h_\rY$, the fit seems appropriate for observations with linear predictor 
+less than $30$. For larger values, the linear predictor underestimates the observations.
+The conditional distribution obtained from the linear transformation model captures
+observations with large values of the response better. For smaller values of the response,
+the fit resembles the normal linear model, although with a smaller conditional variance.
+
+\begin{figure}
+\begin{center}
+\begin{Schunk}
+
+
+{\centering \includegraphics{figure/BostonHousing-plot-1} 
+
+}
+
+\end{Schunk}
+\caption{Boston Housing. Predicted vs.~observed for the normal linear model (left) and the linear
+         transformation model with smooth baseline transformation (right). The observations
+         are overlayed with the conditional quantiles of the response given the
+         linear predictor. \label{fig:BostonHousing-plot}}
+\end{center}
+\end{figure}
+
+
+\paragraph{Truncated Regression: Panel Study of Income Dynamics}
+
+%<<tobin>>=
+%data("tobin", package = "survival")
+%ttobin <- subset(tobin, durable > 0)
+%(truncreg_tobin <- truncreg(durable ~ age + quant, data = ttobin))
+%
+%ttobin$durable <- R(ttobin$durable, tleft = 0)
+%b_d <- as.basis(~ durable, data = tobin, ui = matrix(c(0, 1), nr  = 1), ci = 0)
+%ctm_tobin <- ctm(b_d, shift = ~ age + quant, data = tobin, todistr = "Normal")
+%mlt_tobin <- mlt(ctm_tobin, data = ttobin, scale = TRUE)
+%logLik(truncreg_tobin)
+%logLik(mlt_tobin)	
+%-coef(mlt_tobin)[c("(Intercept)", "age", "quant")] / coef(mlt_tobin)["durable"]
+%@
+
+\cite{Mroz_1987} analysed the University of Michigan Panel Study of Income
+Dynamics (PSID) for the year 1975 (interview year 1976).  The data consists
+of 753 married white women between the ages of 30 and 60 in 1975, with 428
+working at some time during the year.  The dependent variable is the wife's
+annual hours of work and we are interested in modelling the distribution
+of hours of work conditional on participation in the labor
+force, \ie more than zero hours of work in 1975. We first set-up
+a subset consisting of those who actually worked (for money!) in 1975
+and a model formula
+\begin{Schunk}
+\begin{Sinput}
+R> data("PSID1976", package = "AER")
+R> PSID1976$nwincome <- with(PSID1976, (fincome - hours * wage)/1000)
+R> PSID1976$hours <- as.double(PSID1976$hours)
+R> PSID1976_0 <- subset(PSID1976, participation == "yes")
+R> fm_PSID1976 <- hours ~ nwincome + education + experience + 
++                 I(experience^2) + age + youngkids + oldkids
+\end{Sinput}
+\end{Schunk}
+We use a 
+linear regression model for left-truncated data and compare the
+results to \cmd{truncreg} from package \pkg{truncreg} \citep{pkg:truncreg}
+\begin{Schunk}
+\begin{Sinput}
+R> tr_PSID1976 <- truncreg(fm_PSID1976, data = PSID1976_0)
+\end{Sinput}
+\end{Schunk}
+
+We use the \cmd{R} function (see Appendix~\ref{subapp:R}) to
+specify left-truncation at zero, set-up a linear transformation
+function with positive slope for the response (we want to stay within 
+the normal family) and a shift term
+\begin{Schunk}
+\begin{Sinput}
+R> PSID1976_0$hours <- R(PSID1976_0$hours, tleft = 0)
+R> b_hours <- as.basis(~ hours, data = PSID1976, 
++                     ui = matrix(c(0, 1), nr  = 1), ci = 0)
+R> ctm_PSID1976_1 <- ctm(b_hours, shift = fm_PSID1976[-2L], 
++                        data = PSID1976_0, todistr = "Normal") 
+R> mlt_PSID1976_1 <- mlt(ctm_PSID1976_1, data = PSID1976_0, 
++                        scale = TRUE)
+\end{Sinput}
+\end{Schunk}
+The \cmd{mlt} function does a slightly better job at maximising the likelihood 
+than \cmd{truncreg} which explains the differences in the estimated coefficients
+\begin{Schunk}
+\begin{Sinput}
+R> logLik(tr_PSID1976)
+\end{Sinput}
+\begin{Soutput}
+'log Lik.' -3391.478 (df=9)
+\end{Soutput}
+\begin{Sinput}
+R> logLik(mlt_PSID1976_1)
+\end{Sinput}
+\begin{Soutput}
+'log Lik.' -3390.648 (df=9)
+\end{Soutput}
+\begin{Sinput}
+R> cf <- coef(mlt_PSID1976_1)
+R> cbind(truncreg = coef(tr_PSID1976),
++        mlt = c(-cf[-grep("hours", names(cf))], 1) / cf["hours"])
+\end{Sinput}
+\begin{Soutput}
+                    truncreg          mlt
+(Intercept)     2055.7127740 2123.5209244
+nwincome          -0.5011526    0.1534437
+education        -31.2696497  -29.8525973
+experience        73.0066075   72.6223511
+I(experience^2)   -0.9695106   -0.9439834
+age              -25.3359778  -27.4439187
+youngkids       -318.8521247 -484.7131259
+oldkids          -91.6195316 -102.6578164
+sigma            822.4792934  850.7683745
+\end{Soutput}
+\end{Schunk}
+Of course, we might want to question the normal assumption by allowing a potentially
+non-linear transformation function. We simply change the linear to a non-linear
+baseline transformation $\h_\rY$ at the price of five additional parameters in the model
+\begin{Schunk}
+\begin{Sinput}
+R> var_h <- numeric_var("hours", support = range(PSID1976_0$hours$exact),
++                       bounds = c(0, Inf))
+R> B_hours <- Bernstein_basis(var_h, order = 6, ui = "increasing")
+R> ctm_PSID1976_2 <- ctm(B_hours, shift = fm_PSID1976[-2L], 
++                        data = PSID1976_0, todistr = "Normal")
+R> mlt_PSID1976_2 <- mlt(ctm_PSID1976_2, data = PSID1976_0, 
++                        scale = TRUE)
+R> logLik(mlt_PSID1976_2)
+\end{Sinput}
+\begin{Soutput}
+'log Lik.' -3375.477 (df=14)
+\end{Soutput}
+\begin{Sinput}
+R> AIC(mlt_PSID1976_1)
+\end{Sinput}
+\begin{Soutput}
+[1] 6799.295
+\end{Soutput}
+\begin{Sinput}
+R> AIC(mlt_PSID1976_2)
+\end{Sinput}
+\begin{Soutput}
+[1] 6778.953
+\end{Soutput}
+\end{Schunk}
+and it seems the non-normal model is slightly better.
+
+\subsection{Stratified Linear Transformation Models}
+
+Stratification in linear transformation models refers to a 
+strata-specific transformation function but a shift term those
+regression coefficients are constant across strata. The model then
+reads
+\begin{eqnarray*}
+\Prob(\rY \le \ry | \text{stratum} = s, \rX = \rx) = \pZ(\h(\ry | s, \rx)) =
+\pZ(\h_\rY(\ry | s) - \tilde{\rx}^\top \shiftparm) = \pZ(\basisyx(\ry, s, \rx)^\top \parm)
+\end{eqnarray*}
+with basis function $\basisyx = (\basisy^\top \otimes
+\basisx_\text{stratum}^\top, -\basisx_\text{shift}^\top)^\top$.  The basis
+function $\basisx_\text{stratum}^\top$ is a dummy coding for the stratum
+variable and is defined using the \code{interacting} argument of \cmd{ctm}. 
+The constraints for the parameters of $\basisy$ have to be met for each
+single stratum, \ie the total number of linear constraints is the number of
+constraints for $\basisy$ multiplied by the number of strata.
+
+\subsubsection{Discrete Responses}
+
+\paragraph{Categorical Data Analysis: Chinese Survey (Cont'd)} We first
+estimate the distribution of happiness given health without taking any other
+explanatory variables into account, \ie by treating health as a stratum variable 
+(with dummy coding) but
+without any regression coefficients $\shiftparm$ in the model (\code{gtol = 1e-3} relaxes
+the gradient convergence criterion in \cmd{spg} to speed-up the computations)
+\begin{Schunk}
+\begin{Sinput}
+R> b_health <- as.basis(~ R_health - 1, data = CHFLS)
+R> ctm_CHFLS_3 <- ctm(b_happy, interacting = b_health, todist = "Logistic")
+R> mlt_CHFLS_3 <- mlt(ctm_CHFLS_3, data = CHFLS, scale = TRUE,
++                     maxit = 5000, gtol = 1e-3)
+R> logLik(mlt_CHFLS_3)
+\end{Sinput}
+\begin{Soutput}
+'log Lik.' -1192.227 (df=15)
+\end{Soutput}
+\begin{Sinput}
+R> predict(mlt_CHFLS_3, newdata = mkgrid(mlt_CHFLS_3), type = "distribution")
+\end{Sinput}
+\begin{Soutput}
+                R_health
+R_happy               Poor   Not good        Fair        Good    Excellent
+  Very unhappy   0.1999998 0.05036713 0.008676719 0.001718226 2.625274e-06
+  Not too happy  0.5999999 0.38130160 0.154013152 0.073883243 7.602604e-02
+  Somewhat happy 0.9000000 0.93525413 0.913232655 0.862542981 5.614049e-01
+  Very happy     1.0000000 1.00000000 1.000000000 1.000000000 1.000000e+00
+\end{Soutput}
+\end{Schunk}
+The conditional distribution for happiness given each health category is returned
+by \cmd{predict} as a matrix. There is a clear tendency of people being happier with better health. We now `adjust'
+for age and income
+\begin{Schunk}
+\begin{Sinput}
+R> ctm_CHFLS_4 <- ctm(b_happy, interacting = b_health, shifting = b_R, 
++                     todist = "Logistic")
+R> mlt_CHFLS_4 <- mlt(ctm_CHFLS_4, data = CHFLS, scale = TRUE, 
++                     maxit = 5000)
+R> coef(mlt_CHFLS_4)[c("R_age", "R_income")]
+\end{Sinput}
+\begin{Soutput}
+       R_age     R_income 
+0.0117390362 0.0002492703 
+\end{Soutput}
+\end{Schunk}
+Because the shift basis \code{b\_R} is negative, the effects of both age and income 
+on the happiness distribution are towards larger values of happiness, \ie older and richer
+people are happier for all health levels (this is, of course, due to the restrictive model
+not allowing interactions between health and the other two variables). The ``health-adjusted''
+log-odds ratios are now $1.0118$ for each year of age and
+$1.0002$ for each additional Yuan earned and, 
+conditional on health, people are getting happier as they get older \emph{and} richer.
+
+\subsubsection{Continuous Responses}
+
+\paragraph{Survival Analysis: GBSG-2 Trial (Cont'd)}
+
+The Cox model presented in Subsection~\ref{subsec:ltm} features one baseline
+function for all observations, an assumption which we're now going to relax. As
+a first simple example, we want to estimate two separate survivor functions 
+for the two treatment regimes in the model
+\begin{eqnarray*}
+(\pMEV, (\bern{10}(\ry)^\top \otimes
+       (\I(\text{hormonal therapy}), 1 - \I(\text{hormonal therapy})))^\top, (\parm_1^\top, \parm_2^\top)^\top)
+\end{eqnarray*}
+Here, the transformation function $\bern{10}(\ry)^\top \parm_1$ and 
+$\bern{5}(\ry)^\top \parm_2$ correspond to the untreated and treated groups,
+respectively
+\begin{Schunk}
+\begin{Sinput}
+R> b_horTh <- as.basis(GBSG2$horTh)
+R> ctm_GBSG2_4 <- ctm(B_GBSG2y, interacting = b_horTh, todistr = "MinExtrVal")
+R> mlt_GBSG2_4 <- mlt(ctm_GBSG2_4, data = GBSG2)
+\end{Sinput}
+\end{Schunk}
+The two survivor functions, along with the corresponding Kaplan-Meier estimates,
+are shown in Figure~\ref{GBSG2-strata-plot}, the low-dimensional Bernstein polynomials
+produce a nicely smoothed version of the Kaplan-Meier step-functions.
+
+\begin{figure}
+\begin{center}
+\begin{Schunk}
+
+
+{\centering \includegraphics{figure/GBSG2-strata-plot-1} 
+
+}
+
+\end{Schunk}
+\caption{GBSG-2 Trial. Estimated survivor functions 
+         by the most likely transformation model (MLT) and the Kaplan-Meier (KM) estimator in the two 
+         treatment groups. The plot reproduces
+         Figure~4 (left panel) in \cite{Hothorn_Moest_Buehlmann_2016}. \label{GBSG2-strata-plot}}
+\end{center}
+\end{figure}
+
+In a second step, we allow treatment-specific baseline hazard functions while
+estimating a constant age effect in the model 
+\begin{eqnarray*}
+(\pMEV, (\bern{5}(\ry)^\top \otimes
+       (\I(\text{hormonal therapy}), 1 - \I(\text{hormonal therapy})),
+       \text{age})^\top, (\parm_1^\top, \parm_2^\top, \beta)).
+\end{eqnarray*}
+
+This model is fitted by
+\begin{Schunk}
+\begin{Sinput}
+R> ctm_GBSG2_5 <- ctm(B_GBSG2y, interacting = b_horTh, shifting = ~ age, 
++                     data = GBSG2, todistr = "MinExtrVal")
+R> mlt_GBSG2_5 <- mlt(ctm_GBSG2_5, data = GBSG2, scale = TRUE)
+\end{Sinput}
+\end{Schunk}
+The corresponding stratified Cox model with parameter estimation based
+on the partial likelihood is
+\begin{Schunk}
+\begin{Sinput}
+R> coxph_GBSG2_5 <- coxph(Surv(time, cens) ~ age + strata(horTh), 
++                         data = GBSG2)
+R> cf <- coef(coxph_GBSG2_5)
+R> cbind(coxph = cf, mlt = coef(mlt_GBSG2_5)[names(cf)])
+\end{Sinput}
+\begin{Soutput}
+            coxph           mlt
+age -0.0003695703 -0.0004621642
+\end{Soutput}
+\end{Schunk}
+The Cox model fitted via the stratified partial likelihood (\cmd{coxph}) and
+the transformation model agree on a positive age effect $\hat{\beta}$, 
+\ie older patients seem to survive longer (note that \cmd{coxph} estimates 
+a positive shift effect as does the transformation model specified above).
+
+\subsection{Conditional Transformation Models}
+
+The most complex class of models currently supported by the \cmd{ctm} function
+allows basis functions of the form
+\begin{eqnarray*}
+\basisyx = (\basisy^\top \otimes (\basisx_1^\top,\dots, \basisx_J^\top), -\basisx_\text{shift}^\top).
+\end{eqnarray*}
+The model may include response-varying coefficients (as defined by the basis $\basisy$) corresponding
+to the bases $(\basisx_1^\top,\dots, \basisx_J^\top)$ and constant shift effects. Such a model
+is set-up using \cmd{ctm} with arguments \code{response} (basis $\basisy$), \code{interacting} (basis $(\basisx_1^\top,\dots, \basisx_J^\top)$)
+and \code{shifting} (basis $-\basisx_\text{shift}^\top$). It would be conceptually possible
+to fit conditional transformation models of the form
+\begin{eqnarray*}
+\basisyx = (\basisy_1^\top \otimes \basisx_1^\top, \dots, \basisy_J^\top \otimes \basisx_J^\top)
+\end{eqnarray*}
+with a less restrictive user interface.
+
+
+%\begin{defn}[Transformation model]
+%The triple $(\pZ, \basisy, \parm)$ is called transformation model.
+%\end{defn}
+
+\subsubsection{Discrete Responses}
+
+\paragraph{Categorical Data Analysis: Chinese Survey (Cont'd)} 
+In a series of non-proportional odds models for the conditional distribution of happiness
+we study the impact of health, age and income on happiness. Similar to the stratified
+model \code{ctm_CHFLS_3}, we estimate the conditional distribution of happiness separately
+for each health level, but instead of using a dummy coding we use treatment contrasts
+\begin{Schunk}
+\begin{Sinput}
+R> contrasts(CHFLS$R_health) <- "contr.treatment"
+R> b_health <- as.basis(~ R_health, data = CHFLS)
+R> ctm_CHFLS_5 <- ctm(b_happy, interacting = b_health, todist = "Logistic")
+R> mlt_CHFLS_5 <- mlt(ctm_CHFLS_5, data = CHFLS, scale = TRUE, 
++                     maxit = 10000, gtol = 1e-3)
+R> predict(mlt_CHFLS_5, newdata = mkgrid(mlt_CHFLS_5), type = "distribution")
+\end{Sinput}
+\begin{Soutput}
+                R_health
+R_happy               Poor   Not good        Fair        Good    Excellent
+  Very unhappy   0.1998997 0.05035989 0.008676709 0.001718209 2.923172e-06
+  Not too happy  0.5999515 0.38129693 0.154012392 0.073883787 7.602638e-02
+  Somewhat happy 0.8999885 0.93525192 0.913232582 0.862543019 5.614050e-01
+  Very happy     1.0000000 1.00000000 1.000000000 1.000000000 1.000000e+00
+\end{Soutput}
+\begin{Sinput}
+R> logLik(mlt_CHFLS_5)
+\end{Sinput}
+\begin{Soutput}
+'log Lik.' -1192.227 (df=15)
+\end{Soutput}
+\end{Schunk}
+The log-likelihood and the fitted distribution are, of course, equivalent but the parameters
+allow a direct interpretation of the effect of health relative to the baseline 
+category \code{Poor}. In a second step, we fit a non-proportional odds model where the 
+effects of age and income are allowed to vary with happiness
+\begin{Schunk}
+\begin{Sinput}
+R> b_R <- as.basis(~ R_age + R_income, data = CHFLS, remove_intercept = TRUE)
+R> ctm_CHFLS_6 <- ctm(b_happy, interacting = b_R, todist = "Logistic")  
+R> mlt_CHFLS_6 <- mlt(ctm_CHFLS_6, data = CHFLS, scale = TRUE,
++                     maxit = 5000, gtol = 1e-3)
+R> logLik(mlt_CHFLS_6)
+\end{Sinput}
+\begin{Soutput}
+'log Lik.' -1359.731 (df=6)
+\end{Soutput}
+\end{Schunk}
+and finally we include all three variables (health, age and income) allowing 
+happiness-varying effects as
+\begin{Schunk}
+\begin{Sinput}
+R> ctm_CHFLS_7 <- ctm(b_happy, interacting = c(h = b_health, R = b_R), 
++      todist = "Logistic")  
+R> mlt_CHFLS_7 <- mlt(ctm_CHFLS_7, data = CHFLS, scale = TRUE,
++                     maxit = 10000, gtol = 1e-3)
+R> logLik(mlt_CHFLS_7)
+\end{Sinput}
+\begin{Soutput}
+'log Lik.' -1182.779 (df=21)
+\end{Soutput}
+\end{Schunk}
+Overall, we get
+\begin{Schunk}
+\begin{Sinput}
+R> c("1" = AIC(mlt_CHFLS_1), "2" = AIC(mlt_CHFLS_2), "3" = AIC(mlt_CHFLS_3),
++    "4" = AIC(mlt_CHFLS_4), "5" = AIC(mlt_CHFLS_5), "6" = AIC(mlt_CHFLS_6),
++    "7" = AIC(mlt_CHFLS_7))
+\end{Sinput}
+\begin{Soutput}
+       1        2        3        4        5        6        7 
+2662.483 2654.042 2414.453 2404.135 2414.453 2731.461 2407.559 
+\end{Soutput}
+\end{Schunk}
+and it seems the proportional-odds model with health stratum (\code{mlt_CHFLS_4}) performs best.
+
+\paragraph{Categorical Data Analysis: Iris Data}
+
+For an unordered response in a multi-class problem, the conditional distribution 
+can be estimated using a multinomial regression. In a non-proportional odds
+model allowing response-specific regression coefficients, the ordering of the response
+levels only affects the corresponding regression coefficients but the fitted density
+is invariant with respect to the ordering applied as a comparison with
+\cmd{multinom} from package \pkg{nnet} \citep{Venables_Ripley_2002,pkg:nnet} for the iris data shows
+\begin{Schunk}
+\begin{Sinput}
+R> fm_iris <- Species ~ Sepal.Length + Sepal.Width + 
++                       Petal.Length + Petal.Width
+R> multinom_iris <- nnet::multinom(fm_iris, data = iris, trace = FALSE)
+R> logLik(multinom_iris)
+\end{Sinput}
+\begin{Soutput}
+'log Lik.' -5.949867 (df=10)
+\end{Soutput}
+\begin{Sinput}
+R> iris$oSpecies <- ordered(iris$Species)
+R> b_Species <- as.basis(iris$oSpecies)
+R> ctm_iris <- ctm(b_Species, 
++                  interacting = as.basis(fm_iris[-2L], data = iris), 
++                  todistr = "Logistic")
+R> mlt_iris <- mlt(ctm_iris, data = iris, scale = TRUE)
+R> logLik(mlt_iris)
+\end{Sinput}
+\begin{Soutput}
+'log Lik.' -5.949436 (df=10)
+\end{Soutput}
+\begin{Sinput}
+R> p1 <- predict(mlt_iris, newdata = iris, q = sort(unique(iris$oSpecies)), 
++                type = "density")
+R> p2 <- predict(multinom_iris, newdata = iris, type = "prob")
+R> max(abs(t(p1) - p2))
+\end{Sinput}
+\begin{Soutput}
+[1] 0.001173088
+\end{Soutput}
+\end{Schunk}
+
+\subsubsection{Continuous Responses}
+
+\paragraph{Survival Analysis: GBSG-2 Trial (Cont'd)}
+
+The Cox model for the comparison of the survivor distribution between the
+untreated and treated group assuming proportional hazards, \ie the model
+$(\pMEV, (\bern{5}^\top, \I(\text{hormonal therapy}))^\top, (\parm_1^\top, \beta)^\top)$,
+implements the transformation function $\h(\ry | \text{treatment}) =
+\bern{5}(\ry)^\top \parm_1 + \I(\text{hormonal therapy}) \beta$ where
+$\bern{5}^\top \parm_1$ is the log-cumulative baseline hazard function
+parameterised by a Bernstein polynomial and $\beta \in \RR$ is the
+log-hazard ratio of hormonal therapy.  The choice $M = 5$ is used to exactly
+reproduce the results presented in \cite{Hothorn_Moest_Buehlmann_2016}
+\begin{Schunk}
+\begin{Sinput}
+R> B_GBSG2y_5 <- Bernstein_basis(var = GBSG2y, order = 5, ui = "increasing")
+R> ctm_GBSG2_6 <- ctm(B_GBSG2y_5, shifting = ~ horTh, data = GBSG2, 
++                     todistr = "MinExtrVal")
+R> mlt_GBSG2_6 <- mlt(ctm_GBSG2_6, data = GBSG2)
+\end{Sinput}
+\end{Schunk}
+
+This is the classical Cox model with one treatment parameter $\beta$ 
+but fully parameterised baseline transformation function which was fitted by the exact
+log-likelihood under five linear constraints. The model assumes proportional hazards, 
+an assumption whose
+appropriateness we want to assess using the non-proportional hazards model
+$(\pMEV, (\bern{5}^\top \otimes (1, \I(\text{hormonal therapy})))^{\top}, \parm)$ with
+transformation function 
+\begin{eqnarray*}
+\h(\ry | \text{treatment}) = \bern{5}(\ry)^\top \parm_1 + \I(\text{hormonal therapy}) \bern{5}(\ry)^\top \parm_2. 
+\end{eqnarray*}
+The function $\bern{5}^\top \parm_2$ is the time-varying treatment effect
+and can be interpreted as the deviation, on the scale of the transformation
+function, induced by the hormonal therapy.  Under the null hypothesis of no
+treatment effect, we would expect $\parm_2 \equiv \bold{0}$.  This monotone
+deviation function adds five linear constraints to the model. 
+Figure~\ref{GBSG2-deviation-plot} shows the time-varying treatment effect
+$\bern{5}^\top \hat{\parm}_{2, N}$, together with a $95\%$ confidence band
+(see Section~\ref{sec:asympt} for a description of the method). The $95\%$
+confidence interval around the log-hazard ratio $\hat{\beta}$ is plotted in
+addition and since the latter is fully covered by the confidence band for
+the time-varying treatment effect there is no reason to question the
+treatment effect computed under the proportional hazards assumption.
+
+\begin{Schunk}
+\begin{Sinput}
+R> b_horTh <- as.basis(~ horTh, data = GBSG2)
+R> ctm_GBSG2_7 <- ctm(B_GBSG2y_5, interacting = b_horTh, 
++                     todistr = "MinExtrVal")
+R> mlt_GBSG2_7 <- mlt(ctm_GBSG2_7, data = GBSG2)
+\end{Sinput}
+\end{Schunk}
+
+\begin{figure}
+\begin{center} 
+\begin{Schunk}
+
+
+{\centering \includegraphics{figure/GBSG2-deviation-plot-1} 
+
+}
+
+\end{Schunk}
+\caption{GBSG-2 Trial. Verification of proportional hazards: The log-hazard ratio $\hat{\beta}$
+         (dashed line) with $95\%$ confidence interval (dark grey) is fully 
+         covered by a $95\%$ confidence band for the time-varying treatment effect (light grey,
+         the estimate is the solid line)
+         computed from a non-proportional hazards model. 
+         The plot reproduces
+         Figure~4 (right panel) in \cite{Hothorn_Moest_Buehlmann_2016}. \label{GBSG2-deviation-plot}}
+\end{center}
+\end{figure}   
+
+In a second step, we allow an age-varying treatment effect 
+in the model $(\pMEV, (\bern{5}(\ry)^\top \otimes
+       (\I(\text{hormonal therapy}), 1 - \I(\text{hormonal therapy}))
+       \otimes \bernx{5}(\text{age})^\top)^\top, \parm)$. For both treatment
+groups, we estimate a conditional transformation function of survival time
+$\ry$ given age parameterised as the tensor basis of two Bernstein bases. Each of the
+two basis functions comes with $5 \times 6$ linear constraints, so the model
+was fitted under $60$ linear constraints
+%% <FIXME> use quantile(.1, .9) instead of range for age??? </FIXME>
+\begin{Schunk}
+\begin{Sinput}
+R> var_a <- numeric_var("age", support = range(GBSG2$age))
+R> B_age <- Bernstein_basis(var_a, order = 3)
+R> b_horTh <- as.basis(GBSG2$horTh)
+R> ctm_GBSG2_8 <- ctm(B_GBSG2y_5, 
++                     interacting = b(horTh = b_horTh, age = B_age), 
++                     todistr = "MinExtrVal")
+R> mlt_GBSG2_8  <- mlt(ctm_GBSG2_8, data = GBSG2)
+\end{Sinput}
+\end{Schunk}
+Figure~\ref{fig:GBSG2-8-plot} allows an assessment of the prognostic and
+predictive properties of age.  As the survivor functions are clearly larger
+under hormonal treatment for all patients, the positive treatment effect
+applies to all patients.  However, the size of the treatment effect varies
+greatly.  For women younger than $30$, the effect is most pronounced and
+levels-off a little for older patients.  In general, the survival times are
+longest for women between $40$ and $60$ years old.  Younger women suffer
+the highest risk; for women older than $60$ years, the risk starts to
+increase again.  This effect is shifted towards younger women by the
+application of hormonal treatment.
+
+\begin{figure}
+\begin{center}
+\begin{Schunk}
+
+
+{\centering \includegraphics{figure/GBSG2-8-plot-1} 
+
+}
+
+\end{Schunk}
+\caption{GBSG-2 Trial. Prognostic and predictive effect of age. The contours depict the
+         conditional survivor functions given treatment and age of the patient. 
+         The plot reproduces
+         Figure~5 in \cite{Hothorn_Moest_Buehlmann_2016}.
+         \label{fig:GBSG2-8-plot}}
+\end{center}
+\end{figure}
+
+\paragraph{Quantile Regression: Head Circumference}
+
+The Fourth Dutch Growth Study \citep{Fredriks_Buuren_Burgmeijer_2000} is a
+cross-sectional study on growth and development of the Dutch population
+younger than $22$ years.  \cite{Stasinopoulos_Rigby_2007} fitted a growth
+curve to head circumferences (HC) of $7040$ boys using a GAMLSS model with a
+Box-Cox $t$ distribution describing the first four moments of head
+circumference conditionally on age.  The model showed evidence of kurtosis,
+especially for older boys.  We fit the same growth curves by the
+conditional transformation model $(\Phi, (\bern{3}(\text{HC})^\top \otimes
+\bernx{3}(\text{age}^{1/3})^\top)^\top, \parm)$ by maximisation of the
+approximate log-likelihood under $3 \times 4$ linear constraints
+\begin{Schunk}
+\begin{Sinput}
+R> data("db", package = "gamlss.data")
+R> db$lage <- with(db, age^(1/3))
+R> var_head = numeric_var("head", support = quantile(db$head, c(.1, .9)),
++                         bounds = range(db$head))
+R> B_head <- Bernstein_basis(var_head, order = 3, ui = "increasing")
+R> var_lage <- numeric_var("lage", support = quantile(db$lage, c(.1, .9)),
++                          bounds = range(db$lage))
+R> B_age <- Bernstein_basis(var_lage, order = 3, ui = "none")
+R> ctm_head <- ctm(B_head, interacting = B_age)
+R> mlt_head <- mlt(ctm_head, data = db, maxit = 5000, scale = TRUE)
+\end{Sinput}
+\end{Schunk}
+Figure~\ref{fig:head-plot} shows the
+data overlaid with quantile curves obtained via inversion of the estimated
+conditional distributions.  The figure very closely reproduces the growth
+curves presented in Figure~16 of \cite{Stasinopoulos_Rigby_2007} and also
+indicates a certain asymmetry towards older boys.
+
+\begin{figure}
+\begin{center}
+\begin{Schunk}
+
+
+{\centering \includegraphics{figure/head-plot-1} 
+
+}
+
+\end{Schunk}
+\caption{Head Circumference Growth. Observed head circumference and age for
+         $7040$ boys with estimated quantile curves for
+         $\tau = 0.04, 0.02, 0.1, 0.25, 0.5, 0.75, 0.9, 0.98, 0.996$.
+         The plot reproduces
+         Figure~3 in \cite{Hothorn_Moest_Buehlmann_2016}.
+         \label{fig:head-plot}}
+\end{center}
+\end{figure}
+
+\paragraph{Non-normal Linear Regression: Boston Housing Data (Cont'd)}
+
+A response-varying coefficient model, also called distribution regression \citep{Foresi_Peracchi_1995,
+Chernozhukov_2013,Koenker_Leorato_Peracchi_2013}, for the Boston Housing data is 
+\begin{eqnarray*}
+\Prob(\text{medv} \le \ry | \rX = \rx) & = &  
+  \Phi\left(\h_\rY(\ry) - \sum_{j = 1}^J \shiftparm_j(\text{medv}) \tilde{\rx}_j\right) \\
+& = & \Phi\left(\bern{6}(\ry)^\top \parm_1 - \sum_{j = 1}^J \bern{6}(\ry)^\top \parm_{j + 1} \tilde{\rx}_j\right)
+\end{eqnarray*}
+The model is implemented using the basis function 
+$\basisyx = (\bern{6}^\top \otimes (1, \tilde{\rx}^\top))^\top$. Conditional on $\rx$, the transformation
+function must be monotone increasing for all configurations of the explanatory variables
+(argument \code{sumconstr} in \cmd{cmt}). Because the number of linear constraints is very
+large depending on the number of explanatory variables, it makes sense to restrict all functions 
+to be monotone (\code{sumconstr = FALSE})
+\begin{Schunk}
+\begin{Sinput}
+R> b_BH_s <- as.basis(fm_BH[-2L], data = BostonHousing2, scale = TRUE)
+R> ctm_BHi <- ctm(B_m, interacting = b_BH_s, sumconstr = FALSE)
+R> mlt_BHi <- mlt(ctm_BHi, data = BostonHousing2, scale = TRUE, 
++                 maxit = 5000, gtol = 1e-3)
+R> logLik(mlt_BHi)
+\end{Sinput}
+\begin{Soutput}
+'log Lik.' -1274.367 (df=98)
+\end{Soutput}
+\begin{Sinput}
+R> AIC(mlt_BHi)
+\end{Sinput}
+\begin{Soutput}
+[1] 2744.734
+\end{Soutput}
+\begin{Sinput}
+R> AIC(mlt_BH)
+\end{Sinput}
+\begin{Soutput}
+[1] 2689.396
+\end{Soutput}
+\end{Schunk}
+Figure~\ref{fig:Boston-Housing-dr-plot} compares the fitted densities for the linear transformation
+model with constant regression coefficients \code{mlt_BH} and this distribution regression model \code{mlt_BHi}. For some
+observations, the variance of the conditional distribution funtions seems to be smaller in this
+more complex model. The model fit, however, seems to be better for the model \code{mlt_BH} with
+constant regression coefficients, at least when measured by AIC.
+
+\begin{figure}
+\begin{center}
+\begin{Schunk}
+
+
+{\centering \includegraphics{figure/Boston-Housing-dr-plot-1} 
+
+}
+
+\end{Schunk}
+\caption{Boston Housing. Fitted conditional densities for the linear transformation model
+         with constant regression coefficients (left) and the response-varying
+         coefficient model (right).
+         \label{fig:Boston-Housing-dr-plot}}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Count Responses}
+
+Finally, we study a transformation model with response-varying coefficients
+for count data.
+
+\paragraph{Analysis of Count Data: Tree Pipit Counts}
+
+\cite{Mueller_Hothorn_2004} reported data on the number of tree pipits
+\textit{Anthus trivialis}, a small passerine bird, counted on $86$ forest plots at a light gradient
+ranging from open and sunny stands (small cover storey) to dense and dark
+stands (large cover storey).  We model the conditional distribution of the
+number of tree pipits at one plot given the cover storey at this plot 
+by the transformation
+model $(\Phi, (\basisy^\top \otimes \bernx{4}(\text{cover storey})^\top)^\top,
+\parm)$, where $\basisy(y) = \evec_5(y + 1), y = 0, \dots, 4$; the model
+is fitted under $4 \times 5$ linear constraints. In this
+model for count data, the conditional distribution depends on
+both the number of counted birds and the cover storey and the effect of
+cover storey may change with different numbers of birds observed
+%% <FIXME> var ordered </FIXME>
+\begin{Schunk}
+\begin{Sinput}
+R> data("treepipit", package = "coin")
+R> tmp <- treepipit
+R> tmp$counts <- ordered(tmp$counts)
+R> ### we want
+R> #tmp$counts <- R(tmp$counts)
+R> #cv <- numeric_var("counts", support = 0:5)
+R> B_cs <- Bernstein_basis(var = numeric_var("coverstorey", support = 1:110), 
++                          order = 4)
+R> B_c <- as.basis(tmp$counts)
+R> ctm_treepipit <- ctm(B_c, interacting = B_cs)
+R> mlt_treepipit <- mlt(ctm_treepipit, data = tmp, maxit = 10000, 
++                       gtol = 1e-3)
+\end{Sinput}
+\end{Schunk}
+The left
+panel of Figure~\ref{fig:treepipit-plot} depicts the observations and the
+center panel shows the conditional distribution function evaluated for $0,
+\dots, 5$ observed birds.  The conditional distribution function obtained
+from a generalised additive Poisson (GAM) model with smooth mean effect of cover
+storey \citep[computed using \pkg{mgcv},][]{Wood_2006,pkg:mgcv} is given in the right panel  
+\begin{Schunk}
+\begin{Sinput}
+R> gam_treepipit <- gam(counts ~ s(coverstorey), data = treepipit, 
++                       family = "poisson")
+\end{Sinput}
+\end{Schunk}
+Despite some overfitting, this model is
+more restrictive than our transformation model because one mean function determines the whole distribution
+(the local minima of the conditional distributions as a function of cover storey are
+constant in the right panel whereas they are shifted towards higher values of
+cover storey in the center panel).
+
+\begin{figure}
+\begin{center}
+\begin{Schunk}
+
+
+{\centering \includegraphics{figure/treepipit-plot-1} 
+
+}
+
+\end{Schunk}
+\caption{Tree Pipit Counts. Observations (left panel, the size of the points is
+         proportional to the number of observations) and estimated conditional distribution
+         of number of tree pipits given cover storey by the most likely transformation model (MLT, center panel)
+         and a generalised additive Poisson model (function \cmd{gam} in package \pkg{mgcv}, 
+         GAM, right panel). The plot reproduces
+         Figure~7 in \cite{Hothorn_Moest_Buehlmann_2016}. \label{fig:treepipit-plot}}
+\end{center}
+\end{figure}
+
+
+\section{Most Likely Transformations} \label{sec:mlt}
+
+In this Section we review the underpinnings of the \cmd{mlt} function 
+implementing the \emph{most likely transformation} estimator following
+\cite{Hothorn_Moest_Buehlmann_2016} closely.
+For a given transformation function $h$, the likelihood contribution of a
+datum $\esAY = (\ubar{\ry},\bar{\ry}] \in \sAY$ is defined in terms of the
+distribution function \citep{Lindsey_1996}: 
+\begin{eqnarray*} 
+\lik(\h | \rY \in \esAY) := \int_{\esAY} \dY(y | \h) d\measureY(y) =
+\pZ(\h(\bar{\ry})) - \pZ(\h(\ubar{\ry})).
+\end{eqnarray*}
+This ``exact'' definition of the likelihood applies to most practically interesting
+situations and, in particular, allows discrete and (conceptually) continuous as well as
+censored or truncated observations $\esAY$. For a discrete response $\ry_k$ we have $\bar{\ry} = \ry_k$ and $\ubar{\ry}
+= \ry_{k -1}$ such that $\lik(\h | \rY = \ry_k) = \dY(\ry_k | \h) =
+\pZ(\h(\bar{\ry})) - \pZ(\h(\ubar{\ry}))$.  For absolutely continuous random
+variables $\rY$ we always practically observe an imprecise datum $(\ubar{\ry},\bar{\ry}]
+\subset \RR$ and, for short intervals $(\ubar{\ry},\bar{\ry}]$, approximate
+the exact likelihood $\lik(\h | \rY \in (\ubar{\ry},\bar{\ry}])$ by the term
+$(\bar{\ry} - \ubar{\ry}) \dY(\ry | \h)$ or simply $\dY(\ry | \h)$ with $\ry
+= (\ubar{\ry} + \bar{\ry})/2$ \citep{Lindsey_1999}. This approximation only
+works for relatively precise measurements, \ie short intervals. If longer intervals 
+are observed, one speaks of ``censoring'' and relies on the exact definition
+of the likelihood contribution instead of using the above approximation \citep{Klein_Moeschberger_2003}. 
+In summary, the likelihood contribution of a conceptually ``exact
+continuous'' or left, right or interval-censored continuous or discrete 
+observation $(\ubar{\ry}, \bar{\ry}]$ is given by 
+\begin{eqnarray*}
+\lik(\h | \rY \in (\ubar{\ry}, \bar{\ry}]) \left\{ \begin{array}{ll}
+    \approx \dZ(\h(\ry)) \h^\prime(\ry) & \ry = (\ubar{\ry} + \bar{\ry})/2 \in \samY \quad \text{```exact continuous'''}\\
+    = 1 - \pZ(\h(\ubar{\ry})) & \ry \in (\ubar{\ry}, \infty) \cap \samY \quad \text{`right-censored'} \\
+    = \pZ(\h(\bar{\ry})) & \ry \in (-\infty, \bar{\ry}] \cap \samY \quad \text{`left-censored'} \\
+    = \pZ(\h(\bar{\ry})) - \pZ(\h(\ubar{\ry})) & \ry \in (\ubar{\ry},\bar{\ry}] \cap \samY \quad    \text{`interval-censored',}
+\end{array} \right. 
+\end{eqnarray*}
+under the assumption of random censoring.
+The likelihood is more complex under dependent censoring
+\citep{Klein_Moeschberger_2003} but this is is not covered by the \pkg{mlt} implementation. 
+The likelihood contribution $\lik(\h | \rY \in (\ry_k, \ry_{k-1}])$
+of an ordered factor in category $\ry_k$ is equivalent to the term 
+$\lik(\h | \rY \in (\ubar{\ry}, \bar{\ry}])$
+contributed by an interval-censored observation $(\ubar{\ry},\bar{\ry}]$
+when category $\ry_k$ was defined by the interval $(\ubar{\ry},\bar{\ry}]$. Thus,
+the expression $\pZ(\h(\bar{\ry})) - \pZ(\h(\ubar{\ry}))$ for the likelihood
+contribution reflects the equivalence of interval-censoring 
+and categorisation at corresponding cut-off points. 
+
+For truncated observations in the interval $(\ry_l, \ry_r] \subset \samY$,
+the above likelihood contribution is defined in terms of the 
+distribution function conditional on the truncation
+\begin{eqnarray*}
+\pY(\ry | \rY \in (\ry_l, \ry_r]) = \pZ(\h(\ry) | \rY \in (\ry_l, \ry_r]) = 
+\frac{\pZ(\h(\ry))}{\pZ(\h(\ry_r)) - \pZ(\h(\ry_l))}  
+\quad \forall \ry \in (\ry_l, \ry_r]
+\end{eqnarray*}
+and thus the likelihood contribution changes to \citep{Klein_Moeschberger_2003}
+\begin{eqnarray*}
+\frac{\lik(\h | \rY \in (\ubar{\ry}, \bar{\ry}])}{\pZ(\h(\ry_r)) -
+\pZ(\h(\ry_l))} = \frac{\lik(\h | \rY \in (\ubar{\ry}, \bar{\ry}])}{\lik(\h
+| \rY \in (\ry_l, \ry_r])} \quad \text{when } \ry_l < \ubar{\ry} < \bar{\ry} \le \ry_r.
+\end{eqnarray*}
+It is important to note that the likelihood is always \textit{defined} in
+terms of a distribution function \citep{Lindsey_1999} and it therefore makes
+sense to directly model the distribution function of interest.  The ability
+to uniquely characterise this distribution function by the
+transformation function $\h$ gives rise to the following definition of an
+estimator $\hat{\h}_N$. For an independent sample of possibly
+censored or truncated observations $\esAY_1, \dots, \esAY_N$ 
+from $\Prob_\rY$ the estimator
+\begin{eqnarray*}
+\hat{\h}_N := \argmax_{\tilde{\h} \in \hs} \sum_{i = 1}^{N} \log(\lik(\tilde{\h} |
+\rY \in \esAY_i)) 
+\end{eqnarray*}
+is called the most likely transformation (MLT). In \pkg{mlt}, we
+parameterise the transformation function $\h(\ry)$ as a linear function of
+its basis-transformed argument $\ry$ using a basis function $\basisy: \samY
+\rightarrow \RR^\dimparm$ such that $\h(\ry) = \basisy(\ry)^\top \parm,
+\parm \in \RR^\dimparm$.  The choice of the basis function $\basisy$ is
+problem-specific, examples are discussed in Section~\ref{sec:trafo}.  In the conditional
+case we use the basis $\basisyx(\ry, \rx)$ instead of $\basisy(\ry)$. The
+likelihood $\lik$ only requires evaluation of $\h$, and only an
+approximation thereof using the Lebesgue density of ``exact continuous''
+observations makes the evaluation of the first derivative of $\h(\ry)$ with
+respect to $\ry$ necessary.  In this case, the derivative with respect to
+$\ry$ is given by $\h^\prime(\ry) = \basisy^\prime(\ry)^\top \parm$ and we
+assume that $\basisy^\prime$ is available.  In the following we write $\h =
+\basisy^\top \parm$ and $\h^\prime = {\basisy^\prime}^\top \parm$ for the
+transformation function and its first derivative omitting the argument $\ry$
+and we assume that both functions are bounded away from $-\infty$ and
+$\infty$. For the basis functions discussed in Section~\ref{sec:trafo}, the 
+constraint $\parm \in \Theta$ can be written as $\mC \parm \ge \bold{0}$, thus
+the solution to the optimisation problem
+\begin{eqnarray*}
+\hat{\parm}_N := \argmax_{\mC \parm \ge \bold{0}} \sum_{i = 1}^N
+\log(\lik(\basisy^\top \parm | \rY \in \esAY_i))
+\end{eqnarray*}
+is the maximum likelihood estimator. The plug-in estimator for the most
+likely transformation is $\hat{\h}_N := \basisy^\top \hat{\parm}_N$.  
+
+The gradient is available from the score functions.
+The score contribution of an ``exact continuous'' 
+observation $\ry = (\ubar{\ry} +
+\bar{\ry})/2$ from an absolutely continuous distribution is approximated by the
+gradient of the log-density
+\begin{eqnarray*}
+\s(\parm | \rY \in (\ubar{\ry}, \bar{\ry}]) \approx
+\frac{\partial \log(\dY(\ry | \parm))}{\partial \parm} & = & 
+\frac{\partial \log(\dZ(\basisy(\ry)^\top \parm))) +
+\log({\basisy^\prime(\ry)}^\top \parm)}{\partial \parm} \nonumber \\
+& = & \basisy(\ry) \frac{\dZ^\prime(\basisy(\ry)^\top \parm)}{\dZ(\basisy(\ry)^\top \parm)}
+    + \frac{\basisy^\prime(\ry)}{{\basisy^\prime(\ry)}^\top \parm}. \label{f:s_exact}
+\end{eqnarray*}
+For an interval-censored or discrete observation $\ubar{\ry}$ and
+$\bar{\ry}$ (the constant terms $\pZ(\basisy(\pm \infty)^\top \parm) =
+\pZ(\pm \infty) = 1$ or $0$ vanish) the score contribution is
+\begin{eqnarray*}
+\s(\parm | \rY \in (\ubar{\ry}, \bar{\ry}]) & = & \frac{\partial \log(\lik(\basisy^\top \parm | \rY \in (\ubar{\ry},
+\bar{\ry}]))}{\partial \parm} \nonumber \\
+& = & \frac{\partial \log(\pZ(\basisy(\bar{\ry})^\top \parm) - \pZ(\basisy(\ubar{\ry})^\top \parm))}{\partial \parm}  \nonumber \\
+& = & \frac{\dZ(\basisy(\bar{\ry})^\top \parm)\basisy(\bar{\ry}) - \dZ(\basisy(\ubar{\ry})^\top
+\parm) \basisy(\ubar{\ry})}{\pZ(\basisy(\bar{\ry})^\top \parm) - \pZ(\basisy(\ubar{\ry})^\top
+\parm)}. \label{f:s_interval}
+\end{eqnarray*}
+For a truncated observation, the score function is $\s(\parm | \rY \in
+(\ubar{\ry}, \bar{\ry}]) - \s(\parm | \rY \in (\ry_l, \ry_r])$.
+%\begin{eqnarray*}
+%\frac{\partial -\log[\pZ(\basisy(\ry_r)^\top \parm) - \pZ(\basisy(\ry_l)^\top
+%\parm)]}{\partial \parm} & = &
+%-\frac{\dZ(\basisy(\ry_r)^\top \parm)\basisy(\ry_r) - \dZ(\basisy(\ry_l)^\top \parm)\basisy(\ry_l)}
+%     {\pZ(\basisy(\ry_r)^\top \parm) - \pZ(\basisy(\ry_l)^\top \parm)}
+%\end{eqnarray*}
+%has to be added to the score contribution $\s(\parm | \rY \in (\ubar{\ry},
+%\bar{\ry}])$.
+
+The \cmd{mlt} function uses the convenience interface \cmd{BB} to the spectral
+projected gradient method implemented in the \code{spg()} function of
+package \pkg{BB} \citep{Varadhan_Gilbert_2009, pkg:BB} for maximising this
+log-likelihood.  Starting values are obtained from an estimate of the
+unconditional distribution function $\Prob(\rY \le \ry)$ (for example, the
+empricial cumulative distribtion function, a Kaplan-Meier or Turnbull estimate) via a
+(constrained) linear regression of $Z = \pZ^{-1}(\Prob(\rY \le \ry))$ on the
+design matrix of the transformation model. Optionally, columns of the
+underlying model matrices are scaled to $[-1, 1]$ (argument \code{scale = TRUE}
+to \cmd{mlt}) which leads to considerable faster optimisation in many cases.
+Additional arguments (\code{...}) to \cmd{mlt}, such as the maximum number of iterations 
+\code{maxit}, are given to \cmd{spg}.
+
+
+\section{Transformation Analysis} \label{sec:predict}
+
+Based on the maximum likelihood estimator $\hat{\parm}_N$ and the most
+likely transformation is $\hat{\h}_N$, transformation models can be analysed on different scales.
+Plug-in estimators for the distribution and cumulative hazard functions are given by $\hatpY = \pZ
+\circ \basisy^\top \hat{\parm}_N$ and $\hatHazY = -\log(1 - \hatpY)$.  For a
+continuous model, the density is given by $\hatdY = \dZ \circ \basisy^\top
+\hat{\parm}_N \times {\basisy^\prime}^\top \hat{\parm}_N$ and the 
+quantile function is obtained by numerical inversion of the distribution
+function. For a discrete model
+we get $\hatdY(\ry_k) = \pZ(\basisy(\ry_k)^\top \hat{\parm}_N) - 
+\pZ(\basisy(\ry_{k - 1})^\top \hat{\parm}_N)$ (with $\pZ(\basisy(\ry_{0})^\top \hat{\parm}_N) := 0$ and
+$\pZ(\basisy(\ry_{K})^\top \hat{\parm}_N) := 1$). The hazard function is 
+$\hathazY = \hatdY / (1 - \hatpY)$.
+
+The \cmd{predict} method for \code{mlt} objects is the main user interface 
+for the evaluation of these functions, the type of which is selected
+by its \code{type} argument. Conceptually, all functions are evaluated
+on the support of $\rY$, \ie on a grid $\ry_1, \dots, \ry_K$ 
+(arguments \code{q} for the vector of grid poins or \code{K} for the number
+of grid point to be generated) for continuous 
+responses for observations with explanatory variables as given in the
+\code{newdata} argument. That means the transformation function
+\begin{eqnarray*}
+\hat{\h}_N(\ry_k | \rx_i) = \basisyx(\ry_k, \rx_i)^\top \hat{\parm}_N, 
+\quad k = 1, \dots, K; i = 1, \dots, N_\text{new}
+\end{eqnarray*}
+is evaluated for potentially large numbers $K$ ad $N_\text{new}$ by \cmd{predict}
+and it returned as a $K \times N_\text{new}$ matrix. Because in the
+most general case of a conditional distribution function the transformation
+function is 
+\begin{eqnarray*}
+\hat{\h}_N(\ry_k | \rx_i) = 
+(\basisy_1(\ry_k)^\top \otimes (\basisx_1(\rx_i)^\top,\dots, \basisx(\rx_i)_J^\top), -\basisx(\rx_i)_\text{shift}^\top)^\top \hat{\parm}_N
+\end{eqnarray*}
+with $\mA$ being the matrix with rows $\basisy_1(\ry_k)$ for $k = 1, \dots, K$, 
+$\mB$ the matrix with rows $(-\basisx_1(\rx_i)^\top,\dots, \basisx(\rx_i)_J^\top)$
+for $i = 1, \dots, N_\text{new}$ and $\mB_\text{shift}$ the matrix with rows 
+$\basisx(\rx_i)^\top$ for $i = 1, \dots, N_\text{new}$, the transformation function can
+be simultaneously evaluated for all $k = 1, \dots, K$ and $i = 1, \dots, N_\text{new}$ as
+\begin{eqnarray*}
+(\mA \otimes \mB | \bold{1}_K \otimes \mB_\text{shift})^\top \hat{\parm}_N.
+\end{eqnarray*}
+This product is in the special form of an array model \citep{Currie_Durban_Eilers_2006} and
+can be computed very quickly using the tricks described by \cite{Currie_Durban_Eilers_2006}.
+
+
+\section{Classical Likelihood Inference} \label{sec:asympt}
+
+Because the problem of estimating an unknown distribution function is now
+embedded in the maximum likelihood framework, the asymptotic analysis
+benefits from standard results on the asymptotic behaviour of maximum
+likelihood estimators.  The contribution of an ``exact continuous''
+observation $\ry$ from an absolutely continuous distribution to the Fisher
+information is approximately
+\begin{eqnarray*}
+\mF(\parm | \rY \in (\ubar{\ry}, \bar{\ry}]) & \approx & 
+-\frac{\partial^2 \log(\dY(\ry | \parm))}{\partial \parm
+\partial \parm^\top} \nonumber \\
+& = & - \left(
+\basisy(\ry) \basisy(\ry)^\top \left\{
+    \frac{\dZ^{\prime\prime}(\basisy(\ry)^\top \parm)}{\dZ(\basisy(\ry)^\top \parm)}
+   -\left[\frac{\dZ^{\prime}(\basisy(\ry)^\top \parm)}{\dZ(\basisy(\ry)^\top \parm)}\right]^2\right\}
+   - \frac{\basisy^\prime(\ry){\basisy^\prime(\ry)}^\top}{{(\basisy^\prime(\ry)}^\top\parm)^2}\right). \label{f:F_exact}
+\end{eqnarray*}
+For a censored or discrete observation, we have the following
+contribution to the Fisher information
+\begin{eqnarray*}
+\mF(\parm | \rY \in (\ubar{\ry}, \bar{\ry}]) & = & -\frac{\partial^2 \log(\lik(\basisy^\top \parm |
+\rY \in (\ubar{\ry}, \bar{\ry}]))}{\partial \parm \partial \parm^\top} \nonumber \\
+& = & 
+- \left\{\frac{\dZ^\prime(\basisy(\bar{\ry})^\top \parm)\basisy(\bar{\ry})\basisy(\bar{\ry})^\top -
+      \dZ^\prime(\basisy(\ubar{\ry})^\top \parm) \basisy(\ubar{\ry}) \basisy(\ubar{\ry})^\top}
+     {\pZ(\basisy(\bar{\ry})^\top \parm) - \pZ(\basisy(\ubar{\ry})^\top \parm)}
+\right. \label{f:F_interval} \\
+& &  \quad -\frac{[\dZ(\basisy(\bar{\ry})^\top \parm)\basisy(\bar{\ry}) - 
+       \dZ(\basisy(\ubar{\ry})^\top \parm) \basisy(\ubar{\ry})] }
+     {[\pZ(\basisy(\bar{\ry})^\top \parm) - \pZ(\basisy(\ubar{\ry})^\top \parm]^2} \times \nonumber \\
+& & \left. \qquad      [\dZ(\basisy(\bar{\ry})^\top \parm)\basisy(\bar{\ry})^\top - 
+       \dZ(\basisy(\ubar{\ry})^\top \parm) \basisy(\ubar{\ry})^\top]
+\right\}. \nonumber
+\end{eqnarray*}
+For a truncated observation, the Fisher information is given by
+$\mF(\parm | \rY \in (\ubar{\ry}, \bar{\ry}]) - \mF(\parm | \rY \in (\ry_l,
+\ry_r])$.
+
+In particular, we can construct confidence
+intervals and confidence bands for the conditional distribution function
+from confidence intervals and bands for the linear functions $\basisy^\top
+\parm$. 
+
+\paragraph{Categorical Data Analysis: Chinese Survey (Cont'd)}
+
+For the proportional odds model for happiness given age and income, we compare the score function 
+\citep[using the \cmd{estfun} method from package \pkg{sandwich},][]{Zeileis_2004,pkg:sandwich} and the standard errors of the
+regression coefficients. The positive effect of income is ``significant'' by standard measures
+\citep[the classical coefficient table was obtained using \cmd{cftest} from package 
+\pkg{multcomp},][]{Hothorn_Bretz_Westfall_2008,pkg:multcomp}
+\begin{Schunk}
+\begin{Sinput}
+R> max(abs(estfun(polr_CHFLS_2) - (-estfun(mlt_CHFLS_2)[,c(4, 5, 1:3)])))
+\end{Sinput}
+\begin{Soutput}
+[1] 0.008871258
+\end{Soutput}
+\begin{Sinput}
+R> cbind(polr = sqrt(diag(vcov(polr_CHFLS_2))),
++        mlt = sqrt(diag(vcov(mlt_CHFLS_2)))[c(4, 5, 1:3)])
+\end{Sinput}
+\begin{Soutput}
+                                     polr          mlt
+R_age                        5.684041e-03 5.684460e-03
+R_income                     8.509055e-05 7.099273e-05
+Very unhappy|Not too happy   3.536235e-01 3.522657e-01
+Not too happy|Somewhat happy 2.419643e-01 2.400504e-01
+Somewhat happy|Very happy    2.372414e-01 2.355000e-01
+\end{Soutput}
+\begin{Sinput}
+R> cftest(polr_CHFLS_2)
+\end{Sinput}
+\begin{Soutput}
+
+	 Simultaneous Tests for General Linear Hypotheses
+
+Fit: polr(formula = R_happy ~ R_age + R_income, data = CHFLS)
+
+Linear Hypotheses:
+                Estimate Std. Error z value Pr(>|z|)   
+R_age == 0    -6.279e-03  5.684e-03  -1.105  0.26930   
+R_income == 0  2.350e-04  8.509e-05   2.762  0.00575 **
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+(Univariate p values reported)
+\end{Soutput}
+\begin{Sinput}
+R> cftest(mlt_CHFLS_2, parm = names(coef(polr_CHFLS_2)))
+\end{Sinput}
+\begin{Soutput}
+
+	 Simultaneous Tests for General Linear Hypotheses
+
+Fit: mlt(model = ctm_CHFLS_2, data = CHFLS, scale = TRUE)
+
+Linear Hypotheses:
+                Estimate Std. Error z value Pr(>|z|)    
+R_age == 0    -6.279e-03  5.684e-03  -1.105 0.269328    
+R_income == 0  2.350e-04  7.099e-05   3.310 0.000932 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+(Univariate p values reported)
+\end{Soutput}
+\end{Schunk}
+
+\paragraph{Survival Analysis: GBSG-2 Trial (Cont'd)}
+
+For the ``classical'' Cox model \code{mlt_GBSG2_1}, the standard errors
+of all three methods applied (\cmd{coxph}, \cmd{mlt}, \cmd{flexsurvspline})
+are more or less identical 
+\begin{Schunk}
+\begin{Sinput}
+R> cf <- coef(coxph_GBSG2_1)
+R> cbind(coxph = sqrt(diag(vcov(coxph_GBSG2_1))),
++        mlt = sqrt(diag(vcov(mlt_GBSG2_1)))[names(cf)],
++        fss = sqrt(diag(vcov(fss_GBSG2_1)))[names(cf)])
+\end{Sinput}
+\begin{Soutput}
+                    coxph          mlt          fss
+horThyes     0.1290747352 0.1293760634 0.1290343235
+age          0.0093005948 0.0093124938 0.0092899409
+menostatPost 0.1834764517 0.1836840638 0.1833300012
+tsize        0.0039390177 0.0039383111 0.0039372592
+tgrade.L     0.1898441328 0.1898825492 0.1899068142
+tgrade.Q     0.1219653995 0.1220116627 0.1220298327
+pnodes       0.0074470895 0.0074156462 0.0074387203
+progrec      0.0005735286 0.0005740003 0.0005553729
+estrec       0.0004503679 0.0004515681 0.0004309581
+\end{Soutput}
+\end{Schunk}
+As a consequence, the corresponding coefficient tables, here produced
+using \cmd{multcomp::cftest} are also rather similar
+\begin{Schunk}
+\begin{Sinput}
+R> cftest(coxph_GBSG2_1)
+\end{Sinput}
+\begin{Soutput}
+
+	 Simultaneous Tests for General Linear Hypotheses
+
+Fit: coxph(formula = fm_GBSG2, data = GBSG2)
+
+Linear Hypotheses:
+                    Estimate Std. Error z value Pr(>|z|)    
+horThyes == 0     -0.3462784  0.1290747  -2.683 0.007301 ** 
+age == 0          -0.0094592  0.0093006  -1.017 0.309126    
+menostatPost == 0  0.2584448  0.1834765   1.409 0.158954    
+tsize == 0         0.0077961  0.0039390   1.979 0.047794 *  
+tgrade.L == 0      0.5512988  0.1898441   2.904 0.003685 ** 
+tgrade.Q == 0     -0.2010905  0.1219654  -1.649 0.099199 .  
+pnodes == 0        0.0487886  0.0074471   6.551  5.7e-11 ***
+progrec == 0      -0.0022172  0.0005735  -3.866 0.000111 ***
+estrec == 0        0.0001973  0.0004504   0.438 0.661307    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+(Univariate p values reported)
+\end{Soutput}
+\begin{Sinput}
+R> cftest(mlt_GBSG2_1, parm = names(cf))
+\end{Sinput}
+\begin{Soutput}
+
+	 Simultaneous Tests for General Linear Hypotheses
+
+Fit: mlt(model = ctm_GBSG2_1, data = GBSG2, scale = TRUE, maxit = 3000)
+
+Linear Hypotheses:
+                    Estimate Std. Error z value Pr(>|z|)    
+horThyes == 0     -0.3489206  0.1293761  -2.697 0.006998 ** 
+age == 0          -0.0099114  0.0093125  -1.064 0.287189    
+menostatPost == 0  0.2675484  0.1836841   1.457 0.145236    
+tsize == 0         0.0077694  0.0039383   1.973 0.048521 *  
+tgrade.L == 0      0.5600329  0.1898825   2.949 0.003184 ** 
+tgrade.Q == 0     -0.2018734  0.1220117  -1.655 0.098017 .  
+pnodes == 0        0.0487581  0.0074156   6.575 4.86e-11 ***
+progrec == 0      -0.0022105  0.0005740  -3.851 0.000118 ***
+estrec == 0        0.0001828  0.0004516   0.405 0.685536    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+(Univariate p values reported)
+\end{Soutput}
+\begin{Sinput}
+R> cftest(fss_GBSG2_1, parm = names(cf))
+\end{Sinput}
+\begin{Soutput}
+
+	 Simultaneous Tests for General Linear Hypotheses
+
+Fit: flexsurvspline(formula = fm_GBSG2, data = GBSG2, k = 9, bknots = log(support(GBSG2y)$y), 
+    scale = "hazard")
+
+Linear Hypotheses:
+                    Estimate Std. Error z value Pr(>|z|)    
+horThyes == 0     -0.3473363  0.1290343  -2.692  0.00711 ** 
+age == 0          -0.0097896  0.0092899  -1.054  0.29198    
+menostatPost == 0  0.2672205  0.1833300   1.458  0.14495    
+tsize == 0         0.0079052  0.0039373   2.008  0.04467 *  
+tgrade.L == 0      0.5554285  0.1899068   2.925  0.00345 ** 
+tgrade.Q == 0     -0.2078500  0.1220298  -1.703  0.08852 .  
+pnodes == 0        0.0485934  0.0074387   6.532 6.47e-11 ***
+progrec == 0      -0.0022112  0.0005554  -3.982 6.85e-05 ***
+estrec == 0        0.0001891  0.0004310   0.439  0.66076    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+(Univariate p values reported)
+\end{Soutput}
+\end{Schunk}
+
+\paragraph{Density Estimation: Geyser Data (Cont'd)}
+
+A relatively simple method for the construction of asymptotic confidence bands
+is based on the multivariate joint normal distribution of the model coefficients
+$\hat{\parm}_N$. A confidence band for the unconditional transformation function 
+of waiting times is derived from simultaneous confidence intervals for the 
+linear function $\mA \hat{\parm}_N$ as implemented in package \cmd{multcomp}. Here $\mA$ is
+the matrix of Bernstein basis functions evaluated on a grid of \code{K} waiting times
+$\ry_1, \dots, \ry_K$. The quantile adjusted for multiplicity is then used
+on a finer grid of \code{ncheat} values for plotting purposes
+\begin{Schunk}
+\begin{Sinput}
+R> cb_w <- confband(mlt_w, newdata = data.frame(1), K = 20, cheat = 100)
+\end{Sinput}
+\end{Schunk}
+The result is shown in Figure~\ref{fig:geyser-w-cbplot} on the scale of the
+transformation and distribution function.
+
+
+\begin{figure}
+\begin{center}
+\begin{Schunk}
+
+
+{\centering \includegraphics{figure/geyser-w-cbplot-1} 
+
+}
+
+\end{Schunk}
+\caption{Old Faithful Geyser. Estimated transformation (left)
+         and distribution function (right, also featuring the empirical
+         cumulative distribution function) with confidence bands.
+         \label{fig:geyser-w-cbplot}}
+\end{center}
+\end{figure}
+
+
+\section{Simulation-based Likelihood Inference} \label{sec:sim}
+
+The fully specified probabilistic model $(\pZ, \basisy, \hat{\parm}_N)$
+allows sampling from the distribution $\hat{\Prob}_\rY$.
+For estimated parameters $\hat{\parm}_N$, this model-based or 
+``parametric'' bootstrap from $\hat{\Prob}_\rY$ can be implemented by the
+probability integral transform, \ie $\rZ_1, \dots, \rZ_N \stackrel{\text{iid}}{\sim} \Prob_\rZ$ is
+drawn and then $\rY_i^\star = \inf\{\ry \in \samY | \basisy(\ry)^\top \hat{\parm}_N \ge
+\rZ_i\}$ is determined by numerical inversion of the distribution function.
+The \cmd{simulation} method for \code{mlt} objects first computes the
+distribution function over a grid of \code{K} response values, draws \code{nsim} times
+\code{nrow(newdata)} random sample from $\Prob_\rZ$ and returns 
+the intervals $\ry_k < \rZ < \ry_{k + 1}$ (\code{interpolate = FALSE}) or
+a linear interpolation thereof (\code{interpolate = TRUE}). 
+
+
+\paragraph{Density Estimation: Geyser Data (Cont'd)}
+
+The model-based bootstrap analogon of the confidence band for the
+distribution function of waiting times (Figure~\ref{fig:geyser-w-cbplot},
+right panel) based on $100$ bootstrap samples is generated from the
+following code.  First, $100$ samples of size $N = 299$ are
+drawn.  For each sample, the model \code{ctm_w} is refitted, using the
+parameters $\hat{\parm}_N$ as starting values (\code{theta}) to speed-up the
+computations.  Next, the log-likelihood ratio
+\begin{eqnarray*}
+\sum_{i = 1}^N \log(\lik(\basisy^\top \hat{\parm}^\star_N | \rY_i^\star) - 
+\sum_{i = 1}^N \log(\lik(\basisy^\top \hat{\parm}_N | \rY_i^\star)
+\end{eqnarray*}
+is computed for each sample. Last, distribution and density functions are obtained
+for each of the models in this small loop
+\begin{Schunk}
+\begin{Sinput}
+R> new_w <- simulate(mlt_w, nsim = 100)
+R> llr <- numeric(length(new_w))
+R> pdist <- vector(mode = "list", length = length(new_w))
+R> pdens <- vector(mode = "list", length = length(new_w))
+R> ngeyser <- geyser
+R> q <- mkgrid(var_w, 100)[[1]]
+R> for (i in 1:length(new_w)) {
++      ngeyser$waiting <- new_w[[i]]
++      mlt_i <- mlt(ctm_w, data = ngeyser, scale = TRUE, 
++                   theta = coef(mlt_w))
++      llr[[i]] <- logLik(mlt_i) - logLik(mlt_i, parm = coef(mlt_w))
++      pdist[[i]] <- predict(mlt_i, newdata = data.frame(1), 
++                            type = "distribution", q = q)
++      pdens[[i]] <- predict(mlt_i, newdata = data.frame(1), 
++                            type = "density", q = q)
++  }
+\end{Sinput}
+\end{Schunk}
+
+The distribution and density functions corresponding to log-likelihood ratios less then the $95\%$
+quantile of the $100$ log-likelihood ratios, \ie after removal of $5$ extreme
+curves, are plotted in Figure~\ref{geyser-w-simulate-plot} and can be
+interpreted as a band around the distribution and density function.  The
+asymptotic band for the distribution function nicely fits the band obtained
+from the bootstrap sample but the latter does not deteriorate for probabilities close
+to zero and one.
+
+In the conditional case, \code{nsim} samples from the $N$ conditional distributions
+$\hat{\Prob}_{\rY | \rX = \rx_i}, i = 1, \dots, N$ are drawn by \cmd{simulate}. 
+
+\begin{figure}
+\begin{center}
+\begin{Schunk}
+
+
+{\centering \includegraphics{figure/geyser-w-simulate-plot-1} 
+
+}
+
+\end{Schunk}
+\caption{Old Faithful Geyser. Model-based bootstrap for distribution (left, the green area depicts the
+         asymptotic confidence band from Figure~\ref{fig:geyser-w-cbplot}) and density (right) function for 
+         the unconditional transformation model parameterised in terms of a Bernstein polynomials
+         of order $8$. \label{geyser-w-simulate-plot}}
+\end{center}
+\end{figure}
+
+\section{Summary}
+
+The computational framework implemented in package \pkg{mlt} allows fitting of
+a large class of transformation models.  Many established \proglang{R}
+add-on packages implement special cases, mostly in the context of survival
+times.  The most prominent one is the \pkg{survival} package
+\citep{Therneau_Grambsch_2000,pkg:survival} with partial likelihood
+estimation of the Cox model in \cmd{coxph} and parametric linear transformation models
+in \cmd{survreg}.  Parametric proportional hazards (\cmd{phreg}) and accelerated failure time
+models are also available from package \pkg{eha} \citep{pkg:eha}.
+The results obtained using these functions are
+practically identical to those obtained from the unified implementation of
+transformation models in \pkg{mlt} as shown in the various examples
+presented in Section~\ref{sec:trafo}.  Other packages offer estimation of
+the Cox model for interval-censored responses, for example \pkg{intcox}
+\citep{pkg:intcox}, \pkg{coxinterval} \citep{pkg:coxinterval}, \pkg{MIICD}
+\citep{pkg:MIICD} and \pkg{ICsurv} \citep{pkg:ICsurv}.  No special treatment
+of this situation is necessary in \pkg{mlt} as the likelihood maximised by
+\cmd{mlt} allows arbitrary schemes of random censoring and also truncation.
+
+Alternative likelihood approaches to transformation models often
+parameterise the hazard or log-hazard function by some spline, including the
+\proglang{R} add-on packages \pkg{polspline} \citep{pkg:polspline},
+\pkg{logspline} \citep{pkg:logspline}, \pkg{bshazard} \citep{pkg:bshazard}
+and \pkg{gss} \citep{Gu_2014,pkg:gss}.  Packages \pkg{muhaz}
+\citep{pkg:muhaz} and \pkg{ICE} \citep{pkg:ICE} implement kernel smoothing
+for hazard function estimation, the latter package allows for
+interval-censored responses.  The penalised maximum likelihood estimation
+procedure for simultaneous estimation of the baseline hazard function and
+the regression coefficients in a Cox model is available from package
+\pkg{survivalMPL} \citep{pkg:survivalMPL}.  Estimation of the unconstrainted log-hazard 
+function theoretically attractive but too erratic estimates have to be dealt with by
+some form of penalisation. A direct parameterisation of the transformation
+function, \ie the log-cumulative baseline hazard in the Cox model, only requires
+monotone increasing functions to be fitted. Thus, penalisation is not necessary
+but one has to deal with a constraint problem. Package \pkg{mlt} follows the 
+latter approach.
+
+Based on the estimation equation procedure by \cite{Chenetal_2002},
+\pkg{TransModel} \citep{pkg:TransModel} implements continuous time
+proportional hazards and proportional odds linear transformation models. 
+Time-varying coefficients can be estimated using packages \pkg{dynsurv}
+\citep{pkg:dynsurv} and \pkg{timereg}
+\citep{Scheike_Martinussen_2006,Scheike_Zhang_2011,pkg:timereg}
+Discrete proportional odds or proportional hazards models for the analysis
+of ordered categorical responses are implemented in packages
+\pkg{MASS} \citep{Venables_Ripley_2002, pkg:MASS}, \pkg{ordinal} \citep{pkg:ordinal}
+and \pkg{VGAM} \citep{Yee_2010, pkg:VGAM}. 
+
+Maximum likelihood estimators for a fair share of the models implemented in
+the existing packages mentioned in this paper can be re-implemented using
+the computational infrastructure offered by package \pkg{mlt}.  The
+availability of (at least) two independent implementations allows package
+developers to validate their implementation.  In fact, some errors in
+earlier development versions of \pkg{mlt} could be detected by comparing
+model outputs.  Because the implementation of maximum likelihood estimation
+for conditional transformation models presented in this paper relies on a
+rather dense code base ($200$ lines of pure \proglang{R} code in
+\pkg{variables}, $860$ lines in \pkg{basefun} and $1450$ lines in \pkg{mlt},
+all convenience functions and user interfaces included), the likelihood of
+implementation errors is smaller compared the likelihood of errors in any of
+the plethora of alternative implementations of special linear transformation
+models (but not zero, of course).
+
+The modelling abilities of \pkg{mlt} go beyond what is currently available
+in \proglang{R}.  Maybe the practically most interesting example is
+distribution regression, \ie transformation models with response-varying
+regression coefficients.  The only special case available in \proglang{R} we
+are aware of are Cox models with time-varying effects in packages
+\pkg{dynsurv} and \pkg{timereg}.  For other models, such as the distribution
+regression analysis of the Boston Housing data presented here, or for
+non-proportional odds or non-proportional hazards models, implementations
+are lacking.  Our analysis of the bird counts example is novel also from a
+modelling point of view as linear transformation models for count data are
+still waiting to be kissed awake.
+
+One feature of \pkg{mlt} is the strict separation of model specification
+(using \cmd{ctm}) and model estimation (using \cmd{mlt}) allowing
+computations on unfitted models.  Models are specified by combinations of
+basis functions instead of using the rather restrictive formula language. 
+In addition, model coefficients can be altered by the user, for example for
+computing conditional distribution or density functions or for the
+evaluation of the log-likelihood at arbitrary values of the parameters.  The
+\cmd{simulate} method for \code{mlt} objects can always be used to draw
+samples from fitted (or unfitted) transformation models.  Thus, the
+implementation of parametric bootstrap procedures is a straighforward
+exercise.
+
+The very flexible and powerful user interface of \pkg{mlt} will, however, be
+incomprehensible for most of its potential users.  Because transformation
+models seldomly receive the attention they deserve in statistics courses,
+the documentation of \pkg{mlt} will likely also confuse many statisticians,
+let alone ``data scientists'' or subject-matter specialists.  Future efforts
+will concentrate on the implementation of convenience interfaces, \ie higher
+level user interfaces for special forms of transformation models, that
+resemble the traditional notational and naming conventions from the
+statistical modelling literature.
+
+
+\bibliography{mlt,packages}
+
+\newpage
+
+\begin{appendix}
+
+\section*{Appendix}
+
+\section{The variables Package} \label{app:variables}
+
+The \pkg{variables} packages \citep{pkg:variables} offers a small collection
+of classes and methods for specifying and computing on abstract variable
+descriptions.  The main purpose is to allow querying properties of variables
+without having access to observations.  A variable description allows to
+extract the name (\cmd{variable.name}), description (\cmd{desc}) and unit
+(\cmd{unit}) of the variable along with the support (\cmd{support}) and
+possible bounds (\cmd{bounds}) of the measurements.  The \cmd{mkgrid} method
+generates a grid of observations from the variable description.  The package
+differentiates between factors, ordered factors, discrete and continuous
+numeric variables.
+
+\subsection{Unordered Factors}
+
+We use eye color as an example of an unordered factor. The corresponding
+variable description is defined by the name, description and levels of this
+factor
+\begin{Schunk}
+\begin{Sinput}
+R> f_eye <- factor_var("eye", desc = "eye color", 
++                      levels = c("blue", "brown", "green", "grey", "mixed"))
+\end{Sinput}
+\end{Schunk}
+The properties of this factor are
+\begin{Schunk}
+\begin{Sinput}
+R> variable.names(f_eye)
+\end{Sinput}
+\begin{Soutput}
+[1] "eye"
+\end{Soutput}
+\begin{Sinput}
+R> desc(f_eye)
+\end{Sinput}
+\begin{Soutput}
+[1] "eye color"
+\end{Soutput}
+\begin{Sinput}
+R> variables::unit(f_eye)
+\end{Sinput}
+\begin{Soutput}
+[1] NA
+\end{Soutput}
+\begin{Sinput}
+R> support(f_eye)
+\end{Sinput}
+\begin{Soutput}
+$eye
+[1] blue  brown green grey  mixed
+Levels: blue brown green grey mixed
+\end{Soutput}
+\begin{Sinput}
+R> bounds(f_eye)
+\end{Sinput}
+\begin{Soutput}
+$eye
+[1] NA
+\end{Soutput}
+\begin{Sinput}
+R> is.bounded(f_eye)
+\end{Sinput}
+\begin{Soutput}
+[1] TRUE
+\end{Soutput}
+\end{Schunk}
+and we can generate values, \ie an instance of this factor with unique levels, via
+\begin{Schunk}
+\begin{Sinput}
+R> mkgrid(f_eye)
+\end{Sinput}
+\begin{Soutput}
+$eye
+[1] blue  brown green grey  mixed
+Levels: blue brown green grey mixed
+\end{Soutput}
+\end{Schunk}
+
+\subsection{Ordered Factors}
+
+An ordered factor, temperature in categories is used here as an example, is defined as
+in the unordered case
+\begin{Schunk}
+\begin{Sinput}
+R> o_temp <- ordered_var("temp", desc = "temperature", 
++                        levels = c("cold", "lukewarm", "warm", "hot"))
+\end{Sinput}
+\end{Schunk}
+and the only difference is that explicit bounds are known
+\begin{Schunk}
+\begin{Sinput}
+R> variable.names(o_temp)
+\end{Sinput}
+\begin{Soutput}
+[1] "temp"
+\end{Soutput}
+\begin{Sinput}
+R> desc(o_temp)
+\end{Sinput}
+\begin{Soutput}
+[1] "temperature"
+\end{Soutput}
+\begin{Sinput}
+R> variables::unit(o_temp)
+\end{Sinput}
+\begin{Soutput}
+[1] NA
+\end{Soutput}
+\begin{Sinput}
+R> support(o_temp)
+\end{Sinput}
+\begin{Soutput}
+$temp
+[1] cold     lukewarm warm     hot     
+Levels: cold < lukewarm < warm < hot
+\end{Soutput}
+\begin{Sinput}
+R> bounds(o_temp) 
+\end{Sinput}
+\begin{Soutput}
+$temp
+[1] cold hot 
+Levels: cold < lukewarm < warm < hot
+\end{Soutput}
+\begin{Sinput}
+R> is.bounded(o_temp)
+\end{Sinput}
+\begin{Soutput}
+[1] TRUE
+\end{Soutput}
+\begin{Sinput}
+R> mkgrid(o_temp)
+\end{Sinput}
+\begin{Soutput}
+$temp
+[1] cold     lukewarm warm     hot     
+Levels: cold < lukewarm < warm < hot
+\end{Soutput}
+\end{Schunk}
+
+\subsection{Discrete Numeric Variables}
+
+Discrete numeric variables are defined by \cmd{numeric\_var} with integer-valued
+\code{support} argument, here using age of a patient as example
+\begin{Schunk}
+\begin{Sinput}
+R> v_age <- numeric_var("age", desc = "age of patient", 
++                       unit = "years", support = 25:75)
+\end{Sinput}
+\end{Schunk}
+The variable is bounded with finite support
+\begin{Schunk}
+\begin{Sinput}
+R> variable.names(v_age)
+\end{Sinput}
+\begin{Soutput}
+[1] "age"
+\end{Soutput}
+\begin{Sinput}
+R> desc(v_age)
+\end{Sinput}
+\begin{Soutput}
+[1] "age of patient"
+\end{Soutput}
+\begin{Sinput}
+R> variables::unit(v_age)
+\end{Sinput}
+\begin{Soutput}
+[1] "years"
+\end{Soutput}
+\begin{Sinput}
+R> support(v_age)
+\end{Sinput}
+\begin{Soutput}
+$age
+ [1] 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47
+[24] 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70
+[47] 71 72 73 74 75
+\end{Soutput}
+\begin{Sinput}
+R> bounds(v_age) 
+\end{Sinput}
+\begin{Soutput}
+$age
+[1] 25 75
+\end{Soutput}
+\begin{Sinput}
+R> is.bounded(v_age)
+\end{Sinput}
+\begin{Soutput}
+[1] TRUE
+\end{Soutput}
+\end{Schunk}
+and the support is returned in
+\begin{Schunk}
+\begin{Sinput}
+R> mkgrid(v_age)
+\end{Sinput}
+\begin{Soutput}
+$age
+ [1] 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47
+[24] 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70
+[47] 71 72 73 74 75
+\end{Soutput}
+\end{Schunk}
+
+\subsection{Continuous Numeric Variables}
+
+For conceptually continuous variables the \code{support} argument is a
+double vector with two elements representing an interval acting as the
+support for any basis function to be defined later.  The variable may or may
+not be bounded ($\pm \infty$ is allowed).  For generating equidistant 
+grids, \code{support + add} is used for unbounded variables or the
+corresponding finite boundaries if \code{add} is zero.  Daytime temperature
+at Zurich, for example, could be presented as
+\begin{Schunk}
+\begin{Sinput}
+R> v_temp <- numeric_var("ztemp", desc = "Zurich daytime temperature", 
++                        unit = "Celsius", support = c(-10.0, 35.0), 
++                        add = c(-5, 5), bounds = c(-273.15, Inf))
+\end{Sinput}
+\end{Schunk}
+Basis functions for this variable shall be defined 
+for temperatures between $-10$ and $35$ degrees Celsius
+\begin{Schunk}
+\begin{Sinput}
+R> variable.names(v_temp)
+\end{Sinput}
+\begin{Soutput}
+[1] "ztemp"
+\end{Soutput}
+\begin{Sinput}
+R> desc(v_temp)
+\end{Sinput}
+\begin{Soutput}
+[1] "Zurich daytime temperature"
+\end{Soutput}
+\begin{Sinput}
+R> variables::unit(v_temp)
+\end{Sinput}
+\begin{Soutput}
+[1] "Celsius"
+\end{Soutput}
+\begin{Sinput}
+R> support(v_temp)
+\end{Sinput}
+\begin{Soutput}
+$ztemp
+[1] -10  35
+\end{Soutput}
+\begin{Sinput}
+R> bounds(v_temp) 
+\end{Sinput}
+\begin{Soutput}
+$ztemp
+[1] -273.15     Inf
+\end{Soutput}
+\begin{Sinput}
+R> is.bounded(v_temp)
+\end{Sinput}
+\begin{Soutput}
+[1] TRUE
+\end{Soutput}
+\end{Schunk}
+One might be interested in evaluating model predictions outside \code{support} as
+defined by the \code{add} argument, so \cmd{mkgrid} generates a equidistant grid
+between $-15$ and $40$ degrees Celsius
+\begin{Schunk}
+\begin{Sinput}
+R> mkgrid(v_temp, n = 20)
+\end{Sinput}
+\begin{Soutput}
+$ztemp
+ [1] -15.0000000 -12.1052632  -9.2105263  -6.3157895  -3.4210526
+ [6]  -0.5263158   2.3684211   5.2631579   8.1578947  11.0526316
+[11]  13.9473684  16.8421053  19.7368421  22.6315789  25.5263158
+[16]  28.4210526  31.3157895  34.2105263  37.1052632  40.0000000
+\end{Soutput}
+\end{Schunk}
+
+\subsection{Multiple Variables}
+
+We can join multiple variable descriptions via \cmd{c}
+\begin{Schunk}
+\begin{Sinput}
+R> vars <- c(f_eye, o_temp, v_age, v_temp)
+\end{Sinput}
+\end{Schunk}
+and all methods discussed above work accordingly
+\begin{Schunk}
+\begin{Sinput}
+R> variable.names(vars)
+\end{Sinput}
+\begin{Soutput}
+    eye    temp     age   ztemp 
+  "eye"  "temp"   "age" "ztemp" 
+\end{Soutput}
+\begin{Sinput}
+R> desc(vars) 
+\end{Sinput}
+\begin{Soutput}
+                         eye                         temp 
+                 "eye color"                "temperature" 
+                         age                        ztemp 
+            "age of patient" "Zurich daytime temperature" 
+\end{Soutput}
+\begin{Sinput}
+R> variables::unit(vars)
+\end{Sinput}
+\begin{Soutput}
+      eye      temp       age     ztemp 
+       NA        NA   "years" "Celsius" 
+\end{Soutput}
+\begin{Sinput}
+R> support(vars)
+\end{Sinput}
+\begin{Soutput}
+$eye
+[1] blue  brown green grey  mixed
+Levels: blue brown green grey mixed
+
+$temp
+[1] cold     lukewarm warm     hot     
+Levels: cold < lukewarm < warm < hot
+
+$age
+ [1] 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47
+[24] 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70
+[47] 71 72 73 74 75
+
+$ztemp
+[1] -10  35
+\end{Soutput}
+\begin{Sinput}
+R> bounds(vars)
+\end{Sinput}
+\begin{Soutput}
+$eye
+[1] NA
+
+$temp
+[1] cold hot 
+Levels: cold < lukewarm < warm < hot
+
+$age
+[1] 25 75
+
+$ztemp
+[1] -273.15     Inf
+\end{Soutput}
+\begin{Sinput}
+R> is.bounded(vars)
+\end{Sinput}
+\begin{Soutput}
+  eye  temp   age ztemp 
+ TRUE  TRUE  TRUE  TRUE 
+\end{Soutput}
+\begin{Sinput}
+R> mkgrid(vars, n = 20)
+\end{Sinput}
+\begin{Soutput}
+$eye
+[1] blue  brown green grey  mixed
+Levels: blue brown green grey mixed
+
+$temp
+[1] cold     lukewarm warm     hot     
+Levels: cold < lukewarm < warm < hot
+
+$age
+ [1] 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47
+[24] 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70
+[47] 71 72 73 74 75
+
+$ztemp
+ [1] -15.0000000 -12.1052632  -9.2105263  -6.3157895  -3.4210526
+ [6]  -0.5263158   2.3684211   5.2631579   8.1578947  11.0526316
+[11]  13.9473684  16.8421053  19.7368421  22.6315789  25.5263158
+[16]  28.4210526  31.3157895  34.2105263  37.1052632  40.0000000
+\end{Soutput}
+\end{Schunk}
+Calling
+\begin{Schunk}
+\begin{Sinput}
+R> nd <- expand.grid(mkgrid(vars))
+\end{Sinput}
+\end{Schunk}
+generates a \code{data.frame} with all possible values of the
+variables and all combinations thereof. The generic \cmd{as.vars}
+takes a data frame of observations as input and derives abstract
+variable descriptions using the available information. The generic
+function \cmd{check} returns \code{TRUE} if \code{data} matches
+the abstract description
+\begin{Schunk}
+\begin{Sinput}
+R> check(vars, data = nd)
+\end{Sinput}
+\begin{Soutput}
+[1] TRUE
+\end{Soutput}
+\end{Schunk}
+
+
+\section{The basefun Package} \label{app:basefun}
+
+The \pkg{basefun} package \citep{pkg:basefun} implements Bernstein,
+Legendre, log and polynomial basis functions.  In addition, facilities for
+treating arbitrary model matrices as basis functions evaluated on some data
+are available.  Basis functions can be joined columnwise using \cmd{c} or
+the box product can be generated using \cmd{b}.  The definition of basis
+functions does not require any actual observations, only variable
+descriptions (see Appendix~\ref{app:variables}) are necessary.  Each basis
+offers \cmd{model.matrix} and \cmd{predict} methods.  We illustrate how one
+can set-up some of these basis functions in the following sections.
+
+\subsection{Polynomial Basis}
+
+For some positive continuous variable $x$ we want to deal with the polynomial
+$\alpha + \beta_1 x + \beta_3 x^3$ and first set-up a variable description
+(see Appendix~\ref{app:variables}) and the basis function
+\begin{Schunk}
+\begin{Sinput}
+R> xvar <- numeric_var("x", support = c(0.1, pi), bounds= c(0, Inf))
+R> x <- as.data.frame(mkgrid(xvar, n = 20))
+R> ### set-up basis of order 3 ommiting the quadratic term
+R> class(pb <- polynomial_basis(xvar, coef = c(TRUE, TRUE, FALSE, TRUE)))
+\end{Sinput}
+\begin{Soutput}
+[1] "polynomial_basis" "basis"            "function"        
+\end{Soutput}
+\end{Schunk}
+The basis function \code{pb} is a \code{function}, therefore we can
+evaluate the basis as
+\begin{Schunk}
+\begin{Sinput}
+R> head(pb(x))
+\end{Sinput}
+\begin{Soutput}
+     (Intercept)         x x^2         x^3
+[1,]           1 0.0000000   0 0.000000000
+[2,]           1 0.1653470   0 0.004520524
+[3,]           1 0.3306940   0 0.036164195
+[4,]           1 0.4960409   0 0.122054158
+[5,]           1 0.6613879   0 0.289313560
+[6,]           1 0.8267349   0 0.565065547
+\end{Soutput}
+\end{Schunk}
+or, equivalently, using the corresponding \cmd{model.matrix} method (which is preferred)
+\begin{Schunk}
+\begin{Sinput}
+R> head(model.matrix(pb, data = x))
+\end{Sinput}
+\begin{Soutput}
+     (Intercept)         x x^2         x^3
+[1,]           1 0.0000000   0 0.000000000
+[2,]           1 0.1653470   0 0.004520524
+[3,]           1 0.3306940   0 0.036164195
+[4,]           1 0.4960409   0 0.122054158
+[5,]           1 0.6613879   0 0.289313560
+[6,]           1 0.8267349   0 0.565065547
+\end{Soutput}
+\end{Schunk}
+Evaluating the polynomial for some coefficients is done by the
+\cmd{predict} method, which also allows derivatives to be computed
+\begin{Schunk}
+\begin{Sinput}
+R> ### evaluate polynomial defined by basis and coefficients
+R> predict(pb, newdata = x, coef = c(1, 2, 0, 1.75))
+\end{Sinput}
+\begin{Soutput}
+ [1]  1.000000  1.338605  1.724675  2.205677  2.829075  3.642335  4.692922
+ [8]  6.028303  7.695942  9.743305 12.217857 15.167065 18.638393 22.679308
+[15] 27.337274 32.659757 38.694222 45.488136 53.088963 61.544169
+\end{Soutput}
+\begin{Sinput}
+R> ### evaluate 1st derivative
+R> predict(pb, newdata = x, coef = c(1, 2, 0, 1.75), deriv = c(x = 1L))
+\end{Sinput}
+\begin{Soutput}
+ [1]  2.000000  2.143533  2.574132  3.291797  4.296528  5.588326  7.167189
+ [8]  9.033118 11.186114 13.626175 16.353303 19.367496 22.668756 26.257082
+[15] 30.132473 34.294931 38.744455 43.481045 48.504701 53.815423
+\end{Soutput}
+\end{Schunk}
+
+\subsection{Logarithmic Basis}
+
+The monotone increasing logarithmic basis $\eparm_1 + \eparm_2 \log(x)$ being 
+subject to $\eparm_2 > 0$ is defined as
+\begin{Schunk}
+\begin{Sinput}
+R> ### set-up log-basis with intercept for positive variable
+R> class(lb <- log_basis(xvar, ui = "increasing"))
+\end{Sinput}
+\begin{Soutput}
+[1] "log_basis" "basis"     "function" 
+\end{Soutput}
+\begin{Sinput}
+R> head(X <- model.matrix(lb, data = x))
+\end{Sinput}
+\begin{Soutput}
+     (Intercept)      log(x)
+[1,]           1 -36.0436534
+[2,]           1  -1.7997091
+[3,]           1  -1.1065619
+[4,]           1  -0.7010968
+[5,]           1  -0.4134147
+[6,]           1  -0.1902712
+\end{Soutput}
+\end{Schunk}
+The model matrix contains a \code{constraint} attribute 
+\begin{Schunk}
+\begin{Sinput}
+R> attr(X, "constraint")
+\end{Sinput}
+\begin{Soutput}
+$ui
+         ci
+[1,] 0 -Inf
+[2,] 0    0
+
+$ci
+[1] -Inf    0
+\end{Soutput}
+\end{Schunk}
+where the linear constraints $\mA \parm \ge \mvec$ are represented by
+a matrix $\mA$ (\code{ui}) and a vector $\mvec$ (\code{ci}). For 
+$\parm = (1, 2)$ the function and its derivative can be computed
+as
+\begin{Schunk}
+\begin{Sinput}
+R> predict(lb, newdata = x, coef = c(1, 2))
+\end{Sinput}
+\begin{Soutput}
+ [1] -71.0873068  -2.5994182  -1.2131238  -0.4021936   0.1731705
+ [6]   0.6194576   0.9841008   1.2924021   1.5594649   1.7950310
+[11]   2.0057520   2.1963724   2.3703951   2.5304805   2.6786965
+[16]   2.8166822   2.9457593   3.0670085   3.1813253   3.2894598
+\end{Soutput}
+\begin{Sinput}
+R> predict(lb, newdata = x, coef = c(1, 2), deriv = c(x = 1L))
+\end{Sinput}
+\begin{Soutput}
+ [1]        Inf 12.0957757  6.0478878  4.0319252  3.0239439  2.4191551
+ [7]  2.0159626  1.7279680  1.5119720  1.3439751  1.2095776  1.0996160
+[13]  1.0079813  0.9304443  0.8639840  0.8063850  0.7559860  0.7115162
+[19]  0.6719875  0.6366198
+\end{Soutput}
+\end{Schunk}
+
+\subsection{Bernstein Basis}
+A monotone increasing Bernstein polynomial $\bern{3}$ can 
+be defined and evaluated as
+\begin{Schunk}
+\begin{Sinput}
+R> class(bb <- Bernstein_basis(xvar, order = 3, ui = "increasing"))
+\end{Sinput}
+\begin{Soutput}
+[1] "Bernstein_basis" "basis"           "function"       
+\end{Soutput}
+\begin{Sinput}
+R> head(X <- model.matrix(bb, data = x))
+\end{Sinput}
+\begin{Soutput}
+        Bs1(x)      Bs2(x)      Bs3(x)       Bs4(x)
+[1,] 1.0986325 -0.09863254 0.000000000 0.000000e+00
+[2,] 0.9369214  0.06171364 0.001354996 9.916843e-06
+[3,] 0.7892824  0.19433218 0.015949084 4.363204e-04
+[4,] 0.6580299  0.29552260 0.044239941 2.207583e-03
+[5,] 0.5421999  0.36817664 0.083335831 6.287617e-03
+[6,] 0.4408286  0.41518604 0.130345023 1.364033e-02
+\end{Soutput}
+\end{Schunk}
+We can check if the constraints are met for some parameters
+\begin{Schunk}
+\begin{Sinput}
+R> cf <- c(1, 2, 2.5, 2.6)
+R> (cnstr <- attr(X, "constraint"))
+\end{Sinput}
+\begin{Soutput}
+$ui
+3 x 4 sparse Matrix of class "dgCMatrix"
+               
+[1,] -1  1  . .
+[2,]  . -1  1 .
+[3,]  .  . -1 1
+
+$ci
+[1] 0 0 0
+\end{Soutput}
+\begin{Sinput}
+R> all(cnstr$ui %*% cf > cnstr$ci)
+\end{Sinput}
+\begin{Soutput}
+[1] TRUE
+\end{Soutput}
+\end{Schunk}
+using the \code{Matrix} object \citep[from package \pkg{Matrix},][]{pkg:Matrix} representing
+the linear constraints.
+Other possible constraints include a decreasing function (\code{ui = "decreasing"}), 
+positive and negative functions (\code{ui = "positive"} or \code{ui = "negative"}),
+as well as cyclic or integral zero functions (\code{ui = "cyclic"} or \code{ui = "zerointegral"}).
+The polynomial defined by the basis functions and parameters and its first
+derivative can be evaluated using \cmd{predict}
+\begin{Schunk}
+\begin{Sinput}
+R> predict(bb, newdata = x, coef = cf)
+\end{Sinput}
+\begin{Soutput}
+ [1] 0.9013675 1.0637620 1.2189539 1.3654146 1.5032406 1.6325281 1.7533736
+ [8] 1.8658735 1.9701242 2.0662220 2.1542634 2.2343447 2.3065623 2.3710127
+[15] 2.4277922 2.4769972 2.5187240 2.5530692 2.5801291 2.6000000
+\end{Soutput}
+\begin{Sinput}
+R> predict(bb, newdata = x, coef = cf, deriv = c(x = 1))
+\end{Sinput}
+\begin{Soutput}
+ [1] 0.98632537 0.96518023 0.91208351 0.85956975 0.80763896 0.75629112
+ [7] 0.70552625 0.65534435 0.60574540 0.55672942 0.50829640 0.46044634
+[13] 0.41317925 0.36649512 0.32039395 0.27487574 0.22994050 0.18558821
+[19] 0.14181889 0.09863254
+\end{Soutput}
+\end{Schunk}
+
+\subsection{Model Matrices}
+
+Model matrices are basis functions evaluated at some data. The \pkg{basefun}
+package offers an \cmd{as.basis} method for \code{formula} objects which
+basically represents unevaluated calls to \cmd{model.matrix} with two
+additonal argments (\code{remove_intercept} removes the intercept
+\textit{after} appropriate contrasts where computed and \code{negative}
+multiplies the model matrix with $-1$).  Note that the \code{data} argument
+does not need to be a \code{data.frame} with observations, a variable
+description is sufficent. If \code{data} is a data frame of observations,
+\code{scale = TRUE} scales each columns of the model matrix to the unit interval. Here is
+an example using the iris data
+\begin{Schunk}
+\begin{Sinput}
+R> iv <- as.vars(iris)
+R> fb <- as.basis(~ Species + Sepal.Length + Sepal.Width,  data = iv,
++                 remove_intercept = TRUE, negative = TRUE, 
++                 contrasts.args =  list(Species = "contr.sum"))
+R> class(fb)
+\end{Sinput}
+\begin{Soutput}
+[1] "formula_basis" "basis"         "function"     
+\end{Soutput}
+\begin{Sinput}
+R> head(model.matrix(fb, data = iris))
+\end{Sinput}
+\begin{Soutput}
+  Speciesversicolor Speciesvirginica Sepal.Length Sepal.Width
+1                 0                0         -5.1        -3.5
+2                 0                0         -4.9        -3.0
+3                 0                0         -4.7        -3.2
+4                 0                0         -4.6        -3.1
+5                 0                0         -5.0        -3.6
+6                 0                0         -5.4        -3.9
+\end{Soutput}
+\end{Schunk}
+
+\subsection{Combining Bases}
+
+Two (or more) basis functions can be concatenated by simply joining the corresponding
+model matrices columnwise. If constraints $\mA_i \parm_i \ge \mvec_i$ are present for $i = 1, 2, \dots$ 
+the overall constraints are given by a block-diagonal matrix $\mA = \text{blockdiag}(\mA_1, \mA_2, \dots)$,
+$\parm = (\parm_1^\top, \parm_2^\top, \dots)^\top$ and $\mvec = (\mvec_1^\top, \mvec_2^\top, \dots)^\top$. As
+an example we add a positive log-transformation to a Bernstein polynomial
+\begin{Schunk}
+\begin{Sinput}
+R> class(blb <- c(bern = bb, 
++                 log = log_basis(xvar, ui = "increasing", 
++                                 remove_intercept = TRUE)))
+\end{Sinput}
+\begin{Soutput}
+[1] "cbind_bases" "bases"      
+\end{Soutput}
+\begin{Sinput}
+R> head(X <- model.matrix(blb, data = x))
+\end{Sinput}
+\begin{Soutput}
+        Bs1(x)      Bs2(x)      Bs3(x)       Bs4(x)      log(x)
+[1,] 1.0986325 -0.09863254 0.000000000 0.000000e+00 -36.0436534
+[2,] 0.9369214  0.06171364 0.001354996 9.916843e-06  -1.7997091
+[3,] 0.7892824  0.19433218 0.015949084 4.363204e-04  -1.1065619
+[4,] 0.6580299  0.29552260 0.044239941 2.207583e-03  -0.7010968
+[5,] 0.5421999  0.36817664 0.083335831 6.287617e-03  -0.4134147
+[6,] 0.4408286  0.41518604 0.130345023 1.364033e-02  -0.1902712
+\end{Soutput}
+\begin{Sinput}
+R> attr(X, "constraint")
+\end{Sinput}
+\begin{Soutput}
+$ui
+4 x 5 sparse Matrix of class "dgCMatrix"
+                 
+[1,] -1  1  . . .
+[2,]  . -1  1 . .
+[3,]  .  . -1 1 .
+[4,]  .  .  . . 1
+
+$ci
+[1] 0 0 0 0
+\end{Soutput}
+\end{Schunk}
+
+The box product of two basis functions is defined by the row-wise Kronecker product of the
+corresponding model matrices but \textit{not} the Kronecker product of the model matrices (which
+would result in a matrix with the same number of columns but squared number of rows).
+The following definition leads to one intercept and one deviation function
+\begin{Schunk}
+\begin{Sinput}
+R> fb <- as.basis(~ g, data = factor_var("g", levels = LETTERS[1:2]))
+R> class(bfb <- b(bern = bb, f = fb))
+\end{Sinput}
+\begin{Soutput}
+[1] "box_bases" "bases"    
+\end{Soutput}
+\begin{Sinput}
+R> nd <- expand.grid(mkgrid(bfb, n = 10))
+R> head(X <- model.matrix(bfb, data = nd))
+\end{Sinput}
+\begin{Soutput}
+     Bs1(x):(Intercept) Bs2(x):(Intercept) Bs3(x):(Intercept)
+[1,]          1.0986325        -0.09863254         0.00000000
+[2,]          0.7739072         0.20707468         0.01846902
+[3,]          0.5184574         0.38073757         0.09320027
+[4,]          0.3264921         0.44297161         0.20033547
+[5,]          0.1889422         0.42098449         0.31266696
+[6,]          0.0967384         0.34198388         0.40298705
+     Bs4(x):(Intercept) Bs1(x):gB Bs2(x):gB Bs3(x):gB Bs4(x):gB
+[1,]       0.0000000000         0         0         0         0
+[2,]       0.0005490848         0         0         0         0
+[3,]       0.0076047915         0         0         0         0
+[4,]       0.0302008070         0         0         0         0
+[5,]       0.0774063566         0         0         0         0
+[6,]       0.1582906656         0         0         0         0
+\end{Soutput}
+\begin{Sinput}
+R> attr(X, "constraint")
+\end{Sinput}
+\begin{Soutput}
+$ui
+14 x 8 sparse Matrix of class "dgCMatrix"
+                           
+ [1,] -1  1  . .  .  .  . .
+ [2,]  . -1  1 .  .  .  . .
+ [3,]  .  . -1 1  .  .  . .
+ [4,]  .  .  . . -1  1  . .
+ [5,]  .  .  . .  . -1  1 .
+ [6,]  .  .  . .  .  . -1 1
+ [7,]  1  .  . .  .  .  . .
+ [8,]  .  1  . .  .  .  . .
+ [9,]  .  .  1 .  .  .  . .
+[10,]  .  .  . 1  .  .  . .
+[11,]  .  .  . .  1  .  . .
+[12,]  .  .  . .  .  1  . .
+[13,]  .  .  . .  .  .  1 .
+[14,]  .  .  . .  .  .  . 1
+
+$ci
+ [1]    0    0    0    0    0    0 -Inf -Inf -Inf -Inf -Inf -Inf -Inf -Inf
+\end{Soutput}
+\end{Schunk}
+If \code{sumconstr = TRUE}, only the sum of the two functions
+is expected to meet the monotonicity constraint
+\begin{Schunk}
+\begin{Sinput}
+R> bfb <- b(bern = bb, f = fb, sumconstr = TRUE)
+R> head(X <- model.matrix(bfb, data = nd))
+\end{Sinput}
+\begin{Soutput}
+     Bs1(x):(Intercept) Bs2(x):(Intercept) Bs3(x):(Intercept)
+[1,]          1.0986325        -0.09863254         0.00000000
+[2,]          0.7739072         0.20707468         0.01846902
+[3,]          0.5184574         0.38073757         0.09320027
+[4,]          0.3264921         0.44297161         0.20033547
+[5,]          0.1889422         0.42098449         0.31266696
+[6,]          0.0967384         0.34198388         0.40298705
+     Bs4(x):(Intercept) Bs1(x):gB Bs2(x):gB Bs3(x):gB Bs4(x):gB
+[1,]       0.0000000000         0         0         0         0
+[2,]       0.0005490848         0         0         0         0
+[3,]       0.0076047915         0         0         0         0
+[4,]       0.0302008070         0         0         0         0
+[5,]       0.0774063566         0         0         0         0
+[6,]       0.1582906656         0         0         0         0
+\end{Soutput}
+\begin{Sinput}
+R> attr(X, "constraint")
+\end{Sinput}
+\begin{Soutput}
+$ui
+6 x 8 sparse Matrix of class "dgTMatrix"
+                          
+[1,] -1  1  . .  .  .  . .
+[2,]  . -1  1 .  .  .  . .
+[3,]  .  . -1 1  .  .  . .
+[4,] -1  1  . . -1  1  . .
+[5,]  . -1  1 .  . -1  1 .
+[6,]  .  . -1 1  .  . -1 1
+
+$ci
+[1] 0 0 0 0 0 0
+\end{Soutput}
+\end{Schunk}
+
+\section{The mlt Package} \label{app:mlt}
+
+\subsection{Specifying Response Observations} \label{subapp:R}
+
+The generic function \cmd{R} is an extention of \cmd{Surv} (package \pkg{survival}) to possibly 
+truncated, categorical or integer-valued response variables with methods for objects of class 
+\code{Surv}, \code{ordered}, \code{factor}, \code{integer} and \code{numeric}. The main
+purpose is to set-up the interval $(\ubar{\ry}, \bar{\ry}]$ for the evaluation
+of the likelihood contribution $\pZ(\h(\bar{\ry})) - \pZ(\h(\ubar{\ry}))$.
+For ordered categorical responses, $\bar{\ry}$ is the observed level and
+$\ubar{\ry}$ the level preceeding $\bar{\ry}$ (which is missing when the
+first or last level was observed)
+\begin{Schunk}
+\begin{Sinput}
+R> head(R(sort(unique(CHFLS$R_happy))))
+\end{Sinput}
+\begin{Soutput}
+[1] (NA, Very unhappy]              (Very unhappy, Not too happy]  
+[3] (Not too happy, Somewhat happy] (Somewhat happy, NA]           
+\end{Soutput}
+\end{Schunk}
+For integers, $\bar{\ry}$ is the observation and $\ubar{\ry} = \bar{\ry} - 1$
+\begin{Schunk}
+\begin{Sinput}
+R> R(1:5, bounds = c(1, 5))
+\end{Sinput}
+\begin{Soutput}
+[1] (NA, 1] (1, 2]  (2, 3]  (3, 4]  (4, NA]
+\end{Soutput}
+\end{Schunk}
+Numeric observations can be ``exact'' (meaning that the likelihood is
+approximated by the density evaluated at the observation), interval-censored
+(with left- and right-censoring as special cases) and left- or right-truncated
+in arbitrary combinations thereof. For example, consider ten draws from
+the standard normal, truncated to $(-1, 2]$ and possibly censored
+\begin{Schunk}
+\begin{Sinput}
+R> x <- rnorm(10)
+R> xt <- round(x[x > -1 & x <= 2], 3)
+R> xl <- xt - sample(c(Inf, (0:(length(xt) - 2)) / length(xt)), 
++                    replace = FALSE)
+R> xr <- xt + sample(c(Inf, (0:(length(xt) - 2)) / length(xt)), 
++                    replace = FALSE)
+R> R(c(1.2, rep(NA, length(xt))), cleft = c(NA, xl), cright = c(NA, xr), 
++    tleft = -1, tright = 2)
+\end{Sinput}
+\begin{Soutput}
+[1] {1.2| (-1, 2]}             {(0.025, 0.775]| (-1, 2]} 
+[3] {(-Inf, 0.102]| (-1, 2]}   {(-0.406, 0.844]| (-1, 2]}
+[5] {(0.577, Inf]| (-1, 2]}    {(-1.155, -0.78]| (-1, 2]}
+[7] {(1.056, 1.306]| (-1, 2]}  {(-1.104, 0.146]| (-1, 2]}
+[9] {(-0.835, 0.29]| (-1, 2]} 
+\end{Soutput}
+\end{Schunk}
+Censoring and truncation (via the \code{cleft}, \code{cright}, \code{tleft}
+and \code{tright} arguments) are also implemented for ordered categorical
+and integer responses. \code{Surv} objects are simply converted to the 
+alternative format without the possibility to define extra arguments
+\begin{Schunk}
+\begin{Sinput}
+R> head(geyser$duration)
+\end{Sinput}
+\begin{Soutput}
+[1] 4.016667        2.150000        [4.000000, Inf] [4.000000, Inf]
+[5] [4.000000, Inf] [0.000000,   2]
+\end{Soutput}
+\begin{Sinput}
+R> head(R(geyser$duration))
+\end{Sinput}
+\begin{Soutput}
+[1] 4.0166667 2.15      (4, Inf]  (4, Inf]  (4, Inf]  (0, 2]   
+\end{Soutput}
+\end{Schunk}
+It should be noted that the measurement scale of the observations has
+nothing to do with the measurement scale of the response $\rY$ in the model
+and the corresponding basis functions.  Discrete or continuous models are
+specified based on the abstract variable description
+(Appendix~\ref{app:variables}).
+
+\subsection{Methods for Conditional Transformation Models}
+
+Methods for the generic functions \cmd{bounds},
+\cmd{variable.names}, \cmd{model.matrix}, \cmd{mkgrid}
+are available for abstract model descriptions in \code{ctm}
+objects are returned by \cmd{ctm}.
+
+\subsection{Methods for Fitted Transformation Models}
+
+For transformation models fitted using \cmd{mlt}, the following methods are
+available \cmd{update} (for refitting the model), \cmd{logLik} (the
+log-likelihood, optionally also as a \code{function}), \cmd{estfun} (the
+scores), \cmd{coef} and \cmd{vcov} (model parameters and their covariance),
+\code{predict} (model predictions at various scales), \cmd{confband}
+(confidence bands for the transformation and distribution function),
+\cmd{simulate} (sampling from the model) as well as \cmd{print},
+\cmd{summary} and \cmd{plot}.  In addition, \cmd{variable.names},
+\cmd{mkgrid} and \cmd{bounds} are also implemented. The 
+\cmd{coef<-} method changes the parameters in the model. One last example,
+the approximation of a $\chi^2_{20}$ distribution by an unconditonal
+transformation model, shall illustrate how one interacts with
+\code{mlt} objects. We first define the ``true'' distribution
+\begin{Schunk}
+\begin{Sinput}
+R> pY <- function(x) pchisq(x, df = 20)
+R> dY <- function(x) dchisq(x, df = 20)
+R> qY <- function(p) qchisq(p, df = 20)
+\end{Sinput}
+\end{Schunk}
+and set-up a Bernstein polynomial for the transformation function
+\begin{Schunk}
+\begin{Sinput}
+R> yvar <- numeric_var("y", support = qY(c(.001, 1 - .001)), 
++                      bounds = c(0, Inf))
+R> By <- Bernstein_basis(yvar, order = ord <- 15, ui = "increasing")
+\end{Sinput}
+\end{Schunk}
+The \emph{unfitted} model is now
+\begin{Schunk}
+\begin{Sinput}
+R> m <- ctm(By)
+R> d <- as.data.frame(mkgrid(yvar, n = 500))
+R> mod <- mlt(m, data = d, dofit = FALSE)
+\end{Sinput}
+\end{Schunk}
+and we compute the true transformation function
+\begin{Schunk}
+\begin{Sinput}
+R> h <- function(x) qnorm(pY(x))
+R> x <- seq(from = support(yvar)[["y"]][1], to = support(yvar)[["y"]][2], 
++           length.out = ord + 1)
+R> mlt::coef(mod) <- h(x)
+\end{Sinput}
+\end{Schunk}
+We can now simulate from this model
+\begin{Schunk}
+\begin{Sinput}
+R> d$grid <- d$y
+R> d$y <- simulate(mod)
+R> fmod <- mlt(m, data = d, scale = TRUE)
+\end{Sinput}
+\end{Schunk}
+and compare the true (\code{mod}) and fitted
+(\code{fmod}) models by looking at the coefficients
+and log-likelhood (evaluated for the estimated and
+true coefficients)
+\begin{Schunk}
+\begin{Sinput}
+R> coef(mod)
+\end{Sinput}
+\begin{Soutput}
+     Bs1(y)      Bs2(y)      Bs3(y)      Bs4(y)      Bs5(y)      Bs6(y) 
+-3.09023231 -2.24395775 -1.56832579 -0.99651738 -0.49547433 -0.04621458 
+     Bs7(y)      Bs8(y)      Bs9(y)     Bs10(y)     Bs11(y)     Bs12(y) 
+ 0.36325683  0.74104644  1.09291321  1.42310925  1.73487215  2.03072963 
+    Bs13(y)     Bs14(y)     Bs15(y)     Bs16(y) 
+ 2.31269685  2.58240889  2.84121268  3.09023231 
+\end{Soutput}
+\begin{Sinput}
+R> coef(fmod)
+\end{Sinput}
+\begin{Soutput}
+    Bs1(y)     Bs2(y)     Bs3(y)     Bs4(y)     Bs5(y)     Bs6(y) 
+-3.6453881 -2.0595627 -1.3023706 -1.3023706 -1.0253634  0.6128594 
+    Bs7(y)     Bs8(y)     Bs9(y)    Bs10(y)    Bs11(y)    Bs12(y) 
+ 0.6128594  0.6128594  0.6128594  1.1927210  2.1016691  2.1016691 
+   Bs13(y)    Bs14(y)    Bs15(y)    Bs16(y) 
+ 2.1016691  2.1016691  2.1016691  3.3074441 
+\end{Soutput}
+\begin{Sinput}
+R> logLik(fmod)
+\end{Sinput}
+\begin{Soutput}
+'log Lik.' -1619.449 (df=16)
+\end{Soutput}
+\begin{Sinput}
+R> logLik(fmod, parm = coef(mod))
+\end{Sinput}
+\begin{Soutput}
+'log Lik.' -1625.041 (df=16)
+\end{Soutput}
+\end{Schunk}
+The corresponding density functions of the $\chi^2_{20}$ distribution, the
+approximating true transformation model \code{mod} and the estimated transformation
+model \code{fmod} are plotted in Figure~\ref{fig:mlt-chi-plot}.
+
+\begin{figure}
+\begin{center}
+\begin{Schunk}
+\begin{Sinput}
+R> ## compute true density
+R> d$dtrue <- dY(d$grid)
+R> d$dest <- predict(fmod, q = sort(d$grid), type = "density")
+R> plot(mod, newdata = d, type = "density", col = "black", 
++       xlab = "y", ylab = "Density", ylim = c(0, max(d$dest)))
+R> lines(d$grid, d$dtrue, lty = 2)
+R> lines(sort(d$grid), d$dest[order(d$grid)], lty = 3)
+R> legend("topright", lty = 1:3, bty = "n", 
++         legend = c("True", "Approximated", "Estimated"))
+\end{Sinput}
+
+
+{\centering \includegraphics{figure/mlt-chi-plot-1} 
+
+}
+
+\end{Schunk}
+\caption{$\chi^2_{20}$ Data. Density of a $\chi^2_{20}$ (true), 
+         an approximating unconditional transformation model and
+         the density fitted to a sample from the approximating model.
+         \label{fig:mlt-chi-plot}}
+\end{center}
+\end{figure}
+
+
+
+%\section{Computational Details}
+
+
+
+
+\end{appendix}
+
+
+
+
+
+
+\clearpage
+
+\end{document}
