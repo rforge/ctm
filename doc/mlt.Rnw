@@ -2029,7 +2029,7 @@ for hazard function estimation, the latter package allows for
 interval-censored responses.  The penalised maximum likelihood estimation
 procedure for simultaneous estimation of the baseline hazard function and
 the regression coefficients in a Cox model is available from package
-\pkg{survivalMPL} \citep{pkg:survivalMPL}.  Estimation of the unconstrainted log-hazard 
+\pkg{survivalMPL} \citep{pkg:survivalMPL}.  Estimation of the unconstrained log-hazard 
 function theoretically attractive but too erratic estimates have to be dealt with by
 some form of penalisation. A direct parameterisation of the transformation
 function, \ie the log-cumulative baseline hazard in the Cox model, only requires
