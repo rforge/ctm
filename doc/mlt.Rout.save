@@ -22,7 +22,7 @@ Type 'q()' to quit R.
 > 
 > sapply(c("mlt", "survival", "eha", "prodlim", "truncreg", "lattice", "gridExtra",
 +          "MASS", "nnet", "HSAUR3", "sandwich", "flexsurv", "grid", "latticeExtra", 
-+          "colorspace", "multcomp", "mgcv"), library, char = TRUE)
++          "colorspace", "multcomp"), library, char = TRUE)
 Loading required package: basefun
 Loading required package: variables
 Loading required package: maxLik
@@ -63,22 +63,6 @@ The following object is masked from ‘package:HSAUR3’:
 The following object is masked from ‘package:MASS’:
 
     geyser
-
-Loading required package: nlme
-
-Attaching package: ‘nlme’
-
-The following object is masked from ‘package:mlt’:
-
-    coef<-
-
-This is mgcv 1.8-11. For overview type 'help("mgcv-package")'.
-
-Attaching package: ‘mgcv’
-
-The following object is masked from ‘package:nnet’:
-
-    multinom
 
 $mlt
  [1] "mlt"       "basefun"   "variables" "stats"     "graphics"  "grDevices"
@@ -173,15 +157,6 @@ $multcomp
 [21] "survival"     "mlt"          "basefun"      "variables"    "stats"       
 [26] "graphics"     "grDevices"    "utils"        "datasets"     "methods"     
 [31] "base"        
-
-$mgcv
- [1] "mgcv"         "nlme"         "multcomp"     "TH.data"      "mvtnorm"     
- [6] "colorspace"   "latticeExtra" "RColorBrewer" "grid"         "flexsurv"    
-[11] "sandwich"     "HSAUR3"       "tools"        "nnet"         "MASS"        
-[16] "gridExtra"    "lattice"      "truncreg"     "maxLik"       "miscTools"   
-[21] "prodlim"      "eha"          "survival"     "mlt"          "basefun"     
-[26] "variables"    "stats"        "graphics"     "grDevices"    "utils"       
-[31] "datasets"     "methods"      "base"        
 
 > 
 > if (!file.exists("analysis/DVC.rda")) {
@@ -445,7 +420,7 @@ R> lines(p1[[1]]$time, p2[,1], lty = 2)
 R> legend("topright", lty = 1:2, legend = c("flexsurvspline", "mlt"), bty = "n")
 R> 
 R> ## ----GBSG2-2-------------------------------------------------------------
-R> ly <- log_basis(GBSG2y, ui = "increasing", remove_intercept = TRUE)
+R> ly <- log_basis(GBSG2y, ui = "increasing")
 R> ctm_GBSG2_2 <- ctm(ly, shifting = fm_GBSG2[-2L], data = GBSG2, 
 +                     negative = TRUE, todistr = "MinExtrVal")
 R> mlt_GBSG2_2 <- mlt(ctm_GBSG2_2, data = GBSG2, fixed = c("log(y)" = 1), 
@@ -453,27 +428,26 @@ R> mlt_GBSG2_2 <- mlt(ctm_GBSG2_2, data = GBSG2, fixed = c("log(y)" = 1),
 R> 
 R> ## ----GBSG2-2-exp---------------------------------------------------------
 R> survreg_GBSG2_2 <- survreg(fm_GBSG2, data = GBSG2, dist = "exponential")
-R> phreg_GBSG2_2 <- phreg(fm_GBSG2, data = GBSG2, dist = "weibull", 
-+                         shape = 1)
+R> phreg_GBSG2_2 <- phreg(fm_GBSG2, data = GBSG2, dist = "weibull", shape = 1)
 R> logLik(survreg_GBSG2_2)
 'log Lik.' -2599.383 (df=10)
 R> logLik(phreg_GBSG2_2)
 'log Lik.' -2599.383 (df=10)
 R> logLik(mlt_GBSG2_2)
-'log Lik.' -2803.57 (df=9)
+'log Lik.' -2599.383 (df=10)
 R> cbind(survreg = coef(survreg_GBSG2_2)[names(cf)], 
 +        phreg = -coef(phreg_GBSG2_2)[names(cf)], 
 +        mlt = coef(mlt_GBSG2_2)[names(cf)])
-                   survreg         phreg          mlt
-horThyes      0.3321617406  0.3321617406  0.265021122
-age           0.0094196671  0.0094196671  0.174429753
-menostatPost -0.2685358867 -0.2685358867 -2.344659825
-tsize        -0.0073179443 -0.0073179443  0.011117652
-tgrade.L     -0.5193521191 -0.5193521191  0.012150743
-tgrade.Q      0.2139217558  0.2139217558 -0.069961072
-pnodes       -0.0461664688 -0.0461664688 -0.040139513
-progrec       0.0020670894  0.0020670894  0.003552464
-estrec       -0.0001788501 -0.0001788501 -0.001190315
+                   survreg         phreg           mlt
+horThyes      0.3321617406  0.3321617406  0.3321613982
+age           0.0094196671  0.0094196671  0.0094214990
+menostatPost -0.2685358867 -0.2685358867 -0.2685633286
+tsize        -0.0073179443 -0.0073179443 -0.0073179169
+tgrade.L     -0.5193521191 -0.5193521191 -0.5193492820
+tgrade.Q      0.2139217558  0.2139217558  0.2139209889
+pnodes       -0.0461664688 -0.0461664688 -0.0461665366
+progrec       0.0020670894  0.0020670894  0.0020670935
+estrec       -0.0001788501 -0.0001788501 -0.0001788716
 R> 
 R> ## ----GBSG2-3-------------------------------------------------------------
 R> ctm_GBSG2_3 <- ctm(log_basis(GBSG2y, ui = "increasing"), 
@@ -511,7 +485,7 @@ R> ## ----BostonHousing-mlt---------------------------------------------------
 R> BostonHousing2$medvc <- with(BostonHousing2, Surv(cmedv, cmedv < 50))
 R> var_m <- numeric_var("medvc", support = c(10.0, 40.0), bounds = c(0, Inf))
 R> fm_BH <- medvc ~ crim + zn + indus + chas + nox + rm + age + 
-+      dis + rad + tax + ptratio + b + lstat
++                   dis + rad + tax + ptratio + b + lstat
 R> 
 R> ## ----BostonHousing-ctm---------------------------------------------------
 R> B_m <- Bernstein_basis(var_m, order = 6, ui = "increasing")
@@ -554,7 +528,7 @@ R> PSID1976$nwincome <- with(PSID1976, (fincome - hours * wage)/1000)
 R> PSID1976$hours <- as.double(PSID1976$hours)
 R> PSID1976_0 <- subset(PSID1976, participation == "yes")
 R> fm_PSID1976 <- hours ~ nwincome + education + experience + 
-+                 I(experience^2) + age + youngkids + oldkids
++                         I(experience^2) + age + youngkids + oldkids
 R> 
 R> ## ----PSID1976-truncreg---------------------------------------------------
 R> tr_PSID1976 <- truncreg(fm_PSID1976, data = PSID1976_0)
@@ -562,11 +536,10 @@ R>
 R> ## ----PSID1976-mlt--------------------------------------------------------
 R> PSID1976_0$hours <- R(PSID1976_0$hours, tleft = 0)
 R> b_hours <- as.basis(~ hours, data = PSID1976, 
-+                     ui = matrix(c(0, 1), nr  = 1), ci = 0)
++                      ui = matrix(c(0, 1), nr  = 1), ci = 0)
 R> ctm_PSID1976_1 <- ctm(b_hours, shift = fm_PSID1976[-2L], 
 +                        data = PSID1976_0, todistr = "Normal") 
-R> mlt_PSID1976_1 <- mlt(ctm_PSID1976_1, data = PSID1976_0, 
-+                        scale = TRUE)
+R> mlt_PSID1976_1 <- mlt(ctm_PSID1976_1, data = PSID1976_0, scale = TRUE)
 R> 
 R> ## ----PSID1976-cmpr-------------------------------------------------------
 R> logLik(tr_PSID1976)
@@ -628,7 +601,8 @@ R> coef(mlt_CHFLS_4)[c("R_age", "R_income")]
 R> 
 R> ## ----GBSG2-4-------------------------------------------------------------
 R> b_horTh <- as.basis(GBSG2$horTh)
-R> ctm_GBSG2_4 <- ctm(B_GBSG2y, interacting = b_horTh, todistr = "MinExtrVal")
+R> ctm_GBSG2_4 <- ctm(B_GBSG2y, interacting = b_horTh, 
++                     todistr = "MinExtrVal")
 R> mlt_GBSG2_4 <- mlt(ctm_GBSG2_4, data = GBSG2)
 Note: method with signature 'dsparseMatrix#dsparseMatrix' chosen for function 'kronecker',
  target signature 'dgTMatrix#dgCMatrix'.
@@ -734,7 +708,7 @@ R>
 R> ## ----iris-1--------------------------------------------------------------
 R> fm_iris <- Species ~ Sepal.Length + Sepal.Width + 
 +                       Petal.Length + Petal.Width
-R> multinom_iris <- nnet::multinom(fm_iris, data = iris, trace = FALSE)
+R> multinom_iris <- multinom(fm_iris, data = iris, trace = FALSE)
 R> logLik(multinom_iris)
 'log Lik.' -5.949867 (df=10)
 R> iris$oSpecies <- ordered(iris$Species)
@@ -752,16 +726,23 @@ R> max(abs(t(p1) - p2))
 [1] 0.001173088
 R> 
 R> ## ----GBSG2-6-------------------------------------------------------------
-R> B_GBSG2y_5 <- Bernstein_basis(var = GBSG2y, order = 5, ui = "increasing")
-R> ctm_GBSG2_6 <- ctm(B_GBSG2y_5, shifting = ~ horTh, data = GBSG2, 
+R> ctm_GBSG2_6 <- ctm(B_GBSG2y, shifting = ~ horTh, data = GBSG2, 
 +                     todistr = "MinExtrVal")
 R> mlt_GBSG2_6 <- mlt(ctm_GBSG2_6, data = GBSG2)
+R> logLik(mlt_GBSG2_6)
+'log Lik.' -2607.361 (df=12)
+R> AIC(mlt_GBSG2_6)
+[1] 5238.722
 R> 
 R> ## ----GBSG2-7-------------------------------------------------------------
 R> b_horTh <- as.basis(~ horTh, data = GBSG2)
-R> ctm_GBSG2_7 <- ctm(B_GBSG2y_5, interacting = b_horTh, 
+R> ctm_GBSG2_7 <- ctm(B_GBSG2y, interacting = b_horTh, 
 +                     todistr = "MinExtrVal")
 R> mlt_GBSG2_7 <- mlt(ctm_GBSG2_7, data = GBSG2)
+R> logLik(mlt_GBSG2_7)
+'log Lik.' -2605.948 (df=22)
+R> AIC(mlt_GBSG2_7)
+[1] 5255.896
 R> 
 R> ## ----GBSG2-deviation-plot, echo = FALSE, results = "hide"----------------
 R> 
@@ -770,7 +751,7 @@ R> s$y <- s$y[s$y > 100 & s$y < 2400]
 R> nd <- expand.grid(s)
 R> K <- model.matrix(ctm_GBSG2_7, data = nd)
 R> Kyes <- K[nd$horTh == "yes",]
-R> Kyes[,1:6] <- 0  
+R> Kyes[,grep("Intercept", colnames(K))] <- 0  
 R> gh <- glht(parm(coef(mlt_GBSG2_7), vcov(mlt_GBSG2_7)), Kyes)
 R> ci <- confint(gh)
 R> coxy <- s$y
@@ -796,7 +777,7 @@ R> ## ----GBSG2-8, echo = TRUE, cache = TRUE----------------------------------
 R> var_a <- numeric_var("age", support = range(GBSG2$age))
 R> B_age <- Bernstein_basis(var_a, order = 3)
 R> b_horTh <- as.basis(GBSG2$horTh)
-R> ctm_GBSG2_8 <- ctm(B_GBSG2y_5, 
+R> ctm_GBSG2_8 <- ctm(B_GBSG2y, 
 +                     interacting = b(horTh = b_horTh, age = B_age), 
 +                     todistr = "MinExtrVal")
 R> mlt_GBSG2_8  <- mlt(ctm_GBSG2_8, data = GBSG2)
@@ -818,6 +799,10 @@ Note: method with signature 'Matrix#diagonalMatrix' chosen for function 'kroneck
 Note: method with signature 'dsparseMatrix#dsparseMatrix' chosen for function 'kronecker',
  target signature 'dgCMatrix#dtTMatrix'.
  "sparseMatrix#TsparseMatrix" would also be valid
+R> logLik(mlt_GBSG2_8)
+'log Lik.' -2588.743 (df=88)
+R> AIC(mlt_GBSG2_8)
+[1] 5353.486
 R> 
 R> ## ----GBSG2-8-plot, echo = FALSE------------------------------------------
 R> nlev <- c(no = "without hormonal therapy", yes = "with hormonal therapy")
@@ -885,17 +870,32 @@ R> matplot(Q, tri, ylim = ylim, xlab = "Median Value", ylab = "Density",
 R> 
 R> ## ----treepipit, echo = TRUE, cache = TRUE--------------------------------
 R> data("treepipit", package = "coin")
-R> tmp <- treepipit
-R> tmp$counts <- ordered(tmp$counts)
-R> ### we want
-R> #tmp$counts <- R(tmp$counts)
-R> #cv <- numeric_var("counts", support = 0:5)
+R> treepipit$ocounts <- ordered(treepipit$counts)
 R> B_cs <- Bernstein_basis(var = numeric_var("coverstorey", support = 1:110), 
 +                          order = 4)
-R> B_c <- as.basis(tmp$counts)
+R> B_c <- as.basis(treepipit$ocounts)
 R> ctm_treepipit <- ctm(B_c, interacting = B_cs)
-R> mlt_treepipit <- mlt(ctm_treepipit, data = tmp, maxit = 10000, 
+R> mlt_treepipit <- mlt(ctm_treepipit, data = treepipit, maxit = 10000, 
 +                       gtol = 1e-3)
+R> 
+R> ## ----mgcv, echo = FALSE, results = "hide"--------------------------------
+R> library("mgcv") ### masks nnet::multinom
+Loading required package: nlme
+
+Attaching package: 'nlme'
+
+The following object is masked from 'package:mlt':
+
+    coef<-
+
+This is mgcv 1.8-11. For overview type 'help("mgcv-package")'.
+
+Attaching package: 'mgcv'
+
+The following object is masked from 'package:nnet':
+
+    multinom
+
 R> 
 R> ## ----treepipit-gam-------------------------------------------------------
 R> gam_treepipit <- gam(counts ~ s(coverstorey), data = treepipit, 
@@ -903,7 +903,7 @@ R> gam_treepipit <- gam(counts ~ s(coverstorey), data = treepipit,
 R> 
 R> ## ----treepipit-plot, echo = FALSE, fig.height = 3------------------------
 R> s <- mkgrid(ctm_treepipit, 100)
-R> s$counts <- s$counts[1:5]
+R> s$ocounts <- s$ocounts[1:5]
 R> nd <- expand.grid(s)
 R> nd$p <- c(predict(mlt_treepipit, newdata = s, type = "distribution"))
 R> 
@@ -915,7 +915,7 @@ R> treepipit2 <- sapply(as.data.frame(tpt, stringsAsFactors = FALSE),
 +                       as.integer)
 R> 
 R> s <- mkgrid(ctm_treepipit, 10)
-R> s$counts <- s$counts[1]
+R> s$ocounts <- s$ocounts[1]
 R> K <- model.matrix(ctm_treepipit, data = expand.grid(s))
 R> #g <- glht(parm(coef(mod), vcov(mod)), linfct = K)
 R> #confint(g)
@@ -933,11 +933,11 @@ R> plot(counts ~ coverstorey, data = treepipit2, cex = sqrt(Freq),
 R> 
 R> plot(c(0, 110), c(0, 1), type = "n", xlab = xlab, ylab = "Conditional probability",
 +       xlim = xlim, las = 1, main = "MLT")
-R> with(subset(nd, counts == "0"), lines(coverstorey, p, lty = 1))
-R> with(subset(nd, counts == "1"), lines(coverstorey, p, lty = 2))
-R> with(subset(nd, counts == "2"), lines(coverstorey, p, lty = 3))
-R> with(subset(nd, counts == "3"), lines(coverstorey, p, lty = 4))
-R> with(subset(nd, counts == "4"), lines(coverstorey, p, lty = 5))
+R> with(subset(nd, ocounts == "0"), lines(coverstorey, p, lty = 1))
+R> with(subset(nd, ocounts == "1"), lines(coverstorey, p, lty = 2))
+R> with(subset(nd, ocounts == "2"), lines(coverstorey, p, lty = 3))
+R> with(subset(nd, ocounts == "3"), lines(coverstorey, p, lty = 4))
+R> with(subset(nd, ocounts == "4"), lines(coverstorey, p, lty = 5))
 R> abline(h = 1, lty = 6)
 R> legend("bottomright", lty = 1:6, legend = c(expression(TP == 0),
 +                                              expression(TP <= 1),
@@ -948,11 +948,11 @@ R> legend("bottomright", lty = 1:6, legend = c(expression(TP == 0),
 R> 
 R> plot(c(0, 110), c(0, 1), type = "n", xlab = xlab, ylab = "Conditional probability",
 +       xlim = xlim, las = 1, main = "GAM")
-R> with(subset(nd, counts == "0"), lines(coverstorey, ppois(0, lambda), lty = 1))
-R> with(subset(nd, counts == "1"), lines(coverstorey, ppois(1, lambda), lty = 2))
-R> with(subset(nd, counts == "2"), lines(coverstorey, ppois(2, lambda), lty = 3))
-R> with(subset(nd, counts == "3"), lines(coverstorey, ppois(3, lambda), lty = 4))
-R> with(subset(nd, counts == "4"), lines(coverstorey, ppois(4, lambda), lty = 5))
+R> with(subset(nd, ocounts == "0"), lines(coverstorey, ppois(0, lambda), lty = 1))
+R> with(subset(nd, ocounts == "1"), lines(coverstorey, ppois(1, lambda), lty = 2))
+R> with(subset(nd, ocounts == "2"), lines(coverstorey, ppois(2, lambda), lty = 3))
+R> with(subset(nd, ocounts == "3"), lines(coverstorey, ppois(3, lambda), lty = 4))
+R> with(subset(nd, ocounts == "4"), lines(coverstorey, ppois(4, lambda), lty = 5))
 R> abline(h = 1, lty = 6)
 R> 
 R> ## ----CHFLS-2-cmpr-2------------------------------------------------------
@@ -1861,10 +1861,12 @@ $mlt_GBSG2_1
  0.5600329425 -0.2018734495  0.0487581396 -0.0022104961  0.0001828489 
 
 $mlt_GBSG2_2
-      log(y)     horThyes          age menostatPost        tsize 
- 1.000000000  0.265021122  0.174429753 -2.344659825  0.011117652 
-    tgrade.L     tgrade.Q       pnodes      progrec       estrec 
- 0.012150743 -0.069961072 -0.040139513  0.003552464 -0.001190315 
+  (Intercept)        log(y)      horThyes           age  menostatPost 
+-7.8167173761  1.0000000000  0.3321613982  0.0094214990 -0.2685633286 
+        tsize      tgrade.L      tgrade.Q        pnodes       progrec 
+-0.0073179169 -0.5193492820  0.2139209889 -0.0461665366  0.0020670935 
+       estrec 
+-0.0001788716 
 
 $mlt_GBSG2_3
   (Intercept)        log(y)      horThyes           age  menostatPost 
@@ -1903,54 +1905,118 @@ Bs10(y):horThyes Bs11(y):horThyes              age
    -0.1316448432    -0.1316448432    -0.0004621642 
 
 $mlt_GBSG2_6
-    Bs1(y)     Bs2(y)     Bs3(y)     Bs4(y)     Bs5(y)     Bs6(y) 
--3.8517996 -0.3667677 -0.3667677 -0.3667677 -0.1710497  0.4162653 
-  horThyes 
--0.3761094 
+     Bs1(y)      Bs2(y)      Bs3(y)      Bs4(y)      Bs5(y)      Bs6(y) 
+-5.29872359 -0.88352647 -0.88352647 -0.88352647 -0.73449615 -0.28814317 
+     Bs7(y)      Bs8(y)      Bs9(y)     Bs10(y)     Bs11(y)    horThyes 
+-0.28814317 -0.28814317 -0.09597813  0.24272604  0.24272604 -0.36657128 
 
 $mlt_GBSG2_7
-Bs1(y):(Intercept) Bs2(y):(Intercept) Bs3(y):(Intercept) 
-        -3.8468162         -0.3458184         -0.3458184 
-Bs4(y):(Intercept) Bs5(y):(Intercept) Bs6(y):(Intercept) 
-        -0.3458184         -0.2663882          0.4687251 
-   Bs1(y):horThyes    Bs2(y):horThyes    Bs3(y):horThyes 
-        -0.4082456         -0.4421570         -0.4421570 
-   Bs4(y):horThyes    Bs5(y):horThyes    Bs6(y):horThyes 
-        -0.4421570         -0.1057730         -0.5135824 
+ Bs1(y):(Intercept)  Bs2(y):(Intercept)  Bs3(y):(Intercept) 
+        -5.18066000         -0.88125700         -0.88125700 
+ Bs4(y):(Intercept)  Bs5(y):(Intercept)  Bs6(y):(Intercept) 
+        -0.88125700         -0.80839713         -0.24095738 
+ Bs7(y):(Intercept)  Bs8(y):(Intercept)  Bs9(y):(Intercept) 
+        -0.24095738         -0.24095738         -0.09117475 
+Bs10(y):(Intercept) Bs11(y):(Intercept)     Bs1(y):horThyes 
+        -0.09117475          0.56820387         -0.84976339 
+    Bs2(y):horThyes     Bs3(y):horThyes     Bs4(y):horThyes 
+        -0.35847870         -0.35847870         -0.35847870 
+    Bs5(y):horThyes     Bs6(y):horThyes     Bs7(y):horThyes 
+        -0.17776055         -0.51886619         -0.51886619 
+    Bs8(y):horThyes     Bs9(y):horThyes    Bs10(y):horThyes 
+        -0.51886619         -0.06622102         -0.06622102 
+   Bs11(y):horThyes 
+        -0.72559963 
 
 $mlt_GBSG2_8
- Bs1(y):horThno:Bs1(age)  Bs2(y):horThno:Bs1(age)  Bs3(y):horThno:Bs1(age) 
-             -2.08236294               3.11028166               3.11028166 
- Bs4(y):horThno:Bs1(age)  Bs5(y):horThno:Bs1(age)  Bs6(y):horThno:Bs1(age) 
-              3.11028166               3.11028166               3.11028166 
-Bs1(y):horThyes:Bs1(age) Bs2(y):horThyes:Bs1(age) Bs3(y):horThyes:Bs1(age) 
-             -3.69182447              -0.15728796              -0.15728796 
-Bs4(y):horThyes:Bs1(age) Bs5(y):horThyes:Bs1(age) Bs6(y):horThyes:Bs1(age) 
-             -0.15728796              -0.15728796              -0.15728796 
- Bs1(y):horThno:Bs2(age)  Bs2(y):horThno:Bs2(age)  Bs3(y):horThno:Bs2(age) 
-             -4.37254275              -3.67086904              -3.67086904 
- Bs4(y):horThno:Bs2(age)  Bs5(y):horThno:Bs2(age)  Bs6(y):horThno:Bs2(age) 
-             -3.67086904              -3.67086904              -2.28829165 
-Bs1(y):horThyes:Bs2(age) Bs2(y):horThyes:Bs2(age) Bs3(y):horThyes:Bs2(age) 
-             -2.47197700              -2.47197700              -2.47197700 
-Bs4(y):horThyes:Bs2(age) Bs5(y):horThyes:Bs2(age) Bs6(y):horThyes:Bs2(age) 
-             -2.47197700              -1.86543783              -1.86543783 
- Bs1(y):horThno:Bs3(age)  Bs2(y):horThno:Bs3(age)  Bs3(y):horThno:Bs3(age) 
-             -4.42581621               1.34563790               1.34563790 
- Bs4(y):horThno:Bs3(age)  Bs5(y):horThno:Bs3(age)  Bs6(y):horThno:Bs3(age) 
-              1.34563790               1.34563790               1.34563790 
-Bs1(y):horThyes:Bs3(age) Bs2(y):horThyes:Bs3(age) Bs3(y):horThyes:Bs3(age) 
-             -6.59764701               1.04882588               1.04882588 
-Bs4(y):horThyes:Bs3(age) Bs5(y):horThyes:Bs3(age) Bs6(y):horThyes:Bs3(age) 
-              1.04882588               1.79043577               1.79043577 
- Bs1(y):horThno:Bs4(age)  Bs2(y):horThno:Bs4(age)  Bs3(y):horThno:Bs4(age) 
-             -3.73661692              -0.59805454              -0.59805454 
- Bs4(y):horThno:Bs4(age)  Bs5(y):horThno:Bs4(age)  Bs6(y):horThno:Bs4(age) 
-             -0.59805454               0.03486138               1.07141119 
-Bs1(y):horThyes:Bs4(age) Bs2(y):horThyes:Bs4(age) Bs3(y):horThyes:Bs4(age) 
-             -2.95517175              -1.95736664              -1.95736664 
-Bs4(y):horThyes:Bs4(age) Bs5(y):horThyes:Bs4(age) Bs6(y):horThyes:Bs4(age) 
-             -1.95736664              -1.95334231              -0.86284669 
+  Bs1(y):horThno:Bs1(age)   Bs2(y):horThno:Bs1(age) 
+              -3.67285257                2.17986127 
+  Bs3(y):horThno:Bs1(age)   Bs4(y):horThno:Bs1(age) 
+               2.17986127                2.17986127 
+  Bs5(y):horThno:Bs1(age)   Bs6(y):horThno:Bs1(age) 
+               2.80883599                2.80883599 
+  Bs7(y):horThno:Bs1(age)   Bs8(y):horThno:Bs1(age) 
+               2.80883599                2.80883599 
+  Bs9(y):horThno:Bs1(age)  Bs10(y):horThno:Bs1(age) 
+               2.80883599                4.43094953 
+ Bs11(y):horThno:Bs1(age)  Bs1(y):horThyes:Bs1(age) 
+               4.43094953               -2.29542995 
+ Bs2(y):horThyes:Bs1(age)  Bs3(y):horThyes:Bs1(age) 
+              -1.15266874               -1.15266874 
+ Bs4(y):horThyes:Bs1(age)  Bs5(y):horThyes:Bs1(age) 
+              -1.15266874               -1.15266874 
+ Bs6(y):horThyes:Bs1(age)  Bs7(y):horThyes:Bs1(age) 
+              -0.10718700               -0.10718700 
+ Bs8(y):horThyes:Bs1(age)  Bs9(y):horThyes:Bs1(age) 
+              -0.10718700               -0.10718700 
+Bs10(y):horThyes:Bs1(age) Bs11(y):horThyes:Bs1(age) 
+              -0.10718700               -0.10718700 
+  Bs1(y):horThno:Bs2(age)   Bs2(y):horThno:Bs2(age) 
+              -4.73156962               -3.72500376 
+  Bs3(y):horThno:Bs2(age)   Bs4(y):horThno:Bs2(age) 
+              -3.72500376               -3.72500376 
+  Bs5(y):horThno:Bs2(age)   Bs6(y):horThno:Bs2(age) 
+              -3.44129075               -3.44129075 
+  Bs7(y):horThno:Bs2(age)   Bs8(y):horThno:Bs2(age) 
+              -3.44129075               -3.44129075 
+  Bs9(y):horThno:Bs2(age)  Bs10(y):horThno:Bs2(age) 
+              -3.44129075               -3.44129075 
+ Bs11(y):horThno:Bs2(age)  Bs1(y):horThyes:Bs2(age) 
+              -3.44129075               -3.95989594 
+ Bs2(y):horThyes:Bs2(age)  Bs3(y):horThyes:Bs2(age) 
+              -2.09235682               -2.09235682 
+ Bs4(y):horThyes:Bs2(age)  Bs5(y):horThyes:Bs2(age) 
+              -2.09235682               -2.09235682 
+ Bs6(y):horThyes:Bs2(age)  Bs7(y):horThyes:Bs2(age) 
+              -2.09235682               -2.09235682 
+ Bs8(y):horThyes:Bs2(age)  Bs9(y):horThyes:Bs2(age) 
+              -2.09235682               -2.09235682 
+Bs10(y):horThyes:Bs2(age) Bs11(y):horThyes:Bs2(age) 
+              -2.09235682               -2.09235682 
+  Bs1(y):horThno:Bs3(age)   Bs2(y):horThno:Bs3(age) 
+              -5.73428441                0.17352246 
+  Bs3(y):horThno:Bs3(age)   Bs4(y):horThno:Bs3(age) 
+               0.17352246                0.17352246 
+  Bs5(y):horThno:Bs3(age)   Bs6(y):horThno:Bs3(age) 
+               0.24331734                1.46050750 
+  Bs7(y):horThno:Bs3(age)   Bs8(y):horThno:Bs3(age) 
+               1.46050750                1.46050750 
+  Bs9(y):horThno:Bs3(age)  Bs10(y):horThno:Bs3(age) 
+               1.46050750                1.46050750 
+ Bs11(y):horThno:Bs3(age)  Bs1(y):horThyes:Bs3(age) 
+               1.46050750              -10.93584964 
+ Bs2(y):horThyes:Bs3(age)  Bs3(y):horThyes:Bs3(age) 
+               0.18469806                0.18469806 
+ Bs4(y):horThyes:Bs3(age)  Bs5(y):horThyes:Bs3(age) 
+               0.18469806                0.29914932 
+ Bs6(y):horThyes:Bs3(age)  Bs7(y):horThyes:Bs3(age) 
+               0.73069734                0.73069734 
+ Bs8(y):horThyes:Bs3(age)  Bs9(y):horThyes:Bs3(age) 
+               0.93596864                2.02956919 
+Bs10(y):horThyes:Bs3(age) Bs11(y):horThyes:Bs3(age) 
+               2.02956919                2.02956919 
+  Bs1(y):horThno:Bs4(age)   Bs2(y):horThno:Bs4(age) 
+              -6.74124508               -0.65869989 
+  Bs3(y):horThno:Bs4(age)   Bs4(y):horThno:Bs4(age) 
+              -0.65869989               -0.65869989 
+  Bs5(y):horThno:Bs4(age)   Bs6(y):horThno:Bs4(age) 
+              -0.65869989               -0.65869989 
+  Bs7(y):horThno:Bs4(age)   Bs8(y):horThno:Bs4(age) 
+              -0.65869989                0.01463176 
+  Bs9(y):horThno:Bs4(age)  Bs10(y):horThno:Bs4(age) 
+               0.01463176                0.01463176 
+ Bs11(y):horThno:Bs4(age)  Bs1(y):horThyes:Bs4(age) 
+               1.64832594               -2.64616297 
+ Bs2(y):horThyes:Bs4(age)  Bs3(y):horThyes:Bs4(age) 
+              -2.64616297               -2.64616297 
+ Bs4(y):horThyes:Bs4(age)  Bs5(y):horThyes:Bs4(age) 
+              -1.88422788               -1.88422788 
+ Bs6(y):horThyes:Bs4(age)  Bs7(y):horThyes:Bs4(age) 
+              -1.88422788               -1.88422788 
+ Bs8(y):horThyes:Bs4(age)  Bs9(y):horThyes:Bs4(age) 
+              -1.88422788               -1.35838091 
+Bs10(y):horThyes:Bs4(age) Bs11(y):horThyes:Bs4(age) 
+              -1.35838091               -1.35838091 
 
 $mlt_head
 Bs1(head):Bs1(lage) Bs2(head):Bs1(lage) Bs3(head):Bs1(lage) 
@@ -2001,24 +2067,32 @@ $mlt_PSID1976_2
    0.5512723855    0.1269310229 
 
 $mlt_treepipit
-counts1:Bs1(coverstorey) counts2:Bs1(coverstorey) counts3:Bs1(coverstorey) 
-                1.662028                 2.125463                 2.125463 
-counts4:Bs1(coverstorey) counts5:Bs1(coverstorey) counts1:Bs2(coverstorey) 
-                3.054433                 4.926525                -6.106105 
-counts2:Bs2(coverstorey) counts3:Bs2(coverstorey) counts4:Bs2(coverstorey) 
-               -6.106105                -5.295056                -5.295056 
-counts5:Bs2(coverstorey) counts1:Bs3(coverstorey) counts2:Bs3(coverstorey) 
-               -5.295056                12.203602                12.478610 
-counts3:Bs3(coverstorey) counts4:Bs3(coverstorey) counts5:Bs3(coverstorey) 
-               12.478610                12.478610                12.478610 
-counts1:Bs4(coverstorey) counts2:Bs4(coverstorey) counts3:Bs4(coverstorey) 
-               -7.552765                -7.552765                -7.552765 
-counts4:Bs4(coverstorey) counts5:Bs4(coverstorey) counts1:Bs5(coverstorey) 
-               -7.552765                -7.552765                 8.199416 
-counts2:Bs5(coverstorey) counts3:Bs5(coverstorey) counts4:Bs5(coverstorey) 
-                8.199416                12.552434                12.552434 
-counts5:Bs5(coverstorey) 
-               12.552434 
+ocounts1:Bs1(coverstorey) ocounts2:Bs1(coverstorey) 
+                 1.662028                  2.125463 
+ocounts3:Bs1(coverstorey) ocounts4:Bs1(coverstorey) 
+                 2.125463                  3.054433 
+ocounts5:Bs1(coverstorey) ocounts1:Bs2(coverstorey) 
+                 4.926525                 -6.106105 
+ocounts2:Bs2(coverstorey) ocounts3:Bs2(coverstorey) 
+                -6.106105                 -5.295056 
+ocounts4:Bs2(coverstorey) ocounts5:Bs2(coverstorey) 
+                -5.295056                 -5.295056 
+ocounts1:Bs3(coverstorey) ocounts2:Bs3(coverstorey) 
+                12.203602                 12.478610 
+ocounts3:Bs3(coverstorey) ocounts4:Bs3(coverstorey) 
+                12.478610                 12.478610 
+ocounts5:Bs3(coverstorey) ocounts1:Bs4(coverstorey) 
+                12.478610                 -7.552765 
+ocounts2:Bs4(coverstorey) ocounts3:Bs4(coverstorey) 
+                -7.552765                 -7.552765 
+ocounts4:Bs4(coverstorey) ocounts5:Bs4(coverstorey) 
+                -7.552765                 -7.552765 
+ocounts1:Bs5(coverstorey) ocounts2:Bs5(coverstorey) 
+                 8.199416                  8.199416 
+ocounts3:Bs5(coverstorey) ocounts4:Bs5(coverstorey) 
+                12.552434                 12.552434 
+ocounts5:Bs5(coverstorey) 
+                12.552434 
 
 $mlt_w
 Bs1(waiting) Bs2(waiting) Bs3(waiting) Bs4(waiting) Bs5(waiting) 
@@ -2082,9 +2156,10 @@ loaded via a namespace (and not attached):
  [4] polynom_1.3-8      BB_2014.10-1       knitr_1.12.3      
  [7] deSolve_1.12       mstate_0.2.8       orthopolynom_1.0-5
 [10] lava_1.4.1         codetools_0.2-14   splines_3.2.3     
-[13] quadprog_1.5-5     muhaz_1.2.6        zoo_1.7-12        
+[13] numDeriv_2014.2-1  quadprog_1.5-5     muhaz_1.2.6       
+[16] zoo_1.7-12        
 R> 
 R> 
 > proc.time()
    user  system elapsed 
-114.400   0.204 114.548 
+160.880   0.264 161.053 
