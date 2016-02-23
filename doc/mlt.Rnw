@@ -161,7 +161,7 @@ relies on the conditional expectation $\Ex(\rY | \rX = \rx) = \alpha +
 with ``regression function'' $f$ but, as we will see, understanding
 regression models as models for conditional distributions
 makes it easier to see the connections between many classical and novel regression approaches.
-In our linear model, the intercept $\alpha$ and
+In the linear model, the intercept $\alpha$ and
 the regression parameters $\shiftparm$ are estimated by minimisation of the squared error
 $(\rY - \alpha - \tilde{\rx}^\top \shiftparm)^2$.  With some touch-up in
 notation, the model can be equivalently written as a model for a conditional
@@ -352,6 +352,7 @@ plot(d ~ duration, data = nd_d, type = "l", ylab = "Density", xlab = "Duration t
 \end{center}
 \end{figure}
 
+\pagebreak
  
 \section{Specifying Transformation Models} \label{sec:trafo}
 
@@ -627,7 +628,7 @@ basis function $\h(\ry_k) = \evec_{K - 1}(k)^\top \parm = \eparm_k$ can be used 
 case. For model estimation, only the discretised observations 
 $\ry \in (\ry_{k - 1}, \ry_k]$ enter the likelihood.
 
-
+\pagebreak
 
 \subsection{Linear Transformation Models} \label{subsec:ltm}
 
@@ -1246,7 +1247,7 @@ AIC(mlt_GBSG2_6)
 
 This is the classical Cox model with one treatment parameter $\beta$ 
 but fully parameterised baseline transformation function which was fitted by the exact
-log-likelihood under five linear constraints. The model assumes proportional hazards, 
+log-likelihood under ten linear constraints. The model assumes proportional hazards, 
 an assumption whose
 appropriateness we want to assess using the non-proportional hazards model
 $(\pMEV, (\bern{10}^\top \otimes (1, \I(\text{hormonal therapy})))^{\top}, \parm)$ with
@@ -1258,7 +1259,7 @@ The function $\bern{10}^\top \parm_2$ is the time-varying treatment effect
 and can be interpreted as the deviation, on the scale of the transformation
 function, induced by the hormonal therapy.  Under the null hypothesis of no
 treatment effect, we would expect $\parm_2 \equiv \bold{0}$.  This monotone
-deviation function adds five linear constraints to the model. 
+deviation function adds ten linear constraints to the model. 
 Figure~\ref{GBSG2-deviation-plot} shows the time-varying treatment effect
 $\bern{10}^\top \hat{\parm}_{2, N}$, together with a $95\%$ confidence band
 (see Section~\ref{sec:asympt} for a description of the method). The $95\%$
@@ -1276,7 +1277,7 @@ logLik(mlt_GBSG2_7)
 AIC(mlt_GBSG2_7)
 @
 
-\begin{figure}
+\begin{figure}[t!]
 \begin{center} 
 <<GBSG2-deviation-plot, echo = FALSE, results = "hide">>=
 
@@ -1742,6 +1743,7 @@ to \cmd{mlt}) which leads to considerable faster optimisation in many cases.
 Additional arguments (\code{...}) to \cmd{mlt}, such as the maximum number of iterations 
 \code{maxit}, are forwarded to \cmd{spg}.
 
+\pagebreak
 
 \section{Transformation Analysis} \label{sec:predict}
 
