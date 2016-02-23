@@ -95,7 +95,7 @@ computational framework simply by choosing an appropriate transformation
 function and parameterisation thereof.  As it is computationally cheap to
 evaluate the distribution function, models can be estimated by maximisation
 of the exact likelihood, especially in the presence of random censoring or
-truncation. The relatively dense highlevel implementation in the \proglang{R}
+truncation. The relatively dense high-level implementation in the \proglang{R}
 system for statistical computing allows generalisation of many established
 implementations of linear transformation models, such as the Cox model or other
 parametric models for the analysis of survival or ordered categorical data,
@@ -136,7 +136,7 @@ regression''.  This most prominent example of an idea got lost illustrates
 the impact computable approximations had and still have on our understanding
 of statistical methods and procedures.  In the early days of statistical
 computing, implementations of such approximations were a challenge.  With
-todays computing power and software infrastructure at our fingertips, our
+today's computing power and software infrastructure at our fingertips, our
 duty shall be to go back to the original concepts and search for ways how to
 reawake them for the benefit of a simpler understanding of statistical
 models and concepts.
@@ -152,7 +152,7 @@ model is introduced. Most probably you will find something not unlike
 \rY = \alpha + \tilde{\rx}^\top \shiftparm + \varepsilon, \quad \varepsilon \sim \ND(0, \sigma^2)
 \end{eqnarray*}
 where $\rY$ is an absolutely continuous response, $\tilde{\rx}$ a suitable
-representation of a vector of explanator variables $\rx$ (\eg contrasts
+representation of a vector of explanatory variables $\rx$ (\eg contrasts
 etc.), $\shiftparm$ a vector of regression coefficients, $\alpha$ an
 intercept term and $\varepsilon$ a normal error term.  Model interpretation
 relies on the conditional expectation $\Ex(\rY | \rX = \rx) = \alpha +
@@ -232,7 +232,7 @@ paper as \textit{transformation analysis}.  We describe how conditional
 transformation models can be specified, fitted by maximising the likelihood
 \citep[using the estimator developed by][]{Hothorn_Moest_Buehlmann_2016} and
 analysed in \proglang{R} using the \pkg{mlt} add-on package \citep{pkg:mlt}. 
-In essense, the package is built around two important functions.  \cmd{ctm}
+In essence, the package is built around two important functions.  \cmd{ctm}
 specifies transformation models based on basis functions implemented in the
 \pkg{basefun} package \citep{pkg:basefun} for variable descriptions from the
 \pkg{variables} package \citep{pkg:variables}.  These models are then fitted
@@ -405,7 +405,7 @@ invariant with respect to the ordering of the levels (see Section~\ref{sec:mlt})
 
 The Chinese Health and Family Life Survey \citep{Parish}, conducted 1999--2000 as a
 collaborative research project of the Universities of Chicago, Beijing, and
-North Carolina, sampled $60$ villages and urban neighborhoods in China. 
+North Carolina, sampled $60$ villages and urban neighbourhoods in China. 
 Eighty-three individuals were chosen at random for each location from
 official registers of adults aged between $20$ and $64$ years to target a
 sample of $5000$ individuals in total.  Here, we restrict our attention to
@@ -566,7 +566,7 @@ $M = 40$ are compared on the scale of the distribution function (left panel) and
 function (right panel). It is hardly possible to notice the difference in probabilities
 but the more flexible model features a more erratic density estimate, but not overly so.
 The corresponding AIC values are $\Sexpr{round(AIC(mlt_w),1)}$ 
-for $M = 8$ and $\Sexpr{round(AIC(mlt_w_40),1)}$ for $M = 40$ favoring the smaller model.
+for $M = 8$ and $\Sexpr{round(AIC(mlt_w_40),1)}$ for $M = 40$ favouring the smaller model.
 
 
 \subsubsection{Continuous Models for Discrete Responses}
@@ -702,7 +702,7 @@ Group \citep[GBSG-2,][]{gbsg2:1994}.  Patients not older than $65$ years with
 positive regional lymph nodes but no distant metastases were included in
 the study.  Out of $686$ women, $246$ received hormonal therapy whereas the
 control group of $440$ women did not receive hormonal therapy.  Additional
-variables include age, menopausal status, tumor size, tumor grade, number of
+variables include age, menopausal status, tumour size, tumour grade, number of
 positive lymph nodes, progesterone receptor and estrogen receptor.  The
 right-censored recurrence-free survival time is the response variable of
 interest, \ie a positive absolutely continuous variable
@@ -847,7 +847,7 @@ in the linear transformation model
 \Prob(\text{medv} \le \ry | \rX = \rx) = \Phi(\h_\rY(\ry) - \tilde{\rx}^\top \shiftparm)
 = \Phi(\bern{6}(\ry)^\top \parm_1 - \tilde{\rx}^\top \shiftparm)
 \end{eqnarray*}
-and estimate \emph{all} model parameters $(\parm_1, \shiftparm)$ simulaneously, \ie both the
+and estimate \emph{all} model parameters $(\parm_1, \shiftparm)$ simultaneously, \ie both the
 regression coefficients \emph{and} the error distribution. Because it is 
 straightforward to evaluate the conditional distribution function, the likelihood
 can deal with right-censored medv observations ($\ge 50$). This censoring
@@ -948,7 +948,7 @@ Dynamics (PSID) for the year 1975 (interview year 1976).  The data consists
 of 753 married white women between the ages of 30 and 60 in 1975, with 428
 working at some time during the year.  The dependent variable is the wife's
 annual hours of work and we are interested in modelling the distribution
-of hours of work conditional on participation in the labor
+of hours of work conditional on participation in the labour
 force, \ie more than zero hours of work in 1975. We first set-up
 a subset consisting of those who actually worked (for money!) in 1975
 and a model formula
@@ -1452,7 +1452,7 @@ AIC(mlt_BH)
 @
 Figure~\ref{fig:Boston-Housing-dr-plot} compares the fitted densities for the linear transformation
 model with constant regression coefficients \code{mlt_BH} and this distribution regression model \code{mlt_BHi}. For some
-observations, the variance of the conditional distribution funtions seems to be smaller in this
+observations, the variance of the conditional distribution functions seems to be smaller in this
 more complex model. The model fit, however, seems to be better for the model \code{mlt_BH} with
 constant regression coefficients, at least when measured by AIC.
 
@@ -1735,7 +1735,7 @@ projected gradient method implemented in the \code{spg()} function of
 package \pkg{BB} \citep{Varadhan_Gilbert_2009, pkg:BB} for maximising this
 log-likelihood.  Starting values are obtained from an estimate of the
 unconditional distribution function $\Prob(\rY \le \ry)$ (for example, the
-empricial cumulative distribution function, a Kaplan-Meier or Turnbull estimate) via a
+empirical cumulative distribution function, a Kaplan-Meier or Turnbull estimate) via a
 (constrained) linear regression of $\rz_i = \pZ^{-1}(\Prob(\rY \le \ry_i))$ on the
 design matrix of the transformation model. Optionally, columns of the
 underlying model matrices are scaled to $[-1, 1]$ (argument \code{scale = TRUE}
@@ -1764,7 +1764,7 @@ The \cmd{predict} method for \code{mlt} objects is the main user interface
 for the evaluation of these functions, the type of which is selected
 by its \code{type} argument. Conceptually, all functions are evaluated
 on the support of $\rY$, \ie on a grid $\ry_1, \dots, \ry_K$ 
-(arguments \code{q} for the vector of grid poins or \code{K} for the number
+(arguments \code{q} for the vector of grid points or \code{K} for the number
 of grid point to be generated) for continuous 
 responses for observations with explanatory variables as given in the
 \code{newdata} argument. That means the transformation function
@@ -1943,7 +1943,7 @@ a linear interpolation thereof (\code{interpolate = TRUE}).
 
 \paragraph{Density Estimation: Geyser Data (Cont'd)}
 
-The model-based bootstrap analogon of the confidence band for the
+The model-based bootstrap analogue of the confidence band for the
 distribution function of waiting times (Figure~\ref{fig:geyser-w-cbplot},
 right panel) based on $100$ bootstrap samples is generated from the
 following code.  First, $100$ samples of size $N = \Sexpr{nrow(geyser)}$ are
@@ -2093,7 +2093,7 @@ computing conditional distribution or density functions or for the
 evaluation of the log-likelihood at arbitrary values of the parameters.  The
 \cmd{simulate} method for \code{mlt} objects can always be used to draw
 samples from fitted (or unfitted) transformation models.  Thus, the
-implementation of parametric bootstrap procedures is a straighforward
+implementation of parametric bootstrap procedures is a straightforward
 exercise.
 
 The very flexible and powerful user interface of \pkg{mlt} will, however, be
@@ -2262,7 +2262,7 @@ check(vars, data = nd)
 The \pkg{basefun} package \citep{pkg:basefun} implements Bernstein,
 Legendre, log and polynomial basis functions.  In addition, facilities for
 treating arbitrary model matrices as basis functions evaluated on some data
-are available.  Basis functions can be joined columnwise using \cmd{c} or
+are available.  Basis functions can be joined column-wise using \cmd{c} or
 the box product can be generated using \cmd{b}.  The definition of basis
 functions does not require any actual observations, only variable
 descriptions (see Appendix~\ref{app:variables}) are necessary.  Each basis
@@ -2350,11 +2350,11 @@ predict(bb, newdata = x, coef = cf, deriv = c(x = 1))
 Model matrices are basis functions evaluated at some data. The \pkg{basefun}
 package offers an \cmd{as.basis} method for \code{formula} objects which
 basically represents unevaluated calls to \cmd{model.matrix} with two
-additonal argments (\code{remove_intercept} removes the intercept
+additional arguments (\code{remove_intercept} removes the intercept
 \textit{after} appropriate contrasts where computed and \code{negative}
 multiplies the model matrix with $-1$).  Note that the \code{data} argument
 does not need to be a \code{data.frame} with observations, a variable
-description is sufficent. If \code{data} is a data frame of observations,
+description is sufficient. If \code{data} is a data frame of observations,
 \code{scale = TRUE} scales each columns of the model matrix to the unit interval. Here is
 an example using the iris data
 <<basefun-as.basis>>=
@@ -2369,7 +2369,7 @@ head(model.matrix(fb, data = iris))
 \subsection{Combining Bases}
 
 Two (or more) basis functions can be concatenated by simply joining the corresponding
-model matrices columnwise. If constraints $\mA_i \parm_i \ge \mvec_i$ are present for $i = 1, 2, \dots$ 
+model matrices column-wise. If constraints $\mA_i \parm_i \ge \mvec_i$ are present for $i = 1, 2, \dots$ 
 the overall constraints are given by a block-diagonal matrix $\mA = \text{blockdiag}(\mA_1, \mA_2, \dots)$,
 $\parm = (\parm_1^\top, \parm_2^\top, \dots)^\top$ and $\mvec = (\mvec_1^\top, \mvec_2^\top, \dots)^\top$. As
 an example we add a positive log-transformation to a Bernstein polynomial
@@ -2404,13 +2404,13 @@ attr(X, "constraint")
 
 \subsection{Specifying Response Observations} \label{subapp:R}
 
-The generic function \cmd{R} is an extention of \cmd{Surv} (package \pkg{survival}) to possibly 
+The generic function \cmd{R} is an extension of \cmd{Surv} (package \pkg{survival}) to possibly 
 truncated, categorical or integer-valued response variables with methods for objects of class 
 \code{Surv}, \code{ordered}, \code{factor}, \code{integer} and \code{numeric}. The main
 purpose is to set-up the interval $(\ubar{\ry}, \bar{\ry}]$ for the evaluation
 of the likelihood contribution $\pZ(\h(\bar{\ry})) - \pZ(\h(\ubar{\ry}))$.
 For ordered categorical responses, $\bar{\ry}$ is the observed level and
-$\ubar{\ry}$ the level preceeding $\bar{\ry}$ (which is missing when the
+$\ubar{\ry}$ the level preceding $\bar{\ry}$ (which is missing when the
 first or last level was observed)
 <<R-ordered>>=
 head(R(sort(unique(CHFLS$R_happy))))
@@ -2467,7 +2467,7 @@ scores), \cmd{coef} and \cmd{vcov} (model parameters and their covariance),
 \cmd{summary} and \cmd{plot}.  In addition, \cmd{variable.names},
 \cmd{mkgrid} and \cmd{bounds} are also implemented. The 
 \cmd{coef<-} method changes the parameters in the model. One last example,
-the approximation of a $\chi^2_{20}$ distribution by an unconditonal
+the approximation of a $\chi^2_{20}$ distribution by an unconditional
 transformation model, shall illustrate how one interacts with
 \code{mlt} objects. We first define the ``true'' distribution
 <<mlt-chi-p>>=
@@ -2502,7 +2502,7 @@ fmod <- mlt(m, data = d, scale = TRUE)
 @
 and compare the true (\code{mod}) and fitted
 (\code{fmod}) models by looking at the coefficients
-and log-likelhood (evaluated for the estimated and
+and log-likelihood (evaluated for the estimated and
 true coefficients)
 <<mlt-chi-model>>=
 coef(mod)
