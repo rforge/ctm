@@ -1061,7 +1061,7 @@ conditional on health, people are getting happier as they get older \emph{and} r
 
 \paragraph{Survival Analysis: GBSG-2 Trial (Cont'd)}
 
-The Cox model presented in Subsection~\ref{subsec:ltm} features one baseline
+The Cox model presented in Section~\ref{subsec:ltm} features one baseline
 function for all observations, an assumption which we're now going to relax. As
 a first simple example, we want to estimate two separate survivor functions 
 for the two treatment regimes in the model
@@ -2118,7 +2118,7 @@ statistical modelling literature.
 
 \section*{Appendix}
 
-\section{The variables Package} \label{app:variables}
+\section[The variables Package]{The \pkg{variables} Package} \label{app:variables}
 
 The \pkg{variables} packages \citep{pkg:variables} offers a small collection
 of classes and methods for specifying and computing on abstract variable
@@ -2257,7 +2257,7 @@ check(vars, data = nd)
 @
 
 
-\section{The basefun Package} \label{app:basefun}
+\section[The basefun Package]{The \pkg{basefun} Package} \label{app:basefun}
 
 The \pkg{basefun} package \citep{pkg:basefun} implements Bernstein,
 Legendre, log and polynomial basis functions.  In addition, facilities for
@@ -2400,7 +2400,7 @@ head(X <- model.matrix(bfb, data = nd))
 attr(X, "constraint")
 @
 
-\section{The mlt Package} \label{app:mlt}
+\section[The mlt Package]{The \pkg{mlt} Package} \label{app:mlt}
 
 \subsection{Specifying Response Observations} \label{subapp:R}
 
