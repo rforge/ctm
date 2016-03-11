@@ -36,18 +36,22 @@
 
     exact <- .exact(y)
 
+    ret_ll <- numeric(nrow(data))
     ll <- function(beta) {
-        ret <- numeric(nrow(data))
+        ret <- ret_ll ### numeric(nrow(data))
         if (any(exact))
             ret[exact] <- .mlt_loglik_exact(todistr, eY$Y, eY$Yprime, offset[exact], eY$trunc)(.parm(beta))
-        ret[!exact] <- .mlt_loglik_interval(todistr, iY$Yleft, iY$Yright, offset[!exact], iY$trunc)(.parm(beta))
+        if (any(!exact))
+            ret[!exact] <- .mlt_loglik_interval(todistr, iY$Yleft, iY$Yright, offset[!exact], iY$trunc)(.parm(beta))
         return(ret)
     }
+    ret_sc <- matrix(0, nrow = nrow(data), ncol = length(fix))
     sc <- function(beta) {
-        ret <- matrix(0, nrow = nrow(data), ncol = length(fix))
+        ret <- ret_sc ###matrix(0, nrow = nrow(data), ncol = length(fix))
         if (any(exact))
             ret[exact,] <- .mlt_score_exact(todistr, eY$Y, eY$Yprime, offset[exact], eY$trunc)(.parm(beta))
-        ret[!exact,] <- .mlt_score_interval(todistr, iY$Yleft, iY$Yright, offset[!exact], iY$trunc)(.parm(beta))
+        if (any(!exact))
+            ret[!exact,] <- .mlt_score_interval(todistr, iY$Yleft, iY$Yright, offset[!exact], iY$trunc)(.parm(beta))
         return(ret[, !fix, drop = FALSE])
     }
     he <- function(beta, weights) {
@@ -267,7 +271,7 @@ mlt <- function(model, data, weights = NULL, offset = NULL, fixed = NULL,
     ret
 }
 
-update.mlt_fit <- function(object, weights, theta, ...) {
+update.mlt_fit <- function(object, weights, theta = coef(object), ...) {
 
     stopifnot(length(weights) == NROW(object$data))
     args <- list(...)
@@ -279,11 +283,7 @@ update.mlt_fit <- function(object, weights, theta, ...) {
     } else {
         args$weights <- weights
     }
-    if (missing(theta)) {
-        args$theta <- object$theta
-    } else {
-        args$theta <- theta
-    }
+    args$theta <- theta
     args$scale <- object$scale
     args$trace <- object$trace
     args$checkGrad <- object$checkGrad
