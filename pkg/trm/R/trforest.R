@@ -4,7 +4,7 @@ trforest <- function(object, part, data, parm, weights, modelsplit = FALSE,
                                      testtype = "Univ", mincriterion = 0), 
              ...) {
 
-    ret <- .trparty(object = object, part = part, data = data,
+    ret <- .trparty(object = object, part = part, data = data, parm = parm,
                     weights = weights, modelsplit = modelsplit,
                     control = control, FUN = cforest, ...)
     class(ret) <- c("trforest", class(ret))
@@ -12,44 +12,64 @@ trforest <- function(object, part, data, parm, weights, modelsplit = FALSE,
 }
 
 predict.trforest <- function(object, newdata, K = 20, 
-    type = c("node", "coef", "trafo", "distribution", 
+    type = c("node", "weights", "coef", "trafo", "distribution", 
              "survivor", "density", "logdensity", 
              "hazard", "loghazard", "cumhazard", "quantile"), 
-    OOB = FALSE, FUN = NULL, ...) {
+    OOB = FALSE, FUN = NULL, cluster = TRUE, ...) {
 
     class(object) <- class(object)[-1L]
     type <- match.arg(type)
-    if (type == "node") 
-        return(predict(object, newdata = newdata, type = "node", 
+    if (missing(newdata)) newdata <- NULL ### FIXME
+    if (type %in% c("node", "weights")) 
+        return(predict(object, newdata = newdata, type = type, 
                        OOB = OOB))
 
+    w <- predict(object, newdata = newdata, type = "weights", OOB = OOB)
     q <- mkgrid(object$model, n = K)[[object$model$response]]
 
     if (is.null(FUN)) {
         if (type == "coef") {
-            FUN <- function(response, weights)
-                coef(update(object$model, weights = weights))
+            FUN <- function(theta) function(response, weights)
+                coef(update(object$model, weights = weights, theta = theta))
         } else {
-            FUN <- function(response, weights)
-                predict(update(object$model, weights = weights), q = q, 
+            FUN <- function(theta) function(response, weights)
+                predict(update(object$model, weights = weights, theta = theta), q = q, 
                         type = type, ...)
         }
     }
-    predict(object, newdata = newdata, FUN = FUN, OOB = TRUE)
+
+    if (cluster) {
+        cl <- factor(kmeans(t(w), center = floor(sqrt(NCOL(w))))$cluster)
+    } else {
+        cl <- factor(rep(1, NCOL(w)))
+    }
+    ret <- FUN(coef(object$model))(NA, weights(object$model))
+    ret <- matrix(NA, nrow = length(ret), ncol = NCOL(w))
+    for (n in levels(cl)) {
+        i <- (cl == n)
+        theta <- coef(update(object$model, weights = rowMeans(w[,i,drop = FALSE])))
+        ret[,i] <- apply(w[,i,drop = FALSE], 2, function(w) FUN(theta)(NA, w))
+    }
+    ret
 }
 
-logLik.trforest <- function(object, newdata, ...) {
+logLik.trforest <- function(object, newdata, cf, ...) {
 
-    if (missing(newdata)) newdata <- object$model$data
+    if (missing(newdata)) {
+        if (missing(cf)) 
+            cf <- predict(object, type = "coef", ...)
+        mod <- object$model
+    } else {
+        if (missing(cf)) 
+            cf <- predict(object, newdata = newdata, type = "coef", ...)
+        mod <- mlt(object$model$model, data = newdata, dofit = FALSE)
+    }
 
-    cf <- predict(object, newdata = newdata, type = "coef", ...)
-    mod <- mlt(object$model$model, data = newdata, dofit = FALSE)
-
-    ll <- rep(0, NROW(newdata))
-    for (i in 1:NROW(newdata)) {
-        w <- rep(0, NROW(newdata))
+    ll <- rep(0, ncol(cf))
+    for (i in 1:ncol(cf)) {
+        w <- rep(0, ncol(cf))
         w[i] <- 1
-        ll[i] <- logLik(mod, parm = cf[i,], w = w)
+        ll[i] <- logLik(mod, parm = cf[,i], w = w)
     }
     ret <- sum(ll)
     attr(ret, "df") <- NA

@@ -31,6 +31,8 @@ S3method("as.mlt", "sltm")
 S3method("predict", "trtree")
 S3method("plot", "trtree")
 S3method("predict", "trforest")
+S3method("coef", "trtree")
+S3method("logLik", "trtree")
 S3method("logLik", "trforest")
 
 # S3method("paraboot", "sltm")

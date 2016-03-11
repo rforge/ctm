@@ -4,16 +4,40 @@
 
     if (missing(parm)) parm <- 1:length(coef(object))
 
-    trfo <- function(data, weights)
+    cfleft <- cfright <- coef(object)
+    wleft <- wright <- 0
+    trfo <- function(data, weights) {
+        thetastart <- coef(object)
+        if (max(abs(weights - wleft)) < .Machine$double.eps)
+           thetastart <- cfleft
+        if (max(abs(weights - wright)) < .Machine$double.eps)
+           thetastart <- cfright
         estfun(update(object, weights = weights,
-                      theta = coef(object)))[, parm, drop = FALSE]
+                      theta = thetastart))[, parm, drop = FALSE]
+    }
 
     split <- function(x, response, weights, mb) {
 
+
         if (is.ordered(x)) x <- unclass(x)
         if (is.factor(x)) {
-            if(nlevels(x) == 2) return(1:2)
-            stop("not yet implemented")
+            psplits <- partykit:::mob_grow_getlevels(x)
+            lmod <- rmod <- object
+            ll <- numeric(NROW(psplits))
+            lmax <- -Inf
+            for (i in 1:NROW(psplits)) {
+                ll[i] <- logLik(lmod <- update(object, weights = weights * (x %in% lev[psplits[i,]]),
+                                               theta = coef(lmod))) +
+                         logLik(rmod <- update(object, weights = weights * (x %in% lev[!psplits[i,]]),
+                                               theta = coef(rmod)))
+                if (lll[i] > lmax) {
+                    lmax <- ll[i]  
+                    cfleft <<- coef(lmod)
+                    cfright <<- coef(rmod)
+                    xsplit <- i
+                }
+            }
+            return((!psplit[i,]) + 1)
         }
         ox <- order(x)
         w <- cumsum(weights[ox])
@@ -23,12 +47,20 @@
         suxr <- sux[sux > median(sux)]
 
         lll <- numeric(length(suxl))
+        lmax <- -Inf
+        xsplit <- NA
         lmod <- rmod <- object
         for (i in 1:length(suxl)) {
             lll[i] <- logLik(lmod <- update(object, weights = weights * (x <= suxl[i]),
                                         theta = coef(lmod))) +
-                  logLik(rmod <- update(object, weights = weights * (x > suxl[i]),
+                      logLik(rmod <- update(object, weights = weights * (x > suxl[i]),
                                         theta = coef(rmod)))
+            if (lll[i] > lmax) {
+                lmax <- lll[i]
+                cfleft <<- coef(lmod)
+                cfright <<- coef(rmod)
+                xsplit <-  suxl[i]
+            }
         }
         llr <- numeric(length(suxr))
         lmod <- rmod <- object
@@ -37,8 +69,17 @@
                                             theta = coef(lmod))) +
                       logLik(rmod <- update(object, weights = weights * (x > suxr[i]),
                                             theta = coef(rmod)))
+            if (llr[i] > lmax) {
+                lmax <- llr[i]
+                cfleft <<- coef(lmod)
+                cfright <<- coef(rmod)
+                xsplit <-  suxr[i]
+            }
         }
-        xsplit <- c(suxl, suxr)[which.max(c(lll, llr))]
+
+        wleft <<- weights * (x <= xsplit)
+        wright <<- weights * (x > xsplit)
+
         xsplit
     }
 
@@ -63,7 +104,7 @@
 trtree <- function(object, part, data, parm, weights, modelsplit = FALSE, 
                    control = ctree_control(), ...) {
 
-    ret <- .trparty(object = object, part = part, data = data,
+    ret <- .trparty(object = object, part = part, data = data, parm = parm,
                     weights = weights, modelsplit = modelsplit,
                     control = control, FUN = ctree, ...)
 
@@ -71,7 +112,7 @@ trtree <- function(object, part, data, parm, weights, modelsplit = FALSE,
     if (missing(weights)) weights <- rep(1, length(nf))
     cf <- tapply(1:length(nf), nf, function(nd) {
         coef(update(object, 
-                    weights = weights * (1:length(nf) %in% nd))) 
+                    weights = weights * (1:length(nf) %in% nd), theta = coef(object))) 
     })
 
     ret$coefficients <- cf
@@ -195,4 +236,26 @@ class(node_mlt) <- "grapcon_generator"
 plot.trtree <- function(x, ...) {
     class(x) <- class(x)[-1L]
     plot(x, terminal_panel = node_mlt, ...)
+}
+
+coef.trtree <- function(object, ...)
+    object$coef
+
+logLik.trtree <- function(object, newdata, ...) {
+
+    if (missing(newdata)) newdata <- object$model$data
+
+    nd <- factor(predict(object, newdata = newdata, type = "node", ...))
+    mod <- mlt(object$model$model, data = newdata, dofit = FALSE)
+
+    ll <- rep(0, nlevels(nd))
+    for (i in 1:nlevels(nd)) {
+        w <- rep(0, NROW(newdata))
+        w[nd == levels(nd)[i]] <- 1
+        ll[i] <- logLik(mod, parm = coef(object)[[levels(nd)[i]]], w = w)
+    }
+    ret <- sum(ll)
+    attr(ret, "df") <- NA
+    class(ret) <- "logLik"
+    ret
 }
