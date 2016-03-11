@@ -120,7 +120,7 @@ trtree <- function(object, part, data, parm, weights, modelsplit = FALSE,
     ret
 }
 
-predict.trtree <- function(object, newdata, K = 20, 
+predict.trtree <- function(object, newdata, K = 20, q = NULL,
     type = c("node", "trafo", "distribution", "survivor", "density", 
              "logdensity", "hazard", "loghazard", "cumhazard", "quantile"), 
     ...) {
@@ -137,7 +137,8 @@ predict.trtree <- function(object, newdata, K = 20,
     nf <- factor(nf)
     
     mod <- object$model
-    q <- mkgrid(mod, n = K)[[mod$response]]
+    if (is.null(q))
+        q <- mkgrid(mod, n = K)[[mod$response]]
 
     if (missing(newdata)) newdata <- mod$data
 

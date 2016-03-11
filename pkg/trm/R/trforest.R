@@ -11,10 +11,11 @@ trforest <- function(object, part, data, parm, weights, modelsplit = FALSE,
     ret
 }
 
-predict.trforest <- function(object, newdata, K = 20, 
+predict.trforest <- function(object, newdata, 
     type = c("node", "weights", "coef", "trafo", "distribution", 
              "survivor", "density", "logdensity", 
              "hazard", "loghazard", "cumhazard", "quantile"), 
+    K = 20, q = NULL, 
     OOB = FALSE, FUN = NULL, cluster = TRUE, ...) {
 
     class(object) <- class(object)[-1L]
@@ -25,8 +26,8 @@ predict.trforest <- function(object, newdata, K = 20,
                        OOB = OOB))
 
     w <- predict(object, newdata = newdata, type = "weights", OOB = OOB)
-    q <- mkgrid(object$model, n = K)[[object$model$response]]
-
+    if (is.null(q))
+        q <- mkgrid(object$model, n = K)[[object$model$response]]
     if (is.null(FUN)) {
         if (type == "coef") {
             FUN <- function(theta) function(response, weights)
