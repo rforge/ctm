@@ -41,7 +41,12 @@ vcov.mlt <- function(object, parm = coef(object, fixed = FALSE), ...)
     solve(Hessian(object, parm = parm))
 
 logLik.mlt <- function(object, parm = coef(object, fixed = FALSE), 
-                       w = weights(object), ...) {
+                       w = weights(object), newdata, ...) {
+    if (!missing(newdata)) {
+        tmpmod <- mlt(object$model, data = newdata, dofit = FALSE)
+        coef(tmpmod) <- coef(object)
+        return(logLik(tmpmod))
+    }
     ret <- -object$loglik(parm, weights = w)
     ###    attr(ret, "df") <- length(coef(object, fixed = FALSE))
     attr(ret, "df") <- object$df
