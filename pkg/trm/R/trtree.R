@@ -121,7 +121,7 @@ trtree <- function(object, part, data, parm, weights, modelsplit = FALSE,
 }
 
 predict.trtree <- function(object, newdata, K = 20, q = NULL,
-    type = c("node", "trafo", "distribution", "survivor", "density", 
+    type = c("node", "coef", "trafo", "distribution", "survivor", "density", 
              "logdensity", "hazard", "loghazard", "cumhazard", "quantile"), 
     ...) {
 
@@ -135,6 +135,7 @@ predict.trtree <- function(object, newdata, K = 20, q = NULL,
     }
     if (type == "node") return(nf)
     nf <- factor(nf)
+    if (type == "coef") return(do.call("cbind", coef(object)[nf]))
     
     mod <- object$model
     if (is.null(q))
@@ -142,14 +143,15 @@ predict.trtree <- function(object, newdata, K = 20, q = NULL,
 
     if (missing(newdata)) newdata <- mod$data
 
-    pr <- predict(mod, newdata = newdata, q = q, type = type, ...)
+    ### <FIXME> need .R2vec??? </FIXME>
+    pr <- .R2vec(predict(mod, newdata = newdata, q = q, type = type, ...))
     if (!is.matrix(pr))
-        pr <- matrix(pr, nrow = length(q), ncol = NROW(newdata))
+        pr <- matrix(pr, nrow = NROW(pr), ncol = NROW(newdata))
     for (nd in levels(nf)) {
         i <- nf == nd
         coef(mod) <- object$coef[[nd]]
-        pr[,i] <- predict(mod, newdata = newdata[i,], q = q, 
-                          type = type, ...)
+        pr[,i] <- .R2vec(predict(mod, newdata = newdata[i,], q = q, 
+                                 type = type, ...))
     }
     pr
 }
@@ -260,3 +262,5 @@ logLik.trtree <- function(object, newdata, ...) {
     class(ret) <- "logLik"
     ret
 }
+
+simulate.trtree <- simulate.trforest

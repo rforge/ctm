@@ -15,8 +15,8 @@ predict.trforest <- function(object, newdata,
     type = c("node", "weights", "coef", "trafo", "distribution", 
              "survivor", "density", "logdensity", 
              "hazard", "loghazard", "cumhazard", "quantile"), 
-    K = 20, q = NULL, 
-    OOB = FALSE, FUN = NULL, cluster = TRUE, ...) {
+    K = 20, q = NULL,
+    OOB = FALSE, FUN = NULL, cluster = FALSE, ...) {
 
     class(object) <- class(object)[-1L]
     type <- match.arg(type)
@@ -75,5 +75,25 @@ logLik.trforest <- function(object, newdata, cf, ...) {
     ret <- sum(ll)
     attr(ret, "df") <- NA
     class(ret) <- "logLik"
+    ret
+}
+
+simulate.trforest <- function(object, nsim = 1, newdata, cf, ...) {
+
+    if (missing(newdata)) {
+        if (missing(cf))   
+            cf <- predict(object, type = "coef", ...)
+        mod <- object$model
+    } else {
+        if (missing(cf))
+            cf <- predict(object, newdata = newdata, type = "coef", ...)
+        mod <- mlt(object$model$model, data = newdata, dofit = FALSE)   
+    }
+
+    ret <- vector(mode = "list", length = ncol(cf))
+    for (i in 1:ncol(cf)) {
+        coef(mod) <- cf[,i]
+        ret[[i]] <- simulate(mod, nsim = nsim, newdata = data.frame(1), ...)
+    }
     ret
 }

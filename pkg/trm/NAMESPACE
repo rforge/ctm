@@ -10,7 +10,7 @@ importFrom("stats", "coef", "logLik", "AIC", "vcov", "predict", "confint",
            "as.formula", "contr.treatment", "delete.response", 
            "model.frame", "model.matrix", "model.weights", "na.omit",
            "printCoefmat", "quantile", "terms", "update",
-           "variable.names")
+           "variable.names", "kmeans", "simulate")
 importFrom(variables, mkgrid, as.vars, bounds)
 
 export("sltm", "as.mlt", "trtree", "trforest")
@@ -34,5 +34,7 @@ S3method("predict", "trforest")
 S3method("coef", "trtree")
 S3method("logLik", "trtree")
 S3method("logLik", "trforest")
+S3method("simulate", "trtree")
+S3method("simulate", "trforest")
 
 # S3method("paraboot", "sltm")
