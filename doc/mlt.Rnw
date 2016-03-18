@@ -2351,7 +2351,7 @@ Model matrices are basis functions evaluated at some data. The \pkg{basefun}
 package offers an \cmd{as.basis} method for \code{formula} objects which
 basically represents unevaluated calls to \cmd{model.matrix} with two
 additional arguments (\code{remove_intercept} removes the intercept
-\textit{after} appropriate contrasts where computed and \code{negative}
+\textit{after} appropriate contrasts were computed and \code{negative}
 multiplies the model matrix with $-1$).  Note that the \code{data} argument
 does not need to be a \code{data.frame} with observations, a variable
 description is sufficient. If \code{data} is a data frame of observations,
