@@ -17,7 +17,7 @@
          "survivor", "density", "logdensity", "hazard", "loghazard", "cumhazard", 
          "quantile"), terms = c("bresponse", "binteracting", "bshifting"), 
          q = NULL, p = NULL, K = 50, interpolate = TRUE, ...)
-\method{simulate}{mlt}(object, nsim = 1, seed = NULL, newdata = object$data, K = 50, 
+\method{simulate}{mlt}(object, nsim = 1, seed = NULL, newdata = object$data, K = 50, q = NULL,
          interpolate = TRUE, ...)
 }
 \arguments{

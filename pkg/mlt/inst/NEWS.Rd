@@ -7,6 +7,7 @@
     \item{Some small improvements wrt run time and memory consumption.}
     \item{Use \code{theta = coef(object)} as default starting parameters in \code{update()}.}
     \item{\code{logLik} has a new \code{newdata} argument.}
+    \item{\code{simulate} has a new \code{q} argument.}
   }
 }
 
