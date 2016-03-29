@@ -169,7 +169,7 @@ node_mlt <- function(obj, col = "black", bg = "white", ylines = 2,
     if (type %in% c("distribution", "survivor")) {
         yscale <- c(0, 1)
     } else {
-        pr <- predict(obj, q = q, type = type, ...)
+        pr <- predict.trtree(obj, q = q, type = type, ...)
         yscale <- range(pr)
     }
     xscale <- range(q)
