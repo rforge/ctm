@@ -792,7 +792,12 @@ for (i in 1:length(ord)) {
 }
 colnames(CF) <- names(cf)
 
-b <- survfit(coxph_GBSG2_1)
+nd0 <- as.data.frame(lapply(GBSG2, function(x) {
+    if (is.numeric(x)) return(0)
+    if (is.factor(x)) x[x == levels(x)[1]][1]
+}))
+
+b <- survfit(coxph_GBSG2_1, newdata = nd0)
 layout(matrix(1:2, nc = 2))
 col <- rgb(.1, .1, .1, .1)
 ylim <- range(unlist(p))
@@ -843,11 +848,14 @@ p2 <- predict(mlt_GBSG2_1, newdata = GBSG2[1, all.vars(fm_GBSG2[-2L])],
 plot(p1[[1]]$time, p1[[1]]$est, type = "l", lty = 1, xlab = "Survival Time (days)", 
      ylab = "Probability", ylim = c(0, 1))
 lines(p1[[1]]$time, p2[,1], lty = 2)
-legend("topright", lty = 1:2, legend = c("flexsurvspline", "mlt"), bty = "n")
+p3 <- survfit(coxph_GBSG2_1, newdata = GBSG2[1,])
+lines(p3$time, p3$surv, lty = 3)
+legend("topright", lty = 1:3, legend = c("flexsurvspline", "mlt", "coxph"), bty = "n")
 @
 \caption{GBSG-2 Trial. Estimated survivor functions for patient 1  
          by the most likely transformation model (MLT) and the \cite{Royston_Parmar_2002} spline
-         model fitted using \cmd{flexsurvspline}. \label{GBSG2-1-fss-plot}}
+         model fitted using \cmd{flexsurvspline} as well as based on the Nelson-Aalen-Breslow
+         estimator from \cmd{coxph}. \label{GBSG2-1-fss-plot}}
 \end{center}
 \end{figure}
 
