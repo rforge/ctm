@@ -6,6 +6,9 @@ log_basis <- function(var, ui = c("none", "increasing", "decreasing"),
     varname <- variable.names(var)
     support <- support(var)[[varname]]
     stopifnot(support[1] > 0)
+    bounds <- bounds(var)[[varname]]
+    if (is.finite(bounds[1]))
+        stopifnot(bounds[1] >= 0)
 
     ui <- match.arg(ui)
     ci <- switch(ui, "none" = -Inf, 0)
@@ -26,8 +29,10 @@ log_basis <- function(var, ui = c("none", "increasing", "decreasing"),
             if (is.null(varname)) varname <- colnames(data)[1]
             x <- data[[varname]]
         }
+        ### x <= 0 not allowed
+        x <- pmax(x, .Machine$double.eps)
         if (deriv == 0) {
-            X <- cbind(1, matrix(log(pmax(x, .Machine$double.eps)), ncol = 1))
+            X <- cbind(1, matrix(log(x), ncol = 1))
         } else if (deriv == 1) {
             X <- cbind(0, matrix(1 / x, ncol = 1))
         } else if (deriv > 1) {
