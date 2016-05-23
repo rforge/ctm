@@ -177,7 +177,7 @@ its own right.  The usual treatment of $\sigma^2$ as a nuisance parameter
 only works when the likelihood is approximated by the density of the normal
 distribution.  Because in real life we always observe intervals $(\ubar{\ry}, \bar{\ry}]$
 and never real numbers $\ry$, the exact likelihood is, as originally
-\textit{defined} by \cite{Fisher_1934} [B
+\textit{defined} by \cite{Fisher_1934}
 \begin{eqnarray*}
 \Prob(\ubar{\ry} < \rY \le \bar{\ry} | \rX = \rx) = 
 \Phi\left(\frac{\bar{\ry} - \alpha - \tilde{\rx}^\top \shiftparm}{\sigma}\right) - \Phi\left(\frac{\ubar{\ry} - \alpha - \tilde{\rx}^\top \shiftparm}{\sigma}\right)
@@ -1465,7 +1465,7 @@ approximate log-likelihood under $3 \times 4$ linear constraints
 <<head, echo = TRUE, cache = TRUE>>=
 data("db", package = "gamlss.data")
 db$lage <- with(db, age^(1/3))
-var_head = numeric_var("head", support = quantile(db$head, c(.1, .9)),
+var_head <- numeric_var("head", support = quantile(db$head, c(.1, .9)),
                        bounds = range(db$head))
 B_head <- Bernstein_basis(var_head, order = 3, ui = "increasing")
 var_lage <- numeric_var("lage", support = quantile(db$lage, c(.1, .9)),
