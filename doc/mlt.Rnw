@@ -1,7 +1,7 @@
 
 %\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{mlt}
-%\VignetteDepends{variables, basefun, mlt, survival, eha, prodlim, truncreg, lattice, gridExtra, MASS, nnet, HSAUR3, sandwich, flexsurv, grid, latticeExtra, colorspace, multcomp, mgcv, intcox, coxinterval, ICsurv, polspline, logspline, bshazard, gss, MIICD, TransModel, dynsurv, timereg, survivalMPL, np, gamlss, Matrix, muhaz, ICE, ordinal, VGAM, AER, coin, gamlss.data, mlbench}
+%\VignetteDepends{variables, basefun, mlt, survival, eha, prodlim, truncreg, lattice, gridExtra, MASS, nnet, HSAUR3, sandwich, flexsurv, grid, latticeExtra, colorspace, multcomp, mgcv, coxinterval, ICsurv, polspline, logspline, bshazard, gss, MIICD, TransModel, dynsurv, timereg, survivalMPL, np, gamlss, Matrix, muhaz, ICE, ordinal, VGAM, AER, coin, gamlss.data, mlbench}
 
 \documentclass[article,nojss,shortnames]{jss}
 
@@ -1415,7 +1415,8 @@ b_horTh <- as.basis(GBSG2$horTh)
 ctm_GBSG2_8 <- ctm(B_GBSG2y, 
                    interacting = b(horTh = b_horTh, age = B_age), 
                    todistr = "MinExtrVal")
-mlt_GBSG2_8  <- mlt(ctm_GBSG2_8, data = GBSG2)
+mlt_GBSG2_8  <- mlt(ctm_GBSG2_8, data = GBSG2, maxit = 5000, 
+                    gtol = 1e-3)
 logLik(mlt_GBSG2_8)
 AIC(mlt_GBSG2_8)
 @
@@ -2103,8 +2104,8 @@ The results obtained using these functions are
 practically identical to those obtained from the unified implementation of
 transformation models in \pkg{mlt} as shown in the various examples
 presented in Section~\ref{sec:trafo}.  Other packages offer estimation of
-the Cox model for interval-censored responses, for example \pkg{intcox}
-\citep{pkg:intcox}, \pkg{coxinterval} \citep{pkg:coxinterval}, \pkg{MIICD}
+the Cox model for interval-censored responses, for example 
+\pkg{coxinterval} \citep{pkg:coxinterval}, \pkg{MIICD}
 \citep{pkg:MIICD} and \pkg{ICsurv} \citep{pkg:ICsurv}.  No special treatment
 of this situation is necessary in \pkg{mlt} as the likelihood maximised by
 \cmd{mlt} allows arbitrary schemes of random censoring and also truncation.
@@ -2564,22 +2565,27 @@ By <- Bernstein_basis(yvar, order = ord <- 15, ui = "increasing")
 @
 The \emph{unfitted} model is now
 <<mlt-chi-mlt>>=
-m <- ctm(By)
-d <- as.data.frame(mkgrid(yvar, n = 500))
-mod <- mlt(m, data = d, dofit = FALSE)
+mod <- ctm(By)
 @
 and we compute the true transformation function
 <<mlt-chi-trafo>>=
 h <- function(x) qnorm(pY(x))
 x <- seq(from = support(yvar)[["y"]][1], to = support(yvar)[["y"]][2], 
          length.out = ord + 1)
+@
+and set the parameters of the model using
+<<mlt-chi-coef>>=
 mlt::coef(mod) <- h(x)
 @
-We can now simulate from this model
+We can now simulate from this \emph{purely theoretical} model
 <<mlt-chi-sim>>=
+d <- as.data.frame(mkgrid(yvar, n = 500))
 d$grid <- d$y
-d$y <- simulate(mod)
-fmod <- mlt(m, data = d, scale = TRUE)
+d$y <- simulate(mod, newdata = d)
+@
+and fit this model to the simulated data
+<<mlt-chi-fit>>=
+fmod <- mlt(mod, data = d, scale = TRUE)
 @
 and compare the true (\code{mod}) and fitted
 (\code{fmod}) models by looking at the coefficients
