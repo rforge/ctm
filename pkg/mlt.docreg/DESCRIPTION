@@ -6,7 +6,7 @@ Authors@R: person("Torsten", "Hothorn", role = c("aut", "cre"),
                   email = "Torsten.Hothorn@R-project.org")  
 Description: Additional documentation, a package vignette and 
   regression tests for package mlt.
-Depends: mlt (>= 0.0-30)
+Depends: mlt (>= 0.0-32)
 Imports: numDeriv, stats
 Suggests: variables, basefun, np, eha, truncreg, lattice, MASS, TH.data,
   multcomp (>= 1.4-4), knitr, survival, prodlim, gridExtra, nnet, 
