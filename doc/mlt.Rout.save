@@ -1,6 +1,6 @@
 
-R version 3.2.3 (2015-12-10) -- "Wooden Christmas-Tree"
-Copyright (C) 2015 The R Foundation for Statistical Computing
+R version 3.2.4 (2016-03-10) -- "Very Secure Dishes"
+Copyright (C) 2016 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -376,19 +376,97 @@ R> ## ----GBSG2-1-mlt---------------------------------------------------------
 R> mlt_GBSG2_1 <- mlt(ctm_GBSG2_1, data = GBSG2, maxit = 3000, scale = TRUE)
 R> 
 R> ## ----GBSG2-1-coxph-------------------------------------------------------
-R> coxph_GBSG2_1 <- coxph(fm_GBSG2, data = GBSG2)
+R> coxph_GBSG2_1 <- coxph(fm_GBSG2, data = GBSG2, ties = "breslow")
 R> cf <- coef(coxph_GBSG2_1)
 R> cbind(coxph = cf, mlt = coef(mlt_GBSG2_1)[names(cf)])
                      coxph           mlt
-horThyes     -0.3462784276 -0.3489205601
-age          -0.0094592389 -0.0099113611
-menostatPost  0.2584448409  0.2675484077
-tsize         0.0077960839  0.0077694009
-tgrade.L      0.5512988021  0.5600329425
-tgrade.Q     -0.2010905201 -0.2018734495
-pnodes        0.0487886004  0.0487581396
-progrec      -0.0022172357 -0.0022104961
-estrec        0.0001973107  0.0001828489
+horThyes     -0.3462416209 -0.3489205601
+age          -0.0094534071 -0.0099113611
+menostatPost  0.2581565452  0.2675484077
+tsize         0.0077983290  0.0077694009
+tgrade.L      0.5510838051  0.5600329425
+tgrade.Q     -0.2011060204 -0.2018734495
+pnodes        0.0487818043  0.0487581396
+progrec      -0.0022174942 -0.0022104961
+estrec        0.0001978178  0.0001828489
+R> 
+R> ## ----GBSG2-coxph_mlt, echo = FALSE, results = "hide"---------------------
+R> ndtmp <- as.data.frame(mkgrid(GBSG2y, 100))
+R> 
+R> ord <- 1:30
+R> p <- vector(mode = "list", length = length(ord))
+R> CF <- c()
+R> ll <- numeric(length(ord))
+R> tm <- numeric(length(ord))
+R> 
+R> for (i in 1:length(ord)) {
++      print(i)
++      B_GBSG2ytmp <- Bernstein_basis(var = GBSG2y, order = ord[i], ui = "increasing")
++      ctmi <- ctm(B_GBSG2ytmp, shifting = fm_GBSG2[-2L], data = GBSG2,
++                     todistr = "MinExtrVal")
++      tm[i] <- system.time(mlti <- mlt(ctmi, data = GBSG2, maxit = 3000, scale = TRUE))[1]
++  
++      ll[i] <- logLik(mlti)
++      p[[i]] <- predict(mlti, newdata = ndtmp, type = "trafo", terms = "bresponse")
++  
++      cf <- coef(mlti)
++      cf <- cf[-grep("Bs", names(cf))]
++      CF <- rbind(CF, cf)
++  }
+[1] 1
+[1] 2
+[1] 3
+[1] 4
+[1] 5
+[1] 6
+[1] 7
+[1] 8
+[1] 9
+[1] 10
+[1] 11
+[1] 12
+[1] 13
+[1] 14
+[1] 15
+[1] 16
+[1] 17
+[1] 18
+[1] 19
+[1] 20
+[1] 21
+[1] 22
+[1] 23
+[1] 24
+[1] 25
+[1] 26
+[1] 27
+[1] 28
+[1] 29
+[1] 30
+R> colnames(CF) <- names(cf)
+R> 
+R> nd0 <- as.data.frame(lapply(GBSG2, function(x) {
++      if (is.numeric(x)) return(0)
++      if (is.factor(x)) x[x == levels(x)[1]][1]
++  }))
+R> 
+R> b <- survfit(coxph_GBSG2_1, newdata = nd0)
+R> layout(matrix(1:2, nc = 2))
+R> col <- rgb(.1, .1, .1, .1)
+R> ylim <- range(unlist(p))
+R> plot(ndtmp$y, p[[1]], type = "l", ylim =  ylim, col = col, xlab = "Survival Time (days)",
++       ylab = "Log Cumulative Hazard")
+R> out <- sapply(p, function(y) lines(ndtmp$y, y, col = col))
+R> lines(b$time, log(b$cumhaz), col = "red")
+R> 
+R> ylim <- range(CF)
+R> plot(ord, CF[,1], ylim = ylim, col = col[1], xlab = "Order M", 
++       ylab = "Coefficients")
+R> for (i in 1:ncol(CF)) {
++      points(ord, CF[,i], cex = .5)
++      abline(h = coef(coxph_GBSG2_1)[i])
++  }
+R> # text(20, coef(coxph_GBSG2_1) + .1, names(coef(coxph_GBSG2_1)))
 R> 
 R> ## ----GBSG2-1-fss, cache = TRUE-------------------------------------------
 R> fss_GBSG2_1 <- flexsurvspline(fm_GBSG2, data = GBSG2, scale = "hazard", 
@@ -400,15 +478,15 @@ R> logLik(mlt_GBSG2_1)
 R> cbind(coxph = cf, mlt = coef(mlt_GBSG2_1)[names(cf)],
 +        fss = coef(fss_GBSG2_1)[names(cf)])
                      coxph           mlt           fss
-horThyes     -0.3462784276 -0.3489205601 -0.3473363292
-age          -0.0094592389 -0.0099113611 -0.0097895841
-menostatPost  0.2584448409  0.2675484077  0.2672204916
-tsize         0.0077960839  0.0077694009  0.0079051625
-tgrade.L      0.5512988021  0.5600329425  0.5554284931
-tgrade.Q     -0.2010905201 -0.2018734495 -0.2078499581
-pnodes        0.0487886004  0.0487581396  0.0485933666
-progrec      -0.0022172357 -0.0022104961 -0.0022112350
-estrec        0.0001973107  0.0001828489  0.0001891311
+horThyes     -0.3499938811 -0.3489205601 -0.3473363292
+age          -0.0097886655 -0.0099113611 -0.0097895841
+menostatPost  0.2676640924  0.2675484077  0.2672204916
+tsize         0.0077966790  0.0077694009  0.0079051625
+tgrade.L      0.5583932973  0.5600329425  0.5554284931
+tgrade.Q     -0.2022612341 -0.2018734495 -0.2078499581
+pnodes        0.0487008932  0.0487581396  0.0485933666
+progrec      -0.0022070974 -0.0022104961 -0.0022112350
+estrec        0.0001893829  0.0001828489  0.0001891311
 R> 
 R> ## ----GBSG2-1-fss-plot, echo = FALSE--------------------------------------
 R> p1 <- summary(fss_GBSG2_1, newdata = GBSG2[1,], ci = FALSE)
@@ -417,7 +495,9 @@ R> p2 <- predict(mlt_GBSG2_1, newdata = GBSG2[1, all.vars(fm_GBSG2[-2L])],
 R> plot(p1[[1]]$time, p1[[1]]$est, type = "l", lty = 1, xlab = "Survival Time (days)", 
 +       ylab = "Probability", ylim = c(0, 1))
 R> lines(p1[[1]]$time, p2[,1], lty = 2)
-R> legend("topright", lty = 1:2, legend = c("flexsurvspline", "mlt"), bty = "n")
+R> p3 <- survfit(coxph_GBSG2_1, newdata = GBSG2[1,])
+R> lines(p3$time, p3$surv, lty = 3)
+R> legend("topright", lty = 1:3, legend = c("flexsurvspline", "mlt", "coxph"), bty = "n")
 R> 
 R> ## ----GBSG2-2-------------------------------------------------------------
 R> ly <- log_basis(GBSG2y, ui = "increasing")
@@ -603,10 +683,10 @@ R> ## ----GBSG2-4-------------------------------------------------------------
 R> b_horTh <- as.basis(GBSG2$horTh)
 R> ctm_GBSG2_4 <- ctm(B_GBSG2y, interacting = b_horTh, 
 +                     todistr = "MinExtrVal")
-R> mlt_GBSG2_4 <- mlt(ctm_GBSG2_4, data = GBSG2)
 Note: method with signature 'dsparseMatrix#dsparseMatrix' chosen for function 'kronecker',
  target signature 'dgTMatrix#dgCMatrix'.
  "TsparseMatrix#sparseMatrix" would also be valid
+R> mlt_GBSG2_4 <- mlt(ctm_GBSG2_4, data = GBSG2)
 R> 
 R> ## ----GBSG2-strata-plot, echo = FALSE, results = "hide"-------------------
 R> nd <- expand.grid(s <- mkgrid(mlt_GBSG2_4, 100))
@@ -668,8 +748,6 @@ R>
 R> ## ----CHFLS-7, cache = TRUE-----------------------------------------------
 R> ctm_CHFLS_7 <- ctm(b_happy, interacting = c(h = b_health, R = b_R), 
 +      todist = "Logistic")  
-R> mlt_CHFLS_7 <- mlt(ctm_CHFLS_7, data = CHFLS, scale = TRUE,
-+                     maxit = 10000, gtol = 1e-3)
 Note: method with signature 'Matrix#diagonalMatrix' chosen for function 'kronecker',
  target signature 'dtCMatrix#ddiMatrix'.
  "sparseMatrix#ANY" would also be valid
@@ -682,6 +760,11 @@ Note: method with signature 'Matrix#numLike' chosen for function '%*%',
 Note: method with signature 'sparseMatrix#matrix' chosen for function '%*%',
  target signature 'dgTMatrix#matrix'.
  "TsparseMatrix#ANY" would also be valid
+Warning message:
+In matrix(paste(x[rep(1:nrow(x), length = nrow(y)), rep(1:ncol(x),  :
+  data length [63] is not a sub-multiple or multiple of the number of rows [2]
+R> mlt_CHFLS_7 <- mlt(ctm_CHFLS_7, data = CHFLS, scale = TRUE,
++                     maxit = 10000, gtol = 1e-3)
 Warning messages:
 1: contrasts dropped from factor R_health 
 2: In matrix(paste(x[rep(1:nrow(x), length = nrow(y)), rep(1:ncol(x),  :
@@ -780,7 +863,6 @@ R> b_horTh <- as.basis(GBSG2$horTh)
 R> ctm_GBSG2_8 <- ctm(B_GBSG2y, 
 +                     interacting = b(horTh = b_horTh, age = B_age), 
 +                     todistr = "MinExtrVal")
-R> mlt_GBSG2_8  <- mlt(ctm_GBSG2_8, data = GBSG2)
 Note: method with signature 'diagonalMatrix#Matrix' chosen for function 'kronecker',
  target signature 'ddiMatrix#ddiMatrix'.
  "Matrix#diagonalMatrix" would also be valid
@@ -799,10 +881,12 @@ Note: method with signature 'Matrix#diagonalMatrix' chosen for function 'kroneck
 Note: method with signature 'dsparseMatrix#dsparseMatrix' chosen for function 'kronecker',
  target signature 'dgCMatrix#dtTMatrix'.
  "sparseMatrix#TsparseMatrix" would also be valid
+R> mlt_GBSG2_8  <- mlt(ctm_GBSG2_8, data = GBSG2, maxit = 5000, 
++                      gtol = 1e-3)
 R> logLik(mlt_GBSG2_8)
 'log Lik.' -2588.743 (df=88)
 R> AIC(mlt_GBSG2_8)
-[1] 5353.486
+[1] 5353.487
 R> 
 R> ## ----GBSG2-8-plot, echo = FALSE------------------------------------------
 R> nlev <- c(no = "without hormonal therapy", yes = "with hormonal therapy")
@@ -817,7 +901,7 @@ R>
 R> ## ----head, echo = TRUE, cache = TRUE-------------------------------------
 R> data("db", package = "gamlss.data")
 R> db$lage <- with(db, age^(1/3))
-R> var_head = numeric_var("head", support = quantile(db$head, c(.1, .9)),
+R> var_head <- numeric_var("head", support = quantile(db$head, c(.1, .9)),
 +                         bounds = range(db$head))
 R> B_head <- Bernstein_basis(var_head, order = 3, ui = "increasing")
 R> var_lage <- numeric_var("lage", support = quantile(db$lage, c(.1, .9)),
@@ -1010,34 +1094,34 @@ R> cbind(coxph = sqrt(diag(vcov(coxph_GBSG2_1))),
 +        mlt = sqrt(diag(vcov(mlt_GBSG2_1)))[names(cf)],
 +        fss = sqrt(diag(vcov(fss_GBSG2_1)))[names(cf)])
                     coxph          mlt          fss
-horThyes     0.1290747352 0.1293760634 0.1290343235
-age          0.0093005948 0.0093124938 0.0092899409
-menostatPost 0.1834764517 0.1836840638 0.1833300012
-tsize        0.0039390177 0.0039383111 0.0039372592
-tgrade.L     0.1898441328 0.1898825492 0.1899068142
-tgrade.Q     0.1219653995 0.1220116627 0.1220298327
-pnodes       0.0074470895 0.0074156462 0.0074387203
-progrec      0.0005735286 0.0005740003 0.0005553729
-estrec       0.0004503679 0.0004515681 0.0004309581
+horThyes     0.1290732771 0.1293760634 0.1290343235
+age          0.0093002439 0.0093124938 0.0092899409
+menostatPost 0.1834799825 0.1836840638 0.1833300012
+tsize        0.0039390579 0.0039383111 0.0039372592
+tgrade.L     0.1898442780 0.1898825492 0.1899068142
+tgrade.Q     0.1219645723 0.1220116627 0.1220298327
+pnodes       0.0074480015 0.0074156462 0.0074387203
+progrec      0.0005734844 0.0005740003 0.0005553729
+estrec       0.0004503673 0.0004515681 0.0004309581
 R> 
 R> ## ----GBSG2-1-coxph-cmpr-cftest-------------------------------------------
 R> cftest(coxph_GBSG2_1)
 
 	 Simultaneous Tests for General Linear Hypotheses
 
-Fit: coxph(formula = fm_GBSG2, data = GBSG2)
+Fit: coxph(formula = fm_GBSG2, data = GBSG2, ties = "breslow")
 
 Linear Hypotheses:
                     Estimate Std. Error z value Pr(>|z|)    
-horThyes == 0     -0.3462784  0.1290747  -2.683 0.007301 ** 
-age == 0          -0.0094592  0.0093006  -1.017 0.309126    
-menostatPost == 0  0.2584448  0.1834765   1.409 0.158954    
-tsize == 0         0.0077961  0.0039390   1.979 0.047794 *  
-tgrade.L == 0      0.5512988  0.1898441   2.904 0.003685 ** 
-tgrade.Q == 0     -0.2010905  0.1219654  -1.649 0.099199 .  
-pnodes == 0        0.0487886  0.0074471   6.551  5.7e-11 ***
-progrec == 0      -0.0022172  0.0005735  -3.866 0.000111 ***
-estrec == 0        0.0001973  0.0004504   0.438 0.661307    
+horThyes == 0     -0.3462416  0.1290733  -2.683  0.00731 ** 
+age == 0          -0.0094534  0.0093002  -1.016  0.30941    
+menostatPost == 0  0.2581565  0.1834800   1.407  0.15943    
+tsize == 0         0.0077983  0.0039391   1.980  0.04773 *  
+tgrade.L == 0      0.5510838  0.1898443   2.903  0.00370 ** 
+tgrade.Q == 0     -0.2011060  0.1219646  -1.649  0.09917 .  
+pnodes == 0        0.0487818  0.0074480   6.550 5.77e-11 ***
+progrec == 0      -0.0022175  0.0005735  -3.867  0.00011 ***
+estrec == 0        0.0001978  0.0004504   0.439  0.66049    
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 (Univariate p values reported)
@@ -1418,10 +1502,10 @@ R> predict(lb, newdata = x, coef = c(1, 2))
 [11]   2.0057520   2.1963724   2.3703951   2.5304805   2.6786965
 [16]   2.8166822   2.9457593   3.0670085   3.1813253   3.2894598
 R> predict(lb, newdata = x, coef = c(1, 2), deriv = c(x = 1L))
- [1]        Inf 12.0957757  6.0478878  4.0319252  3.0239439  2.4191551
- [7]  2.0159626  1.7279680  1.5119720  1.3439751  1.2095776  1.0996160
-[13]  1.0079813  0.9304443  0.8639840  0.8063850  0.7559860  0.7115162
-[19]  0.6719875  0.6366198
+ [1] 9.007199e+15 1.209578e+01 6.047888e+00 4.031925e+00 3.023944e+00
+ [6] 2.419155e+00 2.015963e+00 1.727968e+00 1.511972e+00 1.343975e+00
+[11] 1.209578e+00 1.099616e+00 1.007981e+00 9.304443e-01 8.639840e-01
+[16] 8.063850e-01 7.559860e-01 7.115162e-01 6.719875e-01 6.366198e-01
 R> 
 R> ## ----basefun-Bernstein---------------------------------------------------
 R> class(bb <- Bernstein_basis(xvar, order = 3, ui = "increasing"))
@@ -1621,20 +1705,23 @@ R> yvar <- numeric_var("y", support = qY(c(.001, 1 - .001)),
 R> By <- Bernstein_basis(yvar, order = ord <- 15, ui = "increasing")
 R> 
 R> ## ----mlt-chi-mlt---------------------------------------------------------
-R> m <- ctm(By)
-R> d <- as.data.frame(mkgrid(yvar, n = 500))
-R> mod <- mlt(m, data = d, dofit = FALSE)
+R> mod <- ctm(By)
 R> 
 R> ## ----mlt-chi-trafo-------------------------------------------------------
 R> h <- function(x) qnorm(pY(x))
 R> x <- seq(from = support(yvar)[["y"]][1], to = support(yvar)[["y"]][2], 
 +           length.out = ord + 1)
+R> 
+R> ## ----mlt-chi-coef--------------------------------------------------------
 R> mlt::coef(mod) <- h(x)
 R> 
 R> ## ----mlt-chi-sim---------------------------------------------------------
+R> d <- as.data.frame(mkgrid(yvar, n = 500))
 R> d$grid <- d$y
-R> d$y <- simulate(mod)
-R> fmod <- mlt(m, data = d, scale = TRUE)
+R> d$y <- simulate(mod, newdata = d)
+R> 
+R> ## ----mlt-chi-fit---------------------------------------------------------
+R> fmod <- mlt(mod, data = d, scale = TRUE)
 R> 
 R> ## ----mlt-chi-model-------------------------------------------------------
 R> coef(mod)
@@ -1930,93 +2017,93 @@ Bs10(y):(Intercept) Bs11(y):(Intercept)     Bs1(y):horThyes
 
 $mlt_GBSG2_8
   Bs1(y):horThno:Bs1(age)   Bs2(y):horThno:Bs1(age) 
-              -3.67285257                2.17986127 
+              -3.67285577                2.17986248 
   Bs3(y):horThno:Bs1(age)   Bs4(y):horThno:Bs1(age) 
-               2.17986127                2.17986127 
+               2.17986248                2.17986248 
   Bs5(y):horThno:Bs1(age)   Bs6(y):horThno:Bs1(age) 
-               2.80883599                2.80883599 
+               2.80883521                2.80883521 
   Bs7(y):horThno:Bs1(age)   Bs8(y):horThno:Bs1(age) 
-               2.80883599                2.80883599 
+               2.80883521                2.80883521 
   Bs9(y):horThno:Bs1(age)  Bs10(y):horThno:Bs1(age) 
-               2.80883599                4.43094953 
+               2.80883521                4.43094975 
  Bs11(y):horThno:Bs1(age)  Bs1(y):horThyes:Bs1(age) 
-               4.43094953               -2.29542995 
+               4.43094975               -2.56039132 
  Bs2(y):horThyes:Bs1(age)  Bs3(y):horThyes:Bs1(age) 
-              -1.15266874               -1.15266874 
+              -1.20145852               -1.20145852 
  Bs4(y):horThyes:Bs1(age)  Bs5(y):horThyes:Bs1(age) 
-              -1.15266874               -1.15266874 
+              -1.20145852               -1.20145852 
  Bs6(y):horThyes:Bs1(age)  Bs7(y):horThyes:Bs1(age) 
-              -0.10718700               -0.10718700 
+              -0.15615550               -0.15615550 
  Bs8(y):horThyes:Bs1(age)  Bs9(y):horThyes:Bs1(age) 
-              -0.10718700               -0.10718700 
+              -0.15615550               -0.15615550 
 Bs10(y):horThyes:Bs1(age) Bs11(y):horThyes:Bs1(age) 
-              -0.10718700               -0.10718700 
+              -0.15615550               -0.15615550 
   Bs1(y):horThno:Bs2(age)   Bs2(y):horThno:Bs2(age) 
-              -4.73156962               -3.72500376 
+              -4.73157511               -3.72500095 
   Bs3(y):horThno:Bs2(age)   Bs4(y):horThno:Bs2(age) 
-              -3.72500376               -3.72500376 
+              -3.72500095               -3.72500095 
   Bs5(y):horThno:Bs2(age)   Bs6(y):horThno:Bs2(age) 
-              -3.44129075               -3.44129075 
+              -3.44129053               -3.44129053 
   Bs7(y):horThno:Bs2(age)   Bs8(y):horThno:Bs2(age) 
-              -3.44129075               -3.44129075 
+              -3.44129053               -3.44129053 
   Bs9(y):horThno:Bs2(age)  Bs10(y):horThno:Bs2(age) 
-              -3.44129075               -3.44129075 
+              -3.44129053               -3.44129053 
  Bs11(y):horThno:Bs2(age)  Bs1(y):horThyes:Bs2(age) 
-              -3.44129075               -3.95989594 
+              -3.44129053               -3.70343574 
  Bs2(y):horThyes:Bs2(age)  Bs3(y):horThyes:Bs2(age) 
-              -2.09235682               -2.09235682 
+              -2.04109656               -2.04109656 
  Bs4(y):horThyes:Bs2(age)  Bs5(y):horThyes:Bs2(age) 
-              -2.09235682               -2.09235682 
+              -2.04109656               -2.04109656 
  Bs6(y):horThyes:Bs2(age)  Bs7(y):horThyes:Bs2(age) 
-              -2.09235682               -2.09235682 
+              -2.04109656               -2.04109656 
  Bs8(y):horThyes:Bs2(age)  Bs9(y):horThyes:Bs2(age) 
-              -2.09235682               -2.09235682 
+              -2.04109656               -2.04109656 
 Bs10(y):horThyes:Bs2(age) Bs11(y):horThyes:Bs2(age) 
-              -2.09235682               -2.09235682 
+              -2.04109656               -2.04109656 
   Bs1(y):horThno:Bs3(age)   Bs2(y):horThno:Bs3(age) 
-              -5.73428441                0.17352246 
+              -5.73428136                0.17352191 
   Bs3(y):horThno:Bs3(age)   Bs4(y):horThno:Bs3(age) 
-               0.17352246                0.17352246 
+               0.17352191                0.17352191 
   Bs5(y):horThno:Bs3(age)   Bs6(y):horThno:Bs3(age) 
-               0.24331734                1.46050750 
+               0.24331806                1.46050876 
   Bs7(y):horThno:Bs3(age)   Bs8(y):horThno:Bs3(age) 
-               1.46050750                1.46050750 
+               1.46050876                1.46050876 
   Bs9(y):horThno:Bs3(age)  Bs10(y):horThno:Bs3(age) 
-               1.46050750                1.46050750 
+               1.46050876                1.46050876 
  Bs11(y):horThno:Bs3(age)  Bs1(y):horThyes:Bs3(age) 
-               1.46050750              -10.93584964 
+               1.46050876              -11.07300855 
  Bs2(y):horThyes:Bs3(age)  Bs3(y):horThyes:Bs3(age) 
-               0.18469806                0.18469806 
+               0.14290290                0.14290290 
  Bs4(y):horThyes:Bs3(age)  Bs5(y):horThyes:Bs3(age) 
-               0.18469806                0.29914932 
+               0.14290290                0.27076991 
  Bs6(y):horThyes:Bs3(age)  Bs7(y):horThyes:Bs3(age) 
-               0.73069734                0.73069734 
+               0.69300692                0.69300692 
  Bs8(y):horThyes:Bs3(age)  Bs9(y):horThyes:Bs3(age) 
-               0.93596864                2.02956919 
+               0.90229824                1.99320801 
 Bs10(y):horThyes:Bs3(age) Bs11(y):horThyes:Bs3(age) 
-               2.02956919                2.02956919 
+               1.99320801                1.99320801 
   Bs1(y):horThno:Bs4(age)   Bs2(y):horThno:Bs4(age) 
-              -6.74124508               -0.65869989 
+              -6.74124588               -0.65870175 
   Bs3(y):horThno:Bs4(age)   Bs4(y):horThno:Bs4(age) 
-              -0.65869989               -0.65869989 
+              -0.65870175               -0.65870175 
   Bs5(y):horThno:Bs4(age)   Bs6(y):horThno:Bs4(age) 
-              -0.65869989               -0.65869989 
+              -0.65870175               -0.65870175 
   Bs7(y):horThno:Bs4(age)   Bs8(y):horThno:Bs4(age) 
-              -0.65869989                0.01463176 
+              -0.65870175                0.01463709 
   Bs9(y):horThno:Bs4(age)  Bs10(y):horThno:Bs4(age) 
-               0.01463176                0.01463176 
+               0.01463709                0.01463709 
  Bs11(y):horThno:Bs4(age)  Bs1(y):horThyes:Bs4(age) 
-               1.64832594               -2.64616297 
+               1.64832795               -2.61751847 
  Bs2(y):horThyes:Bs4(age)  Bs3(y):horThyes:Bs4(age) 
-              -2.64616297               -2.64616297 
+              -2.61751847               -2.61751847 
  Bs4(y):horThyes:Bs4(age)  Bs5(y):horThyes:Bs4(age) 
-              -1.88422788               -1.88422788 
+              -1.86742230               -1.86742230 
  Bs6(y):horThyes:Bs4(age)  Bs7(y):horThyes:Bs4(age) 
-              -1.88422788               -1.88422788 
+              -1.86742230               -1.86742230 
  Bs8(y):horThyes:Bs4(age)  Bs9(y):horThyes:Bs4(age) 
-              -1.88422788               -1.35838091 
+              -1.86742230               -1.34055534 
 Bs10(y):horThyes:Bs4(age) Bs11(y):horThyes:Bs4(age) 
-              -1.35838091               -1.35838091 
+              -1.34055534               -1.34055534 
 
 $mlt_head
 Bs1(head):Bs1(lage) Bs2(head):Bs1(lage) Bs3(head):Bs1(lage) 
@@ -2125,7 +2212,7 @@ R> #sapply(mltobj, function(m) eval(parse(text = paste("checkGH(", m, ")"))))
 R> 
 R> ## ----sessionInfo, echo = FALSE, results = "hide"-------------------------
 R> sessionInfo()
-R version 3.2.3 (2015-12-10)
+R version 3.2.4 (2016-03-10)
 Platform: x86_64-pc-linux-gnu (64-bit)
 Running under: Ubuntu 14.04.4 LTS
 
@@ -2142,24 +2229,24 @@ attached base packages:
 [8] methods   base     
 
 other attached packages:
- [1] mgcv_1.8-11         nlme_3.1-124        multcomp_1.4-4     
+ [1] mgcv_1.8-11         nlme_3.1-124        multcomp_1.4-5     
  [4] TH.data_1.0-7       mvtnorm_1.0-5       colorspace_1.2-6   
  [7] latticeExtra_0.6-28 RColorBrewer_1.1-2  flexsurv_0.7       
 [10] sandwich_2.3-4      HSAUR3_1.0-5        nnet_7.3-12        
 [13] MASS_7.3-45         gridExtra_2.0.0     lattice_0.20-33    
 [16] truncreg_0.2-1      maxLik_1.3-4        miscTools_0.6-16   
 [19] prodlim_1.5.7       eha_2.4-3           survival_2.38-3    
-[22] mlt_0.0-30          basefun_0.0-30      variables_0.0-30   
+[22] mlt_0.0-32          basefun_0.0-31      variables_0.0-30   
 
 loaded via a namespace (and not attached):
  [1] Rcpp_0.12.3        gtable_0.1.2       Matrix_1.2-3      
  [4] polynom_1.3-8      BB_2014.10-1       knitr_1.12.3      
  [7] deSolve_1.12       mstate_0.2.8       orthopolynom_1.0-5
-[10] lava_1.4.1         codetools_0.2-14   splines_3.2.3     
+[10] lava_1.4.1         codetools_0.2-14   splines_3.2.4     
 [13] numDeriv_2014.2-1  quadprog_1.5-5     muhaz_1.2.6       
 [16] zoo_1.7-12        
 R> 
 R> 
 > proc.time()
    user  system elapsed 
-160.880   0.264 161.053 
+151.224   0.404 151.545 
