@@ -1,4 +1,10 @@
 
+as.mlt <- function(object)
+    UseMethod("as.mlt")
+
+as.mlt.mlt <- function(object)
+    object
+
 weights.mlt <- function(object, ...) {
     if (!is.null(object$weights))
         return(object$weights)

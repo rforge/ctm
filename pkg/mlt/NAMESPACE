@@ -14,7 +14,7 @@ importFrom("grDevices", "rgb")
 importFrom("graphics", "axis", "box", "lines")
 importFrom("methods", "as")
 
-export(R, "coef<-", mlt, ctm, confband, Hessian, Gradient)
+export(R, "coef<-", mlt, ctm, confband, Hessian, Gradient, as.mlt)
 #, paraboot, description
 # Hmlt dmlt, hmlt, pmlt, qmlt, smlt, tmlt
 
@@ -48,6 +48,8 @@ S3method("plot", "mlt")
 S3method("weights", "mlt")
 S3method("Hessian", "mlt")
 S3method("Gradient", "mlt")
+
+S3method("as.mlt", "mlt")
 
 #S3method("model.matrix", "mlt")
 #S3method("paraboot", "mlt")

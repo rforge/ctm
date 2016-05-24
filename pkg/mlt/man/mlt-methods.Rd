@@ -14,6 +14,8 @@
 \alias{bounds.mlt}
 \alias{variable.names.mlt}
 \alias{update.mlt_fit}
+\alias{as.mlt}
+\alias{as.mlt.mlt}
 \title{
   Methods for mlt Objects
 }
@@ -36,6 +38,7 @@ Gradient(object, ...)
 \method{bounds}{mlt}(object)
 \method{variable.names}{mlt}(object, ...)
 \method{update}{mlt_fit}(object, weights, theta, ...)
+\method{as.mlt}{mlt}(object)
 }
 \arguments{
   \item{object}{a fitted conditional transformation model as returned by \code{\link{mlt}}}
