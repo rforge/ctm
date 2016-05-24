@@ -1,9 +1,10 @@
 
 ### <FIXME> rename fixed to coef and allow for specification of coefs, 
 ###         ie fitted models? </FIXME>
-.mlt_setup <- function(model, data, y, offset = NULL, fixed = NULL) {
+.mlt_setup <- function(model, data, y, offset = NULL, 
+                       fixed = coef(model)) {
 
-    response <- model$response
+    response <- variable.names(model, "response")
     stopifnot(length(response) == 1)
     todistr <- model$todistr
 
@@ -18,6 +19,11 @@
 
     ui <- attr(Y, "constraint")$ui
     ci <- attr(Y, "constraint")$ci
+
+    if (!is.null(fixed)) {
+        fixed <- fixed[!is.na(fixed)]
+        if (length(fixed) == 0) fixed <- NULL
+    }
 
     if (!is.null(fixed)) {
         stopifnot(all(names(fixed) %in% colnames(Y)))
@@ -128,7 +134,6 @@
     ret$model <- model
     ret$data <- data
     ret$offset <- offset
-    ret$response <- response
     ret$todistr <- todistr
     ret$loglik <- loglikfct
     ret$score <- score
@@ -143,7 +148,7 @@
     stopifnot(length(pstart) == nrow(data))
     if (is.null(offset)) offset <- rep(0, nrow(data))
 
-    response <- model$response
+    response <- variable.names(model, "response")
     stopifnot(length(response) == 1)
 
     eY <- .mm_exact(model, data = data, response = response, object = y)
@@ -234,7 +239,7 @@ mlt <- function(model, data, weights = NULL, offset = NULL, fixed = NULL,
                 checkGrad = FALSE, trace = FALSE, quiet = TRUE, dofit = TRUE, ...) {
 
     vars <- as.vars(model)
-    response <- model$response
+    response <- variable.names(model, "response")
     responsevar <- vars[[response]]
     bounds <- bounds(responsevar)
     stopifnot(length(response) == 1)

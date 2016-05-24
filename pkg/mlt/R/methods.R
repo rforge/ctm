@@ -71,7 +71,7 @@ mkgrid.ctm <- function(object, n = n, ...)
     mkgrid(object$model, n = n, ...)
 
 variable.names.mlt <- function(object, ...)
-    variable.names(object$model)
+    variable.names(object$model, ...)
 
 model <- function(object)
     UseMethod("model")
