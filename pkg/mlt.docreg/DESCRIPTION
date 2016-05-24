@@ -11,7 +11,7 @@ Imports: numDeriv, stats
 Suggests: variables, basefun, np, eha, truncreg, lattice, MASS, TH.data,
   multcomp (>= 1.4-4), knitr, survival, prodlim, gridExtra, nnet, 
   HSAUR3, sandwich, flexsurv, grid, latticeExtra, colorspace, mgcv,
-  intcox, coxinterval, ICsurv, polspline, logspline, bshazard, gss, 
+  coxinterval, ICsurv, polspline, logspline, bshazard, gss, 
   MIICD, TransModel, dynsurv, timereg, survivalMPL, gamlss, Matrix, 
   muhaz, ICE, ordinal, VGAM, AER, coin, gamlss.data, mlbench
 VignetteBuilder: knitr
