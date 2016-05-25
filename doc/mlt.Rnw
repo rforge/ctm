@@ -2674,7 +2674,7 @@ pkg <- function(pkg)
           pkgversion(pkg), ",][]{pkg:", pkg, "}", sep = "")
 
 pkgs <- c("mlt", "variables", "basefun", "survival", "eha", "prodlim", "truncreg", "MASS", "nnet", "HSAUR3", "sandwich", 
-  "flexsurv", "multcomp", "mgcv", "intcox", "coxinterval", "ICsurv",
+  "flexsurv", "multcomp", "mgcv", "coxinterval", "ICsurv",
   "polspline", "logspline", "bshazard", "gss", "MIICD", "TransModel",
   "dynsurv", "timereg", "survivalMPL", "np", "gamlss", "Matrix", "muhaz", "ICE",
   "ordinal", "VGAM", "BB")
