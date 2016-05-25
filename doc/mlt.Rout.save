@@ -17,6 +17,8 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 'help.start()' for an HTML browser interface to help.
 Type 'q()' to quit R.
 
+[Previously saved workspace restored]
+
 > ## ----setup, echo = FALSE, results = "hide", message = FALSE--------------
 > set.seed(290875)
 > 
@@ -33,7 +35,21 @@ Henningsen, Arne and Toomet, Ott (2011). maxLik: A package for maximum likelihoo
 
 If you have questions, suggestions, or comments regarding the 'maxLik' package, please use a forum or 'tracker' at maxLik's R-Forge site:
 https://r-forge.r-project.org/projects/maxlik/
+
+Attaching package: ‘MASS’
+
+The following object is masked _by_ ‘.GlobalEnv’:
+
+    geyser
+
 Loading required package: tools
+
+Attaching package: ‘HSAUR3’
+
+The following object is masked _by_ ‘.GlobalEnv’:
+
+    CHFLS
+
 
 Attaching package: ‘flexsurv’
 
@@ -55,6 +71,10 @@ Loading required package: mvtnorm
 Loading required package: TH.data
 
 Attaching package: ‘TH.data’
+
+The following object is masked _by_ ‘.GlobalEnv’:
+
+    GBSG2
 
 The following object is masked from ‘package:HSAUR3’:
 
@@ -478,9 +498,9 @@ R> logLik(mlt_GBSG2_1)
 R> cbind(coxph = cf, mlt = coef(mlt_GBSG2_1)[names(cf)],
 +        fss = coef(fss_GBSG2_1)[names(cf)])
                      coxph           mlt           fss
-horThyes     -0.3499938811 -0.3489205601 -0.3473363292
+horThyes     -0.3499938811 -0.3489205601 -0.3473363289
 age          -0.0097886655 -0.0099113611 -0.0097895841
-menostatPost  0.2676640924  0.2675484077  0.2672204916
+menostatPost  0.2676640924  0.2675484077  0.2672204917
 tsize         0.0077966790  0.0077694009  0.0079051625
 tgrade.L      0.5583932973  0.5600329425  0.5554284931
 tgrade.Q     -0.2022612341 -0.2018734495 -0.2078499581
@@ -972,7 +992,7 @@ The following object is masked from 'package:mlt':
 
     coef<-
 
-This is mgcv 1.8-11. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-12. For overview type 'help("mgcv-package")'.
 
 Attaching package: 'mgcv'
 
@@ -2229,24 +2249,25 @@ attached base packages:
 [8] methods   base     
 
 other attached packages:
- [1] mgcv_1.8-11         nlme_3.1-124        multcomp_1.4-5     
+ [1] mgcv_1.8-12         nlme_3.1-128        multcomp_1.4-5     
  [4] TH.data_1.0-7       mvtnorm_1.0-5       colorspace_1.2-6   
- [7] latticeExtra_0.6-28 RColorBrewer_1.1-2  flexsurv_0.7       
+ [7] latticeExtra_0.6-28 RColorBrewer_1.1-2  flexsurv_1.0.0     
 [10] sandwich_2.3-4      HSAUR3_1.0-5        nnet_7.3-12        
-[13] MASS_7.3-45         gridExtra_2.0.0     lattice_0.20-33    
+[13] MASS_7.3-45         gridExtra_2.2.1     lattice_0.20-33    
 [16] truncreg_0.2-1      maxLik_1.3-4        miscTools_0.6-16   
-[19] prodlim_1.5.7       eha_2.4-3           survival_2.38-3    
-[22] mlt_0.0-32          basefun_0.0-31      variables_0.0-30   
+[19] prodlim_1.5.7       eha_2.4-3           survival_2.39-4    
+[22] mlt_0.0-33          basefun_0.0-31      variables_0.0-30   
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.3        gtable_0.1.2       Matrix_1.2-3      
- [4] polynom_1.3-8      BB_2014.10-1       knitr_1.12.3      
- [7] deSolve_1.12       mstate_0.2.8       orthopolynom_1.0-5
-[10] lava_1.4.1         codetools_0.2-14   splines_3.2.4     
-[13] numDeriv_2014.2-1  quadprog_1.5-5     muhaz_1.2.6       
-[16] zoo_1.7-12        
+ [1] Rcpp_0.12.5        evaluate_0.9       gtable_0.2.0      
+ [4] Matrix_1.2-6       polynom_1.3-8      stringr_1.0.0     
+ [7] knitr_1.13         BB_2014.10-1       deSolve_1.13      
+[10] mstate_0.2.9       orthopolynom_1.0-5 lava_1.4.3        
+[13] magrittr_1.5       codetools_0.2-14   splines_3.2.4     
+[16] numDeriv_2014.2-1  quadprog_1.5-5     stringi_1.0-1     
+[19] muhaz_1.2.6        zoo_1.7-13        
 R> 
 R> 
 > proc.time()
    user  system elapsed 
-151.224   0.404 151.545 
+124.228   0.336 124.496 
