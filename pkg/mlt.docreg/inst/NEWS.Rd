@@ -2,7 +2,7 @@
 \name{NEWS}
 \title{NEWS file for the mlt.docreg package}
 
-\section{Changes in Version 0.0-31 (2016-05-24)}{
+\section{Changes in Version 0.0-32 (2016-05-25)}{
   \itemize{
     \item{Remove \pkg{intcox} as the package is archived now.}
   }
