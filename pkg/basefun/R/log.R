@@ -15,10 +15,8 @@ log_basis <- function(var, ui = c("none", "increasing", "decreasing"),
     ui <- switch(ui, "none" = matrix(1),
                      "increasing" = matrix(1),
                      "decreasing" = matrix(-1))
-    if (!remove_intercept) {
-        ci <- c(-Inf, ci)
-        ui <- cbind(0, ci)
-    }
+    if (!remove_intercept)
+        ui <- cbind(0, ui)
 
     basis <- function(data, deriv = 0L) {
 

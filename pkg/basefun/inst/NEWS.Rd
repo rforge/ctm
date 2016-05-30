@@ -2,6 +2,12 @@
 \name{NEWS}
 \title{NEWS file for the basefun package}
 
+\section{Changes in Version 0.0-32 (2016-05-31)}{
+  \itemize{
+    \item{Contraints in \code{log_basis} were potentially wrong.}
+  }
+}
+
 \section{Changes in Version 0.0-31 (2016-04-25)}{
   \itemize{
     \item{\code{log_basis} has better checks for positivity of
