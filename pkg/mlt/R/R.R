@@ -113,8 +113,11 @@ R.numeric <- function(object = NA, cleft = NA, cright = NA,
     }
     ret <- .mkR(exact = object, cleft = cleft, cright = cright,
                 tleft = tleft, tright = tright)
+    ### <FIXME>
+    ### this fails if is.na(object) and only cleft/cright are given
     attr(ret, "prob") <- function(weights)
          .wecdf(object, weights)
+    ### </FIXME>
     ret
 }
 
