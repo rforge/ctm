@@ -1,6 +1,7 @@
 
 ### Box product of two matrices
 .boxprod <- function(x, y) {
+    stopifnot(NROW(x) == NROW(y))
     ret <- x[, rep(1:ncol(x), ncol(y)), drop = FALSE] * 
            y[, rep(1:ncol(y), rep(ncol(x), ncol(y))), drop = FALSE]
     colnames(ret) <- paste(colnames(x)[rep(1:ncol(x), ncol(y))], 
