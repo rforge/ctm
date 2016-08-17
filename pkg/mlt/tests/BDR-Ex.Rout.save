@@ -1,0 +1,51 @@
+
+R version 3.3.1 (2016-06-21) -- "Bug in Your Hair"
+Copyright (C) 2016 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library("mlt")
+Loading required package: basefun
+Loading required package: variables
+> set.seed(29)
+> 
+> n <- 2500
+> y <- rchisq(n, df = 1)
+> 
+> vy <- numeric_var("y", support = quantile(y, prob = c(.1, .9)), bounds = c(0, 10))
+> by <- Bernstein_basis(vy, order = 10, ui = "increasing")
+> 
+> m1 <- mlt(ctm(by), data = data.frame(y = y))
+> 
+> if (require("BDR")) {
++ 
++ mydf <- BDR(data.frame(y = y), as.int = "y", nmax = 50, total = TRUE)
++ 
++ mdf <- attr(mydf, "levels")
++ 
++ m2 <- mlt(ctm(by), data = mdf, weights = weights(mdf))
++ 
++ cf1 <- coef(m1)
++ cf2 <- coef(m2)
++ 
++ print(range(cf1/cf2))
++ 
++ }
+Loading required package: BDR
+[1] 0.9128016 1.0238478
+> 
+> proc.time()
+   user  system elapsed 
+  1.300   0.044   1.342 
