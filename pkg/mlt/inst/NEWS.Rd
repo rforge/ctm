@@ -2,6 +2,12 @@
 \name{NEWS}
 \title{NEWS file for the mlt package}
 
+\section{Changes in Version 0.0-34 (2016-08-30)}{
+  \itemize{
+    \item{fix bug when calling \code{survfit} for computing initial probabilities.}
+  }
+}
+
 \section{Changes in Version 0.0-33 (2016-05-25)}{
   \itemize{
     \item{Make sure \code{times} are ordered before calling

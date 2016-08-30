@@ -48,8 +48,7 @@ R.Surv <- function(object, ...) {
                        tleft = object[, "start"])
     )
     attr(ret, "prob") <- function(weights) {
-        w <- weights[weights > 0]
-        sf <- survival::survfit(object ~ 1, subset = weights > 0, weights = w)
+        sf <- survival::survfit(object ~ 1, subset = weights > 0, weights = weights)
         function(y) {
             s <- summary(sf, times = sort(y))$surv[order(y)]
             s[is.na(s)] <- 0
