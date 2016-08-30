@@ -120,6 +120,15 @@ truncation}
 
 \begin{document}
 
+<<citation, echo = FALSE>>=
+year <- substr(packageDescription("mlt.docreg")$Date, 1, 4)
+version <- packageDescription("mlt.docreg")$Version
+@
+\footnote{Please cite this document as: Torsten Hothorn (\Sexpr{year})
+Most Likely Transformations: The \pkg{mlt} Package. 
+R package vignette version \Sexpr{version}, 
+URL \url{https://CRAN.R-project.org/package=mlt.docreg}.}
+
 % \input{todo}
 
 \section{Introduction}
@@ -1402,10 +1411,10 @@ legend("bottomright", lty = 1:2, lwd = 1, legend = c("time-varying treatment eff
 In a second step, we allow an age-varying treatment effect 
 in the model $(\pMEV, (\bern{10}(\ry)^\top \otimes
        (\I(\text{hormonal therapy}), 1 - \I(\text{hormonal therapy}))
-       \otimes \bernx{10}(\text{age})^\top)^\top, \parm)$. For both treatment
+       \otimes \bernx{3}(\text{age})^\top)^\top, \parm)$. For both treatment
 groups, we estimate a conditional transformation function of survival time
 $\ry$ given age parameterised as the tensor basis of two Bernstein bases. Each of the
-two basis functions comes with $5 \times 6$ linear constraints, so the model
+two basis functions comes with $10 \times 3$ linear constraints, so the model
 was fitted under $60$ linear constraints
 %% <FIXME> use quantile(.1, .9) instead of range for age??? </FIXME>
 <<GBSG2-8, echo = TRUE, cache = TRUE>>=
