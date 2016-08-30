@@ -2,6 +2,7 @@
 .mk_ctmfit <- function(object, parm, nmax) {
     ctmfit <- function(formula, data, weights, cluster, ctrl, nmax = ctrl$nmax, ...) {
         weights <- model.weights(data)
+        if (is.null(weights)) weights <- integer(0)
         block <- data[["(cluster)"]]
         f <- Formula(formula)    
         mf <- model.frame(formula = f, data = data, na.action = na.pass)
@@ -11,7 +12,7 @@
             iy <- c(bdr)
             mf1 <- as.data.frame(bdr)
             attr(iy, "levels") <- 1:nrow(mf1)
-            w <- libcoin::ctabs(iy, weights = weights)
+            w <- libcoin::ctabs(iy, weights = weights)[-1L]
         } else {
             mf1 <- mf
             w <- weights

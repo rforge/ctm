@@ -101,7 +101,7 @@ predict.traforest <- function(object,  newdata, K = 20, q = NULL,
         iy <- c(bdr)
         mf1 <- as.data.frame(bdr)
         attr(iy, "levels") <- 1:nrow(mf1)
-        wi <- libcoin::ctabs(iy, weights = integer(0))
+        wi <- libcoin::ctabs(iy, weights = integer(0))[-1L]
     } else {
         mf1 <- mf   
         wi <- rep(1, NROW(mf))
