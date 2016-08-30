@@ -20,4 +20,5 @@ S3method("logLik", "trafotree")
 S3method("predict", "trafotree")
 S3method("plot", "trafotree")
 S3method("predict", "traforest")
-
+S3method("simulate", "traforest")
+S3method("simulate", "trafotree")

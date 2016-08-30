@@ -1,3 +1,16 @@
+
+.R2vec <- function(object) {
+    if (!inherits(object, "response")) return(object)
+    ex <- object$exact
+    le <- object$cleft
+    ri <- object$cright
+    ex[is.na(ex)] <- 0
+    le[is.na(le) | !is.finite(le)] <- 0
+    ri[is.na(ri) | !is.finite(ri)] <- 0
+    ex + (le + (ri - le) / 2)
+}
+
+
 coef.trafotree <- function(object, ...)
     object$coef
 
@@ -44,18 +57,6 @@ predict.trafotree <- function(object, newdata, K = 20, q = NULL,
 
     if (missing(newdata)) newdata <- data_party(object)
 
-.R2vec <- function(object) {
-    if (!inherits(object, "response")) return(object)
-    ex <- object$exact
-    le <- object$cleft
-    ri <- object$cright
-    ex[is.na(ex)] <- 0
-    le[is.na(le) | !is.finite(le)] <- 0
-    ri[is.na(ri) | !is.finite(ri)] <- 0
-    ex + (le + (ri - le) / 2)
-}
-
-
     ### <FIXME> need .R2vec??? </FIXME>
     pr <- .R2vec(predict(mod, newdata = newdata, q = q, type = type, ...))
     if (!is.matrix(pr))
@@ -91,7 +92,7 @@ predict.traforest <- function(object,  newdata, K = 20, q = NULL,
     if (is.null(q))
         q <- mkgrid(mod, n = K)[[mod$response]]
 
-    if (missing(newdata)) newdata <- data_party(object)
+    if (missing(newdata)) newdata <- object$data
 
     mf <- object$data
     if (nmax < Inf) {
@@ -120,3 +121,26 @@ predict.traforest <- function(object,  newdata, K = 20, q = NULL,
         return(predict(umod, q = q, newdata = newdata, type = type))
     })
 }
+
+simulate.traforest <- function(object, nsim = 1, newdata, cf, ...) {
+
+    if (missing(newdata)) {
+        if (missing(cf))  
+            cf <- predict(object, type = "coef", ...)
+    } else {
+        if (missing(cf))
+            cf <- predict(object, newdata = newdata, type = "coef", ...)
+    }
+    if (is.list(cf)) cf <- do.call("rbind", cf)
+
+    mod <- object$model
+    # mod <- mlt(mod, data = newdata, doFit = FALSE)
+    ret <- vector(mode = "list", length = nrow(cf))
+    for (i in 1:nrow(cf)) {
+        coef(mod) <- cf[i,]
+        ret[[i]] <- simulate(mod, nsim = nsim, newdata = data.frame(1), ...)
+    }
+    ret
+}
+
+simulate.trafotree <- simulate.traforest
