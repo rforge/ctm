@@ -27,7 +27,7 @@ logLik.trafotree <- function(object, newdata, ...) {
         for (i in 1:nlevels(nd)) {
             w <- rep(0, NROW(newdata)) ### newdata is always unweighted
             w[nd == levels(nd)[i]] <- 1
-            if (!is.null(mltmod$iy)) w <- libcoin::ctabs(mltmod$iy, w)[-1L]
+            if (!is.null(mltmod$iy)) w <- libcoin::ctabs(mltmod$iy, weights = w)[-1L]
             ll[i] <- logLik(mltmod$object, parm = coef(object)[levels(nd)[i],], w = w)
         }
         ret <- sum(ll)
@@ -57,7 +57,7 @@ logLik.traforest <- function(object, newdata, OOB = FALSE, ...) {
     ret <- sum(sapply(1:nrow(newdata), function(i) {
         w <- weights
         w[-i] <- 0
-        if (!is.null(mltmod$iy)) w <- libcoin::ctabs(mltmod$iy, w)[-1L]
+        if (!is.null(mltmod$iy)) w <- libcoin::ctabs(mltmod$iy, weights = w)[-1L]
         logLik(mltmod$object, parm = cf[[i]], w = w)
     }))
     attr(ret, "df") <- NA
@@ -122,7 +122,7 @@ predict.traforest <- function(object,  newdata, mnewdata = data.frame(1), K = 20
 
         FUN <- function(response, weights) {
             if (!is.null(mltmod$iy)) 
-                weights <- libcoin::ctabs(mltmod$iy, weights)[-1L]
+                weights <- libcoin::ctabs(mltmod$iy, weights = weights)[-1L]
             umod <- update(mltmod$object, theta = thetastart, weights = weights)
             if (type == "coef") return(coef(umod))
             return(predict(umod, q = q, newdata = mnewdata, type = type))
