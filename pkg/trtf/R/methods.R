@@ -130,11 +130,15 @@ predict.traforest <- function(object,  newdata, mnewdata = data.frame(1), K = 20
         ptype <- "response"
     } 
 
-    return(predict(tmp, newdata = newdata, OOB = OOB, FUN = FUN, type = ptype,
+    if (missing(newdata))
+        return(predict(tmp, OOB = OOB, FUN = FUN, type = ptype,
+                       simplify = simplify))
+    return(predict(tmp, newdata = newdata, FUN = FUN, type = ptype,
                    simplify = simplify))
 }
 
-simulate.traforest <- function(object, nsim = 1, seed, newdata, cf, ...) {
+simulate.traforest <- function(object, nsim = 1, seed = NULL, newdata, 
+                               mnewdata = data.frame(1), cf, ...) {
 
     if (missing(cf)) {
         if (missing(newdata)) {
@@ -151,7 +155,7 @@ simulate.traforest <- function(object, nsim = 1, seed, newdata, cf, ...) {
     for (i in 1:nrow(cf)) {
         coef(mod) <- cf[i,]
         ret[[i]] <- simulate(mod, nsim = nsim, seed = seed, 
-                             newdata = data.frame(1), ...)
+                             newdata = mnewdata, ...)
     }
     ret
 }

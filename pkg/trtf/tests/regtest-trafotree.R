@@ -28,6 +28,8 @@ st21 <- st2
 class(st21) <- class(st21)[-1L]
 plot(st21)
 
+simulate(st2, newdata = GBSG2[1:3,], nsim = 3)
+
 st1 <- ctree(y ~ horTh + age + menostat + tsize + tgrade +
     pnodes + progrec + estrec, data = GBSG2, control = ctrl)
 plot(st1)

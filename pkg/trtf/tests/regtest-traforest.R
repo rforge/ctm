@@ -33,6 +33,8 @@ plot(mod, newdata = data.frame(1), type = "survivor", add = TRUE)
 coef(mod) <- cf[[3]]
 plot(mod, newdata = data.frame(1), type = "survivor", add = TRUE)
 
+simulate(tf, newdata = GBSG2[1:3,], nsim = 3)
+
 cmod <- coxph(Surv(time, cens) ~ horTh + age + menostat + tsize + tgrade +
     pnodes + progrec + estrec, data = GBSG2)
 
