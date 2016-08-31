@@ -10,13 +10,14 @@ importFrom("libcoin", "ctabs")
 import("grid")
 importFrom("graphics", "plot")
 importFrom("stats", "coef", "logLik", "model.frame", "model.weights",
-           "na.pass", "predict", "update")
+           "na.pass", "predict", "update", "simulate", "variable.names")
 
 
 export(trafotree, traforest)
 
 S3method("coef", "trafotree")
 S3method("logLik", "trafotree")
+S3method("logLik", "traforest")
 S3method("predict", "trafotree")
 S3method("plot", "trafotree")
 S3method("predict", "traforest")

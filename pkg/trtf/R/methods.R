@@ -17,19 +17,48 @@ coef.trafotree <- function(object, ...)
 logLik.trafotree <- function(object, newdata, ...) {
 
     if (missing(newdata)) {
+        if (is.null(object$logLik))
+            stop("use trafotree(..., refit = TRUE)")
         ret <- sum(object$logLik)
     } else {
         nd <- factor(predict(object, newdata = newdata, type = "node", ...))
         mod <- mlt(object$model, data = newdata, dofit = FALSE)
         ll <- rep(0, nlevels(nd))
         for (i in 1:nlevels(nd)) {
-            w <- rep(0, NROW(newdata))
+            w <- rep(0, NROW(newdata)) ### newdata is always unweighted
             w[nd == levels(nd)[i]] <- 1
             ll[i] <- logLik(mod, parm = coef(object)[levels(nd)[i],], w = w)
         }
         ret <- sum(ll)
     }
     attr(ret, "df") <- length(coef(object))
+    class(ret) <- "logLik"
+    ret
+}
+
+logLik.traforest <- function(object, newdata, OOB = FALSE, ...) {
+
+    if (missing(newdata)) {
+        cf <- predict(object, OOB = OOB, type = "coef")
+    } else {
+        cf <- predict(object, newdata = newdata, type = "coef")
+    }
+    mod <- object$model
+    if (missing(newdata)) {
+        newdata <- object$data
+        weights <- rep(1, nrow(newdata))
+    } else {
+        weights <- object$fitted[["(weights)"]]
+        if (is.null(weights)) weights <- rep(1, nrow(newdata))
+    }
+    mltmod <- mlt(mod, data = newdata, dofit = FALSE)
+
+    ret <- sum(sapply(1:nrow(newdata), function(i) {
+        w <- weights
+        w[-i] <- 0
+        logLik(mltmod, parm = cf[[i]], w = w)
+    }))
+    attr(ret, "df") <- NA
     class(ret) <- "logLik"
     ret
 }
@@ -70,59 +99,53 @@ predict.trafotree <- function(object, newdata, K = 20, q = NULL,
     pr
 }
 
-predict.traforest <- function(object,  newdata, K = 20, q = NULL,
-    type = c("weights", "coef", "trafo", "distribution", "survivor", "density",
+predict.traforest <- function(object,  newdata, mnewdata = data.frame(1), K = 20, q = NULL,
+    type = c("weights", "node", "coef", "trafo", "distribution", "survivor", "density",
              "logdensity", "hazard", "loghazard", "cumhazard", "quantile"),
-    OOB = FALSE, nmax = Inf,
-    ...) {
+    OOB = FALSE, simplify = FALSE, nmax = Inf, ...) {
 
     type <- match.arg(type)
     tmp <- object
     class(tmp) <- class(tmp)[-1L]
 
-    if (missing(newdata)) {
-        w <- predict(tmp, OOB = OOB, type = "weights")
-    } else {
-        w <- predict(tmp, newdata = newdata, type = "weights")
-    }
+    FUN <- NULL
+    ptype <- type
+    if (!(type %in% c("weights", "node"))) {
+        mod <- object$model
+        if (is.null(q))
+            q <- mkgrid(mod, n = K)[[mod$response]]
 
-    if (type == "weights") return(w)
-
-    mod <- object$model
-    if (is.null(q))
-        q <- mkgrid(mod, n = K)[[mod$response]]
-
-    if (missing(newdata)) newdata <- object$data
-
-    mf <- object$data
-    if (nmax < Inf) {
-        bdr <- BDR::BDR(mf, total = TRUE, nmax = nmax, complete.cases.only = TRUE,
-                        as.interval = mod$response)
-        iy <- c(bdr)
-        mf1 <- as.data.frame(bdr)
-        attr(iy, "levels") <- 1:nrow(mf1)
-        wi <- libcoin::ctabs(iy, weights = integer(0))[-1L]
-    } else {
-        mf1 <- mf   
-        wi <- rep(1, NROW(mf))
-    }
-
-    mltmod <- mlt(mod, data = mf1, weights = wi, maxit = 10000)
-    thetastart <- coef(mltmod)
-
-    lapply(1:ncol(w), function(i) {
+        mf <- object$data[, variable.names(mod), drop = FALSE]
         if (nmax < Inf) {
-            wi <- libcoin::ctabs(iy, weights = w[,i])[-1L]
+            bdr <- BDR::BDR(mf, total = TRUE, nmax = nmax, complete.cases.only = TRUE,
+                            as.interval = mod$response)
+            iy <- c(bdr)
+            mf1 <- as.data.frame(bdr)
+            attr(iy, "levels") <- 1:nrow(mf1)
+            wi <- libcoin::ctabs(iy, weights = integer(0))[-1L]
         } else {
-            wi <- w[,i]
-        }      
-        umod <- update(mltmod, theta = thetastart, weights = wi)
-        if (type == "coef") return(coef(umod))
-        return(predict(umod, q = q, newdata = newdata, type = type))
-    })
+            mf1 <- mf   
+            wi <- rep(1, NROW(mf))
+        }
+
+        mltmod <- mlt(mod, data = mf1, weights = wi, ...)
+        thetastart <- coef(mltmod)
+
+        FUN <- function(response, weights) {
+            if (nmax < Inf)
+                weights <- libcoin::ctabs(iy, weights = weights)[-1L]
+            umod <- update(mltmod, theta = thetastart, weights = weights)
+            if (type == "coef") return(coef(umod))
+            return(predict(umod, q = q, newdata = mnewdata, type = type))
+        }
+        ptype <- "response"
+    } 
+
+    return(predict(tmp, newdata = newdata, OOB = OOB, FUN = FUN, type = ptype,
+                   simplify = simplify))
 }
 
-simulate.traforest <- function(object, nsim = 1, newdata, cf, ...) {
+simulate.traforest <- function(object, nsim = 1, seed, newdata, cf, ...) {
 
     if (missing(newdata)) {
         if (missing(cf))  
@@ -134,11 +157,12 @@ simulate.traforest <- function(object, nsim = 1, newdata, cf, ...) {
     if (is.list(cf)) cf <- do.call("rbind", cf)
 
     mod <- object$model
-    # mod <- mlt(mod, data = newdata, doFit = FALSE)
+    # mod <- mlt(mod, data = newdata, dofit = FALSE)
     ret <- vector(mode = "list", length = nrow(cf))
     for (i in 1:nrow(cf)) {
         coef(mod) <- cf[i,]
-        ret[[i]] <- simulate(mod, nsim = nsim, newdata = data.frame(1), ...)
+        ret[[i]] <- simulate(mod, nsim = nsim, seed = seed, 
+                             newdata = data.frame(1), ...)
     }
     ret
 }

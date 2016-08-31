@@ -15,6 +15,8 @@ st2 <- trafotree(m, formula = y ~ horTh + age + menostat + tsize + tgrade +
 coef(st2)
 logLik(st2)
 logLik(st2, newdata = GBSG2)
+logLik(st2, newdata = GBSG2[1:10,])
+sum(sapply(1:10, function(i) logLik(st2, newdata = GBSG2[i,, drop = FALSE])))
 
 predict(st2, newdata = GBSG2[1:3,], type = "node")
 predict(st2, newdata = GBSG2[1:3,], type = "coef")
@@ -22,8 +24,9 @@ predict(st2, newdata = GBSG2[1:3,], type = "hazard")
 
 plot(st2, type = "survivor")
 
-class(st2) <- class(st2)[-1L]
-plot(st2)
+st21 <- st2
+class(st21) <- class(st21)[-1L]
+plot(st21)
 
 st1 <- ctree(y ~ horTh + age + menostat + tsize + tgrade +
     pnodes + progrec + estrec, data = GBSG2, control = ctrl)
