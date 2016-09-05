@@ -148,27 +148,46 @@ predict.traforest <- function(object,  newdata, mnewdata = data.frame(1), K = 20
 }
 
 simulate.traforest <- function(object, nsim = 1, seed = NULL, newdata, 
-                               mnewdata = data.frame(1), coef = NULL, ...) {
+                               OOB = FALSE, coef = NULL, ...) {
 
     if (is.null(coef)) {
         if (missing(newdata)) {
-            cf <- predict(object, type = "coef", ...)
+            cf <- predict(object, type = "coef", OOB = OOB)
+            newdata <- object$data
         } else {
-            cf <- predict(object, newdata = newdata, type = "coef", ...)
+            cf <- predict(object, newdata = newdata, type = "coef")
         }
     } else {
         cf <- coef
+        newdata <- object$data
     }
     if (is.list(cf)) cf <- do.call("rbind", cf)
+    if (nrow(cf) != nrow(newdata)) stop("coef and newdata don't match")
 
     mod <- object$model
     ret <- vector(mode = "list", length = nrow(cf))
     for (i in 1:nrow(cf)) {
         coef(mod) <- cf[i,]
         ret[[i]] <- simulate(mod, nsim = nsim, seed = seed, 
-                             newdata = mnewdata, ...)
+                             newdata = newdata[i,,drop = FALSE], bysim = FALSE, ...)[[1]]
     }
-    ret
+    ans <- vector(mode = "list", length = nsim)
+    if (any(sapply(ret, function(x) inherits(x, "response")))) {
+        ret <- lapply(ret, function(x) {
+            if (inherits(x, "response")) return(x)
+            R(x)
+        })
+        for (j in 1:nsim) {
+            for (i in 1:nrow(cf))
+                ans[[j]] <- rbind(ans[[j]], ret[[i]][j,])
+        }
+    } else {
+        for (j in 1:nsim) {
+            for (i in 1:nrow(cf))
+                ans[[j]] <- rbind(ans[[j]], ret[[i]][j])
+        }
+    }
+    ans
 }
 
 simulate.trafotree <- simulate.traforest
