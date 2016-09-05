@@ -37,12 +37,16 @@ logLik.trafotree <- function(object, newdata, ...) {
     ret
 }
 
-logLik.traforest <- function(object, newdata, OOB = FALSE, ...) {
+logLik.traforest <- function(object, newdata, OOB = FALSE, coef = NULL, ...) {
 
-    if (missing(newdata)) {
-        cf <- predict(object, OOB = OOB, type = "coef")
+    if (is.null(coef)) {
+        if (missing(newdata)) {
+            cf <- predict(object, OOB = OOB, type = "coef")
+        } else {
+            cf <- predict(object, newdata = newdata, type = "coef")
+        }
     } else {
-        cf <- predict(object, newdata = newdata, type = "coef")
+        cf <- coef
     }
     mod <- object$model
     if (missing(newdata)) {
