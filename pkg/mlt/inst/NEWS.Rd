@@ -5,7 +5,8 @@
 \section{Changes in Version 0.0-34 (2016-08-30)}{
   \itemize{
     \item{fix bug when calling \code{survfit} for computing initial probabilities.}
-  }
+    \item{add \code{bysim} argument to \code{simulate}.}
+ }
 }
 
 \section{Changes in Version 0.0-33 (2016-05-25)}{
