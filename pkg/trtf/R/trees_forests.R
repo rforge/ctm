@@ -1,6 +1,8 @@
 
 trafotree <- function(object, parm = 1:length(coef(object)), mltargs = list(maxit = 10000), ...) {
 
+    mltargs$model <- object
+
     ctmfit <- function(formula, data, weights, cluster, ctrl, ...) {
         weights <- model.weights(data)
         if (is.null(weights)) weights <- integer(0)
@@ -19,20 +21,20 @@ trafotree <- function(object, parm = 1:length(coef(object)), mltargs = list(maxi
             if (length(w) == 0) w <- rep(1, nrow(mf1))
             iy <- NULL
         }
-        mltargs$model <- object
         mltargs$data <- mf1  
         mltargs$weights <- w     
         object <- do.call("mlt", mltargs)
         thetastart <- coef(object)
         thetastart <- coef(object)
 
-        function(subset, model = FALSE) {
+        function(subset, info = NULL, model = FALSE) {
             if (model) return(list(object = object, iy = iy))
             if (ctrl$nmax < Inf) {
                 w <- libcoin::ctabs(iy, weights = weights, subset = subset)[-1L]
             } else {
                 w[-subset] <- 0
             }
+            if (!is.null(info$coef)) thetastart <- info$coef
             ret <- estfun(mod <- update(object, weights = w,
                           theta = thetastart))[, parm, drop = FALSE]
             ret <- ret / w ### we need UNWEIGHTED scores
@@ -46,6 +48,7 @@ trafotree <- function(object, parm = 1:length(coef(object)), mltargs = list(maxi
     ret <- ctree(..., ytrafo = ctmfit)
     ret$model <- object
     ret$mltobj <- ret$trafo(model = TRUE)
+    ret$mltargs <- mltargs
 
     nd <- predict(ret, type = "node")
     ret$models <- tapply(1:length(nd), factor(nd), function(i) 
@@ -59,6 +62,8 @@ trafotree <- function(object, parm = 1:length(coef(object)), mltargs = list(maxi
 
 traforest <- function(object, parm = 1:length(coef(object)), mltargs = list(maxit = 10000), ...) {
 
+    mltargs$model <- object
+ 
     ctmfit <- function(formula, data, weights, cluster, ctrl, ...) {
         weights <- model.weights(data)
         if (!is.null(weights)) 
@@ -79,19 +84,19 @@ traforest <- function(object, parm = 1:length(coef(object)), mltargs = list(maxi
             if (length(w) == 0) w <- rep(1, nrow(mf1))
             iy <- NULL
         }
-        mltargs$model <- object
         mltargs$data <- mf1
         mltargs$weights <- w
         object <- do.call("mlt", mltargs)
         thetastart <- coef(object)
 
-        function(subset, model = FALSE) {
+        function(subset, info = NULL, model = FALSE) {
             if (model) return(list(object = object, iy = iy))
             if (ctrl$nmax < Inf) {
                 w <- libcoin::ctabs(iy, weights = weights, subset = subset)[-1L]
             } else {
                 w[-subset] <- 0
             }
+            if (!is.null(info$coef)) thetastart <- info$coef
             ret <- estfun(mod <- update(object, weights = w,
                           theta = thetastart))[, parm, drop = FALSE]
             ret <- ret / w ### we need UNWEIGHTED scores
@@ -103,6 +108,7 @@ traforest <- function(object, parm = 1:length(coef(object)), mltargs = list(maxi
     }
     ret <- cforest(..., ytrafo = ctmfit)
     ret$model <- object
+    ret$mltargs <- mltargs
     ret$mltobj <- ret$trafo(model = TRUE)
     class(ret) <- c("traforest", class(ret))
     ret

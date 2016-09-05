@@ -16,23 +16,26 @@ coef.trafotree <- function(object, ...)
 
 logLik.trafotree <- function(object, newdata, ...) {
 
+    cf <- coef(object)
     if (missing(newdata)) {
-        if (is.null(object$logLik))
-            stop("use trafotree(..., refit = TRUE)")
         ret <- sum(object$logLik)
     } else {
         nd <- factor(predict(object, newdata = newdata, type = "node", ...))
-        mltmod <- object$mltobj
-        ll <- rep(0, nlevels(nd))
+        ### set up unfitted model with newdata
+        mltargs <- object$mltargs
+        mltargs$data <- newdata
+        mltargs$dofit <- FALSE
+        mltmod <- do.call("mlt", mltargs)
+        weights <- rep(1, nrow(newdata))
+        ll <- numeric(nlevels(nd))
         for (i in 1:nlevels(nd)) {
-            w <- rep(0, NROW(newdata)) ### newdata is always unweighted
+            w <- numeric(nrow(newdata))
             w[nd == levels(nd)[i]] <- 1
-            if (!is.null(mltmod$iy)) w <- libcoin::ctabs(mltmod$iy, weights = w)[-1L]
-            ll[i] <- logLik(mltmod$object, parm = coef(object)[levels(nd)[i],], w = w)
+            ll[i] <- logLik(mltmod, parm = cf[levels(nd)[i],], w = w)
         }
         ret <- sum(ll)
     }
-    attr(ret, "df") <- length(coef(object))
+    attr(ret, "df") <- length(cf)
     class(ret) <- "logLik"
     ret
 }
@@ -48,21 +51,24 @@ logLik.traforest <- function(object, newdata, OOB = FALSE, coef = NULL, ...) {
     } else {
         cf <- coef
     }
-    mod <- object$model
     if (missing(newdata)) {
+        mltmod <- object$model
         newdata <- object$data
-        weights <- rep(1, nrow(newdata))
-    } else {
         weights <- object$fitted[["(weights)"]]
         if (is.null(weights)) weights <- rep(1, nrow(newdata))
+    } else {
+        ### set up unfitted model with newdata
+        mltargs <- object$mltargs
+        mltargs$data <- newdata
+        mltargs$dofit <- FALSE
+        mltmod <- do.call("mlt", mltargs)
+        weights <- rep(1, nrow(newdata))
     }
-    mltmod <- object$mltobj
 
     ret <- sum(sapply(1:nrow(newdata), function(i) {
-        w <- weights
-        w[-i] <- 0
-        if (!is.null(mltmod$iy)) w <- libcoin::ctabs(mltmod$iy, weights = w)[-1L]
-        logLik(mltmod$object, parm = cf[[i]], w = w)
+        w <- numeric(length(weights))
+        w[i] <- weights[i]
+        logLik(mltmod, parm = cf[[i]], w = w)
     }))
     attr(ret, "df") <- NA
     class(ret) <- "logLik"
@@ -142,19 +148,20 @@ predict.traforest <- function(object,  newdata, mnewdata = data.frame(1), K = 20
 }
 
 simulate.traforest <- function(object, nsim = 1, seed = NULL, newdata, 
-                               mnewdata = data.frame(1), cf, ...) {
+                               mnewdata = data.frame(1), coef = NULL, ...) {
 
-    if (missing(cf)) {
+    if (is.null(coef)) {
         if (missing(newdata)) {
             cf <- predict(object, type = "coef", ...)
         } else {
             cf <- predict(object, newdata = newdata, type = "coef", ...)
         }
+    } else {
+        cf <- coef
     }
     if (is.list(cf)) cf <- do.call("rbind", cf)
 
     mod <- object$model
-    # mod <- mlt(mod, data = newdata, dofit = FALSE)
     ret <- vector(mode = "list", length = nrow(cf))
     for (i in 1:nrow(cf)) {
         coef(mod) <- cf[i,]
