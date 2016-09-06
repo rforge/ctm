@@ -114,37 +114,52 @@ predict.trafotree <- function(object, newdata, K = 20, q = NULL,
 predict.traforest <- function(object,  newdata, mnewdata = data.frame(1), K = 20, q = NULL,
     type = c("weights", "node", "coef", "trafo", "distribution", "survivor", "density",
              "logdensity", "hazard", "loghazard", "cumhazard", "quantile"),
-    OOB = FALSE, simplify = FALSE, nmax = Inf, ...) {
+    OOB = FALSE, simplify = FALSE, trace = FALSE, ...) {
 
     type <- match.arg(type)
     tmp <- object
     class(tmp) <- class(tmp)[-1L]
 
-    FUN <- NULL
     ptype <- type
-    if (!(type %in% c("weights", "node"))) {
-        mod <- object$model
-        if (is.null(q))
-            q <- mkgrid(mod, n = K)[[mod$response]]
+    if (!(ptype %in% c("weights", "node"))) ptype <- "weights"
+    if (missing(newdata)) {
+        ret <- predict(tmp, OOB = OOB, type = ptype,
+                       simplify = TRUE)
+    } else {
+        ret <- predict(tmp, newdata = newdata, type = ptype,
+                       simplify = TRUE)
+    }
+    if (type %in% c("weights", "node")) return(ret)
 
-        mltmod <- object$mltobj
-        thetastart <- coef(mltmod$object)
+    mod <- object$model
+    if (is.null(q))
+        q <- mkgrid(mod, n = K)[[mod$response]]
+    mltmod <- object$mltobj
+    thetastart <- coef(mltmod$object)
 
-        FUN <- function(response, weights) {
-            if (!is.null(mltmod$iy)) 
-                weights <- libcoin::ctabs(mltmod$iy, weights = weights)[-1L]
-            umod <- update(mltmod$object, theta = thetastart, weights = weights)
-            if (type == "coef") return(coef(umod))
-            return(predict(umod, q = q, newdata = mnewdata, type = type))
+    ans <- vector(mode = "list", length = ncol(ret))
+    names(ans) <- colnames(ret)
+    cf <- vector(mode = "list", length = ncol(ret))
+    names(cf) <- colnames(ret)
+
+    if (trace) pb <- txtProgressBar(style = 3)
+    for (i in 1:ncol(ret)) {
+        if (trace) setTxtProgressBar(pb, í / ncol(ret))
+        w <- ret[,i]
+        if (!is.null(mltmod$iy)) 
+            w <- libcoin::ctabs(mltmod$iy, weights = w)[-1L]
+        if (i > 1) {
+            imin <- which.min(cs <- colSums((ret[, 1:(i - 1), drop = FALSE] - w)^2))
+            thetastart <- cf[[imin]]
         }
-        ptype <- "response"
+        umod <- update(mltmod$object, theta = thetastart, weights = w)
+        cf[[i]] <- coef(umod)
+        if (type != "coef")
+            ans[[i]] <- predict(umod, q = q, newdata = mnewdata, type = type)
     } 
-
-    if (missing(newdata))
-        return(predict(tmp, OOB = OOB, FUN = FUN, type = ptype,
-                       simplify = simplify))
-    return(predict(tmp, newdata = newdata, FUN = FUN, type = ptype,
-                   simplify = simplify))
+    if (trace) close(pb)
+    if (type == "coef") return(cf)
+    return(ans)
 }
 
 simulate.traforest <- function(object, nsim = 1, seed = NULL, newdata, 

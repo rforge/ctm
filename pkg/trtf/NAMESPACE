@@ -7,6 +7,11 @@ importFrom("sandwich", "estfun")
 importFrom("variables", "mkgrid")
 importFrom("libcoin", "ctabs")
 
+importFrom("utils",
+  "setTxtProgressBar",
+  "txtProgressBar"
+)
+
 import("grid")
 importFrom("graphics", "plot")
 importFrom("stats", "coef", "logLik", "model.frame", "model.weights",
