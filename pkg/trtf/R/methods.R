@@ -148,12 +148,25 @@ predict.traforest <- function(object,  newdata, mnewdata = data.frame(1), K = 20
         w <- ret[,i]
         if (!is.null(mltmod$iy)) 
             w <- libcoin::ctabs(mltmod$iy, weights = w)[-1L]
-        if (i > 1) {
+        if (i > 25) {
             imin <- which.min(cs <- colSums((ret[, 1:(i - 1), drop = FALSE] - w)^2))
             thetastart <- cf[[imin]]
         }
-        umod <- update(mltmod$object, theta = thetastart, weights = w)
-        cf[[i]] <- coef(umod)
+        ### try hard to estimate parameters; if may happen that parameters for 
+        ### a specific obs are not identified (out of range)
+        umod <- try(update(mltmod$object, theta = thetastart, weights = w))
+        if (inherits(umod, "try-error") || umod$convergence != 0) {
+            umod <- try(update(mltmod$object, weights = w))
+            if (inherits(umod, "try-error") || umod$convergence != 0) {
+                umod <- try(mlt(object$model, data = object$data, weights = w, ...))
+                if (inherits(umod, "try-error")) {
+                    thiscoef <- NaN
+                } else {
+                    thiscoef <- coef(umod)
+                }
+            }
+        }
+        cf[[i]] <- thiscoef
         if (type != "coef")
             ans[[i]] <- predict(umod, q = q, newdata = mnewdata, type = type)
     } 
