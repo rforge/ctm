@@ -157,18 +157,18 @@ predict.traforest <- function(object,  newdata, mnewdata = data.frame(1), K = 20
         umod <- try(update(mltmod$object, theta = thetastart, weights = w))
         if (inherits(umod, "try-error") || umod$convergence != 0) {
             umod <- try(update(mltmod$object, weights = w))
-            if (inherits(umod, "try-error") || umod$convergence != 0) {
+            thiscoef <- coef(umod)
+            if (inherits(umod, "try-error") || umod$convergence != 0)
                 umod <- try(mlt(object$model, data = object$data, weights = w, ...))
-                if (inherits(umod, "try-error")) {
-                    thiscoef <- NaN
-                } else {
-                    thiscoef <- coef(umod)
-                }
-            }
         }
-        cf[[i]] <- thiscoef
-        if (type != "coef")
-            ans[[i]] <- predict(umod, q = q, newdata = mnewdata, type = type)
+        if (inherits(umod, "try-error")) {
+            cf[[i]] <- NA
+            ans[[i]] <- NA
+        } else {
+            cf[[i]] <- coef(umod)
+            if (type != "coef")
+                ans[[i]] <- predict(umod, q = q, newdata = mnewdata, type = type)
+        }
     } 
     if (trace) close(pb)
     if (type == "coef") return(cf)
