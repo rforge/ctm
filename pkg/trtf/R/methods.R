@@ -144,7 +144,7 @@ predict.traforest <- function(object,  newdata, mnewdata = data.frame(1), K = 20
 
     if (trace) pb <- txtProgressBar(style = 3)
     for (i in 1:ncol(ret)) {
-        if (trace) setTxtProgressBar(pb, í / ncol(ret))
+        if (trace) setTxtProgressBar(pb, i / ncol(ret))
         w <- ret[,i]
         if (!is.null(mltmod$iy)) 
             w <- libcoin::ctabs(mltmod$iy, weights = w)[-1L]
