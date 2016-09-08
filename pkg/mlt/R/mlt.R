@@ -82,7 +82,7 @@
         ui <- ui[!r0,,drop = FALSE]
         ci <- ci[!r0]
         if (nrow(ui) == 0) ui <- ci <- NULL
-        ci <- ci + sqrt(.Machine$double.eps) ### we need ui %*% theta > ci, not >= ci
+#        ci <- ci + sqrt(.Machine$double.eps) ### we need ui %*% theta > ci, not >= ci
     }
 
     optimfct <- function(theta, weights, scale = FALSE, quiet = TRUE, ...) {
@@ -275,6 +275,7 @@ mlt <- function(model, data, weights = NULL, offset = NULL, fixed = NULL,
     args$quiet <- quiet
     ret <- do.call(".mlt_fit", args)
     ret$call <- match.call()
+    ret$checkGrad <- checkGrad
     ret$bounds <- bounds
     ret
 }
