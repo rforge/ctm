@@ -10,11 +10,19 @@ predict.ctm <- function(object, newdata, type = c("trafo", "distribution", "surv
     if (type == "quantile")
         stopifnot(!is.null(p) && (min(p) > 0 & max(p) < 1))
 
-    if (!is.null(newdata)) {
-        if (!is.data.frame(newdata)) {
-            if (type != "quantile")
+    y <- variable.names(object, "response")
+    if (!missing(newdata)) {
+        if (!is.data.frame(newdata)) { ### newdata is list with _all_ variables
+            stopifnot(is.null(q))
+            if (type != "quantile") ### hm, why???
                 stopifnot(variable.names(object, "response") %in% names(newdata))
         }
+        if (!(y %in% names(newdata)) && is.null(q))
+            q <- mkgrid(object, n = K)[[y]]
+    } else {
+        newdata <- NULL
+        if (is.null(q))
+            q <- mkgrid(object, n = K)[[y]]
     }
 
     ret <- switch(type, 
