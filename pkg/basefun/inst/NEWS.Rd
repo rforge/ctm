@@ -6,7 +6,9 @@
   \itemize{
     \item{Approximate Bernstein polynomial f outside its \code{support} (l, u)
           by a linear function f(u + x) = f(u) + f'(u) * (u - x), now also
-          for \code{deriv > 0}}.
+          for \code{deriv > 0} (\code{maxderiv} argument in 
+          \code{model.matrix.Bernstein_basis}. The default (linear extrapolation
+          for \code{deriv = 0} only) did not change.}
   }
 }
 
@@ -30,4 +32,3 @@
           published on CRAN.}
   }
 }
-

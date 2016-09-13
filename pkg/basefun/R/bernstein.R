@@ -98,7 +98,8 @@ Bernstein_basis <- function(var, order = 2,
 
 ### evaluate model.matrix of Bernstein polynom
 model.matrix.Bernstein_basis <- function(object, data,
-                                         deriv = 0L, 
+                                         deriv = 0L,
+                                         maxderiv = 1L, 
                                          integrate = FALSE, ...) {
 
     varname <- variable.names(object)
@@ -116,16 +117,16 @@ model.matrix.Bernstein_basis <- function(object, data,
     stopifnot(!integrate)
     ### interpolate f^d(c + x) = f^d(c) + f^d+1(c + x) * (x - c)
     ### note: the code allows for maxderiv <- deriv + d, d > 1
-    maxderiv <- deriv + 1L
-    data[[varname]][small] <- s[1]        
-    data[[varname]][large] <- s[2]        
+    order <- get("order", envir = environment(object))
+    data[[varname]][small] <- s[1]
+    data[[varname]][large] <- s[2]
     ret <- object(data = data, deriv = deriv, integrate = integrate)
     if (any(small)) {
         dsmall <- data.frame(x = rep(s[1], sum(small)))
         names(dsmall) <- varname
         xdiff <- x[small] - s[1]
         dfun <- function(deriv) {
-            if (deriv == maxderiv)
+            if (deriv >= maxderiv)
                 return(object(data = dsmall, deriv = deriv))
             return(object(data = dsmall, deriv = deriv) +
                    dfun(deriv + 1L) * xdiff)
@@ -138,7 +139,7 @@ model.matrix.Bernstein_basis <- function(object, data,
         X <- object(data = dlarge)
         xdiff <- x[large] - s[2]
         dfun <- function(deriv) {
-            if (deriv == maxderiv)
+            if (deriv >= maxderiv)
                 return(object(data = dlarge, deriv = deriv))
             return(object(data = dlarge, deriv = deriv) +   
                    dfun(deriv + 1L) * xdiff)
