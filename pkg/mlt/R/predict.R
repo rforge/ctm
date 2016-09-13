@@ -27,15 +27,15 @@ predict.ctm <- function(object, newdata, type = c("trafo", "distribution", "surv
 
     ret <- switch(type, 
         "trafo" = tmlt(object = object, newdata = newdata, q = q, terms = terms, ...),
-        "distribution" = pmlt(object = object, newdata = newdata, q = q),
-        "survivor" = smlt(object = object, newdata = newdata, q = q),
-        "density" = dmlt(object = object, newdata = newdata, q = q, log = FALSE),
-        "logdensity" = dmlt(object = object, newdata = newdata, q = q, log = TRUE),
-        "hazard" = hmlt(object = object, newdata = newdata, q = q, log = FALSE),
-        "loghazard" = hmlt(object = object, newdata = newdata, q = q, log = TRUE),
-        "cumhazard" = Hmlt(object = object, newdata = newdata, q = q),
+        "distribution" = pmlt(object = object, newdata = newdata, q = q, ...),
+        "survivor" = smlt(object = object, newdata = newdata, q = q, ...),
+        "density" = dmlt(object = object, newdata = newdata, q = q, log = FALSE, ...),
+        "logdensity" = dmlt(object = object, newdata = newdata, q = q, log = TRUE, ...),
+        "hazard" = hmlt(object = object, newdata = newdata, q = q, log = FALSE, ...),
+        "loghazard" = hmlt(object = object, newdata = newdata, q = q, log = TRUE, ...),
+        "cumhazard" = Hmlt(object = object, newdata = newdata, q = q, ...),
         "quantile" = qmlt(object = object, newdata = newdata, n = K,
-                          p = p, interpolate = interpolate))
+                          p = p, interpolate = interpolate, ...))
 
     return(ret)
 }
