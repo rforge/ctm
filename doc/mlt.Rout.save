@@ -1,5 +1,5 @@
 
-R version 3.2.4 (2016-03-10) -- "Very Secure Dishes"
+R version 3.3.1 (2016-06-21) -- "Bug in Your Hair"
 Copyright (C) 2016 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -17,8 +17,6 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 'help.start()' for an HTML browser interface to help.
 Type 'q()' to quit R.
 
-[Previously saved workspace restored]
-
 > ## ----setup, echo = FALSE, results = "hide", message = FALSE--------------
 > set.seed(290875)
 > 
@@ -35,21 +33,7 @@ Henningsen, Arne and Toomet, Ott (2011). maxLik: A package for maximum likelihoo
 
 If you have questions, suggestions, or comments regarding the 'maxLik' package, please use a forum or 'tracker' at maxLik's R-Forge site:
 https://r-forge.r-project.org/projects/maxlik/
-
-Attaching package: ‘MASS’
-
-The following object is masked _by_ ‘.GlobalEnv’:
-
-    geyser
-
 Loading required package: tools
-
-Attaching package: ‘HSAUR3’
-
-The following object is masked _by_ ‘.GlobalEnv’:
-
-    CHFLS
-
 
 Attaching package: ‘flexsurv’
 
@@ -71,10 +55,6 @@ Loading required package: mvtnorm
 Loading required package: TH.data
 
 Attaching package: ‘TH.data’
-
-The following object is masked _by_ ‘.GlobalEnv’:
-
-    GBSG2
 
 The following object is masked from ‘package:HSAUR3’:
 
@@ -217,6 +197,10 @@ In trellis.par.set(list(plot.symbol = list(col = 1, pch = 20, cex = 0.7),  :
 > ## R settings
 > options(prompt = "R> ", continue = "+  ", useFancyQuotes = FALSE)  # JSS style
 R> options(width = 75)
+R> 
+R> ## ----citation, echo = FALSE----------------------------------------------
+R> year <- substr(packageDescription("mlt.docreg")$Date, 1, 4)
+R> version <- packageDescription("mlt.docreg")$Version
 R> 
 R> ## ----geyser-var, echo = TRUE---------------------------------------------
 R> library("mlt")
@@ -566,15 +550,15 @@ R> cbind(survreg = coef(survreg_GBSG2_3)[names(cf)] / survreg_GBSG2_3$scale,
 +        phreg = - coef(phreg_GBSG2_3)[names(cf)], 
 +        mlt = coef(mlt_GBSG2_3)[names(cf)])
                    survreg         phreg           mlt
-horThyes      0.3730909205  0.3730909205  0.3730886675
-age           0.0094799262  0.0094799262  0.0094818287
-menostatPost -0.2709027409 -0.2709027409 -0.2709283349
-tsize        -0.0080149047 -0.0080149047 -0.0080148112
-tgrade.L     -0.5727992624 -0.5727992624 -0.5727950941
-tgrade.Q      0.2050597169  0.2050597169  0.2050579224
-pnodes       -0.0528016503 -0.0528016503 -0.0528015383
-progrec       0.0022848557  0.0022848557  0.0022848500
-estrec       -0.0002484315 -0.0002484315 -0.0002484469
+horThyes      0.3730909205  0.3730909205  0.3730890844
+age           0.0094799262  0.0094799262  0.0094802357
+menostatPost -0.2709027409 -0.2709027409 -0.2709059621
+tsize        -0.0080149047 -0.0080149047 -0.0080149449
+tgrade.L     -0.5727992624 -0.5727992624 -0.5727954391
+tgrade.Q      0.2050597169  0.2050597169  0.2050572965
+pnodes       -0.0528016503 -0.0528016503 -0.0528019995
+progrec       0.0022848557  0.0022848557  0.0022848577
+estrec       -0.0002484315 -0.0002484315 -0.0002484339
 R> 
 R> ## ----BostonHousing-lm----------------------------------------------------
 R> data("BostonHousing2", package = "mlbench")
@@ -992,7 +976,7 @@ The following object is masked from 'package:mlt':
 
     coef<-
 
-This is mgcv 1.8-12. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-14. For overview type 'help("mgcv-package")'.
 
 Attaching package: 'mgcv'
 
@@ -1507,12 +1491,11 @@ R>
 R> ## ----basefun-log-constr--------------------------------------------------
 R> attr(X, "constraint")
 $ui
-         ci
-[1,] 0 -Inf
-[2,] 0    0
+     [,1] [,2]
+[1,]    0    1
 
 $ci
-[1] -Inf    0
+[1] 0
 
 R> 
 R> ## ----basefun-log-pred----------------------------------------------------
@@ -1977,11 +1960,11 @@ $mlt_GBSG2_2
 
 $mlt_GBSG2_3
   (Intercept)        log(y)      horThyes           age  menostatPost 
--1.065443e+01  1.390262e+00  3.730887e-01  9.481829e-03 -2.709283e-01 
+-1.065457e+01  1.390271e+00  3.730891e-01  9.480236e-03 -2.709060e-01 
         tsize      tgrade.L      tgrade.Q        pnodes       progrec 
--8.014811e-03 -5.727951e-01  2.050579e-01 -5.280154e-02  2.284850e-03 
+-8.014945e-03 -5.727954e-01  2.050573e-01 -5.280200e-02  2.284858e-03 
        estrec 
--2.484469e-04 
+-2.484339e-04 
 
 $mlt_GBSG2_4
   Bs1(y):horThno   Bs2(y):horThno   Bs3(y):horThno   Bs4(y):horThno 
@@ -2232,9 +2215,9 @@ R> #sapply(mltobj, function(m) eval(parse(text = paste("checkGH(", m, ")"))))
 R> 
 R> ## ----sessionInfo, echo = FALSE, results = "hide"-------------------------
 R> sessionInfo()
-R version 3.2.4 (2016-03-10)
+R version 3.3.1 (2016-06-21)
 Platform: x86_64-pc-linux-gnu (64-bit)
-Running under: Ubuntu 14.04.4 LTS
+Running under: Ubuntu 14.04.5 LTS
 
 locale:
  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
@@ -2249,25 +2232,25 @@ attached base packages:
 [8] methods   base     
 
 other attached packages:
- [1] mgcv_1.8-12         nlme_3.1-128        multcomp_1.4-5     
+ [1] mgcv_1.8-14         nlme_3.1-128        multcomp_1.4-6     
  [4] TH.data_1.0-7       mvtnorm_1.0-5       colorspace_1.2-6   
  [7] latticeExtra_0.6-28 RColorBrewer_1.1-2  flexsurv_1.0.0     
 [10] sandwich_2.3-4      HSAUR3_1.0-5        nnet_7.3-12        
 [13] MASS_7.3-45         gridExtra_2.2.1     lattice_0.20-33    
-[16] truncreg_0.2-1      maxLik_1.3-4        miscTools_0.6-16   
-[19] prodlim_1.5.7       eha_2.4-3           survival_2.39-4    
-[22] mlt_0.0-33          basefun_0.0-31      variables_0.0-30   
+[16] truncreg_0.2-4      maxLik_1.3-4        miscTools_0.6-16   
+[19] prodlim_1.5.7       eha_2.4-3           survival_2.39-5    
+[22] mlt_0.0-34          basefun_0.0-33      variables_0.0-30   
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.5        evaluate_0.9       gtable_0.2.0      
- [4] Matrix_1.2-6       polynom_1.3-8      stringr_1.0.0     
- [7] knitr_1.13         BB_2014.10-1       deSolve_1.13      
-[10] mstate_0.2.9       orthopolynom_1.0-5 lava_1.4.3        
-[13] magrittr_1.5       codetools_0.2-14   splines_3.2.4     
-[16] numDeriv_2014.2-1  quadprog_1.5-5     stringi_1.0-1     
+ [1] Rcpp_0.12.6        evaluate_0.9       gtable_0.2.0      
+ [4] Matrix_1.2-7       polynom_1.3-8      stringr_1.1.0     
+ [7] BB_2014.10-1       knitr_1.14         deSolve_1.13      
+[10] mstate_0.2.9       orthopolynom_1.0-5 lava_1.4.4        
+[13] magrittr_1.5       codetools_0.2-14   splines_3.3.1     
+[16] numDeriv_2016.8-1  quadprog_1.5-5     stringi_1.1.1     
 [19] muhaz_1.2.6        zoo_1.7-13        
 R> 
 R> 
 > proc.time()
    user  system elapsed 
-124.228   0.336 124.496 
+129.732   0.228 129.962 

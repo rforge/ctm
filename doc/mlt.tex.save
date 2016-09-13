@@ -93,6 +93,12 @@ truncation}
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
 \begin{document}
 
+
+\footnote{Please cite this document as: Torsten Hothorn (2016)
+Most Likely Transformations: The \pkg{mlt} Package. 
+R package vignette version 0.0-32, 
+URL \url{https://CRAN.R-project.org/package=mlt.docreg}.}
+
 % \input{todo}
 
 \section{Introduction}
@@ -1038,15 +1044,15 @@ R> cbind(survreg = coef(survreg_GBSG2_3)[names(cf)] / survreg_GBSG2_3$scale,
 \end{Sinput}
 \begin{Soutput}
                    survreg         phreg           mlt
-horThyes      0.3730909205  0.3730909205  0.3730886675
-age           0.0094799262  0.0094799262  0.0094818287
-menostatPost -0.2709027409 -0.2709027409 -0.2709283349
-tsize        -0.0080149047 -0.0080149047 -0.0080148112
-tgrade.L     -0.5727992624 -0.5727992624 -0.5727950941
-tgrade.Q      0.2050597169  0.2050597169  0.2050579224
-pnodes       -0.0528016503 -0.0528016503 -0.0528015383
-progrec       0.0022848557  0.0022848557  0.0022848500
-estrec       -0.0002484315 -0.0002484315 -0.0002484469
+horThyes      0.3730909205  0.3730909205  0.3730890844
+age           0.0094799262  0.0094799262  0.0094802357
+menostatPost -0.2709027409 -0.2709027409 -0.2709059621
+tsize        -0.0080149047 -0.0080149047 -0.0080149449
+tgrade.L     -0.5727992624 -0.5727992624 -0.5727954391
+tgrade.Q      0.2050597169  0.2050597169  0.2050572965
+pnodes       -0.0528016503 -0.0528016503 -0.0528019995
+progrec       0.0022848557  0.0022848557  0.0022848577
+estrec       -0.0002484315 -0.0002484315 -0.0002484339
 \end{Soutput}
 \end{Schunk}
 
@@ -1647,10 +1653,10 @@ R> AIC(mlt_GBSG2_7)
 In a second step, we allow an age-varying treatment effect 
 in the model $(\pMEV, (\bern{10}(\ry)^\top \otimes
        (\I(\text{hormonal therapy}), 1 - \I(\text{hormonal therapy}))
-       \otimes \bernx{10}(\text{age})^\top)^\top, \parm)$. For both treatment
+       \otimes \bernx{3}(\text{age})^\top)^\top, \parm)$. For both treatment
 groups, we estimate a conditional transformation function of survival time
 $\ry$ given age parameterised as the tensor basis of two Bernstein bases. Each of the
-two basis functions comes with $5 \times 6$ linear constraints, so the model
+two basis functions comes with $10 \times 3$ linear constraints, so the model
 was fitted under $60$ linear constraints
 %% <FIXME> use quantile(.1, .9) instead of range for age??? </FIXME>
 \begin{Schunk}
@@ -3039,12 +3045,11 @@ R> attr(X, "constraint")
 \end{Sinput}
 \begin{Soutput}
 $ui
-         ci
-[1,] 0 -Inf
-[2,] 0    0
+     [,1] [,2]
+[1,]    0    1
 
 $ci
-[1] -Inf    0
+[1] 0
 \end{Soutput}
 \end{Schunk}
 where the linear constraints $\mA \parm \ge \mvec$ are represented by
