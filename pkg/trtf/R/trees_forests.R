@@ -9,8 +9,8 @@ trafotree <- function(object, parm = 1:length(coef(object)), mltargs = list(maxi
         f <- Formula(formula)    
         mf <- model.frame(formula = f, data = data, na.action = na.pass)
         if (ctrl$nmax < Inf) {
-            bdr <- BDR::BDR(mf, total = TRUE, nmax = ctrl$nmax, complete.cases.only = TRUE,
-                            as.interval = object$response)
+            bdr <- inum::inum(mf, total = TRUE, nmax = ctrl$nmax, complete.cases.only = TRUE,
+                              as.interval = object$response)
             iy <- c(bdr)
             mf1 <- as.data.frame(bdr)
             attr(iy, "levels") <- 1:nrow(mf1)
@@ -72,8 +72,8 @@ traforest <- function(object, parm = 1:length(coef(object)), mltargs = list(maxi
         f <- Formula(formula)    
         mf <- model.frame(formula = f, data = data, na.action = na.pass)
         if (ctrl$nmax < Inf) {
-            bdr <- BDR::BDR(mf, total = TRUE, nmax = ctrl$nmax, complete.cases.only = TRUE,
-                            as.interval = object$response)
+            bdr <- inum::inum(mf, total = TRUE, nmax = ctrl$nmax, complete.cases.only = TRUE,
+                              as.interval = object$response)
             iy <- c(bdr)
             mf1 <- as.data.frame(bdr)
             attr(iy, "levels") <- 1:nrow(mf1)

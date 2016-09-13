@@ -8,5 +8,5 @@ Description: Recursive partytioning of transformation models with
   corresponding random forest for conditional transformation models.
 Depends: mlt (>= 0.0-34), partyNG, partykit
 Imports: Formula, sandwich, grid, stats, variables, libcoin, utils
-Suggests: BDR, survival, MASS, TH.data
+Suggests: inum, survival, MASS, TH.data
 License: GPL-2
