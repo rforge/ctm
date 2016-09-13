@@ -98,7 +98,8 @@ Bernstein_basis <- function(var, order = 2,
 
 ### evaluate model.matrix of Bernstein polynom
 model.matrix.Bernstein_basis <- function(object, data,
-                                         deriv = 0L, integrate = FALSE, ...) {
+                                         deriv = 0L, 
+                                         integrate = FALSE, ...) {
 
     varname <- variable.names(object)
     deriv <- .deriv(varname, deriv)
@@ -113,33 +114,36 @@ model.matrix.Bernstein_basis <- function(object, data,
 
     ### extrapolate linearily for x outside s
     stopifnot(!integrate)
-    stopifnot(deriv %in% c(0, 1))
+    ### interpolate f^d(c + x) = f^d(c) + f^d+1(c + x) * (x - c)
+    ### note: the code allows for maxderiv <- deriv + d, d > 1
+    maxderiv <- deriv + 1L
     data[[varname]][small] <- s[1]        
     data[[varname]][large] <- s[2]        
     ret <- object(data = data, deriv = deriv, integrate = integrate)
-#    if (mean(small + large) > .5)
-#        warning("more than 50% of observations outside interval")
     if (any(small)) {
         dsmall <- data.frame(x = rep(s[1], sum(small)))
         names(dsmall) <- varname
-        X <- object(data = dsmall)
-        Xp <- object(data = dsmall, deriv = 1L)
-        if (deriv == 1L) {
-            ret[small,] <- Xp
-        } else {
-            ret[small,] <- (X + Xp * (x[small] - s[1]))
+        xdiff <- x[small] - s[1]
+        dfun <- function(deriv) {
+            if (deriv == maxderiv)
+                return(object(data = dsmall, deriv = deriv))
+            return(object(data = dsmall, deriv = deriv) +
+                   dfun(deriv + 1L) * xdiff)
         }
+        ret[small,] <- dfun(deriv)
     }
     if (any(large)) {
         dlarge <- data.frame(x = rep(s[2], sum(large)))
         names(dlarge) <- varname
         X <- object(data = dlarge)
-        Xp <- object(data = dlarge, deriv = 1L)
-        if (deriv == 1L) {
-            ret[large,] <- Xp
-        } else {
-            ret[large,] <- (X + Xp * (x[large] - s[2]))
+        xdiff <- x[large] - s[2]
+        dfun <- function(deriv) {
+            if (deriv == maxderiv)
+                return(object(data = dlarge, deriv = deriv))
+            return(object(data = dlarge, deriv = deriv) +   
+                   dfun(deriv + 1L) * xdiff)
         }
+        ret[large,] <- dfun(deriv)
     }
     return(ret)
 }
