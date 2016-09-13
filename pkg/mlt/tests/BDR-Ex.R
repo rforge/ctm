@@ -10,9 +10,9 @@ by <- Bernstein_basis(vy, order = 10, ui = "increasing")
 
 m1 <- mlt(ctm(by), data = data.frame(y = y))
 
-if (require("BDR")) {
+if (require("inum")) {
 
-mydf <- BDR(data.frame(y = y), as.int = "y", nmax = 50, total = TRUE)
+mydf <- inum(data.frame(y = y), as.int = "y", nmax = 50, total = TRUE)
 
 mdf <- attr(mydf, "levels")
 

@@ -29,9 +29,9 @@ Loading required package: variables
 > 
 > m1 <- mlt(ctm(by), data = data.frame(y = y))
 > 
-> if (require("BDR")) {
+> if (require("inum")) {
 + 
-+ mydf <- BDR(data.frame(y = y), as.int = "y", nmax = 50, total = TRUE)
++ mydf <- inum(data.frame(y = y), as.int = "y", nmax = 50, total = TRUE)
 + 
 + mdf <- attr(mydf, "levels")
 + 
@@ -43,7 +43,7 @@ Loading required package: variables
 + print(range(cf1/cf2))
 + 
 + }
-Loading required package: BDR
+Loading required package: inum
 [1] 0.9128016 1.0238478
 > 
 > proc.time()
