@@ -35,13 +35,22 @@ trafotree <- function(object, parm = 1:length(coef(object)), mltargs = list(maxi
                 w[-subset] <- 0
             }
             if (!is.null(info$coef)) thetastart <- info$coef
-            ret <- estfun(mod <- update(object, weights = w,
-                          theta = thetastart))[, parm, drop = FALSE]
+            umod <- try(update(object, theta = thetastart, weights = w))
+            if (inherits(umod, "try-error") || umod$convergence != 0) {
+                umod <- try(update(object, weights = w))
+                if (inherits(umod, "try-error") || umod$convergence != 0)
+                    umod <- try(mlt(object$model, data = mf1, weights = w, ...))
+            }
+            if (inherits(umod, "try-error")) {
+                return(list(estfun = matrix(0, nrow = nrow(mf1), ncol = length(w)),
+                            iy = iy, converged = FALSE))
+            } 
+            ret <- estfun(umod)[, parm, drop = FALSE]
             ret <- ret / w ### we need UNWEIGHTED scores
             ret[w == 0,] <- 0
             return(list(estfun = ret, index = iy, 
-                        coef = coef(mod), logLik = logLik(mod), 
-                        converged = isTRUE(all.equal(mod$convergence, 0))))
+                        coef = coef(umod), logLik = logLik(umod), 
+                        converged = isTRUE(all.equal(umod$convergence, 0))))
         }
     }
 
@@ -97,13 +106,22 @@ traforest <- function(object, parm = 1:length(coef(object)), mltargs = list(maxi
                 w[-subset] <- 0
             }
             if (!is.null(info$coef)) thetastart <- info$coef
-            ret <- estfun(mod <- update(object, weights = w,
-                          theta = thetastart))[, parm, drop = FALSE]
+            umod <- try(update(object, theta = thetastart, weights = w))
+            if (inherits(umod, "try-error") || umod$convergence != 0) {
+                umod <- try(update(object, weights = w))
+                if (inherits(umod, "try-error") || umod$convergence != 0)
+                    umod <- try(mlt(object$model, data = mf1, weights = w, ...))
+            }
+            if (inherits(umod, "try-error")) {
+                return(list(estfun = matrix(0, nrow = nrow(mf1), ncol = length(w)),
+                            iy = iy, converged = FALSE))
+            } 
+            ret <- estfun(umod)[, parm, drop = FALSE]
             ret <- ret / w ### we need UNWEIGHTED scores
             ret[w == 0,] <- 0
             return(list(estfun = ret, index = iy, 
-                        coef = coef(mod), logLik = logLik(mod), 
-                        converged = isTRUE(all.equal(mod$convergence, 0))))
+                        coef = coef(umod), logLik = logLik(umod), 
+                        converged = isTRUE(all.equal(umod$convergence, 0))))
         }
     }
     ret <- cforest(..., ytrafo = ctmfit)
