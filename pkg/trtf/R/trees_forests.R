@@ -25,29 +25,37 @@ trafotree <- function(object, parm = 1:length(coef(object)), mltargs = list(maxi
         mltargs$weights <- w     
         object <- do.call("mlt", mltargs)
         thetastart <- coef(object)
-        thetastart <- coef(object)
 
-        function(subset, info = NULL, model = FALSE) {
+        function(subset = NULL, info = NULL, newweights = NULL, model = FALSE, estfun = TRUE) {
             if (model) return(list(object = object, iy = iy))
-            if (ctrl$nmax < Inf) {
-                w <- libcoin::ctabs(iy, weights = weights, subset = subset)[-1L]
+            if (is.null(newweights)) {
+                if (ctrl$nmax < Inf) {
+                    w <- libcoin::ctabs(iy, weights = weights, subset = subset)[-1L]
+                } else {
+                    w[-subset] <- 0
+                }
             } else {
-                w[-subset] <- 0
+                w <- newweights
             }
             if (!is.null(info$coef)) thetastart <- info$coef
-            umod <- try(update(object, theta = thetastart, weights = w))
+            umod <- suppressWarnings(try(update(object, theta = thetastart, weights = w), silent = TRUE))
             if (inherits(umod, "try-error") || umod$convergence != 0) {
-                umod <- try(update(object, weights = w))
-                if (inherits(umod, "try-error") || umod$convergence != 0)
-                    umod <- try(mlt(object$model, data = mf1, weights = w, ...))
+                umod <- suppressWarnings(try(update(object, weights = w), silent = TRUE))
+                if (inherits(umod, "try-error") || umod$convergence != 0) {
+                    mltargs$weights <- w
+                    umod <- try(do.call("mlt", mltargs))
+                }
             }
             if (inherits(umod, "try-error")) {
                 return(list(estfun = matrix(0, nrow = nrow(mf1), ncol = length(w)),
                             iy = iy, converged = FALSE))
-            } 
-            ret <- estfun(umod)[, parm, drop = FALSE]
-            ret <- ret / w ### we need UNWEIGHTED scores
-            ret[w == 0,] <- 0
+            }
+            ret <- NULL
+            if (estfun) { 
+                ret <- estfun(umod)[, parm, drop = FALSE]
+                ret <- ret / w ### we need UNWEIGHTED scores
+                ret[w == 0,] <- 0
+            }
             return(list(estfun = ret, index = iy, 
                         coef = coef(umod), logLik = logLik(umod), 
                         converged = isTRUE(all.equal(umod$convergence, 0))))
@@ -56,12 +64,12 @@ trafotree <- function(object, parm = 1:length(coef(object)), mltargs = list(maxi
 
     ret <- ctree(..., ytrafo = ctmfit)
     ret$model <- object
-    ret$mltobj <- ret$trafo(model = TRUE)
+    ret$mltobj <- ret$trafo(model = TRUE, estfun = FALSE)
     ret$mltargs <- mltargs
 
     nd <- predict(ret, type = "node")
     ret$models <- tapply(1:length(nd), factor(nd), function(i) 
-        ret$trafo(i)) ### note: trafo is (potentially) weighted
+        ret$trafo(i, estfun = FALSE)) ### note: trafo is (potentially) weighted
     ret$coef <- do.call("rbind", lapply(ret$models, function(x) x$coef))
     ret$logLik <- sapply(ret$models, function(x) x$logLik)
 
@@ -98,27 +106,36 @@ traforest <- function(object, parm = 1:length(coef(object)), mltargs = list(maxi
         object <- do.call("mlt", mltargs)
         thetastart <- coef(object)
 
-        function(subset, info = NULL, model = FALSE) {
+        function(subset, info = NULL, newweights = NULL, model = FALSE, estfun = TRUE) {
             if (model) return(list(object = object, iy = iy))
-            if (ctrl$nmax < Inf) {
-                w <- libcoin::ctabs(iy, weights = weights, subset = subset)[-1L]
+            if (is.null(newweights)) {
+                if (ctrl$nmax < Inf) {
+                    w <- libcoin::ctabs(iy, weights = weights, subset = subset)[-1L]
+                } else {
+                    w[-subset] <- 0
+                }
             } else {
-                w[-subset] <- 0
+                w <- newweights
             }
             if (!is.null(info$coef)) thetastart <- info$coef
-            umod <- try(update(object, theta = thetastart, weights = w))
+            umod <- suppressWarnings(try(update(object, theta = thetastart, weights = w), silent = TRUE))
             if (inherits(umod, "try-error") || umod$convergence != 0) {
-                umod <- try(update(object, weights = w))
-                if (inherits(umod, "try-error") || umod$convergence != 0)
-                    umod <- try(mlt(object$model, data = mf1, weights = w, ...))
+                umod <- suppressWarnings(try(update(object, weights = w), silent = TRUE))
+                if (inherits(umod, "try-error") || umod$convergence != 0) {
+                    mltargs$weights <- w
+                    umod <- try(do.call("mlt", mltargs))
+                }
             }
             if (inherits(umod, "try-error")) {
                 return(list(estfun = matrix(0, nrow = nrow(mf1), ncol = length(w)),
                             iy = iy, converged = FALSE))
             } 
-            ret <- estfun(umod)[, parm, drop = FALSE]
-            ret <- ret / w ### we need UNWEIGHTED scores
-            ret[w == 0,] <- 0
+            ret <- NULL
+            if (estfun) {
+                ret <- estfun(umod)[, parm, drop = FALSE]
+                ret <- ret / w ### we need UNWEIGHTED scores
+                ret[w == 0,] <- 0
+            }
             return(list(estfun = ret, index = iy, 
                         coef = coef(umod), logLik = logLik(umod), 
                         converged = isTRUE(all.equal(umod$convergence, 0))))
@@ -127,7 +144,7 @@ traforest <- function(object, parm = 1:length(coef(object)), mltargs = list(maxi
     ret <- cforest(..., ytrafo = ctmfit)
     ret$model <- object
     ret$mltargs <- mltargs
-    ret$mltobj <- ret$trafo(model = TRUE)
+    ret$mltobj <- ret$trafo(model = TRUE, estfun = FALSE)
     class(ret) <- c("traforest", class(ret))
     ret
 }

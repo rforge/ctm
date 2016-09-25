@@ -4,10 +4,13 @@
     ex <- object$exact
     le <- object$cleft
     ri <- object$cright
-    ex[is.na(ex)] <- 0
-    le[is.na(le) | !is.finite(le)] <- 0
-    ri[is.na(ri) | !is.finite(ri)] <- 0
-    ex + (le + (ri - le) / 2)
+    rex <- ex
+    rle <- le
+    rri <- ri
+    rex[is.na(ex)] <- 0
+    rle[is.na(le) | !is.finite(le)] <- 0
+    rri[is.na(ri) | !is.finite(ri)] <- 0
+    rex + (rle + ifelse(is.finite(ri), (rri - rle) / 2, 0))
 }
 
 
@@ -52,7 +55,7 @@ logLik.traforest <- function(object, newdata, OOB = FALSE, coef = NULL, ...) {
         cf <- coef
     }
     if (missing(newdata)) {
-        mltmod <- object$model
+        mltmod <- object$mltobj$object
         newdata <- object$data
         weights <- object$fitted[["(weights)"]]
         if (is.null(weights)) weights <- rep(1, nrow(newdata))
@@ -135,7 +138,8 @@ predict.traforest <- function(object,  newdata, mnewdata = data.frame(1), K = 20
     if (is.null(q))
         q <- mkgrid(mod, n = K)[[mod$response]]
     mltmod <- object$mltobj
-    thetastart <- coef(mltmod$object)
+    mod <- mltmod$object
+    thetastart <- coef(mod)
 
     ans <- vector(mode = "list", length = ncol(ret))
     names(ans) <- colnames(ret)
@@ -154,20 +158,17 @@ predict.traforest <- function(object,  newdata, mnewdata = data.frame(1), K = 20
         }
         ### try hard to estimate parameters; if may happen that parameters for 
         ### a specific obs are not identified (out of range)
-        umod <- try(update(mltmod$object, theta = thetastart, weights = w))
-        if (inherits(umod, "try-error") || umod$convergence != 0) {
-            umod <- try(update(mltmod$object, weights = w))
-            thiscoef <- coef(umod)
-            if (inherits(umod, "try-error") || umod$convergence != 0)
-                umod <- try(mlt(object$model, data = object$data, weights = w, ...))
-        }
+        umod <- try(object$trafo(subset = NULL, newweights = w, info = list(coef = thetastart),
+                                 estfun = FALSE), silent = TRUE)
         if (inherits(umod, "try-error")) {
             cf[[i]] <- NA
             ans[[i]] <- NA
         } else {
-            cf[[i]] <- coef(umod)
-            if (type != "coef")
-                ans[[i]] <- predict(umod, q = q, newdata = mnewdata, type = type)
+            cf[[i]] <- umod$coef
+            if (type != "coef") {
+                coef(mod) <- umod$coef
+                ans[[i]] <- predict(mod, q = q, newdata = mnewdata, type = type)
+            }
         }
     } 
     if (trace) close(pb)
