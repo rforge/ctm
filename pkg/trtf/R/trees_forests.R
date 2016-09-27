@@ -47,6 +47,11 @@ trafotree <- function(object, parm = 1:length(coef(object)), mltargs = list(maxi
                 }
             }
             if (inherits(umod, "try-error")) {
+                ### we badly need some estimate in each node, even if fitting
+                ### fails
+                if (!estfun) 
+                    return(list(coef = thetastart, logLik = NA,
+                                converged = FALSE))
                 return(list(estfun = matrix(0, nrow = nrow(mf1), ncol = length(w)),
                             iy = iy, converged = FALSE))
             }
@@ -127,6 +132,11 @@ traforest <- function(object, parm = 1:length(coef(object)), mltargs = list(maxi
                 }
             }
             if (inherits(umod, "try-error")) {
+                ### we badly need some estimate in each node, even if fitting
+                ### fails
+                if (!estfun) 
+                    return(list(coef = thetastart, logLik = NA,
+                                converged = FALSE))
                 return(list(estfun = matrix(0, nrow = nrow(mf1), ncol = length(w)),
                             iy = iy, converged = FALSE))
             } 
