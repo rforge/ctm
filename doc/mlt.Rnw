@@ -844,6 +844,7 @@ fss_GBSG2_1 <- flexsurvspline(fm_GBSG2, data = GBSG2, scale = "hazard",
                               k = 9, bknots = log(support(GBSG2y)$y))
 logLik(fss_GBSG2_1)
 logLik(mlt_GBSG2_1)
+cf <- coef(coxph_GBSG2_1)
 cbind(coxph = cf, mlt = coef(mlt_GBSG2_1)[names(cf)],
       fss = coef(fss_GBSG2_1)[names(cf)])
 @
@@ -1300,7 +1301,7 @@ is invariant with respect to the ordering applied as a comparison with
 <<iris-1>>=
 fm_iris <- Species ~ Sepal.Length + Sepal.Width + 
                      Petal.Length + Petal.Width
-multinom_iris <- multinom(fm_iris, data = iris, trace = FALSE)
+multinom_iris <- nnet::multinom(fm_iris, data = iris, trace = FALSE)
 logLik(multinom_iris)
 iris$oSpecies <- ordered(iris$Species)
 b_Species <- as.basis(iris$oSpecies)
