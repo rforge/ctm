@@ -236,7 +236,9 @@ class, the conditional distribution function is
 \end{eqnarray*}
 where the transformation function $\h$ depends on both $\ry$ and $\rx$. 
 Because we are interested in analysing, \ie estimating and interpreting, the
-transformation function $\h$, we refer to the methods presented in this
+transformation function $\h$, we slightly rephrase the title
+``An Analysis of Transformations'' of the first paper on this subject
+\citep{BoxCox_1964} and refer to the methods presented in this
 paper as \textit{transformation analysis}.  We describe how conditional
 transformation models can be specified, fitted by maximising the likelihood
 \citep[using the estimator developed by][]{Hothorn_Moest_Buehlmann_2016} and
