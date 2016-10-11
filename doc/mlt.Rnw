@@ -1526,7 +1526,7 @@ A response-varying coefficient model, also called distribution regression \citep
 Chernozhukov_2013,Koenker_Leorato_Peracchi_2013}, for the Boston Housing data is 
 \begin{eqnarray*}
 \Prob(\text{medv} \le \ry | \rX = \rx) & = &  
-  \Phi\left(\h_\rY(\ry) - \sum_{j = 1}^J \shiftparm_j(\text{medv}) \tilde{\rx}_j\right) \\
+  \Phi\left(\h_\rY(\ry) - \sum_{j = 1}^J \shiftparm_j(\ry) \tilde{\rx}_j\right) \\
 & = & \Phi\left(\bern{6}(\ry)^\top \parm_1 - \sum_{j = 1}^J \bern{6}(\ry)^\top \parm_{j + 1} \tilde{\rx}_j\right)
 \end{eqnarray*}
 The model is implemented using the basis function 
