@@ -167,7 +167,7 @@ predict.traforest <- function(object,  newdata, mnewdata = data.frame(1), K = 20
             cf[[i]] <- umod$coef
             if (type != "coef") {
                 coef(mod) <- umod$coef
-                ans[[i]] <- predict(mod, q = q, newdata = mnewdata, type = type)
+                ans[[i]] <- predict(mod, q = q, newdata = mnewdata, type = type, ...)
             }
         }
     } 
