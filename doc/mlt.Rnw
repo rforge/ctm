@@ -164,9 +164,9 @@ where $\rY$ is an absolutely continuous response, $\tilde{\rx}$ a suitable
 representation of a vector of explanatory variables $\rx$ (\eg contrasts
 etc.), $\shiftparm$ a vector of regression coefficients, $\alpha$ an
 intercept term and $\varepsilon$ a normal error term.  Model interpretation
-relies on the conditional expectation $\Ex(\rY | \rX = \rx) = \alpha +
+relies on the conditional expectation $\Ex(\rY \mid \rX = \rx) = \alpha +
 \tilde{\rx}^\top \shiftparm$. Many textbooks, for example \cite{Fahrmeir_Kneib_Lang_2013}, 
-\emph{define} a regression model as a model for a conditional expectation $\Ex(\rY | \rX = \rx) = f(\rx)$
+\emph{define} a regression model as a model for a conditional expectation $\Ex(\rY \mid \rX = \rx) = f(\rx)$
 with ``regression function'' $f$ but, as we will see, understanding
 regression models as models for conditional distributions
 makes it easier to see the connections between many classical and novel regression approaches.
@@ -176,8 +176,8 @@ $(\rY - \alpha - \tilde{\rx}^\top \shiftparm)^2$.  With some touch-up in
 notation, the model can be equivalently written as a model for a conditional
 distribution
 \begin{eqnarray*}
-\Prob(\rY \le \ry | \rX = \rx) = \Phi\left(\frac{\ry - \alpha - \tilde{\rx}^\top \shiftparm}{\sigma}\right) 
-  \text{ or } (\rY | \rX = \rx) \sim \ND(\alpha + \tilde{\rx}^\top\shiftparm, \sigma^2).
+\Prob(\rY \le \ry \mid \rX = \rx) = \Phi\left(\frac{\ry - \alpha - \tilde{\rx}^\top \shiftparm}{\sigma}\right) 
+  \text{ or } (\rY \mid \rX = \rx) \sim \ND(\alpha + \tilde{\rx}^\top\shiftparm, \sigma^2).
 \end{eqnarray*}
 This formulation highlights that the model is, in fact, a model for a
 conditional distribution and not just a model for a conditional mean.  It
@@ -188,7 +188,7 @@ distribution.  Because in real life we always observe intervals $(\ubar{\ry}, \b
 and never real numbers $\ry$, the exact likelihood is, as originally
 \textit{defined} by \cite{Fisher_1934}
 \begin{eqnarray*}
-\Prob(\ubar{\ry} < \rY \le \bar{\ry} | \rX = \rx) = 
+\Prob(\ubar{\ry} < \rY \le \bar{\ry} \mid \rX = \rx) = 
 \Phi\left(\frac{\bar{\ry} - \alpha - \tilde{\rx}^\top \shiftparm}{\sigma}\right) - \Phi\left(\frac{\ubar{\ry} - \alpha - \tilde{\rx}^\top \shiftparm}{\sigma}\right)
 \end{eqnarray*}
 which requires simultaneous optimisation of all three model parameters $\alpha$, 
@@ -198,19 +198,19 @@ log-density $(y - \alpha - \tilde{\rx}^\top)^2$) winning over the basic
 concept, see \cite{Lindsey_1996, Lindsey_1999}. If we were going to reformulate the model
 a little further to
 \begin{eqnarray*}
-\Prob(\rY \le \ry | \rX = \rx) = \Phi(\tilde{\alpha}_1 + \tilde{\alpha}_2 \ry - \tilde{\rx}^\top \tilde{\shiftparm})
+\Prob(\rY \le \ry \mid \rX = \rx) = \Phi(\tilde{\alpha}_1 + \tilde{\alpha}_2 \ry - \tilde{\rx}^\top \tilde{\shiftparm})
 \end{eqnarray*}
 with $\tilde{\alpha}_1 = -\alpha / \sigma, \tilde{\alpha}_2 = 1 / \sigma$ and $\tilde{\shiftparm} = \shiftparm / \sigma$
 we see that the model is of the form
 \begin{eqnarray*}
-\Prob(\rY \le \ry | \rX = \rx) = \pZ(\h_\rY(\ry) - \tilde{\rx}^\top \tilde{\shiftparm})
+\Prob(\rY \le \ry \mid \rX = \rx) = \pZ(\h_\rY(\ry) - \tilde{\rx}^\top \tilde{\shiftparm})
 \end{eqnarray*}
 with distribution function $\pZ = \Phi$ and linear transformation $\h_\rY(\ry) = \tilde{\alpha}_1 + \tilde{\alpha}_2 \ry$
-such that $\Ex(\h_\rY(\rY) | \rX = \rx) = \tilde{\rx}^\top \shiftparm$. If we now change $\pZ$ to the distribution
+such that $\Ex(\h_\rY(\rY) \mid \rX = \rx) = \tilde{\rx}^\top \shiftparm$. If we now change $\pZ$ to the distribution
 function of the minimum extreme value distribution and allow a non-linear monotone transformation
 $\h_\rY$ we get
 \begin{eqnarray*}
-\Prob(\rY \le \ry | \rX = \rx) = 1 - \exp(-\exp(\h_\rY(\ry) - \tilde{\rx}^\top \tilde{\shiftparm}))
+\Prob(\rY \le \ry \mid \rX = \rx) = 1 - \exp(-\exp(\h_\rY(\ry) - \tilde{\rx}^\top \tilde{\shiftparm}))
 \end{eqnarray*}
 which is the continuous proportional hazards, or Cox, model (typically
 defined with a positive shift term).  From this point of view, the linear
@@ -232,7 +232,7 @@ The class of linear transformation models is a subclass of conditional
 transformation models \citep{Hothorn_Kneib_Buehlmann_2014}.  In this latter
 class, the conditional distribution function is
 \begin{eqnarray*}
-\Prob(\rY \le \ry | \rX = \rx) = \pZ(\h(\ry | \rx))
+\Prob(\rY \le \ry \mid \rX = \rx) = \pZ(\h(\ry \mid \rx))
 \end{eqnarray*}
 where the transformation function $\h$ depends on both $\ry$ and $\rx$. 
 Because we are interested in analysing, \ie estimating and interpreting, the
@@ -647,7 +647,7 @@ A linear transformation model features a linear shift of a typically non-linear 
 of the response $Y$ and is the simplest form of a regression model in the class of
 conditional transformation models. The conditional distribution function is
 \begin{eqnarray*}
-\Prob(\rY \le \ry | \rX = \rx) = \pZ(\h(\ry | \rx)) = 
+\Prob(\rY \le \ry \mid \rX = \rx) = \pZ(\h(\ry \mid \rx)) = 
 \pZ(\h_\rY(\ry) - \tilde{\rx}^\top \shiftparm).
 \end{eqnarray*}
 The transformation $\h_\rY$, sometimes called ``baseline transformation'' can be parameterised
@@ -658,14 +658,14 @@ as discussed in the unconditional situation
 The connection to more complex models is highlighted by the introduction of a 
 basis function $\basisyx$ being conditional on the explanatory variables $\rx$, \ie
 \begin{eqnarray*}
-\pZ(\h(\ry | \rx)) = \pZ(\h_\rY(\ry) - \tilde{\rx}^\top \shiftparm) = \pZ(\basisyx(\ry, \rx)^\top \parm) = \pZ(\basisy(\ry)^\top \parm_1 - \tilde{\rx}^\top \shiftparm)
+\pZ(\h(\ry \mid \rx)) = \pZ(\h_\rY(\ry) - \tilde{\rx}^\top \shiftparm) = \pZ(\basisyx(\ry, \rx)^\top \parm) = \pZ(\basisy(\ry)^\top \parm_1 - \tilde{\rx}^\top \shiftparm)
 \end{eqnarray*}
 with $\basisyx = (\basisy^\top, -\tilde{\rx}^\top)^\top$. 
 The definition of a linear transformation model only requires the basis $\basisy$, 
 the explanatory variables $\rx$ and a distribution $\pZ$. The latter choice is now important,
 as additivity of the linear predictor is assumed on the scale of $\pZ$. It is convenient to
-supply negative linear predictors as $\Ex(\h_\rY(\rY) | \rX = \rx) = \tilde{\rx}^\top \shiftparm$.
-One exception is the Cox model with positive shift and $\Ex(\h_\rY(\rY) | \rX = \rx) = -\tilde{\rx}^\top \shiftparm$. 
+supply negative linear predictors as $\Ex(\h_\rY(\rY) \mid \rX = \rx) = \tilde{\rx}^\top \shiftparm$.
+One exception is the Cox model with positive shift and $\Ex(\h_\rY(\rY) \mid \rX = \rx) = -\tilde{\rx}^\top \shiftparm$. 
 Large positive values of the linear predictor correspond to low expected survival times and thus a high risk.
 
 \subsubsection{Discrete Responses}
@@ -726,7 +726,7 @@ GBSG2$y <- with(GBSG2, Surv(time, cens))
 We start with the Cox model $(\pMEV, (\bern{10}^\top,
 \tilde{\rx}^\top)^\top, (\parm_1^\top, \shiftparm^\top)^\top)$, where $\tilde{\rx}$ contains the treatment
 indicator and all other explanatory variables in the transformation function
-$\h(\ry | \rx) = \bern{10}(\ry)^\top \parm_1 + \tilde{\rx}^\top \shiftparm$
+$\h(\ry \mid \rx) = \bern{10}(\ry)^\top \parm_1 + \tilde{\rx}^\top \shiftparm$
 \citep[the positive shift being in line with the implementation in \cmd{coxph} in package 
 \pkg{survival},][]{Therneau_Grambsch_2000,pkg:survival}
 <<GBSG2-1-Cox>>=
@@ -925,7 +925,7 @@ Assuming a conditional normal distribution for the
 median value of owner-occupied homes (medv, in USD $1000$'s, we use the corrected version) 
 in the normal linear model with constant variance
 \begin{eqnarray*}
-\text{medv} | \rX = \rx \sim \ND(\tilde{\rx}^\top \shiftparm, \sigma^2)
+\text{medv} \mid \rX = \rx \sim \ND(\tilde{\rx}^\top \shiftparm, \sigma^2)
 \end{eqnarray*}
 is rather restrictive
 <<BostonHousing-lm>>=
@@ -937,7 +937,7 @@ We relax the model formulation without sacrificing
 the simplicity of a linear predictor of the explanatory variables
 in the linear transformation model
 \begin{eqnarray*}
-\Prob(\text{medv} \le \ry | \rX = \rx) = \Phi(\h_\rY(\ry) - \tilde{\rx}^\top \shiftparm)
+\Prob(\text{medv} \le \ry \mid \rX = \rx) = \Phi(\h_\rY(\ry) - \tilde{\rx}^\top \shiftparm)
 = \Phi(\bern{6}(\ry)^\top \parm_1 - \tilde{\rx}^\top \shiftparm)
 \end{eqnarray*}
 and estimate \emph{all} model parameters $(\parm_1, \shiftparm)$ simultaneously, \ie both the
@@ -1105,8 +1105,8 @@ strata-specific transformation function but a shift term those
 regression coefficients are constant across strata. The model then
 reads
 \begin{eqnarray*}
-\Prob(\rY \le \ry | \text{stratum} = s, \rX = \rx) = \pZ(\h(\ry | s, \rx)) =
-\pZ(\h_\rY(\ry | s) - \tilde{\rx}^\top \shiftparm) = \pZ(\basisyx(\ry, s, \rx)^\top \parm)
+\Prob(\rY \le \ry \mid \text{stratum} = s, \rX = \rx) = \pZ(\h(\ry \mid s, \rx)) =
+\pZ(\h_\rY(\ry \mid s) - \tilde{\rx}^\top \shiftparm) = \pZ(\basisyx(\ry, s, \rx)^\top \parm)
 \end{eqnarray*}
 with basis function $\basisyx = (\basisy^\top \otimes
 \basisx_\text{stratum}^\top, -\basisx_\text{shift}^\top)^\top$.  The basis
@@ -1325,7 +1325,7 @@ max(abs(t(p1) - p2))
 The Cox model for the comparison of the survivor distribution between the
 untreated and treated group assuming proportional hazards, \ie the model
 $(\pMEV, (\bern{10}^\top, \I(\text{hormonal therapy}))^\top, (\parm_1^\top, \beta)^\top)$,
-implements the transformation function $\h(\ry | \text{treatment}) =
+implements the transformation function $\h(\ry \mid \text{treatment}) =
 \bern{10}(\ry)^\top \parm_1 + \I(\text{hormonal therapy}) \beta$ where
 $\bern{10}^\top \parm_1$ is the log-cumulative baseline hazard function
 parameterised by a Bernstein polynomial and $\beta \in \RR$ is the
@@ -1346,7 +1346,7 @@ appropriateness we want to assess using the non-proportional hazards model
 $(\pMEV, (\bern{10}^\top \otimes (1, \I(\text{hormonal therapy})))^{\top}, \parm)$ with
 transformation function 
 \begin{eqnarray*}
-\h(\ry | \text{treatment}) = \bern{10}(\ry)^\top \parm_1 + \I(\text{hormonal therapy}) \bern{10}(\ry)^\top \parm_2. 
+\h(\ry \mid \text{treatment}) = \bern{10}(\ry)^\top \parm_1 + \I(\text{hormonal therapy}) \bern{10}(\ry)^\top \parm_2. 
 \end{eqnarray*}
 The function $\bern{10}^\top \parm_2$ is the time-varying treatment effect
 and can be interpreted as the deviation, on the scale of the transformation
@@ -1525,7 +1525,7 @@ print(contourplot(p ~ lage + head | cut, data = pr, panel = pfun, region = FALSE
 A response-varying coefficient model, also called distribution regression \citep{Foresi_Peracchi_1995,
 Chernozhukov_2013,Koenker_Leorato_Peracchi_2013}, for the Boston Housing data is 
 \begin{eqnarray*}
-\Prob(\text{medv} \le \ry | \rX = \rx) & = &  
+\Prob(\text{medv} \le \ry \mid \rX = \rx) & = &  
   \Phi\left(\h_\rY(\ry) - \sum_{j = 1}^J \shiftparm_j(\ry) \tilde{\rx}_j\right) \\
 & = & \Phi\left(\bern{6}(\ry)^\top \parm_1 - \sum_{j = 1}^J \bern{6}(\ry)^\top \parm_{j + 1} \tilde{\rx}_j\right)
 \end{eqnarray*}
@@ -1698,18 +1698,18 @@ For a given transformation function $h$, the likelihood contribution of a
 datum $\esAY = (\ubar{\ry},\bar{\ry}] \in \sAY$ is defined in terms of the
 distribution function \citep{Lindsey_1996}: 
 \begin{eqnarray*} 
-\lik(\h | \rY \in \esAY) := \int_{\esAY} \dY(y | \h) d\measureY(y) =
+\lik(\h \mid \rY \in \esAY) := \int_{\esAY} \dY(y \mid \h) d\measureY(y) =
 \pZ(\h(\bar{\ry})) - \pZ(\h(\ubar{\ry})).
 \end{eqnarray*}
 This ``exact'' definition of the likelihood applies to most practically interesting
 situations and, in particular, allows discrete and (conceptually) continuous as well as
 censored or truncated observations $\esAY$. For a discrete response $\ry_k$ we have $\bar{\ry} = \ry_k$ and $\ubar{\ry}
-= \ry_{k -1}$ such that $\lik(\h | \rY = \ry_k) = \dY(\ry_k | \h) =
+= \ry_{k -1}$ such that $\lik(\h \mid \rY = \ry_k) = \dY(\ry_k \mid \h) =
 \pZ(\h(\bar{\ry})) - \pZ(\h(\ubar{\ry}))$.  For absolutely continuous random
 variables $\rY$ we always practically observe an imprecise datum $(\ubar{\ry},\bar{\ry}]
 \subset \RR$ and, for short intervals $(\ubar{\ry},\bar{\ry}]$, approximate
-the exact likelihood $\lik(\h | \rY \in (\ubar{\ry},\bar{\ry}])$ by the term
-$(\bar{\ry} - \ubar{\ry}) \dY(\ry | \h)$ or simply $\dY(\ry | \h)$ with $\ry
+the exact likelihood $\lik(\h \mid \rY \in (\ubar{\ry},\bar{\ry}])$ by the term
+$(\bar{\ry} - \ubar{\ry}) \dY(\ry \mid \h)$ or simply $\dY(\ry \mid \h)$ with $\ry
 = (\ubar{\ry} + \bar{\ry})/2$ \citep{Lindsey_1999}. This approximation only
 works for relatively precise measurements, \ie short intervals. If longer intervals 
 are observed, one speaks of ``censoring'' and relies on the exact definition
@@ -1718,7 +1718,7 @@ In summary, the likelihood contribution of a conceptually ``exact
 continuous'' or left, right or interval-censored continuous or discrete 
 observation $(\ubar{\ry}, \bar{\ry}]$ is given by 
 \begin{eqnarray*}
-\lik(\h | \rY \in (\ubar{\ry}, \bar{\ry}]) \left\{ \begin{array}{ll}
+\lik(\h \mid \rY \in (\ubar{\ry}, \bar{\ry}]) \left\{ \begin{array}{ll}
     \approx \dZ(\h(\ry)) \h^\prime(\ry) & \ry = (\ubar{\ry} + \bar{\ry})/2 \in \samY \quad \text{```exact continuous'''}\\
     = 1 - \pZ(\h(\ubar{\ry})) & \ry \in (\ubar{\ry}, \infty) \cap \samY \quad \text{`right-censored'} \\
     = \pZ(\h(\bar{\ry})) & \ry \in (-\infty, \bar{\ry}] \cap \samY \quad \text{`left-censored'} \\
@@ -1728,9 +1728,9 @@ observation $(\ubar{\ry}, \bar{\ry}]$ is given by
 under the assumption of random censoring.
 The likelihood is more complex under dependent censoring
 \citep{Klein_Moeschberger_2003} but this is is not covered by the \pkg{mlt} implementation. 
-The likelihood contribution $\lik(\h | \rY \in (\ry_k, \ry_{k-1}])$
+The likelihood contribution $\lik(\h \mid \rY \in (\ry_k, \ry_{k-1}])$
 of an ordered factor in category $\ry_k$ is equivalent to the term 
-$\lik(\h | \rY \in (\ubar{\ry}, \bar{\ry}])$
+$\lik(\h \mid \rY \in (\ubar{\ry}, \bar{\ry}])$
 contributed by an interval-censored observation $(\ubar{\ry},\bar{\ry}]$
 when category $\ry_k$ was defined by the interval $(\ubar{\ry},\bar{\ry}]$. Thus,
 the expression $\pZ(\h(\bar{\ry})) - \pZ(\h(\ubar{\ry}))$ for the likelihood
@@ -1741,15 +1741,15 @@ For truncated observations in the interval $(\ry_l, \ry_r] \subset \samY$,
 the above likelihood contribution is defined in terms of the 
 distribution function conditional on the truncation
 \begin{eqnarray*}
-\pY(\ry | \rY \in (\ry_l, \ry_r]) = \pZ(\h(\ry) | \rY \in (\ry_l, \ry_r]) = 
+\pY(\ry \mid \rY \in (\ry_l, \ry_r]) = \pZ(\h(\ry) \mid \rY \in (\ry_l, \ry_r]) = 
 \frac{\pZ(\h(\ry))}{\pZ(\h(\ry_r)) - \pZ(\h(\ry_l))}  
 \quad \forall \ry \in (\ry_l, \ry_r]
 \end{eqnarray*}
 and thus the likelihood contribution changes to \citep{Klein_Moeschberger_2003}
 \begin{eqnarray*}
-\frac{\lik(\h | \rY \in (\ubar{\ry}, \bar{\ry}])}{\pZ(\h(\ry_r)) -
-\pZ(\h(\ry_l))} = \frac{\lik(\h | \rY \in (\ubar{\ry}, \bar{\ry}])}{\lik(\h
-| \rY \in (\ry_l, \ry_r])} \quad \text{when } \ry_l < \ubar{\ry} < \bar{\ry} \le \ry_r.
+\frac{\lik(\h \mid \rY \in (\ubar{\ry}, \bar{\ry}])}{\pZ(\h(\ry_r)) -
+\pZ(\h(\ry_l))} = \frac{\lik(\h \mid \rY \in (\ubar{\ry}, \bar{\ry}])}{\lik(\h
+\mid \rY \in (\ry_l, \ry_r])} \quad \text{when } \ry_l < \ubar{\ry} < \bar{\ry} \le \ry_r.
 \end{eqnarray*}
 It is important to note that the likelihood is always \textit{defined} in
 terms of a distribution function \citep{Lindsey_1999} and it therefore makes
@@ -1760,7 +1760,7 @@ estimator $\hat{\h}_N$. For an independent sample of possibly
 censored or truncated observations $\esAY_1, \dots, \esAY_N$ 
 from $\Prob_\rY$ the estimator
 \begin{eqnarray*}
-\hat{\h}_N := \argmax_{\tilde{\h} \in \hs} \sum_{i = 1}^{N} \log(\lik(\tilde{\h} |
+\hat{\h}_N := \argmax_{\tilde{\h} \in \hs} \sum_{i = 1}^{N} \log(\lik(\tilde{\h} \mid
 \rY \in \esAY_i)) 
 \end{eqnarray*}
 is called the most likely transformation (MLT). In \pkg{mlt}, we
@@ -1784,7 +1784,7 @@ constraint $\parm \in \Theta$ can be written as $\mC \parm \ge \bold{0}$, thus
 the solution to the optimisation problem
 \begin{eqnarray*}
 \hat{\parm}_N := \argmax_{\mC \parm \ge \bold{0}} \sum_{i = 1}^N
-\log(\lik(\basisy^\top \parm | \rY \in \esAY_i))
+\log(\lik(\basisy^\top \parm \mid \rY \in \esAY_i))
 \end{eqnarray*}
 is the maximum likelihood estimator. The plug-in estimator for the most
 likely transformation is $\hat{\h}_N := \basisy^\top \hat{\parm}_N$.  
@@ -1795,8 +1795,8 @@ observation $\ry = (\ubar{\ry} +
 \bar{\ry})/2$ from an absolutely continuous distribution is approximated by the
 gradient of the log-density
 \begin{eqnarray*}
-\s(\parm | \rY \in (\ubar{\ry}, \bar{\ry}]) \approx
-\frac{\partial \log(\dY(\ry | \parm))}{\partial \parm} & = & 
+\s(\parm \mid \rY \in (\ubar{\ry}, \bar{\ry}]) \approx
+\frac{\partial \log(\dY(\ry \mid \parm))}{\partial \parm} & = & 
 \frac{\partial \log(\dZ(\basisy(\ry)^\top \parm))) +
 \log({\basisy^\prime(\ry)}^\top \parm)}{\partial \parm} \nonumber \\
 & = & \basisy(\ry) \frac{\dZ^\prime(\basisy(\ry)^\top \parm)}{\dZ(\basisy(\ry)^\top \parm)}
@@ -1806,22 +1806,22 @@ For an interval-censored or discrete observation $\ubar{\ry}$ and
 $\bar{\ry}$ (the constant terms $\pZ(\basisy(\pm \infty)^\top \parm) =
 \pZ(\pm \infty) = 1$ or $0$ vanish) the score contribution is
 \begin{eqnarray*}
-\s(\parm | \rY \in (\ubar{\ry}, \bar{\ry}]) & = & \frac{\partial \log(\lik(\basisy^\top \parm | \rY \in (\ubar{\ry},
+\s(\parm \mid \rY \in (\ubar{\ry}, \bar{\ry}]) & = & \frac{\partial \log(\lik(\basisy^\top \parm \mid \rY \in (\ubar{\ry},
 \bar{\ry}]))}{\partial \parm} \nonumber \\
 & = & \frac{\partial \log(\pZ(\basisy(\bar{\ry})^\top \parm) - \pZ(\basisy(\ubar{\ry})^\top \parm))}{\partial \parm}  \nonumber \\
 & = & \frac{\dZ(\basisy(\bar{\ry})^\top \parm)\basisy(\bar{\ry}) - \dZ(\basisy(\ubar{\ry})^\top
 \parm) \basisy(\ubar{\ry})}{\pZ(\basisy(\bar{\ry})^\top \parm) - \pZ(\basisy(\ubar{\ry})^\top
 \parm)}. \label{f:s_interval}
 \end{eqnarray*}
-For a truncated observation, the score function is $\s(\parm | \rY \in
-(\ubar{\ry}, \bar{\ry}]) - \s(\parm | \rY \in (\ry_l, \ry_r])$.
+For a truncated observation, the score function is $\s(\parm \mid \rY \in
+(\ubar{\ry}, \bar{\ry}]) - \s(\parm \mid \rY \in (\ry_l, \ry_r])$.
 %\begin{eqnarray*}
 %\frac{\partial -\log[\pZ(\basisy(\ry_r)^\top \parm) - \pZ(\basisy(\ry_l)^\top
 %\parm)]}{\partial \parm} & = &
 %-\frac{\dZ(\basisy(\ry_r)^\top \parm)\basisy(\ry_r) - \dZ(\basisy(\ry_l)^\top \parm)\basisy(\ry_l)}
 %     {\pZ(\basisy(\ry_r)^\top \parm) - \pZ(\basisy(\ry_l)^\top \parm)}
 %\end{eqnarray*}
-%has to be added to the score contribution $\s(\parm | \rY \in (\ubar{\ry},
+%has to be added to the score contribution $\s(\parm \mid \rY \in (\ubar{\ry},
 %\bar{\ry}])$.
 
 The \cmd{mlt} function uses the convenience interface \cmd{BB} to the spectral
@@ -1863,7 +1863,7 @@ of grid point to be generated) for continuous
 responses for observations with explanatory variables as given in the
 \code{newdata} argument. That means the transformation function
 \begin{eqnarray*}
-\hat{\h}_N(\ry_k | \rx_i) = \basisyx(\ry_k, \rx_i)^\top \hat{\parm}_N, 
+\hat{\h}_N(\ry_k \mid \rx_i) = \basisyx(\ry_k, \rx_i)^\top \hat{\parm}_N, 
 \quad k = 1, \dots, K; i = 1, \dots, N_\text{new}
 \end{eqnarray*}
 is evaluated for potentially large numbers $K$ ad $N_\text{new}$ by \cmd{predict}
@@ -1871,7 +1871,7 @@ and it returned as a $K \times N_\text{new}$ matrix. Because in the
 most general case of a conditional distribution function the transformation
 function is 
 \begin{eqnarray*}
-\hat{\h}_N(\ry_k | \rx_i) = 
+\hat{\h}_N(\ry_k \mid \rx_i) = 
 (\basisy_1(\ry_k)^\top \otimes (\basisx_1(\rx_i)^\top,\dots, \basisx(\rx_i)_J^\top), -\basisx(\rx_i)_\text{shift}^\top)^\top \hat{\parm}_N
 \end{eqnarray*}
 with $\mA$ being the matrix with rows $\basisy_1(\ry_k)$ for $k = 1, \dots, K$, 
@@ -1880,7 +1880,7 @@ for $i = 1, \dots, N_\text{new}$ and $\mB_\text{shift}$ the matrix with rows
 $\basisx(\rx_i)^\top$ for $i = 1, \dots, N_\text{new}$, the transformation function can
 be simultaneously evaluated for all $k = 1, \dots, K$ and $i = 1, \dots, N_\text{new}$ as
 \begin{eqnarray*}
-(\mA \otimes \mB | \bold{1}_K \otimes \mB_\text{shift})^\top \hat{\parm}_N.
+(\mA \otimes \mB \mid \bold{1}_K \otimes \mB_\text{shift})^\top \hat{\parm}_N.
 \end{eqnarray*}
 This product is in the special form of an array model \citep{Currie_Durban_Eilers_2006} and
 can be computed very quickly using the tricks described by \cite{Currie_Durban_Eilers_2006}.
@@ -1895,8 +1895,8 @@ likelihood estimators.  The contribution of an ``exact continuous''
 observation $\ry$ from an absolutely continuous distribution to the Fisher
 information is approximately
 \begin{eqnarray*}
-\mF(\parm | \rY \in (\ubar{\ry}, \bar{\ry}]) & \approx & 
--\frac{\partial^2 \log(\dY(\ry | \parm))}{\partial \parm
+\mF(\parm \mid \rY \in (\ubar{\ry}, \bar{\ry}]) & \approx & 
+-\frac{\partial^2 \log(\dY(\ry \mid \parm))}{\partial \parm
 \partial \parm^\top} \nonumber \\
 & = & - \left(
 \basisy(\ry) \basisy(\ry)^\top \left\{
@@ -1907,7 +1907,7 @@ information is approximately
 For a censored or discrete observation, we have the following
 contribution to the Fisher information
 \begin{eqnarray*}
-\mF(\parm | \rY \in (\ubar{\ry}, \bar{\ry}]) & = & -\frac{\partial^2 \log(\lik(\basisy^\top \parm |
+\mF(\parm \mid \rY \in (\ubar{\ry}, \bar{\ry}]) & = & -\frac{\partial^2 \log(\lik(\basisy^\top \parm \mid
 \rY \in (\ubar{\ry}, \bar{\ry}]))}{\partial \parm \partial \parm^\top} \nonumber \\
 & = & 
 - \left\{\frac{\dZ^\prime(\basisy(\bar{\ry})^\top \parm)\basisy(\bar{\ry})\basisy(\bar{\ry})^\top -
@@ -1922,7 +1922,7 @@ contribution to the Fisher information
 \right\}. \nonumber
 \end{eqnarray*}
 For a truncated observation, the Fisher information is given by
-$\mF(\parm | \rY \in (\ubar{\ry}, \bar{\ry}]) - \mF(\parm | \rY \in (\ry_l,
+$\mF(\parm \mid \rY \in (\ubar{\ry}, \bar{\ry}]) - \mF(\parm \mid \rY \in (\ry_l,
 \ry_r])$.
 
 Based on these results, we can construct asymptotically valid confidence
@@ -2026,7 +2026,7 @@ allows sampling from the distribution $\hat{\Prob}_\rY$.
 For estimated parameters $\hat{\parm}_N$, this model-based or 
 ``parametric'' bootstrap from $\hat{\Prob}_\rY$ can be implemented by the
 probability integral transform, \ie $\rZ_1, \dots, \rZ_N \stackrel{\text{iid}}{\sim} \Prob_\rZ$ is
-drawn and then $\rY_i^\star = \inf\{\ry \in \samY | \basisy(\ry)^\top \hat{\parm}_N \ge
+drawn and then $\rY_i^\star = \inf\{\ry \in \samY \mid \basisy(\ry)^\top \hat{\parm}_N \ge
 \rZ_i\}$ is determined by numerical inversion of the distribution function.
 The \cmd{simulation} method for \code{mlt} objects first computes the
 distribution function over a grid of \code{K} response values, draws \code{nsim} times
@@ -2045,8 +2045,8 @@ drawn.  For each sample, the model \code{ctm_w} is refitted, using the
 parameters $\hat{\parm}_N$ as starting values (\code{theta}) to speed-up the
 computations.  Next, the log-likelihood ratio
 \begin{eqnarray*}
-\sum_{i = 1}^N \log(\lik(\basisy^\top \hat{\parm}^\star_N | \rY_i^\star) - 
-\sum_{i = 1}^N \log(\lik(\basisy^\top \hat{\parm}_N | \rY_i^\star)
+\sum_{i = 1}^N \log(\lik(\basisy^\top \hat{\parm}^\star_N \mid \rY_i^\star) - 
+\sum_{i = 1}^N \log(\lik(\basisy^\top \hat{\parm}_N \mid \rY_i^\star)
 \end{eqnarray*}
 is computed for each sample. Last, distribution and density functions are obtained
 for each of the models in this small loop
@@ -2078,7 +2078,7 @@ from the bootstrap sample but the latter does not deteriorate for probabilities 
 to zero and one.
 
 In the conditional case, \code{nsim} samples from the $N$ conditional distributions
-$\hat{\Prob}_{\rY | \rX = \rx_i}, i = 1, \dots, N$ are drawn by \cmd{simulate}. 
+$\hat{\Prob}_{\rY \mid \rX = \rx_i}, i = 1, \dots, N$ are drawn by \cmd{simulate}. 
 
 \begin{figure}
 \begin{center}
