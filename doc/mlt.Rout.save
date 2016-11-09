@@ -1,5 +1,5 @@
 
-R version 3.3.1 (2016-06-21) -- "Bug in Your Hair"
+R version 3.3.2 (2016-10-31) -- "Sincere Pumpkin Patch"
 Copyright (C) 2016 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -267,9 +267,9 @@ R> logLik(mlt_CHFLS_1)
 'log Lik.' -1328.241 (df=3)
 R> cbind(polr = polr_CHFLS_1$zeta, mlt = coef(mlt_CHFLS_1))
                                   polr       mlt
-Very unhappy|Not too happy   -4.687408 -4.687408
-Not too happy|Somewhat happy -1.903382 -1.903382
-Somewhat happy|Very happy     1.499304  1.499304
+Very unhappy|Not too happy   -4.687408 -4.687544
+Not too happy|Somewhat happy -1.903382 -1.903378
+Somewhat happy|Very happy     1.499304  1.499261
 R> 
 R> ## ----CHFLS-1-pred--------------------------------------------------------
 R> predict(polr_CHFLS_1, newdata = data.frame(1), type = "prob")
@@ -277,7 +277,7 @@ R> predict(polr_CHFLS_1, newdata = data.frame(1), type = "prob")
    0.009126466    0.120599751    0.687744449    0.182529334 
 R> c(predict(mlt_CHFLS_1, newdata = data.frame(1), type = "density", 
 +            q = mkgrid(b_happy)[[1]]))
-[1] 0.009126469 0.120599738 0.687744458 0.182529335
+[1] 0.00912524 0.12060135 0.68773768 0.18253574
 R> xtabs(~ R_happy, data = CHFLS) / nrow(CHFLS)
 R_happy
   Very unhappy  Not too happy Somewhat happy     Very happy 
@@ -354,11 +354,11 @@ R> logLik(mlt_CHFLS_2)
 R> cbind(polr = c(polr_CHFLS_2$zeta, coef(polr_CHFLS_2)), 
 +        mlt = coef(mlt_CHFLS_2))
                                      polr           mlt
-Very unhappy|Not too happy   -4.801592360 -4.8015820561
-Not too happy|Somewhat happy -2.011695585 -2.0117019514
-Somewhat happy|Very happy     1.412707129  1.4127041170
-R_age                        -0.006278962 -0.0062791163
-R_income                      0.000235009  0.0002350097
+Very unhappy|Not too happy   -4.801592360 -4.8016007890
+Not too happy|Somewhat happy -2.011695585 -2.0117558752
+Somewhat happy|Very happy     1.412707129  1.4126490150
+R_age                        -0.006278962 -0.0062807722
+R_income                      0.000235009  0.0002350172
 R> 
 R> ## ----GBSG2-1, echo = TRUE------------------------------------------------
 R> data("GBSG2", package = "TH.data")
@@ -384,15 +384,15 @@ R> coxph_GBSG2_1 <- coxph(fm_GBSG2, data = GBSG2, ties = "breslow")
 R> cf <- coef(coxph_GBSG2_1)
 R> cbind(coxph = cf, mlt = coef(mlt_GBSG2_1)[names(cf)])
                      coxph           mlt
-horThyes     -0.3462416209 -0.3489205601
-age          -0.0094534071 -0.0099113611
-menostatPost  0.2581565452  0.2675484077
-tsize         0.0077983290  0.0077694009
-tgrade.L      0.5510838051  0.5600329425
-tgrade.Q     -0.2011060204 -0.2018734495
-pnodes        0.0487818043  0.0487581396
-progrec      -0.0022174942 -0.0022104961
-estrec        0.0001978178  0.0001828489
+horThyes     -0.3462416209 -0.3489669010
+age          -0.0094534071 -0.0098558187
+menostatPost  0.2581565452  0.2668899911
+tsize         0.0077983290  0.0077736281
+tgrade.L      0.5510838051  0.5604259034
+tgrade.Q     -0.2011060204 -0.2020898085
+pnodes        0.0487818043  0.0487492066
+progrec      -0.0022174942 -0.0022104601
+estrec        0.0001978178  0.0001821366
 R> 
 R> ## ----GBSG2-coxph_mlt, echo = FALSE, results = "hide"---------------------
 R> ndtmp <- as.data.frame(mkgrid(GBSG2y, 100))
@@ -479,18 +479,19 @@ R> logLik(fss_GBSG2_1)
 'log Lik.' -2555.856 (df=20)
 R> logLik(mlt_GBSG2_1)
 'log Lik.' -2559.151 (df=20)
+R> cf <- coef(coxph_GBSG2_1)
 R> cbind(coxph = cf, mlt = coef(mlt_GBSG2_1)[names(cf)],
 +        fss = coef(fss_GBSG2_1)[names(cf)])
                      coxph           mlt           fss
-horThyes     -0.3499938811 -0.3489205601 -0.3473363289
-age          -0.0097886655 -0.0099113611 -0.0097895841
-menostatPost  0.2676640924  0.2675484077  0.2672204917
-tsize         0.0077966790  0.0077694009  0.0079051625
-tgrade.L      0.5583932973  0.5600329425  0.5554284931
-tgrade.Q     -0.2022612341 -0.2018734495 -0.2078499581
-pnodes        0.0487008932  0.0487581396  0.0485933666
-progrec      -0.0022070974 -0.0022104961 -0.0022112350
-estrec        0.0001893829  0.0001828489  0.0001891311
+horThyes     -0.3462416209 -0.3489669010 -0.3473363289
+age          -0.0094534071 -0.0098558187 -0.0097895841
+menostatPost  0.2581565452  0.2668899911  0.2672204917
+tsize         0.0077983290  0.0077736281  0.0079051625
+tgrade.L      0.5510838051  0.5604259034  0.5554284931
+tgrade.Q     -0.2011060204 -0.2020898085 -0.2078499581
+pnodes        0.0487818043  0.0487492066  0.0485933666
+progrec      -0.0022174942 -0.0022104601 -0.0022112350
+estrec        0.0001978178  0.0001821366  0.0001891311
 R> 
 R> ## ----GBSG2-1-fss-plot, echo = FALSE--------------------------------------
 R> p1 <- summary(fss_GBSG2_1, newdata = GBSG2[1,], ci = FALSE)
@@ -550,15 +551,15 @@ R> cbind(survreg = coef(survreg_GBSG2_3)[names(cf)] / survreg_GBSG2_3$scale,
 +        phreg = - coef(phreg_GBSG2_3)[names(cf)], 
 +        mlt = coef(mlt_GBSG2_3)[names(cf)])
                    survreg         phreg           mlt
-horThyes      0.3730909205  0.3730909205  0.3730890844
-age           0.0094799262  0.0094799262  0.0094802357
-menostatPost -0.2709027409 -0.2709027409 -0.2709059621
-tsize        -0.0080149047 -0.0080149047 -0.0080149449
-tgrade.L     -0.5727992624 -0.5727992624 -0.5727954391
-tgrade.Q      0.2050597169  0.2050597169  0.2050572965
-pnodes       -0.0528016503 -0.0528016503 -0.0528019995
-progrec       0.0022848557  0.0022848557  0.0022848577
-estrec       -0.0002484315 -0.0002484315 -0.0002484339
+horThyes      0.3730909205  0.3730909205  0.3730854793
+age           0.0094799262  0.0094799262  0.0094998794
+menostatPost -0.2709027409 -0.2709027409 -0.2712240870
+tsize        -0.0080149047 -0.0080149047 -0.0080145014
+tgrade.L     -0.5727992624 -0.5727992624 -0.5726935271
+tgrade.Q      0.2050597169  0.2050597169  0.2049820426
+pnodes       -0.0528016503 -0.0528016503 -0.0528037061
+progrec       0.0022848557  0.0022848557  0.0022835727
+estrec       -0.0002484315 -0.0002484315 -0.0002484516
 R> 
 R> ## ----BostonHousing-lm----------------------------------------------------
 R> data("BostonHousing2", package = "mlbench")
@@ -634,15 +635,15 @@ R> cf <- coef(mlt_PSID1976_1)
 R> cbind(truncreg = coef(tr_PSID1976),
 +        mlt = c(-cf[-grep("hours", names(cf))], 1) / cf["hours"])
                     truncreg          mlt
-(Intercept)     2055.7127740 2123.5209244
-nwincome          -0.5011526    0.1534437
-education        -31.2696497  -29.8525973
-experience        73.0066075   72.6223511
-I(experience^2)   -0.9695106   -0.9439834
-age              -25.3359778  -27.4439187
-youngkids       -318.8521247 -484.7131259
-oldkids          -91.6195316 -102.6578164
-sigma            822.4792934  850.7683745
+(Intercept)     2055.7127740 2123.5661425
+nwincome          -0.5011526    0.1536498
+education        -31.2696497  -29.8512046
+experience        73.0066075   72.6100938
+I(experience^2)   -0.9695106   -0.9436354
+age              -25.3359778  -27.4435844
+youngkids       -318.8521247 -484.7014006
+oldkids          -91.6195316 -102.6517073
+sigma            822.4792934  850.7631886
 R> 
 R> ## ----PSID1976-mlt-ctm----------------------------------------------------
 R> var_h <- numeric_var("hours", support = range(PSID1976_0$hours$exact),
@@ -665,13 +666,13 @@ R> ctm_CHFLS_3 <- ctm(b_happy, interacting = b_health, todist = "Logistic")
 R> mlt_CHFLS_3 <- mlt(ctm_CHFLS_3, data = CHFLS, scale = TRUE,
 +                     maxit = 5000, gtol = 1e-3)
 R> logLik(mlt_CHFLS_3)
-'log Lik.' -1192.227 (df=15)
+'log Lik.' -1192.226 (df=15)
 R> predict(mlt_CHFLS_3, newdata = mkgrid(mlt_CHFLS_3), type = "distribution")
                 R_health
 R_happy               Poor   Not good        Fair        Good    Excellent
-  Very unhappy   0.1999998 0.05036713 0.008676719 0.001718226 2.625274e-06
-  Not too happy  0.5999999 0.38130160 0.154013152 0.073883243 7.602604e-02
-  Somewhat happy 0.9000000 0.93525413 0.913232655 0.862542981 5.614049e-01
+  Very unhappy   0.1999988 0.05035958 0.008676792 0.001718201 3.603317e-08
+  Not too happy  0.5999993 0.38129491 0.154012980 0.073883162 7.602343e-02
+  Somewhat happy 0.9000003 0.93525176 0.913232097 0.862542946 5.614035e-01
   Very happy     1.0000000 1.00000000 1.000000000 1.000000000 1.000000e+00
 R> 
 R> ## ----CHFLS-4, cache = TRUE-----------------------------------------------
@@ -681,7 +682,7 @@ R> mlt_CHFLS_4 <- mlt(ctm_CHFLS_4, data = CHFLS, scale = TRUE,
 +                     maxit = 5000)
 R> coef(mlt_CHFLS_4)[c("R_age", "R_income")]
        R_age     R_income 
-0.0117390362 0.0002492703 
+0.0117396630 0.0002492688 
 R> 
 R> ## ----GBSG2-4-------------------------------------------------------------
 R> b_horTh <- as.basis(GBSG2$horTh)
@@ -718,7 +719,7 @@ R> coxph_GBSG2_5 <- coxph(Surv(time, cens) ~ age + strata(horTh),
 R> cf <- coef(coxph_GBSG2_5)
 R> cbind(coxph = cf, mlt = coef(mlt_GBSG2_5)[names(cf)])
             coxph           mlt
-age -0.0003695703 -0.0004621642
+age -0.0003695703 -0.0004714786
 R> 
 R> ## ----CHFLS-5, cache = TRUE-----------------------------------------------
 R> contrasts(CHFLS$R_health) <- "contr.treatment"
@@ -734,12 +735,12 @@ Warning messages:
 R> predict(mlt_CHFLS_5, newdata = mkgrid(mlt_CHFLS_5), type = "distribution")
                 R_health
 R_happy               Poor   Not good        Fair        Good    Excellent
-  Very unhappy   0.1998997 0.05035989 0.008676709 0.001718209 2.923172e-06
-  Not too happy  0.5999515 0.38129693 0.154012392 0.073883787 7.602638e-02
-  Somewhat happy 0.8999885 0.93525192 0.913232582 0.862543019 5.614050e-01
+  Very unhappy   0.1998996 0.05039632 0.008665935 0.001721158 1.013586e-06
+  Not too happy  0.5998795 0.38129624 0.153996989 0.073882498 7.602025e-02
+  Somewhat happy 0.8997576 0.93522510 0.913243808 0.862559778 5.614392e-01
   Very happy     1.0000000 1.00000000 1.000000000 1.000000000 1.000000e+00
 R> logLik(mlt_CHFLS_5)
-'log Lik.' -1192.227 (df=15)
+'log Lik.' -1192.226 (df=15)
 R> 
 R> ## ----CHFLS-6, cache = TRUE-----------------------------------------------
 R> b_R <- as.basis(~ R_age + R_income, data = CHFLS, remove_intercept = TRUE)
@@ -783,19 +784,19 @@ Warning messages:
 8: In matrix(paste(x[rep(1:nrow(x), length = nrow(y)), rep(1:ncol(x),  :
   data length [63] is not a sub-multiple or multiple of the number of rows [2]
 R> logLik(mlt_CHFLS_7)
-'log Lik.' -1182.779 (df=21)
+'log Lik.' -1182.778 (df=21)
 R> 
 R> ## ----CHFLS-AIC-----------------------------------------------------------
 R> c("1" = AIC(mlt_CHFLS_1), "2" = AIC(mlt_CHFLS_2), "3" = AIC(mlt_CHFLS_3),
 +    "4" = AIC(mlt_CHFLS_4), "5" = AIC(mlt_CHFLS_5), "6" = AIC(mlt_CHFLS_6),
 +    "7" = AIC(mlt_CHFLS_7))
        1        2        3        4        5        6        7 
-2662.483 2654.042 2414.453 2404.135 2414.453 2731.461 2407.559 
+2662.483 2654.042 2414.451 2404.135 2414.452 2731.461 2407.557 
 R> 
 R> ## ----iris-1--------------------------------------------------------------
 R> fm_iris <- Species ~ Sepal.Length + Sepal.Width + 
 +                       Petal.Length + Petal.Width
-R> multinom_iris <- multinom(fm_iris, data = iris, trace = FALSE)
+R> multinom_iris <- nnet::multinom(fm_iris, data = iris, trace = FALSE)
 R> logLik(multinom_iris)
 'log Lik.' -5.949867 (df=10)
 R> iris$oSpecies <- ordered(iris$Species)
@@ -805,12 +806,12 @@ R> ctm_iris <- ctm(b_Species,
 +                  todistr = "Logistic")
 R> mlt_iris <- mlt(ctm_iris, data = iris, scale = TRUE)
 R> logLik(mlt_iris)
-'log Lik.' -5.949436 (df=10)
+'log Lik.' -5.949282 (df=10)
 R> p1 <- predict(mlt_iris, newdata = iris, q = sort(unique(iris$oSpecies)), 
 +                type = "density")
 R> p2 <- predict(multinom_iris, newdata = iris, type = "prob")
 R> max(abs(t(p1) - p2))
-[1] 0.001173088
+[1] 0.001165706
 R> 
 R> ## ----GBSG2-6-------------------------------------------------------------
 R> ctm_GBSG2_6 <- ctm(B_GBSG2y, shifting = ~ horTh, data = GBSG2, 
@@ -827,9 +828,9 @@ R> ctm_GBSG2_7 <- ctm(B_GBSG2y, interacting = b_horTh,
 +                     todistr = "MinExtrVal")
 R> mlt_GBSG2_7 <- mlt(ctm_GBSG2_7, data = GBSG2)
 R> logLik(mlt_GBSG2_7)
-'log Lik.' -2605.948 (df=22)
+'log Lik.' -2605.949 (df=22)
 R> AIC(mlt_GBSG2_7)
-[1] 5255.896
+[1] 5255.897
 R> 
 R> ## ----GBSG2-deviation-plot, echo = FALSE, results = "hide"----------------
 R> 
@@ -888,9 +889,9 @@ Note: method with signature 'dsparseMatrix#dsparseMatrix' chosen for function 'k
 R> mlt_GBSG2_8  <- mlt(ctm_GBSG2_8, data = GBSG2, maxit = 5000, 
 +                      gtol = 1e-3)
 R> logLik(mlt_GBSG2_8)
-'log Lik.' -2588.743 (df=88)
+'log Lik.' -2588.989 (df=88)
 R> AIC(mlt_GBSG2_8)
-[1] 5353.487
+[1] 5353.978
 R> 
 R> ## ----GBSG2-8-plot, echo = FALSE------------------------------------------
 R> nlev <- c(no = "without hormonal therapy", yes = "with hormonal therapy")
@@ -1045,7 +1046,7 @@ R> abline(h = 1, lty = 6)
 R> 
 R> ## ----CHFLS-2-cmpr-2------------------------------------------------------
 R> max(abs(estfun(polr_CHFLS_2) - (-estfun(mlt_CHFLS_2)[,c(4, 5, 1:3)])))
-[1] 0.008871258
+[1] 0.151661
 R> cbind(polr = sqrt(diag(vcov(polr_CHFLS_2))),
 +        mlt = sqrt(diag(vcov(mlt_CHFLS_2)))[c(4, 5, 1:3)])
 
@@ -1053,10 +1054,10 @@ Re-fitting to get Hessian
 
                                      polr          mlt
 R_age                        5.684041e-03 5.684460e-03
-R_income                     8.509055e-05 7.099273e-05
-Very unhappy|Not too happy   3.536235e-01 3.522657e-01
-Not too happy|Somewhat happy 2.419643e-01 2.400504e-01
-Somewhat happy|Very happy    2.372414e-01 2.355000e-01
+R_income                     8.509055e-05 7.099287e-05
+Very unhappy|Not too happy   3.536235e-01 3.522621e-01
+Not too happy|Somewhat happy 2.419643e-01 2.400507e-01
+Somewhat happy|Very happy    2.372414e-01 2.354997e-01
 R> cftest(polr_CHFLS_2)
 
 Re-fitting to get Hessian
@@ -1085,7 +1086,7 @@ Fit: mlt(model = ctm_CHFLS_2, data = CHFLS, scale = TRUE)
 
 Linear Hypotheses:
                 Estimate Std. Error z value Pr(>|z|)    
-R_age == 0    -6.279e-03  5.684e-03  -1.105 0.269328    
+R_age == 0    -6.281e-03  5.684e-03  -1.105 0.269202    
 R_income == 0  2.350e-04  7.099e-05   3.310 0.000932 ***
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
@@ -1098,15 +1099,15 @@ R> cbind(coxph = sqrt(diag(vcov(coxph_GBSG2_1))),
 +        mlt = sqrt(diag(vcov(mlt_GBSG2_1)))[names(cf)],
 +        fss = sqrt(diag(vcov(fss_GBSG2_1)))[names(cf)])
                     coxph          mlt          fss
-horThyes     0.1290732771 0.1293760634 0.1290343235
-age          0.0093002439 0.0093124938 0.0092899409
-menostatPost 0.1834799825 0.1836840638 0.1833300012
-tsize        0.0039390579 0.0039383111 0.0039372592
-tgrade.L     0.1898442780 0.1898825492 0.1899068142
-tgrade.Q     0.1219645723 0.1220116627 0.1220298327
-pnodes       0.0074480015 0.0074156462 0.0074387203
-progrec      0.0005734844 0.0005740003 0.0005553729
-estrec       0.0004503673 0.0004515681 0.0004309581
+horThyes     0.1290732771 0.1293787796 0.1290343235
+age          0.0093002439 0.0093130075 0.0092899409
+menostatPost 0.1834799825 0.1836964932 0.1833300012
+tsize        0.0039390579 0.0039382442 0.0039372592
+tgrade.L     0.1898442780 0.1899217491 0.1899068142
+tgrade.Q     0.1219645723 0.1220326790 0.1220298327
+pnodes       0.0074480015 0.0074162868 0.0074387203
+progrec      0.0005734844 0.0005740200 0.0005553729
+estrec       0.0004503673 0.0004516051 0.0004309581
 R> 
 R> ## ----GBSG2-1-coxph-cmpr-cftest-------------------------------------------
 R> cftest(coxph_GBSG2_1)
@@ -1138,15 +1139,15 @@ Fit: mlt(model = ctm_GBSG2_1, data = GBSG2, scale = TRUE, maxit = 3000)
 
 Linear Hypotheses:
                     Estimate Std. Error z value Pr(>|z|)    
-horThyes == 0     -0.3489206  0.1293761  -2.697 0.006998 ** 
-age == 0          -0.0099114  0.0093125  -1.064 0.287189    
-menostatPost == 0  0.2675484  0.1836841   1.457 0.145236    
-tsize == 0         0.0077694  0.0039383   1.973 0.048521 *  
-tgrade.L == 0      0.5600329  0.1898825   2.949 0.003184 ** 
-tgrade.Q == 0     -0.2018734  0.1220117  -1.655 0.098017 .  
-pnodes == 0        0.0487581  0.0074156   6.575 4.86e-11 ***
+horThyes == 0     -0.3489669  0.1293788  -2.697 0.006991 ** 
+age == 0          -0.0098558  0.0093130  -1.058 0.289925    
+menostatPost == 0  0.2668900  0.1836965   1.453 0.146256    
+tsize == 0         0.0077736  0.0039382   1.974 0.048395 *  
+tgrade.L == 0      0.5604259  0.1899217   2.951 0.003169 ** 
+tgrade.Q == 0     -0.2020898  0.1220327  -1.656 0.097716 .  
+pnodes == 0        0.0487492  0.0074163   6.573 4.92e-11 ***
 progrec == 0      -0.0022105  0.0005740  -3.851 0.000118 ***
-estrec == 0        0.0001828  0.0004516   0.405 0.685536    
+estrec == 0        0.0001821  0.0004516   0.403 0.686721    
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 (Univariate p values reported)
@@ -1684,11 +1685,11 @@ R> xr <- xt + sample(c(Inf, (0:(length(xt) - 2)) / length(xt)),
 +                    replace = FALSE)
 R> R(c(1.2, rep(NA, length(xt))), cleft = c(NA, xl), cright = c(NA, xr), 
 +    tleft = -1, tright = 2)
-[1] {1.2| (-1, 2]}             {(0.025, 0.775]| (-1, 2]} 
-[3] {(-Inf, 0.102]| (-1, 2]}   {(-0.406, 0.844]| (-1, 2]}
-[5] {(0.577, Inf]| (-1, 2]}    {(-1.155, -0.78]| (-1, 2]}
-[7] {(1.056, 1.306]| (-1, 2]}  {(-1.104, 0.146]| (-1, 2]}
-[9] {(-0.835, 0.29]| (-1, 2]} 
+[1] {1.2| (-1, 2]}              {(0.329, 1.329]| (-1, 2]}  
+[3] {(-0.999, -0.249]| (-1, 2]} {(-0.297, 0.203]| (-1, 2]} 
+[5] {(-Inf, 0.118]| (-1, 2]}    {(-1.279, -0.154]| (-1, 2]}
+[7] {(-0.293, Inf]| (-1, 2]}    {(-0.453, -0.328]| (-1, 2]}
+[9] {(-0.576, 0.174]| (-1, 2]} 
 R> 
 R> ## ----R-Surv--------------------------------------------------------------
 R> head(geyser$duration)
@@ -1735,16 +1736,16 @@ R> coef(mod)
     Bs13(y)     Bs14(y)     Bs15(y)     Bs16(y) 
  2.31269685  2.58240889  2.84121268  3.09023231 
 R> coef(fmod)
-    Bs1(y)     Bs2(y)     Bs3(y)     Bs4(y)     Bs5(y)     Bs6(y) 
--3.6453881 -2.0595627 -1.3023706 -1.3023706 -1.0253634  0.6128594 
-    Bs7(y)     Bs8(y)     Bs9(y)    Bs10(y)    Bs11(y)    Bs12(y) 
- 0.6128594  0.6128594  0.6128594  1.1927210  2.1016691  2.1016691 
-   Bs13(y)    Bs14(y)    Bs15(y)    Bs16(y) 
- 2.1016691  2.1016691  2.1016691  3.3074441 
+     Bs1(y)      Bs2(y)      Bs3(y)      Bs4(y)      Bs5(y)      Bs6(y) 
+-3.44857874 -1.70565191 -1.70565174 -1.70564889 -0.08905420  0.03463296 
+     Bs7(y)      Bs8(y)      Bs9(y)     Bs10(y)     Bs11(y)     Bs12(y) 
+ 0.03468490  0.52834567  1.52548216  1.53157724  1.53199603  1.95539312 
+    Bs13(y)     Bs14(y)     Bs15(y)     Bs16(y) 
+ 2.35774342  2.35781004  2.35781006  3.67431640 
 R> logLik(fmod)
-'log Lik.' -1619.449 (df=16)
+'log Lik.' -1606.4 (df=16)
 R> logLik(fmod, parm = coef(mod))
-'log Lik.' -1625.041 (df=16)
+'log Lik.' -1609.71 (df=16)
 R> 
 R> ## ----mlt-chi-plot--------------------------------------------------------
 R> ## compute true density
@@ -1764,191 +1765,191 @@ R> mltobj <- objs[grep("^mlt_", objs)]
 R> sapply(mltobj, function(m) eval(parse(text = paste("coef(", m, ")"))))
 $mlt_BH
    Bs1(medvc)    Bs2(medvc)    Bs3(medvc)    Bs4(medvc)    Bs5(medvc) 
--11.065772775  -9.169005799  -7.491975287  -4.460645082  -4.460645082 
+-11.066136150  -9.169382875  -7.492301627  -4.460990558  -4.460990558 
    Bs6(medvc)    Bs7(medvc)          crim            zn         indus 
- -3.672147635  -3.407241222   0.043695230  -0.007385888  -0.011532401 
+ -3.672499165  -3.407592794   0.043695588  -0.007385880  -0.011532583 
         chas1           nox            rm           age           dis 
- -0.604278179   4.854119372  -0.485074683   0.002666639   0.313179003 
+ -0.604279233   4.854273367  -0.485054367   0.002666594   0.313184199 
           rad           tax       ptratio             b         lstat 
- -0.079214984   0.003680169   0.223955090  -0.002630245   0.164965521 
+ -0.079216176   0.003680191   0.223960153  -0.002630204   0.164966823 
 
 $mlt_BHi
 Bs1(medvc):(Intercept) Bs2(medvc):(Intercept) Bs3(medvc):(Intercept) 
-            -3.3766430             -3.3766430             -3.3766430 
+            -3.3762946             -3.3762946             -3.3762939 
 Bs4(medvc):(Intercept) Bs5(medvc):(Intercept) Bs6(medvc):(Intercept) 
-            -3.3766430             -3.3766430             -3.3766430 
+            -3.3762939             -3.3762939             -3.3762937 
 Bs7(medvc):(Intercept)        Bs1(medvc):crim        Bs2(medvc):crim 
-            -3.3766430              2.9874535              3.7849503 
+            -3.3762937              2.9850141              3.7806821 
        Bs3(medvc):crim        Bs4(medvc):crim        Bs5(medvc):crim 
-             3.7849503              3.7849503              3.7849503 
+             3.7806821              3.7806821              3.7806821 
        Bs6(medvc):crim        Bs7(medvc):crim          Bs1(medvc):zn 
-             3.7849503              3.7849503             -1.3696169 
+             3.7806821              3.7806821             -1.3689122 
          Bs2(medvc):zn          Bs3(medvc):zn          Bs4(medvc):zn 
-            -1.3696169             -1.3696169             -1.3696169 
+            -1.3689121             -1.3689121             -1.3689121 
          Bs5(medvc):zn          Bs6(medvc):zn          Bs7(medvc):zn 
-            -1.3696169             -0.6351902             -0.6351902 
+            -1.3689121             -0.6350316             -0.6350316 
       Bs1(medvc):indus       Bs2(medvc):indus       Bs3(medvc):indus 
-            -1.3521336             -1.3521336             -0.2182461 
+            -1.3525457             -1.3525440             -0.2185306 
       Bs4(medvc):indus       Bs5(medvc):indus       Bs6(medvc):indus 
-            -0.2182461             -0.2182461             -0.2182461 
+            -0.2185306             -0.2185306             -0.2185306 
       Bs7(medvc):indus       Bs1(medvc):chas1       Bs2(medvc):chas1 
-            -0.2182461             -2.0547994             -0.4620740 
+            -0.2185306             -2.0553361             -0.4628222 
       Bs3(medvc):chas1       Bs4(medvc):chas1       Bs5(medvc):chas1 
-            -0.4620740             -0.4620740             -0.4620740 
+            -0.4628222             -0.4628222             -0.4628222 
       Bs6(medvc):chas1       Bs7(medvc):chas1         Bs1(medvc):nox 
-            -0.4620740             -0.4620740              2.0937296 
+            -0.4628222             -0.4628222              2.0931241 
         Bs2(medvc):nox         Bs3(medvc):nox         Bs4(medvc):nox 
-             2.0937296              2.0937296              2.0937296 
+             2.0931241              2.0931241              2.0931241 
         Bs5(medvc):nox         Bs6(medvc):nox         Bs7(medvc):nox 
-             2.0937296              2.0937296              2.0937296 
+             2.0931241              2.0931241              2.0931241 
          Bs1(medvc):rm          Bs2(medvc):rm          Bs3(medvc):rm 
-            -3.1583748             -3.1583748             -3.1583748 
+            -3.1579799             -3.1579799             -3.1579799 
          Bs4(medvc):rm          Bs5(medvc):rm          Bs6(medvc):rm 
-            -3.1583748             -3.1583748             -3.1583748 
+            -3.1579799             -3.1579799             -3.1579799 
          Bs7(medvc):rm         Bs1(medvc):age         Bs2(medvc):age 
-            -3.1305910              0.8575343              0.8575343 
+            -3.1299172              0.8572946              0.8572946 
         Bs3(medvc):age         Bs4(medvc):age         Bs5(medvc):age 
-             0.8575343              0.8575343              0.8575343 
+             0.8572946              0.8572946              0.8572946 
         Bs6(medvc):age         Bs7(medvc):age         Bs1(medvc):dis 
-             0.8575343              0.8575343            -10.5248006 
+             0.8572946              0.8572946            -10.5283887 
         Bs2(medvc):dis         Bs3(medvc):dis         Bs4(medvc):dis 
-             4.8230380              4.8230380              4.8230380 
+             4.8235115              4.8235115              4.8235115 
         Bs5(medvc):dis         Bs6(medvc):dis         Bs7(medvc):dis 
-             4.8230380              4.9803689              6.9620054 
+             4.8235115              4.9826137              6.9627709 
         Bs1(medvc):rad         Bs2(medvc):rad         Bs3(medvc):rad 
-            -2.0058736             -2.0058736             -2.0058736 
+            -2.0052090             -2.0052090             -2.0052090 
         Bs4(medvc):rad         Bs5(medvc):rad         Bs6(medvc):rad 
-            -2.0058736             -2.0058736             -2.0058736 
+            -2.0052090             -2.0052090             -2.0052090 
         Bs7(medvc):rad         Bs1(medvc):tax         Bs2(medvc):tax 
-            -2.0058736              2.1547011              2.1547011 
+            -2.0052090              2.1550591              2.1550591 
         Bs3(medvc):tax         Bs4(medvc):tax         Bs5(medvc):tax 
-             2.1547011              2.1547011              2.1547011 
+             2.1550591              2.1550591              2.1550591 
         Bs6(medvc):tax         Bs7(medvc):tax     Bs1(medvc):ptratio 
-             2.1547011              2.1547011              2.0289097 
+             2.1550591              2.1550591              2.0290756 
     Bs2(medvc):ptratio     Bs3(medvc):ptratio     Bs4(medvc):ptratio 
-             2.0289097              2.0289097              2.0289097 
+             2.0290756              2.0290756              2.0290756 
     Bs5(medvc):ptratio     Bs6(medvc):ptratio     Bs7(medvc):ptratio 
-             2.0289097              2.0289097              2.0289097 
+             2.0290756              2.0290756              2.0290756 
           Bs1(medvc):b           Bs2(medvc):b           Bs3(medvc):b 
-            -1.4727669             -1.4727669             -1.4727669 
+            -1.4730549             -1.4730549             -1.4730533 
           Bs4(medvc):b           Bs5(medvc):b           Bs6(medvc):b 
-             1.7858109              1.7858109              1.8377573 
+             1.7848568              1.7848568              1.8363431 
           Bs7(medvc):b       Bs1(medvc):lstat       Bs2(medvc):lstat 
-             1.8377573              3.5294971              5.1868782 
+             1.8363431              3.5298559              5.1877344 
       Bs3(medvc):lstat       Bs4(medvc):lstat       Bs5(medvc):lstat 
-             5.1868782              7.1421072              7.1421072 
+             5.1877344              7.1396608              7.1396608 
       Bs6(medvc):lstat       Bs7(medvc):lstat 
-            11.5714836             11.5714836 
+            11.5784848             11.5784848 
 
 $mlt_CHFLS_1
  R_happy1  R_happy2  R_happy3 
--4.687408 -1.903382  1.499304 
+-4.687544 -1.903378  1.499261 
 
 $mlt_CHFLS_2
      R_happy1      R_happy2      R_happy3         R_age      R_income 
--4.8015820561 -2.0117019514  1.4127041170 -0.0062791163  0.0002350097 
+-4.8016007890 -2.0117558752  1.4126490150 -0.0062807722  0.0002350172 
 
 $mlt_CHFLS_3
      R_happy1:R_healthPoor      R_happy2:R_healthPoor 
-                -1.3862954                  0.4054648 
+                -1.3863016                  0.4054622 
      R_happy3:R_healthPoor  R_happy1:R_healthNot good 
-                 2.1972251                 -2.9367367 
+                 2.1972277                 -2.9368945 
  R_happy2:R_healthNot good  R_happy3:R_healthNot good 
-                -0.4840273                  2.6703484 
+                -0.4840556                  2.6703092 
      R_happy1:R_healthFair      R_happy2:R_healthFair 
-                -4.7383972                 -1.7034658 
+                -4.7383888                 -1.7034671 
      R_happy3:R_healthFair      R_happy1:R_healthGood 
-                 2.3537603                 -6.3647429 
+                 2.3537533                 -6.3647578 
      R_happy2:R_healthGood      R_happy3:R_healthGood 
-                -2.5285143                  1.8365737 
+                -2.5285155                  1.8365734 
 R_happy1:R_healthExcellent R_happy2:R_healthExcellent 
-               -12.8503226                 -2.4976080 
+               -17.1388258                 -2.4976452 
 R_happy3:R_healthExcellent 
-                 0.2468659 
+                 0.2468601 
 
 $mlt_CHFLS_4
      R_happy1:R_healthPoor      R_happy2:R_healthPoor 
-             -7.877382e-01               1.036969e+00 
+             -7.876069e-01               1.037146e+00 
      R_happy3:R_healthPoor  R_happy1:R_healthNot good 
-              2.842135e+00              -2.346310e+00 
+              2.842474e+00              -2.346279e+00 
  R_happy2:R_healthNot good  R_happy3:R_healthNot good 
-              1.151354e-01               3.288206e+00 
+              1.151554e-01               3.288206e+00 
      R_happy1:R_healthFair      R_happy2:R_healthFair 
-             -4.130445e+00              -1.084914e+00 
+             -4.130417e+00              -1.084893e+00 
      R_happy3:R_healthFair      R_happy1:R_healthGood 
-              3.019161e+00              -5.768608e+00 
+              3.019182e+00              -5.768514e+00 
      R_happy2:R_healthGood      R_happy3:R_healthGood 
-             -1.931189e+00               2.469549e+00 
+             -1.931167e+00               2.469566e+00 
 R_happy1:R_healthExcellent R_happy2:R_healthExcellent 
-             -1.432533e+01              -1.932587e+00 
+             -1.494010e+01              -1.932571e+00 
 R_happy3:R_healthExcellent                      R_age 
-              8.231248e-01               1.173904e-02 
+              8.231449e-01               1.173966e-02 
                   R_income 
-              2.492703e-04 
+              2.492688e-04 
 
 $mlt_CHFLS_5
       R_happy1:(Intercept)       R_happy2:(Intercept) 
-                -1.3869212                  0.4052630 
+                -1.3869219                  0.4049632 
       R_happy3:(Intercept)  R_happy1:R_healthNot good 
-                 2.1970972                 -1.5499668 
+                 2.1945340                 -1.5492047 
  R_happy2:R_healthNot good  R_happy3:R_healthNot good 
-                -0.8893100                  0.4732147 
+                -0.8890132                  0.4753352 
      R_happy1:R_healthFair      R_happy2:R_healthFair 
-                -3.3514771                 -2.1087346 
+                -3.3527298                 -2.1085531 
      R_happy3:R_healthFair      R_happy1:R_healthGood 
-                 0.1566622                 -4.9778320 
+                 0.1593671                 -4.9761137 
      R_happy2:R_healthGood      R_happy3:R_healthGood 
-                -2.9337693                 -0.3605232 
+                -2.9334884                 -0.3578186 
 R_happy1:R_healthExcellent R_happy2:R_healthExcellent 
-               -11.3559170                 -2.9028661 
+               -12.4150935                 -2.9026536 
 R_happy3:R_healthExcellent 
-                -1.9502311 
+                -1.9475290 
 
 $mlt_CHFLS_6
    R_happy1:R_age    R_happy2:R_age    R_happy3:R_age R_happy1:R_income 
-    -9.588057e-02     -3.555227e-02      3.944646e-02     -2.122942e-03 
+    -9.586345e-02     -3.555286e-02      3.944657e-02     -2.124948e-03 
 R_happy2:R_income R_happy3:R_income 
-    -1.006456e-03     -7.264288e-05 
+    -1.006294e-03     -7.262645e-05 
 
 $mlt_CHFLS_7
       R_happy1:(Intercept)       R_happy2:(Intercept) 
-             -6.563814e-01               1.172743e+00 
+             -6.556134e-01               1.173112e+00 
       R_happy3:(Intercept)  R_happy1:R_healthNot good 
-              2.803895e+00              -1.563070e+00 
+              2.804284e+00              -1.563852e+00 
  R_happy2:R_healthNot good  R_happy3:R_healthNot good 
-             -9.325598e-01               4.474238e-01 
+             -9.328857e-01               4.470588e-01 
      R_happy1:R_healthFair      R_happy2:R_healthFair 
-             -3.290400e+00              -2.086540e+00 
+             -3.291283e+00              -2.086878e+00 
      R_happy3:R_healthFair      R_happy1:R_healthGood 
-              1.585437e-01              -4.927471e+00 
+              1.581826e-01              -4.928421e+00 
      R_happy2:R_healthGood      R_happy3:R_healthGood 
-             -2.937780e+00              -3.852942e-01 
+             -2.938123e+00              -3.856578e-01 
 R_happy1:R_healthExcellent R_happy2:R_healthExcellent 
-             -1.133797e+01              -2.941486e+00 
+             -1.572228e+01              -2.941865e+00 
 R_happy3:R_healthExcellent             R_happy1:R_age 
-             -2.022883e+00              -1.177666e-02 
+             -2.023249e+00              -1.177762e-02 
             R_happy2:R_age             R_happy3:R_age 
-             -1.177666e-02              -1.177666e-02 
+             -1.177761e-02              -1.177761e-02 
          R_happy1:R_income          R_happy2:R_income 
-             -6.182411e-04              -5.718425e-04 
+             -6.178675e-04              -5.718298e-04 
          R_happy3:R_income 
-             -1.801054e-04 
+             -1.801042e-04 
 
 $mlt_d
 Bs1(duration) Bs2(duration) Bs3(duration) Bs4(duration) Bs5(duration) 
-   -4.1807238    -0.5358892    -0.3758673    -0.3758673    -0.3758673 
+   -4.1808127    -0.5357844    -0.3758765    -0.3758765    -0.3758765 
 Bs6(duration) Bs7(duration) Bs8(duration) Bs9(duration) 
-   -0.3758673    -0.3758673    -0.2233621     2.0040127 
+   -0.3758765    -0.3758765    -0.2233864     2.0040045 
 
 $mlt_GBSG2_1
        Bs1(y)        Bs2(y)        Bs3(y)        Bs4(y)        Bs5(y) 
--5.5177099955 -1.0295159595 -1.0295159595 -1.0295159595 -0.7971271770 
+-5.5202809891 -1.0323168233 -1.0323168343 -1.0323168222 -0.8000751935 
        Bs6(y)        Bs7(y)        Bs8(y)        Bs9(y)       Bs10(y) 
--0.3466082626 -0.3466082626 -0.3466082626 -0.1249435775  0.2881056889 
+-0.3493004215 -0.3493002119 -0.3492997614 -0.1275849912  0.2853243351 
       Bs11(y)      horThyes           age  menostatPost         tsize 
- 0.2881056889 -0.3489205601 -0.0099113611  0.2675484077  0.0077694009 
+ 0.2853243352 -0.3489669010 -0.0098558187  0.2668899911  0.0077736281 
      tgrade.L      tgrade.Q        pnodes       progrec        estrec 
- 0.5600329425 -0.2018734495  0.0487581396 -0.0022104961  0.0001828489 
+ 0.5604259034 -0.2020898085  0.0487492066 -0.0022104601  0.0001821366 
 
 $mlt_GBSG2_2
   (Intercept)        log(y)      horThyes           age  menostatPost 
@@ -1960,262 +1961,262 @@ $mlt_GBSG2_2
 
 $mlt_GBSG2_3
   (Intercept)        log(y)      horThyes           age  menostatPost 
--1.065457e+01  1.390271e+00  3.730891e-01  9.480236e-03 -2.709060e-01 
+-1.065371e+01  1.390271e+00  3.730855e-01  9.499879e-03 -2.712241e-01 
         tsize      tgrade.L      tgrade.Q        pnodes       progrec 
--8.014945e-03 -5.727954e-01  2.050573e-01 -5.280200e-02  2.284858e-03 
+-8.014501e-03 -5.726935e-01  2.049820e-01 -5.280371e-02  2.283573e-03 
        estrec 
--2.484339e-04 
+-2.484516e-04 
 
 $mlt_GBSG2_4
   Bs1(y):horThno   Bs2(y):horThno   Bs3(y):horThno   Bs4(y):horThno 
-     -5.18067421      -0.88125436      -0.88125436      -0.88125436 
+     -5.18169709      -0.88232574      -0.88232569      -0.88232550 
   Bs5(y):horThno   Bs6(y):horThno   Bs7(y):horThno   Bs8(y):horThno 
-     -0.80840734      -0.24095537      -0.24095537      -0.24095537 
+     -0.80824621      -0.24103086      -0.24102862      -0.24102621 
   Bs9(y):horThno  Bs10(y):horThno  Bs11(y):horThno  Bs1(y):horThyes 
-     -0.09117787      -0.09117787       0.56820919      -6.03038299 
+     -0.08894011      -0.08894000       0.56726325      -6.03350060 
  Bs2(y):horThyes  Bs3(y):horThyes  Bs4(y):horThyes  Bs5(y):horThyes 
-     -1.23974287      -1.23974287      -1.23974287      -0.98614133 
+     -1.23894530      -1.23894313      -1.23863115      -0.98937869 
  Bs6(y):horThyes  Bs7(y):horThyes  Bs8(y):horThyes  Bs9(y):horThyes 
-     -0.75982585      -0.75982585      -0.75982585      -0.15739458 
+     -0.75864589      -0.75864505      -0.75864419      -0.15843887 
 Bs10(y):horThyes Bs11(y):horThyes 
-     -0.15739458      -0.15739458 
+     -0.15843714      -0.15843623 
 
 $mlt_GBSG2_5
   Bs1(y):horThno   Bs2(y):horThno   Bs3(y):horThno   Bs4(y):horThno 
-   -5.1571959023    -0.8574456116    -0.8574456116    -0.8574456116 
+   -5.1549690086    -0.8581443430    -0.8581443197    -0.8581443440 
   Bs5(y):horThno   Bs6(y):horThno   Bs7(y):horThno   Bs8(y):horThno 
-   -0.7845984916    -0.2172065382    -0.2172065382    -0.2172065382 
+   -0.7755656056    -0.2230857939    -0.2230858193    -0.2045357870 
   Bs9(y):horThno  Bs10(y):horThno  Bs11(y):horThno  Bs1(y):horThyes 
-   -0.0673278869    -0.0673278869     0.5930550600    -6.0043210897 
+   -0.0708681786    -0.0708681960     0.5964011063    -6.0047560019 
  Bs2(y):horThyes  Bs3(y):horThyes  Bs4(y):horThyes  Bs5(y):horThyes 
-   -1.2134337195    -1.2134337195    -1.2134337195    -0.9601851286 
+   -1.2127746517    -1.2127161580    -1.2126978950    -0.9597843106 
  Bs6(y):horThyes  Bs7(y):horThyes  Bs8(y):horThyes  Bs9(y):horThyes 
-   -0.7337958843    -0.7337958843    -0.7337958843    -0.1316448432 
+   -0.7334321355    -0.7334276819    -0.7329165885    -0.1309613722 
 Bs10(y):horThyes Bs11(y):horThyes              age 
-   -0.1316448432    -0.1316448432    -0.0004621642 
+   -0.1309613207    -0.1309614038    -0.0004714786 
 
 $mlt_GBSG2_6
      Bs1(y)      Bs2(y)      Bs3(y)      Bs4(y)      Bs5(y)      Bs6(y) 
--5.29872359 -0.88352647 -0.88352647 -0.88352647 -0.73449615 -0.28814317 
+-5.29877074 -0.88348522 -0.88348506 -0.88348497 -0.73451502 -0.28813486 
      Bs7(y)      Bs8(y)      Bs9(y)     Bs10(y)     Bs11(y)    horThyes 
--0.28814317 -0.28814317 -0.09597813  0.24272604  0.24272604 -0.36657128 
+-0.28813478 -0.28813469 -0.09597022  0.24275272  0.24275643 -0.36656409 
 
 $mlt_GBSG2_7
  Bs1(y):(Intercept)  Bs2(y):(Intercept)  Bs3(y):(Intercept) 
-        -5.18066000         -0.88125700         -0.88125700 
+        -5.17968477         -0.88151247         -0.88151255 
  Bs4(y):(Intercept)  Bs5(y):(Intercept)  Bs6(y):(Intercept) 
-        -0.88125700         -0.80839713         -0.24095738 
+        -0.88151150         -0.80707206         -0.24147442 
  Bs7(y):(Intercept)  Bs8(y):(Intercept)  Bs9(y):(Intercept) 
-        -0.24095738         -0.24095738         -0.09117475 
+        -0.24100723         -0.24079992         -0.08968158 
 Bs10(y):(Intercept) Bs11(y):(Intercept)     Bs1(y):horThyes 
-        -0.09117475          0.56820387         -0.84976339 
+        -0.08859641          0.56535385         -0.85430292 
     Bs2(y):horThyes     Bs3(y):horThyes     Bs4(y):horThyes 
-        -0.35847870         -0.35847870         -0.35847870 
+        -0.35777067         -0.35770077         -0.35628520 
     Bs5(y):horThyes     Bs6(y):horThyes     Bs7(y):horThyes 
-        -0.17776055         -0.51886619         -0.51886619 
+        -0.18236149         -0.51782442         -0.51829155 
     Bs8(y):horThyes     Bs9(y):horThyes    Bs10(y):horThyes 
-        -0.51886619         -0.06622102         -0.06622102 
+        -0.51846651         -0.06932302         -0.07040702 
    Bs11(y):horThyes 
-        -0.72559963 
+        -0.72435731 
 
 $mlt_GBSG2_8
   Bs1(y):horThno:Bs1(age)   Bs2(y):horThno:Bs1(age) 
-              -3.67285577                2.17986248 
+              -3.67133989                2.13317140 
   Bs3(y):horThno:Bs1(age)   Bs4(y):horThno:Bs1(age) 
-               2.17986248                2.17986248 
+               2.13317181                2.13317322 
   Bs5(y):horThno:Bs1(age)   Bs6(y):horThno:Bs1(age) 
-               2.80883521                2.80883521 
+               2.83552851                2.83552871 
   Bs7(y):horThno:Bs1(age)   Bs8(y):horThno:Bs1(age) 
-               2.80883521                2.80883521 
+               2.83552950                2.83552965 
   Bs9(y):horThno:Bs1(age)  Bs10(y):horThno:Bs1(age) 
-               2.80883521                4.43094975 
+               2.83552992                4.39910507 
  Bs11(y):horThno:Bs1(age)  Bs1(y):horThyes:Bs1(age) 
-               4.43094975               -2.56039132 
+               4.39910663               -3.45861411 
  Bs2(y):horThyes:Bs1(age)  Bs3(y):horThyes:Bs1(age) 
-              -1.20145852               -1.20145852 
+              -2.73568104               -2.73568100 
  Bs4(y):horThyes:Bs1(age)  Bs5(y):horThyes:Bs1(age) 
-              -1.20145852               -1.20145852 
+              -2.73568008               -2.73567830 
  Bs6(y):horThyes:Bs1(age)  Bs7(y):horThyes:Bs1(age) 
-              -0.15615550               -0.15615550 
+              -1.65464930               -1.65455792 
  Bs8(y):horThyes:Bs1(age)  Bs9(y):horThyes:Bs1(age) 
-              -0.15615550               -0.15615550 
+              -1.65455788               -1.65455775 
 Bs10(y):horThyes:Bs1(age) Bs11(y):horThyes:Bs1(age) 
-              -0.15615550               -0.15615550 
+              -1.65455621               -1.65455616 
   Bs1(y):horThno:Bs2(age)   Bs2(y):horThno:Bs2(age) 
-              -4.73157511               -3.72500095 
+              -4.72987374               -3.64296230 
   Bs3(y):horThno:Bs2(age)   Bs4(y):horThno:Bs2(age) 
-              -3.72500095               -3.72500095 
+              -3.64296213               -3.64296160 
   Bs5(y):horThno:Bs2(age)   Bs6(y):horThno:Bs2(age) 
-              -3.44129053               -3.44129053 
+              -3.47329597               -3.45711605 
   Bs7(y):horThno:Bs2(age)   Bs8(y):horThno:Bs2(age) 
-              -3.44129053               -3.44129053 
+              -3.45711501               -3.45711496 
   Bs9(y):horThno:Bs2(age)  Bs10(y):horThno:Bs2(age) 
-              -3.44129053               -3.44129053 
+              -3.45711397               -3.45711229 
  Bs11(y):horThno:Bs2(age)  Bs1(y):horThyes:Bs2(age) 
-              -3.44129053               -3.70343574 
+              -3.45710449               -2.76189601 
  Bs2(y):horThyes:Bs2(age)  Bs3(y):horThyes:Bs2(age) 
-              -2.04109656               -2.04109656 
+              -0.45568622               -0.45568620 
  Bs4(y):horThyes:Bs2(age)  Bs5(y):horThyes:Bs2(age) 
-              -2.04109656               -2.04109656 
+              -0.45568572               -0.45568546 
  Bs6(y):horThyes:Bs2(age)  Bs7(y):horThyes:Bs2(age) 
-              -2.04109656               -2.04109656 
+              -0.45438053               -0.45176013 
  Bs8(y):horThyes:Bs2(age)  Bs9(y):horThyes:Bs2(age) 
-              -2.04109656               -2.04109656 
+              -0.44985974               -0.44985928 
 Bs10(y):horThyes:Bs2(age) Bs11(y):horThyes:Bs2(age) 
-              -2.04109656               -2.04109656 
+              -0.44985926               -0.44985926 
   Bs1(y):horThno:Bs3(age)   Bs2(y):horThno:Bs3(age) 
-              -5.73428136                0.17352191 
+              -5.77228526                0.11866013 
   Bs3(y):horThno:Bs3(age)   Bs4(y):horThno:Bs3(age) 
-               0.17352191                0.17352191 
+               0.11866123                0.11866229 
   Bs5(y):horThno:Bs3(age)   Bs6(y):horThno:Bs3(age) 
-               0.24331806                1.46050876 
+               0.21019642                1.46976957 
   Bs7(y):horThno:Bs3(age)   Bs8(y):horThno:Bs3(age) 
-               1.46050876                1.46050876 
+               1.46976976                1.46977023 
   Bs9(y):horThno:Bs3(age)  Bs10(y):horThno:Bs3(age) 
-               1.46050876                1.46050876 
+               1.46977025                1.46977031 
  Bs11(y):horThno:Bs3(age)  Bs1(y):horThyes:Bs3(age) 
-               1.46050876              -11.07300855 
+               1.46977039              -11.85718034 
  Bs2(y):horThyes:Bs3(age)  Bs3(y):horThyes:Bs3(age) 
-               0.14290290                0.14290290 
+              -0.96694775               -0.96694773 
  Bs4(y):horThyes:Bs3(age)  Bs5(y):horThyes:Bs3(age) 
-               0.14290290                0.27076991 
+              -0.95971892               -0.94739768 
  Bs6(y):horThyes:Bs3(age)  Bs7(y):horThyes:Bs3(age) 
-               0.69300692                0.69300692 
+              -0.38826432               -0.38826384 
  Bs8(y):horThyes:Bs3(age)  Bs9(y):horThyes:Bs3(age) 
-               0.90229824                1.99320801 
+              -0.37830892                0.90464936 
 Bs10(y):horThyes:Bs3(age) Bs11(y):horThyes:Bs3(age) 
-               1.99320801                1.99320801 
+               0.90464995                0.90465245 
   Bs1(y):horThno:Bs4(age)   Bs2(y):horThno:Bs4(age) 
-              -6.74124588               -0.65870175 
+              -6.72093624               -0.63906377 
   Bs3(y):horThno:Bs4(age)   Bs4(y):horThno:Bs4(age) 
-              -0.65870175               -0.65870175 
+              -0.63882911               -0.63882894 
   Bs5(y):horThno:Bs4(age)   Bs6(y):horThno:Bs4(age) 
-              -0.65870175               -0.65870175 
+              -0.63882876               -0.63882873 
   Bs7(y):horThno:Bs4(age)   Bs8(y):horThno:Bs4(age) 
-              -0.65870175                0.01463709 
+              -0.63882723                0.01375761 
   Bs9(y):horThno:Bs4(age)  Bs10(y):horThno:Bs4(age) 
-               0.01463709                0.01463709 
+               0.01375765                0.01375770 
  Bs11(y):horThno:Bs4(age)  Bs1(y):horThyes:Bs4(age) 
-               1.64832795               -2.61751847 
+               1.63311119               -2.07717236 
  Bs2(y):horThyes:Bs4(age)  Bs3(y):horThyes:Bs4(age) 
-              -2.61751847               -2.61751847 
+              -2.07717233               -2.07717217 
  Bs4(y):horThyes:Bs4(age)  Bs5(y):horThyes:Bs4(age) 
-              -1.86742230               -1.86742230 
+              -1.29164736               -1.29164708 
  Bs6(y):horThyes:Bs4(age)  Bs7(y):horThyes:Bs4(age) 
-              -1.86742230               -1.86742230 
+              -1.29156348               -1.29156346 
  Bs8(y):horThyes:Bs4(age)  Bs9(y):horThyes:Bs4(age) 
-              -1.86742230               -1.34055534 
+              -1.27227859               -0.82569322 
 Bs10(y):horThyes:Bs4(age) Bs11(y):horThyes:Bs4(age) 
-              -1.34055534               -1.34055534 
+              -0.82561393               -0.82561380 
 
 $mlt_head
 Bs1(head):Bs1(lage) Bs2(head):Bs1(lage) Bs3(head):Bs1(lage) 
-        -0.23465422          2.92733835          6.33762464 
+        -0.23433114          2.92683356          6.33974656 
 Bs4(head):Bs1(lage) Bs1(head):Bs2(lage) Bs2(head):Bs2(lage) 
-         6.33762464         -8.13569039         -5.61019533 
+         6.33974660         -8.13532124         -5.61298736 
 Bs3(head):Bs2(lage) Bs4(head):Bs2(lage) Bs1(head):Bs3(lage) 
-         0.04632097          3.96589309         -0.52825709 
+         0.05343994          3.95259309         -0.52961092 
 Bs2(head):Bs3(lage) Bs3(head):Bs3(lage) Bs4(head):Bs3(lage) 
-        -0.52825709          1.66340079          3.57855478 
+        -0.52961091          1.66316774          3.58119206 
 Bs1(head):Bs4(lage) Bs2(head):Bs4(lage) Bs3(head):Bs4(lage) 
-        -6.32573207         -6.32573207         -2.39943146 
+        -6.32545993         -6.32546002         -2.39954375 
 Bs4(head):Bs4(lage) 
-         0.29631915 
+         0.29636387 
 
 $mlt_i
 Bs1(waiting) Bs2(waiting) Bs3(waiting) Bs4(waiting) Bs5(waiting) 
-  -4.9232671   -0.7525941   -0.5347803   -0.5347803   -0.5347803 
+  -4.9307617   -0.7986517   -0.4532501   -0.4532498   -0.4532498 
 Bs6(waiting) Bs7(waiting) Bs8(waiting) Bs9(waiting) 
-  -0.5347803    0.2936873    2.3083034    2.4897398 
+  -0.4532498    1.1340942    1.1513585    3.7963319 
 
 $mlt_iris
  oSpecies1:(Intercept)  oSpecies2:(Intercept) oSpecies1:Sepal.Length 
-             7.9839930             42.6377894              0.1473498 
+             9.9798657             42.6366432              0.1957404 
 oSpecies2:Sepal.Length  oSpecies1:Sepal.Width  oSpecies2:Sepal.Width 
-             2.4652181              5.7969976              6.6808850 
+             2.4651156              7.9461474              6.6805867 
 oSpecies1:Petal.Length oSpecies2:Petal.Length  oSpecies1:Petal.Width 
-            -5.3266879             -9.4293878            -16.1140414 
+            -6.8073970             -9.4290975            -21.1005825 
  oSpecies2:Petal.Width 
-           -18.2861317 
+           -18.2853970 
 
 $mlt_PSID1976_1
     (Intercept)           hours        nwincome       education 
-   -2.496003599     0.001175408    -0.000180359     0.035088983 
+  -2.4960719635    0.0011754152   -0.0001806024    0.0350875603 
      experience I(experience^2)             age       youngkids 
-   -0.085360896     0.001109566     0.032257803     0.569735712 
+  -0.0853470093    0.0011091634    0.0322576068    0.5697254032 
         oldkids 
-    0.120664824 
+   0.1206583791 
 
 $mlt_PSID1976_2
      Bs1(hours)      Bs2(hours)      Bs3(hours)      Bs4(hours) 
-  -2.3463610343   -1.3210915337   -1.3210915337    0.8590640861 
+  -2.346317e+00   -1.321075e+00   -1.321075e+00    8.591752e-01 
      Bs5(hours)      Bs6(hours)      Bs7(hours)        nwincome 
-   2.1429425254    2.1429425254    2.4937866867   -0.0000339552 
+   2.142930e+00    2.142930e+00    2.493904e+00   -3.192133e-05 
       education      experience I(experience^2)             age 
-   0.0358518626   -0.0853550118    0.0010568844    0.0328811232 
+   3.585483e-02   -8.535643e-02    1.056934e-03    3.287872e-02 
       youngkids         oldkids 
-   0.5512723855    0.1269310229 
+   5.513237e-01    1.269289e-01 
 
 $mlt_treepipit
 ocounts1:Bs1(coverstorey) ocounts2:Bs1(coverstorey) 
-                 1.662028                  2.125463 
+                0.6624152                 0.6723410 
 ocounts3:Bs1(coverstorey) ocounts4:Bs1(coverstorey) 
-                 2.125463                  3.054433 
+                0.6723410                 0.6726123 
 ocounts5:Bs1(coverstorey) ocounts1:Bs2(coverstorey) 
-                 4.926525                 -6.106105 
+                0.6889539                -2.8601751 
 ocounts2:Bs2(coverstorey) ocounts3:Bs2(coverstorey) 
-                -6.106105                 -5.295056 
+               -2.8580964                -2.8534321 
 ocounts4:Bs2(coverstorey) ocounts5:Bs2(coverstorey) 
-                -5.295056                 -5.295056 
+               -2.8502551                -2.8468406 
 ocounts1:Bs3(coverstorey) ocounts2:Bs3(coverstorey) 
-                12.203602                 12.478610 
+                4.6378449                 4.6425168 
 ocounts3:Bs3(coverstorey) ocounts4:Bs3(coverstorey) 
-                12.478610                 12.478610 
+                4.6433355                 4.6433357 
 ocounts5:Bs3(coverstorey) ocounts1:Bs4(coverstorey) 
-                12.478610                 -7.552765 
+                4.6433357                -0.2472960 
 ocounts2:Bs4(coverstorey) ocounts3:Bs4(coverstorey) 
-                -7.552765                 -7.552765 
+               -0.2472330                -0.2472151 
 ocounts4:Bs4(coverstorey) ocounts5:Bs4(coverstorey) 
-                -7.552765                 -7.552765 
+               -0.2470778                -0.2470753 
 ocounts1:Bs5(coverstorey) ocounts2:Bs5(coverstorey) 
-                 8.199416                  8.199416 
+                1.3030838                 1.3030838 
 ocounts3:Bs5(coverstorey) ocounts4:Bs5(coverstorey) 
-                12.552434                 12.552434 
+                1.3030838                 1.3030838 
 ocounts5:Bs5(coverstorey) 
-                12.552434 
+                1.3030853 
 
 $mlt_w
 Bs1(waiting) Bs2(waiting) Bs3(waiting) Bs4(waiting) Bs5(waiting) 
-  -4.8137857   -0.4972390   -0.4972390   -0.4972390   -0.4972390 
+  -4.8137927   -0.4972391   -0.4972391   -0.4972391   -0.4972391 
 Bs6(waiting) Bs7(waiting) Bs8(waiting) Bs9(waiting) 
-  -0.4972390    0.4987036    2.3184424    2.6377603 
+  -0.4972391    0.4987046    2.3184420    2.6377599 
 
 $mlt_w_40
  Bs1(waiting)  Bs2(waiting)  Bs3(waiting)  Bs4(waiting)  Bs5(waiting) 
-   -5.6828063    -2.8047735    -2.8047735    -2.8047735    -2.8047735 
+   -5.6639571    -2.8073101    -2.8073099    -2.8073099    -2.8073088 
  Bs6(waiting)  Bs7(waiting)  Bs8(waiting)  Bs9(waiting) Bs10(waiting) 
-   -2.7548052    -0.8958755    -0.8958755    -0.8958755    -0.8958755 
+   -2.7566002    -0.8960107    -0.8960106    -0.8960106    -0.8960105 
 Bs11(waiting) Bs12(waiting) Bs13(waiting) Bs14(waiting) Bs15(waiting) 
-   -0.8958755    -0.8958755    -0.8958755    -0.5497979    -0.4354278 
+   -0.8960105    -0.8960105    -0.8960105    -0.5484649    -0.4363504 
 Bs16(waiting) Bs17(waiting) Bs18(waiting) Bs19(waiting) Bs20(waiting) 
-   -0.4354278    -0.4354278    -0.4354278    -0.3884536    -0.3884536 
+   -0.4363504    -0.4363500    -0.4327347    -0.3909195    -0.3880867 
 Bs21(waiting) Bs22(waiting) Bs23(waiting) Bs24(waiting) Bs25(waiting) 
-   -0.3884536    -0.3884536    -0.3884536    -0.3884536    -0.3884536 
+   -0.3880440    -0.3880440    -0.3880440    -0.3880440    -0.3880388 
 Bs26(waiting) Bs27(waiting) Bs28(waiting) Bs29(waiting) Bs30(waiting) 
-   -0.1442738     0.6932666     0.6932666     0.6932666     0.6932666 
+   -0.1506264     0.6938409     0.6938410     0.6938410     0.6938410 
 Bs31(waiting) Bs32(waiting) Bs33(waiting) Bs34(waiting) Bs35(waiting) 
-    0.6932666     0.6932666     1.2456210     1.6905685     1.6905685 
+    0.6938410     0.6938410     1.2448147     1.6910964     1.6910965 
 Bs36(waiting) Bs37(waiting) Bs38(waiting) Bs39(waiting) Bs40(waiting) 
-    1.6905685     1.6905685     2.4898429     2.6812017     2.6812017 
+    1.6910976     1.6914146     2.4841853     2.6823237     2.6823237 
 Bs41(waiting) 
-    2.7384154 
+    2.7394833 
 
 R> #library("mlt.docreg")
 R> #sapply(mltobj, function(m) eval(parse(text = paste("checkGH(", m, ")"))))
 R> 
 R> ## ----sessionInfo, echo = FALSE, results = "hide"-------------------------
 R> sessionInfo()
-R version 3.3.1 (2016-06-21)
+R version 3.3.2 (2016-10-31)
 Platform: x86_64-pc-linux-gnu (64-bit)
 Running under: Ubuntu 14.04.5 LTS
 
@@ -2239,18 +2240,18 @@ other attached packages:
 [13] MASS_7.3-45         gridExtra_2.2.1     lattice_0.20-33    
 [16] truncreg_0.2-4      maxLik_1.3-4        miscTools_0.6-16   
 [19] prodlim_1.5.7       eha_2.4-3           survival_2.39-5    
-[22] mlt_0.0-34          basefun_0.0-33      variables_0.0-30   
+[22] mlt_0.1-0           basefun_0.0-33      variables_0.0-30   
 
 loaded via a namespace (and not attached):
  [1] Rcpp_0.12.6        evaluate_0.9       gtable_0.2.0      
  [4] Matrix_1.2-7       polynom_1.3-8      stringr_1.1.0     
  [7] BB_2014.10-1       knitr_1.14         deSolve_1.13      
-[10] mstate_0.2.9       orthopolynom_1.0-5 lava_1.4.4        
-[13] magrittr_1.5       codetools_0.2-14   splines_3.3.1     
-[16] numDeriv_2016.8-1  quadprog_1.5-5     stringi_1.1.1     
-[19] muhaz_1.2.6        zoo_1.7-13        
+[10] mstate_0.2.9       orthopolynom_1.0-5 alabama_2015.3-1  
+[13] lava_1.4.4         magrittr_1.5       codetools_0.2-15  
+[16] splines_3.3.2      numDeriv_2016.8-1  quadprog_1.5-5    
+[19] stringi_1.1.1      muhaz_1.2.6        zoo_1.7-13        
 R> 
 R> 
 > proc.time()
    user  system elapsed 
-129.732   0.228 129.962 
+ 85.668   0.232  85.916 

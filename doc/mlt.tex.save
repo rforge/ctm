@@ -96,7 +96,7 @@ truncation}
 
 \footnote{Please cite this document as: Torsten Hothorn (2016)
 Most Likely Transformations: The \pkg{mlt} Package. 
-R package vignette version 0.0-32, 
+R package vignette version 0.1-0, 
 URL \url{https://CRAN.R-project.org/package=mlt.docreg}.}
 
 % \input{todo}
@@ -206,7 +206,9 @@ class, the conditional distribution function is
 \end{eqnarray*}
 where the transformation function $\h$ depends on both $\ry$ and $\rx$. 
 Because we are interested in analysing, \ie estimating and interpreting, the
-transformation function $\h$, we refer to the methods presented in this
+transformation function $\h$, we slightly rephrase the title
+``An Analysis of Transformations'' of the first paper on this subject
+\citep{BoxCox_1964} and refer to the methods presented in this
 paper as \textit{transformation analysis}.  We describe how conditional
 transformation models can be specified, fitted by maximising the likelihood
 \citep[using the estimator developed by][]{Hothorn_Moest_Buehlmann_2016} and
@@ -493,9 +495,9 @@ R> cbind(polr = polr_CHFLS_1$zeta, mlt = coef(mlt_CHFLS_1))
 \end{Sinput}
 \begin{Soutput}
                                   polr       mlt
-Very unhappy|Not too happy   -4.687408 -4.687408
-Not too happy|Somewhat happy -1.903382 -1.903382
-Somewhat happy|Very happy     1.499304  1.499304
+Very unhappy|Not too happy   -4.687408 -4.687544
+Not too happy|Somewhat happy -1.903382 -1.903378
+Somewhat happy|Very happy     1.499304  1.499261
 \end{Soutput}
 \end{Schunk}
 Of course, the above exercise is an extremely cumbersome way
@@ -515,7 +517,7 @@ R> c(predict(mlt_CHFLS_1, newdata = data.frame(1), type = "density",
 +            q = mkgrid(b_happy)[[1]]))
 \end{Sinput}
 \begin{Soutput}
-[1] 0.009126469 0.120599738 0.687744458 0.182529335
+[1] 0.00912524 0.12060135 0.68773768 0.18253574
 \end{Soutput}
 \begin{Sinput}
 R> xtabs(~ R_happy, data = CHFLS) / nrow(CHFLS)
@@ -768,11 +770,11 @@ R> cbind(polr = c(polr_CHFLS_2$zeta, coef(polr_CHFLS_2)),
 \end{Sinput}
 \begin{Soutput}
                                      polr           mlt
-Very unhappy|Not too happy   -4.801592360 -4.8015820561
-Not too happy|Somewhat happy -2.011695585 -2.0117019514
-Somewhat happy|Very happy     1.412707129  1.4127041170
-R_age                        -0.006278962 -0.0062791163
-R_income                      0.000235009  0.0002350097
+Very unhappy|Not too happy   -4.801592360 -4.8016007890
+Not too happy|Somewhat happy -2.011695585 -2.0117558752
+Somewhat happy|Very happy     1.412707129  1.4126490150
+R_age                        -0.006278962 -0.0062807722
+R_income                      0.000235009  0.0002350172
 \end{Soutput}
 \end{Schunk}
 The regression coefficients $\shiftparm$ are the log-odds ratios, \ie 
@@ -849,15 +851,15 @@ R> cbind(coxph = cf, mlt = coef(mlt_GBSG2_1)[names(cf)])
 \end{Sinput}
 \begin{Soutput}
                      coxph           mlt
-horThyes     -0.3462416209 -0.3489205601
-age          -0.0094534071 -0.0099113611
-menostatPost  0.2581565452  0.2675484077
-tsize         0.0077983290  0.0077694009
-tgrade.L      0.5510838051  0.5600329425
-tgrade.Q     -0.2011060204 -0.2018734495
-pnodes        0.0487818043  0.0487581396
-progrec      -0.0022174942 -0.0022104961
-estrec        0.0001978178  0.0001828489
+horThyes     -0.3462416209 -0.3489669010
+age          -0.0094534071 -0.0098558187
+menostatPost  0.2581565452  0.2668899911
+tsize         0.0077983290  0.0077736281
+tgrade.L      0.5510838051  0.5604259034
+tgrade.Q     -0.2011060204 -0.2020898085
+pnodes        0.0487818043  0.0487492066
+progrec      -0.0022174942 -0.0022104601
+estrec        0.0001978178  0.0001821366
 \end{Soutput}
 \end{Schunk}
 A practically important question is how the order $M$ of the Bernstein polynomial
@@ -917,20 +919,21 @@ R> logLik(mlt_GBSG2_1)
 'log Lik.' -2559.151 (df=20)
 \end{Soutput}
 \begin{Sinput}
+R> cf <- coef(coxph_GBSG2_1)
 R> cbind(coxph = cf, mlt = coef(mlt_GBSG2_1)[names(cf)],
 +        fss = coef(fss_GBSG2_1)[names(cf)])
 \end{Sinput}
 \begin{Soutput}
                      coxph           mlt           fss
-horThyes     -0.3499938811 -0.3489205601 -0.3473363289
-age          -0.0097886655 -0.0099113611 -0.0097895841
-menostatPost  0.2676640924  0.2675484077  0.2672204917
-tsize         0.0077966790  0.0077694009  0.0079051625
-tgrade.L      0.5583932973  0.5600329425  0.5554284931
-tgrade.Q     -0.2022612341 -0.2018734495 -0.2078499581
-pnodes        0.0487008932  0.0487581396  0.0485933666
-progrec      -0.0022070974 -0.0022104961 -0.0022112350
-estrec        0.0001893829  0.0001828489  0.0001891311
+horThyes     -0.3462416209 -0.3489669010 -0.3473363289
+age          -0.0094534071 -0.0098558187 -0.0097895841
+menostatPost  0.2581565452  0.2668899911  0.2672204917
+tsize         0.0077983290  0.0077736281  0.0079051625
+tgrade.L      0.5510838051  0.5604259034  0.5554284931
+tgrade.Q     -0.2011060204 -0.2020898085 -0.2078499581
+pnodes        0.0487818043  0.0487492066  0.0485933666
+progrec      -0.0022174942 -0.0022104601 -0.0022112350
+estrec        0.0001978178  0.0001821366  0.0001891311
 \end{Soutput}
 \end{Schunk}
 
@@ -1044,15 +1047,15 @@ R> cbind(survreg = coef(survreg_GBSG2_3)[names(cf)] / survreg_GBSG2_3$scale,
 \end{Sinput}
 \begin{Soutput}
                    survreg         phreg           mlt
-horThyes      0.3730909205  0.3730909205  0.3730890844
-age           0.0094799262  0.0094799262  0.0094802357
-menostatPost -0.2709027409 -0.2709027409 -0.2709059621
-tsize        -0.0080149047 -0.0080149047 -0.0080149449
-tgrade.L     -0.5727992624 -0.5727992624 -0.5727954391
-tgrade.Q      0.2050597169  0.2050597169  0.2050572965
-pnodes       -0.0528016503 -0.0528016503 -0.0528019995
-progrec       0.0022848557  0.0022848557  0.0022848577
-estrec       -0.0002484315 -0.0002484315 -0.0002484339
+horThyes      0.3730909205  0.3730909205  0.3730854793
+age           0.0094799262  0.0094799262  0.0094998794
+menostatPost -0.2709027409 -0.2709027409 -0.2712240870
+tsize        -0.0080149047 -0.0080149047 -0.0080145014
+tgrade.L     -0.5727992624 -0.5727992624 -0.5726935271
+tgrade.Q      0.2050597169  0.2050597169  0.2049820426
+pnodes       -0.0528016503 -0.0528016503 -0.0528037061
+progrec       0.0022848557  0.0022848557  0.0022835727
+estrec       -0.0002484315 -0.0002484315 -0.0002484516
 \end{Soutput}
 \end{Schunk}
 
@@ -1225,15 +1228,15 @@ R> cbind(truncreg = coef(tr_PSID1976),
 \end{Sinput}
 \begin{Soutput}
                     truncreg          mlt
-(Intercept)     2055.7127740 2123.5209244
-nwincome          -0.5011526    0.1534437
-education        -31.2696497  -29.8525973
-experience        73.0066075   72.6223511
-I(experience^2)   -0.9695106   -0.9439834
-age              -25.3359778  -27.4439187
-youngkids       -318.8521247 -484.7131259
-oldkids          -91.6195316 -102.6578164
-sigma            822.4792934  850.7683745
+(Intercept)     2055.7127740 2123.5661425
+nwincome          -0.5011526    0.1536498
+education        -31.2696497  -29.8512046
+experience        73.0066075   72.6100938
+I(experience^2)   -0.9695106   -0.9436354
+age              -25.3359778  -27.4435844
+youngkids       -318.8521247 -484.7014006
+oldkids          -91.6195316 -102.6517073
+sigma            822.4792934  850.7631886
 \end{Soutput}
 \end{Schunk}
 Of course, we might want to question the normal assumption by allowing a potentially
@@ -1412,7 +1415,7 @@ R> cbind(coxph = cf, mlt = coef(mlt_GBSG2_5)[names(cf)])
 \end{Sinput}
 \begin{Soutput}
             coxph           mlt
-age -0.0003695703 -0.0004621642
+age -0.0003695703 -0.0004714786
 \end{Soutput}
 \end{Schunk}
 The Cox model fitted via the stratified partial likelihood (\cmd{coxph}) and
@@ -1529,7 +1532,7 @@ is invariant with respect to the ordering applied as a comparison with
 \begin{Sinput}
 R> fm_iris <- Species ~ Sepal.Length + Sepal.Width + 
 +                       Petal.Length + Petal.Width
-R> multinom_iris <- multinom(fm_iris, data = iris, trace = FALSE)
+R> multinom_iris <- nnet::multinom(fm_iris, data = iris, trace = FALSE)
 R> logLik(multinom_iris)
 \end{Sinput}
 \begin{Soutput}
@@ -1545,7 +1548,7 @@ R> mlt_iris <- mlt(ctm_iris, data = iris, scale = TRUE)
 R> logLik(mlt_iris)
 \end{Sinput}
 \begin{Soutput}
-'log Lik.' -5.949436 (df=10)
+'log Lik.' -5.949282 (df=10)
 \end{Soutput}
 \begin{Sinput}
 R> p1 <- predict(mlt_iris, newdata = iris, q = sort(unique(iris$oSpecies)), 
@@ -1554,7 +1557,7 @@ R> p2 <- predict(multinom_iris, newdata = iris, type = "prob")
 R> max(abs(t(p1) - p2))
 \end{Sinput}
 \begin{Soutput}
-[1] 0.001173088
+[1] 0.001165706
 \end{Soutput}
 \end{Schunk}
 
@@ -1620,13 +1623,13 @@ R> mlt_GBSG2_7 <- mlt(ctm_GBSG2_7, data = GBSG2)
 R> logLik(mlt_GBSG2_7)
 \end{Sinput}
 \begin{Soutput}
-'log Lik.' -2605.948 (df=22)
+'log Lik.' -2605.949 (df=22)
 \end{Soutput}
 \begin{Sinput}
 R> AIC(mlt_GBSG2_7)
 \end{Sinput}
 \begin{Soutput}
-[1] 5255.896
+[1] 5255.897
 \end{Soutput}
 \end{Schunk}
 
@@ -1767,7 +1770,7 @@ A response-varying coefficient model, also called distribution regression \citep
 Chernozhukov_2013,Koenker_Leorato_Peracchi_2013}, for the Boston Housing data is 
 \begin{eqnarray*}
 \Prob(\text{medv} \le \ry | \rX = \rx) & = &  
-  \Phi\left(\h_\rY(\ry) - \sum_{j = 1}^J \shiftparm_j(\text{medv}) \tilde{\rx}_j\right) \\
+  \Phi\left(\h_\rY(\ry) - \sum_{j = 1}^J \shiftparm_j(\ry) \tilde{\rx}_j\right) \\
 & = & \Phi\left(\bern{6}(\ry)^\top \parm_1 - \sum_{j = 1}^J \bern{6}(\ry)^\top \parm_{j + 1} \tilde{\rx}_j\right)
 \end{eqnarray*}
 The model is implemented using the basis function 
@@ -2148,7 +2151,7 @@ regression coefficients. The positive effect of income is ``significant'' by sta
 R> max(abs(estfun(polr_CHFLS_2) - (-estfun(mlt_CHFLS_2)[,c(4, 5, 1:3)])))
 \end{Sinput}
 \begin{Soutput}
-[1] 0.008871258
+[1] 0.151661
 \end{Soutput}
 \begin{Sinput}
 R> cbind(polr = sqrt(diag(vcov(polr_CHFLS_2))),
@@ -2157,10 +2160,10 @@ R> cbind(polr = sqrt(diag(vcov(polr_CHFLS_2))),
 \begin{Soutput}
                                      polr          mlt
 R_age                        5.684041e-03 5.684460e-03
-R_income                     8.509055e-05 7.099273e-05
-Very unhappy|Not too happy   3.536235e-01 3.522657e-01
-Not too happy|Somewhat happy 2.419643e-01 2.400504e-01
-Somewhat happy|Very happy    2.372414e-01 2.355000e-01
+R_income                     8.509055e-05 7.099287e-05
+Very unhappy|Not too happy   3.536235e-01 3.522621e-01
+Not too happy|Somewhat happy 2.419643e-01 2.400507e-01
+Somewhat happy|Very happy    2.372414e-01 2.354997e-01
 \end{Soutput}
 \begin{Sinput}
 R> cftest(polr_CHFLS_2)
@@ -2190,7 +2193,7 @@ Fit: mlt(model = ctm_CHFLS_2, data = CHFLS, scale = TRUE)
 
 Linear Hypotheses:
                 Estimate Std. Error z value Pr(>|z|)    
-R_age == 0    -6.279e-03  5.684e-03  -1.105 0.269328    
+R_age == 0    -6.281e-03  5.684e-03  -1.105 0.269202    
 R_income == 0  2.350e-04  7.099e-05   3.310 0.000932 ***
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
@@ -2212,15 +2215,15 @@ R> cbind(coxph = sqrt(diag(vcov(coxph_GBSG2_1))),
 \end{Sinput}
 \begin{Soutput}
                     coxph          mlt          fss
-horThyes     0.1290732771 0.1293760634 0.1290343235
-age          0.0093002439 0.0093124938 0.0092899409
-menostatPost 0.1834799825 0.1836840638 0.1833300012
-tsize        0.0039390579 0.0039383111 0.0039372592
-tgrade.L     0.1898442780 0.1898825492 0.1899068142
-tgrade.Q     0.1219645723 0.1220116627 0.1220298327
-pnodes       0.0074480015 0.0074156462 0.0074387203
-progrec      0.0005734844 0.0005740003 0.0005553729
-estrec       0.0004503673 0.0004515681 0.0004309581
+horThyes     0.1290732771 0.1293787796 0.1290343235
+age          0.0093002439 0.0093130075 0.0092899409
+menostatPost 0.1834799825 0.1836964932 0.1833300012
+tsize        0.0039390579 0.0039382442 0.0039372592
+tgrade.L     0.1898442780 0.1899217491 0.1899068142
+tgrade.Q     0.1219645723 0.1220326790 0.1220298327
+pnodes       0.0074480015 0.0074162868 0.0074387203
+progrec      0.0005734844 0.0005740200 0.0005553729
+estrec       0.0004503673 0.0004516051 0.0004309581
 \end{Soutput}
 \end{Schunk}
 As a consequence, the corresponding coefficient tables, here produced
@@ -2261,15 +2264,15 @@ Fit: mlt(model = ctm_GBSG2_1, data = GBSG2, scale = TRUE, maxit = 3000)
 
 Linear Hypotheses:
                     Estimate Std. Error z value Pr(>|z|)    
-horThyes == 0     -0.3489206  0.1293761  -2.697 0.006998 ** 
-age == 0          -0.0099114  0.0093125  -1.064 0.287189    
-menostatPost == 0  0.2675484  0.1836841   1.457 0.145236    
-tsize == 0         0.0077694  0.0039383   1.973 0.048521 *  
-tgrade.L == 0      0.5600329  0.1898825   2.949 0.003184 ** 
-tgrade.Q == 0     -0.2018734  0.1220117  -1.655 0.098017 .  
-pnodes == 0        0.0487581  0.0074156   6.575 4.86e-11 ***
+horThyes == 0     -0.3489669  0.1293788  -2.697 0.006991 ** 
+age == 0          -0.0098558  0.0093130  -1.058 0.289925    
+menostatPost == 0  0.2668900  0.1836965   1.453 0.146256    
+tsize == 0         0.0077736  0.0039382   1.974 0.048395 *  
+tgrade.L == 0      0.5604259  0.1899217   2.951 0.003169 ** 
+tgrade.Q == 0     -0.2020898  0.1220327  -1.656 0.097716 .  
+pnodes == 0        0.0487492  0.0074163   6.573 4.92e-11 ***
 progrec == 0      -0.0022105  0.0005740  -3.851 0.000118 ***
-estrec == 0        0.0001828  0.0004516   0.405 0.685536    
+estrec == 0        0.0001821  0.0004516   0.403 0.686721    
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 (Univariate p values reported)
@@ -3504,17 +3507,17 @@ R> coef(fmod)
 \end{Sinput}
 \begin{Soutput}
     Bs1(y)     Bs2(y)     Bs3(y)     Bs4(y)     Bs5(y)     Bs6(y) 
--3.6453881 -2.0595627 -1.3023706 -1.3023706 -1.0253634  0.6128594 
+-3.6528353 -2.0416314 -1.3163211 -1.3163208 -0.9978797  0.6075126 
     Bs7(y)     Bs8(y)     Bs9(y)    Bs10(y)    Bs11(y)    Bs12(y) 
- 0.6128594  0.6128594  0.6128594  1.1927210  2.1016691  2.1016691 
+ 0.6075748  0.6076006  0.6076106  1.2137978  2.0917892  2.1007674 
    Bs13(y)    Bs14(y)    Bs15(y)    Bs16(y) 
- 2.1016691  2.1016691  2.1016691  3.3074441 
+ 2.1010835  2.1010836  2.1010836  3.3011219 
 \end{Soutput}
 \begin{Sinput}
 R> logLik(fmod)
 \end{Sinput}
 \begin{Soutput}
-'log Lik.' -1619.449 (df=16)
+'log Lik.' -1619.45 (df=16)
 \end{Soutput}
 \begin{Sinput}
 R> logLik(fmod, parm = coef(mod))
