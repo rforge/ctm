@@ -1,6 +1,6 @@
 
-R version 3.2.3 (2015-12-10) -- "Wooden Christmas-Tree"
-Copyright (C) 2015 The R Foundation for Statistical Computing
+R version 3.3.2 (2016-10-31) -- "Sincere Pumpkin Patch"
+Copyright (C) 2016 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -87,10 +87,10 @@ Loading required package: survival
 > ## Estimate coefficients
 > (cf <- coef(opt2 <- mlt(m, data = mydata)))
      log(y) (Intercept)          g2          g3 
- 0.92384445 -0.07597016  0.72340493  1.02745662 
+ 0.92384441 -0.07596598  0.72339973  1.02745353 
 > cf[-1] / cf[1]
 (Intercept)          g2          g3 
--0.08223263  0.78303759  1.11215327 
+-0.08222811  0.78303199  1.11214996 
 > 
 > coef(aft2 <- survreg(Surv(y, rep(TRUE, nrow(mydata))) ~ g, data = mydata,
 +                      dist = "weibull"))
@@ -112,7 +112,7 @@ Loading required package: survival
 > 
 > sqrt(diag(vcov(opt2)))[c("g2", "g3")]
        g2        g3 
-0.1462996 0.1502461 
+0.1462995 0.1502459 
 > sqrt(diag(vcov(aft2)))[c("g2", "g3")]
        g2        g3 
 0.1531531 0.1531334 
@@ -123,32 +123,32 @@ Loading required package: survival
 > mydata <- data.frame(y = Surv(y, sample(0:1, length(y), replace = TRUE)), g = g)
 > coef(opt <- mlt(m, data = mydata, fixed = c("log(y)" = 1)))
      log(y) (Intercept)          g2          g3 
-   1.000000   -0.990507    1.024138    1.252586 
+  1.0000000  -0.7769296   0.7114686   0.9290057 
 > 
 > ## Estimate coefficients 
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "expo"))
 (Intercept)          g2          g3 
-  0.9905072  -1.0241384  -1.2525857 
+  0.7769331  -0.7114734  -0.9290107 
 > coef(cox <- coxph(y ~ g, data = mydata))
        g2        g3 
-0.9425123 1.1675680 
+0.6417629 0.8665577 
 > coef(phreg <- phreg(y ~ g, data = mydata, dist = "weibull", shape = 1))
         g2         g3 log(scale) 
- 1.0241384  1.2525857  0.9905072 
+ 0.7114734  0.9290107  0.7769331 
 > 
 > ## Compare standard errors
 > ## MLT
 > sqrt(diag(vcov(opt)))[c("g2", "g3")]
        g2        g3 
-0.2065852 0.2112886 
+0.2001601 0.2061227 
 > ## Cox
 > sqrt(diag(vcov(cox)))
        g2        g3 
-0.2222954 0.2314696 
+0.2145765 0.2246662 
 > ## phreg
 > sqrt(diag(phreg$var))[c("g2", "g3")]
        g2        g3 
-0.2065852 0.2112886 
+0.2001602 0.2061227 
 > 
 > 
 > 
@@ -160,21 +160,21 @@ Loading required package: survival
 > ## Estimate coefficients
 > coef(opt <- mlt(m, data = mydata,  fixed = c("log(y)" = 1)))
      log(y) (Intercept)          g2          g3 
-  1.0000000   0.2828844   0.7853477   1.1284822 
+  1.0000000   0.2539170   0.8049804   1.2275554 
 > 
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "expo"))
 (Intercept)          g2          g3 
- -0.2828844  -0.7853477  -1.1284822 
+ -0.2539170  -0.8049797  -1.2275561 
 > 
 > ## Compare standard errors
 > ## MLT
 > sqrt(diag(vcov(opt)))[c("g2", "g3")]
        g2        g3 
-0.1485644 0.1486573 
+0.1480444 0.1489387 
 > ## phreg
 > sqrt(diag(phreg$var))[c("g2", "g3")]
        g2        g3 
-0.2065852 0.2112886 
+0.2001602 0.2061227 
 > 
 > 
 > try(coef(cox <- coxph(y ~ g, data = mydata)))
@@ -192,20 +192,20 @@ Error in phreg(y ~ g, data = mydata, dist = "weibull", shape = 1) :
 > 
 > coef(opt<- mlt(m, data = mydata, fixed = c("log(y)" = 1)))
      log(y) (Intercept)          g2          g3 
-  1.0000000  -0.5531925   0.8600636   1.2789382 
+  1.0000000  -0.4439600   0.8668106   0.9058717 
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "expo"))
 (Intercept)          g2          g3 
-  0.5531934  -0.8600648  -1.2789393 
+  0.4439603  -0.8668110  -0.9058720 
 > 
 > ## Compare standard errors
 > ## MLT
 > sqrt(diag(vcov(opt)))[c("g2", "g3")]
        g2        g3 
-0.1740432 0.1726433 
+0.1658976 0.1738981 
 > ## phreg
 > sqrt(diag(phreg$var))[c("g2", "g3")]
        g2        g3 
-0.2065852 0.2112886 
+0.2001602 0.2061227 
 > 
 > 
 > try(coef(cox <- coxph(y ~ g, data = mydata)))
@@ -244,7 +244,7 @@ Error in phreg(y ~ g, data = mydata, dist = "weibull", shape = 1) :
 > ## PH-scale
 > (cf <- coef(opt <- mlt(m, data = mydata)))
      log(y) (Intercept)          g2          g3 
- 3.10039985 -0.02638593 -2.12855989 -3.37407495 
+ 3.10055012 -0.02641571 -2.12858193 -3.37418384 
 > 
 > (coef_cox <- coef(cox <- coxph(Surv(y, rep(TRUE, nrow(mydata))) ~ g, 
 +                  	          data = mydata)))
@@ -264,7 +264,7 @@ Error in phreg(y ~ g, data = mydata, dist = "weibull", shape = 1) :
 > 
 > cf[-1] / cf[1]
  (Intercept)           g2           g3 
--0.008510493 -0.686543668 -1.088270902 
+-0.008519685 -0.686517504 -1.088253279 
 > coef_cox * aft$scale
         g2         g3 
 -0.6816897 -1.0983578 
@@ -274,8 +274,8 @@ Error in phreg(y ~ g, data = mydata, dist = "weibull", shape = 1) :
 > 
 > ## Compare shape parameters
 > 1 / cf[1]
-  log(y) 
-0.322539 
+   log(y) 
+0.3225234 
 > 1 / exp(coef_phreg[c("log(shape)")])
 log(shape) 
   0.322539 
@@ -285,7 +285,7 @@ log(shape)
 > ## Compare standard errors
 > sqrt(diag(vcov(opt)))[c("g2", "g3")]
        g2        g3 
-0.1695251 0.2038084 
+0.1695244 0.2038101 
 > sqrt(diag(vcov(cox)))
        g2        g3 
 0.1855397 0.2196354 
@@ -307,41 +307,41 @@ log(shape)
 > ## Estimate coefficients
 > (cf <- coef(opt <- mlt(m, data = mydata)))
      log(y) (Intercept)          g2          g3 
-  2.9704376  -0.5337424  -2.1300099  -3.3635877 
+  3.2532118  -0.6681301  -2.2493856  -3.4629079 
 > cf[-1] / cf[1]
 (Intercept)          g2          g3 
- -0.1796848  -0.7170694  -1.1323543 
+ -0.2053755  -0.6914353  -1.0644582 
 > 
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "weibull"))
 (Intercept)          g2          g3 
-  0.1796848   0.7170695   1.1323542 
+  0.2053755   0.6914353   1.0644582 
 > 
 > coef_cox <- coef(cox <- coxph(y ~ g, data = mydata))
 > coef_cox * aft$scale
         g2         g3 
--0.7135292 -1.1563405 
+-0.6528209 -1.0510234 
 > 
 > coefs_phreg <- coef(phreg <- phreg(y ~ g, data = mydata, dist = "weibull"))
 > coefs_phreg[c("g2", "g3")] * aft$scale
         g2         g3 
--0.7170695 -1.1323542 
+-0.6914353 -1.0644582 
 > 
 > ## Compare standard errors
 > sqrt(diag(vcov(opt)))[c("g2", "g3")]
        g2        g3 
-0.2245735 0.2703786 
+0.2330989 0.2783546 
 > sqrt(diag(vcov(cox)))
        g2        g3 
-0.2441318 0.2938864 
+0.2546303 0.3007458 
 > sqrt(diag(phreg$var))[c("g2", "g3")]
        g2        g3 
-0.2245735 0.2703786 
+0.2330989 0.2783546 
 > 
 > ## Compare log-Likelihoods
 > logLik(opt)
-'log Lik.' -244.3803 (df=4)
+'log Lik.' -234.0108 (df=4)
 > logLik(aft)
-'log Lik.' -244.3803 (df=4)
+'log Lik.' -234.0108 (df=4)
 > 
 > 
 > ## ****************** Left-censored
@@ -352,20 +352,20 @@ log(shape)
 > ## Estimate coefficients
 > (cf <- coef(opt <- mlt(m, data = mydata)))
      log(y) (Intercept)          g2          g3 
-  2.1201725   0.5300827  -1.5420725  -2.3381622 
+  2.0678545   0.5413121  -1.4971426  -2.4559493 
 > cf[-1] / cf[1]
 (Intercept)          g2          g3 
-  0.2500187  -0.7273335  -1.1028170 
+  0.2617748  -0.7240077  -1.1876800 
 > 
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "weibull"))
 (Intercept)          g2          g3 
- -0.2500185   0.7273333   1.1028169 
+ -0.2617748   0.7240077   1.1876800 
 > 
 > ## Compare log-Likelihoods
 > logLik(opt)
-'log Lik.' -229.4246 (df=4)
+'log Lik.' -258.2656 (df=4)
 > logLik(aft)
-'log Lik.' -229.4246 (df=4)
+'log Lik.' -258.2656 (df=4)
 > 
 > 
 > ## ************** Interval-censored
@@ -376,22 +376,22 @@ log(shape)
 > ## Estimate coefficients
 > (cf <- coef(opt <- mlt(m, data = mydata)))
      log(y) (Intercept)          g2          g3 
-  2.7086388  -0.4274823  -1.7414327  -2.7584150 
+  2.2737704  -0.4741015  -1.3075529  -2.1575728 
 > cf[-1] / cf[1]
 (Intercept)          g2          g3 
- -0.1578218  -0.6429180  -1.0183769 
+ -0.2085090  -0.5750593  -0.9488965 
 > 
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "weibull"))
 (Intercept)          g2          g3 
-  0.1578214   0.6429186   1.0183773 
+  0.2085090   0.5750594   0.9488965 
 > 
 > ## Compare log-Likelihoods
 > logLik(opt)
-'log Lik.' -270.1912 (df=4)
+'log Lik.' -303.5903 (df=4)
 > logLik(aft)
-'log Lik.' -270.1912 (df=4)
+'log Lik.' -303.5903 (df=4)
 > 
 > 
 > proc.time()
    user  system elapsed 
-  2.712   0.036   2.744 
+  2.372   0.024   2.399 
