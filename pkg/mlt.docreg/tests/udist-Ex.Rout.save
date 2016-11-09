@@ -1,5 +1,5 @@
 
-R version 3.3.2 (2016-10-31) -- "Sincere Pumpkin Patch"
+R Under development (unstable) (2016-11-08 r71639) -- "Unsuffered Consequences"
 Copyright (C) 2016 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -22,6 +22,8 @@ Loading required package: variables
 > library("np")
 Nonparametric Kernel Methods for Mixed Datatypes (version 0.60-2)
 [vignette("np_faq",package="np") provides answers to frequently asked questions]
+> library("alabama")
+Loading required package: numDeriv
 > set.seed(29)
 > 
 > ### true dgp
@@ -63,4 +65,4 @@ Nonparametric Kernel Methods for Mixed Datatypes (version 0.60-2)
 > 
 > proc.time()
    user  system elapsed 
-  1.036   0.024   1.081 
+  6.195   0.200   6.401 

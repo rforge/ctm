@@ -1,5 +1,5 @@
 
-R version 3.3.2 (2016-10-31) -- "Sincere Pumpkin Patch"
+R Under development (unstable) (2016-11-08 r71639) -- "Unsuffered Consequences"
 Copyright (C) 2016 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -21,6 +21,8 @@ Loading required package: basefun
 Loading required package: variables
 > library("eha")
 Loading required package: survival
+> library("alabama")
+Loading required package: numDeriv
 > set.seed(29)
 > 
 > ## ************** Exponential - AFT *********************************
@@ -123,7 +125,7 @@ Loading required package: survival
 > mydata <- data.frame(y = Surv(y, sample(0:1, length(y), replace = TRUE)), g = g)
 > coef(opt <- mlt(m, data = mydata, fixed = c("log(y)" = 1)))
      log(y) (Intercept)          g2          g3 
-  1.0000000  -0.7769296   0.7114686   0.9290057 
+  1.0000000  -0.7769336   0.7114732   0.9290106 
 > 
 > ## Estimate coefficients 
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "expo"))
@@ -140,7 +142,7 @@ Loading required package: survival
 > ## MLT
 > sqrt(diag(vcov(opt)))[c("g2", "g3")]
        g2        g3 
-0.2001601 0.2061227 
+0.2001603 0.2061228 
 > ## Cox
 > sqrt(diag(vcov(cox)))
        g2        g3 
@@ -394,4 +396,4 @@ log(shape)
 > 
 > proc.time()
    user  system elapsed 
-  2.372   0.024   2.399 
+  9.029   0.226   9.250 

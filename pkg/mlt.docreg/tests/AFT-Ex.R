@@ -1,6 +1,7 @@
 
 library("mlt")
 library("eha")
+library("alabama")
 set.seed(29)
 
 ## ************** Exponential - AFT *********************************

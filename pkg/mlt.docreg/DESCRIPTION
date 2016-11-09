@@ -13,6 +13,6 @@ Suggests: variables, basefun, np, eha, truncreg, lattice, MASS, TH.data,
   HSAUR3, sandwich, flexsurv, grid, latticeExtra, colorspace, mgcv,
   coxinterval, ICsurv, polspline, logspline, bshazard, gss, 
   MIICD, TransModel, dynsurv, timereg, survivalMPL, gamlss, Matrix, 
-  muhaz, ICE, ordinal, VGAM, AER, coin, gamlss.data, mlbench
+  muhaz, ICE, ordinal, VGAM, AER, coin, gamlss.data, mlbench, alabama
 VignetteBuilder: knitr
 License: GPL-2

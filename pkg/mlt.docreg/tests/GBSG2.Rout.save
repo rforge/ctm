@@ -1,5 +1,5 @@
 
-R version 3.3.2 (2016-10-31) -- "Sincere Pumpkin Patch"
+R Under development (unstable) (2016-11-08 r71639) -- "Unsuffered Consequences"
 Copyright (C) 2016 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -20,6 +20,8 @@ Type 'q()' to quit R.
 Loading required package: basefun
 Loading required package: variables
 > library("survival")
+> library("alabama")
+Loading required package: numDeriv
 > 
 > data("GBSG2", package = "TH.data")
 > 
@@ -58,4 +60,4 @@ Loading required package: variables
 > 
 > proc.time()
    user  system elapsed 
-  1.380   0.024   1.401 
+  5.637   0.140   5.764 

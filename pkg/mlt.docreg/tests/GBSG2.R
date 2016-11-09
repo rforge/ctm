@@ -1,6 +1,7 @@
 
 library("mlt")
 library("survival")
+library("alabama")
 
 data("GBSG2", package = "TH.data")
 

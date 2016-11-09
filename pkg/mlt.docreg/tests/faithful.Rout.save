@@ -1,5 +1,5 @@
 
-R version 3.3.2 (2016-10-31) -- "Sincere Pumpkin Patch"
+R Under development (unstable) (2016-11-08 r71639) -- "Unsuffered Consequences"
 Copyright (C) 2016 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -20,6 +20,8 @@ Type 'q()' to quit R.
 Loading required package: basefun
 Loading required package: variables
 > library("lattice")
+> library("alabama")
+Loading required package: numDeriv
 > 
 > data("faithful")
 > 
@@ -130,4 +132,4 @@ Bs9(waiting)   -0.7427123    0.8292219   -0.9214163    1.0000000
 > 
 > proc.time()
    user  system elapsed 
-  3.620   0.032   3.654 
+  9.418   0.210   9.634 
