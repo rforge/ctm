@@ -2,6 +2,12 @@
 \name{NEWS}
 \title{NEWS file for the mlt.docreg package}
 
+\section{Changes in Version 0.1-2 (2016-11-29)}{
+  \itemize{
+    \item{Add tests for survival models with time-dependent covariates.}
+  }
+}
+
 \section{Changes in Version 0.1-1 (2016-11-17)}{
   \itemize{
     \item{Some fixes in vignette.}
@@ -32,4 +38,3 @@
           published on CRAN.}
   }
 }
-
