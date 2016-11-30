@@ -48,7 +48,8 @@ fit3 <- flexsurvreg(Surv(tstart, time, status) ~ karno + karno:timegroup +
 m <- mlt(ctm(by, shift = ~ karno + karno:timegroup + age + trt, data = vet2, todistr = "MinExtr"),
          data = vet2, fixed = c("log(ytime)" = 1))
 
-stopifnot(max(abs(fit3$logliki - get("ll", env = environment(m$loglik))(coef(m)[-2]))) < .001)
+stopifnot(all.equal(fit3$logliki, get("ll", env = environment(m$loglik))(coef(m)[-2]), 
+                    tol = .001, check.attributes = FALSE))
 stopifnot(all.equal(logLik(fit3), logLik(m), check.attributes = FALSE))
 
 ### Weibull model
@@ -57,7 +58,8 @@ fit3 <- flexsurvreg(Surv(tstart, time, status) ~ karno + karno:timegroup +
 m <- mlt(ctm(by, shift = ~ karno + karno:timegroup + age + trt, data = vet2, todistr = "MinExtr"),
          data = vet2, scale = TRUE)
 
-stopifnot(max(abs(fit3$logliki - get("ll", env = environment(m$loglik))(coef(m)))) < .001)
+stopifnot(all.equal(fit3$logliki, get("ll", env = environment(m$loglik))(coef(m)), 
+                    tol = .001, check.attributes = FALSE))
 stopifnot(all.equal(logLik(fit3), logLik(m), check.attributes = FALSE))
 
 ## Cox model, see ?survival::survSplit
