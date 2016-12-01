@@ -2,6 +2,12 @@
 \name{NEWS}
 \title{NEWS file for the mlt.docreg package}
 
+\section{Changes in Version 0.1-3 (2016-12-01)}{
+  \itemize{
+    \item{Some tests were a little too strict on non-Linux platforms.}
+  }
+}
+
 \section{Changes in Version 0.1-2 (2016-11-29)}{
   \itemize{
     \item{Add tests for survival models with time-dependent covariates.}
