@@ -34,7 +34,8 @@ Loading required package: variables
 > m <- mlt(ctm(by, shift = ~ karno + age + trt, data = veteran, todistr = "MinExtr"),
 +          data = veteran, fixed = c("log(ytime)" = 1))
 > 
-> stopifnot(max(abs(fit3$logliki - get("ll", env = environment(m$loglik))(coef(m)[-2]))) < .001)
+> stopifnot(all.equal(fit3$logliki, get("ll", env = environment(m$loglik))(coef(m)[-2]), 
++                     tol = .001, check.attributes = FALSE))
 > 
 > stopifnot(all.equal(logLik(fit2), logLik(m)))
 > stopifnot(all.equal(logLik(fit3), logLik(m), check.attributes = FALSE))
@@ -50,7 +51,8 @@ Loading required package: variables
 > m <- mlt(ctm(by, shift = ~ karno + age + trt, data = veteran, todistr = "MinExtr"),
 +          data = veteran)
 > 
-> stopifnot(max(abs(fit3$logliki - get("ll", env = environment(m$loglik))(coef(m)))) < .001)
+> stopifnot(all.equal(fit3$logliki, get("ll", env = environment(m$loglik))(coef(m)), 
++                     tol = .001, check.attributes = FALSE))
 > 
 > stopifnot(all.equal(logLik(fit2), logLik(m)))
 > stopifnot(all.equal(logLik(fit3), logLik(m), check.attributes = FALSE))
@@ -103,4 +105,4 @@ Note: method with signature 'dsparseMatrix#dsparseMatrix' chosen for function 'k
 > 
 > proc.time()
    user  system elapsed 
-  3.208   0.024   3.233 
+  3.128   0.056   3.187 
