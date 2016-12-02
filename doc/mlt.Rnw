@@ -1591,6 +1591,7 @@ model for count data, the conditional distribution depends on
 both the number of counted birds and the cover storey and the effect of
 cover storey may change with different numbers of birds observed
 %% <FIXME> var ordered </FIXME>
+%% <FIXEM> force spg as auglag doesn't seem to work here </FIXME>
 <<treepipit, echo = TRUE, cache = TRUE>>=
 data("treepipit", package = "coin")
 treepipit$ocounts <- ordered(treepipit$counts)
@@ -1598,11 +1599,10 @@ B_cs <- Bernstein_basis(var = numeric_var("coverstorey", support = 1:110),
                         order = 4)
 B_c <- as.basis(treepipit$ocounts)
 ctm_treepipit <- ctm(B_c, interacting = B_cs)
-mlt_treepipit <- mlt(ctm_treepipit, data = treepipit, maxit = 10000, 
-                     gtol = 1e-3)
+mlt_treepipit <- mlt(ctm_treepipit, data = treepipit, scale = TRUE,
+                     optim = mltoptim()["spg"])
 @
-The left
-panel of Figure~\ref{fig:treepipit-plot} depicts the observations and the
+The left panel of Figure~\ref{fig:treepipit-plot} depicts the observations and the
 center panel shows the conditional distribution function evaluated for $0,
 \dots, 5$ observed birds.  The conditional distribution function obtained
 from a generalised additive Poisson (GAM) model with smooth mean effect of cover
