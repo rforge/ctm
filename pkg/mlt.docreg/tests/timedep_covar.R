@@ -15,7 +15,8 @@ by <- log_basis(dy, ui = "increasing")
 m <- mlt(ctm(by, shift = ~ karno + age + trt, data = veteran, todistr = "MinExtr"),
          data = veteran, fixed = c("log(ytime)" = 1))
 
-stopifnot(max(abs(fit3$logliki - get("ll", env = environment(m$loglik))(coef(m)[-2]))) < .001)
+stopifnot(all.equal(fit3$logliki, get("ll", env = environment(m$loglik))(coef(m)[-2]), 
+                    tol = .001, check.attributes = FALSE))
 
 stopifnot(all.equal(logLik(fit2), logLik(m)))
 stopifnot(all.equal(logLik(fit3), logLik(m), check.attributes = FALSE))
@@ -31,7 +32,8 @@ by <- log_basis(dy, ui = "increasing")
 m <- mlt(ctm(by, shift = ~ karno + age + trt, data = veteran, todistr = "MinExtr"),
          data = veteran)
 
-stopifnot(max(abs(fit3$logliki - get("ll", env = environment(m$loglik))(coef(m)))) < .001)
+stopifnot(all.equal(fit3$logliki, get("ll", env = environment(m$loglik))(coef(m)), 
+                    tol = .001, check.attributes = FALSE))
 
 stopifnot(all.equal(logLik(fit2), logLik(m)))
 stopifnot(all.equal(logLik(fit3), logLik(m), check.attributes = FALSE))

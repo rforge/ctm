@@ -2,6 +2,14 @@
 \name{NEWS}
 \title{NEWS file for the mlt.docreg package}
 
+\section{Changes in Version 0.1-4 (2016-12-02)}{
+  \itemize{
+    \item{More tests were a little too strict on non-Linux platforms.}
+    \item{\code{auglag} does not seem to converge to the ML estimate for the
+          tree pipit example; force \code{sgp} to be used.}
+  }
+}
+
 \section{Changes in Version 0.1-3 (2016-12-01)}{
   \itemize{
     \item{Some tests were a little too strict on non-Linux platforms.}
