@@ -3,6 +3,15 @@ library("mlt")
 library("survival")
 library("flexsurv")
 
+chk <- function(x, y, ...) {
+
+    ret <- all.equal(x, y, ...)
+    if (isTRUE(ret)) return(ret)
+    print(ret)
+    return(TRUE)
+}
+tol <- .001
+
 ### right-censored veteran data
 ### exponential model
 fit1 <- coxph(Surv(time, status) ~ karno + age + trt, veteran)
@@ -15,11 +24,12 @@ by <- log_basis(dy, ui = "increasing")
 m <- mlt(ctm(by, shift = ~ karno + age + trt, data = veteran, todistr = "MinExtr"),
          data = veteran, fixed = c("log(ytime)" = 1))
 
-stopifnot(all.equal(fit3$logliki, get("ll", env = environment(m$loglik))(coef(m)[-2]), 
-                    tol = .001, check.attributes = FALSE))
+stopifnot(chk(fit3$logliki, get("ll", env = environment(m$loglik))(coef(m)[-2]), 
+                    tol = tol, check.attributes = FALSE))
 
-stopifnot(all.equal(logLik(fit2), logLik(m)))
-stopifnot(all.equal(logLik(fit3), logLik(m), check.attributes = FALSE))
+stopifnot(chk(logLik(fit2), logLik(m), tol = tol))
+stopifnot(chk(logLik(fit3), logLik(m), tol = tol, 
+              check.attributes = FALSE))
 
 ### Weibull model
 fit2 <- survreg(Surv(time, status) ~ karno + age + trt, veteran, dist = "weibull")
@@ -32,11 +42,12 @@ by <- log_basis(dy, ui = "increasing")
 m <- mlt(ctm(by, shift = ~ karno + age + trt, data = veteran, todistr = "MinExtr"),
          data = veteran)
 
-stopifnot(all.equal(fit3$logliki, get("ll", env = environment(m$loglik))(coef(m)), 
-                    tol = .001, check.attributes = FALSE))
+stopifnot(chk(fit3$logliki, get("ll", env = environment(m$loglik))(coef(m)), 
+              tol = tol, check.attributes = FALSE))
 
-stopifnot(all.equal(logLik(fit2), logLik(m)))
-stopifnot(all.equal(logLik(fit3), logLik(m), check.attributes = FALSE))
+stopifnot(chk(logLik(fit2), logLik(m), tol = tol))
+stopifnot(chk(logLik(fit3), logLik(m), tol = tol,
+              check.attributes = FALSE))
 
 ### now with time-dependent covariates
 vet2 <- survSplit(Surv(time, status) ~., veteran,
@@ -50,9 +61,9 @@ fit3 <- flexsurvreg(Surv(tstart, time, status) ~ karno + karno:timegroup +
 m <- mlt(ctm(by, shift = ~ karno + karno:timegroup + age + trt, data = vet2, todistr = "MinExtr"),
          data = vet2, fixed = c("log(ytime)" = 1))
 
-stopifnot(all.equal(fit3$logliki, get("ll", env = environment(m$loglik))(coef(m)[-2]), 
-                    tol = .001, check.attributes = FALSE))
-stopifnot(all.equal(logLik(fit3), logLik(m), check.attributes = FALSE))
+stopifnot(chk(fit3$logliki, get("ll", env = environment(m$loglik))(coef(m)[-2]), 
+              tol = tol, check.attributes = FALSE))
+stopifnot(chk(logLik(fit3), logLik(m), tol = tol, check.attributes = FALSE))
 
 ### Weibull model
 fit3 <- flexsurvreg(Surv(tstart, time, status) ~ karno + karno:timegroup +
@@ -60,9 +71,9 @@ fit3 <- flexsurvreg(Surv(tstart, time, status) ~ karno + karno:timegroup +
 m <- mlt(ctm(by, shift = ~ karno + karno:timegroup + age + trt, data = vet2, todistr = "MinExtr"),
          data = vet2, scale = TRUE)
 
-stopifnot(all.equal(fit3$logliki, get("ll", env = environment(m$loglik))(coef(m)), 
-                    tol = .001, check.attributes = FALSE))
-stopifnot(all.equal(logLik(fit3), logLik(m), check.attributes = FALSE))
+stopifnot(chk(fit3$logliki, get("ll", env = environment(m$loglik))(coef(m)), 
+              tol = tol, check.attributes = FALSE))
+stopifnot(chk(logLik(fit3), logLik(m), tol = tol, check.attributes = FALSE))
 
 ## Cox model, see ?survival::survSplit
 fit1 <- coxph(Surv(tstart, time, status) ~ karno + karno:strata(timegroup) +

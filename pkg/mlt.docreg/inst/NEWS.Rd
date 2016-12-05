@@ -2,7 +2,7 @@
 \name{NEWS}
 \title{NEWS file for the mlt.docreg package}
 
-\section{Changes in Version 0.1-4 (2016-12-02)}{
+\section{Changes in Version 0.1-4 (2016-12-04)}{
   \itemize{
     \item{More tests were a little too strict on non-Linux platforms.}
     \item{\code{auglag} does not seem to converge to the ML estimate for the
