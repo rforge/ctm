@@ -236,22 +236,22 @@ class, the conditional distribution function is
 \end{eqnarray*}
 where the transformation function $\h$ depends on both $\ry$ and $\rx$. 
 Because we are interested in analysing, \ie estimating and interpreting, the
-transformation function $\h$, we slightly rephrase the title
-``An Analysis of Transformations'' of the first paper on this subject
-\citep{BoxCox_1964} and refer to the methods presented in this
-paper as \textit{transformation analysis}.  We describe how conditional
-transformation models can be specified, fitted by maximising the likelihood
-\citep[using the estimator developed by][]{Hothorn_Moest_Buehlmann_2016} and
-analysed in \proglang{R} using the \pkg{mlt} add-on package \citep{pkg:mlt}. 
-In essence, the package is built around two important functions.  \cmd{ctm}
-specifies transformation models based on basis functions implemented in the
-\pkg{basefun} package \citep{pkg:basefun} for variable descriptions from the
-\pkg{variables} package \citep{pkg:variables}.  These models are then fitted
-to data by \cmd{mlt} where the log-likelihood function is maximised by the 
-\cmd{spg} optimiser from package \pkg{BB}
-\citep{{Varadhan_Gilbert_2009,pkg:BB}}.  Before we start looking at details,
-we illustrate the workflow by means of an example from unconditional density
-estimation.
+transformation function $\h$, we slightly rephrase the title ``An Analysis
+of Transformations'' of the first paper on this subject \citep{BoxCox_1964}
+and refer to the methods presented in this paper as \textit{transformation
+analysis}.  We describe how conditional transformation models can be
+specified, fitted by maximising the likelihood \citep[using the estimator
+developed by][]{Hothorn_Moest_Buehlmann_2016} and analysed in \proglang{R}
+using the \pkg{mlt} add-on package \citep{pkg:mlt}.  In essence, the package
+is built around two important functions.  \cmd{ctm} specifies transformation
+models based on basis functions implemented in the \pkg{basefun} package
+\citep{pkg:basefun} for variable descriptions from the \pkg{variables}
+package \citep{pkg:variables}.  These models are then fitted to data by
+\cmd{mlt}.  This function maximises the log-likelihood function using the
+\cmd{auglag} and \cmd{spg} optimisers from packages \pkg{alabama}
+\citep{pkg:alabama} and \pkg{BB} \citep{Varadhan_Gilbert_2009,pkg:BB},
+respectively. Before we start looking at details, we illustrate the workflow by means of
+an example from unconditional density estimation.
 
 %% <FIXME> explain that theory is in two other papers and technical stuff
 %% in appendices </FIXME>
@@ -778,7 +778,7 @@ except longer computing times of course. In this sense, there is no need to ``tu
 
 \begin{figure}[t]
 \begin{center}
-<<GBSG2-coxph_mlt, echo = FALSE, results = "hide", fig.width = 9, fig.height = 5>>=
+<<GBSG2-coxph_mlt, echo = FALSE, results = "hide", fig.width = 9, fig.height = 5, cache = TRUE>>=
 ndtmp <- as.data.frame(mkgrid(GBSG2y, 100))
 
 ord <- c(1:30, 35, 40, 45, 50)
@@ -2686,7 +2686,7 @@ pkgs <- c("mlt", "variables", "basefun", "survival", "eha", "prodlim", "truncreg
   "flexsurv", "multcomp", "mgcv", "coxinterval", "ICsurv",
   "polspline", "logspline", "bshazard", "gss", "MIICD", "TransModel",
   "dynsurv", "timereg", "survivalMPL", "np", "gamlss", "Matrix", "muhaz", "ICE",
-  "ordinal", "VGAM", "BB")
+  "ordinal", "VGAM", "BB", "alabama")
 out <- sapply(pkgs, pkg)
 
 x <- readLines("packages.bib")
