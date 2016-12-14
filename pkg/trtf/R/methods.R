@@ -146,12 +146,15 @@ predict.traforest <- function(object,  newdata, mnewdata = data.frame(1), K = 20
     cf <- vector(mode = "list", length = ncol(ret))
     names(cf) <- colnames(ret)
 
+    ### if nmax < Inf tabulate weights here
+    if (!is.null(mltmod$iy)) 
+        ret <- apply(ret, 2, function(r) 
+                     libcoin::ctabs(mltmod$iy, weights = r)[-1L])
+
     if (trace) pb <- txtProgressBar(style = 3)
     for (i in 1:ncol(ret)) {
         if (trace) setTxtProgressBar(pb, i / ncol(ret))
         w <- ret[,i]
-        if (!is.null(mltmod$iy)) 
-            w <- libcoin::ctabs(mltmod$iy, weights = w)[-1L]
         if (i > 25) {
             imin <- which.min(cs <- colSums((ret[, 1:(i - 1), drop = FALSE] - w)^2))
             thetastart <- cf[[imin]]
