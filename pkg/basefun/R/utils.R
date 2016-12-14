@@ -62,7 +62,9 @@
     nd <- names(dim)
     stopifnot(all(subdim %in% nd))
     stopifnot(length(x) == prod(dim[subdim]))
-    nd2 <- c(nd[nd %in% subdim], nd[!(nd %in% subdim)])
+    #was: nd2 <- c(nd[nd %in% subdim], nd[!(nd %in% subdim)])
+    ### respect subdim dimension of x
+    nd2 <- c(subdim, nd[!(nd %in% subdim)])
     
     ret <- array(x, dim = dim[nd2])
     aperm(ret, perm = match(nd, nd2))
