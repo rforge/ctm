@@ -743,7 +743,7 @@ extreme value distribution. The specification of the right-hand side of the
 formula as argument \code{shifting} along with the data (argument \code{data})
 is equivalent to a basis function
 <<GBSG2-1-xbasis, eval = FALSE>>=
-as.basis(fm_GBSG2[-2L], data = GBSG2, remove_intercept)
+as.basis(fm_GBSG2[-2L], data = GBSG2, remove_intercept = TRUE)
 @
 
 In contrast to the classical Cox model where only $\shiftparm$ is estimated
