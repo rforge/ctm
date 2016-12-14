@@ -2,6 +2,14 @@
 \name{NEWS}
 \title{NEWS file for the basefun package}
 
+\section{Changes in Version 0.0-34 (2016-12-14)}{
+  \itemize{
+    \item{Fix bug in \code{predict} when \code{newdata} was a list. The
+          ordering of the resulting array may have been incorrect under
+          rare circumstances.}
+  }
+}
+
 \section{Changes in Version 0.0-33 (2016-09-12)}{
   \itemize{
     \item{Approximate Bernstein polynomial f outside its \code{support} (l, u)
