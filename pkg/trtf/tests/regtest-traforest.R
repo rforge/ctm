@@ -20,6 +20,10 @@ predict(tf, newdata = GBSG2[1:3,], type = "node")
 
 logLik(tf, newdata = GBSG2[1:3,])
 
+sapply(1:length(tf$nodes), function(i) logLik(gettree(tf, i)))
+
+varimp(tf)
+
 mod <- mlt(m, data = GBSG2)
 logLik(mod)
 

@@ -87,9 +87,9 @@ predict.trafotree <- function(object, newdata, K = 20, q = NULL,
     tmp <- object
     class(tmp) <- class(tmp)[-1L]
     if (missing(newdata)) {
-        nf <- predict(tmp, type = "node")
+        nf <- predict(tmp, type = "node", ...)
     } else {
-        nf <- predict(tmp, newdata = newdata, type = "node")
+        nf <- predict(tmp, newdata = newdata, type = "node", ...)
     }
     if (type == "node") return(nf)
     nf <- factor(nf)
@@ -223,3 +223,22 @@ simulate.traforest <- function(object, nsim = 1, seed = NULL, newdata,
 }
 
 simulate.trafotree <- simulate.traforest
+
+gettree.traforest <- function(object, tree = 1L, ...) {
+
+    ret <- party(object$nodes[[tree]], data = object$data, fitted = object$fitted)
+    ret$terms <- object$terms
+    class(ret) <- c("constparty", class(ret))
+    ret$model <- object$model
+    ret$mltobj <- object$mltobj
+    ret$mltargs <- object$mltargs
+    ret$trafo <- object$trafo
+    nd <- predict(ret, newdata = object$data, type = "node")
+    ret$models <- tapply(1:length(nd), factor(nd), function(i)
+        ret$trafo(i, estfun = FALSE)) ### note: trafo is (potentially) weighted
+    ret$coef <- do.call("rbind", lapply(ret$models, function(x) x$coef))
+    ret$logLik <- sapply(ret$models, function(x) x$logLik)
+    class(ret) <- c("trafotree", class(ret))
+    ret
+}
+
