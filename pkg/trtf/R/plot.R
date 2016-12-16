@@ -78,11 +78,9 @@ node_mlt <- function(obj, col = "black", bg = "white", ylines = 2,
 }
 class(node_mlt) <- "grapcon_generator"
 
-plot.trafotree <- function(x, type =  c("trafo", "distribution", "survivor",
-                              "density", "logdensity", "hazard",
-                              "loghazard", "cumhazard", "quantile"), ...) {
+plot.trafotree <- function(x, ...) {
     class(x) <- class(x)[-1L]
-    tp <- function(...) node_mlt(..., type = type)
+    tp <- function(...) node_mlt(...)
     class(tp) <- class(node_mlt)
     plot(x, terminal_panel = tp, ...)
 }

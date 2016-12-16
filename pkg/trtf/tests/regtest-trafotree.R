@@ -22,7 +22,7 @@ predict(st2, newdata = GBSG2[1:3,], type = "node")
 predict(st2, newdata = GBSG2[1:3,], type = "coef")
 predict(st2, newdata = GBSG2[1:3,], type = "hazard")
 
-plot(st2, type = "survivor")
+plot(st2, tp_args = list(type = "survivor"))
 
 st21 <- st2
 class(st21) <- class(st21)[-1L]
