@@ -19,7 +19,11 @@ plot.ctm <- function(x, newdata, type = c("distribution",
                          "cumhazard" = c(0, rpr[2]),
                          rpr)
     if (!is.null(args$ylim)) ylim <- args$ylim
-    if (type == "quantile")  q <- p
+    if (type == "quantile")  {
+        q <- p
+        if (is.null(args$xlab)) args$xlab <- type
+        if (is.null(args$ylab)) args$ylab <- y
+    }
     if (length(col) == 1) col <- rep(col, ncol(pr))
     
     if (!add) {

@@ -7,6 +7,7 @@
     \item{\code{logLik} with \code{newdata} argument ignored \code{parm} 
           and \code{weights} arguments.}
     \item{\code{estfun} now also has a \code{newdata} argument.}
+    \item{Correct axes labelling when plotting quantile functions.}
  }
 }
 
