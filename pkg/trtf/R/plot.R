@@ -3,7 +3,7 @@ node_mlt <- function(obj, col = "black", bg = "white", fill = "transparent",
                      type = c("trafo", "distribution", "survivor",  
                               "density", "logdensity", "hazard",    
                               "loghazard", "cumhazard", "quantile"),
-                     flip = FALSE, ...)
+                     flip = FALSE, axes = TRUE, ...)
 {
     mod <- obj$model
     q <- mkgrid(mod, n = K)[[mod$response]]
@@ -16,6 +16,7 @@ node_mlt <- function(obj, col = "black", bg = "white", fill = "transparent",
         yscale <- range(pr)
     }
     xscale <- range(q)
+    axes <- rep_len(axes, 2)
 
     ### panel function for ecdf in nodes
     rval <- function(node) {
@@ -67,9 +68,9 @@ node_mlt <- function(obj, col = "black", bg = "white", fill = "transparent",
                          name = paste0("node_mlt", nid, "plot"),
                          clip = FALSE)
 
-        pushViewport(plot)
-        grid.xaxis()
-        grid.yaxis()
+        pushViewport(plot)        
+        if(axes[1]) grid.xaxis()
+        if(axes[2]) grid.yaxis()
         grid.rect(gp = gpar(fill = "transparent"))
         grid.clip()
 	if(flip) {
