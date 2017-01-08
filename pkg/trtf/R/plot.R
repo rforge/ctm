@@ -1,8 +1,9 @@
-node_mlt <- function(obj, col = "black", bg = "white", ylines = 2,
-                     id = TRUE, mainlab = NULL, gp = gpar(), K = 20,
+node_mlt <- function(obj, col = "black", bg = "white", fill = "transparent",
+                     ylines = 2, id = TRUE, mainlab = NULL, gp = gpar(), K = 20,
                      type = c("trafo", "distribution", "survivor",  
                               "density", "logdensity", "hazard",    
-                              "loghazard", "cumhazard", "quantile"), ...)
+                              "loghazard", "cumhazard", "quantile"),
+                     flip = FALSE, ...)
 {
     mod <- obj$model
     q <- mkgrid(mod, n = K)[[mod$response]]
@@ -61,7 +62,8 @@ node_mlt <- function(obj, col = "black", bg = "white", ylines = 2,
         popViewport()
 
         plot <- viewport(layout.pos.col=2, layout.pos.row=2,
-                         xscale=xscale, yscale=yscale,
+                         xscale = if(flip) yscale else xscale,
+			 yscale = if(flip) xscale else yscale,
                          name = paste0("node_mlt", nid, "plot"),
                          clip = FALSE)
 
@@ -70,7 +72,19 @@ node_mlt <- function(obj, col = "black", bg = "white", ylines = 2,
         grid.yaxis()
         grid.rect(gp = gpar(fill = "transparent"))
         grid.clip()
-        grid.lines(q, y, gp = gpar(col = col))
+	if(flip) {
+	  if(fill != "transparent") {
+	    grid.polygon(c(min(y), y, min(y)), c(q[1], q, q[K]), gp = gpar(col = col, fill = fill))
+          } else {
+	    grid.lines(y, q, gp = gpar(col = col))
+	  }
+	} else {
+	  if(fill != "transparent") {
+	    grid.polygon(c(q[1], q, q[K]), c(min(y), y, min(y)), gp = gpar(col = col, fill = fill))
+          } else {
+	    grid.lines(q, y, gp = gpar(col = col))
+	  }
+	}
         upViewport(2)
     }
 
