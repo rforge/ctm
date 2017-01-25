@@ -206,6 +206,7 @@
     } else {
         ret <- lm.fit(x = X, y = Z)$coef
     }
+    names(ret) <- names(coef(model))[!fix]
     ret
 }
 
