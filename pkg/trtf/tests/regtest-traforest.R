@@ -2,6 +2,7 @@
 library("trtf")
 library("survival")
 data("GBSG2", package = "TH.data")
+set.seed(290875)
 
 yvar <- numeric_var("y", support = c(100, 2000), bounds = c(0, Inf))
 By <- Bernstein_basis(yvar, order = 5, ui = "incre")
@@ -12,7 +13,7 @@ tf <- traforest(m, formula = y ~ horTh + age + menostat + tsize + tgrade +
     pnodes + progrec + estrec, data = GBSG2, 
     control = ctree_control(splitstat = "quad", teststat = "quad",
                     testtype = "Teststatistic", mincriterion = 1, minbucket = 50), 
-    ntree = 12, trace = TRUE, cores = 4)
+    ntree = 12, trace = FALSE, cores = 4)
 
 predict(tf, newdata = GBSG2[1:3,], type = "weights")
 predict(tf, newdata = GBSG2[1:3,], type = "node")

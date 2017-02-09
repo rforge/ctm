@@ -237,8 +237,7 @@ gettree.traforest <- function(object, tree = 1L, ...) {
     ret$models <- tapply(1:length(nd), factor(nd), function(i)
         ret$trafo(i, estfun = FALSE)) ### note: trafo is (potentially) weighted
     ret$coef <- do.call("rbind", lapply(ret$models, function(x) x$coef))
-    ret$logLik <- sapply(ret$models, function(x) x$logLik)
+    ret$logLik <- sapply(ret$models, function(x) x$objfun)
     class(ret) <- c("trafotree", class(ret))
     ret
 }
-
