@@ -49,3 +49,11 @@ xfm <- as.formula(paste("~", x, collapse = "+"))
 m <- ctm(basis_y, shift = xfm, data = bodyfat)
 mod <- mlt(m, data = bodyfat, scale = TRUE, checkGrad = FALSE)
 summary(mod)
+
+### check for only left/right censoring before fitting
+y <- bodyfat$DEXfat
+sF <- rep(FALSE, length(y))
+library("survival")
+bodyfat$DEXfat <- Surv(y, sF)
+mod <- mlt(m, data = bodyfat, scale = TRUE, checkGrad = FALSE)
+mod$convergence
