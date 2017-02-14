@@ -51,7 +51,7 @@ Note: method with signature 'sparseMatrix#matrix' chosen for function '%*%',
  target signature 'dgTMatrix#matrix'.
  "TsparseMatrix#ANY" would also be valid
 > ### fit model
-> mltm2 <- mlt(ctmm2, data = dat)
+> mltm2 <- mlt(ctmm2, data = dat, scale = TRUE)
 > (p <- predict(mltm2, newdata = data.frame(x1=0, x2 = 0), q = mkgrid(mltm2, n = 10)[["y"]]))
         
 y              [,1]
@@ -128,4 +128,4 @@ In .checkR(y, weights) : response contains left-censored observations only
 > 
 > proc.time()
    user  system elapsed 
-  1.984   0.020   1.999 
+  1.392   0.036   1.424 
