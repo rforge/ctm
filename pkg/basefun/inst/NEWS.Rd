@@ -2,6 +2,12 @@
 \name{NEWS}
 \title{NEWS file for the basefun package}
 
+\section{Changes in Version 0.0-35 (2017-02-14)}{
+  \itemize{
+    \item{Fix bug in \code{predict} when \code{newdata} was a data frame.}
+  }
+}
+
 \section{Changes in Version 0.0-34 (2016-12-14)}{
   \itemize{
     \item{Fix bug in \code{predict} when \code{newdata} was a list. The
