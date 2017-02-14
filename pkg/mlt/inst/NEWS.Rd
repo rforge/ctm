@@ -2,7 +2,7 @@
 \name{NEWS}
 \title{NEWS file for the mlt package}
 
-\section{Changes in Version 0.1-2 (2017-02-09)}{
+\section{Changes in Version 0.1-2 (2017-02-14)}{
   \itemize{
     \item{\code{logLik} with \code{newdata} argument ignored \code{parm} 
           and \code{weights} arguments.}
@@ -11,6 +11,7 @@
     \item{make sure names are correct in \code{coef(model, fixed = FALSE)}.}
     \item{check if any exact or interval-censored response with non-zero 
           weight exists before trying to fit the model.}
+    \item{make checks a little more robust against huge diffs under Windows.}
  }
 }
 
