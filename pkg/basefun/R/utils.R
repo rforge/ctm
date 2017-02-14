@@ -21,11 +21,11 @@
 
 ### Box "product" of two character matrices
 .boxprod_char <- function(x, y) {
-    matrix(paste(x[rep(1:nrow(x), length = nrow(y)), 
+    matrix(paste(x[rep(1:nrow(x), nrow(y)), 
                    rep(1:ncol(x), ncol(y)), drop = FALSE], 
-                 y[rep(1:nrow(y), length = nrow(x)), 
+                 y[rep(1:nrow(y), nrow(x)), 
                    rep(1:ncol(y), rep(ncol(x), ncol(y))), drop = FALSE], 
-                 sep = ":"), nrow = nrow(x))
+                 sep = ":"), nrow = nrow(x) * nrow(y))
 }
 
 ### box "product" of character matrices
