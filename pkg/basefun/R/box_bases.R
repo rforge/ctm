@@ -22,8 +22,13 @@ model.matrix.box_bases <- function(object, data, model.matrix = TRUE,
     varnames <- variable.names(object)
     bnames <- names(object)
 
-    if (model.matrix & !is.data.frame(data))
-        data <- expand.grid(data[varnames])
+    if (model.matrix & !is.data.frame(data)) {
+        if (length(dim) > 1) {
+            data <- expand.grid(data[varnames])
+        } else {
+            data <- as.data.frame(data[varnames])
+        }
+    }
 
     if (!is.null(deriv)) {
         stopifnot(length(deriv) == 1)
