@@ -6,6 +6,8 @@
   \itemize{
     \item{Sum over score contributions with positive weight only when
           evaluating the gradient.}
+    \item{Having all response observations being interval-censored is
+          allowed again (too heavy checking was in place).}
  }
 }
 
