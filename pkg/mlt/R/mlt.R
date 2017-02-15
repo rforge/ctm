@@ -71,7 +71,7 @@
 
     loglikfct <- function(beta, weights) -sum(weights * ll(beta))
     score <- function(beta, weights) weights * sc(beta)
-    scorefct <- function(beta, weights) -colSums(score(beta, weights))
+    scorefct <- function(beta, weights) -colSums(score(beta, weights)[weights > 0,,drop = FALSE])
 
     if (all(!is.finite(ci))) {
         ui <- ci <- NULL
