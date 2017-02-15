@@ -2,6 +2,13 @@
 \name{NEWS}
 \title{NEWS file for the mlt package}
 
+\section{Changes in Version 0.1-3 (2017-XX-YY)}{
+  \itemize{
+    \item{Sum over score contributions with positive weight only when
+          evaluating the gradient.}
+ }
+}
+
 \section{Changes in Version 0.1-2 (2017-02-14)}{
   \itemize{
     \item{\code{logLik} with \code{newdata} argument ignored \code{parm} 
