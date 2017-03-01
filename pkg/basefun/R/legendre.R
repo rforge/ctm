@@ -44,7 +44,7 @@ Legendre_basis <- function(var, order = 2,
             X <- X * (2 / diff(support)^deriv)
         if (deriv < 0) X[] <- 0
         if (ui != "none")
-            constr$ui <- constr$ui %*% L2B(order)
+            constr$ui <- constr$ui %*% .L2B(order)
         attr(X, "constraint") <- constr
         attr(X, "Assign") <- matrix(varname, ncol = ncol(X))
         X

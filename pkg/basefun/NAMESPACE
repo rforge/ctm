@@ -1,5 +1,5 @@
 
-useDynLib("basefun")
+useDynLib("basefun", .registration = TRUE)
 
 import("variables")
 import("Matrix")#, rBind, Diagonal, bdiag)

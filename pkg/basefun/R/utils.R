@@ -88,12 +88,12 @@
     return(-1L)
 }
 
-L2B <- function(order) {
+.L2B <- function(order) {
     stopifnot(order > 0)
-    .Call("L2B", as.integer(order))
+    .Call(L2B, as.integer(order))
 }
 
-B2L <- function(order) {
+.B2L <- function(order) {
     stopifnot(order > 0)
-    .Call("B2L", as.integer(order))
+    .Call(B2L, as.integer(order))
 }
