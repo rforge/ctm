@@ -117,7 +117,7 @@ predict.trafotree <- function(object, newdata, K = 20, q = NULL,
 predict.traforest <- function(object,  newdata, mnewdata = data.frame(1), K = 20, q = NULL,
     type = c("weights", "node", "coef", "trafo", "distribution", "survivor", "density",
              "logdensity", "hazard", "loghazard", "cumhazard", "quantile"),
-    OOB = FALSE, simplify = FALSE, trace = FALSE, ...) {
+    OOB = FALSE, simplify = FALSE, trace = FALSE, updatestart = FALSE, ...) {
 
     type <- match.arg(type)
     tmp <- object
@@ -151,11 +151,12 @@ predict.traforest <- function(object,  newdata, mnewdata = data.frame(1), K = 20
         ret <- apply(ret, 2, function(r) 
                      libcoin::ctabs(mltmod$iy, weights = r)[-1L])
 
+    converged <- logical(ncol(ret))
     if (trace) pb <- txtProgressBar(style = 3)
     for (i in 1:ncol(ret)) {
         if (trace) setTxtProgressBar(pb, i / ncol(ret))
         w <- ret[,i]
-        if (i > 25) {
+        if ((i > 25) && updatestart) {
             imin <- which.min(cs <- colSums((ret[, 1:(i - 1), drop = FALSE] - w)^2))
             thetastart <- cf[[imin]]
         }
@@ -163,6 +164,7 @@ predict.traforest <- function(object,  newdata, mnewdata = data.frame(1), K = 20
         ### a specific obs are not identified (out of range)
         umod <- try(object$trafo(subset = NULL, newweights = w, info = list(coef = thetastart),
                                  estfun = FALSE), silent = TRUE)
+        converged[i] <- umod$converged 
         if (inherits(umod, "try-error")) {
             cf[[i]] <- NA
             ans[[i]] <- NA
@@ -174,6 +176,9 @@ predict.traforest <- function(object,  newdata, mnewdata = data.frame(1), K = 20
             }
         }
     } 
+    if (!all(converged)) 
+        warning("Parameter estimation did not converge for observations ",
+                paste(which(!converged), sep = ", "))
     if (trace) close(pb)
     if (type == "coef") return(cf)
     return(ans)
