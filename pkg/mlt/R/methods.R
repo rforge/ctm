@@ -12,6 +12,9 @@ weights.mlt <- function(object, ...) {
 }
 
 coef.mlt <- function(object, fixed = TRUE, ...) {
+    args <- list(...)
+    if (length(args) > 0)
+        warning("Arguments ", names(args), " are ignored")
     if (fixed) 
         return(object$coef)
     return(object$par)
@@ -34,20 +37,35 @@ coef.mlt <- function(object, fixed = TRUE, ...) {
 Hessian <- function(object, ...)
     UseMethod("Hessian")
 
-Hessian.mlt <- function(object, parm = coef(object, fixed = FALSE), ...)
+Hessian.mlt <- function(object, parm = coef(object, fixed = FALSE), ...) {
+    args <- list(...)
+    if (length(args) > 0)
+        warning("Arguments ", names(args), " are ignored")
     object$hessian(parm, weights = weights(object))
+}
     
 Gradient <- function(object, ...)
     UseMethod("Gradient")
 
-Gradient.mlt <- function(object, parm = coef(object, fixed = FALSE), ...)
+Gradient.mlt <- function(object, parm = coef(object, fixed = FALSE), ...) {
+    args <- list(...)
+    if (length(args) > 0)
+        warning("Arguments ", names(args), " are ignored")
     as.vector(colSums(estfun(object, parm = parm)))
+}
 
-vcov.mlt <- function(object, parm = coef(object, fixed = FALSE), ...)
+vcov.mlt <- function(object, parm = coef(object, fixed = FALSE), ...) {
+    args <- list(...)
+    if (length(args) > 0)
+        warning("Arguments ", names(args), " are ignored")
     solve(Hessian(object, parm = parm))
+}
 
 logLik.mlt <- function(object, parm = coef(object, fixed = FALSE), 
                        w = weights(object), newdata, ...) {
+    args <- list(...)
+    if (length(args) > 0)
+        warning("Arguments ", names(args), " are ignored")
     if (!missing(newdata)) {
         tmpmod <- mlt(object$model, data = newdata, dofit = FALSE)
         coef(tmpmod) <- coef(object)
@@ -62,6 +80,9 @@ logLik.mlt <- function(object, parm = coef(object, fixed = FALSE),
 
 estfun.mlt <- function(object, parm = coef(object, fixed = FALSE), 
                        w = weights(object), newdata, ...) {
+    args <- list(...)
+    if (length(args) > 0)
+        warning("Arguments ", names(args), " are ignored")
     if (!missing(newdata)) {
         tmpmod <- mlt(object$model, data = newdata, dofit = FALSE)
         coef(tmpmod) <- coef(object)

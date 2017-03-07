@@ -8,6 +8,8 @@
           evaluating the gradient.}
     \item{Having all response observations being interval-censored is
           allowed again (too heavy checking was in place).}
+    \item{Don't try to numerically check KKT conditions automatically.}
+    \item{Check for unused arguments in dots where necessary.}
  }
 }
 
