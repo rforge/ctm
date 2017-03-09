@@ -79,6 +79,8 @@ trafotree <- function(object, parm = 1:length(coef(object)), mltargs = list(maxi
     ret$mltobj <- ret$trafo(model = TRUE, estfun = FALSE)
     ret$mltargs <- mltargs
 
+    ### store coefs and logLik _outside_ tree
+    ### <FIXME> this will cause problems with nodeprune </FIXME>
     nd <- predict(ret, type = "node")
     ret$models <- tapply(1:length(nd), factor(nd), function(i) 
         ret$trafo(i, estfun = FALSE)) ### note: trafo is (potentially) weighted
