@@ -73,8 +73,9 @@
 trafotree <- function(object, parm = 1:length(coef(object)), mltargs = list(maxit = 10000), ...) {
 
     mltargs$model <- object
-    ctmfit <- .ctmfit(object, parm, mltargs)
-    ret <- ctree(..., ytrafo = ctmfit)
+    args <- list(...)
+    args$ytrafo <- .ctmfit(object, parm, mltargs)
+    ret <- do.call("ctree", args)
     ret$model <- object
     ret$mltobj <- ret$trafo(model = TRUE, estfun = FALSE)
     ret$mltargs <- mltargs
@@ -94,8 +95,9 @@ trafotree <- function(object, parm = 1:length(coef(object)), mltargs = list(maxi
 traforest <- function(object, parm = 1:length(coef(object)), mltargs = list(maxit = 10000), ...) {
 
     mltargs$model <- object
-    ctmfit <- .ctmfit(object, parm, mltargs)
-    ret <- cforest(..., ytrafo = ctmfit)
+    args <- list(...)
+    args$ytrafo <- .ctmfit(object, parm, mltargs)
+    ret <- do.call("cforest", args)
     ret$model <- object
     ret$mltargs <- mltargs
     ret$mltobj <- ret$trafo(model = TRUE, estfun = FALSE, object = TRUE)
