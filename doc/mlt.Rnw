@@ -899,10 +899,7 @@ If we allow a scaled log-transformation $\h_\rY(\ry) = \eparm_1 \log(\ry) + \epa
 $\eparm_2$ is included in the baseline transformation), the Weibull
 AFT model is fitted by \cmd{mlt}, \cmd{survreg} and \cmd{phreg} using
 <<GBSG2-3>>=
-ctm_GBSG2_3 <- ctm(log_basis(GBSG2y, ui = "increasing"), 
-                   shifting = fm_GBSG2[-2L], data = GBSG2, 
-                   negative = TRUE, todistr = "MinExtrVal")
-mlt_GBSG2_3 <- mlt(ctm_GBSG2_3, data = GBSG2, scale = TRUE)
+mlt_GBSG2_3 <- mlt(ctm_GBSG2_2, data = GBSG2, scale = TRUE)
 survreg_GBSG2_3 <- survreg(fm_GBSG2, data = GBSG2, dist = "weibull")
 phreg_GBSG2_3 <- phreg(fm_GBSG2, data = GBSG2, dist = "weibull")
 logLik(survreg_GBSG2_3)
