@@ -2,6 +2,13 @@
 \name{NEWS}
 \title{NEWS file for the mlt.docreg package}
 
+\section{Changes in Version 0.1-5 (2017-03-17)}{
+  \itemize{
+    \item{Update to \code{mlt} 0.1-3.}
+    \item{Smaller improvements in package vignette.}
+  }
+}
+
 \section{Changes in Version 0.1-4 (2016-12-04)}{
   \itemize{
     \item{More tests were a little too strict on non-Linux platforms.}
@@ -9,6 +16,7 @@
           tree pipit example; force \code{sgp} to be used.}
   }
 }
+
 
 \section{Changes in Version 0.1-3 (2016-12-01)}{
   \itemize{
