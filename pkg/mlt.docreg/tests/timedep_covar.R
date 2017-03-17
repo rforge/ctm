@@ -24,7 +24,7 @@ by <- log_basis(dy, ui = "increasing")
 m <- mlt(ctm(by, shift = ~ karno + age + trt, data = veteran, todistr = "MinExtr"),
          data = veteran, fixed = c("log(ytime)" = 1))
 
-stopifnot(chk(fit3$logliki, get("ll", env = environment(m$loglik))(coef(m)[-2]), 
+stopifnot(chk(fit3$logliki, m$logliki(coef(m)[-2], weights(m)), 
                     tol = tol, check.attributes = FALSE))
 
 stopifnot(chk(logLik(fit2), logLik(m), tol = tol))
@@ -42,7 +42,7 @@ by <- log_basis(dy, ui = "increasing")
 m <- mlt(ctm(by, shift = ~ karno + age + trt, data = veteran, todistr = "MinExtr"),
          data = veteran)
 
-stopifnot(chk(fit3$logliki, get("ll", env = environment(m$loglik))(coef(m)), 
+stopifnot(chk(fit3$logliki, m$logliki(coef(m), weights(m)), 
               tol = tol, check.attributes = FALSE))
 
 stopifnot(chk(logLik(fit2), logLik(m), tol = tol))
@@ -61,7 +61,7 @@ fit3 <- flexsurvreg(Surv(tstart, time, status) ~ karno + karno:timegroup +
 m <- mlt(ctm(by, shift = ~ karno + karno:timegroup + age + trt, data = vet2, todistr = "MinExtr"),
          data = vet2, fixed = c("log(ytime)" = 1))
 
-stopifnot(chk(fit3$logliki, get("ll", env = environment(m$loglik))(coef(m)[-2]), 
+stopifnot(chk(fit3$logliki, m$logliki(coef(m)[-2], weights(m)), 
               tol = tol, check.attributes = FALSE))
 stopifnot(chk(logLik(fit3), logLik(m), tol = tol, check.attributes = FALSE))
 
@@ -71,7 +71,7 @@ fit3 <- flexsurvreg(Surv(tstart, time, status) ~ karno + karno:timegroup +
 m <- mlt(ctm(by, shift = ~ karno + karno:timegroup + age + trt, data = vet2, todistr = "MinExtr"),
          data = vet2, scale = TRUE)
 
-stopifnot(chk(fit3$logliki, get("ll", env = environment(m$loglik))(coef(m)), 
+stopifnot(chk(fit3$logliki, m$logliki(coef(m), weights(m)), 
               tol = tol, check.attributes = FALSE))
 stopifnot(chk(logLik(fit3), logLik(m), tol = tol, check.attributes = FALSE))
 
