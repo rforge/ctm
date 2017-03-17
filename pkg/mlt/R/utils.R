@@ -39,3 +39,35 @@
     }
     return(TRUE)
 }
+
+.exact_subset <- function(exact, subset = NULL) {
+
+    iex <- inex <- NULL
+    if (any(exact))
+        iex <- which(exact)
+    if (any(!exact))
+        inex <- which(!exact)
+    if (is.null(subset))
+        return(list(full_ex = iex, full_nex = inex))
+
+    full_ex <- redu_ex <- full_nex <- redu_nex <- NULL
+    if (length(iex) > 0) {
+        full_ex <- iex[iex %in% subset]
+        redu_ex <- (1L:length(iex))[iex %in% subset]
+    }
+   if (length(inex) > 0) {
+        full_nex <- inex[inex %in% subset]
+        redu_nex <- (1L:length(inex))[inex %in% subset]
+    }
+    return(list(full_ex = full_ex, redu_ex = redu_ex,
+                full_nex = full_nex, redu_nex = redu_nex))
+}
+
+if (FALSE) {
+exact <- c(TRUE, FALSE)[c(1, 2, 1, 1, 2, 2)]
+.exact_subset(rep(TRUE, 3))
+.exact_subset(rep(FALSE, 3))
+.exact_subset(exact)
+.exact_subset(exact, 1:2)
+.exact_subset(exact, 3:6)
+}

@@ -4,6 +4,8 @@
 
 \section{Changes in Version 0.1-3 (2017-XX-YY)}{
   \itemize{
+    \item{Add \code{subset} argument to \code{update} (for faster transformation 
+          trees and forests).}
     \item{Sum over score contributions with positive weight only when
           evaluating the gradient.}
     \item{Having all response observations being interval-censored is

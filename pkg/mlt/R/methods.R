@@ -41,7 +41,10 @@ Hessian.mlt <- function(object, parm = coef(object, fixed = FALSE), ...) {
     args <- list(...)
     if (length(args) > 0)
         warning("Arguments ", names(args), " are ignored")
-    object$hessian(parm, weights = weights(object))
+    w <- weights(object)
+    if (!is.null(object$subset)) 
+        w[-object$subset] <- 0
+    object$hessian(parm, weights = w)
 }
     
 Gradient <- function(object, ...)
@@ -69,9 +72,14 @@ logLik.mlt <- function(object, parm = coef(object, fixed = FALSE),
     if (!missing(newdata)) {
         tmpmod <- mlt(object$model, data = newdata, dofit = FALSE)
         coef(tmpmod) <- coef(object)
-        return(logLik(tmpmod, parm = parm, weights = w))
+        return(logLik(tmpmod, parm = parm, w = rep(1, nrow(newdata))))
     }
-    ret <- -object$loglik(parm, weights = w)
+    if (!is.null(object$subset)) {
+        ret <- sum(object$logliki(parm, weights = w)[object$subset] * 
+                   w[object$subset])
+    } else {
+        ret <- -object$loglik(parm, weights = w)
+    }
     ###    attr(ret, "df") <- length(coef(object, fixed = FALSE))
     attr(ret, "df") <- object$df
     class(ret) <- "logLik"
@@ -88,7 +96,10 @@ estfun.mlt <- function(object, parm = coef(object, fixed = FALSE),
         coef(tmpmod) <- coef(object)
         return(estfun(tmpmod, parm = parm, weights = w))
     }
-    -object$score(parm, weights = w)
+    sc <- -object$score(parm, weights = w)
+    if (!is.null(object$subset))
+        sc <- sc[object$subset,,drop = FALSE]
+    return(sc)
 }
 
 mkgrid.mlt <- function(object, n, ...)

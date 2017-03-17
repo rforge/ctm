@@ -32,18 +32,22 @@
             if (is.null(newweights)) {
                 if (ctrl$nmax < Inf) {
                     w <- libcoin::ctabs(iy, weights = weights, subset = subset)[-1L]
+                    subset <- NULL
                 } else {
-                    w[-subset] <- 0
+                    w[-subset] <- 0 ### mlt >= 1.0-3 allows subset but we
+                    ### still need the weights to be zero for some operations below
                 }
             } else {
                 w <- newweights
             }
             if (!is.null(info$coef)) thetastart <- info$coef
-            umod <- suppressWarnings(try(update(ctmobject, theta = thetastart, weights = w), silent = TRUE))
+            umod <- suppressWarnings(try(update(ctmobject, weights = w, subset = subset, theta = thetastart), silent = TRUE))
             if (inherits(umod, "try-error") || umod$convergence != 0) {
-                umod <- suppressWarnings(try(update(ctmobject, weights = w), silent = TRUE))
+                umod <- suppressWarnings(try(update(ctmobject, weights = w, subset = subset), silent = TRUE))
                 if (inherits(umod, "try-error") || umod$convergence != 0) {
                     mltargs$weights <- w
+                    ### no subset allowed here, so used zero weights (see
+                    ### above)!!!
                     umod <- try(do.call("mlt", mltargs))
                 }
             }
@@ -57,8 +61,14 @@
                             iy = iy, converged = FALSE))
             }
             ret <- NULL
-            if (estfun) { 
+            if (estfun) {
                 ret <- estfun(umod)[, parm, drop = FALSE]
+                if (!is.null(subset)) {
+                    tmp <- matrix(0, nrow = length(w), 
+                                  ncol = ncol(ret))
+                    tmp[subset,] <- ret
+                    ret <- tmp
+                }
                 ret <- ret / w ### we need UNWEIGHTED scores
                 ret[w == 0,] <- 0
             }
