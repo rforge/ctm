@@ -114,6 +114,32 @@ predict.trafotree <- function(object, newdata, K = 20, q = NULL,
     pr
 }
 
+.thetastart <- function(object, weights, i, updatestart, cf) {
+
+    if (!updatestart) return(coef(object))
+    ### not sure if better starting values are worth the time,
+    ### so coef(object) is still the default
+    m <- object$model$model
+    w <- weights[,i]
+    if (names(m) == "bresponse" && 
+        inherits(m$bresponse, "Bernstein_basis")) {
+        ### Bernstein: theta_k = f(k / n)
+        y <- object$response
+        su <- variables::support(attr(m$bresponse, "variables"))[[1]]
+        grid <- seq(from = su[1], to = su[2], length.out = length(coef(object)))
+        prob <- attr(y, "prob")(w)(grid)
+        prob <- pmin(1 - .Machine$double.eps, pmax(.Machine$double.eps, prob))
+        theta <- object$model$todistr$q(prob)
+    } 
+    if ((i > 25)) {
+        imin <- which.min(cs <- colSums((weights[, 1:(i - 1), drop = FALSE] - w)^2))
+        theta <- cf[[imin]]
+    } else {
+        theta <- coef(object) 
+    }
+    return(theta)
+}
+
 predict.traforest <- function(object,  newdata, mnewdata = data.frame(1), K = 20, q = NULL,
     type = c("weights", "node", "coef", "trafo", "distribution", "survivor", "density",
              "logdensity", "hazard", "loghazard", "cumhazard", "quantile"),
@@ -156,13 +182,11 @@ predict.traforest <- function(object,  newdata, mnewdata = data.frame(1), K = 20
     for (i in 1:ncol(ret)) {
         if (trace) setTxtProgressBar(pb, i / ncol(ret))
         w <- ret[,i]
-        if ((i > 25) && updatestart) {
-            imin <- which.min(cs <- colSums((ret[, 1:(i - 1), drop = FALSE] - w)^2))
-            thetastart <- cf[[imin]]
-        }
+        thetastart <- .thetastart(mltmod$object, ret, i, updatestart, cf)
         ### try hard to estimate parameters; if may happen that parameters for 
         ### a specific obs are not identified (out of range)
-        umod <- try(object$trafo(subset = NULL, newweights = w, info = list(coef = thetastart),
+        umod <- try(object$trafo(subset = which(w > 0), 
+                                 newweights = w, info = list(coef = thetastart),
                                  estfun = FALSE), silent = TRUE)
         converged[i] <- umod$converged 
         if (inherits(umod, "try-error")) {

@@ -330,6 +330,7 @@ mlt <- function(model, data, weights = NULL, offset = NULL, fixed = NULL,
     ret <- do.call(".mlt_fit", args)
     ret$call <- match.call()
     ret$bounds <- bounds
+    ret$response <- y
     ret
 }
 

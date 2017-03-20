@@ -3,7 +3,7 @@ import("mlt")
 import("partykit")
 import("Formula")
 importFrom("sandwich", "estfun")
-importFrom("variables", "mkgrid")
+importFrom("variables", "mkgrid", "support")
 importFrom("libcoin", "ctabs")
 
 importFrom("utils",
