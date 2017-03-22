@@ -116,4 +116,4 @@ Note: method with signature 'dsparseMatrix#dsparseMatrix' chosen for function 'k
 > 
 > proc.time()
    user  system elapsed 
-  2.872   0.040   2.910 
+  3.244   0.044   3.312 
