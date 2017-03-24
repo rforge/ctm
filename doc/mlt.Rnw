@@ -1345,8 +1345,15 @@ transformation function
 The function $\bern{10}^\top \parm_2$ is the time-varying treatment effect
 and can be interpreted as the deviation, on the scale of the transformation
 function, induced by the hormonal therapy.  Under the null hypothesis of no
-treatment effect, we would expect $\parm_2 \equiv \bold{0}$.  This monotone
-deviation function adds ten linear constraints to the model. 
+treatment effect, we would expect $\parm_2 \equiv \bold{0}$.  It should be
+notes that the log-cumulative hazard function $\bern{10}(\ry)^\top \parm_1$
+must by monotone. The deviation function $\bern{10}(\ry)^\top \parm_2$ 
+does not need to be monotone, however, the sum of the two functions needs to
+be monotone. Sums of such Bernstein polynomials with coefficients $\parm_1$ and
+$\parm_2$ are a Bernstein polynomial with coefficients $\parm_1 + \parm_2$.
+Thus, monotonicity of the sum can be implemented by monotonicity of $\parm_1 +
+\parm_2$. The argument \code{sumconstr = TRUE} implements the latter
+constraint (the default, in this specific situation).
 Figure~\ref{GBSG2-deviation-plot} shows the time-varying treatment effect
 $\bern{10}^\top \hat{\parm}_{2, N}$, together with a $95\%$ confidence band
 (see Section~\ref{sec:asympt} for a description of the method). The $95\%$
@@ -1359,6 +1366,9 @@ treatment effect computed under the proportional hazards assumption.
 b_horTh <- as.basis(~ horTh, data = GBSG2)
 ctm_GBSG2_7 <- ctm(B_GBSG2y, interacting = b_horTh, 
                    todistr = "MinExtrVal")
+### check sum constraint
+nd <- data.frame(y = GBSG2$time[1:2], horTh = unique(GBSG2$horTh))
+attr(model.matrix(ctm_GBSG2_7, data = nd), "constraint")
 mlt_GBSG2_7 <- mlt(ctm_GBSG2_7, data = GBSG2)
 logLik(mlt_GBSG2_7)
 AIC(mlt_GBSG2_7)
