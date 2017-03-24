@@ -61,20 +61,25 @@ model.matrix.box_bases <- function(object, data, model.matrix = TRUE,
     })
     if (!model.matrix) return(ret)
     if (attr(object, "sumconstr")) {
+        ### sum of Bernstein is Bernstein with sum of coefs
+        ### make sure that sum is monotone, but not
+        ### necessarily all components
         s1 <- mkgrid(object[[1]], 2)
         X1 <- model.matrix(object[[1]], data = expand.grid(s1))
         s2 <- mkgrid(object[[2]], 2) ### min/max for numerics; all levels for factors
-        if (any(sapply(s2, function(x) is.integer(x))))
-            warning("integer-valued variable with sumcontr = TRUE")
+        s2 <- lapply(s2, function(x) {
+            if (is.integer(x)) return(range(x))
+            x
+        })
+        ### model.matrix deal with negative = TRUE
         X2 <- model.matrix(object[[2]], data = expand.grid(s2))
-        if (min(X2, na.rm = TRUE) < 0)
-            stop("negative values in model matrix not allowed for sumconstr = TRUE")
         ui <- attr(X1, "constraint")$ui
         ci <- attr(X1, "constraint")$ci
         ui <- kronecker(X2, ui)
         ci <- rep(ci, nrow(X2))
         constr <- list(ui = ui, ci = ci)
     } else {
+        ### all components must meet constraints
         constr <- do.call(".box_ui_ci", lapply(ret, function(r)
                           attr(r, "constraint")))
     }

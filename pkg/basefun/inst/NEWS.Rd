@@ -2,11 +2,19 @@
 \name{NEWS}
 \title{NEWS file for the basefun package}
 
+\section{Changes in Version 0.0-37 (2017-03-24)}{
+  \itemize{
+    \item{Deal with integer variables when \code{sumconstr = TRUE}.}
+    \item{Remove unnecessary warning when \code{sumconstr = TRUE} and \code{negative = TRUE}.}
+  }
+}
+
 \section{Changes in Version 0.0-36 (2017-03-01)}{
   \itemize{
     \item{Register C routines.}
   }
 }
+
 
 \section{Changes in Version 0.0-35 (2017-02-14)}{
   \itemize{
