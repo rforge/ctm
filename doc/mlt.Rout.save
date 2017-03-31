@@ -1,6 +1,6 @@
 
-R version 3.3.2 (2016-10-31) -- "Sincere Pumpkin Patch"
-Copyright (C) 2016 The R Foundation for Statistical Computing
+R version 3.3.3 (2017-03-06) -- "Another Canoe"
+Copyright (C) 2017 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -22,7 +22,7 @@ Type 'q()' to quit R.
 > 
 > sapply(c("mlt", "survival", "eha", "prodlim", "truncreg", "lattice", "gridExtra",
 +          "MASS", "nnet", "HSAUR3", "sandwich", "flexsurv", "grid", "latticeExtra", 
-+          "colorspace", "multcomp"), library, char = TRUE)
++          "colorspace", "multcomp", "alabama"), library, char = TRUE)
 Loading required package: basefun
 Loading required package: variables
 Loading required package: maxLik
@@ -63,6 +63,14 @@ The following object is masked from ‘package:HSAUR3’:
 The following object is masked from ‘package:MASS’:
 
     geyser
+
+Loading required package: numDeriv
+
+Attaching package: ‘numDeriv’
+
+The following object is masked from ‘package:maxLik’:
+
+    hessian
 
 $mlt
  [1] "mlt"       "basefun"   "variables" "stats"     "graphics"  "grDevices"
@@ -157,6 +165,15 @@ $multcomp
 [21] "survival"     "mlt"          "basefun"      "variables"    "stats"       
 [26] "graphics"     "grDevices"    "utils"        "datasets"     "methods"     
 [31] "base"        
+
+$alabama
+ [1] "alabama"      "numDeriv"     "multcomp"     "TH.data"      "mvtnorm"     
+ [6] "colorspace"   "latticeExtra" "RColorBrewer" "grid"         "flexsurv"    
+[11] "sandwich"     "HSAUR3"       "tools"        "nnet"         "MASS"        
+[16] "gridExtra"    "lattice"      "truncreg"     "maxLik"       "miscTools"   
+[21] "prodlim"      "eha"          "survival"     "mlt"          "basefun"     
+[26] "variables"    "stats"        "graphics"     "grDevices"    "utils"       
+[31] "datasets"     "methods"      "base"        
 
 > 
 > if (!file.exists("analysis/DVC.rda")) {
@@ -374,7 +391,7 @@ R> ctm_GBSG2_1 <- ctm(B_GBSG2y, shifting = fm_GBSG2[-2L], data = GBSG2,
 +                     todistr = "MinExtrVal")
 R> 
 R> ## ----GBSG2-1-xbasis, eval = FALSE----------------------------------------
-R> ## as.basis(fm_GBSG2[-2L], data = GBSG2, remove_intercept)
+R> ## as.basis(fm_GBSG2[-2L], data = GBSG2, remove_intercept = TRUE)
 R> 
 R> ## ----GBSG2-1-mlt---------------------------------------------------------
 R> mlt_GBSG2_1 <- mlt(ctm_GBSG2_1, data = GBSG2, maxit = 3000, scale = TRUE)
@@ -394,10 +411,10 @@ pnodes        0.0487818043  0.0487492066
 progrec      -0.0022174942 -0.0022104601
 estrec        0.0001978178  0.0001821366
 R> 
-R> ## ----GBSG2-coxph_mlt, echo = FALSE, results = "hide"---------------------
+R> ## ----GBSG2-coxph_mlt, echo = FALSE, results = "hide", fig.width = 9, fig.height = 5, cache = TRUE----
 R> ndtmp <- as.data.frame(mkgrid(GBSG2y, 100))
 R> 
-R> ord <- 1:30
+R> ord <- c(1:30, 35, 40, 45, 50)
 R> p <- vector(mode = "list", length = length(ord))
 R> CF <- c()
 R> ll <- numeric(length(ord))
@@ -447,14 +464,19 @@ R> for (i in 1:length(ord)) {
 [1] 28
 [1] 29
 [1] 30
+[1] 31
+[1] 32
+[1] 33
+Error in eigen(a$hessian, symmetric = TRUE, only.values = TRUE) : 
+  infinite or missing values in 'x'
+[1] 34
+Error in eigen(a$hessian, symmetric = TRUE, only.values = TRUE) : 
+  infinite or missing values in 'x'
 R> colnames(CF) <- names(cf)
 R> 
-R> nd0 <- as.data.frame(lapply(GBSG2, function(x) {
-+      if (is.numeric(x)) return(0)
-+      if (is.factor(x)) x[x == levels(x)[1]][1]
-+  }))
-R> 
-R> b <- survfit(coxph_GBSG2_1, newdata = nd0)
+R> of <- model.matrix(coxph_GBSG2_1) %*% coef(coxph_GBSG2_1) 
+R> coxphtmp <- coxph(Surv(time, cens) ~ 1  + offset(of), data = GBSG2)
+R> b <- survfit(coxphtmp)
 R> layout(matrix(1:2, nc = 2))
 R> col <- rgb(.1, .1, .1, .1)
 R> ylim <- range(unlist(p))
@@ -464,11 +486,11 @@ R> out <- sapply(p, function(y) lines(ndtmp$y, y, col = col))
 R> lines(b$time, log(b$cumhaz), col = "red")
 R> 
 R> ylim <- range(CF)
-R> plot(ord, CF[,1], ylim = ylim, col = col[1], xlab = "Order M", 
-+       ylab = "Coefficients")
+R> plot(ord, CF[,1], ylim = ylim, col = col[1], xlab = "Order M",
++       ylab = "Coefficients", type = "n")
 R> for (i in 1:ncol(CF)) {
-+      points(ord, CF[,i], cex = .5)
-+      abline(h = coef(coxph_GBSG2_1)[i])
++      points(ord, CF[,i], cex = .5, pch = 19)
++      abline(h = coef(coxph_GBSG2_1)[i], col = "darkgrey")
 +  }
 R> # text(20, coef(coxph_GBSG2_1) + .1, names(coef(coxph_GBSG2_1)))
 R> 
@@ -483,13 +505,13 @@ R> cf <- coef(coxph_GBSG2_1)
 R> cbind(coxph = cf, mlt = coef(mlt_GBSG2_1)[names(cf)],
 +        fss = coef(fss_GBSG2_1)[names(cf)])
                      coxph           mlt           fss
-horThyes     -0.3462416209 -0.3489669010 -0.3473363289
-age          -0.0094534071 -0.0098558187 -0.0097895841
-menostatPost  0.2581565452  0.2668899911  0.2672204917
-tsize         0.0077983290  0.0077736281  0.0079051625
-tgrade.L      0.5510838051  0.5604259034  0.5554284931
-tgrade.Q     -0.2011060204 -0.2020898085 -0.2078499581
-pnodes        0.0487818043  0.0487492066  0.0485933666
+horThyes     -0.3462416209 -0.3489669010 -0.3473363301
+age          -0.0094534071 -0.0098558187 -0.0097895840
+menostatPost  0.2581565452  0.2668899911  0.2672204934
+tsize         0.0077983290  0.0077736281  0.0079051626
+tgrade.L      0.5510838051  0.5604259034  0.5554284914
+tgrade.Q     -0.2011060204 -0.2020898085 -0.2078499591
+pnodes        0.0487818043  0.0487492066  0.0485933664
 progrec      -0.0022174942 -0.0022104601 -0.0022112350
 estrec        0.0001978178  0.0001821366  0.0001891311
 R> 
@@ -535,10 +557,7 @@ progrec       0.0020670894  0.0020670894  0.0020670935
 estrec       -0.0001788501 -0.0001788501 -0.0001788716
 R> 
 R> ## ----GBSG2-3-------------------------------------------------------------
-R> ctm_GBSG2_3 <- ctm(log_basis(GBSG2y, ui = "increasing"), 
-+                     shifting = fm_GBSG2[-2L], data = GBSG2, 
-+                     negative = TRUE, todistr = "MinExtrVal")
-R> mlt_GBSG2_3 <- mlt(ctm_GBSG2_3, data = GBSG2, scale = TRUE)
+R> mlt_GBSG2_3 <- mlt(ctm_GBSG2_2, data = GBSG2, scale = TRUE)
 R> survreg_GBSG2_3 <- survreg(fm_GBSG2, data = GBSG2, dist = "weibull")
 R> phreg_GBSG2_3 <- phreg(fm_GBSG2, data = GBSG2, dist = "weibull")
 R> logLik(survreg_GBSG2_3)
@@ -765,24 +784,13 @@ Note: method with signature 'Matrix#numLike' chosen for function '%*%',
 Note: method with signature 'sparseMatrix#matrix' chosen for function '%*%',
  target signature 'dgTMatrix#matrix'.
  "TsparseMatrix#ANY" would also be valid
-Warning message:
-In matrix(paste(x[rep(1:nrow(x), length = nrow(y)), rep(1:ncol(x),  :
-  data length [63] is not a sub-multiple or multiple of the number of rows [2]
 R> mlt_CHFLS_7 <- mlt(ctm_CHFLS_7, data = CHFLS, scale = TRUE,
 +                     maxit = 10000, gtol = 1e-3)
 Warning messages:
 1: contrasts dropped from factor R_health 
-2: In matrix(paste(x[rep(1:nrow(x), length = nrow(y)), rep(1:ncol(x),  :
-  data length [63] is not a sub-multiple or multiple of the number of rows [2]
+2: contrasts dropped from factor R_health 
 3: contrasts dropped from factor R_health 
-4: In matrix(paste(x[rep(1:nrow(x), length = nrow(y)), rep(1:ncol(x),  :
-  data length [63] is not a sub-multiple or multiple of the number of rows [2]
-5: contrasts dropped from factor R_health 
-6: In matrix(paste(x[rep(1:nrow(x), length = nrow(y)), rep(1:ncol(x),  :
-  data length [63] is not a sub-multiple or multiple of the number of rows [2]
-7: contrasts dropped from factor R_health 
-8: In matrix(paste(x[rep(1:nrow(x), length = nrow(y)), rep(1:ncol(x),  :
-  data length [63] is not a sub-multiple or multiple of the number of rows [2]
+4: contrasts dropped from factor R_health 
 R> logLik(mlt_CHFLS_7)
 'log Lik.' -1182.778 (df=21)
 R> 
@@ -826,6 +834,36 @@ R> ## ----GBSG2-7-------------------------------------------------------------
 R> b_horTh <- as.basis(~ horTh, data = GBSG2)
 R> ctm_GBSG2_7 <- ctm(B_GBSG2y, interacting = b_horTh, 
 +                     todistr = "MinExtrVal")
+R> ### check sum constraint
+R> nd <- data.frame(y = GBSG2$time[1:2], horTh = unique(GBSG2$horTh))
+R> attr(model.matrix(ctm_GBSG2_7, data = nd), "constraint")
+$ui
+20 x 22 sparse Matrix of class "dgCMatrix"
+                                                                     
+ [1,] -1  1  .  .  .  .  .  .  .  . .  .  .  .  .  .  .  .  .  .  . .
+ [2,]  . -1  1  .  .  .  .  .  .  . .  .  .  .  .  .  .  .  .  .  . .
+ [3,]  .  . -1  1  .  .  .  .  .  . .  .  .  .  .  .  .  .  .  .  . .
+ [4,]  .  .  . -1  1  .  .  .  .  . .  .  .  .  .  .  .  .  .  .  . .
+ [5,]  .  .  .  . -1  1  .  .  .  . .  .  .  .  .  .  .  .  .  .  . .
+ [6,]  .  .  .  .  . -1  1  .  .  . .  .  .  .  .  .  .  .  .  .  . .
+ [7,]  .  .  .  .  .  . -1  1  .  . .  .  .  .  .  .  .  .  .  .  . .
+ [8,]  .  .  .  .  .  .  . -1  1  . .  .  .  .  .  .  .  .  .  .  . .
+ [9,]  .  .  .  .  .  .  .  . -1  1 .  .  .  .  .  .  .  .  .  .  . .
+[10,]  .  .  .  .  .  .  .  .  . -1 1  .  .  .  .  .  .  .  .  .  . .
+[11,] -1  1  .  .  .  .  .  .  .  . . -1  1  .  .  .  .  .  .  .  . .
+[12,]  . -1  1  .  .  .  .  .  .  . .  . -1  1  .  .  .  .  .  .  . .
+[13,]  .  . -1  1  .  .  .  .  .  . .  .  . -1  1  .  .  .  .  .  . .
+[14,]  .  .  . -1  1  .  .  .  .  . .  .  .  . -1  1  .  .  .  .  . .
+[15,]  .  .  .  . -1  1  .  .  .  . .  .  .  .  . -1  1  .  .  .  . .
+[16,]  .  .  .  .  . -1  1  .  .  . .  .  .  .  .  . -1  1  .  .  . .
+[17,]  .  .  .  .  .  . -1  1  .  . .  .  .  .  .  .  . -1  1  .  . .
+[18,]  .  .  .  .  .  .  . -1  1  . .  .  .  .  .  .  .  . -1  1  . .
+[19,]  .  .  .  .  .  .  .  . -1  1 .  .  .  .  .  .  .  .  . -1  1 .
+[20,]  .  .  .  .  .  .  .  .  . -1 1  .  .  .  .  .  .  .  .  . -1 1
+
+$ci
+ [1] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+
 R> mlt_GBSG2_7 <- mlt(ctm_GBSG2_7, data = GBSG2)
 R> logLik(mlt_GBSG2_7)
 'log Lik.' -2605.949 (df=22)
@@ -964,8 +1002,8 @@ R> B_cs <- Bernstein_basis(var = numeric_var("coverstorey", support = 1:110),
 +                          order = 4)
 R> B_c <- as.basis(treepipit$ocounts)
 R> ctm_treepipit <- ctm(B_c, interacting = B_cs)
-R> mlt_treepipit <- mlt(ctm_treepipit, data = treepipit, maxit = 10000, 
-+                       gtol = 1e-3)
+R> mlt_treepipit <- mlt(ctm_treepipit, data = treepipit, scale = TRUE,
++                       optim = mltoptim()["spg"])
 R> 
 R> ## ----mgcv, echo = FALSE, results = "hide"--------------------------------
 R> library("mgcv") ### masks nnet::multinom
@@ -977,7 +1015,7 @@ The following object is masked from 'package:mlt':
 
     coef<-
 
-This is mgcv 1.8-14. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-16. For overview type 'help("mgcv-package")'.
 
 Attaching package: 'mgcv'
 
@@ -1685,11 +1723,14 @@ R> xr <- xt + sample(c(Inf, (0:(length(xt) - 2)) / length(xt)),
 +                    replace = FALSE)
 R> R(c(1.2, rep(NA, length(xt))), cleft = c(NA, xl), cright = c(NA, xr), 
 +    tleft = -1, tright = 2)
-[1] {1.2| (-1, 2]}              {(0.329, 1.329]| (-1, 2]}  
-[3] {(-0.999, -0.249]| (-1, 2]} {(-0.297, 0.203]| (-1, 2]} 
-[5] {(-Inf, 0.118]| (-1, 2]}    {(-1.279, -0.154]| (-1, 2]}
-[7] {(-0.293, Inf]| (-1, 2]}    {(-0.453, -0.328]| (-1, 2]}
-[9] {(-0.576, 0.174]| (-1, 2]} 
+[1] {1.2| (-1, 2]}                                     
+[2] {(-Inf, 0.910857142857143]| (-1, 2]}               
+[3] {(0.361714285714286, Inf]| (-1, 2]}                
+[4] {(-0.0268571428571428, 0.830285714285714]| (-1, 2]}
+[5] {(-0.860428571428571, 0.139571428571429]| (-1, 2]} 
+[6] {(-0.949, -0.663285714285714]| (-1, 2]}            
+[7] {(-0.421571428571429, 0.007]| (-1, 2]}             
+[8] {(0.348285714285714, 1.20542857142857]| (-1, 2]}   
 R> 
 R> ## ----R-Surv--------------------------------------------------------------
 R> head(geyser$duration)
@@ -1736,16 +1777,18 @@ R> coef(mod)
     Bs13(y)     Bs14(y)     Bs15(y)     Bs16(y) 
  2.31269685  2.58240889  2.84121268  3.09023231 
 R> coef(fmod)
-     Bs1(y)      Bs2(y)      Bs3(y)      Bs4(y)      Bs5(y)      Bs6(y) 
--3.44857874 -1.70565191 -1.70565174 -1.70564889 -0.08905420  0.03463296 
-     Bs7(y)      Bs8(y)      Bs9(y)     Bs10(y)     Bs11(y)     Bs12(y) 
- 0.03468490  0.52834567  1.52548216  1.53157724  1.53199603  1.95539312 
-    Bs13(y)     Bs14(y)     Bs15(y)     Bs16(y) 
- 2.35774342  2.35781004  2.35781006  3.67431640 
+      Bs1(y)       Bs2(y)       Bs3(y)       Bs4(y)       Bs5(y) 
+-3.725134672 -1.764780029 -1.764776711 -1.199872799 -0.017963722 
+      Bs6(y)       Bs7(y)       Bs8(y)       Bs9(y)      Bs10(y) 
+-0.007841502 -0.007833509  0.712315111  1.619678195  1.619700874 
+     Bs11(y)      Bs12(y)      Bs13(y)      Bs14(y)      Bs15(y) 
+ 1.619700864  1.619702328  2.232069523  2.592818306  2.592819555 
+     Bs16(y) 
+ 3.558173280 
 R> logLik(fmod)
-'log Lik.' -1606.4 (df=16)
+'log Lik.' -1604.474 (df=16)
 R> logLik(fmod, parm = coef(mod))
-'log Lik.' -1609.71 (df=16)
+'log Lik.' -1607.26 (df=16)
 R> 
 R> ## ----mlt-chi-plot--------------------------------------------------------
 R> ## compute true density
@@ -2125,9 +2168,9 @@ Bs4(head):Bs4(lage)
 
 $mlt_i
 Bs1(waiting) Bs2(waiting) Bs3(waiting) Bs4(waiting) Bs5(waiting) 
-  -4.9307617   -0.7986517   -0.4532501   -0.4532498   -0.4532498 
+ -4.88609658  -0.50960275  -0.43366160  -0.43366153  -0.43366144 
 Bs6(waiting) Bs7(waiting) Bs8(waiting) Bs9(waiting) 
-  -0.4532498    1.1340942    1.1513585    3.7963319 
+ -0.43366142   0.06834571   2.21071588   4.09351650 
 
 $mlt_iris
  oSpecies1:(Intercept)  oSpecies2:(Intercept) oSpecies1:Sepal.Length 
@@ -2159,31 +2202,31 @@ $mlt_PSID1976_2
 
 $mlt_treepipit
 ocounts1:Bs1(coverstorey) ocounts2:Bs1(coverstorey) 
-                0.6624152                 0.6723410 
+                 1.705971                  2.173363 
 ocounts3:Bs1(coverstorey) ocounts4:Bs1(coverstorey) 
-                0.6723410                 0.6726123 
+                 2.173363                  3.109131 
 ocounts5:Bs1(coverstorey) ocounts1:Bs2(coverstorey) 
-                0.6889539                -2.8601751 
+                 4.980605                 -6.365065 
 ocounts2:Bs2(coverstorey) ocounts3:Bs2(coverstorey) 
-               -2.8580964                -2.8534321 
+                -6.365065                 -5.551726 
 ocounts4:Bs2(coverstorey) ocounts5:Bs2(coverstorey) 
-               -2.8502551                -2.8468406 
+                -5.551726                 -5.551726 
 ocounts1:Bs3(coverstorey) ocounts2:Bs3(coverstorey) 
-                4.6378449                 4.6425168 
+                12.838921                 13.112132 
 ocounts3:Bs3(coverstorey) ocounts4:Bs3(coverstorey) 
-                4.6433355                 4.6433357 
+                13.112132                 13.112132 
 ocounts5:Bs3(coverstorey) ocounts1:Bs4(coverstorey) 
-                4.6433357                -0.2472960 
+                13.112132                 -8.378364 
 ocounts2:Bs4(coverstorey) ocounts3:Bs4(coverstorey) 
-               -0.2472330                -0.2472151 
+                -8.378364                 -8.378364 
 ocounts4:Bs4(coverstorey) ocounts5:Bs4(coverstorey) 
-               -0.2470778                -0.2470753 
+                -8.378364                 -8.378364 
 ocounts1:Bs5(coverstorey) ocounts2:Bs5(coverstorey) 
-                1.3030838                 1.3030838 
+                 8.881341                  8.881341 
 ocounts3:Bs5(coverstorey) ocounts4:Bs5(coverstorey) 
-                1.3030838                 1.3030838 
+                13.346403                 13.346403 
 ocounts5:Bs5(coverstorey) 
-                1.3030853 
+                13.346403 
 
 $mlt_w
 Bs1(waiting) Bs2(waiting) Bs3(waiting) Bs4(waiting) Bs5(waiting) 
@@ -2216,9 +2259,9 @@ R> #sapply(mltobj, function(m) eval(parse(text = paste("checkGH(", m, ")"))))
 R> 
 R> ## ----sessionInfo, echo = FALSE, results = "hide"-------------------------
 R> sessionInfo()
-R version 3.3.2 (2016-10-31)
+R version 3.3.3 (2017-03-06)
 Platform: x86_64-pc-linux-gnu (64-bit)
-Running under: Ubuntu 14.04.5 LTS
+Running under: Ubuntu 16.04.2 LTS
 
 locale:
  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
@@ -2233,25 +2276,26 @@ attached base packages:
 [8] methods   base     
 
 other attached packages:
- [1] mgcv_1.8-14         nlme_3.1-128        multcomp_1.4-6     
- [4] TH.data_1.0-7       mvtnorm_1.0-5       colorspace_1.2-6   
- [7] latticeExtra_0.6-28 RColorBrewer_1.1-2  flexsurv_1.0.0     
-[10] sandwich_2.3-4      HSAUR3_1.0-5        nnet_7.3-12        
-[13] MASS_7.3-45         gridExtra_2.2.1     lattice_0.20-33    
-[16] truncreg_0.2-4      maxLik_1.3-4        miscTools_0.6-16   
-[19] prodlim_1.5.7       eha_2.4-3           survival_2.39-5    
-[22] mlt_0.1-0           basefun_0.0-33      variables_0.0-30   
+ [1] mgcv_1.8-16         nlme_3.1-128        alabama_2015.3-1   
+ [4] numDeriv_2016.8-1   multcomp_1.4-6      TH.data_1.0-8      
+ [7] mvtnorm_1.0-6       colorspace_1.3-2    latticeExtra_0.6-28
+[10] RColorBrewer_1.1-2  flexsurv_1.1        sandwich_2.3-4     
+[13] HSAUR3_1.0-6        nnet_7.3-12         MASS_7.3-45        
+[16] gridExtra_2.2.1     lattice_0.20-35     truncreg_0.2-4     
+[19] maxLik_1.3-4        miscTools_0.6-22    prodlim_1.6.1      
+[22] eha_2.4-4           survival_2.41-2     mlt_0.1-2          
+[25] basefun_0.0-36      variables_0.0-30   
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.6        evaluate_0.9       gtable_0.2.0      
- [4] Matrix_1.2-7       polynom_1.3-8      stringr_1.1.0     
- [7] BB_2014.10-1       knitr_1.14         deSolve_1.13      
-[10] mstate_0.2.9       orthopolynom_1.0-5 alabama_2015.3-1  
-[13] lava_1.4.4         magrittr_1.5       codetools_0.2-15  
-[16] splines_3.3.2      numDeriv_2016.8-1  quadprog_1.5-5    
-[19] stringi_1.1.1      muhaz_1.2.6        zoo_1.7-13        
+ [1] Rcpp_0.12.8        evaluate_0.10      gtable_0.2.0      
+ [4] Matrix_1.2-7.1     polynom_1.3-8      stringr_1.1.0     
+ [7] BB_2014.10-1       knitr_1.15.1       deSolve_1.14      
+[10] mstate_0.2.10      orthopolynom_1.0-5 lava_1.4.5        
+[13] magrittr_1.5       codetools_0.2-15   splines_3.3.3     
+[16] quadprog_1.5-5     stringi_1.1.2      muhaz_1.2.6       
+[19] zoo_1.7-13        
 R> 
 R> 
 > proc.time()
    user  system elapsed 
- 85.668   0.232  85.916 
+ 76.440   0.292  76.767 
