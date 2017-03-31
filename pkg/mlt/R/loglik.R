@@ -44,7 +44,7 @@
 ..mlt_score_interval <- function(d, mml, mmr, offset = 0, beta)
     (.dealinf(mmr, beta, offset, d$d, 0, Xmult = TRUE) -
      .dealinf(mml, beta, offset, d$d, 0, Xmult = TRUE)) / 
-    pmax(.Machine$double.eps, (.dealinf(mmr, beta, offset, d$p, 1) - 
+    pmax(.Machine$double.eps^(1/3), (.dealinf(mmr, beta, offset, d$p, 1) - 
      .dealinf(mml, beta, offset, d$p, 0)))
 
 .mlt_score_interval <- function(d, mml, mmr, offset = 0, mmtrunc = NULL) {
