@@ -830,6 +830,7 @@ for (i in 1:ncol(CF)) {
          obtained from \cmd{coxph} in red. The right panel shows the trajectories of the
          regression coefficients $\shiftparm$ obtained for varying $M$ from \cmd{mlt} as
          dots. The horizonal lines represent the partial likelihood estimates from \cmd{coxph}. 
+         This figure reproduces Figure~6 in \cite{{Hothorn_Moest_Buehlmann_2016}}.
          \label{fig:GBSG2-coxph_mlt}}
 \end{center}
 \end{figure}
@@ -1393,7 +1394,7 @@ K[,length(coef(mlt_GBSG2_6))] <- 1
 ci2 <- confint(glht(mlt_GBSG2_6, K))
 
 plot(coxy, ci$confint[, "Estimate"], ylim = range(ci$confint), type = "n",
-     xlab = "Survival time (days)", ylab = "Transformation deviation", las = 1)
+     xlab = "Survival time (days)", ylab = "Log-hazard ratio", las = 1)
 polygon(c(coxy, rev(coxy)), c(ci$confint[,"lwr"], rev(ci$confint[, "upr"])),
         border = NA, col = rgb(.1, .1, .1, .1))
 lines(coxy, ci$confint[, "Estimate"], lty = 1, lwd = 1)
@@ -1402,7 +1403,7 @@ lines(coxy, rep(0, length(coxy)), lty = 3)
 polygon(c(coxy[c(1, length(coxy))], rev(coxy[c(1, length(coxy))])),
         rep(ci2$confint[,c("lwr", "upr")], c(2, 2)),
         border = NA, col = rgb(.1, .1, .1, .1))
-legend("bottomright", lty = 1:2, lwd = 1, legend = c("time-varying treatment effect",
+legend("bottomright", lty = 1:2, lwd = 1, legend = c("time-varying log-hazard ratio",
        "time-constant log-hazard ratio"), bty = "n", cex = .75)
 @
 \caption{GBSG-2 Trial. Verification of proportional hazards: The log-hazard ratio $\hat{\beta}$
@@ -1840,8 +1841,6 @@ underlying model matrices are scaled to $[-1, 1]$ (argument \code{scale = TRUE}
 to \cmd{mlt}) which leads to considerable faster optimisation in many cases.
 Additional arguments (\code{...}) to \cmd{mlt}, such as the maximum number of iterations 
 \code{maxit}, are forwarded to \cmd{spg}.
-
-\pagebreak
 
 \section{Transformation Analysis} \label{sec:predict}
 
