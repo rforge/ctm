@@ -548,7 +548,7 @@ plot(ecdf(geyser$waiting), col = "grey", xlab = "Waiting times", ylab = "Distrib
 lines(nd_w$waiting, nd_w$d)
 B_w_40 <- Bernstein_basis(order = 40, var = var_w, ui = "incre")
 ctm_w_40 <- ctm(B_w_40, todistr = "Normal")
-mlt_w_40 <- mlt(ctm_w_40, data = geyser, maxit = 5000)
+mlt_w_40 <- mlt(ctm_w_40, data = geyser)
 nd_w$d2 <- predict(mlt_w_40, q = nd_w$waiting, type = "distribution")
 lines(nd_w$waiting, nd_w$d2, lty = 2)
 legend("bottomright", lty = 1:2, legend = c("M = 8", "M = 40"), bty = "n")
@@ -758,10 +758,9 @@ from the model matrix prior to model estimation.
 
 In contrast to the classical Cox model where only $\shiftparm$ is estimated
 by the partial likelihood, we estimate all model parameters $(\parm_1^\top, \shiftparm^\top)$ simultaneously
-under ten linear constraints, here with at most $3000$ iterations 
-\citep[argument \code{maxit} to \cmd{spg} from the \pkg{BB} package,][]{Varadhan_Gilbert_2009,pkg:BB}
+under ten linear constraints
 <<GBSG2-1-mlt>>=
-mlt_GBSG2_1 <- mlt(ctm_GBSG2_1, data = GBSG2, maxit = 3000, scale = TRUE)
+mlt_GBSG2_1 <- mlt(ctm_GBSG2_1, data = GBSG2, scale = TRUE)
 @
 The results obtained for $\shiftparm$ from
 the partial and the exact log-likelihood are practically equivalent
@@ -802,7 +801,7 @@ for (i in 1:length(ord)) {
     B_GBSG2ytmp <- Bernstein_basis(var = GBSG2y, order = ord[i], ui = "increasing")
     ctmi <- ctm(B_GBSG2ytmp, shifting = fm_GBSG2[-2L], data = GBSG2,
                    todistr = "MinExtrVal")
-    tm[i] <- system.time(mlti <- mlt(ctmi, data = GBSG2, maxit = 3000, scale = TRUE))[1]
+    tm[i] <- system.time(mlti <- mlt(ctmi, data = GBSG2, scale = TRUE))[1]
 
     ll[i] <- logLik(mlti)
     p[[i]] <- predict(mlti, newdata = ndtmp, type = "trafo", terms = "bresponse")
@@ -1136,8 +1135,7 @@ the gradient convergence criterion in \cmd{spg} to speed-up the computations)
 <<CHFLS-3, cache = TRUE>>=
 b_health <- as.basis(~ R_health - 1, data = CHFLS)
 ctm_CHFLS_3 <- ctm(b_happy, interacting = b_health, todist = "Logistic")
-mlt_CHFLS_3 <- mlt(ctm_CHFLS_3, data = CHFLS, scale = TRUE,
-                   maxit = 5000, gtol = 1e-3)
+mlt_CHFLS_3 <- mlt(ctm_CHFLS_3, data = CHFLS, scale = TRUE)
 logLik(mlt_CHFLS_3)
 predict(mlt_CHFLS_3, newdata = mkgrid(mlt_CHFLS_3), type = "distribution")
 @
@@ -1147,8 +1145,7 @@ for age and income
 <<CHFLS-4, cache = TRUE>>=
 ctm_CHFLS_4 <- ctm(b_happy, interacting = b_health, shifting = b_R, 
                    todist = "Logistic")
-mlt_CHFLS_4 <- mlt(ctm_CHFLS_4, data = CHFLS, scale = TRUE, 
-                   maxit = 5000)
+mlt_CHFLS_4 <- mlt(ctm_CHFLS_4, data = CHFLS, scale = TRUE)
 coef(mlt_CHFLS_4)[c("R_age", "R_income")]
 @
 Because the shift basis \code{b\_R} is negative, the effects of both age and income 
@@ -1268,8 +1265,7 @@ for each health level, but instead of using a dummy coding we use treatment cont
 contrasts(CHFLS$R_health) <- "contr.treatment"
 b_health <- as.basis(~ R_health, data = CHFLS)
 ctm_CHFLS_5 <- ctm(b_happy, interacting = b_health, todist = "Logistic")
-mlt_CHFLS_5 <- mlt(ctm_CHFLS_5, data = CHFLS, scale = TRUE, 
-                   maxit = 10000, gtol = 1e-3)
+mlt_CHFLS_5 <- mlt(ctm_CHFLS_5, data = CHFLS, scale = TRUE)
 predict(mlt_CHFLS_5, newdata = mkgrid(mlt_CHFLS_5), type = "distribution")
 logLik(mlt_CHFLS_5)
 @
@@ -1278,10 +1274,9 @@ allow a direct interpretation of the effect of health relative to the baseline
 category \code{Poor}. In a second step, we fit a non-proportional odds model where the 
 effects of age and income are allowed to vary with happiness
 <<CHFLS-6, cache = TRUE>>=
-b_R <- as.basis(~ R_age + R_income, data = CHFLS, remove_intercept = TRUE)
+b_R <- as.basis(~ R_age + R_income, data = CHFLS, remove_intercept = TRUE, scale = TRUE)
 ctm_CHFLS_6 <- ctm(b_happy, interacting = b_R, todist = "Logistic")  
-mlt_CHFLS_6 <- mlt(ctm_CHFLS_6, data = CHFLS, scale = TRUE,
-                   maxit = 5000, gtol = 1e-3)
+mlt_CHFLS_6 <- mlt(ctm_CHFLS_6, data = CHFLS, scale = TRUE)
 logLik(mlt_CHFLS_6)
 @
 and finally we include all three variables (health, age and income) allowing 
@@ -1289,8 +1284,7 @@ happiness-varying effects as
 <<CHFLS-7, cache = TRUE>>=
 ctm_CHFLS_7 <- ctm(b_happy, interacting = c(h = b_health, R = b_R), 
     todist = "Logistic")  
-mlt_CHFLS_7 <- mlt(ctm_CHFLS_7, data = CHFLS, scale = TRUE,
-                   maxit = 10000, gtol = 1e-3)
+mlt_CHFLS_7 <- mlt(ctm_CHFLS_7, data = CHFLS, scale = TRUE)
 logLik(mlt_CHFLS_7)
 @
 Overall, we get
@@ -1316,8 +1310,8 @@ multinom_iris <- nnet::multinom(fm_iris, data = iris, trace = FALSE)
 logLik(multinom_iris)
 iris$oSpecies <- ordered(iris$Species)
 b_Species <- as.basis(iris$oSpecies)
-ctm_iris <- ctm(b_Species, 
-                interacting = as.basis(fm_iris[-2L], data = iris), 
+b_x <- as.basis(fm_iris[-2L], data = iris, scale = TRUE)
+ctm_iris <- ctm(b_Species, interacting = b_x,
                 todistr = "Logistic")
 mlt_iris <- mlt(ctm_iris, data = iris, scale = TRUE)
 logLik(mlt_iris)
@@ -1446,8 +1440,7 @@ b_horTh <- as.basis(GBSG2$horTh)
 ctm_GBSG2_8 <- ctm(B_GBSG2y, 
                    interacting = b(horTh = b_horTh, age = B_age), 
                    todistr = "MinExtrVal")
-mlt_GBSG2_8  <- mlt(ctm_GBSG2_8, data = GBSG2, maxit = 5000, 
-                    gtol = 1e-3)
+mlt_GBSG2_8  <- mlt(ctm_GBSG2_8, data = GBSG2)
 logLik(mlt_GBSG2_8)
 AIC(mlt_GBSG2_8)
 @
@@ -1504,7 +1497,7 @@ var_lage <- numeric_var("lage", support = quantile(db$lage, c(.1, .9)),
                         bounds = range(db$lage))
 B_age <- Bernstein_basis(var_lage, order = 3, ui = "none")
 ctm_head <- ctm(B_head, interacting = B_age)
-mlt_head <- mlt(ctm_head, data = db, maxit = 5000, scale = TRUE)
+mlt_head <- mlt(ctm_head, data = db, scale = TRUE)
 @
 Figure~\ref{fig:head-plot} shows the
 data overlaid with quantile curves obtained via inversion of the estimated
@@ -1873,8 +1866,8 @@ empirical cumulative distribution function, a Kaplan-Meier or Turnbull estimate)
 design matrix of the transformation model. Optionally, columns of the
 underlying model matrices are scaled to $[-1, 1]$ (argument \code{scale = TRUE}
 to \cmd{mlt}) which leads to considerable faster optimisation in many cases.
-Additional arguments (\code{...}) to \cmd{mlt}, such as the maximum number of iterations 
-\code{maxit}, are forwarded to \cmd{spg}.
+% Additional arguments (\code{...}) to \cmd{mlt}, such as the maximum number of iterations 
+% \code{maxit}, are forwarded to \cmd{spg}.
 
 \section{Transformation Analysis} \label{sec:predict}
 
