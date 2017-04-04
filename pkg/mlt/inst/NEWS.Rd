@@ -2,7 +2,7 @@
 \name{NEWS}
 \title{NEWS file for the mlt package}
 
-\section{Changes in Version 0.1-3 (2017-XX-YY)}{
+\section{Changes in Version 0.1-3 (2017-04-04)}{
   \itemize{
     \item{Add \code{subset} argument to \code{update} (for faster transformation 
           trees and forests).}
@@ -12,6 +12,11 @@
           allowed again (too heavy checking was in place).}
     \item{Don't try to numerically check KKT conditions automatically.}
     \item{Check for unused arguments in dots where necessary.}
+    \item{Make sure the score doesn't get too large (avoid division by near
+          zero probabilities).}
+    \item{Improve \code{survfit} to compute non-parametric unconditional
+          probabilities for obtaining starting values in the presence of
+          censoring and truncation.}
  }
 }
 

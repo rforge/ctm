@@ -52,6 +52,8 @@ R.Surv <- function(object, ...) {
         function(y) {
             uy <- sort(unique(y))
             s <- summary(sf, times = uy)$surv
+            if (length(s) < length(uy))
+                s <- c(s, rep(0, length(uy) - length(s)))
             s[is.na(s)] <- 0
             p <- 1 - s
             p[match(y, uy)]
