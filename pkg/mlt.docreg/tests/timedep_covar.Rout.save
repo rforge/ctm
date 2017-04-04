@@ -110,10 +110,10 @@ Note: method with signature 'dsparseMatrix#dsparseMatrix' chosen for function 'k
  "TsparseMatrix#sparseMatrix" would also be valid
 > 
 > max(abs(coef(fit1) - coef(m)[-(1:12)]))
-[1] 0.03097503
+[1] 0.03000332
 > max(abs(diag(vcov(m))[-(1:12)] - diag(vcov(fit1))))
-[1] 0.0003366202
+[1] 0.0003450689
 > 
 > proc.time()
    user  system elapsed 
-  3.244   0.044   3.312 
+  3.808   0.048   3.858 

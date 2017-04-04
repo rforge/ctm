@@ -1,6 +1,6 @@
 
-R Under development (unstable) (2016-11-08 r71639) -- "Unsuffered Consequences"
-Copyright (C) 2016 The R Foundation for Statistical Computing
+R version 3.3.3 (2017-03-06) -- "Another Canoe"
+Copyright (C) 2017 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -153,4 +153,4 @@ x            0.017333446 -0.018485362  0.03730402
 > 
 > proc.time()
    user  system elapsed 
-  5.502   0.174   5.662 
+  1.052   0.028   1.076 

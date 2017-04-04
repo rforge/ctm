@@ -1,6 +1,6 @@
 
-R Under development (unstable) (2016-11-08 r71639) -- "Unsuffered Consequences"
-Copyright (C) 2016 The R Foundation for Statistical Computing
+R version 3.3.3 (2017-03-06) -- "Another Canoe"
+Copyright (C) 2017 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -47,17 +47,17 @@ Loading required package: numDeriv
 > v <- vcov(mod)[n, n]
 > coef(cmod) / cf
     horThyes          age menostatPost        tsize     tgrade.L     tgrade.Q 
-   0.9920631    0.9530883    0.9655972    1.0031824    0.9843090    0.9962492 
+   0.9921702    0.9524121    0.9652328    1.0035123    0.9840556    0.9957376 
       pnodes      progrec       estrec 
-   1.0008596    1.0032112    1.0758256 
+   1.0007726    1.0032541    1.0740417 
 > diag(vcov(cmod)) / diag(v)
     horThyes          age menostatPost        tsize     tgrade.L     tgrade.Q 
-   0.9952173    0.9973766    0.9977059    1.0001942    0.9995536    0.9992550 
+   0.9952132    0.9973711    0.9976965    1.0001333    0.9993861    0.9991215 
       pnodes      progrec       estrec 
-   1.0085630    0.9984486    0.9948166 
+   1.0086096    0.9984884    0.9949378 
 > range(vcov(cmod) / v)
-[1] 0.6712894 1.9120349
+[1] 0.6709312 1.9224393
 > 
 > proc.time()
    user  system elapsed 
-  5.637   0.140   5.764 
+  1.204   0.024   1.225 

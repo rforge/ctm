@@ -2,10 +2,10 @@
 \name{NEWS}
 \title{NEWS file for the mlt.docreg package}
 
-\section{Changes in Version 0.1-5 (2017-03-17)}{
+\section{Changes in Version 0.1-5 (2017-04-04)}{
   \itemize{
     \item{Update to \code{mlt} 0.1-3.}
-    \item{Smaller improvements in package vignette.}
+    \item{Improvements in package vignette (mainly thanks to Eva Furrer).}
   }
 }
 

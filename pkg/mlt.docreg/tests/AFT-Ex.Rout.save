@@ -1,6 +1,6 @@
 
-R Under development (unstable) (2016-11-08 r71639) -- "Unsuffered Consequences"
-Copyright (C) 2016 The R Foundation for Statistical Computing
+R version 3.3.3 (2017-03-06) -- "Another Canoe"
+Copyright (C) 2017 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -125,7 +125,7 @@ Loading required package: numDeriv
 > mydata <- data.frame(y = Surv(y, sample(0:1, length(y), replace = TRUE)), g = g)
 > coef(opt <- mlt(m, data = mydata, fixed = c("log(y)" = 1)))
      log(y) (Intercept)          g2          g3 
-  1.0000000  -0.7769336   0.7114732   0.9290106 
+  1.0000000  -0.7769311   0.7114706   0.9290078 
 > 
 > ## Estimate coefficients 
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "expo"))
@@ -142,7 +142,7 @@ Loading required package: numDeriv
 > ## MLT
 > sqrt(diag(vcov(opt)))[c("g2", "g3")]
        g2        g3 
-0.2001603 0.2061228 
+0.2001601 0.2061227 
 > ## Cox
 > sqrt(diag(vcov(cox)))
        g2        g3 
@@ -162,7 +162,7 @@ Loading required package: numDeriv
 > ## Estimate coefficients
 > coef(opt <- mlt(m, data = mydata,  fixed = c("log(y)" = 1)))
      log(y) (Intercept)          g2          g3 
-  1.0000000   0.2539170   0.8049804   1.2275554 
+  1.0000000   0.2539170   0.8049797   1.2275561 
 > 
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "expo"))
 (Intercept)          g2          g3 
@@ -194,7 +194,7 @@ Error in phreg(y ~ g, data = mydata, dist = "weibull", shape = 1) :
 > 
 > coef(opt<- mlt(m, data = mydata, fixed = c("log(y)" = 1)))
      log(y) (Intercept)          g2          g3 
-  1.0000000  -0.4439600   0.8668106   0.9058717 
+  1.0000000  -0.4439599   0.8668105   0.9058714 
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "expo"))
 (Intercept)          g2          g3 
   0.4439603  -0.8668110  -0.9058720 
@@ -309,10 +309,10 @@ log(shape)
 > ## Estimate coefficients
 > (cf <- coef(opt <- mlt(m, data = mydata)))
      log(y) (Intercept)          g2          g3 
-  3.2532118  -0.6681301  -2.2493856  -3.4629079 
+  3.2532110  -0.6681291  -2.2493977  -3.4629504 
 > cf[-1] / cf[1]
 (Intercept)          g2          g3 
- -0.2053755  -0.6914353  -1.0644582 
+ -0.2053753  -0.6914392  -1.0644715 
 > 
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "weibull"))
 (Intercept)          g2          g3 
@@ -331,7 +331,7 @@ log(shape)
 > ## Compare standard errors
 > sqrt(diag(vcov(opt)))[c("g2", "g3")]
        g2        g3 
-0.2330989 0.2783546 
+0.2330995 0.2783563 
 > sqrt(diag(vcov(cox)))
        g2        g3 
 0.2546303 0.3007458 
@@ -354,10 +354,10 @@ log(shape)
 > ## Estimate coefficients
 > (cf <- coef(opt <- mlt(m, data = mydata)))
      log(y) (Intercept)          g2          g3 
-  2.0678545   0.5413121  -1.4971426  -2.4559493 
+  2.0678535   0.5413121  -1.4971422  -2.4559485 
 > cf[-1] / cf[1]
 (Intercept)          g2          g3 
-  0.2617748  -0.7240077  -1.1876800 
+  0.2617749  -0.7240079  -1.1876801 
 > 
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "weibull"))
 (Intercept)          g2          g3 
@@ -378,10 +378,10 @@ log(shape)
 > ## Estimate coefficients
 > (cf <- coef(opt <- mlt(m, data = mydata)))
      log(y) (Intercept)          g2          g3 
-  2.2737704  -0.4741015  -1.3075529  -2.1575728 
+  2.2737651  -0.4740896  -1.3075578  -2.1575689 
 > cf[-1] / cf[1]
 (Intercept)          g2          g3 
- -0.2085090  -0.5750593  -0.9488965 
+ -0.2085042  -0.5750628  -0.9488970 
 > 
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "weibull"))
 (Intercept)          g2          g3 
@@ -396,4 +396,4 @@ log(shape)
 > 
 > proc.time()
    user  system elapsed 
-  9.029   0.226   9.250 
+  2.356   0.036   2.392 
