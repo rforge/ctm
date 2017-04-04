@@ -2,10 +2,11 @@
 \name{NEWS}
 \title{NEWS file for the basefun package}
 
-\section{Changes in Version 0.0-37 (2017-03-24)}{
+\section{Changes in Version 0.0-37 (2017-04-04)}{
   \itemize{
     \item{Deal with integer variables when \code{sumconstr = TRUE}.}
-    \item{Remove unnecessary warning when \code{sumconstr = TRUE} and \code{negative = TRUE}.}
+    \item{Remove unnecessary warning when \code{sumconstr = TRUE} and 
+          \code{negative = TRUE}.}
   }
 }
 
