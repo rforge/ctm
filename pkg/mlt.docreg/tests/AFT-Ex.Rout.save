@@ -1,5 +1,5 @@
 
-R version 3.3.3 (2017-03-06) -- "Another Canoe"
+R version 3.4.0 (2017-04-21) -- "You Stupid Darkness"
 Copyright (C) 2017 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -21,8 +21,6 @@ Loading required package: basefun
 Loading required package: variables
 > library("eha")
 Loading required package: survival
-> library("alabama")
-Loading required package: numDeriv
 > set.seed(29)
 > 
 > ## ************** Exponential - AFT *********************************
@@ -162,7 +160,7 @@ Loading required package: numDeriv
 > ## Estimate coefficients
 > coef(opt <- mlt(m, data = mydata,  fixed = c("log(y)" = 1)))
      log(y) (Intercept)          g2          g3 
-  1.0000000   0.2539170   0.8049797   1.2275561 
+  1.0000000   0.2539173   0.8049793   1.2275557 
 > 
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "expo"))
 (Intercept)          g2          g3 
@@ -194,7 +192,7 @@ Error in phreg(y ~ g, data = mydata, dist = "weibull", shape = 1) :
 > 
 > coef(opt<- mlt(m, data = mydata, fixed = c("log(y)" = 1)))
      log(y) (Intercept)          g2          g3 
-  1.0000000  -0.4439599   0.8668105   0.9058714 
+  1.0000000  -0.4439604   0.8668120   0.9058709 
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "expo"))
 (Intercept)          g2          g3 
   0.4439603  -0.8668110  -0.9058720 
@@ -354,7 +352,7 @@ log(shape)
 > ## Estimate coefficients
 > (cf <- coef(opt <- mlt(m, data = mydata)))
      log(y) (Intercept)          g2          g3 
-  2.0678535   0.5413121  -1.4971422  -2.4559485 
+  2.0678543   0.5413123  -1.4971429  -2.4559495 
 > cf[-1] / cf[1]
 (Intercept)          g2          g3 
   0.2617749  -0.7240079  -1.1876801 
@@ -378,10 +376,10 @@ log(shape)
 > ## Estimate coefficients
 > (cf <- coef(opt <- mlt(m, data = mydata)))
      log(y) (Intercept)          g2          g3 
-  2.2737651  -0.4740896  -1.3075578  -2.1575689 
+  2.2737739  -0.4740909  -1.3075677  -2.1575866 
 > cf[-1] / cf[1]
 (Intercept)          g2          g3 
- -0.2085042  -0.5750628  -0.9488970 
+ -0.2085040  -0.5750649  -0.9489011 
 > 
 > coef(aft <- survreg(y ~ g, data = mydata, dist = "weibull"))
 (Intercept)          g2          g3 
@@ -396,4 +394,4 @@ log(shape)
 > 
 > proc.time()
    user  system elapsed 
-  2.356   0.036   2.392 
+  3.144   0.044   3.183 

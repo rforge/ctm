@@ -2,6 +2,12 @@
 \name{NEWS}
 \title{NEWS file for the mlt package}
 
+\section{Changes in Version 0.1-4 (2017-04-25)}{
+  \itemize{
+    \item{Import package \pkg{alabama}.}
+  }
+}
+
 \section{Changes in Version 0.1-3 (2017-04-04)}{
   \itemize{
     \item{Add \code{subset} argument to \code{update} (for faster transformation 

@@ -1,5 +1,5 @@
 
-R version 3.3.3 (2017-03-06) -- "Another Canoe"
+R version 3.4.0 (2017-04-21) -- "You Stupid Darkness"
 Copyright (C) 2017 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -28,15 +28,6 @@ Henningsen, Arne and Toomet, Ott (2011). maxLik: A package for maximum likelihoo
 
 If you have questions, suggestions, or comments regarding the 'maxLik' package, please use a forum or 'tracker' at maxLik's R-Forge site:
 https://r-forge.r-project.org/projects/maxlik/
-> library("alabama")
-Loading required package: numDeriv
-
-Attaching package: 'numDeriv'
-
-The following object is masked from 'package:maxLik':
-
-    hessian
-
 > 
 > 
 > ## Left-truncated 
@@ -153,4 +144,4 @@ x            0.017333446 -0.018485362  0.03730402
 > 
 > proc.time()
    user  system elapsed 
-  1.052   0.028   1.076 
+  1.888   0.032   1.917 

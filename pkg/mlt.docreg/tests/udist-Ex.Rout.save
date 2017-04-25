@@ -1,5 +1,5 @@
 
-R version 3.3.3 (2017-03-06) -- "Another Canoe"
+R version 3.4.0 (2017-04-21) -- "You Stupid Darkness"
 Copyright (C) 2017 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -22,8 +22,6 @@ Loading required package: variables
 > library("np")
 Nonparametric Kernel Methods for Mixed Datatypes (version 0.60-2)
 [vignette("np_faq",package="np") provides answers to frequently asked questions]
-> library("alabama")
-Loading required package: numDeriv
 > set.seed(29)
 > 
 > ### true dgp
@@ -65,4 +63,4 @@ Loading required package: numDeriv
 > 
 > proc.time()
    user  system elapsed 
-  1.044   0.020   1.087 
+  1.552   0.044   1.594 

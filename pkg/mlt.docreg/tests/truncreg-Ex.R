@@ -1,7 +1,6 @@
 
 library("mlt")
 library("truncreg")
-library("alabama")
 
 
 ## Left-truncated 

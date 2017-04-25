@@ -1,7 +1,6 @@
 
 library("mlt")
 library("np")
-library("alabama")
 set.seed(29)
 
 ### true dgp

@@ -1,7 +1,6 @@
 
 library("mlt")
 library("lattice")
-library("alabama")
 
 data("faithful")
 
