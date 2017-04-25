@@ -1,5 +1,5 @@
 
-R version 3.3.3 (2017-03-06) -- "Another Canoe"
+R version 3.4.0 (2017-04-21) -- "You Stupid Darkness"
 Copyright (C) 2017 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -22,7 +22,7 @@ Type 'q()' to quit R.
 > 
 > sapply(c("mlt", "survival", "eha", "prodlim", "truncreg", "lattice", "gridExtra",
 +          "MASS", "nnet", "HSAUR3", "sandwich", "flexsurv", "grid", "latticeExtra", 
-+          "colorspace", "multcomp", "alabama"), library, char = TRUE)
++          "colorspace", "multcomp"), library, char = TRUE)
 Loading required package: basefun
 Loading required package: variables
 Loading required package: maxLik
@@ -63,14 +63,6 @@ The following object is masked from ‘package:HSAUR3’:
 The following object is masked from ‘package:MASS’:
 
     geyser
-
-Loading required package: numDeriv
-
-Attaching package: ‘numDeriv’
-
-The following object is masked from ‘package:maxLik’:
-
-    hessian
 
 $mlt
  [1] "mlt"       "basefun"   "variables" "stats"     "graphics"  "grDevices"
@@ -165,15 +157,6 @@ $multcomp
 [21] "survival"     "mlt"          "basefun"      "variables"    "stats"       
 [26] "graphics"     "grDevices"    "utils"        "datasets"     "methods"     
 [31] "base"        
-
-$alabama
- [1] "alabama"      "numDeriv"     "multcomp"     "TH.data"      "mvtnorm"     
- [6] "colorspace"   "latticeExtra" "RColorBrewer" "grid"         "flexsurv"    
-[11] "sandwich"     "HSAUR3"       "tools"        "nnet"         "MASS"        
-[16] "gridExtra"    "lattice"      "truncreg"     "maxLik"       "miscTools"   
-[21] "prodlim"      "eha"          "survival"     "mlt"          "basefun"     
-[26] "variables"    "stats"        "graphics"     "grDevices"    "utils"       
-[31] "datasets"     "methods"      "base"        
 
 > 
 > if (!file.exists("analysis/DVC.rda")) {
@@ -1017,7 +1000,7 @@ The following object is masked from 'package:mlt':
 
     coef<-
 
-This is mgcv 1.8-16. For overview type 'help("mgcv-package")'.
+This is mgcv 1.8-17. For overview type 'help("mgcv-package")'.
 
 Attaching package: 'mgcv'
 
@@ -2326,9 +2309,13 @@ R> #sapply(mltobj, function(m) eval(parse(text = paste("checkGH(", m, ")"))))
 R> 
 R> ## ----sessionInfo, echo = FALSE, results = "hide"-------------------------
 R> sessionInfo()
-R version 3.3.3 (2017-03-06)
+R version 3.4.0 (2017-04-21)
 Platform: x86_64-pc-linux-gnu (64-bit)
 Running under: Ubuntu 16.04.2 LTS
+
+Matrix products: default
+BLAS: /usr/local/lib64/R/lib/libRblas.so
+LAPACK: /usr/local/lib64/R/lib/libRlapack.so
 
 locale:
  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
@@ -2343,26 +2330,26 @@ attached base packages:
 [8] methods   base     
 
 other attached packages:
- [1] mgcv_1.8-16         nlme_3.1-128        alabama_2015.3-1   
- [4] numDeriv_2016.8-1   multcomp_1.4-6      TH.data_1.0-8      
- [7] mvtnorm_1.0-6       colorspace_1.3-2    latticeExtra_0.6-28
-[10] RColorBrewer_1.1-2  flexsurv_1.1        sandwich_2.3-4     
-[13] HSAUR3_1.0-6        nnet_7.3-12         MASS_7.3-45        
-[16] gridExtra_2.2.1     lattice_0.20-35     truncreg_0.2-4     
-[19] maxLik_1.3-4        miscTools_0.6-22    prodlim_1.6.1      
-[22] eha_2.4-4           survival_2.41-2     mlt_0.1-3          
-[25] basefun_0.0-37      variables_0.0-30   
+ [1] mgcv_1.8-17         nlme_3.1-131        multcomp_1.4-6     
+ [4] TH.data_1.0-8       mvtnorm_1.0-6       colorspace_1.3-2   
+ [7] latticeExtra_0.6-28 RColorBrewer_1.1-2  flexsurv_1.1       
+[10] sandwich_2.3-4      HSAUR3_1.0-6        nnet_7.3-12        
+[13] MASS_7.3-47         gridExtra_2.2.1     lattice_0.20-35    
+[16] truncreg_0.2-4      maxLik_1.3-4        miscTools_0.6-22   
+[19] prodlim_1.6.1       eha_2.4-4           survival_2.41-3    
+[22] mlt_0.1-4           basefun_0.0-37      variables_0.0-30   
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.8        evaluate_0.10      gtable_0.2.0      
- [4] Matrix_1.2-7.1     polynom_1.3-8      stringr_1.1.0     
- [7] BB_2014.10-1       knitr_1.15.1       deSolve_1.14      
-[10] mstate_0.2.10      orthopolynom_1.0-5 lava_1.4.5        
-[13] magrittr_1.5       codetools_0.2-15   splines_3.3.3     
-[16] quadprog_1.5-5     stringi_1.1.2      muhaz_1.2.6       
-[19] zoo_1.7-13        
+ [1] Rcpp_0.12.10       compiler_3.4.0     evaluate_0.10     
+ [4] gtable_0.2.0       Matrix_1.2-8       polynom_1.3-9     
+ [7] stringr_1.2.0      knitr_1.15.1       BB_2014.10-1      
+[10] deSolve_1.14       mstate_0.2.10      orthopolynom_1.0-5
+[13] lava_1.5           alabama_2015.3-1   magrittr_1.5      
+[16] codetools_0.2-15   splines_3.4.0      numDeriv_2016.8-1 
+[19] quadprog_1.5-5     stringi_1.1.5      muhaz_1.2.6       
+[22] zoo_1.8-0         
 R> 
 R> 
 > proc.time()
    user  system elapsed 
-139.488   2.668 142.182 
+126.704   1.228 127.947 
