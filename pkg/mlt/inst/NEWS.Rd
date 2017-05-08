@@ -5,6 +5,9 @@
 \section{Changes in Version 0.1-4 (2017-04-25)}{
   \itemize{
     \item{Import package \pkg{alabama}.}
+    \item{\code{as.Surv(R(Surv(...)))} returns \code{Surv(...)},
+          useful for converting output by \code{simulate}
+          to \code{Surv} objects.}
   }
 }
 

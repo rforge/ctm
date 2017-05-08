@@ -9,6 +9,6 @@ Description: Likelihood-based estimation of conditional transformation
   Hothorn et al. (2016) <arXiv:1508.06749>.
 Depends: basefun (>= 0.0-37), variables (>= 0.0-30)
 Imports: BB, alabama, stats, quadprog, graphics, methods, grDevices, sandwich,
-  numDeriv
-Suggests: MASS, nnet, TH.data, survival, multcomp
+  numDeriv, survival
+Suggests: MASS, nnet, TH.data, multcomp
 License: GPL-2
