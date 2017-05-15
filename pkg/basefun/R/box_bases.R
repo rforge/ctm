@@ -61,8 +61,10 @@ model.matrix.box_bases <- function(object, data, model.matrix = TRUE,
     })
     if (!model.matrix) return(ret)
     if (attr(object, "sumconstr")) {
-        stopifnot(inherits(object[[2]], "formula_basis"))
+        ### not necessary anymore:
+        ### stopifnot(inherits(object[[2]], "formula_basis"))
         ### stopifnot(intercept(object[[2]]))
+        ###
         ### sum of Bernstein is Bernstein with sum of coefs
         ### make sure that sum is monotone, but not
         ### necessarily all components
