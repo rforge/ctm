@@ -25,11 +25,28 @@ model.matrix.cbind_bases <- function(object, data, model.matrix = TRUE,
 
     if (model.matrix) {
         vn <- unique(unlist(c(variable.names(object))))
+        ### more than one variable
         if (length(vn) > 1) {
+            ### data is a list
             if (!is.data.frame(data)) {
                 data <- data[vn]
-                stopifnot(length(unique(sapply(data, length))) == 1L)
-                data <- as.data.frame(data)
+                ### we have dimensions from elsewhere
+                if (!is.logical(dim)) {
+                    vdim <- dim[vn]
+                    ### if dimenions match newdata 
+                    ### expand
+                    if (isTRUE(all.equal(sapply(data, length), vdim))) {
+                        data <- do.call("expand.grid", data)
+                    } else {
+                    ### it not: cbind
+                        stopifnot(length(unique(sapply(data, length))) == 1L)
+                        data <- as.data.frame(data)
+                    }
+                } else {
+                    ### without dims: cbind
+                    stopifnot(length(unique(sapply(data, length))) == 1L)
+                    data <- as.data.frame(data)
+                }
             }
             stopifnot(is.data.frame(data))
         }

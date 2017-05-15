@@ -92,5 +92,35 @@ stopifnot(all.equal(p3, p4, check.attributes = FALSE))
 ## compute derivative wrt the first element
 dp2 <- predict(bb, newdata = d, coef(m1), deriv = c(x = 1))
 
+### a third variable
+z <- runif(length(x))
+zvar <- numeric_var("z", support = c(0.0, 1.0))
+bz <- as.basis(~ z - 1, data = zvar)
 
-	
+testb <- function(bb) {
+    X1 <- model.matrix(bb, data = data.frame(x = x, g = g, z = z))
+    ## fit model
+    m1 <- lm(y ~  X1 - 1)
+    m2 <- lm(y ~  model.matrix(bb, data.frame(x = x, g = g, z = z)) - 1, 
+             data = data.frame(y = y, x = x, g = g, z = z))
+    stopifnot(all.equal(coef(m1), coef(m2), check.attributes = FALSE))
+    ## compute estimated regression functions
+    d <- mkgrid(bb, n = 100)
+    p2 <- c(predict(bb, newdata = d, coef(m1)))
+    ## brute force; 2 times
+    p3 <- predict(bb, newdata = do.call(expand.grid, d), coef(m1))
+    p4 <- predict(m2, newdata = do.call(expand.grid, d))
+    stopifnot(all.equal(p2, p3, check.attributes = FALSE))
+    stopifnot(all.equal(p3, p4, check.attributes = FALSE))
+    ## compute derivative wrt the first element
+    dp2 <- predict(bb, newdata = d, coef(m1), deriv = c(x = 1))
+}
+
+testb(c(b1 = Bb, b2 = b(b2g = gb, b2z = bz)))
+testb(c(b1 = Bb, b2 = c(b2g = gb, b2z = bz)))
+testb(b(b1 = Bb, b2 = c(b2g = gb, b2z = bz)))
+
+testb(c(b0 = c(b1 = Bb, b2 = b(b2g = gb, b2z = bz))))
+testb(c(b0 = c(b1 = Bb, b2 = c(b2g = gb, b2z = bz))))
+testb(c(b0 = b(b1 = Bb, b2 = c(b2g = gb, b2z = bz))))
+

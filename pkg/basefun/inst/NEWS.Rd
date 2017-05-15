@@ -2,6 +2,15 @@
 \name{NEWS}
 \title{NEWS file for the basefun package}
 
+\section{Changes in Version 0.0-38 (2017-05-15)}{
+  \itemize{
+    \item{\code{model.matrix.cbind_bases} can now deal with 
+          lists as \code{newdata} argument (given appropriate 
+          dimensions in \code{dim}).}
+  }
+}
+
+
 \section{Changes in Version 0.0-37 (2017-04-04)}{
   \itemize{
     \item{Deal with integer variables when \code{sumconstr = TRUE}.}
@@ -9,6 +18,7 @@
           \code{negative = TRUE}.}
   }
 }
+
 
 \section{Changes in Version 0.0-36 (2017-03-01)}{
   \itemize{
