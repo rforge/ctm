@@ -1,4 +1,8 @@
 
+### y | strata ~ x | z
+### cluster: Hessian with cluster weights, sum-up
+### variances
+
 tram <- function(formula, data, subset, weights, offset,
                  order = 1, distribution = c("Normal", "Logistic", "MinExtrVal"),
                  algorithm = c("ML", "boosting", "tree", "forest"), ...) 
