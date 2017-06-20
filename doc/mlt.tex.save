@@ -1,7 +1,7 @@
 
 %\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{mlt}
-%\VignetteDepends{variables, basefun, mlt, survival, eha, prodlim, truncreg, lattice, gridExtra, MASS, nnet, HSAUR3, sandwich, flexsurv, grid, latticeExtra, colorspace, multcomp, mgcv, coxinterval, ICsurv, polspline, logspline, bshazard, gss, MIICD, TransModel, dynsurv, timereg, survivalMPL, np, gamlss, Matrix, muhaz, ICE, ordinal, VGAM, AER, coin, gamlss.data, mlbench, alabama}
+%\VignetteDepends{variables, basefun, mlt, survival, eha, prodlim, truncreg, lattice, gridExtra, MASS, nnet, HSAUR3, sandwich, flexsurv, grid, latticeExtra, colorspace, multcomp, mgcv, coxinterval, ICsurv, polspline, logspline, bshazard, gss, MIICD, TransModel, dynsurv, timereg, survivalMPL, np, gamlss, Matrix, muhaz, ICE, ordinal, VGAM, AER, coin, gamlss.data, mlbench}
 
 \documentclass[article,nojss,shortnames]{jss}\usepackage[]{graphicx}\usepackage[]{color}
 %% maxwidth is the original width if it is less than linewidth
@@ -94,9 +94,9 @@ truncation}
 \begin{document}
 
 
-\footnote{Please cite this document as: Torsten Hothorn (2016)
+\footnote{Please cite this document as: Torsten Hothorn (2017)
 Most Likely Transformations: The \pkg{mlt} Package. 
-R package vignette version 0.1-4, 
+R package vignette version 0.1-5, 
 URL \url{https://CRAN.R-project.org/package=mlt.docreg}.}
 
 % \input{todo}
@@ -212,7 +212,7 @@ of Transformations'' of the first paper on this subject \citep{BoxCox_1964}
 and refer to the methods presented in this paper as \textit{transformation
 analysis}.  We describe how conditional transformation models can be
 specified, fitted by maximising the likelihood \citep[using the estimator
-developed by][]{Hothorn_Moest_Buehlmann_2016} and analysed in \proglang{R}
+developed by][]{Hothorn_Moest_Buehlmann_2017} and analysed in \proglang{R}
 using the \pkg{mlt} add-on package \citep{pkg:mlt}.  In essence, the package
 is built around two important functions.  \cmd{ctm} specifies transformation
 models based on basis functions implemented in the \pkg{basefun} package
@@ -1977,7 +1977,7 @@ cover storey in the center panel).
 
 In this Section we review the underpinnings of the \cmd{mlt} function 
 implementing the \emph{most likely transformation} estimator. Most of the material in this section
-originates from \cite{Hothorn_Moest_Buehlmann_2016}.
+originates from \cite{Hothorn_Moest_Buehlmann_2017}.
 For a given transformation function $h$, the likelihood contribution of a
 datum $\esAY = (\ubar{\ry},\bar{\ry}] \in \sAY$ is defined in terms of the
 distribution function \citep{Lindsey_1996}: 

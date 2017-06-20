@@ -2,9 +2,11 @@
 \name{NEWS}
 \title{NEWS file for the mlt.docreg package}
 
-\section{Changes in Version 0.1-6 (2017-04-25)}{
+\section{Changes in Version 0.2-0 (2017-06-20)}{
   \itemize{
-    \item{Update to \code{mlt} 0.1-4.}
+    \item{Most Likely Transformations will be published in
+          the Scandinavian Journal of Statistics.}
+    \item{Update to \code{mlt} 0.2-0.}
     \item{Remove \pkg{alabama} from Suggests as it is imported by
           \pkg{mlt} now.}
   }

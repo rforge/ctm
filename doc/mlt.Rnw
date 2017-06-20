@@ -242,7 +242,7 @@ of Transformations'' of the first paper on this subject \citep{BoxCox_1964}
 and refer to the methods presented in this paper as \textit{transformation
 analysis}.  We describe how conditional transformation models can be
 specified, fitted by maximising the likelihood \citep[using the estimator
-developed by][]{Hothorn_Moest_Buehlmann_2016} and analysed in \proglang{R}
+developed by][]{Hothorn_Moest_Buehlmann_2017} and analysed in \proglang{R}
 using the \pkg{mlt} add-on package \citep{pkg:mlt}.  In essence, the package
 is built around two important functions.  \cmd{ctm} specifies transformation
 models based on basis functions implemented in the \pkg{basefun} package
@@ -1725,7 +1725,7 @@ abline(h = 1, lty = 6)
 
 In this Section we review the underpinnings of the \cmd{mlt} function 
 implementing the \emph{most likely transformation} estimator. Most of the material in this section
-originates from \cite{Hothorn_Moest_Buehlmann_2016}.
+originates from \cite{Hothorn_Moest_Buehlmann_2017}.
 For a given transformation function $h$, the likelihood contribution of a
 datum $\esAY = (\ubar{\ry},\bar{\ry}] \in \sAY$ is defined in terms of the
 distribution function \citep{Lindsey_1996}: 

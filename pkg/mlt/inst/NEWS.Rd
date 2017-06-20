@@ -2,8 +2,10 @@
 \name{NEWS}
 \title{NEWS file for the mlt package}
 
-\section{Changes in Version 0.1-4 (2017-04-25)}{
+\section{Changes in Version 0.2-0 (2017-06-20)}{
   \itemize{
+    \item{Most Likely Transformations will be published in
+          the Scandinavian Journal of Statistics.}
     \item{Import package \pkg{alabama}.}
     \item{\code{as.Surv(R(Surv(...)))} returns \code{Surv(...)},
           useful for converting output by \code{simulate}

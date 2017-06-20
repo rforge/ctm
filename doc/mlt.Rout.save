@@ -2337,7 +2337,7 @@ other attached packages:
 [13] MASS_7.3-47         gridExtra_2.2.1     lattice_0.20-35    
 [16] truncreg_0.2-4      maxLik_1.3-4        miscTools_0.6-22   
 [19] prodlim_1.6.1       eha_2.4-4           survival_2.41-3    
-[22] mlt_0.1-4           basefun_0.0-37      variables_0.0-30   
+[22] mlt_0.2-0           basefun_0.0-38      variables_0.0-30   
 
 loaded via a namespace (and not attached):
  [1] Rcpp_0.12.10       compiler_3.4.0     evaluate_0.10     
@@ -2352,4 +2352,4 @@ R>
 R> 
 > proc.time()
    user  system elapsed 
-126.704   1.228 127.947 
+186.880   2.336 189.392 
