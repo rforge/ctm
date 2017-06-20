@@ -2024,25 +2024,22 @@ q <- cb_w[, "q"]
 lwr <- cb_w[, "lwr"]
 upr <-  cb_w[, "upr"]
 polygon(c(q, rev(q)), c(lwr, rev(upr)),
-        border = NA, col = rgb(.1, .1, .1, .1))
+        border = NA, col = "lightblue") ### rgb(.1, .1, .1, .1))
 
-#lines(cb_w[, "q"], cb_w[, "lwr"])
-#lines(cb_w[, "q"], cb_w[, "upr"])
+lines(cb_w[, "q"], cb_w[, "Estimate"])
 rug(geyser$waiting, col = rgb(.1, .1, .1, .1))
-plot(ecdf(geyser$waiting), col = "grey", xlab = "Waiting times", ylab = "Distribution", 
-     main = "", cex = .5)
-lines(cb_w[, "q"], pnorm(cb_w[, "Estimate"]))
-
+plot(cb_w[, "q"], pnorm(cb_w[, "Estimate"]), xlab = "Waiting times", ylab = "Distribution", 
+     main = "", cex = .5, type = "n")
 polygon(c(q, rev(q)), c(pnorm(lwr), rev(pnorm(upr))),                                     
-        border = NA, col = rgb(.1, .1, .1, .1))
+        border = NA, col = "lightblue") ### rgb(.1, .1, .1, .1))
+lines(cb_w[, "q"], pnorm(cb_w[, "Estimate"]))
 
 # lines(cb_w[, "q"], pnorm(cb_w[, "lwr"]))
 # lines(cb_w[, "q"], pnorm(cb_w[, "upr"]))
 rug(geyser$waiting, col = rgb(.1, .1, .1, .1))
 @
 \caption{Old Faithful Geyser. Estimated transformation (left)
-         and distribution function (right, also featuring the empirical
-         cumulative distribution function) with confidence bands.
+         and distribution function (right) with asymptotic confidence bands.
          \label{fig:geyser-w-cbplot}}
 \end{center}
 \end{figure}
