@@ -476,8 +476,9 @@ R> for (i in 1:ncol(CF)) {
 R> # text(20, coef(coxph_GBSG2_1) + .1, names(coef(coxph_GBSG2_1)))
 R> 
 R> ## ----GBSG2-1-fss, cache = TRUE-------------------------------------------
+R> kn <- log(support(GBSG2y)$y)
 R> fss_GBSG2_1 <- flexsurvspline(fm_GBSG2, data = GBSG2, scale = "hazard", 
-+                                k = 9, bknots = log(support(GBSG2y)$y))
++                                k = 9, bknots = kn)
 R> logLik(fss_GBSG2_1)
 'log Lik.' -2555.856 (df=20)
 R> logLik(mlt_GBSG2_1)
@@ -1178,7 +1179,7 @@ R> cftest(fss_GBSG2_1, parm = names(cf))
 
 	 Simultaneous Tests for General Linear Hypotheses
 
-Fit: flexsurvspline(formula = fm_GBSG2, data = GBSG2, k = 9, bknots = log(support(GBSG2y)$y), 
+Fit: flexsurvspline(formula = fm_GBSG2, data = GBSG2, k = 9, bknots = kn, 
     scale = "hazard")
 
 Linear Hypotheses:
@@ -2347,4 +2348,4 @@ R>
 R> 
 > proc.time()
    user  system elapsed 
-130.840   2.084 132.975 
+135.100   2.332 137.627 
