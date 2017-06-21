@@ -323,8 +323,7 @@ R> B_dvc <- Bernstein_basis(var_dvc, order = 6, ui = "increasing")
 R> dvc_mlt <- mlt(ctm(B_dvc), data = data.frame(dvc = dvc))
 R> 
 R> ## ----dvc-predict---------------------------------------------------------
-R> range(q <- support(var_dvc)[[1]])
-[1] 135 693
+R> q <- support(var_dvc)[[1]]
 R> p <- predict(dvc_mlt, newdata = data.frame(1), q = q,
 +               type = "distribution")
 R> 
@@ -397,7 +396,7 @@ pnodes        0.0487818043  0.048761983
 progrec      -0.0022174942 -0.002210539
 estrec        0.0001978178  0.000182990
 R> 
-R> ## ----GBSG2-coxph_mlt, echo = FALSE, results = "hide", fig.width = 9, fig.height = 5, cache = TRUE----
+R> ## ----GBSG2-coxph_mlt, echo = FALSE, results = "hide", cache = TRUE-------
 R> ndtmp <- as.data.frame(mkgrid(GBSG2y, 100))
 R> 
 R> ord <- c(1:30, 35, 40, 45, 50)
@@ -741,7 +740,8 @@ R> logLik(mlt_CHFLS_5)
 'log Lik.' -1192.226 (df=15)
 R> 
 R> ## ----CHFLS-6, cache = TRUE-----------------------------------------------
-R> b_R <- as.basis(~ R_age + R_income, data = CHFLS, remove_intercept = TRUE, scale = TRUE)
+R> b_R <- as.basis(~ R_age + R_income, data = CHFLS, remove_intercept = TRUE, 
++                  scale = TRUE)
 R> ctm_CHFLS_6 <- ctm(b_happy, interacting = b_R, todist = "Logistic")  
 R> mlt_CHFLS_6 <- mlt(ctm_CHFLS_6, data = CHFLS, scale = TRUE)
 R> logLik(mlt_CHFLS_6)
@@ -811,7 +811,6 @@ R> ## ----GBSG2-7-------------------------------------------------------------
 R> b_horTh <- as.basis(~ horTh, data = GBSG2)
 R> ctm_GBSG2_7 <- ctm(B_GBSG2y, interacting = b_horTh, 
 +                     todistr = "MinExtrVal")
-R> ### check sum constraint
 R> nd <- data.frame(y = GBSG2$time[1:2], horTh = unique(GBSG2$horTh))
 R> attr(model.matrix(ctm_GBSG2_7, data = nd), "constraint")
 $ui
@@ -962,7 +961,7 @@ R> logLik(mlt_BHi2)
 R> AIC(mlt_BHi2)
 [1] 2744.736
 R> 
-R> ## ----Boston-Housing-dr-plot, echo = FALSE--------------------------------
+R> ## ----Boston-Housing-dr-plot, echo = FALSE, fig.height = 3----------------
 R> q <- mkgrid(var_m, 100)[[1]]
 R> tr <- predict(mlt_BH, newdata = BostonHousing2[, all.vars(fm_BH[-2L])],
 +                q = q, type = "density")
@@ -1213,17 +1212,15 @@ R> q <- cb_w[, "q"]
 R> lwr <- cb_w[, "lwr"]
 R> upr <-  cb_w[, "upr"]
 R> polygon(c(q, rev(q)), c(lwr, rev(upr)),
-+          border = NA, col = rgb(.1, .1, .1, .1))
++          border = NA, col = "lightblue") ### rgb(.1, .1, .1, .1))
 R> 
-R> #lines(cb_w[, "q"], cb_w[, "lwr"])
-R> #lines(cb_w[, "q"], cb_w[, "upr"])
+R> lines(cb_w[, "q"], cb_w[, "Estimate"])
 R> rug(geyser$waiting, col = rgb(.1, .1, .1, .1))
-R> plot(ecdf(geyser$waiting), col = "grey", xlab = "Waiting times", ylab = "Distribution", 
-+       main = "", cex = .5)
-R> lines(cb_w[, "q"], pnorm(cb_w[, "Estimate"]))
-R> 
+R> plot(cb_w[, "q"], pnorm(cb_w[, "Estimate"]), xlab = "Waiting times", ylab = "Distribution", 
++       main = "", cex = .5, type = "n")
 R> polygon(c(q, rev(q)), c(pnorm(lwr), rev(pnorm(upr))),                                     
-+          border = NA, col = rgb(.1, .1, .1, .1))
++          border = NA, col = "lightblue") ### rgb(.1, .1, .1, .1))
+R> lines(cb_w[, "q"], pnorm(cb_w[, "Estimate"]))
 R> 
 R> # lines(cb_w[, "q"], pnorm(cb_w[, "lwr"]))
 R> # lines(cb_w[, "q"], pnorm(cb_w[, "upr"]))
@@ -1254,7 +1251,7 @@ R> tpdens <- pdens[i]
 R> layout(matrix(1:2, ncol = 2))
 R> plot(q, tpdist[[1]], type = "n", xlab = "Waiting times", ylab = "Distribution")
 R> polygon(c(q, rev(q)), c(pnorm(lwr), rev(pnorm(upr))),
-+          border = NA, col = "greenyellow")
++          border = NA, col = "lightblue")
 R> tmp <- sapply(tpdist, function(x) lines(q, x, col = rgb(.1, .1, .1, .1)))
 R> plot(q, tpdens[[1]], type = "n", ylim = range(unlist(pdens)),
 +       xlab = "Waiting times", ylab = "Density")
@@ -1463,7 +1460,6 @@ R>
 R> ## ----basefun-polynom-----------------------------------------------------
 R> xvar <- numeric_var("x", support = c(0.1, pi), bounds= c(0, Inf))
 R> x <- as.data.frame(mkgrid(xvar, n = 20))
-R> ### set-up basis of order 3 ommiting the quadratic term
 R> class(pb <- polynomial_basis(xvar, coef = c(TRUE, TRUE, FALSE, TRUE)))
 [1] "polynomial_basis" "basis"            "function"        
 R> 
@@ -1488,19 +1484,18 @@ R> head(model.matrix(pb, data = x))
 [6,]           1 0.8267349   0 0.565065547
 R> 
 R> ## ----basefun-polynom-pred------------------------------------------------
-R> ### evaluate polynomial defined by basis and coefficients
 R> predict(pb, newdata = x, coef = c(1, 2, 0, 1.75))
  [1]  1.000000  1.338605  1.724675  2.205677  2.829075  3.642335  4.692922
  [8]  6.028303  7.695942  9.743305 12.217857 15.167065 18.638393 22.679308
 [15] 27.337274 32.659757 38.694222 45.488136 53.088963 61.544169
-R> ### evaluate 1st derivative
+R> 
+R> ## ----basefun-polynom-pred-deriv------------------------------------------
 R> predict(pb, newdata = x, coef = c(1, 2, 0, 1.75), deriv = c(x = 1L))
  [1]  2.000000  2.143533  2.574132  3.291797  4.296528  5.588326  7.167189
  [8]  9.033118 11.186114 13.626175 16.353303 19.367496 22.668756 26.257082
 [15] 30.132473 34.294931 38.744455 43.481045 48.504701 53.815423
 R> 
 R> ## ----basefun-log---------------------------------------------------------
-R> ### set-up log-basis with intercept for positive variable
 R> class(lb <- log_basis(xvar, ui = "increasing"))
 [1] "log_basis" "basis"     "function" 
 R> head(X <- model.matrix(lb, data = x))
@@ -2352,4 +2347,4 @@ R>
 R> 
 > proc.time()
    user  system elapsed 
-186.880   2.336 189.392 
+130.840   2.084 132.975 

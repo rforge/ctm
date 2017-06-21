@@ -96,7 +96,7 @@ truncation}
 
 \footnote{Please cite this document as: Torsten Hothorn (2017)
 Most Likely Transformations: The \pkg{mlt} Package. 
-R package vignette version 0.1-5, 
+R package vignette version 0.2-0, 
 URL \url{https://CRAN.R-project.org/package=mlt.docreg}.}
 
 % \input{todo}
@@ -665,12 +665,7 @@ The discrete distribution function (evaluated for all integers between
 $135$ and $693$) 
 \begin{Schunk}
 \begin{Sinput}
-R> range(q <- support(var_dvc)[[1]])
-\end{Sinput}
-\begin{Soutput}
-[1] 135 693
-\end{Soutput}
-\begin{Sinput}
+R> q <- support(var_dvc)[[1]]
 R> p <- predict(dvc_mlt, newdata = data.frame(1), q = q,
 +               type = "distribution")
 \end{Sinput}
@@ -708,8 +703,6 @@ but in probabilities $\pY(\ry_k)$ for some grid $\ry_1, \dots, \ry_K$ only. The 
 basis function $\h(\ry_k) = \evec_{K - 1}(k)^\top \parm = \eparm_k$ can be used in this
 case. For model estimation, only the discretised observations 
 $\ry \in (\ry_{k - 1}, \ry_k]$ enter the likelihood.
-
-\pagebreak
 
 \subsection{Linear Transformation Models} \label{subsec:ltm}
 
@@ -1315,8 +1308,7 @@ constraints for $\basisy$ multiplied by the number of strata.
 estimate the distribution of happiness given health without taking any other
 explanatory variables into account, \ie by treating health as a stratum variable 
 (with dummy coding) but
-without any regression coefficients $\shiftparm$ in the model (\code{gtol = 1e-3} relaxes
-the gradient convergence criterion in \cmd{spg} to speed-up the computations)
+without any regression coefficients $\shiftparm$ in the model 
 \begin{Schunk}
 \begin{Sinput}
 R> b_health <- as.basis(~ R_health - 1, data = CHFLS)
@@ -1499,7 +1491,8 @@ category \code{Poor}. In a second step, we fit a non-proportional odds model whe
 effects of age and income are allowed to vary with happiness
 \begin{Schunk}
 \begin{Sinput}
-R> b_R <- as.basis(~ R_age + R_income, data = CHFLS, remove_intercept = TRUE, scale = TRUE)
+R> b_R <- as.basis(~ R_age + R_income, data = CHFLS, remove_intercept = TRUE, 
++                  scale = TRUE)
 R> ctm_CHFLS_6 <- ctm(b_happy, interacting = b_R, todist = "Logistic")  
 R> mlt_CHFLS_6 <- mlt(ctm_CHFLS_6, data = CHFLS, scale = TRUE)
 R> logLik(mlt_CHFLS_6)
@@ -1641,7 +1634,6 @@ treatment effect computed under the proportional hazards assumption.
 R> b_horTh <- as.basis(~ horTh, data = GBSG2)
 R> ctm_GBSG2_7 <- ctm(B_GBSG2y, interacting = b_horTh, 
 +                     todistr = "MinExtrVal")
-R> ### check sum constraint
 R> nd <- data.frame(y = GBSG2$time[1:2], horTh = unique(GBSG2$horTh))
 R> attr(model.matrix(ctm_GBSG2_7, data = nd), "constraint")
 \end{Sinput}
@@ -2108,8 +2100,10 @@ For a truncated observation, the score function is $\s(\parm \mid \rY \in
 %has to be added to the score contribution $\s(\parm \mid \rY \in (\ubar{\ry},
 %\bar{\ry}])$.
 
-The \cmd{mlt} function uses the convenience interface \cmd{BB} to the spectral
-projected gradient method implemented in the \code{spg()} function of
+The \cmd{mlt} function uses the convenience interfaces 
+\cmd{auglag} for augmented Lagrangian minimization 
+\citep[package \pkg{alabama}]{pkg:alabama} and 
+\cmd{BB} for spectral projected gradients implemented in the \code{spg()} function of
 package \pkg{BB} \citep{Varadhan_Gilbert_2009, pkg:BB} for maximising this
 log-likelihood.  Starting values are obtained from an estimate of the
 unconditional distribution function $\Prob(\rY \le \ry)$ (for example, the
@@ -2407,8 +2401,7 @@ transformation and distribution function.
 
 \end{Schunk}
 \caption{Old Faithful Geyser. Estimated transformation (left)
-         and distribution function (right, also featuring the empirical
-         cumulative distribution function) with confidence bands.
+         and distribution function (right) with asymptotic confidence bands.
          \label{fig:geyser-w-cbplot}}
 \end{center}
 \end{figure}
@@ -2487,7 +2480,7 @@ $\hat{\Prob}_{\rY \mid \rX = \rx_i}, i = 1, \dots, N$ are drawn by \cmd{simulate
 }
 
 \end{Schunk}
-\caption{Old Faithful Geyser. Model-based bootstrap for distribution (left, the green area depicts the
+\caption{Old Faithful Geyser. Model-based bootstrap for distribution (left, the blue area depicts the
          asymptotic confidence band from Figure~\ref{fig:geyser-w-cbplot}) and density (right) function for 
          the unconditional transformation model parameterised in terms of a Bernstein polynomials
          of order $8$. \label{geyser-w-simulate-plot}}
@@ -3024,11 +3017,11 @@ can set-up some of these basis functions in the following sections.
 For some positive continuous variable $x$ we want to deal with the polynomial
 $\alpha + \beta_1 x + \beta_3 x^3$ and first set-up a variable description
 (see Appendix~\ref{app:variables}) and the basis function
+(we set-up a basis of order three ommiting the quadratic term)
 \begin{Schunk}
 \begin{Sinput}
 R> xvar <- numeric_var("x", support = c(0.1, pi), bounds= c(0, Inf))
 R> x <- as.data.frame(mkgrid(xvar, n = 20))
-R> ### set-up basis of order 3 ommiting the quadratic term
 R> class(pb <- polynomial_basis(xvar, coef = c(TRUE, TRUE, FALSE, TRUE)))
 \end{Sinput}
 \begin{Soutput}
@@ -3067,10 +3060,9 @@ R> head(model.matrix(pb, data = x))
 \end{Soutput}
 \end{Schunk}
 Evaluating the polynomial for some coefficients is done by the
-\cmd{predict} method, which also allows derivatives to be computed
+\cmd{predict} method
 \begin{Schunk}
 \begin{Sinput}
-R> ### evaluate polynomial defined by basis and coefficients
 R> predict(pb, newdata = x, coef = c(1, 2, 0, 1.75))
 \end{Sinput}
 \begin{Soutput}
@@ -3078,8 +3070,10 @@ R> predict(pb, newdata = x, coef = c(1, 2, 0, 1.75))
  [8]  6.028303  7.695942  9.743305 12.217857 15.167065 18.638393 22.679308
 [15] 27.337274 32.659757 38.694222 45.488136 53.088963 61.544169
 \end{Soutput}
+\end{Schunk}
+which also allows derivatives to be computed
+\begin{Schunk}
 \begin{Sinput}
-R> ### evaluate 1st derivative
 R> predict(pb, newdata = x, coef = c(1, 2, 0, 1.75), deriv = c(x = 1L))
 \end{Sinput}
 \begin{Soutput}
@@ -3095,7 +3089,6 @@ The monotone increasing logarithmic basis $\eparm_1 + \eparm_2 \log(x)$ being
 subject to $\eparm_2 > 0$ is defined as
 \begin{Schunk}
 \begin{Sinput}
-R> ### set-up log-basis with intercept for positive variable
 R> class(lb <- log_basis(xvar, ui = "increasing"))
 \end{Sinput}
 \begin{Soutput}
