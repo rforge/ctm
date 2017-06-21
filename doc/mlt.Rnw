@@ -847,8 +847,9 @@ A comparison with the \cite{Royston_Parmar_2002} spline model as implemented in 
 \pkg{flexsurv} package \citep{pkg:flexsurv} shows that the two spline parameterisations
 of the log cumulative hazard function $\h_\rY$ are practically equivalent (see Figure~\ref{GBSG2-1-fss-plot} also)
 <<GBSG2-1-fss, cache = TRUE>>=
+kn <- log(support(GBSG2y)$y)
 fss_GBSG2_1 <- flexsurvspline(fm_GBSG2, data = GBSG2, scale = "hazard", 
-                              k = 9, bknots = log(support(GBSG2y)$y))
+                              k = 9, bknots = kn)
 logLik(fss_GBSG2_1)
 logLik(mlt_GBSG2_1)
 cf <- coef(coxph_GBSG2_1)

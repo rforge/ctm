@@ -918,8 +918,9 @@ A comparison with the \cite{Royston_Parmar_2002} spline model as implemented in 
 of the log cumulative hazard function $\h_\rY$ are practically equivalent (see Figure~\ref{GBSG2-1-fss-plot} also)
 \begin{Schunk}
 \begin{Sinput}
+R> kn <- log(support(GBSG2y)$y)
 R> fss_GBSG2_1 <- flexsurvspline(fm_GBSG2, data = GBSG2, scale = "hazard", 
-+                                k = 9, bknots = log(support(GBSG2y)$y))
++                                k = 9, bknots = kn)
 R> logLik(fss_GBSG2_1)
 \end{Sinput}
 \begin{Soutput}
@@ -2351,7 +2352,7 @@ R> cftest(fss_GBSG2_1, parm = names(cf))
 
 	 Simultaneous Tests for General Linear Hypotheses
 
-Fit: flexsurvspline(formula = fm_GBSG2, data = GBSG2, k = 9, bknots = log(support(GBSG2y)$y), 
+Fit: flexsurvspline(formula = fm_GBSG2, data = GBSG2, k = 9, bknots = kn, 
     scale = "hazard")
 
 Linear Hypotheses:
