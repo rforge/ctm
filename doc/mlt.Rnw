@@ -81,26 +81,23 @@ options(width = 75)
 \Plaintitle{Most Likely Transformations: The mlt Package}
 \Shorttitle{The \pkg{mlt} Package}
 
-\Abstract{
-The \pkg{mlt} package implements maximum likelihood estimation in the class
-of conditional transformation models.  Based on a suitable explicit
-parameterisation of the unconditional or conditional transformation function
-using infrastructure from package \pkg{basefun}, we show how one can define, 
-estimate and compare 
-a cascade of increasingly complex transformation models 
-in the maximum likelihood framework. 
-Models for the unconditional or conditional distribution function of any
-univariate response variable are set-up and estimated in the same
-computational framework simply by choosing an appropriate transformation
-function and parameterisation thereof.  As it is computationally cheap to
-evaluate the distribution function, models can be estimated by maximisation
-of the exact likelihood, especially in the presence of random censoring or
-truncation. The relatively dense high-level implementation in the \proglang{R}
-system for statistical computing allows generalisation of many established
-implementations of linear transformation models, such as the Cox model or other
-parametric models for the analysis of survival or ordered categorical data,
-to the more complex situations illustrated in this paper.
-}
+\Abstract{ The \pkg{mlt} package implements maximum likelihood estimation in
+the class of conditional transformation models.  Based on a suitable
+explicit parameterisation of the unconditional or conditional transformation
+function using infrastructure from package \pkg{basefun}, we show how one
+can define, estimate, and compare a cascade of increasingly complex
+transformation models in the maximum likelihood framework.  Models for the
+unconditional or conditional distribution function of any univariate
+response variable are set-up and estimated in the same computational
+framework simply by choosing an appropriate transformation function and
+parameterisation thereof.  As it is computationally cheap to evaluate the
+distribution function, models can be estimated by maximisation of the exact
+likelihood, especially in the presence of random censoring or truncation. 
+The relatively dense high-level implementation in the \proglang{R} system
+for statistical computing allows generalisation of many established
+implementations of linear transformation models, such as the Cox model or
+other parametric models for the analysis of survival or ordered categorical
+data, to the more complex situations illustrated in this paper.  }
 
 \Keywords{transformation model, transformation analysis, distribution regression, conditional
 distribution function, conditional quantile function, censoring,
@@ -139,7 +136,7 @@ computationally inaccessible concept often vanished from the collective
 consciousness of our profession and the approximation was taught and
 understood as the real thing.  Least squares regression emerged from
 Gau{\ss}' computational trick of changing Bo\v{s}covi{\'c}' absolute to squared
-error and it took more than 200 years for the original, and in many aspects
+error and it took $200$ years for the original, and in many aspects
 advantageous, concept to surface again under the name ``quantile
 regression''.  This most prominent example of an idea got lost illustrates
 the impact computable approximations had and still have on our understanding
@@ -215,8 +212,9 @@ $\h_\rY$ we get
 which is the continuous proportional hazards, or Cox, model (typically
 defined with a positive shift term).  From this point of view, the linear
 and the Cox model are two instances of so-called linear transformation
-models (a misleading name, because the transformation $\h_\rY$ is non-linear
-in the latter case and only the shift $\tilde{\rx}^\top \tilde{\shiftparm}$
+models (a misleading name, because the transformation $\h_\rY$ of the
+response $\rY$ is non-linear
+in the latter case and only the shift term $\tilde{\rx}^\top \tilde{\shiftparm}$
 is linear in $\tilde{\rx}$).  It is now also obvious that the Cox model has
 nothing to do with censoring, let alone survival times $\rY > 0$.  It is a
 model for the conditional distribution of a continuous response $\rY \in
@@ -224,13 +222,13 @@ model for the conditional distribution of a continuous response $\rY \in
 is scaled by $\exp(\tilde{\rx}^\top \tilde{\shiftparm})$.  For both the
 linear and the Cox model, application of the exact likelihood allows the
 models to be fitted to imprecise, or ``censored'', observations
-$(\ubar{\ry}, \bar{\ry}]$. The generality of the class of linear transformation
+$(\ubar{\ry}, \bar{\ry}] \in \RR$. The generality of the class of linear transformation
 models comes from the ability to change $\pZ$ and $\h_\rY$ in this flexible
 class of models.
 
 The class of linear transformation models is a subclass of conditional
 transformation models \citep{Hothorn_Kneib_Buehlmann_2014}.  In this latter
-class, the conditional distribution function is
+class, the conditional distribution function is modelled by
 \begin{eqnarray*}
 \Prob(\rY \le \ry \mid \rX = \rx) = \pZ(\h(\ry \mid \rx))
 \end{eqnarray*}
@@ -248,7 +246,7 @@ is built around two important functions.  \cmd{ctm} specifies transformation
 models based on basis functions implemented in the \pkg{basefun} package
 \citep{pkg:basefun} for variable descriptions from the \pkg{variables}
 package \citep{pkg:variables}.  These models are then fitted to data by
-\cmd{mlt}.  This function maximises the log-likelihood function using the
+\cmd{mlt}.  This function maximises the exact or approximate log-likelihood function using the
 \cmd{auglag} and \cmd{spg} optimisers from packages \pkg{alabama}
 \citep{pkg:alabama} and \pkg{BB} \citep{Varadhan_Gilbert_2009,pkg:BB},
 respectively. Before we start looking at details, we illustrate the workflow by means of
@@ -269,8 +267,10 @@ time, the observations were either left-censored (``short'' eruption),
 interval-censored (``medium'' eruption) or right-censored (``long''
 eruption) as explained by \cite{Azzalini_Bowman_1990}.  This fact was widely
 ignored in analyses of the Old Faithful data because most non-parametric
-density estimators cannot deal with censoring. We fit the parameters
-$\parm$ in the transformation model
+density estimators cannot deal with censoring. The key issue is the
+representation of the unknown transformation function by $\h(\ry) =
+\basisy(\ry)^\top \parm$ based on suitable basis functions $\basisy$ and
+parameters $\parm$. We fit these parameters $\parm$ in the transformation model
 \begin{eqnarray*}
 \Prob(\rY \le \ry) = \Phi(\h(\ry)) = \Phi(\basisy(\ry)^\top \parm)
 \end{eqnarray*}
@@ -322,7 +322,7 @@ logLik(mlt_d)
 @
 The model is best visualised in terms of the corresponding density
 $\phi(\basisy(\ry)^\top \hat{\parm}_N) \basisy^\prime(\ry)^\top \hat{\parm}_N$,
-the density can be extracted from the fitted model using
+which can be extracted from the fitted model using
 <<geyser-density, echo = TRUE>>=
 nd_d$d <- predict(mlt_d, newdata = nd_d, type = "density")
 @
@@ -331,10 +331,11 @@ shows the well-known bimodal distribution in a nice smooth way.  Several
 things are quite unusual in this short example.  First, the model was
 specified using \cmd{ctm} without reference to the actual observations, and
 second, although the model is fully parametric, the resulting density
-resembles the flexibility of a non-parametric approach (details in
+resembles the flexibility of a non-parametric density estimate (details in
 Section~\ref{sec:trafo}).  Third, the exact likelihood, as defined by the
 interval-censored observations, was used to obtain the model
-(Section~\ref{sec:mlt}).  Fourth, inspection of the parameter estimates is
+(Section~\ref{sec:mlt}).  Fourth, inspection of the parameter estimates
+$\hat{\parm}_N$ is
 uninteresting, the model is better looked at by means of the estimated
 distribution, density, quantile, hazard or cumulative hazard functions
 (Section~\ref{sec:predict}).  Fifth, no regularisation is necessary due to
@@ -351,7 +352,7 @@ conditional case, \ie to regression models?''.  The answer to this question
 is ``yes!'' and the rest of this paper describes the details following the
 workflow sketched in this section.  Technical issues about the three
 packages \pkg{variables}, \pkg{basefun} and \pkg{mlt} involved are explained
-in Appendices~\ref{app:variables}, \ref{app:basefun} and \ref{app:mlt}.
+in Appendices~\ref{app:variables}, \ref{app:basefun}, and \ref{app:mlt}.
 
 
 \begin{figure}
@@ -361,7 +362,7 @@ plot(d ~ duration, data = nd_d, type = "l", ylab = "Density", xlab = "Duration t
 @
 \caption{Old Faithful Geyser. Estimated density for duration time obtained from
          an unconditional transformation model where the transformation function
-         was parameterised as a Bernstein polynomial. The plot reproduces
+         was parameterised as a Bernstein polynomial of order eight. The plot reproduces
          Figure~1 (right panel) in \cite{Hothorn_Moest_Buehlmann_2016}. \label{fig:geyser-plot}}
 \end{center}
 \end{figure}
@@ -370,14 +371,15 @@ plot(d ~ duration, data = nd_d, type = "l", ylab = "Density", xlab = "Duration t
  
 \section{Specifying Transformation Models} \label{sec:trafo}
 
-In this section we introduce a cascade of increasingly complex
-transformation models and discuss how one can specify such models using the
+In this section we review a cascade of increasingly complex
+transformation models following \cite{Hothorn_Moest_Buehlmann_2017}
+and discuss how one can specify such models using the
 \cmd{ctm} function provided by the \pkg{mlt} package.  The models are fitted
 via maximum likelihood by the \cmd{mlt} function (details are given in
 Section~\ref{sec:mlt}) to studies from different domains.  Results obtained
 from established implementations of the corresponding models in the
 \proglang{R} universe are used to evaluate the implementation in package
-\pkg{mlt} whenever possible.  We start with the simplest case of models for
+\pkg{mlt} whereever possible.  We start with the simplest case of models for
 unconditional distribution functions.
 
 \subsection{Unconditional Transformation Models} \label{subsec:uncond}
@@ -471,14 +473,14 @@ logLik(mlt_CHFLS_1)
 cbind(polr = polr_CHFLS_1$zeta, mlt = coef(mlt_CHFLS_1))
 @
 Of course, the above exercise is an extremely cumbersome way
-of estimating a discrete density whose maximum likelihood estimator
-simply is the relative frequency but, as we will see in the rest of this paper, a generalisation
+of estimating a discrete density whose maximum likelihood estimator is
+a simple proportion but, as we will see in the rest of this paper, a generalisation
 to the conditional case strongly relies on this parameterisation
 <<CHFLS-1-pred>>=
-predict(polr_CHFLS_1, newdata = data.frame(1), type = "prob")
-c(predict(mlt_CHFLS_1, newdata = data.frame(1), type = "density", 
-          q = mkgrid(b_happy)[[1]]))
-xtabs(~ R_happy, data = CHFLS) / nrow(CHFLS)
+cbind(polr = predict(polr_CHFLS_1, newdata = data.frame(1), type = "prob"),
+      mlt = c(predict(mlt_CHFLS_1, newdata = data.frame(1), 
+                      type = "density", q = mkgrid(b_happy)[[1]])),
+      direct = xtabs(~ R_happy, data = CHFLS) / nrow(CHFLS))
 @
 
 \subsubsection{Continuous Models for Continuous Responses}
@@ -558,7 +560,7 @@ lines(nd_w$waiting, predict(mlt_w_40, q = nd_w$waiting, type = "density"), lty =
 rug(geyser$waiting, col = rgb(.1, .1, .1, .1))
 @
 \caption{Old Faithful Geyser. Estimated distribution (left, also featuring the empirical
-         cumulative distribution function) and density (right) function for 
+         cumulative distribution function as grey circles) and density (right) function for 
          two transformation models parameterised in terms of Bernstein polynomials
          of order eight and $40$.  The right plot reproduces the density for $M = 8$ shown in
          Figure~1 (left panel) in \cite{Hothorn_Moest_Buehlmann_2016}. \label{fig:geyser-w-plot}}
@@ -579,8 +581,8 @@ in Figure~\ref{fig:geyser-w-plot} where two Bernstein polynomials of order $M = 
 $M = 40$ are compared on the scale of the distribution function (left panel) and density
 function (right panel). It is hardly possible to notice the difference in probabilities
 but the more flexible model features a more erratic density estimate, but not overly so.
-The corresponding AIC values are $\Sexpr{round(AIC(mlt_w),1)}$ 
-for $M = 8$ and $\Sexpr{round(AIC(mlt_w_40),1)}$ for $M = 40$ favouring the smaller model.
+%% The corresponding AIC values are $\Sexpr{round(AIC(mlt_w),1)}$ 
+%% for $M = 8$ and $\Sexpr{round(AIC(mlt_w_40),1)}$ for $M = 40$ favouring the smaller model.
 
 
 \subsubsection{Continuous Models for Discrete Responses}
@@ -589,7 +591,8 @@ Although a model for $\rY$ can assume an absolutely continuous distribution,
 observations from such a model will always be discrete. This fact is taken 
 into account by the exact likelihood (Section~\ref{sec:mlt}). In some cases, 
 for example for count data with potentially large number of counts, one might
-use a continuous parameterisation of the transformation function $\bern{M}^\top \parm$
+use a continuous parameterisation of the transformation function
+$\bern{M}(\ry)^\top \parm$
 which is evaluated at the observed counts only as in the next example.
 
 \paragraph{Analysis of Count Data: Deer-vehicle Collisions}
@@ -603,15 +606,16 @@ var_dvc <- numeric_var("dvc", support = min(dvc):max(dvc))
 B_dvc <- Bernstein_basis(var_dvc, order = 6, ui = "increasing")
 dvc_mlt <- mlt(ctm(B_dvc), data = data.frame(dvc = dvc))
 @
-The discrete distribution function (evaluated for all integers between
+The discrete unconditional distribution function (evaluated for all integers between
 $\Sexpr{min(dvc)}$ and $\Sexpr{max(dvc)}$) 
 <<dvc-predict>>=
 q <- support(var_dvc)[[1]]
 p <- predict(dvc_mlt, newdata = data.frame(1), q = q,
              type = "distribution")
 @
-along with the distribution
-function of the Poisson distribution are given in Figure~\ref{fig:dvc-plot}. 
+along with the unconditional distribution
+function of the Poisson distribution with rate estimated from the data 
+are given in Figure~\ref{fig:dvc-plot}. 
 The empirical cumulative distribution function is smoothly approximated
 using only seven parameters.  There is clear evidence for overdispersion as
 the variance of the Poisson model is much smaller than the variance
@@ -650,12 +654,14 @@ $\ry \in (\ry_{k - 1}, \ry_k]$ enter the likelihood.
 A linear transformation model features a linear shift of a typically non-linear transformation
 of the response $Y$ and is the simplest form of a regression model in the class of
 conditional transformation models. The conditional distribution function is
+modelled by
 \begin{eqnarray*}
 \Prob(\rY \le \ry \mid \rX = \rx) = \pZ(\h(\ry \mid \rx)) = 
 \pZ(\h_\rY(\ry) - \tilde{\rx}^\top \shiftparm).
 \end{eqnarray*}
-The transformation $\h_\rY$, sometimes called ``baseline transformation'' can be parameterised
-as discussed in the unconditional situation
+The transformation $\h_\rY$, sometimes called ``baseline transformation'', can be parameterised
+as discussed in the unconditional situation using an appropriate basis
+function $\basisy$
 \begin{eqnarray*}
 \pZ(\h_\rY(\ry) - \tilde{\rx}^\top \shiftparm) = \pZ(\basisy(\ry)^\top \parm_1 - \tilde{\rx}^\top \shiftparm).
 \end{eqnarray*}
@@ -668,7 +674,8 @@ with $\basisyx = (\basisy^\top, -\tilde{\rx}^\top)^\top$.
 The definition of a linear transformation model only requires the basis $\basisy$, 
 the explanatory variables $\rx$ and a distribution $\pZ$. The latter choice is now important,
 as additivity of the linear predictor is assumed on the scale of $\pZ$. It is convenient to
-supply negative linear predictors as $\Ex(\h_\rY(\rY) \mid \rX = \rx) = \tilde{\rx}^\top \shiftparm$.
+supply negative linear predictors as $\Ex(\h_\rY(\rY) \mid \rX = \rx) = \tilde{\rx}^\top \shiftparm$
+(up to an additive constant $\Ex(\rZ)$).
 One exception is the Cox model with positive shift and $\Ex(\h_\rY(\rY) \mid \rX = \rx) = -\tilde{\rx}^\top \shiftparm$. 
 Large positive values of the linear predictor correspond to low expected survival times and thus a high risk.
 
@@ -718,7 +725,7 @@ positive regional lymph nodes but no distant metastases were included in
 the study.  Out of $686$ women, $246$ received hormonal therapy whereas the
 control group of $440$ women did not receive hormonal therapy.  Additional
 variables include age, menopausal status, tumour size, tumour grade, number of
-positive lymph nodes, progesterone receptor and estrogen receptor.  The
+positive lymph nodes, progesterone receptor, and estrogen receptor.  The
 right-censored recurrence-free survival time is the response variable of
 interest, \ie a positive absolutely continuous variable
 <<GBSG2-1, echo = TRUE>>=
@@ -728,9 +735,17 @@ GBSG2y <- numeric_var("y", support = c(100.0, max(GBSG2$time)),
 GBSG2$y <- with(GBSG2, Surv(time, cens))
 @
 We start with the Cox model $(\pMEV, (\bern{10}^\top,
-\tilde{\rx}^\top)^\top, (\parm_1^\top, \shiftparm^\top)^\top)$, where $\tilde{\rx}$ contains the treatment
+\tilde{\rx}^\top)^\top, (\parm_1^\top, \shiftparm^\top)^\top)$, in more
+classical notation the model 
+\begin{eqnarray*}
+\Prob(\rY \le \ry \mid \rX = \rx) = 1 - \exp(-\exp(\bern{10}(\ry)^\top \parm_1
+                                                   + \tilde{\rx}^\top \shiftparm),
+\end{eqnarray*}
+where $\tilde{\rx}$ contains the treatment
 indicator and all other explanatory variables in the transformation function
 $\h(\ry \mid \rx) = \bern{10}(\ry)^\top \parm_1 + \tilde{\rx}^\top \shiftparm$
+with log-cumulative baseline hazard $\h_\rY(\ry) = \bern{10}(\ry)^\top
+\parm_1$
 \citep[the positive shift being in line with the implementation in \cmd{coxph} in package 
 \pkg{survival},][]{Therneau_Grambsch_2000,pkg:survival}
 <<GBSG2-1-Cox>>=
@@ -768,15 +783,15 @@ cf <- coef(coxph_GBSG2_1)
 cbind(coxph = cf, mlt = coef(mlt_GBSG2_1)[names(cf)])
 @
 A practically important question is how the order $M$ of the Bernstein polynomial
-affects the results. Recall that the log cumulative baseline function $\h_\rY$ is not
+affects the results. Recall that the log-cumulative baseline hazard function $\h_\rY$ is not
 specified when the partial likelihood is maximised and thus \cmd{coxph} makes no
 assumptions regarding this function. To study the impact of $M$ on the results, 
 we refit the Cox model using \cmd{mlt} for $M = 1, \dots, 30$ and plot the 
-log cumulative hazard function $\h_\rY$ for different $M$ along with the
+log-cumulative hazard function $\h_\rY$ for different $M$ along with the
 non-parametric Nelson-Aalen-Breslow estimator in the left panel of 
 Figure~\ref{fig:GBSG2-coxph_mlt}. In the right panel of Figure~\ref{fig:GBSG2-coxph_mlt},
 the change in the regression coefficients $\shiftparm$ as a function of order $M$
-is shown. Both the log cumulative hazard function and the regression coefficients
+is shown. Both the log-cumulative hazard function and the regression coefficients
 obtained from \cmd{mlt} are stable for $M \ge 10$ and very similar to the results
 one obtains from \cmd{coxph}. This result shows that a simple yet fully parametric model 
 produces practically equivalent results when compared to the 
@@ -817,7 +832,7 @@ layout(matrix(1:2, nc = 2))
 col <- rgb(.1, .1, .1, .1)
 ylim <- range(unlist(p))
 plot(ndtmp$y, p[[1]], type = "l", ylim =  ylim, col = col, xlab = "Survival Time (days)",
-     ylab = "Log Cumulative Hazard")
+     ylab = "Log-cumulative Hazard")
 out <- sapply(p, function(y) lines(ndtmp$y, y, col = col))
 lines(b$time, log(b$cumhaz), col = "red")
 
@@ -831,8 +846,8 @@ for (i in 1:ncol(CF)) {
 # text(20, coef(coxph_GBSG2_1) + .1, names(coef(coxph_GBSG2_1)))
 @
 \caption{GBSG-2 Trial. Comparison of exact and partial likelihood for order $M = 1, \dots, 30, 35, 40, 45, 50$
-         of the Bernstein polynom approximating the log cumulative hazard function $\h_\rY$.
-         In the left panel the estimated log cumulative hazard functions for varying
+         of the Bernstein polynom approximating the log-cumulative hazard function $\h_\rY$.
+         In the left panel the estimated log-cumulative hazard functions for varying
          $M$ obtained by \cmd{mlt} are shown in grey and the Nelson-Aalen-Breslow estimator
          obtained from \cmd{coxph} in red. The right panel shows the trajectories of the
          regression coefficients $\shiftparm$ obtained for varying $M$ from \cmd{mlt} as
@@ -845,7 +860,7 @@ for (i in 1:ncol(CF)) {
 
 A comparison with the \cite{Royston_Parmar_2002} spline model as implemented in the
 \pkg{flexsurv} package \citep{pkg:flexsurv} shows that the two spline parameterisations
-of the log cumulative hazard function $\h_\rY$ are practically equivalent (see Figure~\ref{GBSG2-1-fss-plot} also)
+of the log-cumulative hazard function $\h_\rY$ are also practically equivalent (see Figure~\ref{GBSG2-1-fss-plot})
 <<GBSG2-1-fss, cache = TRUE>>=
 kn <- log(support(GBSG2y)$y)
 fss_GBSG2_1 <- flexsurvspline(fm_GBSG2, data = GBSG2, scale = "hazard", 
@@ -898,7 +913,8 @@ fit the same model, the results are again equivalent up to the sign of the regre
 coefficients
 <<GBSG2-2-exp>>=
 survreg_GBSG2_2 <- survreg(fm_GBSG2, data = GBSG2, dist = "exponential")
-phreg_GBSG2_2 <- phreg(fm_GBSG2, data = GBSG2, dist = "weibull", shape = 1)
+phreg_GBSG2_2 <- phreg(fm_GBSG2, data = GBSG2, dist = "weibull", 
+                       shape = 1)
 logLik(survreg_GBSG2_2)
 logLik(phreg_GBSG2_2)
 logLik(mlt_GBSG2_2)
@@ -907,7 +923,7 @@ cbind(survreg = coef(survreg_GBSG2_2)[names(cf)],
       mlt = coef(mlt_GBSG2_2)[names(cf)])
 @
 If we allow a scaled log-transformation $\h_\rY(\ry) = \eparm_1 \log(\ry) + \eparm_2$ (the intercept
-$\eparm_2$ is included in the baseline transformation), the Weibull
+$\eparm_2$ is included in the baseline transformation), the resulting Weibull
 AFT model is fitted by \cmd{mlt}, \cmd{survreg} and \cmd{phreg} using
 <<GBSG2-3>>=
 mlt_GBSG2_3 <- mlt(ctm_GBSG2_2, data = GBSG2, scale = TRUE)
@@ -934,7 +950,7 @@ in the normal linear model with constant variance
 \begin{eqnarray*}
 \text{medv} \mid \rX = \rx \sim \ND(\tilde{\rx}^\top \shiftparm, \sigma^2)
 \end{eqnarray*}
-is rather restrictive
+as implemented in \cmd{lm} is rather restrictive
 <<BostonHousing-lm>>=
 data("BostonHousing2", package = "mlbench")
 lm_BH <- lm(cmedv ~ crim + zn + indus + chas + nox + rm + age + dis + 
@@ -948,9 +964,9 @@ in the linear transformation model
 = \Phi(\bern{6}(\ry)^\top \parm_1 - \tilde{\rx}^\top \shiftparm)
 \end{eqnarray*}
 and estimate \emph{all} model parameters $(\parm_1, \shiftparm)$ simultaneously, \ie both the
-regression coefficients \emph{and} the error distribution. Because it is 
+regression coefficients \emph{and} the baseline transformation $\h_\rY$. Because it is 
 straightforward to evaluate the conditional distribution function, the likelihood
-can deal with right-censored medv observations ($\ge 50$). This censoring
+can deal with right-censored \code{medvc} observations ($\ge 50$). This censoring
 was mostly ignored in other parametric or non-parametric analyses of this data set.
 
 We start with a suitable definition of median value of owner-occupied homes,
@@ -961,7 +977,30 @@ var_m <- numeric_var("medvc", support = c(10.0, 40.0), bounds = c(0, Inf))
 fm_BH <- medvc ~ crim + zn + indus + chas + nox + rm + age + 
                  dis + rad + tax + ptratio + b + lstat
 @
-We are interested in a possibly non-linear transformation of the response
+
+First, we aim at fitting a normal linear model taking censored observations
+properly into account. With linear baseline transformation $\h_\rY$, \ie a
+Bernstein polynomial of order one or a linear function with intercept and
+positive slope, the model is equivalent to the model underlying \cmd{lm} as
+explained in the introduction. Only the likelihood changes when we fit the
+model via
+<<BostonHousng-mlt-linear>>=
+B_m <- polynomial_basis(var_m, coef = c(TRUE, TRUE), 
+                        ui = matrix(c(0, 1), nrow = 1), ci = 0)
+ctm_BH <- ctm(B_m, shift = fm_BH[-2L], data = BostonHousing2, 
+              todistr = "Normal")
+lm_BH_2 <- mlt(ctm_BH, data = BostonHousing2, scale = TRUE)
+logLik(lm_BH_2)
+@
+%%% FIXME: survreg gives larger likelihood when `rm' in included
+%%% same results without variable `rm'. No idea where the problem lies.
+%% tmp <- survreg(fm_BH, data = BostonHousing2, dist = "gaussian")
+%% logLik(tmp)
+%% cf1 <- coef(tmp)
+%% cf2 <- -cf1 / tmp$scale
+%% cf2 <- c(cf2[1], 1 / tmp$scale, cf2[-1])
+%% logLik(lm_BH_2, parm = cf2)
+In a second step, we are interested in a possibly non-linear transformation of the response
 and use a Bernstein polynomial of order six. In principle, this approach is equivalent
 to using a Box-Cox transformation but with a more flexible transformation function.
 In a sense, we don't need to worry too much about the error distribution $\pZ$
@@ -975,6 +1014,7 @@ B_m <- Bernstein_basis(var_m, order = 6, ui = "increasing")
 ctm_BH <- ctm(B_m, shift = fm_BH[-2L], data = BostonHousing2, 
               todistr = "Normal")
 mlt_BH <- mlt(ctm_BH, data = BostonHousing2, scale = TRUE)
+logLik(mlt_BH)
 @
 The model can be compared with a normal linear model (fitted by \cmd{lm}) on the
 scale of the fitted conditional distribution functions. Figure~\ref{fig:BostonHousing-plot}
@@ -1100,10 +1140,8 @@ ctm_PSID1976_2 <- ctm(B_hours, shift = fm_PSID1976[-2L],
 mlt_PSID1976_2 <- mlt(ctm_PSID1976_2, data = PSID1976_0, 
                       scale = TRUE)
 logLik(mlt_PSID1976_2)
-AIC(mlt_PSID1976_1)
-AIC(mlt_PSID1976_2)
 @
-and it seems the non-normal model is slightly better.
+and there might be a small advantage with the non-normal model.
 
 \subsection{Stratified Linear Transformation Models}
 
@@ -1138,8 +1176,9 @@ logLik(mlt_CHFLS_3)
 predict(mlt_CHFLS_3, newdata = mkgrid(mlt_CHFLS_3), type = "distribution")
 @
 The conditional distribution for happiness given each health category is returned
-by \cmd{predict} as a matrix. There is a clear tendency of people being happier with better health. We now `adjust'
-for age and income
+by \cmd{predict} as a matrix. There is a clear tendency of people being happier with better health. 
+We now `adjust' for age and income by including a linear shift term which is
+constant across strata
 <<CHFLS-4, cache = TRUE>>=
 ctm_CHFLS_4 <- ctm(b_happy, interacting = b_health, shifting = b_R, 
                    todist = "Logistic")
@@ -1159,7 +1198,7 @@ conditional on health, people are getting happier as they get older \emph{and} r
 \paragraph{Survival Analysis: GBSG-2 Trial (Cont'd)}
 
 The Cox model presented in Section~\ref{subsec:ltm} features one baseline
-function for all observations, an assumption which we're now going to relax. As
+function for all observations, an assumption which we are now going to relax. As
 a first simple example, we want to estimate two separate survivor functions 
 for the two treatment regimes in the model
 \begin{eqnarray*}
@@ -1241,7 +1280,7 @@ The model may include response-varying coefficients (as defined by the basis $\b
 to the bases $(\basisx_1^\top,\dots, \basisx_J^\top)$ and constant shift effects ($\basisx_\text{shift}$). Such a model
 is set-up using \cmd{ctm} with arguments \code{response} (basis $\basisy$), \code{interacting} (basis $(\basisx_1^\top,\dots, \basisx_J^\top)$)
 and \code{shifting} (basis $-\basisx_\text{shift}^\top$). It would be conceptually possible
-to fit conditional transformation models of the form
+to fit even more complex conditional transformation models of the form
 \begin{eqnarray*}
 \basisyx = (\basisy_1^\top \otimes \basisx_1^\top, \dots, \basisy_J^\top \otimes \basisx_J^\top)
 \end{eqnarray*}
@@ -1286,13 +1325,13 @@ ctm_CHFLS_7 <- ctm(b_happy, interacting = c(h = b_health, R = b_R),
 mlt_CHFLS_7 <- mlt(ctm_CHFLS_7, data = CHFLS, scale = TRUE)
 logLik(mlt_CHFLS_7)
 @
-Overall, we get
-<<CHFLS-AIC>>=
-c("1" = AIC(mlt_CHFLS_1), "2" = AIC(mlt_CHFLS_2), "3" = AIC(mlt_CHFLS_3),
-  "4" = AIC(mlt_CHFLS_4), "5" = AIC(mlt_CHFLS_5), "6" = AIC(mlt_CHFLS_6),
-  "7" = AIC(mlt_CHFLS_7))
-@
-and it seems the proportional-odds model with health stratum (\code{mlt_CHFLS_4}) performs best.
+%Overall, we get
+%<<CHFLS-AIC>>=
+%c("1" = AIC(mlt_CHFLS_1), "2" = AIC(mlt_CHFLS_2), "3" = AIC(mlt_CHFLS_3),
+%  "4" = AIC(mlt_CHFLS_4), "5" = AIC(mlt_CHFLS_5), "6" = AIC(mlt_CHFLS_6),
+%  "7" = AIC(mlt_CHFLS_7))
+%@
+%and it seems the proportional-odds model with health stratum (\code{mlt_CHFLS_4}) performs best.
 
 \paragraph{Categorical Data Analysis: Iris Data}
 
@@ -1319,6 +1358,9 @@ p1 <- predict(mlt_iris, newdata = iris, q = sort(unique(iris$oSpecies)),
 p2 <- predict(multinom_iris, newdata = iris, type = "prob")
 max(abs(t(p1) - p2))
 @
+From this point of view, the multinomial model for an unordered categorical
+response is equivalent to a non-proportional odds model with
+response-varying effects.
 
 \subsubsection{Continuous Responses}
 
@@ -1337,7 +1379,6 @@ ctm_GBSG2_6 <- ctm(B_GBSG2y, shifting = ~ horTh, data = GBSG2,
                    todistr = "MinExtrVal")
 mlt_GBSG2_6 <- mlt(ctm_GBSG2_6, data = GBSG2)
 logLik(mlt_GBSG2_6)
-AIC(mlt_GBSG2_6)
 @
 
 This is the classical Cox model with one treatment parameter $\beta$ 
@@ -1354,11 +1395,11 @@ The function $\bern{10}^\top \parm_2$ is the time-varying treatment effect
 and can be interpreted as the deviation, on the scale of the transformation
 function, induced by the hormonal therapy.  Under the null hypothesis of no
 treatment effect, we would expect $\parm_2 \equiv \bold{0}$.  It should be
-notes that the log-cumulative hazard function $\bern{10}(\ry)^\top \parm_1$
+noted that the log-cumulative hazard function $\bern{10}(\ry)^\top \parm_1$
 must by monotone. The deviation function $\bern{10}(\ry)^\top \parm_2$ 
 does not need to be monotone, however, the sum of the two functions needs to
 be monotone. Sums of such Bernstein polynomials with coefficients $\parm_1$ and
-$\parm_2$ are a Bernstein polynomial with coefficients $\parm_1 + \parm_2$.
+$\parm_2$ are again Bernstein polynomials with coefficients $\parm_1 + \parm_2$.
 Thus, monotonicity of the sum can be implemented by monotonicity of $\parm_1 +
 \parm_2$. The argument \code{sumconstr = TRUE} implements the latter
 constraint (the default, in this specific situation).
@@ -1378,7 +1419,6 @@ nd <- data.frame(y = GBSG2$time[1:2], horTh = unique(GBSG2$horTh))
 attr(model.matrix(ctm_GBSG2_7, data = nd), "constraint")
 mlt_GBSG2_7 <- mlt(ctm_GBSG2_7, data = GBSG2)
 logLik(mlt_GBSG2_7)
-AIC(mlt_GBSG2_7)
 @
 
 \begin{figure}[t!]
@@ -1440,7 +1480,6 @@ ctm_GBSG2_8 <- ctm(B_GBSG2y,
                    todistr = "MinExtrVal")
 mlt_GBSG2_8  <- mlt(ctm_GBSG2_8, data = GBSG2)
 logLik(mlt_GBSG2_8)
-AIC(mlt_GBSG2_8)
 @
 Figure~\ref{fig:GBSG2-8-plot} allows an assessment of the prognostic and
 predictive properties of age.  As the survivor functions are clearly larger
@@ -1554,7 +1593,6 @@ b_BH_s <- as.basis(fm_BH[-2L], data = BostonHousing2, scale = TRUE)
 ctm_BHi <- ctm(B_m, interacting = b_BH_s, sumconstr = TRUE)
 mlt_BHi <- mlt(ctm_BHi, data = BostonHousing2)
 logLik(mlt_BHi)
-AIC(mlt_BHi)
 @
 This takes quite some time, simply because the number of constraints is
 is very large, depending on the number of explanatory variables. It might
@@ -1564,14 +1602,15 @@ parameters $\parm_j$ to be monotone (argument \code{sumconstr = FALSE}):
 ctm_BHi2 <- ctm(B_m, interacting = b_BH_s, sumconstr = FALSE)
 mlt_BHi2 <- mlt(ctm_BHi2, data = BostonHousing2)
 logLik(mlt_BHi2)
-AIC(mlt_BHi2)
 @
 
 Figure~\ref{fig:Boston-Housing-dr-plot} compares the fitted densities for
 the linear transformation model with constant regression coefficients
 \code{mlt_BH} and the two distribution regression models \code{mlt_BHi} and
 \code{mlt_BHi2}.  For some observations, the variance of the conditional
-distribution functions seems to be smaller in this more complex model. There
+distribution functions seems to be smaller in the more complex model
+distribution regression models with response-varying effects, compared to a
+linear transformation model with constant shift effects $\shiftparm$. There
 is not very much difference between the distribution regression models with
 different constraints.
 
@@ -1648,7 +1687,7 @@ gam_treepipit <- gam(counts ~ s(coverstorey), data = treepipit,
                      family = "poisson")
 @
 Despite some overfitting, this model is
-more restrictive than our transformation model because one mean function determines the whole distribution
+more restrictive than the transformation model because one mean function determines the whole distribution
 (the local minima of the conditional distributions as a function of cover storey are
 constant in the right panel whereas they are shifted towards higher values of
 cover storey in the center panel).
@@ -1798,7 +1837,7 @@ parameterise the transformation function $\h(\ry)$ as a linear function of
 its basis-transformed argument $\ry$ using a basis function $\basisy: \samY
 \rightarrow \RR^\dimparm$ such that $\h(\ry) = \basisy(\ry)^\top \parm,
 \parm \in \RR^\dimparm$.  The choice of the basis function $\basisy$ is
-problem-specific, examples are discussed in Section~\ref{sec:trafo}.  In the conditional
+problem-specific, practically relevant examples were discussed in Section~\ref{sec:trafo}.  In the conditional
 case we use the basis $\basisyx(\ry, \rx)$ instead of $\basisy(\ry)$. The
 likelihood $\lik$ only requires evaluation of $\h$, and only an
 approximation thereof using the Lebesgue density of ``exact continuous''
@@ -1819,7 +1858,6 @@ the solution to the optimisation problem
 is the maximum likelihood estimator. The plug-in estimator for the most
 likely transformation is $\hat{\h}_N := \basisy^\top \hat{\parm}_N$.  
 
-The gradient is available from the score functions.
 The score contribution of an ``exact continuous'' 
 observation $\ry = (\ubar{\ry} +
 \bar{\ry})/2$ from an absolutely continuous distribution is approximated by the
@@ -1896,8 +1934,9 @@ responses for observations with explanatory variables as given in the
 \hat{\h}_N(\ry_k \mid \rx_i) = \basisyx(\ry_k, \rx_i)^\top \hat{\parm}_N, 
 \quad k = 1, \dots, K; i = 1, \dots, N_\text{new}
 \end{eqnarray*}
-is evaluated for potentially large numbers $K$ ad $N_\text{new}$ by \cmd{predict}
-and it returned as a $K \times N_\text{new}$ matrix. Because in the
+is evaluated for potentially large numbers $K$ and $N_\text{new}$ by \cmd{predict}
+and is returned as a $K \times N_\text{new}$ matrix (columns correspond to
+observations). Because in the
 most general case of a conditional distribution function the transformation
 function is 
 \begin{eqnarray*}
@@ -1913,13 +1952,13 @@ be simultaneously evaluated for all $k = 1, \dots, K$ and $i = 1, \dots, N_\text
 (\mA \otimes \mB \mid \bold{1}_K \otimes \mB_\text{shift})^\top \hat{\parm}_N.
 \end{eqnarray*}
 This product is in the special form of an array model \citep{Currie_Durban_Eilers_2006} and
-can be computed very quickly using the tricks described by \cite{Currie_Durban_Eilers_2006}.
+is computed very quickly by \pkg{mlt} using the tricks described by \cite{Currie_Durban_Eilers_2006}.
 
 
 \section{Classical Likelihood Inference} \label{sec:asympt}
 
-Because the problem of estimating an unknown distribution function is now
-embedded in the maximum likelihood framework, the asymptotic analysis
+Because the problem of estimating an unknown distribution function is 
+embedded in the maximum likelihood framework in \pkg{mlt}, the asymptotic analysis
 benefits from standard results on the asymptotic behaviour of maximum
 likelihood estimators.  The contribution of an ``exact continuous''
 observation $\ry$ from an absolutely continuous distribution to the Fisher
@@ -1963,12 +2002,15 @@ from confidence intervals and bands for the linear functions $\basisy^\top
 \paragraph{Categorical Data Analysis: Chinese Survey (Cont'd)}
 
 For the proportional odds model for happiness given age and income, we compare the score function 
-\citep[using the \cmd{estfun} method from package \pkg{sandwich},][]{Zeileis_2004,pkg:sandwich} and the standard errors of the
+\citep[using the \cmd{estfun} method from package \pkg{sandwich},][]{Zeileis_2004,pkg:sandwich} 
+<<CHFLS-2-cmpr-estfun>>=
+summary(estfun(polr_CHFLS_2) - (-estfun(mlt_CHFLS_2)[,c(4, 5, 1:3)]))
+@
+and the standard errors of the
 regression coefficients. The positive effect of income is ``significant'' by standard measures
 \citep[the classical coefficient table was obtained using \cmd{cftest} from package 
 \pkg{multcomp},][]{Hothorn_Bretz_Westfall_2008,pkg:multcomp}
 <<CHFLS-2-cmpr-2>>=
-max(abs(estfun(polr_CHFLS_2) - (-estfun(mlt_CHFLS_2)[,c(4, 5, 1:3)])))
 cbind(polr = sqrt(diag(vcov(polr_CHFLS_2))),
       mlt = sqrt(diag(vcov(mlt_CHFLS_2)))[c(4, 5, 1:3)])
 cftest(polr_CHFLS_2)
@@ -2003,7 +2045,7 @@ of waiting times is derived from simultaneous confidence intervals for the
 linear function $\mA \hat{\parm}_N$ as implemented in package \pkg{multcomp}. Here $\mA$ is
 the matrix of Bernstein basis functions evaluated on a grid of \code{K} waiting times
 $\ry_1, \dots, \ry_K$. The quantile adjusted for multiplicity is then used
-on a finer grid of \code{ncheat} values for plotting purposes
+on a finer grid of \code{cheat} values for plotting purposes
 <<geyser-w-band>>=
 cb_w <- confband(mlt_w, newdata = data.frame(1), K = 20, cheat = 100)
 @
@@ -2040,7 +2082,7 @@ lines(cb_w[, "q"], pnorm(cb_w[, "Estimate"]))
 rug(geyser$waiting, col = rgb(.1, .1, .1, .1))
 @
 \caption{Old Faithful Geyser. Estimated transformation (left)
-         and distribution function (right) with asymptotic confidence bands.
+         and distribution functions (right) with asymptotic confidence bands.
          \label{fig:geyser-w-cbplot}}
 \end{center}
 \end{figure}
@@ -2068,7 +2110,8 @@ The model-based bootstrap analogue of the confidence band for the
 distribution function of waiting times (Figure~\ref{fig:geyser-w-cbplot},
 right panel) based on $100$ bootstrap samples is generated from the
 following code.  First, $100$ samples of size $N = \Sexpr{nrow(geyser)}$ are
-drawn.  For each sample, the model \code{ctm_w} is refitted, using the
+drawn from the fitted unconditional model \code{mlt\_w} for waiting times.  
+For each sample, the model \code{ctm_w} is refitted, using the
 parameters $\hat{\parm}_N$ as starting values (\code{theta}) to speed-up the
 computations.  Next, the log-likelihood ratio
 \begin{eqnarray*}
@@ -2097,7 +2140,7 @@ for (i in 1:length(new_w)) {
 @
 
 The distribution and density functions corresponding to log-likelihood ratios less then the $95\%$
-quantile of the $100$ log-likelihood ratios, \ie after removal of $5$ extreme
+quantile of the $100$ log-likelihood ratios, \ie after removal of five extreme
 curves, are plotted in Figure~\ref{geyser-w-simulate-plot} and can be
 interpreted as a band around the distribution and density function.  The
 asymptotic band for the distribution function nicely fits the band obtained
@@ -2179,7 +2222,7 @@ of ordered categorical responses are implemented in packages
 and \pkg{VGAM} \citep{Yee_2010, pkg:VGAM}. 
 
 Maximum likelihood estimators for a fair share of the models implemented in
-these established packages mentioned can be re-implemented using
+these established packages can be re-implemented using
 the computational infrastructure offered by package \pkg{mlt}.  The
 availability of (at least) two independent implementations allows package
 developers to validate their implementation.  In fact, some errors in
@@ -2205,7 +2248,7 @@ are lacking.  Our analysis of the bird counts example is novel also from a
 modelling point of view as linear transformation models for count data are
 still waiting to be kissed awake.
 
-One feature of \pkg{mlt} is the strict separation of model specification
+One unique feature of \pkg{mlt} is the strict separation of model specification
 (using \cmd{ctm}) and model estimation (using \cmd{mlt}) allowing
 computations on unfitted models.  Models are specified by combinations of
 basis functions instead of using the rather restrictive formula language. 
@@ -2226,7 +2269,7 @@ the traditionally compartmentalised fields of
 in this documentation of \pkg{mlt} will likely also confuse many statisticians,
 let alone data or subject-matter scientists.  Future efforts
 will concentrate on the implementation of convenience interfaces, \ie higher
-level user interfaces for special forms of transformation models, that
+level user interfaces for special forms of transformation models, which
 resemble the traditional notational and naming conventions from the
 statistical modelling literature.
 
@@ -2241,7 +2284,7 @@ statistical modelling literature.
 
 \section[The variables Package]{The \pkg{variables} Package} \label{app:variables}
 
-The \pkg{variables} packages \citep{pkg:variables} offers a small collection
+The \pkg{variables} package \citep{pkg:variables} offers a small collection
 of classes and methods for specifying and computing on abstract variable
 descriptions.  The main purpose is to allow querying properties of variables
 without having access to observations.  A variable description allows to
@@ -2249,7 +2292,7 @@ extract the name (\cmd{variable.name}), description (\cmd{desc}) and unit
 (\cmd{unit}) of the variable along with the support (\cmd{support}) and
 possible bounds (\cmd{bounds}) of the measurements.  The \cmd{mkgrid} method
 generates a grid of observations from the variable description.  The package
-differentiates between factors, ordered factors, discrete and continuous
+differentiates between factors, ordered factors, discrete, and continuous
 numeric variables.
 
 \subsection{Unordered Factors}
@@ -2525,7 +2568,7 @@ attr(X, "constraint")
 
 \subsection{Specifying Response Observations} \label{subapp:R}
 
-The generic function \cmd{R} is an extension of \cmd{Surv} (package \pkg{survival}) to possibly 
+The generic function \cmd{R} is an extention of \cmd{Surv} (package \pkg{survival}) to possibly 
 truncated, categorical or integer-valued response variables with methods for objects of class 
 \code{Surv}, \code{ordered}, \code{factor}, \code{integer} and \code{numeric}. The main
 purpose is to set-up the interval $(\ubar{\ry}, \bar{\ry}]$ for the evaluation
@@ -2579,8 +2622,8 @@ objects are returned by \cmd{ctm}.
 \subsection{Methods for Fitted Transformation Models}
 
 For transformation models fitted using \cmd{mlt}, the following methods are
-available \cmd{update} (for refitting the model), \cmd{logLik} (the
-log-likelihood, optionally also as a \code{function}), \cmd{estfun} (the
+available: \cmd{update} (for refitting the model), \cmd{logLik} (the
+log-likelihood, optionally also as a function of parameters $\parm$), \cmd{estfun} (the
 scores), \cmd{coef} and \cmd{vcov} (model parameters and their covariance),
 \code{predict} (model predictions at various scales), \cmd{confband}
 (confidence bands for the transformation and distribution function),
@@ -2589,7 +2632,7 @@ scores), \cmd{coef} and \cmd{vcov} (model parameters and their covariance),
 \cmd{mkgrid} and \cmd{bounds} are also implemented. The 
 \cmd{coef<-} method changes the parameters in the model. One last example,
 the approximation of a $\chi^2_{20}$ distribution by an unconditional
-transformation model, shall illustrate how one interacts with
+transformation model, shall illustrate how one interacts with \code{ctm} and 
 \code{mlt} objects. We first define the ``true'' distribution
 <<mlt-chi-p>>=
 pY <- function(x) pchisq(x, df = 20)
@@ -2622,13 +2665,13 @@ d <- as.data.frame(mkgrid(yvar, n = 500))
 d$grid <- d$y
 d$y <- simulate(mod, newdata = d)
 @
-and fit this model to the simulated data
+fit this model to the simulated data
 <<mlt-chi-fit>>=
 fmod <- mlt(mod, data = d, scale = TRUE)
 @
 and compare the true (\code{mod}) and fitted
 (\code{fmod}) models by looking at the coefficients
-and log-likelihood (evaluated for the estimated and
+and log-likelihoods (evaluated for the estimated and
 true coefficients)
 <<mlt-chi-model>>=
 coef(mod)
@@ -2638,7 +2681,8 @@ logLik(fmod, parm = coef(mod))
 @
 The corresponding density functions of the $\chi^2_{20}$ distribution, the
 approximating true transformation model \code{mod} and the estimated transformation
-model \code{fmod} are plotted in Figure~\ref{fig:mlt-chi-plot}.
+model \code{fmod} are plotted in Figure~\ref{fig:mlt-chi-plot} using the
+code shown on top of the plot.
 
 \begin{figure}[h!]
 \begin{center}
