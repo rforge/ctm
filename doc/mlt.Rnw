@@ -354,8 +354,7 @@ workflow sketched in this section.  Technical issues about the three
 packages \pkg{variables}, \pkg{basefun} and \pkg{mlt} involved are explained
 in Appendices~\ref{app:variables}, \ref{app:basefun}, and \ref{app:mlt}.
 
-
-\begin{figure}
+\begin{figure}[t]
 \begin{center}
 <<geyser-plot, echo = FALSE>>=
 plot(d ~ duration, data = nd_d, type = "l", ylab = "Density", xlab = "Duration time")
@@ -367,8 +366,6 @@ plot(d ~ duration, data = nd_d, type = "l", ylab = "Density", xlab = "Duration t
 \end{center}
 \end{figure}
 
-\pagebreak
- 
 \section{Specifying Transformation Models} \label{sec:trafo}
 
 In this section we review a cascade of increasingly complex
@@ -541,7 +538,7 @@ nd_w$d <- predict(mlt_w, newdata = nd_w, type = "distribution")
 with the empirical cumulative distribution function (the non-parametric maximum likelihood estimator) 
 in the left panel of Figure~\ref{fig:geyser-w-plot}.
 
-\begin{figure}
+\begin{figure}[t]
 \begin{center}
 <<geyser-w-plot, echo = FALSE>>=
 layout(matrix(1:2, ncol = 2))
