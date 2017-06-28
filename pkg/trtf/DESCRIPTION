@@ -1,7 +1,7 @@
 Package: trtf
 Title: Transformation Trees and Forests
-Version: 0.2-1
-Date: 2017-04-26
+Version: 0.2-2
+Date: 2017-06-28
 Authors@R: person("Torsten", "Hothorn", role = c("aut", "cre"),
                   email = "Torsten.Hothorn@R-project.org")
 Description: Recursive partytioning of transformation models with
