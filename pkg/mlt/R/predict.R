@@ -34,7 +34,7 @@ predict.ctm <- function(object, newdata, type = c("trafo", "distribution", "surv
         "hazard" = hmlt(object = object, newdata = newdata, q = q, log = FALSE, ...),
         "loghazard" = hmlt(object = object, newdata = newdata, q = q, log = TRUE, ...),
         "cumhazard" = Hmlt(object = object, newdata = newdata, q = q, ...),
-        "quantile" = qmlt(object = object, newdata = newdata, n = K,
+        "quantile" = qmlt(object = object, newdata = newdata, q = q, n = K,
                           p = p, interpolate = interpolate, ...))
 
     return(ret)

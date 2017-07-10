@@ -181,12 +181,12 @@ Hmlt <- function(object, newdata = NULL, q = NULL, ...)
 }
 
 ### quantile function
-qmlt <- function(object, newdata = NULL, p = .5, n = 50, 
+qmlt <- function(object, newdata = NULL, q = NULL, p = .5, n = 50, 
                  interpolate = TRUE, ...) {
 
     y <- variable.names(object, "response")
-    ### don't accept user-generated quantiles
-    q <- mkgrid(object, n = n)[[y]]
+    if (is.null(q))
+        q <- mkgrid(object, n = n)[[y]]
     if (!is.null(newdata) & !is.data.frame(newdata)) {
         newdata[[y]] <- NULL
         nm <- names(newdata)
