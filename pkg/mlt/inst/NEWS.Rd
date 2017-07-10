@@ -2,6 +2,12 @@
 \name{NEWS}
 \title{NEWS file for the mlt package}
 
+\section{Changes in Version 0.2-1 (2017-07-xy)}{
+  \itemize{
+    \item{\code{q} is forwarded to \code{qmlt} by \code{predict.ctm} now.}
+  }
+}
+
 \section{Changes in Version 0.2-0 (2017-06-20)}{
   \itemize{
     \item{Most Likely Transformations will be published in
