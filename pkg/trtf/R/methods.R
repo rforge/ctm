@@ -24,7 +24,7 @@ logLik.trafotree <- function(object, newdata, ...) {
         ret <- sum(object$logLik)
     } else {
         tids <- nodeids(object, terminal = TRUE)
-        nd <- factor(predict(object, newdata = newdata, type = "node"), 
+        nd <- factor(predict(object, newdata = newdata, type = "node", ...), 
                      levels = tids, labels = tids)
         ### set up unfitted model with newdata
         mltargs <- object$mltargs
@@ -83,15 +83,15 @@ logLik.traforest <- function(object, newdata, OOB = FALSE, coef = NULL, ...) {
 predict.trafotree <- function(object, newdata, K = 20, q = NULL,
     type = c("node", "coef", "trafo", "distribution", "survivor", "density",
              "logdensity", "hazard", "loghazard", "cumhazard", "quantile"),
-    ...) {
+    perm = NULL, ...) {
 
     type <- match.arg(type)
     tmp <- object
     class(tmp) <- class(tmp)[-1L]
     if (missing(newdata)) {
-        nf <- predict(tmp, type = "node")
+        nf <- predict(tmp, type = "node", perm = perm)
     } else {
-        nf <- predict(tmp, newdata = newdata, type = "node")
+        nf <- predict(tmp, newdata = newdata, type = "node", perm = perm)
     }
     if (type == "node") return(nf)
     tids <- nodeids(object, terminal = TRUE)
