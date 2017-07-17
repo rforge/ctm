@@ -5,6 +5,7 @@
 \section{Changes in Version 0.2-1 (2017-07-xy)}{
   \itemize{
     \item{\code{q} is forwarded to \code{qmlt} by \code{predict.ctm} now.}
+    \item{\code{p} is now \code{prob} in \code{qmlt} and thus \code{predict.ctm}.}
   }
 }
 
