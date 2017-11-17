@@ -4,6 +4,7 @@
     ctmobject <- object
 
     function(formula, data, weights, cluster, ctrl, ...) {
+        ### ignore weights?
         weights <- model.weights(data)
         if (is.null(weights)) weights <- integer(0)
         f <- Formula(formula)    
