@@ -4,7 +4,7 @@
     ctmobject <- object
 
     function(data, weights, control, ...) {
-        mf <- model.frame(data)
+        mf <- model.frame(data, yxonly = TRUE)
         iy <- data[["yx", type = "index"]]
 
         mltargs$data <- mf
@@ -56,6 +56,7 @@
                     tmp[subset,] <- ret
                     ret <- tmp
                 }
+                if (!is.null(iy)) ret <- rbind(0, ret)
             }
             return(list(estfun = ret, 
                         coefficients = coef(umod), objfun = logLik(umod), 
@@ -68,6 +69,7 @@
 trafotree <- function(object, parm = 1:length(coef(object)), mltargs = list(maxit = 10000), ...) {
 
     mltargs$model <- object
+    ### note: weights, offset, cluster etc. are evaluated here !!!
     args <- list(...)
     args$ytrafo <- .ctmfit(object, parm, mltargs)
     args$update <- TRUE
@@ -91,6 +93,7 @@ trafotree <- function(object, parm = 1:length(coef(object)), mltargs = list(maxi
 traforest <- function(object, parm = 1:length(coef(object)), mltargs = list(maxit = 10000), ...) {
 
     mltargs$model <- object
+    ### note: weights, offset, cluster etc. are evaluated here !!!
     args <- list(...)
     args$ytrafo <- .ctmfit(object, parm, mltargs)
     args$update <- TRUE
