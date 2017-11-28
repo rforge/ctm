@@ -17,14 +17,16 @@
 coef.trafotree <- function(object, ...)
     object$coef
 
-logLik.trafotree <- function(object, newdata, ...) {
+logLik.trafotree <- function(object, newdata, perm = NULL, ...) {
 
     cf <- coef(object)
-    if (missing(newdata)) {
+    if (missing(newdata) && is.null(perm)) {
         ret <- sum(object$logLik)
     } else {
+        if (missing(newdata))
+            newdata <- object$data
         tids <- nodeids(object, terminal = TRUE)
-        nd <- factor(predict(object, newdata = newdata, type = "node", ...), 
+        nd <- factor(predict(object, newdata = newdata, type = "node", perm = perm, ...), 
                      levels = tids, labels = tids)
         ### set up unfitted model with newdata
         mltargs <- object$mltargs
@@ -174,11 +176,6 @@ predict.traforest <- function(object,  newdata, mnewdata = data.frame(1), K = 20
     names(ans) <- colnames(ret)
     cf <- vector(mode = "list", length = ncol(ret))
     names(cf) <- colnames(ret)
-
-    ### if nmax < Inf tabulate weights here
-    if (!is.null(mltmod$iy)) 
-        ret <- apply(ret, 2, function(r) 
-                     libcoin::ctabs(mltmod$iy, weights = r)[-1L])
 
     converged <- logical(ncol(ret))
     if (trace) pb <- txtProgressBar(style = 3)
