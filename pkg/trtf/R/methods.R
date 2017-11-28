@@ -189,7 +189,7 @@ predict.traforest <- function(object,  newdata, mnewdata = data.frame(1), K = 20
         ### try hard to estimate parameters; if may happen that parameters for 
         ### a specific obs are not identified (out of range)
         umod <- try(object$trafo(subset = which(w > 0), 
-                                 newweights = w, info = list(coef = thetastart),
+                                 weights = w, info = list(coef = thetastart),
                                  estfun = FALSE), silent = TRUE)
         converged[i] <- umod$converged 
         if (inherits(umod, "try-error")) {
