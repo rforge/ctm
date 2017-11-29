@@ -17,14 +17,20 @@
 coef.trafotree <- function(object, ...)
     object$coef
 
-logLik.trafotree <- function(object, newdata, perm = NULL, ...) {
+logLik.trafotree <- function(object, newdata, weights = NULL, perm = NULL, ...) {
 
     cf <- coef(object)
-    if (missing(newdata) && is.null(perm)) {
+    if (missing(newdata) && is.null(perm) && is.null(weights)) {
         ret <- sum(object$logLik)
     } else {
-        if (missing(newdata))
+        if (missing(newdata)) {
             newdata <- object$data
+            if (is.null(weights))
+                weights <- data_party(object)[["(weights)"]]
+        } else {
+            if (is.null(weights))
+                weights <- rep(1, nrow(newdata))
+        }
         tids <- nodeids(object, terminal = TRUE)
         nd <- factor(predict(object, newdata = newdata, type = "node", perm = perm, ...), 
                      levels = tids, labels = tids)
@@ -33,11 +39,10 @@ logLik.trafotree <- function(object, newdata, perm = NULL, ...) {
         mltargs$data <- newdata
         mltargs$dofit <- FALSE
         mltmod <- do.call("mlt", mltargs)
-        weights <- rep(1, nrow(newdata))
         ll <- numeric(nlevels(nd))
         for (i in 1:nlevels(nd)) {
-            w <- numeric(nrow(newdata))
-            w[nd == levels(nd)[i]] <- 1
+            w <- weights
+            w[nd != levels(nd)[i]] <- 0
             ll[i] <- logLik(mltmod, parm = cf[levels(nd)[i],], w = w)
         }
         ret <- sum(ll)
@@ -47,7 +52,9 @@ logLik.trafotree <- function(object, newdata, perm = NULL, ...) {
     ret
 }
 
-logLik.traforest <- function(object, newdata, OOB = FALSE, coef = NULL, ...) {
+logLik.traforest <- function(object, newdata, weights = NULL, OOB = FALSE, coef = NULL,  ...) {
+
+    stopifnot(is.null(weights))
 
     if (is.null(coef)) {
         if (missing(newdata)) {
@@ -58,19 +65,19 @@ logLik.traforest <- function(object, newdata, OOB = FALSE, coef = NULL, ...) {
     } else {
         cf <- coef
     }
+
     if (missing(newdata)) {
         mltmod <- object$mltobj$object
         newdata <- object$data
         weights <- object$fitted[["(weights)"]]
-        if (is.null(weights)) weights <- rep(1, nrow(newdata))
     } else {
         ### set up unfitted model with newdata
         mltargs <- object$mltargs
         mltargs$data <- newdata
         mltargs$dofit <- FALSE
         mltmod <- do.call("mlt", mltargs)
-        weights <- rep(1, nrow(newdata))
     }
+    if (is.null(weights)) weights <- rep(1, nrow(newdata))
 
     ret <- sum(sapply(1:nrow(newdata), function(i) {
         w <- numeric(length(weights))
@@ -255,7 +262,9 @@ simulate.trafotree <- simulate.traforest
 
 gettree.traforest <- function(object, tree = 1L, ...) {
 
-    ret <- party(object$nodes[[tree]], data = object$data, fitted = object$fitted)
+    ft <- object$fitted
+    ft[["(weights)"]] <- weights <- object$weights[[tree]]
+    ret <- party(object$nodes[[tree]], data = object$data, fitted = ft)
     ret$terms <- object$terms
     class(ret) <- c("constparty", class(ret))
     ret$model <- object$model
@@ -264,9 +273,9 @@ gettree.traforest <- function(object, tree = 1L, ...) {
     ret$trafo <- object$trafo
     nd <- predict(ret, newdata = object$data, type = "node")
     ret$models <- tapply(1:length(nd), factor(nd), function(i)
-        ret$trafo(i, estfun = FALSE)) ### note: trafo is (potentially) weighted
+        ret$trafo(i, weights = weights, estfun = FALSE)) ### note: trafo needs weights
     ret$coef <- do.call("rbind", lapply(ret$models, function(x) x$coef))
-    ret$logLik <- sapply(ret$models, function(x) x$objfun)
+    ret$logLik <- sapply(ret$models, function(x) -x$objfun)
     class(ret) <- c("trafotree", class(ret))
     ret
 }
