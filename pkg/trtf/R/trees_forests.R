@@ -45,7 +45,7 @@
                     return(list(coef = thetastart, objfun = NA,
                                 converged = FALSE))
                 return(list(estfun = matrix(0, nrow = nrow(mf), ncol = length(w)),
-                            iy = iy, converged = FALSE))
+                            coef = thetastart, objfun = NA,  converged = FALSE))
             }
             ret <- NULL
             if (estfun) {
@@ -59,7 +59,9 @@
                 if (!is.null(iy)) ret <- rbind(0, ret)
             }
             return(list(estfun = ret, 
-                        coefficients = coef(umod), objfun = logLik(umod), 
+                        coefficients = coef(umod), 
+                        ### we always minimise risk
+                        objfun = -logLik(umod), 
                         object = if (object) umod else NULL,
                         converged = isTRUE(all.equal(umod$convergence, 0))))
         }
@@ -78,13 +80,16 @@ trafotree <- function(object, parm = 1:length(coef(object)), mltargs = list(maxi
     ret$mltobj <- ret$trafo(model = TRUE, estfun = FALSE)
     ret$mltargs <- mltargs
 
+    weights <- data_party(ret)[["(weights)"]]
+    if (is.null(weights)) weights <- rep(1, nrow(data_party(ret)))
+
     ### store coefs and logLik _outside_ tree
     ### <FIXME> this will cause problems with nodeprune </FIXME>
     nd <- predict(ret, type = "node")
     ret$models <- tapply(1:length(nd), factor(nd), function(i) 
-        ret$trafo(i, estfun = FALSE)) ### note: trafo is (potentially) weighted
+        ret$trafo(i, weights = weights, estfun = FALSE)) ### note: trafo needs weights
     ret$coef <- do.call("rbind", lapply(ret$models, function(x) x$coef))
-    ret$logLik <- sapply(ret$models, function(x) x$objfun)
+    ret$logLik <- sapply(ret$models, function(x) -x$objfun) ### objfun is neg logLik
 
     class(ret) <- c("trafotree", class(ret))
     ret
