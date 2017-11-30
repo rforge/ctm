@@ -77,6 +77,9 @@ logLik.traforest <- function(object, newdata, weights = NULL, OOB = FALSE, coef 
         mltargs$dofit <- FALSE
         mltmod <- do.call("mlt", mltargs)
     }
+
+    ### <FIXME> this will not work for nmax < Inf </FIXME>
+
     if (is.null(weights)) weights <- rep(1, nrow(newdata))
 
     ret <- sum(sapply(1:nrow(newdata), function(i) {
