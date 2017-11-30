@@ -67,18 +67,14 @@ logLik.traforest <- function(object, newdata, weights = NULL, OOB = FALSE, coef 
     }
 
     if (missing(newdata)) {
-        mltmod <- object$mltobj$object
         newdata <- object$data
         weights <- object$fitted[["(weights)"]]
-    } else {
-        ### set up unfitted model with newdata
-        mltargs <- object$mltargs
-        mltargs$data <- newdata
-        mltargs$dofit <- FALSE
-        mltmod <- do.call("mlt", mltargs)
-    }
-
-    ### <FIXME> this will not work for nmax < Inf </FIXME>
+    } 
+    ### set up unfitted model with newdata
+    mltargs <- object$mltargs
+    mltargs$data <- newdata
+    mltargs$dofit <- FALSE
+    mltmod <- do.call("mlt", mltargs)
 
     if (is.null(weights)) weights <- rep(1, nrow(newdata))
 
