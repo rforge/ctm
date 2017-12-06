@@ -21,6 +21,7 @@ logLik.trafotree <- function(object, newdata, weights = NULL, perm = NULL, ...) 
 
     cf <- coef(object)
     if (missing(newdata) && is.null(perm) && is.null(weights)) {
+        ### <FIXME> this is different when nmax < Inf </FIXME>
         ret <- sum(object$logLik)
     } else {
         if (missing(newdata)) {
@@ -54,8 +55,6 @@ logLik.trafotree <- function(object, newdata, weights = NULL, perm = NULL, ...) 
 
 logLik.traforest <- function(object, newdata, weights = NULL, OOB = FALSE, coef = NULL,  ...) {
 
-    stopifnot(is.null(weights))
-
     if (is.null(coef)) {
         if (missing(newdata)) {
             cf <- predict(object, OOB = OOB, type = "coef")
@@ -68,7 +67,8 @@ logLik.traforest <- function(object, newdata, weights = NULL, OOB = FALSE, coef 
 
     if (missing(newdata)) {
         newdata <- object$data
-        weights <- object$fitted[["(weights)"]]
+        if (is.null(weights))
+            weights <- object$fitted[["(weights)"]]
     } 
     ### set up unfitted model with newdata
     mltargs <- object$mltargs
