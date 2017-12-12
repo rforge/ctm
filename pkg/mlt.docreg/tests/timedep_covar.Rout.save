@@ -1,5 +1,5 @@
 
-R version 3.4.0 (2017-04-21) -- "You Stupid Darkness"
+R version 3.4.3 (2017-11-30) -- "Kite-Eating Tree"
 Copyright (C) 2017 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -105,9 +105,6 @@ There were 21 warnings (use warnings() to see them)
 > m <- mlt(ctm(by, interacting = btg, 
 +          shift = ~ karno + karno:timegroup + age + trt, data = vet2, todistr = "MinExtr"),
 +          data = vet2, scale = TRUE)
-Note: method with signature 'dsparseMatrix#dsparseMatrix' chosen for function 'kronecker',
- target signature 'dgTMatrix#dgCMatrix'.
- "TsparseMatrix#sparseMatrix" would also be valid
 > 
 > max(abs(coef(fit1) - coef(m)[-(1:12)]))
 [1] 0.03000332
@@ -116,4 +113,4 @@ Note: method with signature 'dsparseMatrix#dsparseMatrix' chosen for function 'k
 > 
 > proc.time()
    user  system elapsed 
-  4.752   0.056   4.809 
+  5.576   0.068   5.648 
