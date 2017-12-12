@@ -2,6 +2,12 @@
 \name{NEWS}
 \title{NEWS file for the mlt.docreg package}
 
+\section{Changes in Version 0.2-1 (2017-12-12)}{
+  \itemize{
+    \item{Update citations.}
+  }
+}
+
 \section{Changes in Version 0.2-0 (2017-06-20)}{
   \itemize{
     \item{Most Likely Transformations will be published in
