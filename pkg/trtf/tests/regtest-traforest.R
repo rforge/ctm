@@ -13,7 +13,7 @@ tf <- traforest(m, formula = y ~ horTh + age + menostat + tsize + tgrade +
     pnodes + progrec + estrec, data = GBSG2, 
     control = ctree_control(splitstat = "quad", teststat = "quad",
                     testtype = "Teststatistic", mincriterion = 1, minbucket = 50), 
-    ntree = 12, trace = FALSE, cores = 4)
+    ntree = 12, trace = FALSE, cores = 1)
 
 predict(tf, newdata = GBSG2[1:3,], type = "weights")
 predict(tf, newdata = GBSG2[1:3,], type = "node")
