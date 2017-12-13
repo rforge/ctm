@@ -19,13 +19,20 @@ trafotree(object, parm = 1:length(coef(object)), mltargs = list(maxit = 10000), 
 }
 \details{
   Conditional inference trees are used for partitioning likelihood-based transformation
-  models as described in Hothorn and Zeileis (2017).
+  models as described in Hothorn and Zeileis (2017). The method can be seen
+  in action in Hothorn (2018) and the corresponding code is available as
+  \code{demo("BMI")}. \code{demo("applications")} performs transformation
+  tree analyses for some standard benchmarking problems.
 }
 \value{
   An object of class \code{trafotree} with corresponding \code{plot}, \code{logLik} and
   \code{predict} methods.}
 \references{
   Torsten Hothorn and Achim Zeileis (2017). Transformation Forests.
+  \url{https://arxiv.org/abs/1701.02110}.
+
+  Torsten Hothorn (2018). Top-Down Transformation Choice. \emph{Statistical
+  Modelling}, \url{https://arxiv.org/abs/1706.08269}.
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
