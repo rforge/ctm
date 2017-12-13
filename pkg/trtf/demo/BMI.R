@@ -16,7 +16,7 @@ library("ATR")
 library("trtf")
 library("mlt")
 
-pdf("BMI.pdf", width = 12, height = 8))
+pdf("BMI.pdf", width = 12, height = 8)
 
 col <- diverge_hcl(2, h = c(246, 40), c = 120, l = c(65, 90), alpha = .75)
 trellis.par.set(list(plot.symbol = list(col="blue",pch=18, cex=0.5),
