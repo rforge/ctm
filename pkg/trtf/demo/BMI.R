@@ -16,6 +16,8 @@ library("ATR")
 library("trtf")
 library("mlt")
 
+pdf("BMI.pdf", width = 12, height = 8))
+
 col <- diverge_hcl(2, h = c(246, 40), c = 120, l = c(65, 90), alpha = .75)
 trellis.par.set(list(plot.symbol = list(col="blue",pch=18, cex=0.5),
                      box.rectangle = list(col=1),
@@ -533,3 +535,5 @@ ctm_ss3h <- ctm(bBMIh, interacting = b(sm = bSMK, sex = bSEX),
                data = learn, todistr = "Normal")
 mlt_ss3h <- mlt(ctm_ss3h, data = learn, scale = TRUE, weights = learn$wght)
 ll_ss3h <- logLik(mlt_ss3h)
+
+dev.off()
