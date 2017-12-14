@@ -34,4 +34,42 @@ traforest(object, parm = 1:length(coef(object)), mltargs = list(maxit = 10000), 
   Torsten Hothorn (2018). Top-Down Transformation Choice. \emph{Statistical
   Modelling}, \url{https://arxiv.org/abs/1706.08269}.
 }
+\examples{
+
+### Example: Personalised Medicine Using Partitioned and Aggregated Cox-Models
+### A combination of <DOI:10.1177/0962280217693034> and <arXiv:1701.02110>
+### based on infrastructure in the mlt R add-on package described in
+### https://cran.r-project.org/web/packages/mlt.docreg/vignettes/mlt.pdf
+
+library("trtf")
+library("survival")
+### German Breast Cancer Study Group 2 data set
+data("GBSG2", package = "TH.data")
+
+### set-up Cox model with overall treatment effect in hormonal therapy
+yvar <- numeric_var("y", support = c(100, 2000), bounds = c(0, Inf))
+By <- Bernstein_basis(yvar, order = 5, ui = "incre")
+m <- ctm(response = By, shifting = ~ horTh, todistr = "MinExt", data = GBSG2)
+GBSG2$y <- with(GBSG2, Surv(time, cens))
+
+### overall log-hazard ratio
+coef(cmod <- mlt(m, data = GBSG2))["horThyes"]
+### roughly the same as 
+coef(coxph(y ~ horTh, data = GBSG2))
+
+### estimate age-dependent Cox models (here ignoring all other covariates)
+ctrl <- ctree_control(minsplit = 50, minbucket = 20, mincriterion = 0)
+set.seed(290875)
+tf_cmod <- traforest(m, formula = y ~ horTh | age, control = ctrl, 
+                     ntree = 50, mtry = 1, trace = TRUE, data = GBSG2)
+
+### plot age-dependent treatment effects vs. overall treatment effect
+nd <- data.frame(age = 30:70)
+cf <- predict(tf_cmod, newdata = nd, type = "coef")
+nd$logHR <- sapply(cf, function(x) x["horThyes"])
+plot(logHR ~ age, data = nd, pch = 19, xlab = "Age", ylab = "log-Hazard Ratio")
+abline(h = coef(cmod <- mlt(m, data = GBSG2))["horThyes"])
+### treatment most beneficial in very young patients
+
+}
 \keyword{trees}
