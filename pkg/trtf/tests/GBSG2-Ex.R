@@ -1,5 +1,6 @@
 
 library("trtf")
+library("partykit")
 library("survival")
 data("GBSG2", package = "TH.data")
 set.seed(290875)
