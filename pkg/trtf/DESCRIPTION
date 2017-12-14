@@ -10,5 +10,5 @@ Description: Recursive partytioning of transformation models with
   and `Top-Down Transformation Choice'  <arXiv:1706.08269>.
 Depends: mlt (>= 0.2-1), partykit (>= 1.2-0)
 Imports: Formula, sandwich, grid, stats, variables, libcoin, utils
-Suggests: survival, TH.data
+Suggests: survival, TH.data, coin
 License: GPL-2
