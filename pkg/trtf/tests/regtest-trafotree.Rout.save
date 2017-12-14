@@ -1,5 +1,5 @@
 
-R version 3.4.1 (2017-06-30) -- "Single Candle"
+R Under development (unstable) (2017-12-13 r73907) -- "Unsuffered Consequences"
 Copyright (C) 2017 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -31,6 +31,7 @@ The following object is masked from 'package:variables':
 
 Loading required package: libcoin
 Loading required package: mvtnorm
+Loading required package: rpart
 > library("survival")
 > data("GBSG2", package = "TH.data")
 > set.seed(290875)
@@ -131,4 +132,4 @@ n1    3   4   6   7
 > 
 > proc.time()
    user  system elapsed 
-  4.316   0.120   4.427 
+  7.020   0.180   7.198 
