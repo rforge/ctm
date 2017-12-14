@@ -1,5 +1,5 @@
 
-R version 3.4.3 (2017-11-30) -- "Kite-Eating Tree"
+R Under development (unstable) (2017-12-13 r73907) -- "Unsuffered Consequences"
 Copyright (C) 2017 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -33,6 +33,7 @@ Loading required package: libcoin
 Loading required package: mvtnorm
 Loading required package: rpart
 > library("survival")
+> library("partykit")
 > data("GBSG2", package = "TH.data")
 > set.seed(290875)
 > 
@@ -832,4 +833,4 @@ $`3`
 > 
 > proc.time()
    user  system elapsed 
- 13.740   0.080  13.874 
+ 28.072   0.236  28.328 
