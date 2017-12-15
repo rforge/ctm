@@ -3,7 +3,7 @@ Title: Transformation Models
 Version: 0.1-0
 Date: 2017-12-18
 Authors@R: person("Torsten", "Hothorn", role = c("aut", "cre"),
-                  email = "Torsten.Hothorn@R-project.org")
+                  email = "Torsten.Hothorn@R-project.org", comment = c(ORCID = "0000-0001-8301-0471"))
 Description: Simple user-interfaces to specific transformation models
   implemented in package mlt.
 Depends: mlt (>= 0.2-1)
