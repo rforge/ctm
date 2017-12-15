@@ -70,6 +70,10 @@ nd$logHR <- sapply(cf, function(x) x["horThyes"])
 plot(logHR ~ age, data = nd, pch = 19, xlab = "Age", ylab = "log-Hazard Ratio")
 abline(h = coef(cmod <- mlt(m, data = GBSG2))["horThyes"])
 ### treatment most beneficial in very young patients
+### NOTE: scale of log-hazard ratios depends on
+### corresponding baseline hazard function which  _differs_
+### across age; interpretation of positive / negative treatment effect is,
+### however, save.
 
 }
 \keyword{trees}
