@@ -1,56 +1,87 @@
 
-### y | strata ~ x | z
-### cluster: Hessian with cluster weights, sum-up
-### variances
-
-tram <- function(formula, data, subset, weights, offset,
-                 order = 1, distribution = c("Normal", "Logistic", "MinExtrVal"),
-                 algorithm = c("ML", "boosting", "tree", "forest"), ...) 
+tram_data <- function(formula, data, subset, weights, offset, cluster, na.action = na.omit) 
 {
 
-    if (missing(data))
-        data <- environment(formula)
+    ## set up model.frame() call
     mf <- match.call(expand.dots = FALSE)
-    names(mf)[names(mf) %in% c("subset", "weights", "offset")]  <- 
-        paste("(", names(mf)[names(mf) %in% c("subset", "weights", "offset")], ")", sep = "")
-    m <- match(c("formula", "data", "(subset)", "(weights)", "(offset)"),
-               names(mf), 0)
-    mf <- mf[c(1, m)]
+    mf$na.action <- na.action ### evaluate na.action
+    if(missing(data)) data <- environment(formula)
+    m <- match(c("formula", "data", "subset", "na.action", "weights", "offset", "cluster"), names(mf), 0L)
+    mf <- mf[c(1L, m)]
+    mf$drop.unused.levels <- TRUE
+    mf$dot <- "sequential"
 
-    formula <- Formula::Formula(formula)
+    ## formula processing
+    oformula <- as.formula(formula)
+    formula <- Formula::as.Formula(formula)
     mf$formula <- formula
-    mf[[1]] <- quote(stats::get_all_vars)
+    npart <- length(formula)
+    if(any(npart < 1L)) stop("'formula' must specify at least one left-hand and one right-hand side")
+    if(any(npart > 2L)) stop("'formula' must specify at least one left-hand and one right-hand side")
+
+    ## evaluate model.frame
+    mf[[1L]] <- quote(stats::model.frame)
     mf <- eval(mf, parent.frame())
 
-    mfterms <- terms(formula, data = data, dot = "sequential") 
-    ### there might be dots in formula, fdot
-    ### is formula with dots replaced
-    fdot <- attr(mfterms, "Formula_without_dot")
-    if (!is.null(fdot)) formula <- fdot
+    ## extract terms in various combinations
+    mt <- list(
+      "all" = terms(formula, data = data,                        dot = "sequential"),
+      "y"   = terms(formula, data = data, lhs = 1L, rhs = 0L,    dot = "sequential"),
+      "s"   = if (npart[1] == 2) 
+              terms(formula, data = data, lhs = 2L, rhs = 0L,    dot = "sequential"),
+      "x"   = terms(formula, data = data, lhs = 0L, rhs = 1L,    dot = "sequential"),
+      "z"   = if (npart[2] == 2) 
+              terms(formula, data = data, lhs = 0L, rhs = 2L,    dot = "sequential")
+    )
 
-    lfm <- length(formula)
-    stopifnot(length(lfm) == 2)
-    stopifnot(lfm[1] == 1)
-    yfm <- formula(formula, lhs = 1, rhs = 0)
+    stopifnot(is.null(mt$z))
 
-    xfm <- formula(formula, lhs = 0, rhs = 1)
-    sfm <- NULL
-    if (lfm[2] >= 2)
-        sfm <- formula(formula, lhs = 0, rhs = 2)
-    rfm <- NULL
-    if (lfm[2] >= 3)
-        rfm <- formula(formula, lhs = 0, rhs = 3)
-    zfm <- NULL
-    if (lfm[2] == 4)
-        zfm <- formula(formula, lhs = 0, rhs = 4)
+    response <- mf[[1L]]
+    weights <- model.weights(mf)
+    offset <- model.offset(mf)
+    cluster <- mf[["(cluster)"]]
 
-    return(list(xfm, sfm, rfm, zfm, mf))
+    ret <- list(response = response, weights = weights, offset = offset, cluster =
+                cluster, mf = mf, mt = mt)
+    class(ret) <- "tram_data"
+    ret
 }
 
+tram <- function(formula, data, subset, weights, offset, cluster, na.action = na.omit,
+                 distribution = c("Normal", "Logistic", "MinExtrVal"),
+                 transformation = c("discrete", "linear", "logarithmic", "smooth"),
+                 prob = c(.1, .9), order = 6, negative = FALSE, asFamily =
+                 FALSE, ...) 
+{
 
-tram(y ~ ., 
-     data = data.frame(y = 1:3, x = 2:4, s = 3:5, r = 4:6, z = 5:7),
-     weights = rep(1, 3),
-     offset = 0,
-     subset = z > 6)
+    if (!inherits(td <- formula, "tram_data")) {
+        mf <- match.call(expand.dots = FALSE)
+        m <- match(c("formula", "data", "subset", "na.action", "weights", "offset", "cluster"), names(mf), 0L)
+        mf <- mf[c(1L, m)]
+        mf[[1L]] <- quote(tram_data)
+        td <- eval(mf, parent.frame())
+    } 
 
+    rvar <- asvar(td$response, names(td$mf)[1L], prob = prob, ...)
+    rbasis <- mkbasis(rvar, transformation = transformation, order = order)
+
+    iS <- NULL
+    if (!is.null(td$mt$s)) 
+        iS <- as.basis(formula(Formula(td$mt$s)[-3]), data = td$mf)
+    iX <- NULL
+    if (!is.null(td$mt$x)) 
+        iX <- as.basis(td$mt$x, data = td$mf, remove_intercept = !asFamily, 
+                       negative = negative)
+
+    model <- ctm(response = rbasis, interacting = iS, shifting = iX, 
+                 todistr = distribution, data = td$mf)
+
+    if (asFamily) return(ctmFamily(model, td$mf))
+
+    ret <- mlt(model, data = td$mf, weights = td$weights, offset = td$offset, ...)
+    ret$terms <- td$terms
+    ret$cluster <- td$cluster
+    ret$shiftcoef <- colnames(model.matrix(iX, data = td$mf))
+    class(ret) <- c("tram", class(ret))
+    ret
+}
