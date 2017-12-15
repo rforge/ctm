@@ -28,7 +28,7 @@ node_mlt <- function(obj, newdata = data.frame(1), col = "black", bg = "white", 
         cf <- obj$coef[as.character(nid),]
         coef(mod) <- cf
         y <- predict(mod, newdata = newdata, q = q, type = type)
-        yv <- as.vector(y)
+        if (!is.matrix(y)) y <- matrix(y, ncol = 1)
         if (length(col) != ncol(y)) col <- rep(col, length.out = ncol(y))
 
         ## set up plot
