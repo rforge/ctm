@@ -70,6 +70,7 @@
 
 trafotree <- function(object, parm = 1:length(coef(object)), mltargs = list(maxit = 10000), ...) {
 
+    if (inherits(object, "mlt")) object <- object$model
     mltargs$model <- object
     ### note: weights, offset, cluster etc. are evaluated here !!!
     args <- list(...)
@@ -97,6 +98,7 @@ trafotree <- function(object, parm = 1:length(coef(object)), mltargs = list(maxi
 
 traforest <- function(object, parm = 1:length(coef(object)), mltargs = list(maxit = 10000), ...) {
 
+    if (inherits(object, "mlt")) object <- object$model
     mltargs$model <- object
     ### note: weights, offset, cluster etc. are evaluated here !!!
     args <- list(...)

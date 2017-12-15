@@ -8,7 +8,7 @@
 traforest(object, parm = 1:length(coef(object)), mltargs = list(maxit = 10000), ...)
 }
 \arguments{
-  \item{object}{an object of class \code{\link[mlt]{ctm}} specifying the
+  \item{object}{an object of class \code{\link[mlt]{ctm}} or \code{\link[mlt]{mlt}} specifying the
                 abstract model to be partitioned.}
   \item{parm}{parameters of \code{object} those corresponding score is
               used for finding partitions.}
