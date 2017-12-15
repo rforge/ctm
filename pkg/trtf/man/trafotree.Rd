@@ -69,18 +69,11 @@ logLik(part_cmod)
 ### stronger effects in nodes 2 and 4 and no effect in node 5
 coef(part_cmod)[, "horThyes"]
 
-### plot the conditional survivor functions
+### plot the conditional survivor functions; blue is untreated
+### and green is hormonal therapy
 nd <- data.frame(horTh = sort(unique(GBSG2$horTh)))
-col <- c("cadetblue3", "chartreuse4")
-layout(matrix(1:3, ncol = 3))
-cf <- coef(part_cmod)
-tmp <- sapply(rownames(cf), function(node) {
-    coef(cmod) <- cf[node,]
-    plot(cmod, newdata = nd, type = "survivor", col = col, 
-         xlab = "Time", ylab = "Probability", lwd = 2,
-         main = paste("Node", node))
-    legend("topright", col = col, legend = levels(nd$horTh), 
-           lty = 1, title = "Hormonal Therapy", bty = "n", lwd = 2)
-})
+plot(part_cmod, newdata = nd, 
+     tp_args = list(type = "survivor", col = c("cadetblue3", "chartreuse4")))
+
 }
 \keyword{trees}

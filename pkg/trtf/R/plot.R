@@ -1,4 +1,4 @@
-node_mlt <- function(obj, col = "black", bg = "white", fill = "transparent",
+node_mlt <- function(obj, newdata = data.frame(1), col = "black", bg = "white", fill = "transparent",
                      ylines = 2, id = TRUE, mainlab = NULL, gp = gpar(), K = 20,
                      type = c("trafo", "distribution", "survivor",  
                               "density", "logdensity", "hazard",    
@@ -27,7 +27,9 @@ node_mlt <- function(obj, col = "black", bg = "white", fill = "transparent",
 
         cf <- obj$coef[as.character(nid),]
         coef(mod) <- cf
-        y <- as.vector(predict(mod, newdata = data.frame(1), q = q, type = type))
+        y <- predict(mod, newdata = newdata, q = q, type = type)
+        yv <- as.vector(y)
+        if (length(col) != ncol(y)) col <- rep(col, length.out = ncol(y))
 
         ## set up plot
         q <- q - xscale[1]
@@ -73,19 +75,24 @@ node_mlt <- function(obj, col = "black", bg = "white", fill = "transparent",
         if(axes[2]) grid.yaxis()
         grid.rect(gp = gpar(fill = "transparent"))
         grid.clip()
-	if(flip) {
-	  if(fill != "transparent") {
-	    grid.polygon(c(min(y), y, min(y)), c(q[1], q, q[K]), gp = gpar(col = col, fill = fill))
-          } else {
-	    grid.lines(y, q, gp = gpar(col = col))
-	  }
-	} else {
-	  if(fill != "transparent") {
-	    grid.polygon(c(q[1], q, q[K]), c(min(y), y, min(y)), gp = gpar(col = col, fill = fill))
-          } else {
-	    grid.lines(q, y, gp = gpar(col = col))
-	  }
-	}
+        draw <- function(i) {
+            y <- y[,i]
+            col <- col[i]
+            if(flip) {
+                if(fill != "transparent") {
+                    grid.polygon(c(min(y), y, min(y)), c(q[1], q, q[K]), gp = gpar(col = col, fill = fill))
+                } else {
+                    grid.lines(y, q, gp = gpar(col = col))
+                }
+           } else {
+               if(fill != "transparent") {
+                   grid.polygon(c(q[1], q, q[K]), c(min(y), y, min(y)), gp = gpar(col = col, fill = fill))
+               } else {
+                   grid.lines(q, y, gp = gpar(col = col))
+               }
+           }
+        }
+        out <- sapply(1:ncol(y), draw)
         upViewport(2)
     }
 
@@ -93,9 +100,9 @@ node_mlt <- function(obj, col = "black", bg = "white", fill = "transparent",
 }
 class(node_mlt) <- "grapcon_generator"
 
-plot.trafotree <- function(x, ...) {
+plot.trafotree <- function(x, newdata = data.frame(1), ...) {
     class(x) <- class(x)[-1L]
-    tp <- function(...) node_mlt(...)
+    tp <- function(...) node_mlt(newdata = newdata, ...)
     class(tp) <- class(node_mlt)
     plot(x, terminal_panel = tp, ...)
 }
