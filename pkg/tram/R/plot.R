@@ -4,7 +4,13 @@ plot.tram <- function(x, newdata = x$data,
 
     which <- match.arg(which)
     object <- as.mlt(x)
+    y <- newdata[[variable.names(x, "response")]]
 
+    censored <- inherits(y, "Surv") || inherits(y, "response")
+
+    if (which != "distribution" && censored)
+        stop("Cannot compute in-sample ", which, " for censored responses")
+        
     if (which == "QQresiduals") {
         U <- predict(object, newdata = newdata, type = "distribution")
         qqplot(U, 1:length(U) / length(U), ...)

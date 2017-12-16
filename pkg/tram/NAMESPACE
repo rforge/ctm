@@ -7,11 +7,11 @@ importFrom("sandwich", "vcovCL", "estfun")
 importFrom("multcomp", "cftest")
 importFrom("stats", "model.matrix", "coef", "vcov", "nobs", "predict", "quantile", "na.omit",
            "logLik", "model.response", "model.weights", "model.offset", "terms", "as.formula",
-           "printCoefmat", "qqline", "qqplot", "qunif", "variable.names")
+           "printCoefmat", "qqline", "qqplot", "qunif", "variable.names", "pchisq")
 importFrom("survival", "survfit", "Surv")
 importFrom("graphics", "plot")
 
-export(tram, tram_data, Coxph, Colr, Polr)
+export(tram, tram_data, Coxph, Colr, Polr, Lm, BoxCox, Survreg)
 
 S3method("as.mlt", "tram")
 S3method("model.matrix", "tram")
@@ -22,6 +22,7 @@ S3method("logLik", "tram")
 S3method("estfun", "tram")
 S3method("predict", "tram")
 S3method("summary", "tram")
+S3method("model.frame", "tram")
 S3method("print", "tram")
 S3method("print", "summary.tram")
 S3method("plot", "tram")

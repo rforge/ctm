@@ -36,6 +36,9 @@ tram_data <- function(formula, data, subset, weights, offset, cluster, na.action
 
     stopifnot(is.null(mt$z))
 
+    ### Surv(...) etc. will be altered anyway...
+    # names(mf) <- make.names(names(mf))
+
     response <- mf[[1L]]
     weights <- model.weights(mf)
     offset <- model.offset(mf)
@@ -50,8 +53,9 @@ tram_data <- function(formula, data, subset, weights, offset, cluster, na.action
 tram <- function(formula, data, subset, weights, offset, cluster, na.action = na.omit,
                  distribution = c("Normal", "Logistic", "MinExtrVal"),
                  transformation = c("discrete", "linear", "logarithmic", "smooth"),
-                 prob = c(.1, .9), order = 6, negative = FALSE, asFamily =
-                 FALSE, ...) 
+                 LRtest = TRUE, 
+                 prob = c(.1, .9), support = NULL, order = 6, negative = FALSE, scale =
+                 TRUE, asFamily = FALSE, model_only = FALSE, ...) 
 {
 
     if (!inherits(td <- formula, "tram_data")) {
@@ -62,7 +66,7 @@ tram <- function(formula, data, subset, weights, offset, cluster, na.action = na
         td <- eval(mf, parent.frame())
     } 
 
-    rvar <- asvar(td$response, names(td$mf)[1L], prob = prob, ...)
+    rvar <- asvar(td$response, names(td$mf)[1L], prob = prob, support = support)
     rbasis <- mkbasis(rvar, transformation = transformation, order = order)
 
     iS <- NULL
@@ -76,12 +80,27 @@ tram <- function(formula, data, subset, weights, offset, cluster, na.action = na
     model <- ctm(response = rbasis, interacting = iS, shifting = iX, 
                  todistr = distribution, data = td$mf)
 
+    if (model_only) return(model)
+
     if (asFamily) return(ctmFamily(model, td$mf))
 
-    ret <- mlt(model, data = td$mf, weights = td$weights, offset = td$offset, ...)
+    ret <- mlt(model, data = td$mf, weights = td$weights, offset = td$offset, 
+               scale = scale, ...)
     ret$terms <- td$terms
     ret$cluster <- td$cluster
     ret$shiftcoef <- colnames(model.matrix(iX, data = td$mf))
     class(ret) <- c("tram", class(ret))
+
+    if (LRtest & !is.null(iX)) {
+        nullmodel <- ctm(response = rbasis, interacting = iS, 
+                         todistr = distribution, data = td$mf)
+        nullret <- mlt(nullmodel, data = td$mf, weights = td$weights, offset = td$offset, 
+                       scale = scale, ...)
+        nulllogLik <- logLik(nullret)
+        fulllogLik <- logLik(ret)
+        ret$LRtest <- c(LRstat = -2 * (nulllogLik - fulllogLik), 
+                        df = attr(fulllogLik, "df") - attr(nulllogLik, "df"))
+    }
+
     ret
 }

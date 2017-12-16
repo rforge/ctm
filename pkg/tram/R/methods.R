@@ -5,6 +5,8 @@ as.mlt.tram <- function(object) {
     object
 }    
 
+model.frame.tram <- function(formula, ...)
+    formula$data
 
 model.matrix.tram <- function(object, baseline = FALSE, ...) 
 {
@@ -57,6 +59,7 @@ predict.tram <- function(object, newdata = object$data,
 }
 
 print.tram <- function(x, ...) {
+    cat("\n", x$tram, "\n")
     cat("\nCall:\n")
     print(x$call)
     cat("\nCoefficients:\n")
@@ -71,11 +74,18 @@ summary.tram <- function(object, ...) {
     ret <- list(call = object$call,
                 test = cftest(object, parm = names(coef(object, baseline = FALSE))),
                 ll = logLik(object))
+    if (!is.null(object$LRtest)) {
+        ret$LRstat <- object$LRtest["LRstat"]
+        ret$df <- floor(object$LRtest["df"])
+        ret$p.value <- pchisq(object$LRtest["LRstat"], 
+                              df = object$LRtest["df"], lower.tail = FALSE)
+    }
     class(ret) <- "summary.tram"
     ret
 }
 
 print.summary.tram <- function(x, digits = max(3L, getOption("digits") - 3L), ...) {
+    cat("\n", x$tram, "\n")
     cat("\nCall:\n")
     print(x$call)
     cat("\nCoefficients:\n")
@@ -86,6 +96,9 @@ print.summary.tram <- function(x, digits = max(3L, getOption("digits") - 3L), ..
     printCoefmat(mtests, digits = digits, has.Pvalue = TRUE, 
         P.values = TRUE, eps.Pvalue = sig)
     cat("\nLog-Likelihood:\n ", x$ll, " (df = ", attr(x$ll, "df"), ")", sep = "")
+    if (!is.null(x$LRstat))
+        cat("\nLikelihood-ratio Test: Chisq =", x$LRstat, "on",
+            x$df, "degrees of freedom; p =", format.pval(x$p.value, digits = digits, ...))
     cat("\n\n")
     invisible(x)
 }
