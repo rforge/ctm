@@ -39,4 +39,4 @@ clean:
 	rm -rf .Rdata
 	rm -rf Rplots.pdf
 	rm -rf .RData
-	
+	rm -rf figure

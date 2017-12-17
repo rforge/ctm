@@ -24,6 +24,10 @@ for f in ./tests/*.ps; do
     rm -f $f
 done
 
+for f in ./vignettes/*~; do
+    rm -f $f
+done
+
 find . -name "DEADJOE" -exec rm -f {} \;
 
 exit 0

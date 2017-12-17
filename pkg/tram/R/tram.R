@@ -35,6 +35,12 @@ tram_data <- function(formula, data, subset, weights, offset, cluster, na.action
     )
 
     stopifnot(is.null(mt$z))
+    ### ~ 0 or ~ 1: no need to do anything
+    if (length(attr(mt$s, "variables")) == 1)
+        mt$s <- NULL
+    ### ~ 0 or ~ 1: no need to do anything
+    if (length(attr(mt$x, "variables")) == 1)
+        mt$x <- NULL
 
     ### Surv(...) etc. will be altered anyway...
     # names(mf) <- make.names(names(mf))
@@ -88,7 +94,8 @@ tram <- function(formula, data, subset, weights, offset, cluster, na.action = na
                scale = scale, ...)
     ret$terms <- td$terms
     ret$cluster <- td$cluster
-    ret$shiftcoef <- colnames(model.matrix(iX, data = td$mf))
+    if (!is.null(iX))
+        ret$shiftcoef <- colnames(model.matrix(iX, data = td$mf))
     class(ret) <- c("tram", class(ret))
 
     if (LRtest & !is.null(iX)) {

@@ -12,6 +12,7 @@ model.matrix.tram <- function(object, baseline = FALSE, ...)
 {
     ret <- model.matrix(as.mlt(object), ...)
     if (baseline) return(ret)
+    if (is.null(object$shiftcoef)) return(NULL)
     return(ret[, object$shiftcoef,,drop = FALSE])
 }	
 
@@ -19,6 +20,7 @@ coef.tram <- function(object, baseline = FALSE, ...)
 {
     cf <- coef(as.mlt(object), ...)
     if (baseline) return(cf)
+    if (is.null(object$shiftcoef)) return(NULL)
     return(cf[object$shiftcoef])
 }
         
@@ -30,11 +32,15 @@ vcov.tram <- function(object, baseline = FALSE, ...)
         ret <- sandwich::vcovCL(as.mlt(object), cluster = object$cluster)
     }
     if (baseline) return(ret)
+    if (is.null(object$shiftcoef)) return(NULL)
     return(ret[object$shiftcoef, object$shiftcoef, drop = FALSE])
 }
 
-nobs.tram <- function(object, ...)
-    NROW(object$data)
+nobs.tram <- function(object, ...) {
+    if (!is.null(object$weights)) 
+        return(sum(object$weights != 0))
+    return(NROW(object$data))
+}
 
 logLik.tram <- function(object, parm = coef(as.mlt(object), fixed = FALSE), ...)
     logLik(as.mlt(object), parm = parm, ...)

@@ -160,7 +160,7 @@ Lm <- function(formula, data, subset, weights, offset, cluster, na.action = na.o
               inherits(td$response, "response") ||
               is.numeric(td$response))
 
-    ret <- tram(td, transformation = "linear", distribution = "normal", ...)
+    ret <- tram(td, transformation = "linear", distribution = "Normal", ...)
     if (!inherits(ret, "mlt")) return(ret)
     ret$call <- match.call(expand.dots = TRUE)
     ret$tram <- paste(ifelse(is.null(td$terms$s), "", "(Stratified)"),
@@ -181,7 +181,7 @@ BoxCox <- function(formula, data, subset, weights, offset, cluster, na.action = 
               inherits(td$response, "response") ||
               is.numeric(td$response))
 
-    ret <- tram(td, transformation = "smooth", distribution = "normal", ...)
+    ret <- tram(td, transformation = "smooth", distribution = "Normal", ...)
     if (!inherits(ret, "mlt")) return(ret)
     ret$call <- match.call(expand.dots = TRUE)
     ret$tram <- paste(ifelse(is.null(td$terms$s), "", "(Stratified)"),
