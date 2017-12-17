@@ -945,7 +945,7 @@ Assuming a conditional normal distribution for the
 median value of owner-occupied homes (medv, in USD $1000$'s, we use the corrected version) 
 in the normal linear model with constant variance
 \begin{eqnarray*}
-\text{medv} \mid \rX = \rx \sim \ND(\tilde{\rx}^\top \shiftparm, \sigma^2)
+\text{medv} \mid \rX = \rx \sim \ND(\alpha + \tilde{\rx}^\top \shiftparm, \sigma^2)
 \end{eqnarray*}
 as implemented in \cmd{lm} is rather restrictive
 <<BostonHousing-lm>>=
