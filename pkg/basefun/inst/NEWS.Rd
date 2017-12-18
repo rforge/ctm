@@ -2,6 +2,12 @@
 \name{NEWS}
 \title{NEWS file for the basefun package}
 
+\section{Changes in Version 0.0-39 (2017-12-18)}{
+  \itemize{
+    \item{Add \code{intercept_basis}, ie an intercept only model matrix.}
+  }
+}
+
 \section{Changes in Version 0.0-38 (2017-05-15)}{
   \itemize{
     \item{\code{model.matrix.cbind_bases} can now deal with 
@@ -9,6 +15,7 @@
           dimensions in \code{dim}).}
   }
 }
+
 
 
 \section{Changes in Version 0.0-37 (2017-04-04)}{

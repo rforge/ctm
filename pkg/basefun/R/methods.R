@@ -48,6 +48,9 @@ mkgrid.basis <- function(object, n, ...)
 
 mkgrid.bases <- mkgrid.basis
 
+mkgrid.intercept_basis <- function(object, n, ...)
+    return(c("(Intercept)" = 1L))
+
 as.vars.basis <- function(object)
     attr(object, "variables")
 

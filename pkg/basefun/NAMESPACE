@@ -11,7 +11,7 @@ importFrom("stats", ".checkMFClasses", ".getXlevels", "as.formula",
            "variable.names", "model.matrix", "predict")
 
 export(Bernstein_basis, as.basis, b, 
-       log_basis, polynomial_basis, Legendre_basis)
+       log_basis, polynomial_basis, Legendre_basis, intercept_basis)
 ##     cyclic_basis,
 
 S3method("as.basis", "formula")
@@ -21,6 +21,7 @@ S3method("as.basis", "factor")
 S3method("as.basis", "ordered")
 S3method("mkgrid", "basis")
 S3method("mkgrid", "bases")
+S3method("mkgrid", "intercept_basis")
 S3method("c", "basis")
 S3method("c", "bases")
 S3method("as.vars", "basis")
@@ -34,6 +35,7 @@ S3method("model.matrix", "cbind_bases")
 S3method("model.matrix", "formula_basis")
 S3method("model.matrix", "log_basis")
 S3method("model.matrix", "polynomial_basis")
+S3method("model.matrix", "intercept_basis")
 S3method("predict", "basis")
 S3method("predict", "box_bases")
 S3method("predict", "cbind_bases")
