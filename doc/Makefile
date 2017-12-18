@@ -1,5 +1,5 @@
 
-all:	mlt.pdf
+all:	mlt.pdf tram.pdf
 
 mlt.tex:	mlt.Rnw
 	echo "library(\"knitr\"); knit(\"mlt.Rnw\")" | R --vanilla 
@@ -18,6 +18,24 @@ mlt.pdf:	mlt.tex mlt.bib
 	texi2dvi --pdf mlt.tex
 	pdflatex mlt.tex
 
+tram.tex:	tram.Rnw
+	echo "library(\"knitr\"); knit(\"tram.Rnw\")" | R --vanilla 
+#	diff mlt.tex mlt.tex.save
+
+tram.R:	tram.Rnw
+	echo "library(\"knitr\"); knit(\"tram.Rnw\", tangle = TRUE)" | R --vanilla 
+	grep -v "^opts" tram.R > tmp.R
+	mv tmp.R tram.R
+
+tram.Rout:	tram.R
+	R CMD BATCH tram.R
+#	diff mlt.Rout mlt.Rout.save
+	
+tram.pdf:	tram.tex mlt.bib
+	texi2dvi --pdf tram.tex
+	pdflatex tram.tex
+
+
 texclean:
 	rm -rf mlt.aux
 	rm -rf mlt.pdf
@@ -32,6 +50,8 @@ texclean:
 
 clean:	
 	make texclean
+	rm -rf tram.aux
+	rm -rf tram.pdf
 	rm -rf mlt.tex
 	rm -rf mlt.R
 	rm -rf mlt.Rout
@@ -39,6 +59,11 @@ clean:
 	rm -rf .Rdata
 	rm -rf Rplots.pdf
 	rm -rf .RData
+	rm -rf tram.tex
+	rm -rf tram.R
+	rm -rf tram.Rout
+	rm -rf packages.bib
+	rm -rf figure
 	
 dist-clean:
 	make clean
