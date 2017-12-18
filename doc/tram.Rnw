@@ -1,7 +1,7 @@
 
 %\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{tram}
-%\VignetteDepends{tram, survival, MASS, mlbench, multcomp}
+%\VignetteDepends{tram, survival, MASS, mlbench, multcomp, ordinal}
 
 \documentclass[article,nojss,shortnames]{jss}
 
@@ -21,7 +21,7 @@
 <<setup, echo = FALSE, results = "hide", message = FALSE>>=
 set.seed(290875)
 
-sapply(c("tram", "survival", "MASS", "lattice", "mlbench", "multcomp"), library, char = TRUE)
+sapply(c("tram", "survival", "MASS", "lattice", "mlbench", "multcomp", "ordinal"), library, char = TRUE)
 
 
 trellis.par.set(list(plot.symbol = list(col=1,pch=20, cex=0.7),
@@ -295,6 +295,61 @@ legend("bottomright", lty = 1, col = col,
        title = "Near Charles River", legend = c("no", "yes"), bty = "n")
 @
 \end{figure}
+
+\section{Ordinal Regression}
+
+<<wine-polr>>=
+data("wine", package = "ordinal")
+polr_wine <- polr(rating ~ temp + contact, data = wine)
+logLik(polr_wine)
+@
+
+<<wine-clm-1>>=
+clm_wine_1 <- clm(rating ~ temp + contact, data = wine)
+logLik(clm_wine_1)
+@
+
+<<wine-Polr-1>>=
+Polr_wine_1 <- Polr(rating ~ temp + contact, data = wine)
+logLik(Polr_wine_1)
+@
+
+<<wine-clm-2>>=
+clm_wine_2 <- clm(rating ~ temp, nominal = ~ contact, data = wine)
+logLik(clm_wine_2)
+@
+
+<<wine-Polr-2>>=
+Polr_wine_2 <- Polr(rating | 0 + contact ~ temp, data = wine)
+logLik(Polr_wine_2)
+@
+
+<<wine-clm-3>>=
+clm_wine_3 <- clm(rating ~ temp, nominal = ~ contact, data = wine, link = "probit")
+logLik(clm_wine_3)
+@
+
+<<wine-Polr-3>>=
+Polr_wine_3 <- Polr(rating | 0 + contact ~ temp, data = wine, method = "probit")
+logLik(Polr_wine_3)
+@
+
+<<wine-censored>>=
+erating <- wine$rating
+lrating <- erating
+rrating <- erating
+l9 <- lrating[wine$judge == 9] 
+l9[l9 > 1] <- levels(l9)[unclass(l9[l9 > 1]) - 1]
+r9 <- rrating[wine$judge == 9] 
+r9[r9 < 5] <- levels(r9)[unclass(r9[r9 < 5]) + 1]
+lrating[wine$judge != 9] <- rrating[wine$judge != 9] <- NA
+erating[wine$judge == 9] <- NA
+lrating[wine$judge == 9] <- l9
+rrating[wine$judge == 9] <- r9
+wine$crating <- R(erating, cleft = lrating, cright = rrating)
+# Polr_wine_4 <- Polr(crating | 0 + contact ~ temp, data = wine, method = "probit")
+# logLik(Polr_wine_4)
+@
 
 
 \bibliography{mlt,packages}
