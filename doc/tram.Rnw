@@ -151,21 +151,25 @@ design matrix.
 
 The normal linear regression model
 \begin{eqnarray*}
-\rY = \alpha + \tilde{\rx}^\top \shiftparm + \varepsilon, \quad \varepsilon \sim \ND(0, \sigma^2)
+\rY = \tilde{\alpha} + \tilde{\rx}^\top \tilde{\shiftparm} + \varepsilon, \quad \varepsilon \sim \ND(0, \sigma^2)
 \end{eqnarray*}
 is a transformation model of the general form (\ref{tram}) because we can
 rewrite it in the form
 \begin{eqnarray} \label{Lm}
-\Prob(\rY \le \ry \mid \rX = \rx) & = & \Phi\left(\frac{\ry - \alpha - \tilde{\rx}^\top \shiftparm}{\sigma}\right) \\ \nonumber
-& = & \Phi(\tilde{\alpha}_1 + \tilde{\alpha}_2 \ry - \tilde{\rx}^\top \tilde{\shiftparm})
+\Prob(\rY \le \ry \mid \rX = \rx) & = & \Phi\left(\frac{\ry - \tilde{\alpha} - \tilde{\rx}^\top \tilde{\shiftparm}}{\sigma}\right) \\ \nonumber
+& = & \Phi(\eparm_1 + \eparm_2 \ry - \tilde{\rx}^\top \shiftparm)
 \end{eqnarray}
-with $\tilde{\alpha}_1 = -\alpha / \sigma, \tilde{\alpha}_2 = 1 / \sigma$ and $\tilde{\shiftparm} = \shiftparm / \sigma$
+with $\eparm_1 = -\tilde{\alpha} / \sigma, \eparm_2 = 1 / \sigma$ and $\shiftparm = \tilde{\shiftparm} / \sigma$
 we see that the model is of the form
 \begin{eqnarray*}
-\Prob(\rY \le \ry \mid \rX = \rx) = \pZ(\h_\rY(\ry) - \tilde{\rx}^\top \tilde{\shiftparm})
+\Prob(\rY \le \ry \mid \rX = \rx) = \pZ(\h_\rY(\ry) - \tilde{\rx}^\top \shiftparm)
 \end{eqnarray*}
-with distribution function $\pZ = \Phi$ and linear transformation $\h_\rY(\ry) = \tilde{\alpha}_1 + \tilde{\alpha}_2 \ry$
-such that $\Ex(\h_\rY(\rY) \mid \rX = \rx) = \tilde{\rx}^\top \shiftparm$.
+with distribution function $\pZ = \Phi$ and linear transformation $\h_\rY(\ry) =
+\eparm_1 + \eparm_2 \ry$ such that 
+\begin{eqnarray*}
+\Ex(\h_\rY(\rY) \mid \rX = \rx) = \Ex(\eparm_1 + \eparm_2 \rY \mid \rX = \rx) = \tilde{\rx}^\top
+\shiftparm.
+\end{eqnarray*}
 
 The Boston Housing data are a prominent test-bed for parametric and
 non-parametric alternatives to a normal linear regression model.
@@ -173,7 +177,7 @@ Assuming a conditional normal distribution for the
 median value of owner-occupied homes (medv, in USD $1000$'s, we use the corrected version) 
 in the normal linear model with constant variance
 \begin{eqnarray*}
-\text{medv} \mid \rX = \rx \sim \ND(\tilde{\rx}^\top \shiftparm, \sigma^2)
+\text{medv} \mid \rX = \rx \sim \ND(\tilde{\alpha} + \tilde{\rx}^\top \tilde{\shiftparm}, \sigma^2)
 \end{eqnarray*}
 we can fit this model using the \cmd{lm} function:
 <<BostonHousing-lm>>=
@@ -196,16 +200,18 @@ logLik(Lm_BH_1)
 @
 so why would one want to set \cmd{lm} aside in favour of \cmd{Lm}? The
 parameterisation in (\ref{Lm}) seems a little odd, because the parameters
-are $\tilde{\shiftparm} = \shiftparm / \sigma$ and not $\shiftparm$
+are $\shiftparm = \tilde{\shiftparm} / \sigma$ and not $\tilde{\shiftparm}$.
+The parameters on the scale of $\tilde{\shiftparm}$, including the intercept
+$\tilde{\alpha}$ can be obtained via
 <<BostonHousing-coef>>=
 coef(lm_BH)
-cf <- coef(as.mlt(Lm_BH_1))
-- cf[-2] / cf[2]
+coef(Lm_BH_1, as.lm = TRUE)
 @
-with standard deviation
+The standard deviation is the inverse interaction term with the response
+$\eparm_2^{-1}$
 <<BostonHousing-sd>>=
 summary(lm_BH)$sigma
-1 / cf[2]
+1 / coef(Lm_BH_1, with_baseline = TRUE)["cmedv"]
 @
 The latter estimate is the maximum-likelihood estimator of $\hat{\sigma}$
 and not the usual REML estimate reported by \cmd{lm}.
@@ -237,7 +243,7 @@ logLik(Lm_BH_3)
 In fact, it seems the standard deviation is almost twice as large in areas
 without access to the Charles River
 <<BostonHousing-chas>>=
-1 / coef(as.mlt(Lm_BH_3))[c(2, 4)]
+1 / coef(Lm_BH_3, with_baseline = TRUE)[c(2, 4)]
 summary(glht(as.mlt(Lm_BH_3), linfct = c("y:chas0 - y:chas1 = 0")))
 @
 
@@ -274,11 +280,9 @@ logLik(BC_BH_1)
 \begin{figure}
 <<BostonHousing-BC-1-plot>>=
 nd <- model.frame(BC_BH_1)[1:2, -1]
-nd[, colnames(nd) != "chas"] <- 0
-nd$rad <- nd$tax <- 0L
 nd$chas <- factor(c("0", "1"))
 col <- c("red", "blue")
-plot(as.mlt(BC_BH_1), newdata = nd, q = 0:40, type = "trafo", lty = 1:2, col = col)
+plot(BC_BH_1, which = "baseline only", newdata = nd, q = 0:40, col = col)
 legend("bottomright", lty = 1, col = col, 
        title = "Near Charles River", legend = c("no", "yes"), bty = "n")
 @
@@ -292,6 +296,8 @@ legend("bottomright", lty = 1, col = col,
 @
 \end{figure}
 
+
+\bibliography{mlt,packages}
 
 
 %\section{Computational Details}
@@ -370,7 +376,5 @@ sapply(mltobj, function(m) eval(parse(text = paste("coef(", m, ")"))))
 <<sessionInfo, echo = FALSE, results = "hide">>=
 sessionInfo()
 @
-
-\clearpage
 
 \end{document}
