@@ -1,6 +1,6 @@
 
-plot.tram <- function(x, newdata = x$data, 
-    which = c("QQresiduals", "baseline", "distribution"), ...) {
+plot.tram <- function(x, newdata = model.frame(x), 
+    which = c("QQ-PIT", "baseline only", "distribution"), ...) {
 
     which <- match.arg(which)
     object <- as.mlt(x)
@@ -11,17 +11,25 @@ plot.tram <- function(x, newdata = x$data,
     if (which != "distribution" && censored)
         stop("Cannot compute in-sample ", which, " for censored responses")
         
-    if (which == "QQresiduals") {
-        U <- predict(object, newdata = newdata, type = "distribution")
-        qqplot(U, 1:length(U) / length(U), ...)
-        qqline(U, distribution = qunif)
-    }
-    if (which == "baseline") {
-        B <- predict(object, newdata = newdata, type = "trafo") - 
-             predict(object, newdata = newdata, terms = "bshifting")
-        y <- newdata[[variable.names(x, "response")]]
-        plot(y, B, ...)
-    }
-    if (which == "distribution")
-        plot(object, newdata = newdata, ...)
+    ret <- switch(which, 
+        "QQ-PIT" = {
+            U <- predict(object, newdata = newdata, type = "distribution")
+            qqplot(U, 1:length(U) / length(U), ...)
+            qqline(U, distribution = qunif)
+        },
+        "baseline only" = {
+            scf <- object$shiftparm
+            if (length(scf) > 0) {
+                mobj <- as.mlt(object)
+                cf <- coef(mobj)
+                cf[scf] <- 0
+                coef(mobj) <- cf
+                plot(mobj, newdata = newdata, type = "trafo", ...)
+            } else {
+                plot(object, newdata = newdata, type = "trafo", ...)
+            }
+        },
+        "distribution" = {
+            plot(object, newdata = newdata, ...)
+        })
 }

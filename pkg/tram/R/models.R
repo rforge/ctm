@@ -12,7 +12,8 @@ Coxph <- function(formula, data, subset, weights, offset, cluster, na.action = n
               inherits(td$response, "response") ||
               is.numeric(td$response))
 
-    ret <- tram(td, order = order, prob = prob, transformation = "smooth", distribution = "MinExtrVal", ...)
+    ret <- tram(td, order = order, prob = prob, transformation = "smooth", distribution = "MinExtrVal", 
+                negative = FALSE, ...)
     if (!inherits(ret, "mlt")) return(ret)
     ret$call <- match.call(expand.dots = TRUE)
     ret$tram <- paste(ifelse(is.null(td$terms$s), "", "(Stratified)"), 
@@ -69,12 +70,13 @@ Survreg <- function(formula, data, subset, weights, offset, cluster, na.action =
     if (dist == "exponential") 
         scale <- 1
     if (dist == "rayleigh")
-        scale <- 2
+        scale <- 0.5
     if (scale > 0) {
         fixed <- rep(1 / scale, length(scalecf))
         names(fixed) <- cfnm[scalecf]
         ret <- tram(td, transformation = transformation, 
-                    distribution = distribution, negative = TRUE, fixed = fixed, ...)
+                    distribution = distribution, negative = TRUE, 
+                    fixed = fixed, ...)
     } else {
         ret <- tram(td, transformation = transformation, 
                     distribution = distribution, negative = TRUE, ...)
@@ -109,7 +111,8 @@ Colr <- function(formula, data, subset, weights, offset, cluster, na.action = na
               inherits(td$response, "response") ||
               is.numeric(td$response))
 
-    ret <- tram(td, order = order, prob = prob, transformation = "smooth", distribution = "Logistic", ...)
+    ret <- tram(td, order = order, prob = prob, transformation = "smooth", 
+                distribution = "Logistic", negative = FALSE, ...)
     if (!inherits(ret, "mlt")) return(ret)
     ret$call <- match.call(expand.dots = TRUE)
     ret$tram <- paste(ifelse(is.null(td$terms$s), "", "(Stratified)"),
@@ -160,7 +163,8 @@ Lm <- function(formula, data, subset, weights, offset, cluster, na.action = na.o
               inherits(td$response, "response") ||
               is.numeric(td$response))
 
-    ret <- tram(td, transformation = "linear", distribution = "Normal", ...)
+    ret <- tram(td, transformation = "linear", distribution = "Normal", 
+                negative = TRUE, ...)
     if (!inherits(ret, "mlt")) return(ret)
     ret$call <- match.call(expand.dots = TRUE)
     ret$tram <- paste(ifelse(is.null(td$terms$s), "", "(Stratified)"),
@@ -181,7 +185,8 @@ BoxCox <- function(formula, data, subset, weights, offset, cluster, na.action = 
               inherits(td$response, "response") ||
               is.numeric(td$response))
 
-    ret <- tram(td, transformation = "smooth", distribution = "Normal", ...)
+    ret <- tram(td, transformation = "smooth", distribution = "Normal", 
+                negative = TRUE, ...)
     if (!inherits(ret, "mlt")) return(ret)
     ret$call <- match.call(expand.dots = TRUE)
     ret$tram <- paste(ifelse(is.null(td$terms$s), "", "(Stratified)"),

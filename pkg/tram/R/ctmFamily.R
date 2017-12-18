@@ -16,9 +16,9 @@ ctmFamily <- function(object, data, ...) {
     }
 
     risk <- function(y, f, w = 1) {
-        data$f <- f
         if (length(w) == 1) w <- rep(w, nrow(data))
-        logLik(model, newdata = data, w = w, parm = coef(model))
+        tmp <- mlt(object, data = data, dofit = FALSE, offset = -f)
+        logLik(tmp, w = w, parm = coef(model, fixed = TRUE))
     }
 
     mboost::Family(ngradient = ngradient,

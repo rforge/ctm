@@ -60,8 +60,8 @@ tram <- function(formula, data, subset, weights, offset, cluster, na.action = na
                  distribution = c("Normal", "Logistic", "MinExtrVal"),
                  transformation = c("discrete", "linear", "logarithmic", "smooth"),
                  LRtest = TRUE, 
-                 prob = c(.1, .9), support = NULL, order = 6, negative = FALSE, scale =
-                 TRUE, asFamily = FALSE, model_only = FALSE, ...) 
+                 prob = c(.1, .9), support = NULL, order = 6, negative =
+                 TRUE, scale = TRUE, asFamily = FALSE, model_only = FALSE, ...) 
 {
 
     if (!inherits(td <- formula, "tram_data")) {
@@ -79,9 +79,12 @@ tram <- function(formula, data, subset, weights, offset, cluster, na.action = na
     if (!is.null(td$mt$s)) 
         iS <- as.basis(formula(Formula(td$mt$s)[-3]), data = td$mf)
     iX <- NULL
-    if (!is.null(td$mt$x)) 
+    if (!is.null(td$mt$x)) {
         iX <- as.basis(td$mt$x, data = td$mf, remove_intercept = !asFamily, 
                        negative = negative)
+    } else {
+        if (asFamily) iX <- intercept_basis()
+    }
 
     model <- ctm(response = rbasis, interacting = iS, shifting = iX, 
                  todistr = distribution, data = td$mf)
@@ -96,6 +99,8 @@ tram <- function(formula, data, subset, weights, offset, cluster, na.action = na
     ret$cluster <- td$cluster
     if (!is.null(iX))
         ret$shiftcoef <- colnames(model.matrix(iX, data = td$mf))
+    if (!is.null(iS))
+        ret$stratacoef <- colnames(model.matrix(iS, data = td$mf))
     class(ret) <- c("tram", class(ret))
 
     if (LRtest & !is.null(iX)) {
