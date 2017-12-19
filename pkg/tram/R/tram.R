@@ -58,7 +58,7 @@ tram_data <- function(formula, data, subset, weights, offset, cluster, na.action
         cl$data <- av
         cl$dot <- NULL
         mf <- eval(cl, av)
-        rname <- make.names(deparse(rfm[[2L]]))
+        rname <- deparse(rfm[[2L]])
         ### store the response outside the model.frame
         response <- r[mf[[".index."]], , drop = FALSE]
         mf[[rname]] <- response

@@ -7,7 +7,7 @@ Authors@R: person("Torsten", "Hothorn", role = c("aut", "cre"),
 Description: Simple user-interfaces to specific transformation models
   implemented in package mlt.
 Depends: mlt (>= 0.2-1)
-Imports: Formula, multcomp, variables, basefun (>= 0.0-39), sandwich, stats, survival, graphics
+Imports: Formula, multcomp, variables, basefun (>= 0.0-40), sandwich, stats, survival, graphics
 Suggests: MASS, TH.data, trtf, mboost, mlbench, knitr
 VignetteBuilder: knitr
 License: GPL-2
