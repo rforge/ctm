@@ -58,6 +58,6 @@ mkbasis <- function(yvar, transformation = c("discrete", "linear", "logarithmic"
       )
   }
 
-  return(as.basis(yvar, data = as.data.frame(mkgrid(yvar))))
+  return(as.basis(yvar, data = as.data.frame(mkgrid(yvar), check.names = FALSE)))
 }
 
