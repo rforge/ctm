@@ -188,7 +188,7 @@ lm_BH <- lm(cmedv ~ crim + zn + indus + chas + nox + rm + age + dis +
 @
 The \pkg{tram} package implements a function \cmd{Lm} for fitting the normal
 linear regression model in the parameterisation (\ref{Lm})
-<<BostonHousing-Lm1>>=
+<<BostonHousing-Lm1, cache = TRUE>>=
 BostonHousing2$rad <- as.numeric(BostonHousing2$rad)
 BostonHousing2$tax <- as.numeric(BostonHousing2$tax)
 Lm_BH_1 <- Lm(cmedv ~ crim + zn + indus + chas + nox + rm + age + dis + 
@@ -221,7 +221,7 @@ One subtle difficulty with the observed response is that median housing
 values larger than $50$ are actually right-censored. This fact was ignored
 in both model fits. In contrast to \cmd{lm}, \cmd{Lm} is able to deal with
 this situation
-<<BostonHousing-Lm2>>=
+<<BostonHousing-Lm2, cache = TRUE>>=
 BostonHousing2$y <- with(BostonHousing2, Surv(cmedv, cmedv < 50))
 Lm_BH_2 <- Lm(y ~ crim + zn + indus + chas + nox + 
               rm + age + dis + rad + tax + ptratio + b + lstat, 
@@ -235,7 +235,7 @@ One of the variables (\code{chas}) gives us information about
 proximity to the Charles River. The model above only allows for mean changes
 in this variable, but how about models that allow different variances? This
 is simple in \cmd{Lm} because we can use \code{chas} as a stratum variable
-<<BostonHousing-Lm3>>=
+<<BostonHousing-Lm3, cache = TRUE>>=
 Lm_BH_3 <- Lm(y | 0 + chas ~ crim + zn + indus + nox + 
               rm + age + dis + rad + tax + ptratio + b + lstat, 
               data = BostonHousing2)
@@ -251,7 +251,7 @@ summary(glht(as.mlt(Lm_BH_3), linfct = c("y:chas0 - y:chas1 = 0")))
 
 We could go one step further and include an interaction term between each
 covariate and the response by treating all covariates as strata
-<<BostonHousing-Lm4>>=
+<<BostonHousing-Lm4, cache = TRUE>>=
 Lm_BH_4 <- Lm(y | 0 + chas + crim + zn + indus + nox + 
               rm + age + dis + rad + tax + ptratio + b + lstat ~ 0, 
               data = BostonHousing2)
@@ -271,7 +271,7 @@ are different, the spirit is the same and we thus refer to the model
 \Prob(\rY \le \ry \mid \rS = \rs, \rX = \rx) = \Phi(\h_\rY(\ry \mid \rs) - \tilde{\rx}^\top \shiftparm - \text{offset})
 \end{eqnarray*}
 as a `Box-Cox' model:
-<<BostonHousing-BC-1>>=
+<<BostonHousing-BC-1, cache = TRUE>>=
 BC_BH_1 <- BoxCox(y | 0 + chas ~ crim + zn + indus + nox + 
                   rm + age + dis + rad + tax + ptratio + b + lstat, 
                   data = BostonHousing2)
@@ -305,37 +305,37 @@ polr_wine <- polr(rating ~ temp + contact, data = wine)
 logLik(polr_wine)
 @
 
-<<wine-clm-1>>=
+<<wine-clm-1, cache = TRUE>>=
 clm_wine_1 <- clm(rating ~ temp + contact, data = wine)
 logLik(clm_wine_1)
 @
 
-<<wine-Polr-1>>=
+<<wine-Polr-1, cache = TRUE>>=
 Polr_wine_1 <- Polr(rating ~ temp + contact, data = wine)
 logLik(Polr_wine_1)
 @
 
-<<wine-clm-2>>=
+<<wine-clm-2, cache = TRUE>>=
 clm_wine_2 <- clm(rating ~ temp, nominal = ~ contact, data = wine)
 logLik(clm_wine_2)
 @
 
-<<wine-Polr-2>>=
+<<wine-Polr-2, cache = TRUE>>=
 Polr_wine_2 <- Polr(rating | 0 + contact ~ temp, data = wine)
 logLik(Polr_wine_2)
 @
 
-<<wine-clm-3>>=
+<<wine-clm-3, cache = TRUE>>=
 clm_wine_3 <- clm(rating ~ temp, nominal = ~ contact, data = wine, link = "probit")
 logLik(clm_wine_3)
 @
 
-<<wine-Polr-3>>=
+<<wine-Polr-3, cache = TRUE>>=
 Polr_wine_3 <- Polr(rating | 0 + contact ~ temp, data = wine, method = "probit")
 logLik(Polr_wine_3)
 @
 
-<<wine-censored>>=
+<<wine-censored, cache = TRUE>>=
 erating <- wine$rating
 lrating <- erating
 rrating <- erating
@@ -393,7 +393,7 @@ $\sigma$:
 \tilde{\shiftparm}}{\sigma}\right)\right)
 \end{eqnarray*}
 
-<<GBSG2-Weibull-1>>=
+<<GBSG2-Weibull-1, cache = TRUE>>=
 data("GBSG2", package = "TH.data")
 Survreg_GBSG2_1 <- Survreg(Surv(time, cens) ~ horTh, data = GBSG2)
 logLik(Survreg_GBSG2_1)
@@ -415,7 +415,7 @@ legend("bottomleft", lty = 1, title = "Hormonal Therapy", legend = levels(nd$hor
 @
 \end{figure}
 
-<<GBSG2-Weibull-2>>=
+<<GBSG2-Weibull-2, cache = TRUE>>=
 Survreg_GBSG2_2 <- Survreg(Surv(time, cens) | 0 + horTh ~ 1, data = GBSG2)
 logLik(Survreg_GBSG2_2)
 survreg_GBSG2_2 <- survreg(Surv(time, cens) ~ strata(horTh) + horTh - 1, data = GBSG2)
@@ -468,13 +468,13 @@ parameterised as
 \end{eqnarray*}
 and thus the hazard ratio is $\exp(\tilde{\rx}^\top \shiftparm)$.
 
-<<GBSG2-Cox-1>>=
+<<GBSG2-Cox-1, cache = TRUE>>=
 Coxph_GBSG2_1 <- Coxph(Surv(time, cens) ~ horTh, data = GBSG2)
 logLik(Coxph_GBSG2_1)
 coef(Coxph_GBSG2_1)
 @
 
-<<GBSG2-Cox-2>>=
+<<GBSG2-Cox-2, cache = TRUE>>=
 Coxph_GBSG2_2 <- Coxph(Surv(time, cens) | 0 + horTh ~ 1 , data = GBSG2)
 logLik(Coxph_GBSG2_2)
 @
@@ -490,7 +490,58 @@ plot(Coxph_GBSG2_2, newdata = nd, which = "distribution", type = "survivor",
 \end{figure}
 
 
+\section{Continuous Outcome Logistic Regression}
 
+\begin{eqnarray*}
+\Prob(\rY \le \ry \mid \rX = \rx) = \frac{\exp(\h_\rY(\ry) + \tilde{\rx}^\top
+\shiftparm)}{1 + \exp(\h_\rY(\ry) + \tilde{\rx}^\top \shiftparm)}
+\end{eqnarray*}
+
+with odds
+
+\begin{eqnarray*}
+\frac{\Prob(\rY \le \ry \mid \rX = \rx)}{\Prob(\rY > \ry \mid \rX = \rx)} =
+\exp(\h_\rY(\ry))\exp(\tilde{\rx}^\top \shiftparm)
+\end{eqnarray*}
+where $\exp(\tilde{\rx}^\top \shiftparm)$ is the cutpoint $\ry$
+independent odds ratio (compared to a subject with $\tilde{\rx}^\top
+\shiftparm = 0$).
+
+\begin{eqnarray*}
+\Prob(\rY \le \ry \mid \rX = \rx) = \Phi(\h_\rY(\ry) - \tilde{\rx}^\top \shiftparm)
+\end{eqnarray*}
+is Box-Cox regression with $\Ex(\h_\rY(\rY) \mid \rX = \rx) = \tilde{\rx}^\top
+\shiftparm$.
+
+<<BostonHousing-Colr-1, cache = TRUE>>=
+Colr_BH_1 <- Colr(y | 0 + chas ~ crim + zn + indus + nox + 
+                  rm + age + dis + rad + tax + ptratio + b + lstat, 
+                  data = BostonHousing2)
+logLik(Colr_BH_1)
+exp(coef(Colr_BH_1))
+exp(confint(Colr_BH_1))
+@
+
+\begin{figure}
+<<BostonHousing-Colr-1-plot>>=
+nd <- BostonHousing2
+nd$y <- NULL
+q <- 0:50
+d <- predict(Colr_BH_1, newdata = nd, q = q, which = "distribution", type="distribution")
+lp <- c(predict(Colr_BH_1, newdata = nd, type = "lp"))
+nd2 <- expand.grid(q = q, lp = -lp)
+nd2$d <- c(d)
+nd2$chas <- rep(nd$chas, rep(length(q), length(lp)))
+pfun <- function(x, y, z, subscripts, at, ...) {
+    panel.contourplot(x, y, z, subscripts, at = 1:9/10, ...)
+    ch <- as.character(unique(nd2$chas[subscripts]))
+    panel.xyplot(x = -lp[nd$chas == ch], y = subset(BostonHousing2, chas == ch)$cmedv, pch = 20, 
+                 col = rgb(.1, .1, .1, .1), ...)   
+}
+plot(contourplot(d ~ lp + q | chas, data = nd2, panel = pfun, xlab = "Linear predictor", 
+     ylab = "Observed", main = "Continuous Outcome Logistic Regression"))
+@
+\end{figure}
 
 \bibliography{mlt,packages}
 
