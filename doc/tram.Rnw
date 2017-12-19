@@ -44,6 +44,7 @@ knitr::set_header(highlight = '')  # do not \usepackage{Sweave}
 ## R settings
 options(prompt = "R> ", continue = "+  ", useFancyQuotes = FALSE)  # JSS style
 options(width = 75)
+col <- c("red", "blue")
 @
 
 \newcommand{\TODO}[1]{{\color{red} #1}}
@@ -353,6 +354,142 @@ Polr_wine_4 <- Polr(crating | 0 + contact ~ temp, data = wine, method = "probit"
 logLik(Polr_wine_4)
 # summary(Polr_wine_4)
 @
+
+\section{Survival Analysis}
+
+Weibull distribution
+\begin{eqnarray*}
+\Prob(\rY \le \ry \mid \rX = \rx) = 1 - \exp(-\exp(\eparm_1 + \eparm_2 \log(\ry) - \tilde{\rx}^\top
+\shiftparm)), \eparm_2 > 0
+\end{eqnarray*}
+
+\begin{eqnarray*}
+\Prob(\rY > \ry \mid \rX = \rx) = S(\ry \mid \rX = \rx) = \exp(-\exp(\eparm_1 + \eparm_2 \log(\ry) - \tilde{\rx}^\top \shiftparm))
+\end{eqnarray*}
+and because of $S(\ry) = \exp(-\Lambda(\ry))$ we get the conditional cumulative
+hazard function
+\begin{eqnarray*}
+\Lambda(\ry \mid \rX = \rx) = \exp(\eparm_1 + \eparm_2 \log(\ry) - \tilde{\rx}^\top \shiftparm)
+= \exp(\eparm_1 + \eparm_2 \log(\ry)) \exp(-\tilde{\rx}^\top \shiftparm)
+\end{eqnarray*}
+with baseline cumulative hazard function $\Lambda_\rY(\ry) = \exp(\eparm_1 + \eparm_2
+\log(\ry))$ and hazard ratio $\exp(-\tilde{\rx}^\top \shiftparm)$, \ie the
+relative change of the conditional cumulative hazard function compared to an
+individual with $\tilde{\rx}^\top \shiftparm = 0$. The baseline hazard function
+is then $\lambda_\rY(\ry) = \Lambda^\prime(\ry) = \exp(\eparm_1 +
+\eparm_2 \log(\ry)) / (\eparm_2 \ry)$.
+
+With $\eparm_2 = 1$, the distribution function simplifies to an exponential distribution
+\begin{eqnarray*}
+\Prob(\rY \le \ry \mid \rX = \rx) = 1 - \exp(-\ry \exp(\eparm_1 - \tilde{\rx}^\top \shiftparm))
+\end{eqnarray*}
+with parameter $\lambda = \exp(\eparm_1 - \tilde{\rx}^\top \shiftparm)$.
+With $\eparm = 2$, the distribution is known as Rayleigh distribution. 
+
+\cmd{survreg} uses a different parameterisation with scale parameter
+$\sigma$:
+\begin{eqnarray*}
+\Prob(\rY \le \ry \mid \rX = \rx) = 1 - \exp\left(-\exp\left(\frac{\tilde{\alpha} + \log(\ry) - \tilde{\rx}^\top
+\tilde{\shiftparm}}{\sigma}\right)\right)
+\end{eqnarray*}
+
+<<GBSG2-Weibull-1>>=
+data("GBSG2", package = "TH.data")
+Survreg_GBSG2_1 <- Survreg(Surv(time, cens) ~ horTh, data = GBSG2)
+logLik(Survreg_GBSG2_1)
+survreg_GBSG2_1 <- survreg(Surv(time, cens) ~ horTh, data = GBSG2)
+logLik(survreg_GBSG2_1)
+@
+
+We get the log-hazard ratio $\beta = \Sexpr{round(coef(Survreg_GBSG2_1),
+2)}$ as the log-hazard ratio between treated and untreated
+patients. The hazard ratio $\exp(-\beta) = \Sexpr{round(exp(-coef(Survreg_GBSG2_1)), 2)}$ 
+means that the hazard of a treated patient is $\Sexpr{round(exp(-coef(Survreg_GBSG2_1)),
+2) * 100}\%$ the hazard of an untreated patient.
+
+\begin{figure}
+<<GBSG2-Weibull-1-plot>>=
+nd <- data.frame(horTh = factor(c("no", "yes")))
+plot(Survreg_GBSG2_1, newdata = nd, which = "distribution", type = "survivor", col = col)
+legend("bottomleft", lty = 1, title = "Hormonal Therapy", legend = levels(nd$horTh), bty = "n", col = col)
+@
+\end{figure}
+
+<<GBSG2-Weibull-2>>=
+Survreg_GBSG2_2 <- Survreg(Surv(time, cens) | 0 + horTh ~ 1, data = GBSG2)
+logLik(Survreg_GBSG2_2)
+survreg_GBSG2_2 <- survreg(Surv(time, cens) ~ strata(horTh) + horTh - 1, data = GBSG2)
+logLik(survreg_GBSG2_2)
+coef(Survreg_GBSG2_2, with_baseline = TRUE)
+c(1 / survreg_GBSG2_2$scale, -coef(survreg_GBSG2_2) / survreg_GBSG2_2$scale)
+@
+
+Log-logistic distribution
+\begin{eqnarray*}
+\Prob(\rY \le \ry \mid \rX = \rx) = \frac{\exp(\eparm_1 + \eparm_2 \log(\ry) - \tilde{\rx}^\top \shiftparm)}{1
++ \exp(\eparm_1 + \eparm_2 \log(\ry) - \tilde{\rx}^\top \shiftparm)}, \eparm_2 > 0
+\end{eqnarray*}
+
+The odds
+\begin{eqnarray*}
+\frac{\Prob(\rY \le \ry \mid \rX = \rx)}{\Prob(\rY > \ry \mid \rX = \rx)} = 
+  \frac{\frac{\exp(\eparm_1 + \eparm_2 \log(\ry) - \tilde{\rx}^\top \shiftparm)}
+             {1 + \exp(\eparm_1 + \eparm_2 \log(\ry) - \tilde{\rx}^\top \shiftparm)}}
+        {\frac{1}{1 + \exp(\eparm_1 + \eparm_2 \log(\ry) - \tilde{\rx}^\top \shiftparm)}}
+= \exp(\eparm_1 + \eparm_2 \log(\ry) - \tilde{\rx}^\top \shiftparm)
+\end{eqnarray*}
+consists of the baseline odds $\exp(\eparm_1 + \eparm_2 \log(\ry))$ and the
+odds ratio $\exp(- \tilde{\rx}^\top \shiftparm)$.
+
+
+Log-normal distribution
+\begin{eqnarray*}
+\Prob(\rY \le \ry \mid \rX = \rx) = \Phi(\eparm_1 + \eparm_2 \log(\ry) - \tilde{\rx}^\top \shiftparm))
+\end{eqnarray*}
+we have $\log(\rY) \sim \ND((-\eparm_1, \shiftparm) / \eparm_2, 1 / \eparm^2)$
+
+Two ways to change the baseline transformation $\eparm_1 + \eparm_2
+\log(\ry)$. Simplify to linear function $\eparm_1 + \eparm_2 \ry$ (and thus
+to logistic or normal distributions of the outcome) or generalising to
+$\h_\rY(\ry)$. This is what the Cox model does.
+
+\section{Cox Model}
+
+\begin{eqnarray*}
+\Prob(\rY \le \ry \mid \rX = \rx) = 1 - \exp(-\exp(\h_\rY(\ry) - \tilde{\rx}^\top \shiftparm))
+\end{eqnarray*}
+with $\Lambda(\ry \mid \rX = \rx) = \exp(\h_\rY(\ry))\exp(- \tilde{\rx}^\top
+\shiftparm)$ and thus baseline cumulative hazard $\Lambda_\rY(\ry) =
+\exp(\h_\rY(\ry))$. The term $\exp(- \tilde{\rx}^\top \shiftparm)$ is the
+odds ratio. Typically (for example in \cmd{coxph}), the model is
+parameterised as
+\begin{eqnarray*}
+\Prob(\rY \le \ry \mid \rX = \rx) = 1 - \exp(-\exp(\h_\rY(\ry) + \tilde{\rx}^\top \shiftparm))
+\end{eqnarray*}
+and thus the hazard ratio is $\exp(\tilde{\rx}^\top \shiftparm)$.
+
+<<GBSG2-Cox-1>>=
+Coxph_GBSG2_1 <- Coxph(Surv(time, cens) ~ horTh, data = GBSG2)
+logLik(Coxph_GBSG2_1)
+coef(Coxph_GBSG2_1)
+@
+
+<<GBSG2-Cox-2>>=
+Coxph_GBSG2_2 <- Coxph(Surv(time, cens) | 0 + horTh ~ 1 , data = GBSG2)
+logLik(Coxph_GBSG2_2)
+@
+
+\begin{figure}
+<<GBSG2-Cox-1-plot>>=
+plot(survfit(Surv(time, cens) ~ horTh, data = GBSG2), col = col)
+plot(Coxph_GBSG2_1, newdata = nd, which = "distribution", type = "survivor", 
+     col = col, add = TRUE)
+plot(Coxph_GBSG2_2, newdata = nd, which = "distribution", type = "survivor", 
+     col = col, add = TRUE)
+@
+\end{figure}
+
+
 
 
 \bibliography{mlt,packages}
