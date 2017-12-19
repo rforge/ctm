@@ -2,11 +2,19 @@
 \name{NEWS}
 \title{NEWS file for the basefun package}
 
+\section{Changes in Version 0.0-40 (2017-12-19)}{
+  \itemize{
+    \item{\code{nparm} sometimes generated data with sanitised variable
+          names, we don't want this to happen.}
+  }
+}
+
 \section{Changes in Version 0.0-39 (2017-12-18)}{
   \itemize{
     \item{Add \code{intercept_basis}, ie an intercept only model matrix.}
   }
 }
+
 
 \section{Changes in Version 0.0-38 (2017-05-15)}{
   \itemize{
