@@ -347,8 +347,11 @@ erating[wine$judge == 9] <- NA
 lrating[wine$judge == 9] <- l9
 rrating[wine$judge == 9] <- r9
 wine$crating <- R(erating, cleft = lrating, cright = rrating)
-# Polr_wine_4 <- Polr(crating | 0 + contact ~ temp, data = wine, method = "probit")
-# logLik(Polr_wine_4)
+Polr_wine_4 <- Polr(R(erating, cleft = lrating, cright = rrating) | 0 + contact ~ temp, data = wine, method = "probit")
+logLik(Polr_wine_4)
+Polr_wine_4 <- Polr(crating | 0 + contact ~ temp, data = wine, method = "probit")
+logLik(Polr_wine_4)
+# summary(Polr_wine_4)
 @
 
 
