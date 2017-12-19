@@ -10,10 +10,11 @@ model.frame.tram <- function(formula, ...)
 
 model.matrix.tram <- function(object, with_baseline = FALSE, ...) 
 {
-    ret <- model.matrix(as.mlt(object), ...)
-    if (with_baseline) return(ret)
-    if (is.null(object$shiftcoef)) return(NULL)
-    return(ret[, object$shiftcoef,,drop = FALSE])
+    if (with_baseline) 
+        return(model.matrix(as.mlt(object), ...))
+    if (is.null(object$shiftcoef)) 
+        return(NULL)
+    return(model.matrix(as.mlt(object)$model$model$bshifting, ...))
 }	
 
 coef.tram <- function(object, with_baseline = FALSE, ...) 
