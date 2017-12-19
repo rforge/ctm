@@ -25,8 +25,23 @@ tram_data <- function(formula, data, subset, weights, offset, cluster, na.action
     ### R(y) ~ x will fail
     mf <- try(eval(mf, parent.frame()), silent = TRUE)
     if (inherits(mf, "try-error")) {
-        ### get all variables first
+        ### set-up a formula with response only
+        rfm <- terms(formula, lhs = 1, rhs = 0)
+        ### evaluate response only
+        if (missing(data))
+            data <- parent.frame()
+        r <- eval(rfm[[2L]], envir = data, enclos = parent.frame())
+
+        ### set-up a formula without response
+        lhs <- formula[c(1, 2)]
+        rhs <- formula[c(1, 3)]
+        if (npart[1L] > 1) lhs <- terms(as.Formula(lhs), rhs = 2, lhs = 0)
+        sxzfm <- as.Formula(lhs, rhs)
+
+        ### get all x, s and z variables first WITHOUT subsetting or
+        ### na.action
         avcl <- cl
+        avcl$formula <- sxzfm
         avcl[[1L]] <- quote(stats::get_all_vars)
         avcl$subset <- NULL
         avcl$na.action <- NULL
@@ -34,22 +49,15 @@ tram_data <- function(formula, data, subset, weights, offset, cluster, na.action
         avcl$dot <- NULL
         av <- eval(avcl, parent.frame())
         ### assign row numbers
+        stopifnot(NROW(r) == NROW(av))
         av[[".index."]] <- 1:NROW(av)
-        ### set-up a formula with response only
-        rfm <- terms(formula, lhs = 1, rhs = 0)
-        ### set-up a formula without response
-        lhs <- formula[c(1, 2)]
-        rhs <- formula[c(1, 3)]
-        if (npart[1L] > 1) lhs <- terms(as.Formula(lhs), rhs = 2, lhs = 0)
-        sxzfm <- as.Formula(~ .index., lhs, rhs)
+
         ### evaluate model frame _without_ response
+        sxzfm <- as.Formula(~ .index., lhs, rhs)
         cl$formula <- sxzfm
         cl$data <- av
         cl$dot <- NULL
         mf <- eval(cl, av)
-        ### evaluate response only
-        r <- eval(rfm[[2L]], av)
-        stopifnot(NROW(r) == NROW(av))
         rname <- make.names(deparse(rfm[[2L]]))
         ### store the response outside the model.frame
         response <- r[mf[[".index."]], , drop = FALSE]
