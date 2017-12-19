@@ -21,7 +21,45 @@ tram_data <- function(formula, data, subset, weights, offset, cluster, na.action
 
     ## evaluate model.frame
     mf[[1L]] <- quote(stats::model.frame)
-    mf <- eval(mf, parent.frame())
+    cl <- mf
+    ### R(y) ~ x will fail
+    mf <- try(eval(mf, parent.frame()), silent = TRUE)
+    if (inherits(mf, "try-error")) {
+        ### get all variables first
+        avcl <- cl
+        avcl[[1L]] <- quote(stats::get_all_vars)
+        avcl$subset <- NULL
+        avcl$na.action <- NULL
+        avcl$drop.unused.levels <- NULL
+        avcl$dot <- NULL
+        av <- eval(avcl, parent.frame())
+        ### assign row numbers
+        av[[".index."]] <- 1:NROW(av)
+        ### set-up a formula with response only
+        rfm <- terms(formula, lhs = 1, rhs = 0)
+        ### set-up a formula without response
+        lhs <- formula[c(1, 2)]
+        rhs <- formula[c(1, 3)]
+        if (npart[1L] > 1) lhs <- terms(as.Formula(lhs), rhs = 2, lhs = 0)
+        sxzfm <- as.Formula(~ .index., lhs, rhs)
+        ### evaluate model frame _without_ response
+        cl$formula <- sxzfm
+        cl$data <- av
+        cl$dot <- NULL
+        mf <- eval(cl, av)
+        ### evaluate response only
+        r <- eval(rfm[[2L]], av)
+        stopifnot(NROW(r) == NROW(av))
+        rname <- make.names(deparse(rfm[[2L]]))
+        ### store the response outside the model.frame
+        response <- r[mf[[".index."]], , drop = FALSE]
+        mf[[rname]] <- response
+        mf[[".index."]] <- NULL
+        mf <- mf[, c(rname, colnames(mf)[colnames(mf) != rname]), drop = FALSE]
+    }
+
+    response <- mf[[1L]]
+    rname <- names(mf)[1L]
 
     ## extract terms in various combinations
     mt <- list(
@@ -45,13 +83,12 @@ tram_data <- function(formula, data, subset, weights, offset, cluster, na.action
     ### Surv(...) etc. will be altered anyway...
     # names(mf) <- make.names(names(mf))
 
-    response <- mf[[1L]]
     weights <- model.weights(mf)
     offset <- model.offset(mf)
     cluster <- mf[["(cluster)"]]
 
-    ret <- list(response = response, weights = weights, offset = offset, cluster =
-                cluster, mf = mf, mt = mt)
+    ret <- list(response = response, rname = rname, weights = weights, 
+                offset = offset, cluster = cluster, mf = mf, mt = mt)
     class(ret) <- "tram_data"
     ret
 }
@@ -72,7 +109,7 @@ tram <- function(formula, data, subset, weights, offset, cluster, na.action = na
         td <- eval(mf, parent.frame())
     } 
 
-    rvar <- asvar(td$response, names(td$mf)[1L], prob = prob, support = support)
+    rvar <- asvar(td$response, td$rname, prob = prob, support = support)
     rbasis <- mkbasis(rvar, transformation = transformation, order = order)
 
     iS <- NULL

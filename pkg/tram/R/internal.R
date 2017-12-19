@@ -25,6 +25,12 @@ asvar.Surv <- function(object, name, prob = c(.1, .9), support = NULL, bounds = 
 }
 
 asvar.response <- function(object, name, prob = c(.1, .9), support = NULL, bounds = c(-Inf, Inf), ...) {
+    if (any(sapply(object, is.factor))) {
+        f <- object$exact
+        if (any(!is.na(f))) return(asvar(f, name))
+        if (any(!is.na(object$cleft))) return(asvar(object$cleft, name))
+        stop("cannot determine class of response")
+    }
     if (is.null(support)) {
         support <- quantile(survfit(y ~ 1, data = data.frame(y = as.Surv(object))), prob = prob)$quantile
         if (is.na(support[2])) 
@@ -52,6 +58,6 @@ mkbasis <- function(yvar, transformation = c("discrete", "linear", "logarithmic"
       )
   }
 
-  return(as.basis(yvar))
+  return(as.basis(yvar, data = as.data.frame(mkgrid(yvar))))
 }
 
