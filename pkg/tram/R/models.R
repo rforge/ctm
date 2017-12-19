@@ -23,7 +23,7 @@ Coxph <- function(formula, data, subset, weights, offset, cluster, na.action = n
 }
 
 Survreg <- function(formula, data, subset, weights, offset, cluster, na.action = na.omit, 
-                    dist = c("logistic", "gaussian", "weibull", "exponential", 
+                    dist = c("weibull", "logistic", "gaussian", "exponential", 
                              "rayleigh", "loggaussian", "lognormal", "loglogistic"), 
                     scale = 0, ...)
 {
@@ -63,10 +63,10 @@ Survreg <- function(formula, data, subset, weights, offset, cluster, na.action =
     cfnm <- names(coef(ret))
 
     scalecf <- grep(rname, cfnm, fixed = TRUE)
-    if (length(scalecf) > 0) {
-        if (length(grep("Intercept", cfnm[scalecf])) > 0)
-            stop("strata contain explicit intercept term")
-    }
+#    if (length(scalecf) > 0) {
+#        if (length(grep("Intercept", cfnm[scalecf])) > 0)
+#            stop("strata contain explicit intercept term")
+#    }
     if (dist == "exponential") 
         scale <- 1
     if (dist == "rayleigh")
