@@ -5,7 +5,7 @@ library("survival")
 tol <- .Machine$double.eps^(1/5)
 
 cmp <- function(x, y)
-    stopifnot(isTRUE(all.equal(x, y, tolerance = tol)))
+    stopifnot(isTRUE(all.equal(x, y, tolerance = tol, check.attributes = FALSE)))
 
 data("GBSG2", package = "TH.data")
 
