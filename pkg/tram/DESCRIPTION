@@ -8,6 +8,6 @@ Description: Simple user-interfaces to specific transformation models
   implemented in package mlt.
 Depends: mlt (>= 0.2-1)
 Imports: Formula, multcomp, variables, basefun (>= 0.0-40), sandwich, stats, survival, graphics
-Suggests: MASS, TH.data, trtf, mboost, mlbench, knitr
+Suggests: MASS, TH.data, trtf, mboost, mlbench, knitr, quantreg
 VignetteBuilder: knitr
 License: GPL-2

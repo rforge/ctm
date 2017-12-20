@@ -4,13 +4,13 @@ import("variables")
 import("basefun")
 import("Formula")
 importFrom("sandwich", "vcovCL", "estfun")
-importFrom("multcomp", "cftest")
+importFrom("multcomp", "cftest", "adjusted_calpha", "univariate_calpha")
 importFrom("stats", "model.matrix", "coef", "vcov", "nobs", "predict", "quantile", "na.omit",
            "logLik", "model.response", "model.weights", "model.offset", "terms", "as.formula",
            "printCoefmat", "qqline", "qqplot", "qunif", "variable.names", "pchisq",
            "model.frame")
 importFrom("survival", "survfit", "Surv")
-importFrom("graphics", "plot")
+importFrom("graphics", "plot", "lines", "polygon")
 
 export(tram, tram_data, Coxph, Colr, Polr, Lm, BoxCox, Survreg)
 
