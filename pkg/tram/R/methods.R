@@ -39,9 +39,13 @@ coef.Lm <- function(object, as.lm = FALSE, ...) {
     cfs <- cf[!(names(cf) %in% names(cfx))]
     sd <- 1 / cfs[names(cfs) != "(Intercept)"]
 
-    if (is.null(object$shiftcoef))
-        return(-cfs["(Intercept)"] * sd)
-    return(c(-cfs["(Intercept)"], cfx) * sd)
+    if (is.null(object$shiftcoef)) {
+        ret <- -cfs["(Intercept)"] * sd
+    } else {
+        ret <- c(-cfs["(Intercept)"], cfx) * sd
+    }
+    attr(ret, "scale") <- sd
+    ret
 }
 
 coef.Survreg <- function(object, as.survreg = FALSE, ...)
