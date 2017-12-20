@@ -125,6 +125,7 @@ tram <- function(formula, data, subset, weights, offset, cluster, na.action = na
         iS <- as.basis(formula(Formula(td$mt$s)[-3]), data = td$mf)
     iX <- NULL
     if (!is.null(td$mt$x)) {
+        ### NOTE: this triggers sumconstr = TRUE
         iX <- as.basis(td$mt$x, data = td$mf, remove_intercept = !asFamily, 
                        negative = negative)
     } else {
