@@ -1,7 +1,7 @@
 
 %\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{tram}
-%\VignetteDepends{tram, survival, MASS, mlbench, multcomp, ordinal}
+%\VignetteDepends{tram, survival, MASS, mlbench, multcomp, ordinal, colorspace, quantreg}
 
 \documentclass[article,nojss,shortnames]{jss}
 
@@ -21,7 +21,8 @@
 <<setup, echo = FALSE, results = "hide", message = FALSE>>=
 set.seed(290875)
 
-sapply(c("tram", "survival", "MASS", "lattice", "mlbench", "multcomp", "ordinal"), library, char = TRUE)
+sapply(c("tram", "survival", "MASS", "lattice", "mlbench", 
+         "multcomp", "ordinal", "colorspace", "quantreg"), library, char = TRUE)
 
 
 trellis.par.set(list(plot.symbol = list(col=1,pch=20, cex=0.7),
@@ -44,7 +45,9 @@ knitr::set_header(highlight = '')  # do not \usepackage{Sweave}
 ## R settings
 options(prompt = "R> ", continue = "+  ", useFancyQuotes = FALSE)  # JSS style
 options(width = 75)
-col <- c("red", "blue")
+library("colorspace")
+col <- diverge_hcl(2, h = c(246, 40), c = 96, l = c(65, 90))
+fill <- diverge_hcl(2, h = c(246, 40), c = 96, l = c(65, 90), alpha = .3)
 @
 
 \newcommand{\TODO}[1]{{\color{red} #1}}
@@ -282,8 +285,8 @@ logLik(BC_BH_1)
 <<BostonHousing-BC-1-plot>>=
 nd <- model.frame(BC_BH_1)[1:2, -1]
 nd$chas <- factor(c("0", "1"))
-col <- c("red", "blue")
-plot(BC_BH_1, which = "baseline only", newdata = nd, q = 0:40, col = col)
+plot(BC_BH_1, which = "baseline only", newdata = nd, col = col,
+     confidence = "interval", fill = fill, lwd = 2)
 legend("bottomright", lty = 1, col = col, 
        title = "Near Charles River", legend = c("no", "yes"), bty = "n")
 @
@@ -291,7 +294,8 @@ legend("bottomright", lty = 1, col = col,
 
 \begin{figure}
 <<BostonHousing-Lm-3-plot>>=
-plot(as.mlt(Lm_BH_3), newdata = nd, q = 0:40, type = "trafo", lty = 1:2, col = col)
+plot(Lm_BH_3, which = "baseline only", newdata = nd, col = col,
+     confidence = "interval", fill = fill, lwd = 2)
 legend("bottomright", lty = 1, col = col, 
        title = "Near Charles River", legend = c("no", "yes"), bty = "n")
 @
@@ -410,7 +414,8 @@ means that the hazard of a treated patient is $\Sexpr{round(exp(-coef(Survreg_GB
 \begin{figure}
 <<GBSG2-Weibull-1-plot>>=
 nd <- data.frame(horTh = factor(c("no", "yes")))
-plot(Survreg_GBSG2_1, newdata = nd, which = "distribution", type = "survivor", col = col)
+plot(Survreg_GBSG2_1, newdata = nd, which = "distribution", type = "survivor", 
+     confidence = "interval", fill = fill, col = col)
 legend("bottomleft", lty = 1, title = "Hormonal Therapy", legend = levels(nd$horTh), bty = "n", col = col)
 @
 \end{figure}
@@ -523,7 +528,7 @@ exp(confint(Colr_BH_1))
 @
 
 \begin{figure}
-<<BostonHousing-Colr-1-plot>>=
+<<BostonHousing-Colr-1-plot, echo = FALSE>>=
 nd <- BostonHousing2
 nd$y <- NULL
 q <- 0:50
@@ -542,6 +547,69 @@ plot(contourplot(d ~ lp + q | chas, data = nd2, panel = pfun, xlab = "Linear pre
      ylab = "Observed", main = "Continuous Outcome Logistic Regression"))
 @
 \end{figure}
+
+\section{Connection to Quantile Regression}
+
+Linear quantile regression for the $p$th conditional
+quantile $Q_\rY(p \mid \rX = \rx)$ of $\rY$:
+\begin{eqnarray*}
+Q_\rY(p \mid \rX = \rx) = \tilde{\alpha}(p) + \tilde{\rx}^\top
+\tilde{\shiftparm}(p)
+\end{eqnarray*}
+Quantiles are invariate wrt.~monotone transformations $\h_\rY$ and we have
+\begin{eqnarray*}
+\h_\rY(Q_\rY(p \mid \rX = \rx)) = Q_{\h_\rY(\rY)}(p \mid \rX = \rx)
+\end{eqnarray*}
+
+With $\ry = Q_\rY(p \mid \rX = \rx)$ we have
+\begin{eqnarray*}
+& & p = \Prob(\rY \le \ry \mid \rX = \rx) = \pZ(\h_Y(\ry) - \tilde{\rx}^\top\shiftparm) \\
+& \iff & \h_\rY(Q_\rY(p \mid \rX = \rx)) = \pZ^{-1}(p) + \tilde{\rx}^\top\shiftparm
+\end{eqnarray*}
+
+When we allow for response varying effects 
+\begin{eqnarray*}
+& & p = \Prob(\rY \le \ry \mid \rX = \rx) = \pZ(\h_Y(\ry) - \tilde{\rx}^\top\shiftparm(\ry)) \\
+& \iff & \h_\rY(Q_\rY(p \mid \rX = \rx)) = \pZ^{-1}(p) +
+\tilde{\rx}^\top\tilde{\shiftparm}(p)
+\end{eqnarray*}
+with $\tilde{\shiftparm}(p) = \shiftparm(Q_\rY(p \mid \rX = \rx))$.
+
+Fit linear quantile regression on a grid along with continuous outcome
+logistic regression with response varying effects (``distribution
+regression'').
+<<BostonHousing-rq-1, cache = TRUE>>=
+tau <- 2:18 / 20
+fm <- cmedv ~ crim + zn + indus + chas + nox + rm + age + dis + 
+              rad + tax + ptratio + b + lstat
+rq_BH_1 <- lapply(tau, function(p) rq(fm, data = BostonHousing2, tau = p))
+Colr_BH_2 <- Colr(cmedv | crim + zn + indus + chas + nox + rm + age + dis + 
+                  rad + tax + ptratio + b + lstat ~ 0, data = BostonHousing2, order = 2)
+@
+
+\begin{figure}
+<<BostonHousing-rq-1-plot, echo = FALSE, fig.width = 10, fig.height = 10>>=
+idx <- order(BostonHousing2$cmedv)[ceiling(1:9/10 * NROW(BostonHousing2))]
+layout(matrix(1:9, nrow = 3))
+for (i in idx) {
+  qrq <- sapply(rq_BH_1, function(x) predict(x, newdata = BostonHousing2[i,]))
+  nd <- BostonHousing2[i,]
+  nd$cmedv <- NULL
+  plot(Colr_BH_2, newdata = nd, which = "distribution", type = "distribution", 
+       q = 5:36, main = paste("Obs.", i))
+  points(qrq, tau, type = "b")
+  abline(v = BostonHousing2[i, "cmedv"])
+}
+@
+\end{figure}
+
+
+
+\section{Transformation Boosting}
+
+\section{Transformation Trees}
+
+\section{Transformation Forests}
 
 \bibliography{mlt,packages}
 
