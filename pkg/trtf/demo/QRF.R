@@ -2,6 +2,8 @@
 library("quantregForest")
 set.seed(290875)
 
+pdf("QRF.pdf", width = 12, height = 8)
+
 ntree <- 100
 n <- 10000
 p <- 10
@@ -54,3 +56,5 @@ legend("topleft", lty = c(1, 2, 1), lwd = c(lwd * 1.5, lwd * 1.5, lwd * 1.5),
        col = c("black", colB, colB),
        legend = c("Quantile Regression Forest", "Transformation Tree", "Transformation Forest"),
        bty = "n")
+
+dev.off()
