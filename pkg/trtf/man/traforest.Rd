@@ -61,6 +61,8 @@ coef(cmod <- mlt(m, data = GBSG2))["horThyes"]
 ### roughly the same as 
 coef(coxph(y ~ horTh, data = GBSG2))
 
+\dontrun{
+
 ### estimate age-dependent Cox models (here ignoring all other covariates)
 ctrl <- ctree_control(minsplit = 50, minbucket = 20, mincriterion = 0)
 set.seed(290875)
@@ -78,6 +80,7 @@ abline(h = coef(cmod <- mlt(m, data = GBSG2))["horThyes"])
 ### corresponding baseline hazard function which  _differs_
 ### across age; interpretation of positive / negative treatment effect is,
 ### however, save.
+}
 
 }
 \keyword{trees}
