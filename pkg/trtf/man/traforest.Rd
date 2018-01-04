@@ -22,6 +22,10 @@ traforest(object, parm = 1:length(coef(object)), mltargs = list(maxit = 10000), 
   models as described in Hothorn and Zeileis (2017). The method can be seen
   in action in Hothorn (2018) and the corresponding code is available as
   \code{demo("BMI")}. 
+
+  A short talk introducing transformation trees and forests is available from
+  \url{https://channel9.msdn.com/Events/useR-international-R-User-conferences/useR-International-R-User-2017-Conference/Transformation-Forests}.
+
 }
 \value{
   An object of class \code{traforest} with corresponding \code{logLik} and
