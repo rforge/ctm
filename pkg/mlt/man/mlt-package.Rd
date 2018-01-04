@@ -3,7 +3,7 @@
 \alias{mlt-package}
 \title{General Information on the \pkg{mlt} Package}
 \description{
-  The \pkg{mlt} implements maximum likelihood estimation in 
+  The \pkg{mlt} package implements maximum likelihood estimation in 
   conditional transformation models as introduced by Hothorn et al. (2017).
 
   An introduction to the package is available in the \code{mlt} package
