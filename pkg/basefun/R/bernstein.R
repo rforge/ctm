@@ -28,11 +28,14 @@ Bernstein_basis <- function(var, order = 2,
     ui <- match.arg(ui, several.ok = TRUE)
     if (length(ui) > 2) ui <- "none"
     if (length(ui) > 1) 
-        stopifnot((length(ui) == 2) && "zerointegral" %in% ui)
+        stopifnot(length(ui) == 2)
     if ("zerointegral" %in% ui) {
         zeroint <- TRUE
         ui <- ifelse(length(ui) == 2, ui[ui != "zerointegral"], "none")
+    } else {
+        ui <- paste(sort(ui), collapse = ".")
     }
+
     constr <- switch(ui,
         "none" = list(ui = Diagonal(order + 1), 
                       ci = rep(-Inf, order + 1)),
@@ -40,9 +43,16 @@ Bernstein_basis <- function(var, order = 2,
                             ci = rep(0, order)),
         "decreasing" = list(ui = diff(Diagonal(order + 1), differences = 1) * -1,
                             ci = rep(0, order)),
-        "cyclic" = stop("not yet implemented"),
+        "increasing.positive" = {
+            tmp <- Bernstein_basis(var, order = order)
+            tmpdf <- as.data.frame(mkgrid(var))
+            B0 <- model.matrix(tmp, data = tmpdf)[1,]
+            list(ui = rBind(B0, diff(Diagonal(order + 1), differences = 1)), 
+                        ci = rep(0, order + 1))
+        },
         "positive" = list(ui = Diagonal(order + 1), ci = rep(0, order + 1)),
-        "negative" = list(ui = -Diagonal(order + 1), ci = rep(0, order + 1)))
+        "negative" = list(ui = -Diagonal(order + 1), ci = rep(0, order + 1)),
+        "default" = stop(paste(ui, "not yet implemented")))
 
     stopifnot(inherits(var, "numeric_var"))
     varname <- variable.names(var)

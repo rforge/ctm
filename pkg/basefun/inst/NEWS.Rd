@@ -6,6 +6,7 @@
   \itemize{
     \item{\code{nparm} sometimes generated data with sanitised variable
           names, we don't want this to happen.}
+    \item{Allow positive increasing Bernstein polynomials.}
   }
 }
 

@@ -34,6 +34,9 @@ nparm.basis <- function(object) {
                                            check.names = FALSE))) 
 }
 
+nparm.intercept_basis <- function(object)
+    return(1)
+
 nparm.box_bases <- function(object)
     prod(sapply(object, nparm))
 
