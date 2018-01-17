@@ -10,7 +10,8 @@
     rex[is.na(ex)] <- 0
     rle[is.na(le) | !is.finite(le)] <- 0
     rri[is.na(ri) | !is.finite(ri)] <- 0
-    rex + (rle + ifelse(is.finite(ri), (rri - rle) / 2, 0))
+    ### (-Inf, x] -> x and (x, Inf) -> x
+    rex + (rle + ifelse(is.finite(ri) & is.finite(le), (rri - rle)/2, rri))
 }
 
 
