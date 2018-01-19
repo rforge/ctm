@@ -1,7 +1,6 @@
 
 library("tram")
 library("survival")
-library("mboost")
 library("trtf")
 
 data("GBSG2", package = "TH.data")
@@ -29,6 +28,7 @@ coef(Cmod)
 diag(vcov(cmod))
 diag(vcov(Cmod))
 
+if (FALSE) {
 fm <- Coxph(Surv(time, cens) ~ 1, data = GBSG2, asFamily = TRUE)
 bmod <- glmboost(Surv(time, cens) ~ ., data = GBSG2, family = fm, 
                  control = boost_control(nu = .75, mstop = 250, trace = TRUE), 
@@ -59,6 +59,8 @@ coef(as.mlt(Cmod))
 cf2
 
 risk(bmod)
+
+}
 
 cmod <- Coxph(Surv(time, cens) ~ horTh, data = GBSG2)
 (tmod <- trafotree(cmod, formula = Surv(time, cens) ~ horTh | ., data = GBSG2))

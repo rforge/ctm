@@ -106,7 +106,7 @@ tram <- function(formula, data, subset, weights, offset, cluster, na.action = na
                  transformation = c("discrete", "linear", "logarithmic", "smooth"),
                  LRtest = TRUE, 
                  prob = c(.1, .9), support = NULL, order = 6, negative =
-                 TRUE, scale = TRUE, asFamily = FALSE, model_only = FALSE, ...) 
+                 TRUE, scale = TRUE, model_only = FALSE, ...) 
 {
 
     if (!inherits(td <- formula, "tram_data")) {
@@ -126,18 +126,14 @@ tram <- function(formula, data, subset, weights, offset, cluster, na.action = na
     iX <- NULL
     if (!is.null(td$mt$x)) {
         ### NOTE: this triggers sumconstr = TRUE
-        iX <- as.basis(td$mt$x, data = td$mf, remove_intercept = !asFamily, 
+        iX <- as.basis(td$mt$x, data = td$mf, remove_intercept = TRUE, 
                        negative = negative)
-    } else {
-        if (asFamily) iX <- intercept_basis()
-    }
+    } 
 
     model <- ctm(response = rbasis, interacting = iS, shifting = iX, 
                  todistr = distribution, data = td$mf)
 
     if (model_only) return(model)
-
-    if (asFamily) return(ctmFamily(model, td$mf))
 
     ret <- mlt(model, data = td$mf, weights = td$weights, offset = td$offset, 
                scale = scale, ...)
