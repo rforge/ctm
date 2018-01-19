@@ -31,7 +31,7 @@ shiftFamily <- function(object, data, weights) {
     risk <- function(y, f, w = 1) {
         if (length(w) == 1) w <- rep(w, nrow(data))
         tmp <- mlt(object, data = data, dofit = FALSE, offset = -f)
-        logLik(tmp, w = w, parm = coef(model, fixed = TRUE))
+        -logLik(tmp, w = w, parm = coef(model, fixed = TRUE))
     }
 
     mboost::Family(ngradient = ngradient,
@@ -70,7 +70,7 @@ ctmFamily <- function(model, data, weights) {
             ### already weighted!
             ret <- ret + of$ll(fit[i,])[i]
         }
-        ret
+        - ret
     }
     offset <- function(y, weights) {
         cf <- coef(mf)
@@ -95,7 +95,13 @@ trboost <- function(model, formula, data = list(), na.action = na.omit, weights 
         mf$family <- family
         mf$baselearner <- baselearner
         mf[[1L]] <- quote(mboost::mboost)
-        return(eval(mf, parent.frame()))
+        ret <- eval(mf, parent.frame())
+        ret$trmodel <- model$model
+        class(ret) <- c("trshift", class(ret))
+        return(ret)
+    } else {
+        stopifnot(is.null(model$model$bases$interacting))
+        stopifnot(is.null(model$model$bases$shifting))
     }
 
     tmpcontrol <- control
@@ -165,7 +171,7 @@ trboost <- function(model, formula, data = list(), na.action = na.omit, weights 
                         fitted = function() {
                             ret <- as(X %*% coef, "matrix")
                             if (NCOL(coef) == 1)
-                            ret <- as.vector(coef)
+                                ret <- as.vector(coef)
                             if (is.null(index)) return(ret)
                             if (is.matrix(ret)) 
                             return(ret[index,,drop = FALSE])
@@ -187,9 +193,9 @@ trboost <- function(model, formula, data = list(), na.action = na.omit, weights 
 
         ### prepare for computing predictions
         predict <- function(bm, newdata = NULL, aggregate = c("sum", "cumsum", "none")) {
-            cf <- sapply(bm, coef)
-            if (!is.matrix(cf))
-                cf <- matrix(cf, nrow = 1)
+            cf <- lapply(bm, function(x) x$model)
+#            if (!is.matrix(cf))
+#                cf <- matrix(cf, nrow = 1)
             if(!is.null(newdata)) {
                 index <- NULL
                 ## Use sparse data represenation if data set is huge
@@ -203,13 +209,13 @@ trboost <- function(model, formula, data = list(), na.action = na.omit, weights 
             }
             aggregate <- match.arg(aggregate)
             pr <- switch(aggregate, "sum" =
-                 as(X %*% rowSums(cf), "matrix"),
+                 as(X %*% Reduce("+", cf), "matrix"),
             "cumsum" = {
                  stop("cumsum not available")  
 #                 as(X %*% .Call("R_mcumsum", as(cf, "matrix"),
 #                                PACKAGE = "mboost"), "matrix")
             },
-            "none" = as(X %*% cf, "matrix"))
+            "none" = sapply(cf, function(b) as(X %*% b, "matrix")))
             if (is.null(index))
                 return(pr[ , , drop = FALSE])
             return(pr[index, ,drop = FALSE])
@@ -237,7 +243,118 @@ trboost <- function(model, formula, data = list(), na.action = na.omit, weights 
         ret$rownames <- rownames(data)
     else ret$rownames <- 1:NROW(m1$response)
     ret$call <- match.call()
+
+    offset <- 0
+    mstop <- mstop(ret)
+    y <- 1
+    xselect <- 1
+    cwlin <- FALSE
+    bnames <- ""
+    thiswhich <- function() NA
+    bl <- 0
+    ens <- 0
+    nu <- 0
+    .predict <- function(newdata = NULL, which = NULL,
+                         aggregate = c("sum")) {
+
+    if (mstop == 0) {
+        if (length(offset) == 1) {
+           if (!is.null(newdata))
+                return(rep(offset, NCOL(newdata)))
+            return(rep(offset, NROW(y)))
+        } 
+        if (!is.null(newdata)) {
+            warning("User-specified offset is not a scalar, ",
+                    "thus it cannot be used for predictions when ",
+                    sQuote("newdata"), " is specified.")
+            return(rep(0, NCOL(newdata)))
+        }
+        return(offset)
+   }
+   if (!is.null(xselect))
+        indx <- ((1:length(xselect)) <= mstop)
+    which <- thiswhich(which, usedonly = nw <- is.null(which))
+    if (length(which) == 0) return(NULL)
+    aggregate <- match.arg(aggregate)
+    pfun <- function(w, agg) {
+        ix <- xselect == w & indx
+        if (!any(ix))
+            return(0)
+        if (cwlin) w <- 1
+        ret <- nu * bl[[w]]$predict(ens[ix],
+               newdata = newdata, aggregate = agg)
+        return(ret)
+    }
+    pr <- lapply(which, pfun, agg = "sum")
+        if (!nw){
+            names(pr) <- bnames[which]
+            attr(pr, "offset") <- offset[1,]
+            return(pr)
+        } else {
+            ## only if no selection of baselearners
+            ## was made via the `which' argument
+            ret <- Reduce("+", pr)
+            ret <- ret + matrix(offset[1,], nrow = nrow(ret), 
+                                ncol = ncol(offset), byrow = TRUE)
+            return(ret)
+        }
+    }
+    env <- environment(ret$predict)
+    ret$predict <- .predict
+    environment(ret$predict) <- env
+
+    ret$trmodel <- model$model
     class(ret) <- c("trboost", class(ret))
     ret
 }
 
+predict.trboost <- function(object, newdata = NULL, ...) {
+
+    if (is.null(newdata)) {
+        pr <- fitted(object)
+    } else {
+        class(object) <- class(object)[-1L]
+        pr <- predict(object, newdata)
+    }
+    ret <- c()
+    tmpm <- object$trmodel
+    for (i in 1:nrow(pr)) {
+        coef(tmpm) <- pr[i,]
+        ret <- cbind(ret, predict(tmpm, newdata = data.frame(1), ...))
+    }
+    ret
+}
+
+predict.trshift <- function(object, newdata = NULL, ...) {
+
+    if (is.null(newdata)) {
+        pr <- fitted(object)
+    } else {
+        class(object) <- class(object)[-1L]
+        pr <- predict(object, newdata)
+    }
+    ret <- c()
+    if (is.null(newdata))
+        newdata <- as.data.frame(model.frame(object))
+   
+    tmp <- object$trmodel$bases
+    if (!is.null(tmp$shifting)) {
+        tmp$shifting <- c(int = intercept_basis(), shift = tmp$shifting)
+    } else {
+        tmp$shifting <- intercept_basis()
+    }
+    td <- object$trmodel$todistr$name
+    td <- switch(td, "normal" = "Normal", "logistic" = "Logistic",
+                 "minimum extreme value" = "MinExtrVal")
+    tmpm <- ctm(tmp$response, tmp$interacting, tmp$shifting, 
+                todistr = td)
+    coef(tmpm) <- nuisance(object)
+    ret <- c()
+    for (i in 1:nrow(pr)) {
+        coef(tmpm)["(Intercept)"] <- -pr[i,]
+        ret <- cbind(ret, predict(tmpm, newdata = data.frame(1), ...))
+    }
+    ret
+}
+
+    
