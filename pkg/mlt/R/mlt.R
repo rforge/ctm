@@ -258,7 +258,8 @@
     }
 
     if (!is.null(ui)) {    
-        ret <- solve.QP(Dmat, dvec, t(ui), ci, meq = 0)$solution
+        ret <- c(coneproj::qprog(Dmat, dvec, ui, ci, msg = FALSE)$thetahat)
+        ### was: solve.QP(Dmat, dvec, t(ui), ci, meq = 0)$solution
     } else {
         ret <- lm.fit(x = X, y = Z)$coef
     }

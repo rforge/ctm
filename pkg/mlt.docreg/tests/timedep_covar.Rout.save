@@ -107,10 +107,10 @@ There were 21 warnings (use warnings() to see them)
 +          data = vet2, scale = TRUE)
 > 
 > max(abs(coef(fit1) - coef(m)[-(1:12)]))
-[1] 0.03000332
+[1] 0.03026507
 > max(abs(diag(vcov(m))[-(1:12)] - diag(vcov(fit1))))
-[1] 0.0003450689
+[1] 0.0003465017
 > 
 > proc.time()
    user  system elapsed 
-  5.576   0.068   5.648 
+  5.652   0.060   5.735 

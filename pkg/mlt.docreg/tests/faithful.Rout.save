@@ -1,5 +1,5 @@
 
-R version 3.4.0 (2017-04-21) -- "You Stupid Darkness"
+R version 3.4.3 (2017-11-30) -- "Kite-Eating Tree"
 Copyright (C) 2017 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -79,7 +79,7 @@ Loading required package: variables
 > w <- drop((Xprime %*% coef(mod))^2)
 > H3 <- crossprod(X) + crossprod(Xprime * w, Xprime)
 > max(abs(H3 - H2))
-[1] 9.885613
+[1] 9.885612
 > 
 > cov2cor(vcov(mod))
              Bs1(waiting) Bs2(waiting) Bs3(waiting) Bs4(waiting) Bs5(waiting)
@@ -130,4 +130,4 @@ Bs9(waiting)   -0.7427123    0.8292219   -0.9214163    1.0000000
 > 
 > proc.time()
    user  system elapsed 
-  3.224   0.040   3.263 
+  3.792   0.064   3.854 

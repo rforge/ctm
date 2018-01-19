@@ -1,5 +1,5 @@
 
-R version 3.4.0 (2017-04-21) -- "You Stupid Darkness"
+R version 3.4.3 (2017-11-30) -- "Kite-Eating Tree"
 Copyright (C) 2017 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -45,17 +45,17 @@ Loading required package: variables
 > v <- vcov(mod)[n, n]
 > coef(cmod) / cf
     horThyes          age menostatPost        tsize     tgrade.L     tgrade.Q 
-   0.9921702    0.9524121    0.9652328    1.0035123    0.9840556    0.9957376 
+   0.9939063    0.9515362    0.9683811    0.9997614    0.9851680    0.9964934 
       pnodes      progrec       estrec 
-   1.0007726    1.0032541    1.0740417 
+   1.0017132    1.0035906    1.0709679 
 > diag(vcov(cmod)) / diag(v)
     horThyes          age menostatPost        tsize     tgrade.L     tgrade.Q 
-   0.9952132    0.9973711    0.9976965    1.0001333    0.9993861    0.9991215 
+   0.9954304    0.9972914    0.9977362    1.0009441    1.0000382    0.9996852 
       pnodes      progrec       estrec 
-   1.0086096    0.9984884    0.9949378 
+   1.0078981    0.9989809    0.9948581 
 > range(vcov(cmod) / v)
-[1] 0.6709312 1.9224393
+[1] 0.6699401 1.9540725
 > 
 > proc.time()
    user  system elapsed 
-  1.496   0.036   1.531 
+  1.780   0.032   1.809 

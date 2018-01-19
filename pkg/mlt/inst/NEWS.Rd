@@ -2,6 +2,12 @@
 \name{NEWS}
 \title{NEWS file for the mlt package}
 
+\section{Changes in Version 0.2-2 (2018-01-20)}{
+  \itemize{
+    \item{Use \pkg{coneprog} for getting the starting values.}
+  }
+}
+
 \section{Changes in Version 0.2-1 (2017-12-12)}{
   \itemize{
     \item{\code{q} is forwarded to \code{qmlt} by \code{predict.ctm} now.}
@@ -9,6 +15,7 @@
     \item{Update citation.}
   }
 }
+
 
 \section{Changes in Version 0.2-0 (2017-06-20)}{
   \itemize{
