@@ -37,7 +37,7 @@ plot.tram <- function(x, newdata = model.frame(x),
             qqline(U, distribution = qunif)
         },
         "baseline only" = {
-            scf <- object$shiftparm
+            scf <- object$shiftcoef
             if (length(scf) > 0) {
                 mobj <- as.mlt(object)
                 cf <- coef(mobj)
@@ -71,9 +71,11 @@ plot.tram <- function(x, newdata = model.frame(x),
         if (length(col) != NROW(newdata)) 
             col <- rep(col, length.out = NROW(newdata))
 
-        if (is.matrix(cb)) 
-            .add_confband(cb, fill = fill[1], col = col[1], lwd = lwd)
-        out <- lapply(1:length(cb), function(i) 
-            .add_confband(cb[[i]], fill = fill[i], col = col[i], lwd = lwd))
+        if (is.matrix(cb)) {
+            .add_confband(cb, fill = fill[1], col = col[1], lwd = lwd) 
+        } else {
+            out <- lapply(1:length(cb), function(i) 
+                .add_confband(cb[[i]], fill = fill[i], col = col[i], lwd = lwd))
+        }
     }
 }

@@ -81,7 +81,7 @@ ctmFamily <- function(model, data, weights) {
 
 
 trboost <- function(model, formula, data = list(), na.action = na.omit, weights = NULL, 
-                    shiftonly = FALSE, control = boost_control(), oobweights = NULL, 
+                    shiftonly = FALSE, monotone = TRUE, control = boost_control(), oobweights = NULL, 
                     baselearner = c("bbs", "bols"), ...) {
 
     baselearner <- match.arg(baselearner)
@@ -119,6 +119,8 @@ trboost <- function(model, formula, data = list(), na.action = na.omit, weights 
     index <- 1
     get_index <- function() NA
     newX <- function() NA
+    P <- 1
+    mono <- TRUE
 
     dpp_constr <- function(weights) {
         w <- weights
@@ -136,26 +138,39 @@ trboost <- function(model, formula, data = list(), na.action = na.omit, weights 
         Xi <- X
         if (!is.null(index)) Xi <- Xi[index,,drop = FALSE]
 
+        tmp <- vector(mode = "list", length = P)
+        for (i in 1:P) tmp[[i]] <- XtX
+        XtX2 <- do.call("bdiag", tmp)
+        i <- as.vector(t(matrix(1:(nrow(XtX) * P), nrow = nrow(XtX))))
+        ### make this baselearner monotone
+        XtX2 <- as(XtX2[i,i], "matrix")
+
         mysolve <- function(y) {
+            stopifnot(ncol(y) == P)
             si <- y
             if (!is.null(index))
                 si <- apply(y, 2, function(w) tapply(w, index, sum))
             Xs <- crossprod(X, si)
             G <- solve(XtX, Xs)
+            if (!mono)
+                return(G)
             ui <- attr(y, "ui")
             lastparm <- attr(y, "fit")
             nu <- attr(y, "nu")
             ci <- attr(y, "ci")
-            chk <- all(ui %*% t(nu * X %*% G + lastparm) - ci >= -.Machine$double.eps)
+            if (mono) {
+                chk <- FALSE
+            } else {
+                chk <- all(ui %*% t(nu * X %*% G + lastparm) - ci >= -.Machine$double.eps)
+            }
             if (!chk) {
                 Xs2 <- as.vector(t(Xs))
-                tmp <- vector(mode = "list", length = ncol(y))
-                for (i in 1:ncol(y)) tmp[[i]] <- XtX
-                XtX2 <- do.call("bdiag", tmp)
-                i <- as.vector(t(matrix(1:(nrow(XtX) * ncol(y)), nrow = nrow(XtX))))
-                ### make this baselearner monotone
-                sv <- solve.QP(XtX2[i,i], Xs2, t(kronecker(Xi, ui)))
-                G <- matrix(sv$solution, ncol = ncol(y), byrow = TRUE)
+                ### G <- solve.QP(XtX2, Xs2, t(kronecker(Xi[ix,], ui)))$solution
+                ix <- sample(1:nrow(Xi), pmin(25, nrow(Xi)))
+                A <- as(kronecker(Xi[ix,], ui), "matrix")
+                b <- rep(ci, length.out = nrow(A))
+                G <- coneproj::qprog(XtX2, Xs2, A, b, msg = FALSE)$thetahat
+                G <- matrix(G, ncol = P, byrow = TRUE)
             }
             return(G)
         }
@@ -229,8 +244,20 @@ trboost <- function(model, formula, data = list(), na.action = na.omit, weights 
     }
 
     blg <- m1$baselearner
+    P <- length(coef(model))
+    if (length(monotone) == 1 & is.null(names(monotone))) {
+        monotone <- rep(monotone, length(blg))
+    } else {
+        tmp <- rep(TRUE, length(blg))
+        names(tmp) <- names(blg)
+        stopifnot(all(names(monotone) %in% names(blg)))
+        tmp[names(montone)] <- monotone
+    }
+
     for (i in 1:length(blg)) {
         env <- environment(blg[[i]]$dpp)
+        assign("P", P, env)
+        assign("mono", monotone[i], env)
         blg[[i]]$dpp <- dpp_constr
         environment(blg[[i]]$dpp) <- env
     }

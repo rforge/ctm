@@ -2,7 +2,7 @@
 import("mboost")
 import("mlt")
 import("sandwich")
-importFrom("quadprog", "solve.QP")
+importFrom("coneproj", "qprog")
 importFrom("methods", "as")
 importFrom("basefun", "intercept_basis")
 importFrom("stats", "coef", "fitted", "model.matrix", 

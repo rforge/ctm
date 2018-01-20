@@ -11,8 +11,12 @@ asvar.ordered <- function(object, name, ...)
 asvar.numeric <- function(object, name, prob = c(.1, .9), support = NULL, ...) {
     if (is.integer(object))
         return(variables::numeric_var(name, support = sort(unique(object))))  
-    if (is.null(support)) support = quantile(object, prob = prob)
-    variables::numeric_var(name, support = support, ...)
+    if (is.null(support)) {
+        support <- quantile(object, prob = prob)
+        add <- range(object) - support
+        return(variables::numeric_var(name, support = support, add = add, ...))
+    }
+    return(variables::numeric_var(name, support = support, ...))
 }
 
 asvar.Surv <- function(object, name, prob = c(.1, .9), support = NULL, bounds = c(0, Inf), ...) {
