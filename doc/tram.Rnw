@@ -22,7 +22,7 @@
 set.seed(290875)
 
 sapply(c("tram", "survival", "MASS", "lattice", "mlbench", 
-         "multcomp", "ordinal", "colorspace", "quantreg"), library, char = TRUE)
+         "multcomp", "ordinal", "colorspace", "quantreg", "trtf", "ATR"), library, char = TRUE)
 
 
 trellis.par.set(list(plot.symbol = list(col=1,pch=20, cex=0.7),
@@ -862,11 +862,73 @@ BC_BH_0 <- BoxCox(y ~ 1, data = BostonHousing2)
 BC_BH_4 <- trafotree(BC_BH_0, 
     formula = y ~ chas + crim + zn + indus + nox + 
               rm + age + dis + rad + tax + ptratio + b + lstat, data =
-    BostonHousing2)
+    BostonHousing2, control = ctree_control(minbucket = 30))
 logLik(BC_BH_4)
 @
 
+\begin{sidewaysfigure}
+<<BostonHousing-BC-4-plot, fig.width = 14, fig.height = 10, echo = FALSE>>=
+library("ATR")
+plot(rotate(BC_BH_4), terminal_panel = trtf:::node_mlt, 
+     tp_args = list(type = "density", K = 100, fill = col[1], id = FALSE))
+@
+\caption{\label{}}
+\end{sidewaysfigure}
 
+<<BostonHousing-BC-5, eval = FALSE>>=
+BC_BH_5 <- traforest(BC_BH_0, 
+    formula = y ~ chas + crim + zn + indus + nox + 
+              rm + age + dis + rad + tax + ptratio + b + lstat, data =
+    BostonHousing2)
+@
+
+\begin{eqnarray*}
+\Prob(\rY \le \ry \mid \rX = \rx, \text{horTh}) = \pZ(\basisy(\ry)^\top \parm(\rx) +
+I(\text{horTh}) \beta(\rx))
+\end{eqnarray*}
+Here we are interested in an $\rx$-varying log-hazard ratio
+$\beta(\rx)$. We first fit the model using a transformation tree
+<<GBSG2-Cox-3>>=
+Coxph_GBSG2_3 <- trafotree(Coxph_GBSG2_1, formula = Surv(time, cens) ~ horTh | age + menostat + tsize + 
+    tgrade + pnodes + progrec + estrec, data = GBSG2)
+logLik(Coxph_GBSG2_1)
+logLik(Coxph_GBSG2_3)
+coef(Coxph_GBSG2_3)[, "horThyes"]
+@
+Figure~\ref{GBSG2-Cox-3-plot} shows that the global treatment effect
+vanishes in patients with many positive lymph nodes and a larger tumor
+grading.
+\begin{figure}
+<<GBSG2-Cox-3-plot>>=
+nd <- data.frame(horTh = sort(unique(GBSG2$horTh)))
+plot(Coxph_GBSG2_3, newdata = nd, 
+     tp_args = list(type = "survivor", col = col))
+@
+\caption{\label{GBSG2-Cox-3-plot}}
+\end{figure}
+
+Now we restrict out attention to an age-varying log-hazard ratio
+$\beta(\text{age})$ and fit a more flexible model using a transformation
+forest
+<<GBSG2-Cox-4, cache = TRUE>>=
+ctrl <- ctree_control(minsplit = 30, minbucket = 15, mincriterion = 0)
+Coxph_GBSG2_4 <- traforest(Coxph_GBSG2_1, formula = Surv(time, cens) ~ horTh | age, control = ctrl, 
+                           ntree = 100, mtry = 1, data = GBSG2)
+@
+The effect is plotted in \ref{GBSG2-Cox-4-plot}. Very young women seem to
+profit most from the treatment, whereas women in the mid-forties seem not to
+profit or even have an increased risk under hormonal therapy.
+
+\begin{figure}
+<<GBSG2-Cox-4-plot, cache = TRUE>>=
+nd <- data.frame(age = 30:70)
+cf <- predict(Coxph_GBSG2_4, newdata = nd, type = "coef")
+nd$logHR <- sapply(cf, function(x) x["horThyes"])
+plot(logHR ~ age, data = nd, pch = 19, xlab = "Age", ylab = "log-Hazard Ratio")
+abline(h = coef(Coxph_GBSG2_1)["horThyes"])
+@
+\caption{\label{GBSG2-Cox-4-plot}}
+\end{figure}
 
 
 \bibliography{mlt,packages}
