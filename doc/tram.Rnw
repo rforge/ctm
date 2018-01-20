@@ -101,24 +101,41 @@ URL \url{https://CRAN.R-project.org/package=tram}.}
 
 \section{Introduction}
 
-The \pkg{tram} package offers standard \proglang{R} interfaces for 
-performing regression analyses by stratified linear transformation models.
-The model class covered by the package consists of transformation models of the
-form
+The \pkg{tram} package offers standard formula-based \proglang{R} interfaces
+to computational infrastructure for conditional transformation models
+provided by package \pkg{mlt}. \pkg{tram} restricts its attention to 
+likelihood inference for stratified linear transformation models. An
+interface to package \pkg{trtf} allows more complex models to be fitted
+by recursive partitioning and random forest technology.
+
+In a nutshell, the model class covered by the package consists of transformation 
+models of the form
 \begin{eqnarray} \label{tram}
 \Prob(\rY \le \ry \mid \rS = \rs, \rX = \rx) = \pZ(\h_\rY(\ry \mid \rs) - \tilde{\rx}^\top \shiftparm - \text{offset})
 \end{eqnarray}
 where $\rY$ is an at least ordered univariate response variable, $\rS$ are
-stratum variables and $\rX$ covariates. The $P$-vector $\tilde{\rx}^\top$ is a row of
+stratum variables and $\rX$ covariates with observations $\ry, \rs$, and
+$\rx$, respectively. We use the term `stratum' is a little more general
+sense and allow factors and also numeric variables in $\rS$. The $P$-vector $\tilde{\rx}^\top$ is a row of
 the design matrix corresponding to the observed covariate status $\rx$. The packages allows different
 choices if the `link' function $\pZ$ and the monotone increasing (in it's $\ry$ argument) `baseline transformation' $\h_\rY$
 and, consequently, the estimation of a rather broad class of models.
 
-A little more specifically, the baseline transformation $\h_\rY$ is of the form
+A little more specifically, the monotone increasing baseline
+stratum-specific transformation $\h_\rY$ is of the form
 \begin{eqnarray*}
 \h_\rY(\ry \mid \rs) = \tilde{\rs}^\top\baseparm(\ry)
 \end{eqnarray*}
-where each element of $\baseparm(\ry) \in \RR^J$ is $\basisy(\ry)^\top\parm_j, j = 1, \dots, J$.
+with $J$-vector $\tilde{\rs}^\top$ being the row of
+the design matrix corresponding to the observed strata $\rs$.
+Each element of the parameter vector $\baseparm(\ry) = (\basisy(\ry)^\top \parm_1, \dots,
+\basisy(\ry)^\top\parm_J) \in \RR^J$ is parameterised as $\basisy(\ry)^\top\parm_j, j = 1, \dots, J$.
+Thus, the `response-varying' coefficients of $\tilde{\rs}^\top$ depend on the response
+$\ry$.
+The key part is a basis transformation $\basisy(\ry)$ of the response.
+Different choices of this basis allow the model class to handle different
+types of response variables and models of different complexity.
+
 In the absence of any stratum variables, we have
 \begin{eqnarray*}
 \h_\rY(\ry) = \basisy(\ry)^\top\parm_1.
@@ -131,15 +148,16 @@ We treat numeric variables with response-varying coefficients in a similar
 way. With $\rs = s \in \RR$, the baseline transformation 
 \begin{eqnarray*}
 \h_\rY(\ry \mid \rs) = \alpha_1(\ry) + s \alpha_2(\ry) = \basisy(\ry)^\top\parm_1 + s
-\basisy(\ry)^\top\parm_2.
+\basisy(\ry)^\top\parm_2
 \end{eqnarray*}
-The coefficient function $\alpha_2(\ry)$ is called `time-varying' in
+The coefficient function $\alpha_2(\ry)$ of $s$ is called `time-varying' in
 survival analysis and some people use the more general term `distribution
 regression' when refering to models with response-varying coefficients.
 
 Because the intercept function is contained in $\h_\rY$, the linear predictor
 $\tilde{\rx}^\top \shiftparm$ must not contain an intercept. The design row
-$\tilde{\rs}^\top$, however, is expected to include an intercept term.
+$\tilde{\rs}^\top$, however, is expected to include an intercept term,
+explicitly or implicitly.
 
 All model interfaces implemented in the \pkg{tram} package expect models to
 be specified by calls of the form
@@ -149,7 +167,14 @@ tram(y | s ~ x, ...)
 where \code{y} is a variable containing the observed response (possibly
 under all forms random censoring and truncation), \code{s} specifies the
 design row $\tilde{\rs}^\top$ and \code{x} the row $\tilde{\rx}^\top$ in the
-design matrix. 
+design matrix using standard \proglang{R} formula language. Specific
+modelling functions for normal linear regression models (\cmd{Lm}),
+non-normal linear regression models (\cmd{BoxCox}, \cmd{Colr}), ordinal
+linear regression models (\cmd{Polr}), and survival analysis (\cmd{Survreg},
+\cmd{Coxph}) implement transformation models tailored to these specific
+domains. The corresponding user interfaces resemble the interfaces of
+existing modeling functions (such as \cmd{lm}, \cmd{polr}, \cmd{survreg}, or
+\cmd{coxph}) are closely as possible.
 
 \section{Normal Linear Regression Models}
 
@@ -191,9 +216,11 @@ lm_BH <- lm(cmedv ~ crim + zn + indus + chas + nox + rm + age + dis +
 @
 The \pkg{tram} package implements a function \cmd{Lm} for fitting the normal
 linear regression model in the parameterisation (\ref{Lm})
-<<BostonHousing-Lm1, cache = TRUE>>=
+<<BostonHousing-numeric, echo = FALSE>>=
 BostonHousing2$rad <- as.numeric(BostonHousing2$rad)
 BostonHousing2$tax <- as.numeric(BostonHousing2$tax)
+@
+<<BostonHousing-Lm1, cache = TRUE>>=
 Lm_BH_1 <- Lm(cmedv ~ crim + zn + indus + chas + nox + rm + age + dis + 
               rad + tax + ptratio + b + lstat, data = BostonHousing2)
 @
@@ -204,7 +231,8 @@ logLik(Lm_BH_1)
 @
 so why would one want to set \cmd{lm} aside in favour of \cmd{Lm}? The
 parameterisation in (\ref{Lm}) seems a little odd, because the parameters
-are $\shiftparm = \tilde{\shiftparm} / \sigma$ and not $\tilde{\shiftparm}$.
+are $\eparm_1 = - \tilde{alpha}/\sigma$ and $\shiftparm = \tilde{\shiftparm} / \sigma$
+instead of the mean $\tilde{alpha}$ and the regression coefficients $\tilde{\shiftparm}$.
 The parameters on the scale of $\tilde{\shiftparm}$, including the intercept
 $\tilde{\alpha}$ can be obtained via
 <<BostonHousing-coef>>=
