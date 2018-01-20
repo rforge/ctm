@@ -232,7 +232,7 @@ logLik(Lm_BH_1)
 so why would one want to set \cmd{lm} aside in favour of \cmd{Lm}? The
 parameterisation in (\ref{Lm}) seems a little odd, because the parameters
 are $\eparm_1 = - \tilde{alpha}/\sigma$ and $\shiftparm = \tilde{\shiftparm} / \sigma$
-instead of the mean $\tilde{alpha}$ and the regression coefficients $\tilde{\shiftparm}$.
+instead of the mean $\tilde{\alpha}$ and the regression coefficients $\tilde{\shiftparm}$.
 The parameters on the scale of $\tilde{\shiftparm}$, including the intercept
 $\tilde{\alpha}$ can be obtained via
 <<BostonHousing-coef>>=
@@ -259,26 +259,39 @@ Lm_BH_2 <- Lm(y ~ crim + zn + indus + chas + nox +
               data = BostonHousing2)
 logLik(Lm_BH_2)
 @
-In this setup, the variance needs to be estimated simultaneously with the
-shift parameters.
+Why is the extention to censored responses such a big deal? \code{lm}
+estimates the regression coefficients $\tilde{\shiftparm}$ by least-squares
+$(\ry - \tilde{\rx}^\top\tilde{\shiftparm})^2$.
+In the presence of censoring (here at \code{cmedv} $>50$), the likelihood
+contribution is
+\begin{eqnarray*}
+\Prob(\text{medv} > 50 \mid \rX = \rx) = 1 - \pZ(\eparm_1 + \eparm_2 50 - \tilde{\rx}^\top \shiftparm)
+\end{eqnarray*}
+and one cannot treat the inverse standard deviation $\sigma = \eparm_2^{-1}$
+as a nuisance parameter. This, the variance needs to be estimated simultaneously with the
+shift parameters. As we will see later, this model can also be estimated by
+\cmd{survreg}, for example.
 
 One of the variables (\code{chas}) gives us information about 
 proximity to the Charles River. The model above only allows for mean changes
 in this variable, but how about models that allow different variances? This
-is simple in \cmd{Lm} because we can use \code{chas} as a stratum variable
+is simple in \cmd{Lm} because we can use \code{chas} as a stratum variable.
+This means that we estimate $\eparm_1$ and $\eparm_2$ separately for each of
+the two groups in the model
 <<BostonHousing-Lm3, cache = TRUE>>=
 Lm_BH_3 <- Lm(y | 0 + chas ~ crim + zn + indus + nox + 
               rm + age + dis + rad + tax + ptratio + b + lstat, 
               data = BostonHousing2)
 logLik(Lm_BH_3)
 @
-In fact, it seems the standard deviation is almost twice as large in areas
-without access to the Charles River
+Here, it seems the standard deviation is almost twice as large in areas
+without access to the Charles River. Because the stratum-specific inverse
+standard deviations are parameters in our model, we can construct a test for
+the null of equal variances as a test for a linear hypothesis
 <<BostonHousing-chas>>=
 1 / coef(Lm_BH_3, with_baseline = TRUE)[c(2, 4)]
 summary(glht(as.mlt(Lm_BH_3), linfct = c("y:chas0 - y:chas1 = 0")))
 @
-
 
 We could go one step further and include an interaction term between each
 covariate and the response by treating all covariates as strata
@@ -288,6 +301,16 @@ Lm_BH_4 <- Lm(y | 0 + chas + crim + zn + indus + nox +
               data = BostonHousing2)
 logLik(Lm_BH_4)
 @
+For each variable $x$ (or factor level) in the model, we obtain two
+parameters, \ie $\eparm_1 x + \eparm_2 \ry x = (\eparm_1 + \eparm_2 y) x$.
+Thus, each regression coefficient for $x$ may vary with the response in a
+linear way. Technically, this extention of the notion of a stratum to
+numeric covariates leads to the simplest form of `distribition regression',
+that is, a model with linear response-varying regression coefficients.
+Because our transformation function is still linear in $\ry$, the class of
+conditional distributions of our response $\rY \mid \rX = \rx$ is still
+normal. The next section discusses how we can fit models without such an
+restrictive assumption.
 
 \section{Box-Cox Models}
 
@@ -301,24 +324,61 @@ are different, the spirit is the same and we thus refer to the model
 \begin{eqnarray*}
 \Prob(\rY \le \ry \mid \rS = \rs, \rX = \rx) = \Phi(\h_\rY(\ry \mid \rs) - \tilde{\rx}^\top \shiftparm - \text{offset})
 \end{eqnarray*}
-as a `Box-Cox' model:
+with smooth (with respect to $\ry$) baseline transformation $\h_\rY$ as a `Box-Cox'
+model. For the Boston Housing data, we first fit the model
+\begin{eqnarray*}
+\Prob(\text{medv} \le \ry \mid \rX = \rx) = \Phi(\h_\rY(\ry) - \tilde{\rx}^\top \shiftparm)
+\end{eqnarray*}
 <<BostonHousing-BC-1, cache = TRUE>>=
-BC_BH_1 <- BoxCox(y | 0 + chas ~ crim + zn + indus + nox + 
+BC_BH_1 <- BoxCox(y ~ chas + crim + zn + indus + nox + 
                   rm + age + dis + rad + tax + ptratio + b + lstat, 
                   data = BostonHousing2)
 logLik(BC_BH_1)
 @
+Inspection of the fitted baseline transformation $\hat{\h}_\rY(\ry)$ is a
+simple device for detecting deviations from normality. An approximately 
+linear function $\hat{\h}_\rY(\ry)$ suggests that the normal assumption is
+appropriate whereas deviations from linearity correspond to deviations from
+this assumption. Figure~\ref{BostonHousing-BC-1-plot} indicates that there
+is a deviation from normality in the upper tail.
 
 \begin{figure}
 <<BostonHousing-BC-1-plot>>=
-nd <- model.frame(BC_BH_1)[1:2, -1]
-nd$chas <- factor(c("0", "1"))
+nd <- model.frame(BC_BH_1)[1,-1,drop = FALSE]
 plot(BC_BH_1, which = "baseline only", newdata = nd, col = col,
-     confidence = "interval", fill = fill, lwd = 2)
+     confidence = "interval", fill = fill, lwd = 2,
+     xlab = "Median Value", ylab = expression(h[Y]))
+@
+\caption{\label{BostonHousing-BC-1-plot}}
+\end{figure}
+
+When we add proximity to Charles River as stratum in the model,
+<<BostonHousing-BC-2, cache = TRUE>>=
+BC_BH_2 <- BoxCox(y | 0 + chas ~ crim + zn + indus + nox + 
+                  rm + age + dis + rad + tax + ptratio + b + lstat, 
+                  data = BostonHousing2)
+logLik(BC_BH_2)
+@
+we see, in Figure~\ref{BostonHousing-BC-2-plot}, that the two baseline transformations differ only for median values
+smaller than USD $15,000$ with a large variance in houses near Charles River
+(indicating that there are hardly any cheap houses to find in this area).
+
+\begin{figure}
+<<BostonHousing-BC-2-plot>>=
+nd <- model.frame(BC_BH_2)[1:2, -1]
+nd$chas <- factor(c("0", "1"))
+plot(BC_BH_2, which = "baseline only", newdata = nd, col = col,
+     confidence = "interval", fill = fill, lwd = 2,
+     xlab = "Median Value", ylab = expression(h[Y]))
 legend("bottomright", lty = 1, col = col, 
        title = "Near Charles River", legend = c("no", "yes"), bty = "n")
 @
+\caption{\label{BostonHousing-BC-2-plot}}
 \end{figure}
+
+The heterogeneous variances in our model \code{Lm_BH_3} where caused by the
+same effect and Figure~\ref{BostonHousing-Lm-3-plot} shows that us allowing
+the model to deviate from normality leads to better model interpretation.
 
 \begin{figure}
 <<BostonHousing-Lm-3-plot>>=
@@ -327,7 +387,16 @@ plot(Lm_BH_3, which = "baseline only", newdata = nd, col = col,
 legend("bottomright", lty = 1, col = col, 
        title = "Near Charles River", legend = c("no", "yes"), bty = "n")
 @
+\caption{\label{BostonHousing-Lm-3-plot}}
 \end{figure}
+
+We could now look at a model with smooth response-varying effects 
+<<BostonHousing-BC-3, eval = FALSE>>=
+BoxCox(y | 0 + chas + crim + zn + indus + nox + 
+       rm + age + dis + rad + tax + ptratio + b + lstat ~ 0, 
+       data = BostonHousing2)
+@
+put postpone this exercise until Section~\ref{sec:colr}.
 
 \section{Ordinal Regression}
 
@@ -523,7 +592,7 @@ plot(Coxph_GBSG2_2, newdata = nd, which = "distribution", type = "survivor",
 \end{figure}
 
 
-\section{Continuous Outcome Logistic Regression}
+\section{Continuous Outcome Logistic Regression} \label{sec:colr}
 
 \begin{eqnarray*}
 \Prob(\rY \le \ry \mid \rX = \rx) = \frac{\exp(\h_\rY(\ry) + \tilde{\rx}^\top
