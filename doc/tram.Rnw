@@ -342,14 +342,15 @@ appropriate whereas deviations from linearity correspond to deviations from
 this assumption. Figure~\ref{BostonHousing-BC-1-plot} indicates that there
 is a deviation from normality in the upper tail.
 
-\begin{figure}
+\begin{figure}[t]
 <<BostonHousing-BC-1-plot>>=
 nd <- model.frame(BC_BH_1)[1,-1,drop = FALSE]
 plot(BC_BH_1, which = "baseline only", newdata = nd, col = col,
      confidence = "interval", fill = fill, lwd = 2,
      xlab = "Median Value", ylab = expression(h[Y]))
 @
-\caption{\label{BostonHousing-BC-1-plot}}
+\caption{Boston Housing: Baseline transformation $\h_\rY$ in model  
+         \code{BC\_BH\_1} with pointwise confidence intervals. \label{BostonHousing-BC-1-plot}}
 \end{figure}
 
 When we add proximity to Charles River as stratum in the model,
@@ -363,7 +364,7 @@ we see, in Figure~\ref{BostonHousing-BC-2-plot}, that the two baseline transform
 smaller than USD $15,000$ with a large variance in houses near Charles River
 (indicating that there are hardly any cheap houses to find in this area).
 
-\begin{figure}
+\begin{figure}[t]
 <<BostonHousing-BC-2-plot>>=
 nd <- model.frame(BC_BH_2)[1:2, -1]
 nd$chas <- factor(c("0", "1"))
@@ -373,21 +374,23 @@ plot(BC_BH_2, which = "baseline only", newdata = nd, col = col,
 legend("bottomright", lty = 1, col = col, 
        title = "Near Charles River", legend = c("no", "yes"), bty = "n")
 @
-\caption{\label{BostonHousing-BC-2-plot}}
+\caption{Boston Housing: Stratified baseline transformation $\h_\rY$ in model  
+         \code{BC\_BH\_2} with pointwise confidence intervals. \label{BostonHousing-BC-2-plot}}
 \end{figure}
 
 The heterogeneous variances in our model \code{Lm_BH_3} where caused by the
 same effect and Figure~\ref{BostonHousing-Lm-3-plot} shows that us allowing
 the model to deviate from normality leads to better model interpretation.
 
-\begin{figure}
+\begin{figure}[t]
 <<BostonHousing-Lm-3-plot>>=
 plot(Lm_BH_3, which = "baseline only", newdata = nd, col = col,
      confidence = "interval", fill = fill, lwd = 2)
 legend("bottomright", lty = 1, col = col, 
        title = "Near Charles River", legend = c("no", "yes"), bty = "n")
 @
-\caption{\label{BostonHousing-Lm-3-plot}}
+\caption{Boston Housing: Stratified linear baseline transformation $\h_\rY$ in model  
+         \code{Lm\_BH\_2} with pointwise confidence intervals. \label{BostonHousing-Lm-3-plot}}
 \end{figure}
 
 We could now look at a model with smooth response-varying effects 
@@ -466,7 +469,7 @@ Figure~\ref{BostonHousing-Colr-1-plot}. For each observation, the linear
 predictor is plotted against the observed value and this scatterplot is
 overlayed with the conditional decile curves.
 
-\begin{figure}
+\begin{figure}[t]
 <<BostonHousing-Colr-1-plot, echo = FALSE>>=
 nd <- BostonHousing2
 nd$y <- NULL
@@ -476,16 +479,22 @@ lp <- c(predict(Colr_BH_1, newdata = nd, type = "lp"))
 nd2 <- expand.grid(q = q, lp = -lp)
 nd2$d <- c(d)
 nd2$chas <- rep(nd$chas, rep(length(q), length(lp)))
+BHtmp <- BostonHousing2
+levels(BHtmp$chas) <- levels(nd2$chas) <- levels(nd$chas) <- c("Off Charles River", "Near Charles River")
 pfun <- function(x, y, z, subscripts, at, ...) {
     panel.contourplot(x, y, z, subscripts, at = 1:9/10, ...)
     ch <- as.character(unique(nd2$chas[subscripts]))
-    panel.xyplot(x = -lp[nd$chas == ch], y = subset(BostonHousing2, chas == ch)$cmedv, pch = 20, 
-                 col = rgb(.1, .1, .1, .1), ...)   
+    panel.xyplot(x = -lp[nd$chas == ch], y = subset(BHtmp, chas == ch)$cmedv, pch = 20, 
+                 col = rgb(.1, .1, .1, .2))   
 }
 plot(contourplot(d ~ lp + q | chas, data = nd2, panel = pfun, xlab = "Linear predictor", 
-     ylab = "Median Value"))#, main = "Continuous Outcome Logistic Regression"))
+     ylab = "Median Value", col = col[1]))#, main = "Continuous Outcome Logistic Regression"))
 @
-\caption{Continuous Outcome Logistic Regression \label{BostonHousing-Colr-1-plot}}
+\caption{Boston Housing: Scatterplot of linear predictors vs.~observed
+         median values obtained from the Continuous Outcome Logistic Regression 
+         model \code{Colr\_BH\_1}. The observations are overlayed with lines
+         representing conditional quantiles of median value given the
+         linear predictor. \label{BostonHousing-Colr-1-plot}}
 \end{figure}
 
 \section{Connection to Quantile Regression} \label{sec:rq}
@@ -549,8 +558,8 @@ fm <- cmedv ~ crim + zn + indus + chas + nox + rm + age + dis +
               rad + tax + ptratio + b + lstat
 rq_BH_1 <- lapply(tau, function(p) rq(fm, data = BostonHousing2, tau = p))
 Colr_BH_2 <- Colr(cmedv | crim + zn + indus + chas + nox + rm + age + dis + 
-                  rad + tax + ptratio + b + lstat ~ 0, data = BostonHousing2, 
-                  order = 2)
+                  rad + tax + ptratio + b + lstat ~ 0, 
+                  data = BostonHousing2, order = 2)
 @
 
 For nine selected observations from the dataset, we then plot the estimated
@@ -561,8 +570,8 @@ distribution functions and for some observations, for example for number
 153, the estimated conditional quantiles are very rough and, in fact, not
 monotone.
 
-\begin{figure}
-<<BostonHousing-rq-1-plot, echo = FALSE, fig.width = 10, fig.height = 10>>=
+\begin{figure}[t]
+<<BostonHousing-rq-1-plot, echo = FALSE, fig.width = 9, fig.height = 9>>=
 idx <- order(BostonHousing2$cmedv)[ceiling(1:9/10 * NROW(BostonHousing2))]
 layout(matrix(1:9, nrow = 3))
 for (i in idx) {
@@ -570,13 +579,20 @@ for (i in idx) {
   nd <- BostonHousing2[i,]
   nd$cmedv <- NULL
   plot(Colr_BH_2, newdata = nd, which = "distribution", type = "distribution", 
-       q = 5:36, main = paste("Obs.", i))
-  points(qrq, tau, type = "b")
-  arrows(BostonHousing2[i, "cmedv"], 0, BostonHousing2[i, "cmedv"], .2)
+       q = 5:36, main = paste("Obs.", i), ylab = "Distribution", xlab =
+       "Median Value", col = col[1], lwd = 2)
+  points(qrq, tau, type = "b", col = col[2], cex = 1.5)
+  arrows(BostonHousing2[i, "cmedv"], 0, BostonHousing2[i, "cmedv"], .2,
+         length = .15, angle = 15)
 #  abline(v = BostonHousing2[i, "cmedv"])
 }
 @
-\caption{Arrow indicates observed value. \label{BostonHousing-rq-1-plot}}
+\caption{Boston Housing: Comparison of distribution regression via a
+         transformation model (model \code{Colr\_BH\_2}, solid lines) 
+         and quantile regression (model \code{rq\_BH\_1}, dots). The plot
+         shows the estimated conditional distribution functions along
+         with the actually observed median value (arrows). 
+         \label{BostonHousing-rq-1-plot}}
 \end{figure}
 
 
@@ -667,15 +683,18 @@ parameter $\beta$, might be questionable. We might want to ask `How well do
 the corresponding conditional survivor functions (Figure~\ref{GBSG2-Weibull-1-plot}, obtained under
 proportional hazards) reflect what is going on in the data?'. 
 
-\begin{figure}
+\begin{figure}[t]
 <<GBSG2-Weibull-1-plot>>=
 nd <- data.frame(horTh = factor(c("no", "yes")))
-plot(Survreg_GBSG2_1, newdata = nd, which = "distribution", type = "survivor", 
-     confidence = "interval", fill = fill, col = col, ylab = "Probability")
-legend("bottomleft", lty = 1, title = "Hormonal Therapy", legend = levels(nd$horTh), 
-       bty = "n", col = col)
+plot(Survreg_GBSG2_1, newdata = nd, which = "distribution", 
+     type = "survivor", confidence = "interval", fill = fill, 
+     col = col, ylab = "Probability", xlab = "Survival Time")
+legend("bottomleft", lty = 1, title = "Hormonal Therapy", 
+       legend = levels(nd$horTh), bty = "n", col = col)
 @
-\caption{\label{GBSG2-Weibull-1-plot}}
+\caption{German Breast Cancer Study Group 2: Conditional survivor curves
+         of treated and control patients obtained from the Weibull model
+         \code{Survreg\_GBSG2\_1} under proportional hazards assumption. \label{GBSG2-Weibull-1-plot}}
 \end{figure}
 
 The question is simple to answer when we use the treatment as a stratum and,
@@ -683,10 +702,13 @@ in essense, fit two models at once
 <<GBSG2-Weibull-2, cache = TRUE>>=
 Survreg_GBSG2_2 <- Survreg(Surv(time, cens) | 0 + horTh ~ 1, data = GBSG2)
 logLik(Survreg_GBSG2_2)
-survreg_GBSG2_2 <- survreg(Surv(time, cens) ~ strata(horTh) + horTh - 1, data = GBSG2)
+survreg_GBSG2_2 <- survreg(Surv(time, cens) ~ strata(horTh) + horTh - 1, 
+                           data = GBSG2)
 logLik(survreg_GBSG2_2)
 coef(Survreg_GBSG2_2, with_baseline = TRUE)
-c(1 / survreg_GBSG2_2$scale, -coef(survreg_GBSG2_2) / survreg_GBSG2_2$scale)
+c(1, -coef(survreg_GBSG2_2)) / survreg_GBSG2_2$scale
+c(1 / survreg_GBSG2_2$scale, -coef(survreg_GBSG2_2) / 
+                              survreg_GBSG2_2$scale)
 @
 It should be noted that the \code{strata} command in \cmd{survreg} only
 leads to stratum-specific scale parameters, so we added a treatment specific
@@ -710,7 +732,8 @@ parameterised as
 \begin{eqnarray*}
 \Prob(\rY \le \ry \mid \rX = \rx) = 1 - \exp(-\exp(\h_\rY(\ry) + \tilde{\rx}^\top \shiftparm))
 \end{eqnarray*}
-and thus the hazard ratio is $\exp(\tilde{\rx}^\top \shiftparm)$. The
+with positive linear predictors being related to larger hazards (and smaller
+means). Thus, the hazard ratio is $\exp(\tilde{\rx}^\top \shiftparm)$. The
 classical (and not so classical) literature very often associates the Cox
 model with an unspecified baseline hazard function and the corresponding
 partial likelihood estimator for $\shiftparm$. The \pkg{tram} package uses a
@@ -734,18 +757,21 @@ When we compare the survivor curves from these two models with the
 Kaplan-Meier curves in Figure~\ref{GBSG2-Cox-1-plot} we essentially get a
 smooth interpolation of this nonparametric maximum likelihood estimator by
 the two parametric Cox models.
-\begin{figure}
+\begin{figure}[t]
 <<GBSG2-Cox-1-plot>>=
 plot(survfit(Surv(time, cens) ~ horTh, data = GBSG2), col = col, 
-     ylab = "Probability")
-plot(Coxph_GBSG2_1, newdata = nd, which = "distribution", type = "survivor", 
-     col = col, add = TRUE, lty = 1)
-plot(Coxph_GBSG2_2, newdata = nd, which = "distribution", type = "survivor", 
-     col = col, add = TRUE, lty = 2)
-legend("bottomleft", lty = 1, title = "Hormonal Therapy", legend = levels(nd$horTh), 
-       bty = "n", col = col)
+     ylab = "Probability", xlab = "Survival Time")
+plot(Coxph_GBSG2_1, newdata = nd, which = "distribution", 
+     type = "survivor", col = col, add = TRUE, lty = 1)
+plot(Coxph_GBSG2_2, newdata = nd, which = "distribution", 
+     type = "survivor", col = col, add = TRUE, lty = 2)
+legend("bottomleft", lty = 1, title = "Hormonal Therapy", 
+       legend = levels(nd$horTh), bty = "n", col = col)
 @
-\caption{\label{GBSG2-Cox-1-plot}}
+\caption{German Breast Cancer Study Group 2: Conditional survivor curves
+         of treated and control patients obtained from the Kaplan-Meier estimator, model 
+         \code{Coxph\_GBSG2\_1} under proportional hazards assumption, and 
+         \code{Coxph\_GBSG2\_2} under non-proportional hazards. \label{GBSG2-Cox-1-plot}}
 \end{figure}
 
 
@@ -898,7 +924,7 @@ coef(Coxph_GBSG2_3)[, "horThyes"]
 Figure~\ref{GBSG2-Cox-3-plot} shows that the global treatment effect
 vanishes in patients with many positive lymph nodes and a larger tumor
 grading.
-\begin{figure}
+\begin{figure}[t]
 <<GBSG2-Cox-3-plot>>=
 nd <- data.frame(horTh = sort(unique(GBSG2$horTh)))
 plot(Coxph_GBSG2_3, newdata = nd, 
@@ -919,7 +945,7 @@ The effect is plotted in \ref{GBSG2-Cox-4-plot}. Very young women seem to
 profit most from the treatment, whereas women in the mid-forties seem not to
 profit or even have an increased risk under hormonal therapy.
 
-\begin{figure}
+\begin{figure}[t]
 <<GBSG2-Cox-4-plot, cache = TRUE>>=
 nd <- data.frame(age = 30:70)
 cf <- predict(Coxph_GBSG2_4, newdata = nd, type = "coef")
