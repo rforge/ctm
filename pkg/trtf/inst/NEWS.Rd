@@ -5,6 +5,7 @@
 \section{Changes in Version 0.3-1 (2018-01-17)}{
   \itemize{
     \item{Some improvements in internal functions.}
+    \item{Simulations with 500 (not 50) noise variables.}
   }
 }
 
