@@ -2,10 +2,12 @@
 \name{NEWS}
 \title{NEWS file for the trtf package}
 
-\section{Changes in Version 0.3-1 (2018-01-17)}{
+\section{Changes in Version 0.3-1 (2018-02-21)}{
   \itemize{
     \item{Some improvements in internal functions.}
     \item{Simulations with 500 (not 50) noise variables.}
+    \item{Simplify likelihood evaluations based on new capabilities in
+          \pkg{mlt}.}
   }
 }
 

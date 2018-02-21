@@ -41,13 +41,9 @@ logLik.trafotree <- function(object, newdata, weights = NULL, perm = NULL, ...) 
         mltargs$data <- newdata
         mltargs$dofit <- FALSE
         mltmod <- do.call("mlt", mltargs)
-        ll <- numeric(nlevels(nd))
-        for (i in 1:nlevels(nd)) {
-            w <- weights
-            w[nd != levels(nd)[i]] <- 0
-            ll[i] <- logLik(mltmod, parm = cf[levels(nd)[i],], w = w)
-        }
-        ret <- sum(ll)
+        ndcf <- cf[unclass(nd),,drop = FALSE]
+        if (NROW(ndcf) == 1L) ndcf <- ndcf[1,,drop = TRUE]
+        ret <- logLik(mltmod, parm = ndcf, w = weights)
     }
     attr(ret, "df") <- length(cf)
     class(ret) <- "logLik"
@@ -78,12 +74,9 @@ logLik.traforest <- function(object, newdata, weights = NULL, OOB = FALSE, coef 
     mltmod <- do.call("mlt", mltargs)
 
     if (is.null(weights)) weights <- rep(1, nrow(newdata))
-
-    ret <- sum(sapply(1:nrow(newdata), function(i) {
-        w <- numeric(length(weights))
-        w[i] <- weights[i]
-        logLik(mltmod, parm = cf[[i]], w = w)
-    }))
+    ndcf <- do.call("rbind", cf)
+    if (NROW(ndcf) == 1L) ndcf <- ndcf[1,,drop = TRUE]
+    ret <- logLik(mltmod, parm = ndcf, w = weights)
     attr(ret, "df") <- NA
     class(ret) <- "logLik"
     ret

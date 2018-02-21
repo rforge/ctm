@@ -2,9 +2,13 @@
 \name{NEWS}
 \title{NEWS file for the mlt package}
 
-\section{Changes in Version 0.2-2 (2018-01-20)}{
+\section{Changes in Version 0.2-2 (2018-02-21)}{
   \itemize{
     \item{Use \pkg{coneprog} for getting the starting values.}
+    \item{\code{logLik} and \code{estfun} accept matrices as \code{parm}
+          argument for the evalution of log-likelihoods and scores
+          with subject-specific parameters (for example in transformation
+          trees or forests and boosting procedures.}
   }
 }
 

@@ -23,9 +23,11 @@ shiftFamily <- function(object, data, weights) {
         model <<- mlt(object, data = data, weights = w, fixed = c("(Intercept)" = 0),
                       theta = coef(model, fixed = FALSE), offset = -f)
         tmp <- mlt(object, data = data, dofit = FALSE, offset = -f)
+        coef(tmp) <- coef(model, fixed = TRUE)
         i <- names(coef(tmp)) == "(Intercept)"
         ### gradient wrt offset == score wrt (Intercept) = 1
-        estfun(tmp, parm = coef(model, fixed = TRUE))[,i]
+        ### We need UNWEIGHTED scores
+        estfun(tmp, w = w)[,i]
     }
 
     risk <- function(y, f, w = 1) {
@@ -50,29 +52,17 @@ ctmFamily <- function(model, data, weights) {
     mf <- mlt(model, data, weights  = weights)
     ui <- attr(X <- model.matrix(model, data = data[1:2,,drop = FALSE]), "constraint")$ui
     ci <- attr(X, "constraint")$ci
-    ngradient <- function(y, fit, weights) {
-        ret <- matrix(0, nrow = NROW(data), ncol = length(coef(mf)))
-        for (i in 1:NROW(data)) {
-            of <- get(".ofuns", environment(mf$score))(weights, subset = i)
-            ### already weighted!
-            ret[i, ] <- of$sc(fit[i,])[i,,drop = TRUE] / weights[i]
-        }
+    ngradient <- function(y, f, w) {
+        ret <- - estfun(mf, parm = f, w = w)
         attr(ret, "ui") <- ui
         attr(ret, "ci") <- ci
-        attr(ret, "fit") <- fit
+        attr(ret, "fit") <- f
         attr(ret, "nu") <- get("nu", envir = parent.frame())
         ret
     }
-    risk <- function(y, fit, weights) {
-        ret <- 0
-        for (i in 1:NROW(data)) {
-            of <- get(".ofuns", environment(mf$score))(weights, subset = i)
-            ### already weighted!
-            ret <- ret + of$ll(fit[i,])[i]
-        }
-        - ret
-    }
-    offset <- function(y, weights) {
+    risk <- function(y, f, w)
+        logLik(mf, parm = f, w = w)
+    offset <- function(y, w) {
         cf <- coef(mf)
         matrix(cf, nrow = NROW(data), ncol = length(cf), byrow = TRUE)
     }
@@ -251,7 +241,7 @@ trboost <- function(model, formula, data = list(), na.action = na.omit, weights 
         tmp <- rep(TRUE, length(blg))
         names(tmp) <- names(blg)
         stopifnot(all(names(monotone) %in% names(blg)))
-        tmp[names(montone)] <- monotone
+        tmp[names(monotone)] <- monotone
     }
 
     for (i in 1:length(blg)) {
