@@ -1,0 +1,266 @@
+
+\documentclass[12pt]{article}
+
+\let\Prob\P
+\usepackage{amsfonts,amstext,amsmath,amssymb,amsthm}
+
+\usepackage{hyperref}
+
+\usepackage[utf8]{inputenc}
+
+\usepackage{natbib}
+
+% File with math commands etc.
+\input{../defs}
+
+\title{Point-to-point Response \\ JSS 3178}
+
+\author{}
+
+\usepackage{Sweave}
+\begin{document}
+
+\maketitle
+
+We are very grateful to the two referees and to the section editor.
+
+
+\section*{Section Editor}
+
+\noindent
+\textit{
+My reading of the paper is somewhat different from the reviewers', and
+my recommendation is to accept the paper pending minor revisions. That
+said, I believe that the reviewers make some useful suggestions for
+improving the paper and the author should carefully consider them.}
+
+\textit{More specifically, I think that the difficulty of the paper is largely
+intrinsic to the subject-matter, and that the intent of the mlt and
+related packages is to implement the methods discussed in as unified,
+complete, and general a manner as possible. Nevertheless, reorganizing
+the paper along the lines that the reviewers suggest likely would
+increase its accessibility and potential impact.}
+
+I thank the section editor and both referees for their helpful suggestions
+regarding organisation of the material. The line of arguments in this
+manuscript was motivated by negative experiences with earlier, more
+theoretical, papers on this subject (especially DOI: 10.1111/sjos.12291).
+The classical approach of theory first and examples later discouraged many
+readers and so I tried to organise things in reverse order here (not very
+successfully, as it seems). However, I'm still convinced that the
+example-rich style is a good complement to a theory-driven presention. One
+of my aims is to highlight connections between models by showing (almost)
+equivalence of empirical results. 
+
+To addess the concerns raised by both referees, I outline the structure of
+the manuscript, and the connections between concepts and implementation, in
+a flowchart (new Fig 1). In addition, links to existing implementations were
+moved from the discussion to the introduction as suggested by both referees.
+
+\textit{Reviewer B also suggests adding user-friendly interfaces for standard
+cases, and the author makes reference to this possibility in the last
+paragraph of the paper. Whether or not to do this now should be up to
+the author, and I can see an argument for separating the basic material
+currently in the paper from an implementation meant for a wider
+readership.}
+
+\section*{Reviewer A}
+
+\begin{enumerate}
+
+\item \textit{It seems to me the manuscript has two main points.  The first
+is that many common statistical models that we usually treat separately can
+be viewed in a unified framework.  That framework consists of a family of
+transformations of Y and a standard distribution (often N(0,1)) into which
+we try to transform Y.}
+
+The manuscript presents, in as much detail as necessary, theoretical results
+published recently in a methodological journal (DOI: 10.1111/sjos.12291).
+The primary purpose of the manuscript is to introduce and describe the
+corresponding software implementation in package mlt.
+
+\item \textit{ The second is an R package for implementing the
+framework and estimating its parameters.  I like both of these things.  I
+like to be aware of different perspectives on the same ideas and I think it
+would be a service to our discipline to publish Hothorn’s perspective.  I
+don’t know whether it is new or has been published previously and have not
+attempted to find out.  I’m not saying the unified perspective is the best
+way to teach statistics, but even if it’s not, it might still be interesting
+to people who have previously seen many of the individual models.  I can’t
+predict how many statisticians will ultimately use Hothorn’s software, but
+its use is not implausible and I suspect at least a few will use it.}
+
+The second purpose of the manuscript is, indeed, to foster an understanding
+of many classical models as special cases of a transformation model.
+
+\item \textit{Though I like the ideas, I have concerns about the writing. 
+The first has to do with the organization.  Sentence by sentence, the
+manuscript is well written.  But I wasn’t able to figure out the main ideas
+until at least midway through the ms, and it was the Summary that really
+brought them home. I would wish for a better explanation at the start.}
+
+Thank you very much for sharing this experience. It seems that the
+reformulation of the normal linear regression model in the introduction was
+not sufficient to illustrate the existing connections to other models. My
+own re-reading of the manuscript lead to the decision to stay with the
+current line of arguments, but to guide readers on their way. I added a
+flowchart linking statistical concepts (model formulation, parameter
+estimation, interpretation and diagnostics, inference) with sections and
+packages/functions/methods discussed.
+
+\item \textit{Second, the Introduction says, “the computationally inaccessible concept
+often vanished from the collective consciousness of our profession and the
+approximation was taught and understood as the real thing” and the rest of
+the Intro reinforces the idea that Hothorn is unhappy with the way many
+statisticians think [so am I!] and wants to correct us.  [So do I.]  But
+that idea is unnecessary for understanding the rest of the ms and may be
+psychologically unwise if the purpose is to get readers to appreciate the
+material.  Hothorn may disagree and feel that he wants to address what he
+views as sloppy thinking.  But my reading of the ms is that he doesn’t do a
+lot to address that problem; the ms is mostly about the unified view and the
+software. Readers may be more receptive to the ms if it doesn’t begin by
+scolding them. }
+
+\item \textit{I was a little surprised to hear that people might feel
+offended by the introduction. In hindsight, I can understand the rather
+harsh criticism we received from referees of the corresponding theoretical
+paper (the comments are part of https://arxiv.org/pdf/1508.06749.pdf)
+in light of your statement better. Maybe my choice of words in the
+introduction was a subconscious reaction to the refusal to rethink some of
+the traditions we have in statistics. I have, on the other hand, experienced
+enthusiastic feedback from younger people who, as you did, value simplicity
+and uniformity over mathematical interestingness. I thought about your
+comments for quite some time, but I think we won't chance anything by just
+being nice. The manscript offers constructive criticism of the way many
+models are taught, parameterised, estimated and implemented. The
+introduction, with its new paragraph on workflow and organisation as well as
+better connections to classical models, will hopefully get readers
+hooked.}
+
+\item \textit{Finally, I think the ms could be considerably shortened,
+with much of the code either online or in an appendix.  The space saved by
+removing code could then be used for more explanation.  }
+
+I agree that a huge proportion of the code serves for presenting existing
+implementations and comparison of corresponding results. My intention was to
+keep readers in their comfort zone (by analysing data using one of the
+classical packages) while showing them the green grass on the other
+(transformation) side. I hope that readers will, in the very end, realise:
+"Oh, instead of learning of to use all these different packages, it is
+enough for me to understand one package!". I admit that only patient readers
+willing to carry on until the very end will experience this effect. I tried
+to move some of the "light" shining in the discussion to the introduction,
+so maybe more people will invest the energy to carry through.
+
+\end{enumerate}
+
+\section*{Reviewer B}
+
+\begin{enumerate}
+
+\item \textit{First I would like to compliment the author on an interesting
+manuscript, and interesting package(s).  With that said there are major
+issues with the way the manuscript is written from a flow and accessibility
+perspective.  }
+
+
+\item \textit{I enjoy the opening few paragraphs but I believe that the
+motivation for the work needs further explained.  Why is this package the
+solution to my problems, I believe much of the discussion found in the
+summary is clear motivation for this work, and the comparisons that take
+shape within Section 2, and should be explained prior to this in the
+introduction, as clear motivation.  }
+
+Thank you very much for the suggestion. The introduction was smoothed (a
+better connected to the first paragraph was added) and the general workflow
+was linked to packages/functions/methods and sections in the manuscript.
+Also, some parts of the discussion are now presented in the introduction,
+with the aim to link transformation models to models most readers will be
+familiar with.
+
+\item \textit{The author jumps into an example from the mlt package with
+only really describing the workflow in a single paragraph.  As this paper is
+presenting the package more time and effort should be devoted to explaining
+why this work flow is important what it allows for.  Your work flow is
+complex,  and  is important to the packages.  I believe this would truly
+benefit by you taking the time to be in-depth on the work flow before you do
+an example.  Or better yet present the workflow through an example at the
+simplest level possible without doing a comparison or referring readers to
+further sections.  The quality of this work is there, it just needs to be
+presented in a simplified manner before introduce complexity.  }
+
+THe workflow is now presented by a flowchart, alongside with the relevant
+links to the implementation and description in the manuscript. In some way,
+one can understand the whole document as a description of the workflow,
+starting with model specification and estimation over model diagnostics and
+interpretation to model inference. My experience with the classical approach 
+of presenting the theory first and examples later was very unsatisfactory so
+far, because many readers won't make it to the first example (I did
+therefore not move sections 3-4 before section 2).
+
+\item \textit{Again it seems like section 3 and 4, should be presented
+before section 2, and could be broken into a single example or workflow, to
+show the impact of the MLT methods.  This would actually give the author a
+way to specify how the package integrates to the methods discussed, without
+worrying about comparisons to other tools.}
+
+The comparison of the results is not the main focus. My intention was to
+show readers how they can fit a model they are already familiar with (here
+presented by means of the corresponding function call) using mlt.
+
+\item \textit{I think keeping the focus on MLT
+in the early discussion is the most important thing and then using the
+examples as justification and comparison is important.  Also some examples
+could be moved to an appendix, not to overwhelm the reader in too many
+directions.  }
+
+The examples are not just "illustrations", they serve a specific purpose.
+The different models fitted to different data sets are stopovers on our
+trajectory through the transformation model space. For some (not all!)
+readers, this way of thinking about models will hopefully be easier to
+understand than a heavily formula-based theoretical description of things
+(which is already available from DOI: 10.1111/sjos.12291).
+
+\item \textit{On page 14, the author also discussed the choice of M.  Many
+practitioners will read this document for insight, commenting on how to
+choose  M, other than it doesn't effect it to choose M too large.  This
+raises the question what is large enough, and what will not adversely effect
+computational times.  }
+
+\item \textit{A minor issue is the comparisons are hard to see minor
+differences and where the effects can be dramatic.  Possibly using smaller
+examples or using norms, or differences to define the changes could make
+this   Possibly looking at a visualization of this as well.  }
+
+Thank you; relative changes are not presented along with the absolute
+values.  For some problems (Figs 5, 6, 7, 11, 12) models have been compared
+graphically.
+
+\item \textit{The comment the author makes regarding the usefulness and
+impact in the last section makes the work seem more academic than
+practitioner friendly.  With that said most of my comments have been
+centered around helping combat that as I do see this as useful work, and if
+presented in a coherent manner and with a user friendly package the impact
+can be attained.  }
+
+\item \textit{The package itself has some flaws in the design which can
+impact this as well.  The work flow as previously mentioned has some
+complexity that could be reduced by creating a basic wrapper function to do
+the "standard" cases.  For instance possibly doing the basis function
+definition inside of the wrapper using standard arguments.  This would
+simplify the use of the practitioner, while leaving the flexibility for more
+complex examples the author portrays.  Also minimizing the number of steps
+needed to create the result.  I also suggest the author add an explanation
+of the basis functions used and why, this can be as small as a sentence, but
+can be impactful.  }
+
+Basis functions are explicitly described at the beginning of Section 2.
+
+\item \textit{Overall I believe these packages show a great use case of
+understanding statistical models, and contains interesting content, but the
+impact gets lost in the current format of the manuscript and the package. 
+Again I congratulate the author on an interesting manuscript.}
+
+\end{enumerate}
+
+\end{document}
