@@ -18,6 +18,12 @@
 
 \newcommand{\cmd}[1]{\texttt{#1()}}
 
+\newcommand{\NEW}[1]{{\color{red} #1}}
+
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,chains}
+\usepackage{verbatim}
+
 <<setup, echo = FALSE, results = "hide", message = FALSE>>=
 set.seed(290875)
 
@@ -60,6 +66,18 @@ knitr::set_header(highlight = '')  # do not \usepackage{Sweave}
 ## R settings
 options(prompt = "R> ", continue = "+  ", useFancyQuotes = FALSE)  # JSS style
 options(width = 75)
+
+RC <- function(...) {
+    ret <- do.call("cbind", list(...))
+    mlt <- which(colnames(ret) == "mlt")
+    for (i in (1:ncol(ret))[-mlt]) {
+        nm <- colnames(ret)[i]
+        ret <- cbind(ret, (ret[,i] - ret[,mlt]) / ret[,mlt])
+        colnames(ret)[ncol(ret)] <- paste("(", nm, " - mlt)/mlt", sep = "")
+    }
+    print(ret, digits = 5)
+    return(invisible(ret))
+}
 @
 
 \newcommand{\TODO}[1]{{\color{red} #1}}
@@ -147,6 +165,10 @@ duty shall be to go back to the original concepts and search for ways how to
 reawake them for the benefit of a simpler understanding of statistical
 models and concepts.
 
+\NEW{The Leitmotiv of our discipline is to foster empirical research by
+providing tools for the characterisation of deterministic and random
+aspects of natural phenomena through distributions estimated from
+experimental or observational data.}
 This paper describes an attempt to understand and unify a large class of
 statistical models as models for unconditional or conditional distributions.  This sounds like an
 implicitness, but do we really practice (in courses on applied statistics or
@@ -229,16 +251,23 @@ class of models.
 The class of linear transformation models is a subclass of conditional
 transformation models \citep{Hothorn_Kneib_Buehlmann_2014}.  In this latter
 class, the conditional distribution function is modelled by
-\begin{eqnarray*}
-\Prob(\rY \le \ry \mid \rX = \rx) = \pZ(\h(\ry \mid \rx))
-\end{eqnarray*}
+\begin{eqnarray}
+\Prob(\rY \le \ry \mid \rX = \rx) = \pZ(\h(\ry \mid \rx)) \label{mod:ctm}
+\end{eqnarray}
 where the transformation function $\h$ depends on both $\ry$ and $\rx$. This
 function is unknown and this document describes how one can estimate $\h$. 
 Because we are interested in analysing, \ie estimating and interpreting, the
 transformation function $\h$, we slightly rephrase the title ``An Analysis
 of Transformations'' of the first paper on this subject \citep{BoxCox_1964}
 and refer to the methods presented in this paper as \textit{transformation
-analysis}.  We describe how conditional transformation models can be
+analysis}.  
+\NEW{Different choices of $\pZ$ and different parameterisations of $\h$ in
+model~(\ref{mod:ctm}) relate to specific transformation models, including the
+normal linear model, proportional hazards (Cox) and proportional odds
+models for continuous or ordinal responses, parametric models for survival
+regression, such as the Weibull or log-normal model, distribution regression models
+or survival models with time-varying effects and much more.}
+We describe how members of the large class of conditional transformation models can be
 specified, fitted by maximising the likelihood \citep[using the estimator
 developed by][]{Hothorn_Moest_Buehlmann_2017} and analysed in \proglang{R}
 using the \pkg{mlt} add-on package \citep{pkg:mlt}.  In essence, the package
@@ -246,14 +275,104 @@ is built around two important functions.  \cmd{ctm} specifies transformation
 models based on basis functions implemented in the \pkg{basefun} package
 \citep{pkg:basefun} for variable descriptions from the \pkg{variables}
 package \citep{pkg:variables}.  These models are then fitted to data by
-\cmd{mlt}.  This function maximises the exact or approximate log-likelihood function using the
-\cmd{auglag} and \cmd{spg} optimisers from packages \pkg{alabama}
-\citep{pkg:alabama} and \pkg{BB} \citep{Varadhan_Gilbert_2009,pkg:BB},
-respectively. Before we start looking at details, we illustrate the workflow by means of
-an example from unconditional density estimation.
+\cmd{mlt}.  
+%This function maximises the exact or approximate log-likelihood function using the
+%\cmd{auglag} and \cmd{spg} optimisers from packages \pkg{alabama}
+%\citep{pkg:alabama} and \pkg{BB} \citep{Varadhan_Gilbert_2009,pkg:BB},
+%respectively.
 
-%% <FIXME> explain that theory is in two other papers and technical stuff
-%% in appendices </FIXME>
+
+
+\NEW{The general workflow of working with the \pkg{mlt} package 
+and the organisation of this document follow the
+general principles of model specification, model estimation, model
+diagnostics and interpretation and, finally, model inference. The flowchart
+in Figure~\ref{fig:workflow} links these conceptual steps with packages,
+functions and methods discussed in this document. We take an example-based
+approach for introducing models and corresponding software infrastructure in
+the main document. The underlying theory for model formulation, parameter
+estimation and model inference is presented along the way, and we refer the
+reader to \cite{Hothorn_Moest_Buehlmann_2017} for the theoretical
+foundations. Technical issues about the three
+packages \pkg{variables}, \pkg{basefun} and \pkg{mlt} involved are explained
+in Appendices~\ref{app:variables}, \ref{app:basefun}, and \ref{app:mlt}.}
+
+
+\begin{figure}
+\begin{tikzpicture}[%
+    >=triangle 60,              % Nice arrows; your taste may be different
+    start chain=going below,    % General flow is top-to-bottom
+    node distance=6mm and 40mm, % Global setup of box spacing
+    every join/.style={norm},   % Default linetype for connecting boxes
+    ]
+% ------------------------------------------------- 
+% A few box styles 
+% <on chain> *and* <on grid> reduce the need for manual relative
+% positioning of nodes
+\tikzset{
+  base/.style={draw, on chain, on grid, align=center, minimum height=4ex},
+  proc/.style={base, rectangle, text width=7em},
+  test/.style={base, diamond, aspect=2, text width=3em},
+  term/.style={proc, rounded corners},
+  % coord node style is used for placing corners of connecting lines
+  coord/.style={coordinate, on chain, on grid, node distance=6mm and 10mm},
+  % nmark node style is used for coordinate debugging marks
+  nmark/.style={draw, cyan, circle, font={\sffamily\bfseries}},
+  % -------------------------------------------------
+  % Connector line styles for different parts of the diagram
+  norm/.style={->, draw},
+  free/.style={->, draw},
+  cong/.style={->, draw},
+  it/.style={font={\small\itshape}}
+}
+\tikzstyle{line} = [draw, -latex']
+
+% -------------------------------------------------
+% Start by placing the nodes
+\node [term] (pSPEC) {Specification \\ Section~\ref{sec:trafo}};
+\node [term, join] (pEST) {Estimation \\ Section~\ref{sec:mlt}};
+\node [term, join] (pINTER) {Diagnostics and Interpretation \\ Section~\ref{sec:predict}};
+\node [term, join] (pINF) {Inference and Simulation \\ Sections~\ref{sec:asympt},
+\ref{sec:sim}};
+
+\node [proc, right=of pSPEC] (pMOD) {Transformation Models \\ \cmd{mlt::ctm}};
+\node [proc, above=20mm of pMOD] (pTRAFO) {Transformations \\
+Appendix~\ref{app:basefun} \\ \pkg{pkg:basefun}};
+\node [proc, right=of pTRAFO] (pVAR) {Variables \\
+Appendix~\ref{app:variables} \pkg{pkg:variables}};
+
+\node [proc, right=of pEST] (pCOEF) {Likelihood \\ \cmd{mlt::mlt}};
+\node [proc, join, right=of pCOEF] (pLIK) {Parameters \\ \cmd{coef}, \cmd{logLik},
+\cmd{estfun}};
+
+
+\node [proc, right=of pINTER] (pTA) {Transformation Analysis \\ \cmd{plot},
+\cmd{predict}};
+
+\node [proc, right=of pINF] (pAB) {Asymptotics \& Bootstrap \\
+\cmd{summary}, \cmd{simulate}};
+
+\node [test, left=of pEST] (pDATA) {Data};
+
+%% \path (pDATA.west) to node [near start, xshift = 1em] {$y$} (pEST);
+
+\draw [->] (pDATA.east) -- (pEST);
+\draw [->] (pMOD.west) -- (pSPEC);
+\draw [->] (pVAR.west) -- (pTRAFO);
+\draw [->] (pTRAFO.south) -- (pMOD);
+\draw [->] (pEST.east) -- (pCOEF);
+\draw [->] (pINTER.east) -- (pTA);
+\draw [->] (pINF.east) -- (pAB);
+
+
+\end{tikzpicture}
+\caption{Workflow for transformation modelling using the \pkg{mlt} package 
+         and organisation of this document. \label{fig:workflow}}
+\end{figure}
+
+\NEW{Before we start looking at more complex models and associated
+conceptual and technical details, we illustrate the workflow by means of
+an example from unconditional density estimation.}
 
 \paragraph{Density Estimation: Old Faithful Geyser Data}
 
@@ -350,10 +469,7 @@ theoretically but readily implemented in package \pkg{mlt}.  The only
 remaining question is ``Do all these nice properties carry over to the
 conditional case, \ie to regression models?''.  The answer to this question
 is ``yes!'' and the rest of this paper describes the details following the
-workflow sketched in this section.  Technical issues about the three
-packages \pkg{variables}, \pkg{basefun} and \pkg{mlt} involved are explained
-in Appendices~\ref{app:variables}, \ref{app:basefun}, and \ref{app:mlt}.
-
+workflow sketched in this section.  
 \begin{figure}[t]
 \begin{center}
 <<geyser-plot, echo = FALSE>>=
@@ -463,21 +579,23 @@ and \code{data}
 <<CHFLS-1-mlt>>=
 mlt_CHFLS_1 <- mlt(model = ctm_CHFLS_1, data = CHFLS)
 @
-The results are equivalent to the results obtained from \cmd{polr}
+The results are equivalent to the results obtained from \cmd{polr}. The
+helper function \cmd{RC} prints its arguments along with the relative change 
+to the \code{mlt} argument
 <<CHFLS-1-cmpr>>=
 logLik(polr_CHFLS_1)
 logLik(mlt_CHFLS_1)
-cbind(polr = polr_CHFLS_1$zeta, mlt = coef(mlt_CHFLS_1))
+RC(polr = polr_CHFLS_1$zeta, mlt = coef(mlt_CHFLS_1))
 @
 Of course, the above exercise is an extremely cumbersome way
 of estimating a discrete density whose maximum likelihood estimator is
 a simple proportion but, as we will see in the rest of this paper, a generalisation
 to the conditional case strongly relies on this parameterisation
 <<CHFLS-1-pred>>=
-cbind(polr = predict(polr_CHFLS_1, newdata = data.frame(1), type = "prob"),
-      mlt = c(predict(mlt_CHFLS_1, newdata = data.frame(1), 
-                      type = "density", q = mkgrid(b_happy)[[1]])),
-      direct = xtabs(~ R_happy, data = CHFLS) / nrow(CHFLS))
+RC(polr = predict(polr_CHFLS_1, newdata = data.frame(1), type = "prob"),
+   mlt = c(predict(mlt_CHFLS_1, newdata = data.frame(1), 
+                   type = "density", q = mkgrid(b_happy)[[1]])),
+   ML = xtabs(~ R_happy, data = CHFLS) / nrow(CHFLS))
 @
 
 \subsubsection{Continuous Models for Continuous Responses}
@@ -702,8 +820,8 @@ Again, the results of \cmd{polr} and \cmd{mlt} are equivalent
 <<CHFLS-2-cmpr>>=
 logLik(polr_CHFLS_2)
 logLik(mlt_CHFLS_2)
-cbind(polr = c(polr_CHFLS_2$zeta, coef(polr_CHFLS_2)), 
-      mlt = coef(mlt_CHFLS_2))
+RC(polr = c(polr_CHFLS_2$zeta, coef(polr_CHFLS_2)), 
+   mlt = coef(mlt_CHFLS_2))
 @
 The regression coefficients $\shiftparm$ are the log-odds ratios, \ie 
 the odds-ratio between any two subsequent happiness categories is
@@ -777,7 +895,7 @@ the partial and the exact log-likelihood are practically equivalent
 <<GBSG2-1-coxph>>=
 coxph_GBSG2_1 <- coxph(fm_GBSG2, data = GBSG2, ties = "breslow")
 cf <- coef(coxph_GBSG2_1)
-cbind(coxph = cf, mlt = coef(mlt_GBSG2_1)[names(cf)])
+RC(coxph = cf, mlt = coef(mlt_GBSG2_1)[names(cf)])
 @
 A practically important question is how the order $M$ of the Bernstein polynomial
 affects the results. Recall that the log-cumulative baseline hazard function $\h_\rY$ is not
@@ -865,8 +983,8 @@ fss_GBSG2_1 <- flexsurvspline(fm_GBSG2, data = GBSG2, scale = "hazard",
 logLik(fss_GBSG2_1)
 logLik(mlt_GBSG2_1)
 cf <- coef(coxph_GBSG2_1)
-cbind(coxph = cf, mlt = coef(mlt_GBSG2_1)[names(cf)],
-      fss = coef(fss_GBSG2_1)[names(cf)])
+RC(coxph = cf, mlt = coef(mlt_GBSG2_1)[names(cf)],
+   fss = coef(fss_GBSG2_1)[names(cf)])
 @
 
 \begin{figure}
@@ -915,9 +1033,9 @@ phreg_GBSG2_2 <- phreg(fm_GBSG2, data = GBSG2, dist = "weibull",
 logLik(survreg_GBSG2_2)
 logLik(phreg_GBSG2_2)
 logLik(mlt_GBSG2_2)
-cbind(survreg = coef(survreg_GBSG2_2)[names(cf)], 
-      phreg = -coef(phreg_GBSG2_2)[names(cf)], 
-      mlt = coef(mlt_GBSG2_2)[names(cf)])
+RC(survreg = coef(survreg_GBSG2_2)[names(cf)], 
+   phreg = -coef(phreg_GBSG2_2)[names(cf)], 
+   mlt = coef(mlt_GBSG2_2)[names(cf)])
 @
 If we allow a scaled log-transformation $\h_\rY(\ry) = \eparm_1 \log(\ry) + \eparm_2$ (the intercept
 $\eparm_2$ is included in the baseline transformation), the resulting Weibull
@@ -929,9 +1047,9 @@ phreg_GBSG2_3 <- phreg(fm_GBSG2, data = GBSG2, dist = "weibull")
 logLik(survreg_GBSG2_3)
 logLik(phreg_GBSG2_3)
 logLik(mlt_GBSG2_3)
-cbind(survreg = coef(survreg_GBSG2_3)[names(cf)] / survreg_GBSG2_3$scale, 
-      phreg = - coef(phreg_GBSG2_3)[names(cf)], 
-      mlt = coef(mlt_GBSG2_3)[names(cf)])
+RC(survreg = coef(survreg_GBSG2_3)[names(cf)] / survreg_GBSG2_3$scale, 
+   phreg = - coef(phreg_GBSG2_3)[names(cf)], 
+   mlt = coef(mlt_GBSG2_3)[names(cf)])
 @
 The estimated scale parameters $\hat{\eparm}_1$ are $\Sexpr{round(1 / survreg_GBSG2_3$scale,
 4)}$ (\cmd{survreg}), $\Sexpr{round(exp(coef(phreg_GBSG2_3)["log(shape)"]), 4)}$ 
@@ -1122,8 +1240,8 @@ than \cmd{truncreg} which explains the differences in the estimated coefficients
 logLik(tr_PSID1976)
 logLik(mlt_PSID1976_1)
 cf <- coef(mlt_PSID1976_1)
-cbind(truncreg = coef(tr_PSID1976),
-      mlt = c(-cf[-grep("hours", names(cf))], 1) / cf["hours"])
+RC(truncreg = coef(tr_PSID1976),
+   mlt = c(-cf[-grep("hours", names(cf))], 1) / cf["hours"])
 @
 Of course, we might want to question the normal assumption by allowing a potentially
 non-linear transformation function. We simply change the linear to a non-linear
@@ -1259,7 +1377,7 @@ on the partial likelihood is
 coxph_GBSG2_5 <- coxph(Surv(time, cens) ~ age + strata(horTh), 
                        data = GBSG2)
 cf <- coef(coxph_GBSG2_5)
-cbind(coxph = cf, mlt = coef(mlt_GBSG2_5)[names(cf)])
+RC(coxph = cf, mlt = coef(mlt_GBSG2_5)[names(cf)])
 @
 The Cox model fitted via the stratified partial likelihood (\cmd{coxph}) and
 the transformation model agree on a positive age effect $\hat{\beta}$, 
@@ -1999,17 +2117,24 @@ from confidence intervals and bands for the linear functions $\basisy^\top
 \paragraph{Categorical Data Analysis: Chinese Survey (Cont'd)}
 
 For the proportional odds model for happiness given age and income, we compare the score function 
-\citep[using the \cmd{estfun} method from package \pkg{sandwich},][]{Zeileis_2004,pkg:sandwich} 
+\citep[using the \cmd{estfun} method from package \pkg{sandwich},][]{Zeileis_2004,pkg:sandwich}
+by their relative change
 <<CHFLS-2-cmpr-estfun>>=
-summary(estfun(polr_CHFLS_2) - (-estfun(mlt_CHFLS_2)[,c(4, 5, 1:3)]))
+sc_polr <- estfun(polr_CHFLS_2)
+sc_mlt <- -estfun(mlt_CHFLS_2)[,c(4, 5, 1:3)]
+summary((sc_polr - sc_mlt) / 
+        pmax(sqrt(.Machine$double.eps), sc_mlt))
 @
 and the standard errors of the
-regression coefficients. The positive effect of income is ``significant'' by standard measures
+regression coefficients
+<<CHFLS-2-cmpr-2>>=
+RC(polr = sqrt(diag(vcov(polr_CHFLS_2))),
+   mlt = sqrt(diag(vcov(mlt_CHFLS_2)))[c(4, 5, 1:3)])
+@
+The positive effect of income is ``significant'' by standard measures
 \citep[the classical coefficient table was obtained using \cmd{cftest} from package 
 \pkg{multcomp},][]{Hothorn_Bretz_Westfall_2008,pkg:multcomp}
-<<CHFLS-2-cmpr-2>>=
-cbind(polr = sqrt(diag(vcov(polr_CHFLS_2))),
-      mlt = sqrt(diag(vcov(mlt_CHFLS_2)))[c(4, 5, 1:3)])
+<<CHFLS-2-cmpr-3>>=
 cftest(polr_CHFLS_2)
 cftest(mlt_CHFLS_2, parm = names(coef(polr_CHFLS_2)))
 @
@@ -2021,9 +2146,9 @@ of all three methods applied (\cmd{coxph}, \cmd{mlt}, \cmd{flexsurvspline})
 are more or less identical 
 <<GBSG2-1-coxph-cmpr>>=  
 cf <- coef(coxph_GBSG2_1)
-cbind(coxph = sqrt(diag(vcov(coxph_GBSG2_1))),
-      mlt = sqrt(diag(vcov(mlt_GBSG2_1)))[names(cf)],
-      fss = sqrt(diag(vcov(fss_GBSG2_1)))[names(cf)])
+RC(coxph = sqrt(diag(vcov(coxph_GBSG2_1))),
+   mlt = sqrt(diag(vcov(mlt_GBSG2_1)))[names(cf)],
+   fss = sqrt(diag(vcov(fss_GBSG2_1)))[names(cf)])
 @
 As a consequence, the corresponding coefficient tables, here produced
 using \cmd{cftest}, are also rather similar
