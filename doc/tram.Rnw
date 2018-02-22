@@ -114,7 +114,9 @@ The \pkg{tram} package offers standard formula-based \proglang{R} interfaces
 for stratified linear transformation models.  The package uses general
 infrastructure for likelihood-based inference in conditional transformation
 models provided by package \pkg{mlt} \citep{pkg:mlt}.  The underlying
-theory is presented by \cite{Hothorn_Moest_Buehlmann_2017}. An interface to
+theory is presented by \cite{Hothorn_Moest_Buehlmann_2017} and an
+introduction to the \pkg{mlt} package is given in the package vignette
+of package \pkg{mlt.docreg} \cite{pkg:mlt.docreg}. An interface to
 package \pkg{trtf} \citep{pkg:trtf} also allows more complex models to be
 fitted by recursive partitioning and random forest technology \citep{Hothorn_Zeileis_2017}.
 
@@ -1051,6 +1053,18 @@ age. The solid horizontal line corresponds to the global treatment effect
 obtained from model \code{Coxph\_GBSG2\_1}. \label{GBSG2-Cox-4-plot}}
 \end{figure}
 
+\section{Summary}
+
+The \pkg{tram} package simplifies model estimation, interpretation and
+inference for some members of the broad family of conditional transformation
+models. Where implementations for special cases already exist, practically
+equivalent results are obtained. In some aspects, such as different ways of
+handling stratum variables, response-varying coefficients, likelihood
+estimation for interval-censored or truncated data, etc., the \pkg{tram}
+package offers additional functionality. Users requiring more control over
+model specification are welcome to study facilities for model specification,
+estimation and inference provided by package \pkg{mlt}.
+
 \clearpage
 
 \bibliography{mlt,packages}
@@ -1107,7 +1121,7 @@ pkgs <- c("mlt", "variables", "basefun", "survival", "eha", "prodlim", "truncreg
   "flexsurv", "multcomp", "mgcv", "coxinterval", "ICsurv",
   "polspline", "logspline", "bshazard", "gss", "MIICD", "TransModel",
   "dynsurv", "timereg", "survivalMPL", "np", "gamlss", "Matrix", "muhaz", "ICE",
-  "ordinal", "VGAM", "BB", "alabama", "trtf")
+  "ordinal", "VGAM", "BB", "alabama", "trtf", "mlt.docreg")
 out <- sapply(pkgs, pkg)
 
 x <- readLines("packages.bib")
