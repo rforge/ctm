@@ -2830,7 +2830,7 @@ legend("topright", lty = 1:3, bty = "n",
 
 %\section{Computational Details}
 
-<<funs, echo = FALSE, results='hide', purl = FALSE>>=
+<<funs, echo = FALSE, results='hide', purl = FALSE, cache = FALSE>>=
 if (file.exists("packages.bib")) file.remove("packages.bib")
 pkgversion <- function(pkg) {
     pkgbib(pkg)
