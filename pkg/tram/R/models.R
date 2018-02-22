@@ -1,6 +1,5 @@
 
-Coxph <- function(formula, data, subset, weights, offset, cluster, na.action = na.omit, order = 6, 
-                  prob = c(.1, .9), ...)
+Coxph <- function(formula, data, subset, weights, offset, cluster, na.action = na.omit, ...)
 {
     mf <- match.call(expand.dots = FALSE)
     m <- match(c("formula", "data", "subset", "na.action", "weights", "offset", "cluster"), names(mf), 0L)
@@ -12,7 +11,7 @@ Coxph <- function(formula, data, subset, weights, offset, cluster, na.action = n
               inherits(td$response, "response") ||
               is.numeric(td$response))
 
-    ret <- tram(td, order = order, prob = prob, transformation = "smooth", distribution = "MinExtrVal", 
+    ret <- tram(td, transformation = "smooth", distribution = "MinExtrVal", 
                 negative = FALSE, ...)
     if (!inherits(ret, "mlt")) return(ret)
     ret$call <- match.call(expand.dots = TRUE)
@@ -98,8 +97,7 @@ Survreg <- function(formula, data, subset, weights, offset, cluster, na.action =
     ret
 }
 
-Colr <- function(formula, data, subset, weights, offset, cluster, na.action = na.omit, order = 6, 
-                 prob = c(.1, .9), ...)
+Colr <- function(formula, data, subset, weights, offset, cluster, na.action = na.omit, ...)
 {
     mf <- match.call(expand.dots = FALSE)
     m <- match(c("formula", "data", "subset", "na.action", "weights", "offset", "cluster"), names(mf), 0L)
@@ -111,7 +109,7 @@ Colr <- function(formula, data, subset, weights, offset, cluster, na.action = na
               inherits(td$response, "response") ||
               is.numeric(td$response))
 
-    ret <- tram(td, order = order, prob = prob, transformation = "smooth", 
+    ret <- tram(td, transformation = "smooth", 
                 distribution = "Logistic", negative = FALSE, ...)
     if (!inherits(ret, "mlt")) return(ret)
     ret$call <- match.call(expand.dots = TRUE)
