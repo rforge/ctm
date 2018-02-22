@@ -17,7 +17,7 @@ Survreg(formula, data, subset, weights, offset, cluster, na.action = na.omit,
   \item{formula}{an object of class \code{"formula"}: a symbolic description 
           of the model structure to be
           fitted.  The details of model specification are given under
-          \code{\link[tram]{tram}} and in the package vignette.
+          \code{\link{tram}} and in the package vignette.
   }
   \item{data}{an optional data frame, list or environment (or object
           coercible by \code{as.data.frame} to a data frame) containing the
@@ -50,7 +50,7 @@ Survreg(formula, data, subset, weights, offset, cluster, na.action = na.omit,
   }
   \item{scale}{a fixed value for the scale parameter(s).
   }
-  \item{\dots}{additional arguments to \code{\link[tram]{tram}}.}
+  \item{\dots}{additional arguments to \code{\link{tram}}.}
 }
 \details{
 Parametric survival models reusing the interface of

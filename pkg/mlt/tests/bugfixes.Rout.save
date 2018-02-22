@@ -90,6 +90,14 @@ Log-Likelihood: -171.1428 (df = 12)
 Coefficients: 30.95069 38.88527 42.5229 -0.01507979 -0.05890574 -0.121357 -0.05406142 -0.4769787 -0.344239 -2.414345 -1.131853 0.369285
 
 > 
+> ### parm can be a matrix with subject-specific parameters
+> parm <- matrix(coef(mod), nrow = 1L)
+> parm <- parm[rep(1, NROW(bodyfat)),]
+> all.equal(logLik(mod), logLik(mod, parm = parm))
+[1] TRUE
+> all.equal(estfun(mod), estfun(mod, parm = parm))
+[1] TRUE
+> 
 > ### check for only left/right censoring before fitting
 > y <- bodyfat$DEXfat
 > sF <- rep(FALSE, length(y))
@@ -100,6 +108,7 @@ Warning message:
 In .checkR(y, weights) : response contains left-censored observations only
 > mod$convergence
 [1] 1
+> 
 > 
 > ### just in case: check for new intercept_basis (basefun 0.0-39)
 > d <- data.frame(y = rnorm(100, mean = 2, sd = .25))
@@ -114,7 +123,6 @@ In .checkR(y, weights) : response contains left-censored observations only
 > stopifnot(all.equal(estfun(f), estfun(f2)[,2:1]))
 > 
 > 
-> 
 > proc.time()
    user  system elapsed 
-  2.348   0.052   2.399 
+  2.460   0.024   2.482 

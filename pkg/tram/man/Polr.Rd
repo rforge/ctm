@@ -14,7 +14,7 @@ Polr(formula, data, subset, weights, offset, cluster, na.action = na.omit,
   \item{formula}{an object of class \code{"formula"}: a symbolic description 
           of the model structure to be
           fitted.  The details of model specification are given under
-          \code{\link[tram]{tram}} and in the package vignette.
+          \code{\link{tram}} and in the package vignette.
   }
   \item{data}{an optional data frame, list or environment (or object
           coercible by \code{as.data.frame} to a data frame) containing the
@@ -42,7 +42,7 @@ Polr(formula, data, subset, weights, offset, cluster, na.action = na.omit,
   }
   \item{method}{a character describing the link function.
   }
-  \item{\dots}{additional arguments to \code{\link[tram]{tram}}.}
+  \item{\dots}{additional arguments to \code{\link{tram}}.}
 }
 \details{
 Models for ordered categorical responses reusing the interface of

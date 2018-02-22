@@ -15,7 +15,7 @@ Lm(formula, data, subset, weights, offset, cluster, na.action = na.omit, ...)
   \item{formula}{an object of class \code{"formula"}: a symbolic description 
           of the model structure to be
           fitted.  The details of model specification are given under
-          \code{\link[tram]{tram}} and in the package vignette.
+          \code{\link{tram}} and in the package vignette.
   }
   \item{data}{an optional data frame, list or environment (or object
           coercible by \code{as.data.frame} to a data frame) containing the
@@ -40,7 +40,7 @@ Lm(formula, data, subset, weights, offset, cluster, na.action = na.omit, ...)
   \item{na.action}{a function which indicates what should happen when the data
           contain \code{NA}s.  The default is set to \code{na.omit}.
   }
-  \item{\dots}{additional arguments to \code{\link[tram]{tram}}.}
+  \item{\dots}{additional arguments to \code{\link{tram}}.}
 }
 \details{
 A normal linear model with simulaneous estimation of regression coefficients

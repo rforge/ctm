@@ -14,7 +14,7 @@ Colr(formula, data, subset, weights, offset, cluster, na.action = na.omit, ...)
   \item{formula}{an object of class \code{"formula"}: a symbolic description 
           of the model structure to be
           fitted.  The details of model specification are given under
-          \code{\link[tram]{tram}} and in the package vignette.
+          \code{\link{tram}} and in the package vignette.
   }
   \item{data}{an optional data frame, list or environment (or object
           coercible by \code{as.data.frame} to a data frame) containing the
@@ -40,7 +40,7 @@ Colr(formula, data, subset, weights, offset, cluster, na.action = na.omit, ...)
           contain \code{NA}s.  The default is set by the \code{na.action} setting
           of \code{options}, and is \code{na.fail} if that is unset.
   }
-  \item{\dots}{additional arguments to \code{\link[tram]{tram}}.}
+  \item{\dots}{additional arguments to \code{\link{tram}}.}
 }
 \details{
 Simultanous estimation of all possible binary logistic models obtained 
