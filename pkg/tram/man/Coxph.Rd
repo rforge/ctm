@@ -1,6 +1,5 @@
 \name{Coxph}
 \alias{Coxph}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
   Cox Proportional Hazards Model
 }
@@ -10,12 +9,11 @@
 \usage{
 Coxph(formula, data, subset, weights, offset, cluster, na.action = na.omit, ...)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{formula}{an object of class \code{"formula"}: a symbolic description 
           of the model structure to be
           fitted.  The details of model specification are given under
-          ‘Details’.
+          \code{\link[tram]{tram}} and in the package vignette.
   }
   \item{data}{an optional data frame, list or environment (or object
           coercible by \code{as.data.frame} to a data frame) containing the
@@ -43,59 +41,39 @@ Coxph(formula, data, subset, weights, offset, cluster, na.action = na.omit, ...)
   \item{\dots}{additional arguments to \code{\link[tram]{tram}}.}
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+The original implementation of Cox models via the partial likelihood,
+treating the baseline hazard function as a nuisance parameter, is available
+in \code{\link[survival]{coxph}}. This function allows simultaneous
+estimation of the log-hazard ratios and the log-cumulative baseline hazard,
+the latter parameterised by a Bernstein polynomial. The model can be fitted
+under stratification (time-varying coefficients), all types of random
+censoring and trunction. An early reference to this parameterisation is
+McLain and Ghosh (2013).
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+An object of class \code{Coxph}, with corresponding \code{coef},
+\code{logLik}, \code{summary}, \code{print} and \code{predict} methods.
 }
 \references{
-%% ~put references to the literature/web site here ~
-}
-\author{
-%%  ~~who you are~~
-}
-\note{
-%%  ~~further notes~~
-}
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
+  Alexander C. McLain and Sujit K. Ghosh (2013).
+  Efficient Sieve Maximum Likelihood Estimation of
+  Time-Transformation Models, \emph{Journal of Statistical Theory and Practice},
+  \bold{7}(2), 285--303,
+  \url{http://dx.doi.org/10.1080/15598608.2013.772835}.
 
-\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
 
-## The function is currently defined as
-function (formula, data, subset, weights, offset, cluster, na.action = na.omit, 
-    order = 6, prob = c(0.1, 0.9), ...) 
-{
-    mf <- match.call(expand.dots = FALSE)
-    m <- match(c("formula", "data", "subset", "na.action", "weights", 
-        "offset", "cluster"), names(mf), 0L)
-    mf <- mf[c(1L, m)]
-    mf[[1L]] <- quote(tram_data)
-    td <- eval(mf, parent.frame())
-    stopifnot(inherits(td$response, "Surv") || inherits(td$response, 
-        "response") || is.numeric(td$response))
-    ret <- tram(td, order = order, prob = prob, transformation = "smooth", 
-        distribution = "MinExtrVal", negative = FALSE, ...)
-    if (!inherits(ret, "mlt")) 
-        return(ret)
-    ret$call <- match.call(expand.dots = TRUE)
-    ret$tram <- paste(ifelse(is.null(td$terms$s), "", "(Stratified)"), 
-        "Parametric Linear Cox' Regression Model")
-    class(ret) <- c("Coxph", class(ret))
-    ret
-  }
+  data("GBSG2", package = "TH.data")
+
+  library("survival")
+  coxph(Surv(time, cens) ~ horTh, data = GBSG2)
+
+  Coxph(Surv(time, cens) ~ horTh, data = GBSG2)
+
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }% use one of  RShowDoc("KEYWORDS")
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{models}
+\keyword{regression}
+\keyword{survival}
+\keyword{smooth}

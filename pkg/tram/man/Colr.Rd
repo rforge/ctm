@@ -1,6 +1,5 @@
 \name{Colr}
 \alias{Colr}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
   Continuous Outcome Logistic Regression
 }
@@ -15,7 +14,7 @@ Colr(formula, data, subset, weights, offset, cluster, na.action = na.omit, ...)
   \item{formula}{an object of class \code{"formula"}: a symbolic description 
           of the model structure to be
           fitted.  The details of model specification are given under
-          ‘Details’.
+          \code{\link[tram]{tram}} and in the package vignette.
   }
   \item{data}{an optional data frame, list or environment (or object
           coercible by \code{as.data.frame} to a data frame) containing the
@@ -44,59 +43,33 @@ Colr(formula, data, subset, weights, offset, cluster, na.action = na.omit, ...)
   \item{\dots}{additional arguments to \code{\link[tram]{tram}}.}
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+Simultanous estimation of all possible binary logistic models obtained 
+by dichotomisation of a continuous response. The regression coefficients can
+be constant allowing for an interpretation as log-odds ratios.
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+An object of class \code{Colr}, with corresponding \code{coef},
+\code{logLik}, \code{summary}, \code{print} and \code{predict} methods.
 }
 \references{
-%% ~put references to the literature/web site here ~
-}
-\author{
-%%  ~~who you are~~
-}
-\note{
-%%  ~~further notes~~
-}
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
+  Tina Lohse, Sabine Rohrmann, David Faeh and Torsten Hothorn (2017),
+  Continuous Outcome Logistic Regression for Analyzing Body Mass Index
+  Distributions, \emph{F1000Research}, \bold{6}(1933),
+  \url{http://dx.doi.org/10.12688/f1000research.12934.1}.
 
-\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
 
-## The function is currently defined as
-function (formula, data, subset, weights, offset, cluster, na.action = na.omit, 
-    order = 6, prob = c(0.1, 0.9), ...) 
-{
-    mf <- match.call(expand.dots = FALSE)
-    m <- match(c("formula", "data", "subset", "na.action", "weights", 
-        "offset", "cluster"), names(mf), 0L)
-    mf <- mf[c(1L, m)]
-    mf[[1L]] <- quote(tram_data)
-    td <- eval(mf, parent.frame())
-    stopifnot(inherits(td$response, "Surv") || inherits(td$response, 
-        "response") || is.numeric(td$response))
-    ret <- tram(td, order = order, prob = prob, transformation = "smooth", 
-        distribution = "Logistic", negative = FALSE, ...)
-    if (!inherits(ret, "mlt")) 
-        return(ret)
-    ret$call <- match.call(expand.dots = TRUE)
-    ret$tram <- paste(ifelse(is.null(td$terms$s), "", "(Stratified)"), 
-        "Continuous Outcome Logistic Regression")
-    class(ret) <- c("colr", class(ret))
-    ret
-  }
+  data("BostonHousing2", package = "mlbench")
+
+  lm(cmedv ~ crim + zn + indus + chas + nox + rm + age + dis + 
+             rad + tax + ptratio + b + lstat, data = BostonHousing2)
+
+  Colr(cmedv ~ chas + crim + zn + indus + nox + 
+               rm + age + dis + rad + tax + ptratio + b + lstat, 
+               data = BostonHousing2)
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }% use one of  RShowDoc("KEYWORDS")
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{models}
+\keyword{regression}
+\keyword{smooth}
