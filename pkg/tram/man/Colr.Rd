@@ -49,7 +49,8 @@ be constant allowing for an interpretation as log-odds ratios.
 }
 \value{
 An object of class \code{Colr}, with corresponding \code{coef},
-\code{logLik}, \code{summary}, \code{print} and \code{predict} methods.
+\code{vcov}, \code{logLik}, \code{estfun}, \code{summary}, 
+\code{print}, \code{plot} and \code{predict} methods.
 }
 \references{
 

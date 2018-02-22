@@ -51,7 +51,8 @@ trunction.
 }
 \value{
 An object of class \code{Polr}, with corresponding \code{coef},
-\code{logLik}, \code{summary}, \code{print} and \code{predict} methods.
+\code{vcov}, \code{logLik}, \code{estfun}, \code{summary}, 
+\code{print}, \code{plot} and \code{predict} methods.
 }
 \examples{
 
