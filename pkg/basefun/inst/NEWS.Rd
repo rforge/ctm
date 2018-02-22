@@ -2,7 +2,7 @@
 \name{NEWS}
 \title{NEWS file for the basefun package}
 
-\section{Changes in Version 0.0-40 (2017-12-19)}{
+\section{Changes in Version 0.0-40 (2018-02-22)}{
   \itemize{
     \item{\code{nparm} sometimes generated data with sanitised variable
           names, we don't want this to happen.}
