@@ -2389,12 +2389,16 @@ the unorthodox presentation of regression models ignoring the fences between
 the traditionally compartmentalised fields of
 ``regression analysis'', ``survival analysis'' or ``categorical data analysis''
 in this documentation of \pkg{mlt} will likely also confuse many statisticians,
-let alone data or subject-matter scientists.  Future efforts
-will concentrate on the implementation of convenience interfaces, \ie higher
+let alone data or subject-matter scientists.  \NEW{Current efforts
+concentrate on the implementation of convenience interfaces, \ie higher
 level user interfaces for special forms of transformation models, which
 resemble the traditional notational and naming conventions from the
-statistical modelling literature.
-
+statistical modelling literature. Standard formula-based interfaces to the
+underlying \pkg{mlt} implementation of Cox models, parametric survival models, 
+models for ordered categorical data, normal linear and non-normal linear models 
+are available in package \pkg{tram} \citep{pkg:tram}. The corresponding package vignette 
+shows how some of model outputs presented in this paper can be obtained
+suffering less headaches.}
 
 \bibliography{mlt,packages}
 
@@ -2882,7 +2886,7 @@ pkgs <- c("mlt", "variables", "basefun", "survival", "eha", "prodlim", "truncreg
   "flexsurv", "multcomp", "mgcv", "coxinterval", "ICsurv",
   "polspline", "logspline", "bshazard", "gss", "MIICD", "TransModel",
   "dynsurv", "timereg", "survivalMPL", "np", "gamlss", "Matrix", "muhaz", "ICE",
-  "ordinal", "VGAM", "BB", "alabama")
+  "ordinal", "VGAM", "BB", "alabama", "tram")
 out <- sapply(pkgs, pkg)
 
 x <- readLines("packages.bib")
