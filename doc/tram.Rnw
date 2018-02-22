@@ -1,7 +1,7 @@
 
 %\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{tram}
-%\VignetteDepends{tram, survival, MASS, mlbench, multcomp, ordinal, colorspace, quantreg}
+%\VignetteDepends{tram, survival, MASS, mlbench, multcomp, ordinal, colorspace, quantreg, ATR}
 
 \documentclass[article,nojss,shortnames]{jss}
 
@@ -74,7 +74,7 @@ The \pkg{tram} package allows a range of stratified linear
 transformation models to be fitted using standard formula-based \proglang{R}
 interfaces. Functions for the estimation of potentially stratified Cox models, several survival
 regression models including log-normal or log-logistic models, 
-models for ordered categorial responses (proportional odds, proportional
+models for ordered categorical responses (proportional odds, proportional
 hazards, probit) are available. Likelihood-based inference, also in the presense of random
 left-, right-, and interval-censoring and arbitrary forms of truncation, is
 performed using infrastructure from package \pkg{mlt}. More complex models, allowing non-linear and interaction
@@ -82,9 +82,9 @@ functions of covariates, can be estimated using corresponding transformation
 trees and forests in package \pkg{trtf}.}
 
 \Keywords{Linear model, Cox model, survival regression, ordered regression,
-censoring, trunctation}
+censoring, truncation}
 \Plainkeywords{Linear model, Cox model, survival regression, ordered regression,
-censoring, trunctation}
+censoring, truncation}
 
 \Address{
   Torsten Hothorn\\
@@ -116,21 +116,21 @@ infrastructure for likelihood-based inference in conditional transformation
 models provided by package \pkg{mlt} \citep{pkg:mlt}.  The underlying
 theory is presented by \cite{Hothorn_Moest_Buehlmann_2017} and an
 introduction to the \pkg{mlt} package is given in the package vignette
-of package \pkg{mlt.docreg} \cite{pkg:mlt.docreg}. An interface to
+of package \pkg{mlt.docreg} \citep{pkg:mlt.docreg}. An interface to
 package \pkg{trtf} \citep{pkg:trtf} also allows more complex models to be
 fitted by recursive partitioning and random forest technology \citep{Hothorn_Zeileis_2017}.
 
 In a nutshell, the model class covered by package \pkg{tram} consists of transformation 
 models of the form
 \begin{eqnarray} \label{tram}
-\Prob(\rY \le \ry \mid \rS = \rs, \rX = \rx) = \pZ(\h_\rY(\ry \mid \rs) - \tilde{\rx}^\top \shiftparm - \text{offset})
+\Prob(\rY \le \ry \mid \rS = \rs, \rX = \rx) = \pZ(\h_\rY(\ry \mid \rs) - \tilde{\rx}^\top \shiftparm + \text{offset})
 \end{eqnarray}
 where $\rY$ is an at least ordered univariate response variable, $\rS$ are
 stratum variables and $\rX$ covariates with observations $\ry, \rs$, and
 $\rx$, respectively. We use the term `stratum' in a little more general
 sense and allow factors and also numeric variables in $\rS$. The $P$-vector $\tilde{\rx}^\top$ is a row of
 the design matrix corresponding to the observed covariate status $\rx$. The package allows different
-choices of the `link' function $\pZ$ and the monotone increasing (in it's $\ry$ argument) `baseline transformation' $\h_\rY$
+choices of the `link' function $\pZ$ and the monotone increasing (in its $\ry$ argument) `baseline transformation' $\h_\rY$
 and, consequently, the estimation of a rather broad class of models.
 
 A little more specifically, the monotone increasing baseline
@@ -342,7 +342,7 @@ whereas the \pkg{tram} package uses rather flexible Bernstein polynomials
 for the `baseline transformation' $\h_\rY$. Although the technical details
 are different, the spirit is the same and we thus refer to the model
 \begin{eqnarray*}
-\Prob(\rY \le \ry \mid \rS = \rs, \rX = \rx) = \Phi(\h_\rY(\ry \mid \rs) - \tilde{\rx}^\top \shiftparm - \text{offset})
+\Prob(\rY \le \ry \mid \rS = \rs, \rX = \rx) = \Phi(\h_\rY(\ry \mid \rs) - \tilde{\rx}^\top \shiftparm + \text{offset})
 \end{eqnarray*}
 with smooth (with respect to $\ry$) baseline transformation $\h_\rY$ as a `Box-Cox'
 model. For the Boston Housing data, we first fit the model
@@ -473,7 +473,7 @@ Colr_BH_1 <- Colr(y | 0 + chas ~ crim + zn + indus + nox +
                   data = BostonHousing2)
 logLik(Colr_BH_1)
 @
-In comparion to the BoxCox-type model \code{BC_BH_2} with the exact same
+In comparison to the BoxCox-type model \code{BC_BH_2} with the exact same
 structure of the model (except the link function) with likelihood
 \Sexpr{round(logLik(BC_BH_2), 2)}, the continuous outcome logistic regression improved
 the model fit.
@@ -519,7 +519,7 @@ plot(contourplot(d ~ lp + q | chas, data = nd2, panel = pfun, xlab = "Linear pre
 \section{Connection to Quantile Regression} \label{sec:rq}
 
 There is a strong relationship between quantile regression models and
-transformation models. In essense, quantile regression (as the name
+transformation models. In essence, quantile regression (as the name
 suggests) models the conditional quantile function whereas transformation
 models describe the conditional distribution function (that is, the inverse
 conditional quantile function). Under which circumstances can we expect to
@@ -532,7 +532,7 @@ Q_\rY(p \mid \rX = \rx) = \tilde{\alpha}(p) + \tilde{\rx}^\top
 \tilde{\shiftparm}(p).
 \end{eqnarray*}
 Typically (for example in package \pkg{quantreg}), separate models are
-fitted for varying probabilities $p \in (0, 1)$, potentiall causing a
+fitted for varying probabilities $p \in (0, 1)$, potentially causing a
 `quantile crossing' problem.
 
 One nice feature of this model is its invariance wrt.~monotone
@@ -570,7 +570,7 @@ But how well do the two approaches coincide for the Boston Housing data?
 We first fit a number of linear quantile regressions for a grid of
 probabilities $p \in \{.1, \dots, .9\}$ and, second, 
 estimate a continuous outcome logistic regression with response-varying effects
-(restricting the outself to very smooth regression coefficient functions
+(restricting ourselves to very smooth regression coefficient functions
 parameterised as Bernstein polynomials with three parameters by
 the choice \code{order = 2}):
 <<BostonHousing-rq-1, cache = TRUE>>=
@@ -719,7 +719,7 @@ legend("bottomleft", lty = 1, title = "Hormonal Therapy",
 \end{figure}
 
 The question is simple to answer when we use the treatment as a stratum and,
-in essense, fit two unconditional models (for each treatment arm) at once
+in essence, fit two unconditional models (for each treatment arm) at once
 <<GBSG2-Weibull-2, cache = TRUE>>=
 Survreg_GBSG2_2 <- Survreg(Surv(time, cens) | 0 + horTh ~ 1, data = GBSG2)
 logLik(Survreg_GBSG2_2)
@@ -919,7 +919,7 @@ logLik(Polr_wine_4)
 coef(Polr_wine_4)
 @
 As expected, the difference is not very large, but more extreme forms of
-censoring (or truncation) might very well lead to substantically different
+censoring (or truncation) might very well lead to substantially different
 models.
 
 \section{Transformation Trees and Forests}
@@ -983,11 +983,12 @@ BC_BH_5 <- traforest(BC_BH_0,
 Another interesting option is to partition more complex models by
 \cmd{trafotree}. Suppose we are interested in the identification of
 potential treatment effect modifiers in a Cox model of the form
-
 \begin{eqnarray*}
 \Prob(\rY \le \ry \mid \rX = \rx, \text{horTh}) = 1 - \exp(-\exp(\basisy(\ry)^\top \parm(\rx) +
-I(\text{horTh}) \beta(\rx))).
+I(\text{horTh}) \beta(\rx)))
 \end{eqnarray*}
+\citep[details on tree-based subgroup analyses are given
+in][]{Seibold_Zeileis_Hothorn_2015}.
 Here we are interested in an $\rx$-varying log-hazard ratio
 $\beta(\rx)$, \ie, the dependency of the success (or failure) of hormonal
 therapy on baseline variables $\rx$. We start with the model 
@@ -996,7 +997,7 @@ Coxph_GBSG2_1 <- Coxph(Surv(time, cens) ~ horTh, data = GBSG2)
 logLik(Coxph_GBSG2_1)
 coef(Coxph_GBSG2_1)
 @
-This model estimates a global treatment effect, \ie, a treatement effect
+This model estimates a global treatment effect, \ie, a treatment effect
 which applies uniformly to all patients. We now try to find out if this
 model can be improved by a transformation tree
 <<GBSG2-Cox-3>>=
@@ -1022,7 +1023,8 @@ conditional survivor functions given treatment (blue is hormonal treatment,
 yellow refers to the control group) in each terminal node. \label{GBSG2-Cox-3-plot}}
 \end{figure}
 
-In our last example we restrict out attention to an age-varying log-hazard ratio
+In our last example \citep[inspired by][]{Seibold_Zeileis_Hothorn_2017}
+we restrict out attention to an age-varying log-hazard ratio
 $\beta(\text{age})$. We again start with the Cox model \code{Coxph\_GBSG2\_1}
 featuring a smooth baseline hazard function and a global treatment effect
 $\eshiftparm$. We fit $100$ trees to subsamples of the data and study splits
