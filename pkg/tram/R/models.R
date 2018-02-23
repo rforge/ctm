@@ -188,7 +188,7 @@ BoxCox <- function(formula, data, subset, weights, offset, cluster, na.action = 
     if (!inherits(ret, "mlt")) return(ret)
     ret$call <- match.call(expand.dots = TRUE)
     ret$tram <- paste(ifelse(is.null(td$terms$s), "", "(Stratified)"),
-                      "Transformed Normal Linear Regression Model")
+                      "Non-normal (Box-Cox-Type) Linear Regression Model")
     class(ret) <- c("BoxCox", class(ret))
     ret
 }

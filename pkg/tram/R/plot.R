@@ -49,7 +49,8 @@ plot.tram <- function(x, newdata = model.frame(x),
                                    calpha = calpha, level = level, K = K, 
                                    cheat = cheat)
             } else {
-                plot(object, newdata = newdata, type = "trafo", col = col, lwd = lwd, ...)
+                plot(object, newdata = newdata, type = "trafo", col = col, lwd = lwd, 
+                     K = K, ...)
                 if (confidence) 
                     cb <- confband(object, newdata = newdata, type = "trafo", 
                                    calpha = calpha, level = level, K = K, 
@@ -57,7 +58,7 @@ plot.tram <- function(x, newdata = model.frame(x),
             }
         },
         "distribution" = {
-            plot(object, newdata = newdata, col = col, lwd = lwd, ...)
+            plot(object, newdata = newdata, col = col, lwd = lwd, K = K, ...)
             type <- list(...)$type
             if (is.null(type)) type <- "trafo"
             if (confidence)

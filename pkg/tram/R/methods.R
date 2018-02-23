@@ -81,13 +81,17 @@ Gradient.tram <- function(object, parm = coef(as.mlt(object), fixed = FALSE), ..
 estfun.tram <- function(object, parm = coef(as.mlt(object), fixed = FALSE), ...)
     estfun(as.mlt(object), parm = parm, ...)
 
-predict.tram <- function(object, newdata = object$data, 
+predict.tram <- function(object, newdata = model.frame(object), 
     type = c("lp", "trafo", "distribution", "survivor", "density", 
              "logdensity", "hazard", "loghazard", "cumhazard", "quantile"), ...) {
 
     type <- match.arg(type)
-    if (type == "lp")
-        return(model.matrix(object, data = newdata) %*% coef(object, with_baseline = FALSE))
+    if (type == "lp") {
+        ret <- model.matrix(object, data = newdata) %*% 
+               coef(object, with_baseline = FALSE)
+        if (object$negative) return(-ret)
+        return(ret)
+    }
     predict(as.mlt(object), newdata = newdata, type = type, ...)
 }
 
@@ -105,6 +109,7 @@ print.tram <- function(x, ...) {
 
 summary.tram <- function(object, ...) {
     ret <- list(call = object$call,
+                tram = object$tram,
                 test = cftest(object, parm = names(coef(object, with_baseline = FALSE))),
                 ll = logLik(object))
     if (!is.null(object$LRtest)) {

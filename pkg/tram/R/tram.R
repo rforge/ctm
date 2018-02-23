@@ -144,6 +144,7 @@ tram <- function(formula, data, subset, weights, offset, cluster, na.action = na
     if (!is.null(iS))
         ret$stratacoef <- colnames(model.matrix(iS, data = td$mf))
     class(ret) <- c("tram", class(ret))
+    ret$negative <- negative
 
     if (LRtest & !is.null(iX)) {
         nullmodel <- ctm(response = rbasis, interacting = iS, 

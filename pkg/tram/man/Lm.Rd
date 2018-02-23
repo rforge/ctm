@@ -47,6 +47,11 @@ A normal linear model with simulaneous estimation of regression coefficients
 and scale parameter(s). This function also allows for stratum-specific
 intercepts and variances as well as censoring and truncation in the
 response.
+
+Note that the scale of the parameters is different from what is reported by
+\code{\link[stats]{lm}}; the discrepancies are explained in the package
+vignette.
+
 }
 \value{
 An object of class \code{BoxCox}, with corresponding \code{coef},
