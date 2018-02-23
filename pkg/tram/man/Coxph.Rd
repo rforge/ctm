@@ -60,8 +60,7 @@ An object of class \code{Coxph}, with corresponding \code{coef},
   Alexander C. McLain and Sujit K. Ghosh (2013).
   Efficient Sieve Maximum Likelihood Estimation of
   Time-Transformation Models, \emph{Journal of Statistical Theory and Practice},
-  \bold{7}(2), 285--303,
-  \url{http://dx.doi.org/10.1080/15598608.2013.772835}.
+  \bold{7}(2), 285--303, \doi{10.1080/15598608.2013.772835}.
 
 }
 \examples{

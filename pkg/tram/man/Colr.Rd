@@ -57,7 +57,7 @@ An object of class \code{Colr}, with corresponding \code{coef},
   Tina Lohse, Sabine Rohrmann, David Faeh and Torsten Hothorn (2017),
   Continuous Outcome Logistic Regression for Analyzing Body Mass Index
   Distributions, \emph{F1000Research}, \bold{6}(1933),
-  \url{http://dx.doi.org/10.12688/f1000research.12934.1}.
+  \doi{10.12688/f1000research.12934.1}.
 
 }
 \examples{
