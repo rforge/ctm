@@ -2,7 +2,7 @@
 \name{NEWS}
 \title{NEWS file for the mlt package}
 
-\section{Changes in Version 0.2-2 (2018-02-21)}{
+\section{Changes in Version 0.2-2 (2018-02-23)}{
   \itemize{
     \item{Use \pkg{coneprog} for getting the starting values.}
     \item{\code{logLik} and \code{estfun} accept matrices as \code{parm}
