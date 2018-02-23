@@ -50,7 +50,8 @@ readers and so I tried to organise things in reverse order here (not very
 successfully, as it seems). However, I'm still convinced that the
 example-rich style is a good complement to a theory-driven presention. One
 of my aims is to highlight connections between models by showing (almost)
-equivalence of empirical results. 
+equivalence of empirical results obtained from different implementations of
+the (roughly) same idea. 
 
 To addess the concerns raised by both referees, I outline the structure of
 the manuscript, and the connections between concepts and implementation, in
@@ -63,6 +64,14 @@ paragraph of the paper. Whether or not to do this now should be up to
 the author, and I can see an argument for separating the basic material
 currently in the paper from an implementation meant for a wider
 readership.}
+
+The new CRAN package \textbf{tram} offers standard R formula-interfaces for
+some stratified linear transformation models, such as the Cox model,
+parametric survival regression and continuous outcome logistic regression. I
+did not include the package itself in the manuscript, because it lacks the
+level of maturity of \textbf{mlt}, but extended the last paragraph of the
+discussion with a link to this, for some users, hopefully less painful way
+of estimating likelihood-based transformation models.
 
 \section*{Reviewer A}
 
@@ -121,7 +130,7 @@ lot to address that problem; the ms is mostly about the unified view and the
 software. Readers may be more receptive to the ms if it doesn’t begin by
 scolding them. }
 
-\item \textit{I was a little surprised to hear that people might feel
+I was a little surprised to hear that people might feel
 offended by the introduction. In hindsight, I can understand the rather
 harsh criticism we received from referees of the corresponding theoretical
 paper (the comments are part of https://arxiv.org/pdf/1508.06749.pdf)
@@ -135,7 +144,7 @@ being nice. The manscript offers constructive criticism of the way many
 models are taught, parameterised, estimated and implemented. The
 introduction, with its new paragraph on workflow and organisation as well as
 better connections to classical models, will hopefully get readers
-hooked.}
+hooked.
 
 \item \textit{Finally, I think the ms could be considerably shortened,
 with much of the code either online or in an appendix.  The space saved by
@@ -146,7 +155,7 @@ implementations and comparison of corresponding results. My intention was to
 keep readers in their comfort zone (by analysing data using one of the
 classical packages) while showing them the green grass on the other
 (transformation) side. I hope that readers will, in the very end, realise:
-"Oh, instead of learning of to use all these different packages, it is
+"Oh, instead of learning how to use all these different packages, it is
 enough for me to understand one package!". I admit that only patient readers
 willing to carry on until the very end will experience this effect. I tried
 to move some of the "light" shining in the discussion to the introduction,
@@ -163,6 +172,8 @@ manuscript, and interesting package(s).  With that said there are major
 issues with the way the manuscript is written from a flow and accessibility
 perspective.  }
 
+Thank you; please see my comments to the section editor and referee A on
+the workflow issue.
 
 \item \textit{I enjoy the opening few paragraphs but I believe that the
 motivation for the work needs further explained.  Why is this package the
@@ -172,7 +183,7 @@ shape within Section 2, and should be explained prior to this in the
 introduction, as clear motivation.  }
 
 Thank you very much for the suggestion. The introduction was smoothed (a
-better connected to the first paragraph was added) and the general workflow
+better connection to the first paragraph was added) and the general workflow
 was linked to packages/functions/methods and sections in the manuscript.
 Also, some parts of the discussion are now presented in the introduction,
 with the aim to link transformation models to models most readers will be
@@ -189,7 +200,7 @@ simplest level possible without doing a comparison or referring readers to
 further sections.  The quality of this work is there, it just needs to be
 presented in a simplified manner before introduce complexity.  }
 
-THe workflow is now presented by a flowchart, alongside with the relevant
+The workflow is now presented by a flowchart, alongside with the relevant
 links to the implementation and description in the manuscript. In some way,
 one can understand the whole document as a description of the workflow,
 starting with model specification and estimation over model diagnostics and
@@ -226,6 +237,10 @@ practitioners will read this document for insight, commenting on how to
 choose  M, other than it doesn't effect it to choose M too large.  This
 raises the question what is large enough, and what will not adversely effect
 computational times.  }
+
+The paper works with M between 5 and 10. I know that people like 
+rules of thumb, so I added a subjective recommendation of using M in this
+range.
 
 \item \textit{A minor issue is the comparisons are hard to see minor
 differences and where the effects can be dramatic.  Possibly using smaller

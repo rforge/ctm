@@ -18,7 +18,8 @@
 
 \newcommand{\cmd}[1]{\texttt{#1()}}
 
-\newcommand{\NEW}[1]{{\color{red} #1}}
+%%%\newcommand{\NEW}[1]{{\color{red} #1}}
+\newcommand{\NEW}[1]{{#1}}
 
 \usepackage{tikz}
 \usetikzlibrary{shapes,arrows,chains}
@@ -696,6 +697,9 @@ in Figure~\ref{fig:geyser-w-plot} where two Bernstein polynomials of order $M = 
 $M = 40$ are compared on the scale of the distribution function (left panel) and density
 function (right panel). It is hardly possible to notice the difference in probabilities
 but the more flexible model features a more erratic density estimate, but not overly so.
+\NEW{The subjective recommendation of choosing $M$ between $5$ and $10$ is
+based on the quite remarkable flexibility of distributions in this range and
+still managable computing times for the corresponding maximum-likelihood estimator.}
 %% The corresponding AIC values are $\Sexpr{round(AIC(mlt_w),1)}$ 
 %% for $M = 8$ and $\Sexpr{round(AIC(mlt_w_40),1)}$ for $M = 40$ favouring the smaller model.
 
