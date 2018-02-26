@@ -70,16 +70,18 @@ fill <- diverge_hcl(2, h = c(246, 40), c = 96, l = c(65, 90), alpha = .3)
 \Shorttitle{The \pkg{tram} Package}
 
 \Abstract{
-The \pkg{tram} package allows a range of stratified linear
-transformation models to be fitted using standard formula-based \proglang{R}
-interfaces. Functions for the estimation of potentially stratified Cox models, several survival
-regression models including log-normal or log-logistic models, 
+The \pkg{tram} package allows a range of stratified linear transformation
+models to be fitted using standard formula-based \proglang{R} interfaces. 
+Functions for the estimation of potentially stratified Cox models, several
+survival regression models including log-normal or log-logistic models,
 models for ordered categorical responses (proportional odds, proportional
-hazards, probit) are available. Likelihood-based inference, also in the presense of random
-left-, right-, and interval-censoring and arbitrary forms of truncation, is
-performed using infrastructure from package \pkg{mlt}. More complex models, allowing non-linear and interaction
-functions of covariates, can be estimated using corresponding transformation
-trees and forests in package \pkg{trtf}.}
+hazards, probit) are available.  Likelihood-based inference, also in the
+presense of random left-, right-, and interval-censoring and arbitrary forms
+of truncation, is performed using infrastructure from package \pkg{mlt}. 
+More complex models, allowing non-linear and interaction functions of
+covariates, can be estimated using corresponding transformation trees and
+forests in package \pkg{trtf} with the same simple user interface.
+}
 
 \Keywords{Linear model, Cox model, survival regression, ordered regression,
 censoring, truncation}
@@ -116,7 +118,7 @@ infrastructure for likelihood-based inference in conditional transformation
 models provided by package \pkg{mlt} \citep{pkg:mlt}.  The underlying
 theory is presented by \cite{Hothorn_Moest_Buehlmann_2017} and an
 introduction to the \pkg{mlt} package is given in the package vignette
-of package \pkg{mlt.docreg} \citep{pkg:mlt.docreg}. An interface to
+of package \pkg{mlt.docreg}. An interface to
 package \pkg{trtf} \citep{pkg:trtf} also allows more complex models to be
 fitted by recursive partitioning and random forest technology \citep{Hothorn_Zeileis_2017}.
 
@@ -437,7 +439,7 @@ given by the linear predictor. We can still judge whether a relationship is
 positive or negative by the sign of the regression coefficients $\shiftparm$
 but the nice way of saying `a one-unit increase in $x$ corresponds to an
 increase of $\beta$ in the conditional mean of $\rY$ (all other covariables
-being fix) just goes away. Better
+being fix)' just goes away. Better
 interpretability guides the choice of models in this section.
 
 Consider the linear transformation model (we skip strata and offset here,
@@ -859,7 +861,7 @@ logLik(Polr_wine_1)
 coef(Polr_wine_1, with_baseline = TRUE)
 @
 with identical results. Treating one of the variables as stratum is possible
-in \cmd{clm} and \cmd{Polr} (we use treatment contrasts for $\tilde{s}$
+in \cmd{clm} and \cmd{Polr} (we use treatment contrasts for $\tilde{\rs}$
 here)
 <<wine-clm-2, cache = TRUE>>=
 clm_wine_2 <- clm(rating ~ temp, nominal = ~ contact, data = wine)
@@ -1120,7 +1122,7 @@ pkg <- function(pkg)
           pkgversion(pkg), ",][]{pkg:", pkg, "}", sep = "")
 
 pkgs <- c("mlt", "variables", "basefun", "survival", "MASS", 
-  "ordinal", "trtf", "mlt.docreg")
+  "ordinal", "trtf")
 out <- sapply(pkgs, pkg)
 
 x <- readLines("packages.bib")
