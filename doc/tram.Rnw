@@ -729,7 +729,6 @@ survreg_GBSG2_2 <- survreg(Surv(time, cens) ~ strata(horTh) + horTh - 1,
                            data = GBSG2)
 logLik(survreg_GBSG2_2)
 coef(Survreg_GBSG2_2, with_baseline = TRUE)
-c(1, -coef(survreg_GBSG2_2)) / survreg_GBSG2_2$scale
 c(1 / survreg_GBSG2_2$scale, -coef(survreg_GBSG2_2) / 
                               survreg_GBSG2_2$scale)
 @
