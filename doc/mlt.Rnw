@@ -18,8 +18,8 @@
 
 \newcommand{\cmd}[1]{\texttt{#1()}}
 
-%%%\newcommand{\NEW}[1]{{\color{red} #1}}
-\newcommand{\NEW}[1]{{#1}}
+\newcommand{\NEW}[1]{{\color{red} #1}}
+%%%\newcommand{\NEW}[1]{{#1}}
 
 \usepackage{tikz}
 \usetikzlibrary{shapes,arrows,chains}
@@ -270,7 +270,7 @@ regression, such as the Weibull or log-normal model, distribution regression mod
 or survival models with time-varying effects and much more.}
 We describe how members of the large class of conditional transformation models can be
 specified, fitted by maximising the likelihood \citep[using the estimator
-developed by][]{Hothorn_Moest_Buehlmann_2017} and analysed in \proglang{R}
+developed by][]{Hothorn_Moest_Buehlmann_2017}, and analysed in \proglang{R}
 using the \pkg{mlt} add-on package \citep{pkg:mlt}.  In essence, the package
 is built around two important functions.  \cmd{ctm} specifies transformation
 models based on basis functions implemented in the \pkg{basefun} package
@@ -284,19 +284,19 @@ package \citep{pkg:variables}.  These models are then fitted to data by
 
 
 
-\NEW{The general workflow of working with the \pkg{mlt} package 
-and the organisation of this document follow the
-general principles of model specification, model estimation, model
-diagnostics and interpretation and, finally, model inference. The flowchart
-in Figure~\ref{fig:workflow} links these conceptual steps with packages,
-functions and methods discussed in this document. We take an example-based
-approach for introducing models and corresponding software infrastructure in
-the main document. The underlying theory for model formulation, parameter
-estimation and model inference is presented along the way, and we refer the
-reader to \cite{Hothorn_Moest_Buehlmann_2017} for the theoretical
-foundations. Technical issues about the three
-packages \pkg{variables}, \pkg{basefun} and \pkg{mlt} involved are explained
-in Appendices~\ref{app:variables}, \ref{app:basefun}, and \ref{app:mlt}.}
+\NEW{The general workflow of working with the \pkg{mlt} package and the
+organisation of this document follow the general principles of model
+specification, model estimation, model diagnostics and interpretation and,
+finally, model inference.  The flowchart in Figure~\ref{fig:workflow} links
+these conceptual steps to packages, functions and methods discussed in this
+document.  We take an example-based approach for introducing models and
+corresponding software infrastructure in the main document.  The underlying
+theory for model formulation, parameter estimation, and model inference is
+presented along the way, and we refer the reader to
+\cite{Hothorn_Moest_Buehlmann_2017} for the theoretical foundations. 
+Technical issues about the three packages \pkg{variables}, \pkg{basefun},
+and \pkg{mlt} involved are explained in Appendices~\ref{app:variables},
+\ref{app:basefun}, and \ref{app:mlt}.}
 
 
 \begin{figure}
@@ -2389,20 +2389,20 @@ exercise.
 The very flexible and powerful user interface of \pkg{mlt} will, however, be
 incomprehensible for most of its potential users.  Because transformation
 models seldomly receive the attention they deserve in statistics courses,
-the unorthodox presentation of regression models ignoring the fences between 
-the traditionally compartmentalised fields of
-``regression analysis'', ``survival analysis'' or ``categorical data analysis''
-in this documentation of \pkg{mlt} will likely also confuse many statisticians,
-let alone data or subject-matter scientists.  \NEW{Current efforts
-concentrate on the implementation of convenience interfaces, \ie higher
-level user interfaces for special forms of transformation models, which
-resemble the traditional notational and naming conventions from the
-statistical modelling literature. Standard formula-based interfaces to the
-underlying \pkg{mlt} implementation of Cox models, parametric survival models, 
-models for ordered categorical data, normal linear and non-normal linear models 
-are available in package \pkg{tram} \citep{pkg:tram}. The corresponding package vignette 
-shows how some of model outputs presented in this paper can be obtained
-suffering less headaches.}
+the unorthodox presentation of regression models ignoring the fences between
+the traditionally compartmentalised fields of ``regression analysis'',
+``survival analysis'', or ``categorical data analysis'' in this documentation
+of \pkg{mlt} will likely also confuse many statisticians, let alone data or
+subject-matter scientists.  \NEW{Current efforts concentrate on the
+implementation of convenience interfaces, \ie higher-level user interfaces
+for special forms of transformation models, which resemble the traditional
+notational and naming conventions from the statistical modelling literature. 
+Standard formula-based interfaces to the underlying \pkg{mlt} implementation
+of Cox models, parametric survival models, models for ordered categorical
+data, normal linear and non-normal linear models are available in package
+\pkg{tram} \citep{pkg:tram}.  The corresponding package vignette
+demonstrates how some of the model outputs presented in this paper can be
+obtained in simpler ways.}
 
 \bibliography{mlt,packages}
 
