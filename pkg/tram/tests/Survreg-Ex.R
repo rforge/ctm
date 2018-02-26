@@ -2,6 +2,9 @@
 library("tram")
 library("survival")
 
+### Windows diffs...
+options(digits = 3)
+
 tol <- .Machine$double.eps^(1/5)
 
 cmp <- function(x, y)

@@ -2,6 +2,9 @@
 library("MASS")
 library("tram")
 
+### Windows diffs...
+options(digits = 3)
+
 tol <- .Machine$double.eps^(1/4)
 
 cmp <- function(x, y)
@@ -17,8 +20,3 @@ cmp(coef(house.plr), coef(house.plr2))
 ll <- logLik(house.plr)
 attr(ll, "nobs") <- NULL
 cmp(ll, logLik(house.plr2))
-
-
-
-
-

@@ -4,8 +4,7 @@
 Parametric Survival Models
 }
 \description{
-Weibull, log-normal, log-logistic and other parametric models for survival
-analysis
+Weibull, log-normal, log-logistic and other parametric models (not exclusively) for survival analysis
 }
 \usage{
 Survreg(formula, data, subset, weights, offset, cluster, na.action = na.omit, 
@@ -61,6 +60,11 @@ different, see the package vignette.
 An object of class \code{Survreg},  with corresponding \code{coef},
 \code{vcov}, \code{logLik}, \code{estfun}, \code{summary}, 
 \code{print}, \code{plot} and \code{predict} methods.
+}
+\references{
+  Torsten Hothorn, Lisa Moest, Peter Buehlmann (2018), Most Likely
+  Transformations, \emph{Scandinavian Journal of Statistics}, \bold{45}(1),
+  110--134, \doi{10.1111/sjos.12291}.
 }
 \examples{
 

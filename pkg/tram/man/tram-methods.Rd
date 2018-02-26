@@ -28,7 +28,8 @@
 \method{estfun}{tram}(object, parm = coef(as.mlt(object), fixed = FALSE), ...)
 \method{predict}{tram}(object, newdata = model.frame(object), 
         type = c("lp", "trafo", "distribution", "survivor", "density", 
-                 "logdensity", "hazard", "loghazard", "cumhazard", "quantile"), ...)
+                    "logdensity", "hazard", "loghazard", "cumhazard", "quantile"), 
+           ...)
 \method{plot}{tram}(x, newdata = model.frame(x), 
      which = c("QQ-PIT", "baseline only", "distribution"), 
      confidence = c("none", "interval", "band"), level = 0.95, 
@@ -82,6 +83,11 @@
 \seealso{
   \code{\link[mlt]{mlt-methods}},  \code{\link[mlt]{plot.ctm}}
 }
+\references{
+  Torsten Hothorn, Lisa Moest, Peter Buehlmann (2018), Most Likely
+  Transformations, \emph{Scandinavian Journal of Statistics}, \bold{45}(1),
+  110--134, \doi{10.1111/sjos.12291}.
+}
 \examples{
 
     data("BostonHousing2", package = "mlbench")
@@ -107,7 +113,7 @@
     coef(BC_BH_2, with_baseline = TRUE)
 
     ### compute predicted median along with 10% and 90% quantile for the first
-    ### houses
+    ### observations
     predict(BC_BH_2, newdata = BostonHousing2[1:3,], type = "quantile",
             prob = c(.1, .5, .9))
 

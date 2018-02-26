@@ -62,6 +62,10 @@ An object of class \code{Coxph}, with corresponding \code{coef},
   Time-Transformation Models, \emph{Journal of Statistical Theory and Practice},
   \bold{7}(2), 285--303, \doi{10.1080/15598608.2013.772835}.
 
+  Torsten Hothorn, Lisa Moest, Peter Buehlmann (2018), Most Likely
+  Transformations, \emph{Scandinavian Journal of Statistics}, \bold{45}(1),
+  110--134, \doi{10.1111/sjos.12291}.
+
 }
 \examples{
 

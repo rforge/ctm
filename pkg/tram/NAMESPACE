@@ -29,5 +29,3 @@ S3method("model.frame", "tram")
 S3method("print", "tram")
 S3method("print", "summary.tram")
 S3method("plot", "tram")
-
-

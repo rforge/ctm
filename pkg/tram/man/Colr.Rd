@@ -59,6 +59,10 @@ An object of class \code{Colr}, with corresponding \code{coef},
   Distributions, \emph{F1000Research}, \bold{6}(1933),
   \doi{10.12688/f1000research.12934.1}.
 
+  Torsten Hothorn, Lisa Moest, Peter Buehlmann (2018), Most Likely
+  Transformations, \emph{Scandinavian Journal of Statistics}, \bold{45}(1),
+  110--134, \doi{10.1111/sjos.12291}.
+
 }
 \examples{
 
