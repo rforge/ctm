@@ -2,7 +2,16 @@
 \name{NEWS}
 \title{NEWS file for the mlt.docreg package}
 
-\section{Changes in Version 0.2-2 (2018-02-23)}{
+\section{Changes in Version 1.0-0 (2018-03-07)}{
+  \itemize{
+    \item{A paper describing version 1.0-0 of the \pkg{mlt}, \pkg{basefun}, and
+          \pkg{variables} packages was accepted for publication in the Journal of
+          Statistical Software 2018-03-05.}
+    \item{Documentation updates.}
+  }
+}
+
+\section{Changes in Version 0.2-2 (2018-02-27)}{
   \itemize{
     \item{Update to \pkg{mlt} 0.2-2.}
     \item{Vignette updates; add link to simpler interfaces

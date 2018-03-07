@@ -18,8 +18,6 @@
 
 \newcommand{\cmd}[1]{\texttt{#1()}}
 
-\newcommand{\NEW}[1]{{\color{red} #1}}
-%%%\newcommand{\NEW}[1]{{#1}}
 
 \usepackage{tikz}
 \usetikzlibrary{shapes,arrows,chains}
@@ -140,10 +138,10 @@ truncation}
 year <- substr(packageDescription("mlt.docreg")$Date, 1, 4)
 version <- packageDescription("mlt.docreg")$Version
 @
-\footnote{Please cite this document as: Torsten Hothorn (\Sexpr{year})
+\footnote{Please cite this document as: Torsten Hothorn (2018)
 Most Likely Transformations: The \pkg{mlt} Package. 
-R package vignette version \Sexpr{version}, 
-URL \url{https://CRAN.R-project.org/package=mlt.docreg}.}
+\emph{Journal of Statistical Software}, accepted for publication 2018-03-05,
+URL \url{https://CRAN.R-project.org/package=mlt}.}
 
 % \input{todo}
 
@@ -166,10 +164,10 @@ duty shall be to go back to the original concepts and search for ways how to
 reawake them for the benefit of a simpler understanding of statistical
 models and concepts.
 
-\NEW{The Leitmotiv of our discipline is to foster empirical research by
+The Leitmotiv of our discipline is to foster empirical research by
 providing tools for the characterisation of deterministic and random
 aspects of natural phenomena through distributions estimated from
-experimental or observational data.}
+experimental or observational data.
 This paper describes an attempt to understand and unify a large class of
 statistical models as models for unconditional or conditional distributions.  This sounds like an
 implicitness, but do we really practice (in courses on applied statistics or
@@ -214,7 +212,7 @@ and never real numbers $\ry$, the exact likelihood is, as originally
 which requires simultaneous optimisation of all three model parameters $\alpha$, 
 $\shiftparm$ and $\sigma$ but is exact also under other forms of random censoring. 
 This exact likelihood is another prominent example of its approximation (via the
-log-density $(y - \alpha - \tilde{\rx}^\top)^2$) winning over the basic
+log-density $(y - \alpha - \tilde{\rx}^\top \shiftparm)^2$) winning over the basic
 concept, see \cite{Lindsey_1996, Lindsey_1999}. If we were going to reformulate the model
 a little further to
 \begin{eqnarray*}
@@ -262,12 +260,12 @@ transformation function $\h$, we slightly rephrase the title ``An Analysis
 of Transformations'' of the first paper on this subject \citep{BoxCox_1964}
 and refer to the methods presented in this paper as \textit{transformation
 analysis}.  
-\NEW{Different choices of $\pZ$ and different parameterisations of $\h$ in
+Different choices of $\pZ$ and different parameterisations of $\h$ in
 model~(\ref{mod:ctm}) relate to specific transformation models, including the
 normal linear model, proportional hazards (Cox) and proportional odds
 models for continuous or ordinal responses, parametric models for survival
 regression, such as the Weibull or log-normal model, distribution regression models
-or survival models with time-varying effects and much more.}
+or survival models with time-varying effects and much more.
 We describe how members of the large class of conditional transformation models can be
 specified, fitted by maximising the likelihood \citep[using the estimator
 developed by][]{Hothorn_Moest_Buehlmann_2017}, and analysed in \proglang{R}
@@ -284,7 +282,7 @@ package \citep{pkg:variables}.  These models are then fitted to data by
 
 
 
-\NEW{The general workflow of working with the \pkg{mlt} package and the
+The general workflow of working with the \pkg{mlt} package and the
 organisation of this document follow the general principles of model
 specification, model estimation, model diagnostics and interpretation and,
 finally, model inference.  The flowchart in Figure~\ref{fig:workflow} links
@@ -296,7 +294,7 @@ presented along the way, and we refer the reader to
 \cite{Hothorn_Moest_Buehlmann_2017} for the theoretical foundations. 
 Technical issues about the three packages \pkg{variables}, \pkg{basefun},
 and \pkg{mlt} involved are explained in Appendices~\ref{app:variables},
-\ref{app:basefun}, and \ref{app:mlt}.}
+\ref{app:basefun}, and \ref{app:mlt}.
 
 
 \begin{figure}
@@ -371,9 +369,9 @@ Appendix~\ref{app:variables} \pkg{pkg:variables}};
          and organisation of this document. \label{fig:workflow}}
 \end{figure}
 
-\NEW{Before we start looking at more complex models and associated
+Before we start looking at more complex models and associated
 conceptual and technical details, we illustrate the workflow by means of
-an example from unconditional density estimation.}
+an example from unconditional density estimation.
 
 \paragraph{Density Estimation: Old Faithful Geyser Data}
 
@@ -697,9 +695,9 @@ in Figure~\ref{fig:geyser-w-plot} where two Bernstein polynomials of order $M = 
 $M = 40$ are compared on the scale of the distribution function (left panel) and density
 function (right panel). It is hardly possible to notice the difference in probabilities
 but the more flexible model features a more erratic density estimate, but not overly so.
-\NEW{The subjective recommendation of choosing $M$ between $5$ and $10$ is
+The subjective recommendation of choosing $M$ between $5$ and $10$ is
 based on the quite remarkable flexibility of distributions in this range and
-still managable computing times for the corresponding maximum-likelihood estimator.}
+still managable computing times for the corresponding maximum-likelihood estimator.
 %% The corresponding AIC values are $\Sexpr{round(AIC(mlt_w),1)}$ 
 %% for $M = 8$ and $\Sexpr{round(AIC(mlt_w_40),1)}$ for $M = 40$ favouring the smaller model.
 
@@ -2393,7 +2391,7 @@ the unorthodox presentation of regression models ignoring the fences between
 the traditionally compartmentalised fields of ``regression analysis'',
 ``survival analysis'', or ``categorical data analysis'' in this documentation
 of \pkg{mlt} will likely also confuse many statisticians, let alone data or
-subject-matter scientists.  \NEW{Current efforts concentrate on the
+subject-matter scientists.  Current efforts concentrate on the
 implementation of convenience interfaces, \ie higher-level user interfaces
 for special forms of transformation models, which resemble the traditional
 notational and naming conventions from the statistical modelling literature. 
@@ -2402,7 +2400,7 @@ of Cox models, parametric survival models, models for ordered categorical
 data, normal linear and non-normal linear models are available in package
 \pkg{tram} \citep{pkg:tram}.  The corresponding package vignette
 demonstrates how some of the model outputs presented in this paper can be
-obtained in simpler ways.}
+obtained in simpler ways.
 
 \bibliography{mlt,packages}
 
@@ -2908,8 +2906,6 @@ cat(x, sep = "\n", file = "packages.bib", append = FALSE)
 objs <- ls()
 mltobj <- objs[grep("^mlt_", objs)]
 sapply(mltobj, function(m) eval(parse(text = paste("coef(", m, ")"))))
-#library("mlt.docreg")
-#sapply(mltobj, function(m) eval(parse(text = paste("checkGH(", m, ")"))))
 @
 
 <<sessionInfo, echo = FALSE, results = "hide">>=

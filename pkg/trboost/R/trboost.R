@@ -153,6 +153,10 @@ trboost <- function(model, formula, data = list(), na.action = na.omit, weights 
             } else {
                 chk <- all(ui %*% t(nu * X %*% G + lastparm) - ci >= -.Machine$double.eps)
             }
+            ### <FIXME> make constraints adaptive such that
+            ### ui %*% t(nu * X %*% G + lastparm) - ci >= -.Machine$double.eps
+            ### but not ui %*% t(X %*% G) >= ci
+            ### better samples from Xi (factors???)
             if (!chk) {
                 Xs2 <- as.vector(t(Xs))
                 ### G <- solve.QP(XtX2, Xs2, t(kronecker(Xi[ix,], ui)))$solution

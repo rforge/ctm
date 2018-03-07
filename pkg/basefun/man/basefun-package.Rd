@@ -9,8 +9,13 @@
 
   The package was written to support the \pkg{mlt}
   package and will be of limited use outside this package.
-  The user interface is not yet stable, so please be careful using 
-  \pkg{basefun} in your package.
+}
+\references{
+
+  Torsten Hothorn (2018), Most Likely Transformations: The mlt Package,
+  \emph{Journal of Statistical Software}, forthcoming. URL: 
+  \url{https://cran.r-project.org/web/packages/mlt.docreg/vignettes/mlt.pdf}
+
 }
 \author{
   This package is authored by Torsten Hothorn <Torsten.Hothorn@R-project.org>.

@@ -1,0 +1,684 @@
+
+R version 3.4.3 (2017-11-30) -- "Kite-Eating Tree"
+Copyright (C) 2017 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> ## ----setup, echo = FALSE, results = "hide", message = FALSE--------------
+> set.seed(290875)
+> 
+> sapply(c("tram", "survival", "MASS", "lattice", "mlbench", 
++          "multcomp", "ordinal", "colorspace", "quantreg", "trtf", "ATR"), library, char = TRUE)
+Loading required package: mlt
+Loading required package: basefun
+Loading required package: variables
+
+Attaching package: ‘MASS’
+
+The following object is masked _by_ ‘.GlobalEnv’:
+
+    geyser
+
+Loading required package: mvtnorm
+Loading required package: TH.data
+
+Attaching package: ‘TH.data’
+
+The following object is masked _by_ ‘.GlobalEnv’:
+
+    GBSG2
+
+The following object is masked from ‘package:MASS’:
+
+    geyser
+
+Loading required package: SparseM
+
+Attaching package: ‘SparseM’
+
+The following object is masked from ‘package:base’:
+
+    backsolve
+
+
+Attaching package: ‘quantreg’
+
+The following object is masked from ‘package:survival’:
+
+    untangle.specials
+
+Loading required package: partykit
+Loading required package: grid
+
+Attaching package: ‘grid’
+
+The following object is masked from ‘package:variables’:
+
+    unit
+
+Loading required package: libcoin
+Loading required package: rpart
+$tram
+ [1] "tram"      "mlt"       "basefun"   "variables" "stats"     "graphics" 
+ [7] "grDevices" "utils"     "datasets"  "methods"   "base"     
+
+$survival
+ [1] "survival"  "tram"      "mlt"       "basefun"   "variables" "stats"    
+ [7] "graphics"  "grDevices" "utils"     "datasets"  "methods"   "base"     
+
+$MASS
+ [1] "MASS"      "survival"  "tram"      "mlt"       "basefun"   "variables"
+ [7] "stats"     "graphics"  "grDevices" "utils"     "datasets"  "methods"  
+[13] "base"     
+
+$lattice
+ [1] "lattice"   "MASS"      "survival"  "tram"      "mlt"       "basefun"  
+ [7] "variables" "stats"     "graphics"  "grDevices" "utils"     "datasets" 
+[13] "methods"   "base"     
+
+$mlbench
+ [1] "mlbench"   "lattice"   "MASS"      "survival"  "tram"      "mlt"      
+ [7] "basefun"   "variables" "stats"     "graphics"  "grDevices" "utils"    
+[13] "datasets"  "methods"   "base"     
+
+$multcomp
+ [1] "multcomp"  "TH.data"   "mvtnorm"   "mlbench"   "lattice"   "MASS"     
+ [7] "survival"  "tram"      "mlt"       "basefun"   "variables" "stats"    
+[13] "graphics"  "grDevices" "utils"     "datasets"  "methods"   "base"     
+
+$ordinal
+ [1] "ordinal"   "multcomp"  "TH.data"   "mvtnorm"   "mlbench"   "lattice"  
+ [7] "MASS"      "survival"  "tram"      "mlt"       "basefun"   "variables"
+[13] "stats"     "graphics"  "grDevices" "utils"     "datasets"  "methods"  
+[19] "base"     
+
+$colorspace
+ [1] "colorspace" "ordinal"    "multcomp"   "TH.data"    "mvtnorm"   
+ [6] "mlbench"    "lattice"    "MASS"       "survival"   "tram"      
+[11] "mlt"        "basefun"    "variables"  "stats"      "graphics"  
+[16] "grDevices"  "utils"      "datasets"   "methods"    "base"      
+
+$quantreg
+ [1] "quantreg"   "SparseM"    "colorspace" "ordinal"    "multcomp"  
+ [6] "TH.data"    "mvtnorm"    "mlbench"    "lattice"    "MASS"      
+[11] "survival"   "tram"       "mlt"        "basefun"    "variables" 
+[16] "stats"      "graphics"   "grDevices"  "utils"      "datasets"  
+[21] "methods"    "base"      
+
+$trtf
+ [1] "trtf"       "partykit"   "rpart"      "libcoin"    "grid"      
+ [6] "quantreg"   "SparseM"    "colorspace" "ordinal"    "multcomp"  
+[11] "TH.data"    "mvtnorm"    "mlbench"    "lattice"    "MASS"      
+[16] "survival"   "tram"       "mlt"        "basefun"    "variables" 
+[21] "stats"      "graphics"   "grDevices"  "utils"      "datasets"  
+[26] "methods"    "base"      
+
+$ATR
+ [1] "ATR"        "trtf"       "partykit"   "rpart"      "libcoin"   
+ [6] "grid"       "quantreg"   "SparseM"    "colorspace" "ordinal"   
+[11] "multcomp"   "TH.data"    "mvtnorm"    "mlbench"    "lattice"   
+[16] "MASS"       "survival"   "tram"       "mlt"        "basefun"   
+[21] "variables"  "stats"      "graphics"   "grDevices"  "utils"     
+[26] "datasets"   "methods"    "base"      
+
+> 
+> 
+> trellis.par.set(list(plot.symbol = list(col=1,pch=20, cex=0.7),
++                      box.rectangle = list(col=1),
++                      box.umbrella = list(lty=1, col=1),
++                      strip.background = list(col = "white")))
+Warning message:
+In trellis.par.set(list(plot.symbol = list(col = 1, pch = 20, cex = 0.7),  :
+  Note: The default device has been opened to honour attempt to modify trellis settings
+> ltheme <- canonical.theme(color = FALSE)     ## in-built B&W theme
+> ltheme$strip.background$col <- "transparent" ## change strip bg
+> lattice.options(default.theme = ltheme)
+> 
+> knitr::opts_chunk$set(echo = TRUE, results = 'markup', error = FALSE,
++                       warning = FALSE, message = FALSE,
++                       tidy = FALSE, cache = FALSE, size = "small",
++                       fig.width = 6, fig.height = 4, fig.align = "center",
++                       out.width = NULL, ###'.6\\linewidth', 
++                       out.height = NULL,
++                       fig.scap = NA)
+> knitr::render_sweave()  # use Sweave environments
+> knitr::set_header(highlight = '')  # do not \usepackage{Sweave}
+> ## R settings
+> options(prompt = "R> ", continue = "+  ", useFancyQuotes = FALSE)  # JSS style
+R> options(width = 75)
+R> library("colorspace")
+R> col <- diverge_hcl(2, h = c(246, 40), c = 96, l = c(65, 90))
+R> fill <- diverge_hcl(2, h = c(246, 40), c = 96, l = c(65, 90), alpha = .3)
+R> 
+R> ## ----citation, echo = FALSE----------------------------------------------
+R> year <- substr(packageDescription("tram")$Date, 1, 4)
+R> version <- packageDescription("tram")$Version
+R> 
+R> ## ----tram, echo = TRUE, eval = FALSE-------------------------------------
+R> ## tram(y | s ~ x, ...)
+R> 
+R> ## ----BostonHousing-lm----------------------------------------------------
+R> data("BostonHousing2", package = "mlbench")
+R> lm_BH <- lm(cmedv ~ crim + zn + indus + chas + nox + rm + age + dis + 
++              rad + tax + ptratio + b + lstat, data = BostonHousing2)
+R> 
+R> ## ----BostonHousing-numeric, echo = FALSE---------------------------------
+R> BostonHousing2$rad <- as.numeric(BostonHousing2$rad)
+R> BostonHousing2$tax <- as.numeric(BostonHousing2$tax)
+R> 
+R> ## ----BostonHousing-Lm1, cache = TRUE-------------------------------------
+R> Lm_BH_1 <- Lm(cmedv ~ crim + zn + indus + chas + nox + rm + age + dis + 
++                rad + tax + ptratio + b + lstat, data = BostonHousing2)
+R> 
+R> ## ----BostonHousing-logLik------------------------------------------------
+R> logLik(lm_BH)
+'log Lik.' -1494.245 (df=15)
+R> logLik(Lm_BH_1)
+'log Lik.' -1494.245 (df=15)
+R> 
+R> ## ----BostonHousing-coef--------------------------------------------------
+R> coef(lm_BH)
+  (Intercept)          crim            zn         indus         chas1 
+ 3.637189e+01 -1.062004e-01  4.772368e-02  2.325237e-02  2.691727e+00 
+          nox            rm           age           dis           rad 
+-1.774262e+01  3.789395e+00  5.749168e-04 -1.501794e+00  3.037606e-01 
+          tax       ptratio             b         lstat 
+-1.270462e-02 -9.239118e-01  9.228445e-03 -5.306619e-01 
+R> coef(Lm_BH_1, as.lm = TRUE)
+  (Intercept)          crim            zn         indus         chas1 
+ 3.636982e+01 -1.062027e-01  4.772448e-02  2.324320e-02  2.691722e+00 
+          nox            rm           age           dis           rad 
+-1.774153e+01  3.789503e+00  5.738338e-04 -1.501794e+00  3.037523e-01 
+          tax       ptratio             b         lstat 
+-1.270440e-02 -9.238719e-01  9.228803e-03 -5.306558e-01 
+attr(,"scale")
+   cmedv 
+4.637222 
+R> 
+R> ## ----BostonHousing-sd----------------------------------------------------
+R> summary(lm_BH)$sigma
+[1] 4.702737
+R> 1 / coef(Lm_BH_1, with_baseline = TRUE)["cmedv"]
+   cmedv 
+4.637222 
+R> 
+R> ## ----BostonHousing-Lm2, cache = TRUE-------------------------------------
+R> BostonHousing2$y <- with(BostonHousing2, Surv(cmedv, cmedv < 50))
+R> Lm_BH_2 <- Lm(y ~ crim + zn + indus + chas + nox + 
++                rm + age + dis + rad + tax + ptratio + b + lstat, 
++                data = BostonHousing2)
+R> logLik(Lm_BH_2)
+'log Lik.' -1496.301 (df=15)
+R> 
+R> ## ----BostonHousing-Lm3, cache = TRUE-------------------------------------
+R> Lm_BH_3 <- Lm(y | 0 + chas ~ crim + zn + indus + nox + 
++                rm + age + dis + rad + tax + ptratio + b + lstat, 
++                data = BostonHousing2)
+R> logLik(Lm_BH_3)
+'log Lik.' -1478.452 (df=16)
+R> 
+R> ## ----BostonHousing-chas-coef---------------------------------------------
+R> 1 / coef(Lm_BH_3, with_baseline = TRUE)[c(2, 4)]
+ y:chas0  y:chas1 
+4.132790 7.156279 
+R> 
+R> ## ----BostonHousing-chas-glht---------------------------------------------
+R> summary(glht(as.mlt(Lm_BH_3), linfct = c("y:chas0 - y:chas1 = 0")))
+
+	 Simultaneous Tests for General Linear Hypotheses
+
+Fit: Lm(formula = y | 0 + chas ~ crim + zn + indus + nox + rm + age + 
+    dis + rad + tax + ptratio + b + lstat, data = BostonHousing2)
+
+Linear Hypotheses:
+                       Estimate Std. Error z value Pr(>|z|)    
+y:chas0 - y:chas1 == 0  0.10223    0.01497   6.829 8.55e-12 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+(Adjusted p values reported -- single-step method)
+
+R> 
+R> ## ----BostonHousing-Lm4, cache = TRUE-------------------------------------
+R> Lm_BH_4 <- Lm(y | 0 + chas + crim + zn + indus + nox + 
++                rm + age + dis + rad + tax + ptratio + b + lstat ~ 0, 
++                data = BostonHousing2)
+Warning messages:
+1: In model.matrix.box_bases(object = list(iresponse = function (data,  :
+  use scale = TRUE in as.basis.formula with sumcontr = TRUE
+2: In model.matrix.box_bases(object = list(iresponse = function (data,  :
+  use scale = TRUE in as.basis.formula with sumcontr = TRUE
+3: In model.matrix.box_bases(object = list(iresponse = function (data,  :
+  use scale = TRUE in as.basis.formula with sumcontr = TRUE
+4: In model.matrix.box_bases(object = list(iresponse = function (data,  :
+  use scale = TRUE in as.basis.formula with sumcontr = TRUE
+5: In model.matrix.box_bases(object = list(iresponse = function (data,  :
+  use scale = TRUE in as.basis.formula with sumcontr = TRUE
+6: In model.matrix.box_bases(object = list(iresponse = function (data,  :
+  use scale = TRUE in as.basis.formula with sumcontr = TRUE
+7: In model.matrix.box_bases(object = list(iresponse = function (data,  :
+  use scale = TRUE in as.basis.formula with sumcontr = TRUE
+R> logLik(Lm_BH_4)
+'log Lik.' -1300.693 (df=28)
+R> 
+R> ## ----BostonHousing-BC-1, cache = TRUE------------------------------------
+R> BC_BH_1 <- BoxCox(y ~ chas + crim + zn + indus + nox + 
++                    rm + age + dis + rad + tax + ptratio + b + lstat, 
++                    data = BostonHousing2)
+R> logLik(BC_BH_1)
+'log Lik.' -1324.651 (df=20)
+R> 
+R> ## ----BostonHousing-BC-1-plot---------------------------------------------
+R> nd <- model.frame(BC_BH_1)[1,-1,drop = FALSE]
+R> plot(BC_BH_1, which = "baseline only", newdata = nd, col = col,
++       confidence = "interval", fill = fill, lwd = 2,
++       xlab = "Median Value", ylab = expression(h[Y]))
+R> 
+R> ## ----BostonHousing-BC-2, cache = TRUE------------------------------------
+R> BC_BH_2 <- BoxCox(y | 0 + chas ~ crim + zn + indus + nox + 
++                    rm + age + dis + rad + tax + ptratio + b + lstat, 
++                    data = BostonHousing2)
+R> logLik(BC_BH_2)
+'log Lik.' -1319.249 (df=26)
+R> 
+R> ## ----BostonHousing-BC-2-plot---------------------------------------------
+R> nd <- model.frame(BC_BH_2)[1:2, -1]
+R> nd$chas <- factor(c("0", "1"))
+R> plot(BC_BH_2, which = "baseline only", newdata = nd, col = col,
++       confidence = "interval", fill = fill, lwd = 2,
++       xlab = "Median Value", ylab = expression(h[Y]))
+R> legend("bottomright", lty = 1, col = col, 
++         title = "Near Charles River", legend = c("no", "yes"), bty = "n")
+R> 
+R> ## ----BostonHousing-Lm-3-plot---------------------------------------------
+R> plot(Lm_BH_3, which = "baseline only", newdata = nd, col = col,
++       confidence = "interval", fill = fill, lwd = 2)
+R> legend("bottomright", lty = 1, col = col, 
++         title = "Near Charles River", legend = c("no", "yes"), bty = "n")
+R> 
+R> ## ----BostonHousing-BC-3, eval = FALSE------------------------------------
+R> ## BoxCox(y | 0 + chas + crim + zn + indus + nox +
+R> ##        rm + age + dis + rad + tax + ptratio + b + lstat ~ 0,
+R> ##        data = BostonHousing2)
+R> 
+R> ## ----BostonHousing-Colr-1, cache = TRUE----------------------------------
+R> Colr_BH_1 <- Colr(y | 0 + chas ~ crim + zn + indus + nox + 
++                    rm + age + dis + rad + tax + ptratio + b + lstat, 
++                    data = BostonHousing2)
+R> logLik(Colr_BH_1)
+'log Lik.' -1292.479 (df=26)
+R> 
+R> ## ----BostonHousing-Colr-CI, cache = TRUE---------------------------------
+R> round(cbind(exp(coef(Colr_BH_1)), exp(confint(Colr_BH_1))), 3)
+                  2.5 %    97.5 %
+crim       1.085  1.056     1.115
+zn         0.990  0.980     0.999
+indus      0.973  0.933     1.015
+nox     1089.637 59.160 20069.436
+rm         0.209  0.136     0.323
+age        1.010  1.000     1.021
+dis        1.659  1.424     1.934
+rad        0.883  0.841     0.927
+tax        1.007  1.004     1.009
+ptratio    1.494  1.359     1.643
+b          0.994  0.992     0.996
+lstat      1.323  1.256     1.394
+R> 
+R> ## ----BostonHousing-Colr-1-plot, echo = FALSE-----------------------------
+R> nd <- BostonHousing2
+R> nd$y <- NULL
+R> q <- 0:50
+R> d <- predict(Colr_BH_1, newdata = nd, q = q, which = "distribution", type="distribution")
+R> lp <- c(predict(Colr_BH_1, newdata = nd, type = "lp"))
+R> nd2 <- expand.grid(q = q, lp = -lp)
+R> nd2$d <- c(d)
+R> nd2$chas <- rep(nd$chas, rep(length(q), length(lp)))
+R> BHtmp <- BostonHousing2
+R> levels(BHtmp$chas) <- levels(nd2$chas) <- levels(nd$chas) <- c("Off Charles River", "Near Charles River")
+R> pfun <- function(x, y, z, subscripts, at, ...) {
++      panel.contourplot(x, y, z, subscripts, at = 1:9/10, ...)
++      ch <- as.character(unique(nd2$chas[subscripts]))
++      panel.xyplot(x = -lp[nd$chas == ch], y = subset(BHtmp, chas == ch)$cmedv, pch = 20, 
++                   col = rgb(.1, .1, .1, .2))   
++  }
+R> plot(contourplot(d ~ lp + q | chas, data = nd2, panel = pfun, xlab = "Linear predictor", 
++       ylab = "Median Value", col = col[1]))#, main = "Continuous Outcome Logistic Regression"))
+R> 
+R> ## ----BostonHousing-rq-1, cache = TRUE------------------------------------
+R> tau <- 2:18 / 20
+R> fm <- cmedv ~ crim + zn + indus + chas + nox + rm + age + dis + 
++                rad + tax + ptratio + b + lstat
+R> rq_BH_1 <- lapply(tau, function(p) rq(fm, data = BostonHousing2, tau = p))
+Warning message:
+In rq.fit.br(x, y, tau = tau, ...) : Solution may be nonunique
+R> Colr_BH_2 <- Colr(cmedv | crim + zn + indus + chas + nox + rm + age + dis + 
++                    rad + tax + ptratio + b + lstat ~ 0, 
++                    data = BostonHousing2, order = 2)
+Warning messages:
+1: In model.matrix.box_bases(object = list(iresponse = function (data,  :
+  use scale = TRUE in as.basis.formula with sumcontr = TRUE
+2: In model.matrix.box_bases(object = list(iresponse = function (data,  :
+  use scale = TRUE in as.basis.formula with sumcontr = TRUE
+3: In model.matrix.box_bases(object = list(iresponse = function (data,  :
+  use scale = TRUE in as.basis.formula with sumcontr = TRUE
+4: In model.matrix.box_bases(object = list(iresponse = function (data,  :
+  use scale = TRUE in as.basis.formula with sumcontr = TRUE
+5: In model.matrix.box_bases(object = list(iresponse = function (data,  :
+  use scale = TRUE in as.basis.formula with sumcontr = TRUE
+R> 
+R> ## ----BostonHousing-rq-1-plot, echo = FALSE, fig.width = 9, fig.height = 9----
+R> idx <- order(BostonHousing2$cmedv)[ceiling(1:9/10 * NROW(BostonHousing2))]
+R> layout(matrix(1:9, nrow = 3))
+R> for (i in idx) {
++    qrq <- sapply(rq_BH_1, function(x) predict(x, newdata = BostonHousing2[i,]))
++    nd <- BostonHousing2[i,]
++    nd$cmedv <- NULL
++    plot(Colr_BH_2, newdata = nd, which = "distribution", type = "distribution", 
++         q = 5:36, main = paste("Obs.", i), ylab = "Distribution", xlab =
++         "Median Value", col = col[1], lwd = 2)
++    points(qrq, tau, type = "b", col = col[2], cex = 1.5)
++    arrows(BostonHousing2[i, "cmedv"], 0, BostonHousing2[i, "cmedv"], .2,
++           length = .15, angle = 15)
++  #  abline(v = BostonHousing2[i, "cmedv"])
++  }
+R> 
+R> ## ----GBSG2-Weibull-1, cache = TRUE---------------------------------------
+R> data("GBSG2", package = "TH.data")
+R> Survreg_GBSG2_1 <- Survreg(Surv(time, cens) ~ horTh, data = GBSG2)
+R> logLik(Survreg_GBSG2_1)
+'log Lik.' -2632.096 (df=3)
+R> survreg_GBSG2_1 <- survreg(Surv(time, cens) ~ horTh, data = GBSG2)
+R> logLik(survreg_GBSG2_1)
+'log Lik.' -2632.096 (df=3)
+R> 
+R> ## ----GBSG2-Weibull-coef--------------------------------------------------
+R> c(coef(Survreg_GBSG2_1),
++    coef(survreg_GBSG2_1)["horThyes"] / survreg_GBSG2_1$scale)
+ horThyes  horThyes 
+0.3932393 0.3932403 
+R> 
+R> ## ----GBSG2-Weibull-ci----------------------------------------------------
+R> exp(-rev(confint(Survreg_GBSG2_1)))
+[1] 0.5284035 0.8619280
+R> 
+R> ## ----GBSG2-Weibull-1-plot------------------------------------------------
+R> nd <- data.frame(horTh = factor(c("no", "yes")))
+R> plot(Survreg_GBSG2_1, newdata = nd, which = "distribution", 
++       type = "survivor", confidence = "interval", fill = fill, 
++       col = col, ylab = "Probability", xlab = "Survival Time")
+R> legend("bottomleft", lty = 1, title = "Hormonal Therapy", 
++         legend = levels(nd$horTh), bty = "n", col = col)
+R> 
+R> ## ----GBSG2-Weibull-2, cache = TRUE---------------------------------------
+R> Survreg_GBSG2_2 <- Survreg(Surv(time, cens) | 0 + horTh ~ 1, data = GBSG2)
+R> logLik(Survreg_GBSG2_2)
+'log Lik.' -2632.086 (df=4)
+R> survreg_GBSG2_2 <- survreg(Surv(time, cens) ~ strata(horTh) + horTh - 1, 
++                             data = GBSG2)
+R> logLik(survreg_GBSG2_2)
+'log Lik.' -2632.086 (df=4)
+R> coef(Survreg_GBSG2_2, with_baseline = TRUE)
+           (Intercept):horThno  log(Surv(time, cens)):horThno 
+                     -9.736006                       1.279324 
+          (Intercept):horThyes log(Surv(time, cens)):horThyes 
+                    -10.273829                       1.299109 
+R> c(1 / survreg_GBSG2_2$scale, -coef(survreg_GBSG2_2) / 
++                                survreg_GBSG2_2$scale)
+        no        yes    horThno   horThyes 
+  1.279328   1.299123  -9.736037 -10.273925 
+R> 
+R> ## ----GBSG2-Cox-1, cache = TRUE-------------------------------------------
+R> Coxph_GBSG2_1 <- Coxph(Surv(time, cens) ~ horTh, data = GBSG2)
+R> logLik(Coxph_GBSG2_1)
+'log Lik.' -2625.626 (df=8)
+R> coef(Coxph_GBSG2_1)
+  horThyes 
+-0.3708811 
+R> 
+R> ## ----GBSG2-Cox-2, cache = TRUE-------------------------------------------
+R> Coxph_GBSG2_2 <- Coxph(Surv(time, cens) | 0 + horTh ~ 1 , data = GBSG2)
+R> logLik(Coxph_GBSG2_2)
+'log Lik.' -2624.904 (df=14)
+R> 
+R> ## ----GBSG2-Cox-1-plot----------------------------------------------------
+R> plot(survfit(Surv(time, cens) ~ horTh, data = GBSG2), col = col, 
++       ylab = "Probability", xlab = "Survival Time")
+R> plot(Coxph_GBSG2_1, newdata = nd, which = "distribution", 
++       type = "survivor", col = col, add = TRUE, lty = 1)
+R> plot(Coxph_GBSG2_2, newdata = nd, which = "distribution", 
++       type = "survivor", col = col, add = TRUE, lty = 2)
+R> legend("bottomleft", lty = 1, title = "Hormonal Therapy", 
++         legend = levels(nd$horTh), bty = "n", col = col)
+R> 
+R> ## ----wine-polr-----------------------------------------------------------
+R> data("wine", package = "ordinal")
+R> polr_wine <- polr(rating ~ temp + contact, data = wine)
+R> logLik(polr_wine)
+'log Lik.' -86.49192 (df=6)
+R> coef(polr_wine)
+  tempwarm contactyes 
+  2.503073   1.527786 
+R> 
+R> ## ----wine-clm-1, cache = TRUE--------------------------------------------
+R> clm_wine_1 <- clm(rating ~ temp + contact, data = wine)
+R> logLik(clm_wine_1)
+'log Lik.' -86.49192 (df=6)
+R> coef(clm_wine_1)
+       1|2        2|3        3|4        4|5   tempwarm contactyes 
+ -1.344383   1.250809   3.466887   5.006404   2.503102   1.527798 
+R> 
+R> ## ----wine-Polr-1, cache = TRUE-------------------------------------------
+R> Polr_wine_1 <- Polr(rating ~ temp + contact, data = wine)
+R> logLik(Polr_wine_1)
+'log Lik.' -86.49192 (df=6)
+R> coef(Polr_wine_1, with_baseline = TRUE)
+   rating1    rating2    rating3    rating4   tempwarm contactyes 
+ -1.344383   1.250808   3.466887   5.006404   2.503102   1.527798 
+R> 
+R> ## ----wine-clm-2, cache = TRUE--------------------------------------------
+R> clm_wine_2 <- clm(rating ~ temp, nominal = ~ contact, data = wine)
+R> logLik(clm_wine_2)
+'log Lik.' -86.20855 (df=9)
+R> coef(clm_wine_2)
+1|2.(Intercept) 2|3.(Intercept) 3|4.(Intercept) 4|5.(Intercept) 
+      -1.323043        1.246444        3.550044        4.660247 
+ 1|2.contactyes  2|3.contactyes  3|4.contactyes  4|5.contactyes 
+      -1.615059       -1.511567       -1.674756       -1.050623 
+       tempwarm 
+       2.519045 
+R> 
+R> ## ----wine-Polr-2, cache = TRUE-------------------------------------------
+R> Polr_wine_2 <- Polr(rating | 1 + contact ~ temp, data = wine)
+R> logLik(Polr_wine_2)
+'log Lik.' -86.20855 (df=9)
+R> coef(Polr_wine_2, with_baseline = TRUE)
+rating1:(Intercept) rating2:(Intercept) rating3:(Intercept) 
+          -1.323025            1.246455            3.550072 
+rating4:(Intercept)  rating1:contactyes  rating2:contactyes 
+           4.660264           -1.615099           -1.511602 
+ rating3:contactyes  rating4:contactyes            tempwarm 
+          -1.674781           -1.050617            2.519071 
+R> 
+R> ## ----wine-clm-3, cache = TRUE--------------------------------------------
+R> clm_wine_3 <- clm(rating ~ temp, nominal = ~ contact, data = wine, 
++                    link = "probit")
+R> logLik(clm_wine_3)
+'log Lik.' -85.32668 (df=9)
+R> coef(clm_wine_3)
+1|2.(Intercept) 2|3.(Intercept) 3|4.(Intercept) 4|5.(Intercept) 
+     -0.7829404       0.7521184       2.1322657       2.7543749 
+ 1|2.contactyes  2|3.contactyes  3|4.contactyes  4|5.contactyes 
+     -0.8229143      -0.8892051      -1.0093661      -0.5818493 
+       tempwarm 
+      1.5113822 
+R> 
+R> ## ----wine-Polr-3, cache = TRUE-------------------------------------------
+R> Polr_wine_3 <- Polr(rating | 1 + contact ~ temp, data = wine, 
++                      method = "probit")
+R> logLik(Polr_wine_3)
+'log Lik.' -85.32668 (df=9)
+R> coef(clm_wine_3)
+1|2.(Intercept) 2|3.(Intercept) 3|4.(Intercept) 4|5.(Intercept) 
+     -0.7829404       0.7521184       2.1322657       2.7543749 
+ 1|2.contactyes  2|3.contactyes  3|4.contactyes  4|5.contactyes 
+     -0.8229143      -0.8892051      -1.0093661      -0.5818493 
+       tempwarm 
+      1.5113822 
+R> 
+R> ## ----wine-censored-------------------------------------------------------
+R> erating <- wine$rating
+R> lrating <- erating
+R> rrating <- erating
+R> l9 <- lrating[wine$judge == 9] 
+R> l9[l9 > 1] <- levels(l9)[unclass(l9[l9 > 1]) - 1]
+R> r9 <- rrating[wine$judge == 9] 
+R> r9[r9 < 5] <- levels(r9)[unclass(r9[r9 < 5]) + 1]
+R> lrating[wine$judge != 9] <- rrating[wine$judge != 9] <- NA
+R> erating[wine$judge == 9] <- NA
+R> lrating[wine$judge == 9] <- l9
+R> rrating[wine$judge == 9] <- r9
+R> which(wine$judge == 9)
+[1] 65 66 67 68 69 70 71 72
+R> (wine$crating <- R(erating, cleft = lrating, cright = rrating))
+ [1] (1, 2]  (2, 3]  (2, 3]  (3, 4]  (3, 4]  (3, 4]  (4, NA] (4, NA]
+ [9] (NA, 1] (1, 2]  (NA, 1] (2, 3]  (1, 2]  (2, 3]  (4, NA] (3, 4] 
+[17] (1, 2]  (2, 3]  (2, 3]  (1, 2]  (4, NA] (4, NA] (3, 4]  (3, 4] 
+[25] (2, 3]  (1, 2]  (2, 3]  (1, 2]  (2, 3]  (1, 2]  (4, NA] (2, 3] 
+[33] (1, 2]  (2, 3]  (3, 4]  (2, 3]  (2, 3]  (2, 3]  (2, 3]  (2, 3] 
+[41] (2, 3]  (1, 2]  (2, 3]  (1, 2]  (1, 2]  (3, 4]  (4, NA] (3, 4] 
+[49] (NA, 1] (NA, 1] (1, 2]  (1, 2]  (1, 2]  (2, 3]  (1, 2]  (2, 3] 
+[57] (1, 2]  (1, 2]  (1, 2]  (2, 3]  (2, 3]  (2, 3]  (2, 3]  (3, 4] 
+[65] (1, 2]  (1, 3]  (2, 4]  (1, 3]  (2, 4]  (1, 3]  (3, NA] (3, NA]
+R> 
+R> ## ----wine-censored-Polr, echo = TRUE-------------------------------------
+R> Polr_wine_4 <- Polr(crating | contact ~ temp, data = wine, 
++                      method = "probit")
+R> logLik(Polr_wine_4)
+'log Lik.' -80.25516 (df=9)
+R> coef(Polr_wine_4)
+tempwarm 
+ 1.51489 
+R> 
+R> ## ----BostonHousing-BC-4-0, cache = TRUE----------------------------------
+R> BC_BH_0 <- BoxCox(y ~ 1, data = BostonHousing2)
+R> logLik(BC_BH_0)
+'log Lik.' -1743.478 (df=7)
+R> 
+R> ## ----BostonHousing-BC-4, cache = TRUE------------------------------------
+R> library("trtf")
+R> BC_BH_4 <- trafotree(BC_BH_0, 
++      formula = y ~ chas + crim + zn + indus + nox + 
++                rm + age + dis + rad + tax + ptratio + b + lstat, data =
++      BostonHousing2, control = ctree_control(minbucket = 30))
+R> logLik(BC_BH_4)
+'log Lik.' -1286.98 (df=77)
+R> 
+R> ## ----BostonHousing-BC-4-plot, fig.width = 14, fig.height = 10, echo = FALSE----
+R> library("ATR")
+R> plot(rotate(BC_BH_4), terminal_panel = trtf:::node_mlt, 
++       tp_args = list(type = "density", K = 100, fill = col[1], id = FALSE))
+R> 
+R> ## ----BostonHousing-BC-5, eval = FALSE------------------------------------
+R> ## BC_BH_5 <- traforest(BC_BH_0,
+R> ##     formula = y ~ chas + crim + zn + indus + nox +
+R> ##               rm + age + dis + rad + tax + ptratio + b + lstat, data =
+R> ##     BostonHousing2)
+R> 
+R> ## ----GBSG2-Cox-3-0-------------------------------------------------------
+R> Coxph_GBSG2_1 <- Coxph(Surv(time, cens) ~ horTh, data = GBSG2)
+R> logLik(Coxph_GBSG2_1)
+'log Lik.' -2625.626 (df=8)
+R> coef(Coxph_GBSG2_1)
+  horThyes 
+-0.3708811 
+R> 
+R> ## ----GBSG2-Cox-3---------------------------------------------------------
+R> Coxph_GBSG2_3 <- trafotree(Coxph_GBSG2_1, 
++      formula = Surv(time, cens) ~ horTh | age + menostat + tsize + 
++                                   tgrade + pnodes + progrec + estrec, 
++      data = GBSG2)
+R> logLik(Coxph_GBSG2_3)
+'log Lik.' -2581.773 (df=24)
+R> coef(Coxph_GBSG2_3)[, "horThyes"]
+          2           4           5 
+-0.49167012 -0.47043304  0.09277705 
+R> 
+R> ## ----GBSG2-Cox-3-plot----------------------------------------------------
+R> nd <- data.frame(horTh = sort(unique(GBSG2$horTh)))
+R> plot(Coxph_GBSG2_3, newdata = nd, 
++       tp_args = list(type = "survivor", col = col))
+R> 
+R> ## ----GBSG2-Cox-4, cache = TRUE-------------------------------------------
+R> ctrl <- ctree_control(minsplit = 30, minbucket = 15, mincriterion = 0)
+R> Coxph_GBSG2_4 <- traforest(Coxph_GBSG2_1, 
++      formula = Surv(time, cens) ~ horTh | age, control = ctrl, 
++      ntree = 100, mtry = 1, data = GBSG2)
+R> 
+R> ## ----GBSG2-Cox-4-plot, cache = TRUE--------------------------------------
+R> nd <- data.frame(age = 30:70)
+R> cf <- predict(Coxph_GBSG2_4, newdata = nd, type = "coef")
+R> nd$logHR <- sapply(cf, function(x) x["horThyes"])
+R> plot(logHR ~ age, data = nd, pch = 19, xlab = "Age", 
++       ylab = "log-Hazard Ratio")
+R> abline(h = coef(Coxph_GBSG2_1)["horThyes"])
+R> 
+R> ## ----sessionInfo, echo = FALSE, results = "hide"-------------------------
+R> sessionInfo()
+R version 3.4.3 (2017-11-30)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Ubuntu 16.04.4 LTS
+
+Matrix products: default
+BLAS: /usr/local/lib64/R/lib/libRblas.so
+LAPACK: /usr/local/lib64/R/lib/libRlapack.so
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=de_CH.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=de_CH.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=de_CH.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=de_CH.UTF-8 LC_IDENTIFICATION=C       
+
+attached base packages:
+[1] grid      stats     graphics  grDevices utils     datasets  methods  
+[8] base     
+
+other attached packages:
+ [1] ATR_0.1-0         trtf_0.3-1        partykit_1.2-0   
+ [4] rpart_4.1-13      libcoin_1.0-1     quantreg_5.35    
+ [7] SparseM_1.77      colorspace_1.3-2  ordinal_2015.6-28
+[10] multcomp_1.4-8    TH.data_1.0-8     mvtnorm_1.0-7    
+[13] mlbench_2.1-1     lattice_0.20-35   MASS_7.3-49      
+[16] survival_2.41-3   tram_0.2-0        mlt_1.0-0        
+[19] basefun_1.0-0     variables_1.0-0  
+
+loaded via a namespace (and not attached):
+ [1] Rcpp_0.12.15       compiler_3.4.3     RColorBrewer_1.1-2
+ [4] tools_3.4.3        ucminf_1.1-4       Matrix_1.2-12     
+ [7] polynom_1.3-9      knitr_1.20         BB_2014.10-1      
+[10] MatrixModels_0.4-1 deSolve_1.20       mstate_0.2.10     
+[13] orthopolynom_1.0-5 alabama_2015.3-1   Formula_1.2-2     
+[16] codetools_0.2-15   splines_3.4.3      numDeriv_2016.8-1 
+[19] flexsurv_1.1       quadprog_1.5-5     sandwich_2.4-0    
+[22] coneproj_1.12      muhaz_1.2.6        inum_1.0-0        
+[25] zoo_1.8-1         
+R> 
+R> 
+> proc.time()
+   user  system elapsed 
+118.220   0.572 118.913 
