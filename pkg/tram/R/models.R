@@ -16,7 +16,7 @@ Coxph <- function(formula, data, subset, weights, offset, cluster, na.action = n
     if (!inherits(ret, "mlt")) return(ret)
     ret$call <- match.call(expand.dots = TRUE)
     ret$tram <- paste(ifelse(is.null(td$terms$s), "", "(Stratified)"), 
-                      "Parametric Linear Cox' Regression Model")
+                      "Parametric Linear Cox Regression Model")
     class(ret) <- c("Coxph", class(ret))
     ret
 }
