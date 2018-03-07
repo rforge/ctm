@@ -99,7 +99,7 @@ explained in the package vignette of package \pkg{tram}.
 The underlying theory of most likely transformations 
 is presented in Hothorn et al. (2018), computational
 and modelling aspects in more complex situations 
-are discussed in the package vignette of package \pkg{mlt.docreg}.
+are discussed by Hothorn (2018).
 
 }
 \value{
@@ -109,6 +109,11 @@ An object of class \code{tram} inheriting from \code{mlt}.
   Torsten Hothorn, Lisa Moest, Peter Buehlmann (2018), Most Likely
   Transformations, \emph{Scandinavian Journal of Statistics}, \bold{45}(1),
   110--134, \doi{10.1111/sjos.12291}.
+
+  Torsten Hothorn (2018), Most Likely Transformations: The mlt Package,
+  \emph{Journal of Statistical Software}, forthcoming. URL: 
+  \url{https://cran.r-project.org/web/packages/mlt.docreg/vignettes/mlt.pdf}
+
 }
 \keyword{models}
 \keyword{regression}
