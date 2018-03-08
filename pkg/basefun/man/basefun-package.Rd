@@ -14,7 +14,7 @@
 
   Torsten Hothorn (2018), Most Likely Transformations: The mlt Package,
   \emph{Journal of Statistical Software}, forthcoming. URL: 
-  \url{https://cran.r-project.org/web/packages/mlt.docreg/vignettes/mlt.pdf}
+  \url{https://cran.r-project.org/package=mlt.docreg}
 
 }
 \author{
