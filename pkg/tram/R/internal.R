@@ -12,7 +12,7 @@ asvar.numeric <- function(object, name, prob = c(.1, .9), support = NULL, ...) {
     if (is.integer(object))
         return(variables::numeric_var(name, support = sort(unique(object))))  
     if (is.null(support)) {
-        support <- quantile(object, prob = prob)
+        support <- quantile(object, prob = prob, na.rm = TRUE)
         add <- range(object) - support
         return(variables::numeric_var(name, support = support, add = add, ...))
     }
@@ -24,6 +24,8 @@ asvar.Surv <- function(object, name, prob = c(.1, .9), support = NULL, bounds = 
         support <- quantile(survfit(y ~ 1, data = data.frame(y = object)), prob = prob)$quantile
         if (is.na(support[2])) 
             support[2] <- max(object[, 1])
+        add <- c(0 - support[1], 0)
+        return(variables::numeric_var(name, support = support, bounds = bounds, add = add, ...))
     }
     variables::numeric_var(name, support = support, bounds = bounds, ...)
 }
