@@ -129,6 +129,22 @@ tram <- function(formula, data, subset, weights, offset, cluster, na.action = na
         iX <- as.basis(td$mt$x, data = td$mf, remove_intercept = TRUE, 
                        negative = negative)
     } 
+    ### <FIXME> this is a hack: stratum terms must not appear in the
+    ###         linear predictor; so we remove them _by name_ (which isn't
+    ###         save). Use terms and drop. Here we use fixed which should
+    ###         be OK.
+    Xfixed <- NULL
+    if (!is.null(iS) && !is.null(iX)) {
+        ### fix coefs corresponding to a stratum to zero
+        nS <- colnames(model.matrix(iS, data = td$mf[1:10,]))
+        nX <- colnames(model.matrix(iX, data = td$mf[1:10,]))
+        if (any(xin <- nX %in% nS)) {
+            Xfixed <- numeric(sum(xin))
+            names(Xfixed) <- nX[xin]
+        }
+    } 
+    ### </FIXME>
+    fixed <- c(list(...)$fixed, Xfixed)
 
     model <- ctm(response = rbasis, interacting = iS, shifting = iX, 
                  todistr = distribution, data = td$mf)
@@ -136,7 +152,7 @@ tram <- function(formula, data, subset, weights, offset, cluster, na.action = na
     if (model_only) return(model)
 
     ret <- mlt(model, data = td$mf, weights = td$weights, offset = td$offset, 
-               scale = scale, ...)
+               scale = scale, fixed = fixed, ...)
     ret$terms <- td$terms
     ret$cluster <- td$cluster
     if (!is.null(iX))
