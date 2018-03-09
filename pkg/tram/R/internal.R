@@ -9,8 +9,11 @@ asvar.ordered <- function(object, name, ...)
     variables::ordered_var(name, levels = levels(object))
 
 asvar.numeric <- function(object, name, prob = c(.1, .9), support = NULL, ...) {
-    if (is.integer(object))
-        return(variables::numeric_var(name, support = sort(unique(object))))  
+    if (is.integer(object)) {
+        if (is.null(support)) 
+            support <- sort(unique(object))
+        return(variables::numeric_var(name, support = support, ...))  
+    }
     if (is.null(support)) {
         support <- quantile(object, prob = prob, na.rm = TRUE)
         add <- range(object) - support

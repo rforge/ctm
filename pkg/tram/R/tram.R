@@ -117,7 +117,13 @@ tram <- function(formula, data, subset, weights, offset, cluster, na.action = na
         td <- eval(mf, parent.frame())
     } 
 
-    rvar <- asvar(td$response, td$rname, prob = prob, support = support)
+    bounds <- list(...)$bounds
+    if (is.null(bounds)) {
+        rvar <- asvar(td$response, td$rname, prob = prob, support = support)
+    } else {
+        rvar <- asvar(td$response, td$rname, prob = prob, support = support,
+                      bounds = bounds)
+    }
     rbasis <- mkbasis(rvar, transformation = transformation, order = order)
 
     iS <- NULL
@@ -129,6 +135,12 @@ tram <- function(formula, data, subset, weights, offset, cluster, na.action = na
         iX <- as.basis(td$mt$x, data = td$mf, remove_intercept = TRUE, 
                        negative = negative)
     } 
+
+    model <- ctm(response = rbasis, interacting = iS, shifting = iX, 
+                 todistr = distribution, data = td$mf)
+
+    if (model_only) return(model)
+
     ### <FIXME> this is a hack: stratum terms must not appear in the
     ###         linear predictor; so we remove them _by name_ (which isn't
     ###         save). Use terms and drop. Here we use fixed which should
@@ -146,13 +158,14 @@ tram <- function(formula, data, subset, weights, offset, cluster, na.action = na
     ### </FIXME>
     fixed <- c(list(...)$fixed, Xfixed)
 
-    model <- ctm(response = rbasis, interacting = iS, shifting = iX, 
-                 todistr = distribution, data = td$mf)
-
-    if (model_only) return(model)
-
-    ret <- mlt(model, data = td$mf, weights = td$weights, offset = td$offset, 
-               scale = scale, fixed = fixed, ...)
+    args <- list(...)
+    args$model <- model
+    args$data <- td$mf
+    args$weights <- td$weights
+    args$offset <- td$offset
+    args$scale <- scale
+    args$fixed <- fixed
+    ret <- do.call("mlt", args)
     ret$terms <- td$terms
     ret$cluster <- td$cluster
     if (!is.null(iX))
