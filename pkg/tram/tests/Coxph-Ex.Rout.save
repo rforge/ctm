@@ -70,7 +70,7 @@ Score (logrank) test = 77.5  on 2 df,   p=0
 +               data = GBSG2)
 > summary(Cmod)
 
-  Parametric Linear Cox' Regression Model 
+  Parametric Linear Cox Regression Model 
 
 Call:
 Coxph(formula = Surv(time, cens) | 0 + horTh:tgrade ~ progrec + 
@@ -150,4 +150,4 @@ Number of terminal nodes: 3
 > 
 > proc.time()
    user  system elapsed 
-  5.316   0.076   5.391 
+  5.264   0.044   5.321 
