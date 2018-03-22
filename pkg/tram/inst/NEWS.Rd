@@ -4,6 +4,7 @@
 
 \section{Changes in Version 0.2-1 (2018-03-xx)}{
   \itemize{
+    \item{Likelihood ratio tests with fixed parameters gave an error.}
     \item{Remove strata from linear predictor (experimental).}
     \item{Try to implement a better guess for the \code{add} argument
           later defining the axes corresponding to the response

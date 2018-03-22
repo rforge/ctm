@@ -178,8 +178,12 @@ tram <- function(formula, data, subset, weights, offset, cluster, na.action = na
     if (LRtest & !is.null(iX)) {
         nullmodel <- ctm(response = rbasis, interacting = iS, 
                          todistr = distribution, data = td$mf)
-        nullret <- mlt(nullmodel, data = td$mf, weights = td$weights, offset = td$offset, 
-                       scale = scale, ...)
+        if (!is.null(fixed)) {
+            fixed <- fixed[names(fixed) %in% names(coef(nullmodel))]
+            args$fixed <- fixed
+        }
+        args$model <- nullmodel
+        nullret <- do.call("mlt", args)
         nulllogLik <- logLik(nullret)
         fulllogLik <- logLik(ret)
         ret$LRtest <- c(LRstat = -2 * (nulllogLik - fulllogLik), 
