@@ -8,6 +8,8 @@
     \item{Simulations with 500 (not 50) noise variables.}
     \item{Simplify likelihood evaluations based on new capabilities in
           \pkg{mlt}.}
+    \item{New \code{update} argument for transformation forests.}
+    \item{Update outputs (\code{scale = TRUE} in \pkg{partykit} 1.2-1).}
   }
 }
 

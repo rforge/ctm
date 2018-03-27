@@ -121,13 +121,13 @@ n1    3   4   6   7
 > cf <- coef(mlt(m, data = GBSG2))
 > coef(m1 <- mlt(m, data = GBSG2, weights = w[,1], theta = cf))
   Bs1(y)   Bs2(y)   Bs3(y)   Bs4(y)   Bs5(y)   Bs6(y) 
--5.81355 -1.02614 -1.02614 -1.02614 -0.59619 -0.31608 
+-5.78885 -1.02739 -1.02739 -1.02739 -0.59177 -0.31235 
 > coef(m2 <- mlt(m, data = GBSG2, weights = w[,2], theta = cf))
   Bs1(y)   Bs2(y)   Bs3(y)   Bs4(y)   Bs5(y)   Bs6(y) 
--4.60643 -0.70372 -0.70372 -0.64209 -0.50491 -0.15183 
+-4.64957 -0.72016 -0.72016 -0.64744 -0.51526 -0.15658 
 > coef(m3 <- mlt(m, data = GBSG2, weights = w[,3], theta = cf))
-    Bs1(y)     Bs2(y)     Bs3(y)     Bs4(y)     Bs5(y)     Bs6(y) 
--4.5671631 -0.5487942 -0.5487942 -0.4254166 -0.3342657  0.0043676 
+   Bs1(y)    Bs2(y)    Bs3(y)    Bs4(y)    Bs5(y)    Bs6(y) 
+-4.617996 -0.581874 -0.581874 -0.432848 -0.362252 -0.013281 
 > 
 > layout(matrix(1:3, nr = 1))
 > plot(m1, newdata = data.frame(1), type = "survivor")
@@ -151,13 +151,13 @@ n1    3   4   6   7
 > cf <- coef(mlt(m, data = GBSG2))
 > coef(m1 <- mlt(m, data = GBSG2, weights = w[,1], theta = cf))
   Bs1(y)   Bs2(y)   Bs3(y)   Bs4(y)   Bs5(y)   Bs6(y) 
--5.37793 -1.02885 -1.02885 -1.02885 -0.59194 -0.36636 
+-5.48124 -1.04500 -1.04500 -1.04500 -0.58777 -0.36249 
 > coef(m2 <- mlt(m, data = GBSG2, weights = w[,2], theta = cf))
   Bs1(y)   Bs2(y)   Bs3(y)   Bs4(y)   Bs5(y)   Bs6(y) 
--4.59753 -0.75064 -0.75064 -0.50094 -0.50094 -0.14967 
+-4.71412 -0.79452 -0.79452 -0.53341 -0.53341 -0.17448 
 > coef(m3 <- mlt(m, data = GBSG2, weights = w[,3], theta = cf))
    Bs1(y)    Bs2(y)    Bs3(y)    Bs4(y)    Bs5(y)    Bs6(y) 
--4.321633 -0.519670 -0.519670 -0.304647 -0.252028  0.060181 
+-4.417350 -0.589109 -0.589109 -0.303519 -0.303512  0.027579 
 > 
 > plot(m1, newdata = data.frame(1), type = "survivor")
 > plot(m2, newdata = data.frame(1), type = "survivor", add = TRUE)
@@ -165,4 +165,4 @@ n1    3   4   6   7
 > 
 > proc.time()
    user  system elapsed 
- 24.228   0.040  24.450 
+ 24.816   0.056  24.872 
