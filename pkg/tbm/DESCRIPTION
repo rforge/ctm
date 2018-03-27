@@ -1,5 +1,5 @@
-Package: trboost
-Title: Likelihood-based Boosting for Transformation Models
+Package: tbm
+Title: Transformation Boosting Machines
 Version: 0.1-0
 Date: 2018-01-18
 Authors@R: person("Torsten", "Hothorn", role = c("aut", "cre"),
