@@ -61,7 +61,7 @@ ctmFamily <- function(model, data, weights) {
         ret
     }
     risk <- function(y, f, w)
-        logLik(mf, parm = f, w = w)
+        -logLik(mf, parm = f, w = w)
     offset <- function(y, w) {
         cf <- coef(mf)
         matrix(cf, nrow = NROW(data), ncol = length(cf), byrow = TRUE)
@@ -162,7 +162,7 @@ trboost <- function(model, formula, data = list(), na.action = na.omit, weights 
                 ### G <- solve.QP(XtX2, Xs2, t(kronecker(Xi[ix,], ui)))$solution
                 ix <- sample(1:nrow(Xi), pmin(25, nrow(Xi)))
                 A <- as(kronecker(Xi[ix,], ui), "matrix")
-                b <- rep(ci, length.out = nrow(A))
+                b <- rep(ci - ui %*% t(lastparm[ix,,drop = FALSE]), length.out = nrow(A))
                 G <- coneproj::qprog(XtX2, Xs2, A, b, msg = FALSE)$thetahat
                 G <- matrix(G, ncol = P, byrow = TRUE)
             }
@@ -378,4 +378,3 @@ predict.trshift <- function(object, newdata = NULL, ...) {
     ret
 }
 
-    
