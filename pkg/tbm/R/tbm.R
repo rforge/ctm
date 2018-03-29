@@ -44,6 +44,15 @@ ctmFamily <- function(model, data, weights) {
     CS <- diag(length(coef(mf)))
     CS[upper.tri(CS)] <- 1
     ngradient <- function(y, f, w) {
+        ### update to weights w if necessary
+        if (!isTRUE(all.equal(w, weights))) {
+            mf <<- mlt(model, data, weights  = w)
+            theta <<- coef(mf)
+            offset <<- c(theta[1], log(pmax(sqrt(.Machine$double.eps), diff(theta))))
+            OM <<- matrix(offset, nrow = NROW(data), ncol = length(offset),
+                          byrow = TRUE)
+            weights <<- w
+        }
         f <- matrix(f, nrow = NROW(y), ncol = length(coef(mf))) + OM
         theta <- cbind(f[,1], exp(f[,-1])) %*% CS
         ret <- - estfun(mf, parm = theta, w = w)
@@ -61,44 +70,55 @@ ctmFamily <- function(model, data, weights) {
            nuisance = function() offset)
 }
 
-tbm <- function(model, formula, data = list(), na.action = na.omit, weights = NULL, 
-                shiftonly = FALSE, control = boost_control(), oobweights = NULL, 
-                baselearner = c("bbs", "bols"), ...) {
+tbm <- function(model, formula, data = list(), weights = NULL, 
+                gradient = c("ctm", "shift"), baselearner = c("bbs", "bols"), ...) {
 
     baselearner <- match.arg(baselearner)
-    if (shiftonly) {
-        tmp <- model$bases
+    gradient <- match.arg(gradient)
+    ### note: This defines the response and MUST match data
+    basedata <- model$data
+
+    mf <- match.call(expand.dots = FALSE)
+    mf$model <- NULL
+    mf$gradient <- NULL
+    if(missing(data)) data <- environment(formula)
+
+    if (gradient == "shift") {
+        tmp <- model$model$bases
         if (!is.null(tmp$shifting)) {
             tmp$shifting <- c(int = intercept_basis(), shift = tmp$shifting)
         } else {
             tmp$shifting <- intercept_basis()
         }
-        td <- model$todistr$name
+        td <- model$model$todistr$name
         td <- switch(td, "normal" = "Normal", "logistic" = "Logistic",
                      "minimum extreme value" = "MinExtrVal")
-        model <- ctm(tmp$response, tmp$interacting, tmp$shifting, 
+        myctm <- ctm(tmp$response, tmp$interacting, tmp$shifting, 
                      todistr = td)
-        family <- shiftFamily(model, data, weights)
+        family <- shiftFamily(myctm, basedata, weights)
         class <- "tbm_shift"
+        mf$family <- family
+        if (baselearner == "bols") {
+            mf$baselearner <- NULL
+            mf[[1L]] <- quote(mboost:::glmboost.formula)
+        } else {
+            mf$baselearner <- baselearner
+            mf[[1L]] <- quote(mboost::mboost)
+        }
     } else {
         stopifnot(is.null(model$model$bases$interacting))
         stopifnot(is.null(model$model$bases$shifting))
-        model <- model$model
-        family <- ctmFamily(model, data, weights)
+        myctm <- model$model
+        family <- ctmFamily(myctm, basedata, weights)
         class <- "tbm_ctm"
+        mf$family <- family
+        mf$baselearner <- baselearner
+        mf[[1L]] <- quote(mboost::mboost)
     }
 
-    mf <- match.call(expand.dots = FALSE)
-    mf$model <- NULL
-    mf$shiftonly <- NULL
-    mf$na.action <- na.action ### evaluate na.action
-    if(missing(data)) data <- environment(formula)
-    mf$family <- family
-    mf$baselearner <- baselearner
-    mf[[1L]] <- quote(mboost::mboost)
     ret <- eval(mf, parent.frame())
-    ret$ctm <- model
-    class(ret) <- c(class, class(ret))
+    ret$model <- mlt(myctm, data = basedata, dofit = FALSE)
+    class(ret) <- c(class, "tbm", class(ret))
     return(ret) 
 }
 
@@ -109,16 +129,18 @@ predict.tbm_ctm <- function(object, newdata = NULL, which = NULL,
         pr <- fitted(object)
     } else {
         class(object) <- class(object)[-1L]
-        if (is.null(newdata)) newdata <- object$data
+        if (is.null(newdata)) 
+            newdata <- as.data.frame(model.frame(object))
         pr <- predict(object, newdata, which = which)
     }
-    pr <- matrix(pr, ncol = length(coef(object$ctm)))
+    pr <- matrix(pr, ncol = length(coef(object$model)))
+    pr <- t(t(pr) + nuisance(object)) ### this is the OFFSET!!!
     CS <- diag(ncol(pr))
     CS[upper.tri(CS)] <- 1
     pr <- cbind(pr[,1], exp(pr[,-1])) %*% CS
     if (coef) return(pr)
     ret <- c()
-    tmpm <- object$ctm
+    tmpm <- object$model$model
     for (i in 1:nrow(pr)) {
         coef(tmpm) <- pr[i,]
         ret <- cbind(ret, predict(tmpm, newdata = data.frame(1), ...))
@@ -131,23 +153,34 @@ predict.tbm_shift <- function(object, newdata = NULL, which = NULL,
 
     if (is.null(newdata) && is.null(which)) {
         pr <- fitted(object)
+            newdata <- as.data.frame(model.frame(object))
     } else {
         class(object) <- class(object)[-1L]
-        if (is.null(newdata)) newdata <- object$data
+        if (is.null(newdata))
+            newdata <- as.data.frame(model.frame(object))
         pr <- predict(object, newdata, which = which)
     }
     if (coef) {
         cf <- nuisance(object)
         ret <- matrix(cf, nrow = NROW(pr), ncol = length(cf), byrow = TRUE)
+        ret <- cbind(ret, -pr)
         return(ret)
     }
     ret <- c()
-    tmpm <- object$ctm
+    tmpm <- object$model$model
     coef(tmpm) <- c(nuisance(object), "(Intercept)" = 0)
     ret <- c()
-    for (i in 1:nrow(pr)) {
+    nd <- newdata[, !colnames(newdata) %in% variable.names(tmpm)[1], drop = FALSE]
+    for (i in 1:NROW(pr)) {
         coef(tmpm)["(Intercept)"] <- -pr[i]
-        ret <- cbind(ret, predict(tmpm, newdata = newdata[i,,drop = FALSE], ...))
+        ret <- cbind(ret, predict(tmpm, newdata = nd, ...))
     }
     ret
 }
+
+coef.tbm <- function(object, newdata = NULL, ...)
+    predict(object, newdata = newdata, coef = TRUE)
+
+logLik.tbm <- function(object, newdata = NULL, coef = coef(object, newdata = newdata), 
+                       weights = model.weights(object), ...)
+    logLik(object$model, parm = coef, newdata = newdata, weights = weights)

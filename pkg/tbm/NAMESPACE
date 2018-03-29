@@ -1,14 +1,14 @@
 
 import("mboost")
 import("mlt")
-import("sandwich")
-importFrom("coneproj", "qprog")
-importFrom("methods", "as")
+importFrom("sandwich", "estfun")
 importFrom("basefun", "intercept_basis")
 importFrom("stats", "coef", "fitted", "model.matrix", 
-           "na.omit", "complete.cases", "logLik", "predict", "model.frame")
-import("Matrix")
+           "na.omit", "complete.cases", "logLik", "predict", 
+           "model.frame", "model.weights", "variable.names")
 
-export("trboost")
-S3method("predict", "trboost")
-S3method("predict", "trshift")
+export("tbm")
+S3method("predict", "tbm_shift")
+S3method("predict", "tbm_ctm")
+S3method("coef", "tbm")
+S3method("logLik", "tbm")

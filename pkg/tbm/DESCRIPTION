@@ -1,11 +1,11 @@
 Package: tbm
 Title: Transformation Boosting Machines
 Version: 0.1-0
-Date: 2018-01-18
+Date: 2018-03-29
 Authors@R: person("Torsten", "Hothorn", role = c("aut", "cre"),
                   email = "Torsten.Hothorn@R-project.org", comment = c(ORCID = "0000-0001-8301-0471"))
 Description: Likelihood-based boosting for conditional transformation models.
-Depends: mlt (>= 0.2-3), mboost
-Imports: basefun, sandwich, coneproj, Matrix, methods
-Suggests: TH.data
+Depends: mlt (>= 1.0-0), mboost
+Imports: basefun, sandwich
+Suggests: TH.data, tram
 License: GPL-2
