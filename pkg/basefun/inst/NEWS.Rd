@@ -2,6 +2,12 @@
 \name{NEWS}
 \title{NEWS file for the basefun package}
 
+\section{Changes in Version 1.0-1 (2018-03-27)}{
+  \itemize{
+    \item{Replace \code{rBind} by \code{rbind} as requested by MM.}
+  }
+}
+
 \section{Changes in Version 1.0-0 (2018-03-07)}{
   \itemize{
     \item{A paper describing version 1.0-0 of the \pkg{mlt}, \pkg{basefun}, and
@@ -10,6 +16,7 @@
     \item{Documentation updates.}
   }
 }
+
 
 \section{Changes in Version 0.0-40 (2018-02-23)}{
   \itemize{

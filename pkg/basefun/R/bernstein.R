@@ -47,7 +47,7 @@ Bernstein_basis <- function(var, order = 2,
             tmp <- Bernstein_basis(var, order = order)
             tmpdf <- as.data.frame(mkgrid(var))
             B0 <- model.matrix(tmp, data = tmpdf)[1,]
-            list(ui = rBind(B0, diff(Diagonal(order + 1), differences = 1)), 
+            list(ui = rbind(B0, diff(Diagonal(order + 1), differences = 1)), 
                         ci = rep(0, order + 1))
         },
         "positive" = list(ui = Diagonal(order + 1), ci = rep(0, order + 1)),

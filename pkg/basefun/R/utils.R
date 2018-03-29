@@ -46,7 +46,7 @@
     for (i in 2:length(args)) {
         nci <- ncol(args[[i]]$ui)
         ncr <- ncol(ret$ui)
-        ret$ui <- rBind(kronecker(Diagonal(nci), ret$ui),
+        ret$ui <- rbind(kronecker(Diagonal(nci), ret$ui),
                         kronecker(args[[i]]$ui, Diagonal(ncr)))
         ret$ci <- c(as(kronecker(Diagonal(nci), 
                                  matrix(ret$ci, ncol = 1)) %*% rep(1, nci), 
