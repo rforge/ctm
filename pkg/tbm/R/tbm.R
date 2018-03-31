@@ -70,8 +70,36 @@ ctmFamily <- function(model, data, weights) {
            nuisance = function() offset)
 }
 
+schwarzboost <- function (formula, data = list(), weights = NULL, na.action = na.pass, 
+    offset = NULL, family = Gaussian(), control = boost_control(), 
+    oobweights = NULL, tree_controls = partykit::ctree_control(teststat = "quad", 
+        testtype = "Teststatistic", mincriterion = 0, maxdepth = 2, 
+        saveinfo = FALSE), ...) 
+{
+    cl <- match.call()
+    mf <- match.call(expand.dots = FALSE)
+    m <- match(c("formula", "data", "weights", "na.action"), 
+        names(mf), 0L)
+    mf <- mf[c(1L, m)]
+    mf$drop.unused.levels <- TRUE
+    mf[[1L]] <- quote(stats::model.frame)
+    mf <- eval(mf, parent.frame())
+    response <- model.response(mf)
+    weights <- model.weights(mf)
+    mf <- mf[, -1, drop = FALSE]
+    mf$"(weights)" <- NULL
+    bl <- list(bbaum(mf, tree_controls = tree_controls))
+    ret <- mboost_fit(bl, response = response, weights = weights, 
+        offset = offset, family = family, control = control, 
+        oobweights = oobweights, ...)
+    ret$call <- cl
+    ret$rownames <- rownames(mf)
+    class(ret) <- c("blackboost", class(ret))
+    ret
+}
+
 tbm <- function(model, formula, data = list(), weights = NULL, 
-                gradient = c("ctm", "shift"), baselearner = c("bbs", "bols"), ...) {
+                gradient = c("ctm", "shift"), baselearner = c("bbs", "bols", "bbaum"), ...) {
 
     baselearner <- match.arg(baselearner)
     gradient <- match.arg(gradient)
@@ -101,7 +129,10 @@ tbm <- function(model, formula, data = list(), weights = NULL,
         if (baselearner == "bols") {
             mf$baselearner <- NULL
             mf[[1L]] <- quote(mboost:::glmboost.formula)
-        } else {
+        } else if (baselearner == "bbaum") {
+            mf$baselearner <- NULL
+            mf[[1L]] <- quote(schwarzboost)
+        } else {          
             mf$baselearner <- baselearner
             mf[[1L]] <- quote(mboost::mboost)
         }
@@ -112,27 +143,74 @@ tbm <- function(model, formula, data = list(), weights = NULL,
         family <- ctmFamily(myctm, basedata, weights)
         class <- "tbm_ctm"
         mf$family <- family
-        mf$baselearner <- baselearner
-        mf[[1L]] <- quote(mboost::mboost)
+        if (baselearner == "bbaum") {
+            mf$baselearner <- NULL
+            mf[[1L]] <- quote(schwarzboost)	
+        } else {          
+            mf$baselearner <- baselearner
+            mf[[1L]] <- quote(mboost::mboost)
+        }
     }
 
     ret <- eval(mf, parent.frame())
     ret$model <- mlt(myctm, data = basedata, dofit = FALSE)
     class(ret) <- c(class, "tbm", class(ret))
+
+    if (gradient != "shift") {
+    mypredict <- function(newdata = NULL, which = NULL,
+                          aggregate = c("sum")) {
+
+        if (mstop == 0) {
+            if (length(offset) == 1) {
+                if (!is.null(newdata))
+                    return(rep(offset, NCOL(newdata)))
+                return(rep(offset, NROW(y)))
+            } 
+            if (!is.null(newdata)) {
+                warning("User-specified offset is not a scalar, ",
+                        "thus it cannot be used for predictions when ",
+                        sQuote("newdata"), " is specified.")
+                return(rep(0, NCOL(newdata)))
+            }
+            return(offset)
+        }
+        if (!is.null(xselect))
+            indx <- ((1:length(xselect)) <= mstop)
+        which <- thiswhich(which, usedonly = nw <- is.null(which))
+        if (length(which) == 0) return(NULL)
+
+        aggregate <- match.arg(aggregate)
+
+        pfun <- function(w, agg) {
+            ix <- xselect == w & indx
+            if (!any(ix))
+                return(0)
+            if (cwlin) w <- 1
+            ret <- nu * bl[[w]]$predict(ens[ix],
+                   newdata = newdata, aggregate = agg)
+            if (agg == "sum") return(ret)
+            m <- Matrix(0, nrow = nrow(ret), ncol = sum(indx))
+            m[, which(ix)] <- ret
+            m
+        }
+
+        pr <- do.call("cbind", lapply(which, pfun, agg = "sum"))
+        attr(pr, "offset") <- offset
+        return(pr)
+    }
+
+    environment(mypredict) <- environment(ret$predict)
+    ret$predict <- mypredict
+    }
     return(ret) 
 }
 
 predict.tbm_ctm <- function(object, newdata = NULL, which = NULL, 
                             coef = FALSE, ...) {
 
-    if (is.null(newdata) && is.null(which)) {
-        pr <- fitted(object)
-    } else {
-        class(object) <- class(object)[-1L]
-        if (is.null(newdata)) 
-            newdata <- as.data.frame(model.frame(object))
-        pr <- predict(object, newdata, which = which)
-    }
+    class(object) <- class(object)[-1L]
+    pr <- predict(object, newdata, which = which)
+
     pr <- matrix(pr, ncol = length(coef(object$model)))
     pr <- t(t(pr) + nuisance(object)) ### this is the OFFSET!!!
     CS <- diag(ncol(pr))
@@ -151,15 +229,9 @@ predict.tbm_ctm <- function(object, newdata = NULL, which = NULL,
 predict.tbm_shift <- function(object, newdata = NULL, which = NULL, 
                               coef = FALSE, ...) {
 
-    if (is.null(newdata) && is.null(which)) {
-        pr <- fitted(object)
-            newdata <- as.data.frame(model.frame(object))
-    } else {
-        class(object) <- class(object)[-1L]
-        if (is.null(newdata))
-            newdata <- as.data.frame(model.frame(object))
-        pr <- predict(object, newdata, which = which)
-    }
+    class(object) <- class(object)[-1L]
+    pr <- predict(object, newdata, which = which)
+
     if (coef) {
         cf <- nuisance(object)
         ret <- matrix(cf, nrow = NROW(pr), ncol = length(cf), byrow = TRUE)
@@ -179,8 +251,8 @@ predict.tbm_shift <- function(object, newdata = NULL, which = NULL,
 }
 
 coef.tbm <- function(object, newdata = NULL, ...)
-    predict(object, newdata = newdata, coef = TRUE)
+    predict(object, newdata = newdata, coef = TRUE, ...)
 
 logLik.tbm <- function(object, newdata = NULL, coef = coef(object, newdata = newdata), 
                        weights = model.weights(object), ...)
-    logLik(object$model, parm = coef, newdata = newdata, weights = weights)
+    logLik(object$model, parm = coef, newdata = newdata, weights = weights, ...)
