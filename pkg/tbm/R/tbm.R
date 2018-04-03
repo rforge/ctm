@@ -48,7 +48,8 @@ ctmFamily <- function(model, data, weights) {
         if (!isTRUE(all.equal(w, weights))) {
             mf <<- mlt(model, data, weights  = w)
             theta <<- coef(mf)
-            offset <<- c(theta[1], diff(theta))
+            ### start low!
+            offset <<- c(theta[1] - 2, diff(theta))
             OM <<- matrix(offset, nrow = NROW(data), ncol = length(offset),
                           byrow = TRUE)
             weights <<- w
@@ -105,7 +106,7 @@ tbm <- function(model, formula, data = list(), weights = NULL,
     ### note: This defines the response and MUST match data
     basedata <- model$data
 
-    mf <- match.call(expand.dots = FALSE)
+    mf <- match.call(expand.dots = TRUE)
     mf$model <- NULL
     mf$gradient <- NULL
     if(missing(data)) data <- environment(formula)

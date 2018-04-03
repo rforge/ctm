@@ -13,7 +13,7 @@ logLik(mf)
 
 Mstop <- 500
 
-fd <- cv(rep(1, NROW(bodyfat)), type = "kfold", B = 10)
+fd <- cv(rep(1, NROW(bodyfat)), type = "kfold", B = 2)
 
 schwarzboost <- tbm:::schwarzboost
 
