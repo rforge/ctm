@@ -11,9 +11,9 @@ data("bodyfat", package = "TH.data")
 mf <- as.mlt(Colr(DEXfat ~ 1, data = bodyfat, order = 5))
 logLik(mf)
 
-Mstop <- 110
+Mstop <- 500
 
-fd <- cv(rep(1, NROW(bodyfat)), type = "kfold", B = 5)
+fd <- cv(rep(1, NROW(bodyfat)), type = "kfold", B = 10)
 
 schwarzboost <- tbm:::schwarzboost
 
@@ -21,8 +21,7 @@ bf_t <- tbm(model = mf, formula = DEXfat ~ ., data = bodyfat, baselearner = "bba
 ms <- cvrisk(bf_t, folds = fd)
 plot(ms, main = "CTM-Baum")
 bf_t <- bf_t[mstop(ms)]
-logLik(mf, parm = coef(bf_t, which = 1))
-
+logLik(mf, parm = coef(bf_t))
 
 bf_ctm <- tbm(model = mf, formula = DEXfat ~ ., data = bodyfat, baselearner = "bbs")[Mstop]
 ms <- cvrisk(bf_ctm, folds = fd)
@@ -62,10 +61,13 @@ logLik(bf_lin$model, parm = coef(bf_lin))
 table(selected(bf_lin))
 
 
+X11()
+layout(matrix(1:6, ncol = 3, byrow = TRUE))
+
 col <- rgb(.1, .1, .1, .1)
-matplot(predict(bf_t, type = "distribution"), type = "l", main = "CTM-Baum", col = col, lty = 1)
-matplot(predict(bf_ctm, type = "distribution"), type = "l", main = "CTM-Add", col = col, lty = 1)
-matplot(predict(bf_dr, type = "distribution"), type = "l", main = "Distribution Regression", col = col, lty = 1)
+matplot(predict(bf_t, newdata = bodyfat, type = "distribution"), type = "l", main = "CTM-Baum", col = col, lty = 1)
+matplot(predict(bf_ctm, newdata = bodyfat, type = "distribution"), type = "l", main = "CTM-Add", col = col, lty = 1)
+matplot(predict(bf_dr, newdata = bodyfat, type = "distribution"), type = "l", main = "Distribution Regression", col = col, lty = 1)
 matplot(predict(bf_st, newdata = bodyfat, type = "distribution"), type = "l", main = "Baum", col = col, lty = 1)
 matplot(predict(bf_shift, newdata = bodyfat, type = "distribution"), type = "l", main = "GAM", col = col, lty = 1)
 matplot(predict(bf_lin, newdata = bodyfat, type = "distribution"), type = "l", main = "TRAM", col = col, lty = 1)

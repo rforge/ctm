@@ -38,7 +38,7 @@ shiftFamily <- function(object, data, weights) {
 ctmFamily <- function(model, data, weights) {
     mf <- mlt(model, data, weights  = weights)
     theta <- coef(mf)
-    offset <- c(theta[1], log(pmax(sqrt(.Machine$double.eps), diff(theta))))
+    offset <- c(theta[1], diff(theta))
     OM <- matrix(offset, nrow = NROW(data), ncol = length(offset),
                  byrow = TRUE)
     CS <- diag(length(coef(mf)))
@@ -48,21 +48,20 @@ ctmFamily <- function(model, data, weights) {
         if (!isTRUE(all.equal(w, weights))) {
             mf <<- mlt(model, data, weights  = w)
             theta <<- coef(mf)
-            offset <<- c(theta[1], log(pmax(sqrt(.Machine$double.eps), diff(theta))))
+            offset <<- c(theta[1], diff(theta))
             OM <<- matrix(offset, nrow = NROW(data), ncol = length(offset),
                           byrow = TRUE)
             weights <<- w
         }
         f <- matrix(f, nrow = NROW(y), ncol = length(coef(mf))) + OM
-        theta <- cbind(f[,1], exp(f[,-1])) %*% CS
+        theta <- f %*% CS
         ret <- - estfun(mf, parm = theta, w = w)
         ### we need unweighted scores!
-        ret <- ret * cbind(1, exp(f[,-1]))
         ret
     }
     risk <- function(y, f, w) {
         f <- matrix(f, nrow = NROW(y), ncol = length(coef(mf))) + OM
-        theta <- cbind(f[,1], exp(f[,-1])) %*% CS
+        theta <- f %*% CS
         -logLik(mf, parm = theta, w = w)
     }
     Family(ngradient = ngradient, risk = risk, 
@@ -155,53 +154,6 @@ tbm <- function(model, formula, data = list(), weights = NULL,
     ret <- eval(mf, parent.frame())
     ret$model <- mlt(myctm, data = basedata, dofit = FALSE)
     class(ret) <- c(class, "tbm", class(ret))
-
-    if (gradient != "shift") {
-    mypredict <- function(newdata = NULL, which = NULL,
-                          aggregate = c("sum")) {
-
-        if (mstop == 0) {
-            if (length(offset) == 1) {
-                if (!is.null(newdata))
-                    return(rep(offset, NCOL(newdata)))
-                return(rep(offset, NROW(y)))
-            } 
-            if (!is.null(newdata)) {
-                warning("User-specified offset is not a scalar, ",
-                        "thus it cannot be used for predictions when ",
-                        sQuote("newdata"), " is specified.")
-                return(rep(0, NCOL(newdata)))
-            }
-            return(offset)
-        }
-        if (!is.null(xselect))
-            indx <- ((1:length(xselect)) <= mstop)
-        which <- thiswhich(which, usedonly = nw <- is.null(which))
-        if (length(which) == 0) return(NULL)
-
-        aggregate <- match.arg(aggregate)
-
-        pfun <- function(w, agg) {
-            ix <- xselect == w & indx
-            if (!any(ix))
-                return(0)
-            if (cwlin) w <- 1
-            ret <- nu * bl[[w]]$predict(ens[ix],
-                   newdata = newdata, aggregate = agg)
-            if (agg == "sum") return(ret)
-            m <- Matrix(0, nrow = nrow(ret), ncol = sum(indx))
-            m[, which(ix)] <- ret
-            m
-        }
-
-        pr <- do.call("cbind", lapply(which, pfun, agg = "sum"))
-        attr(pr, "offset") <- offset
-        return(pr)
-    }
-
-    environment(mypredict) <- environment(ret$predict)
-    ret$predict <- mypredict
-    }
     return(ret) 
 }
 
@@ -215,7 +167,7 @@ predict.tbm_ctm <- function(object, newdata = NULL, which = NULL,
     pr <- t(t(pr) + nuisance(object)) ### this is the OFFSET!!!
     CS <- diag(ncol(pr))
     CS[upper.tri(CS)] <- 1
-    pr <- cbind(pr[,1], exp(pr[,-1])) %*% CS
+    pr <- pr %*% CS
     if (coef) return(pr)
     ret <- c()
     tmpm <- object$model$model
