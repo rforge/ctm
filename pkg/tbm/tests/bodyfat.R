@@ -28,7 +28,7 @@ bf_ctm <- bf_ctm[mstop(ms)]
 logLik(mf, parm = coef(bf_ctm))
 table(selected(bf_ctm))
 
-bf_dr <- drboost(model = mf, formula = DEXfat ~ ., data = bodyfat, baselearner = "bols")[Mstop]
+bf_dr <- ctmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, baselearner = "bols")[Mstop]
 ms <- cvrisk(bf_dr, folds = fd)
 plot(ms, main = "Distr Reg")
 bf_dr <- bf_dr[mstop(ms)]

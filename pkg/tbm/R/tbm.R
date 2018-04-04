@@ -121,6 +121,7 @@ ctmboost <- function(model, formula, data = list(), weights = NULL,
     mf <- match.call(expand.dots = TRUE)
     mf$model <- NULL
     mf$gradient <- NULL
+    mf$method <- NULL
     if(missing(data)) data <- environment(formula)
 
     stopifnot(is.null(model$model$bases$interacting))
@@ -155,6 +156,7 @@ tramboost <- function(model, formula, data = list(), weights = NULL,
 
     mf <- match.call(expand.dots = TRUE)
     mf$model <- mf$method <- NULL
+    mf$method <- NULL
     if(missing(data)) data <- environment(formula)
 
     tmp <- model$model$bases

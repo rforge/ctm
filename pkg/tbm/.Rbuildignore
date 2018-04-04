@@ -1,2 +1,3 @@
 R/bbaum.R
 tests/regtest-bbaum.R
+man
