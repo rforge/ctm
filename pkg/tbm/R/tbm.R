@@ -1,4 +1,39 @@
 
+.loglinFamily <-  function(model, data, weights) {
+    mf <- mlt(model, data, weights  = weights)
+    theta <- coef(mf)
+    offset <- c(theta[1], log(theta[2]))
+    OM <- matrix(offset, nrow = NROW(data), ncol = length(offset),
+                 byrow = TRUE)
+    ngradient <- function(y, f, w) {
+        ### update to weights w if necessary
+        if (!isTRUE(all.equal(w, weights))) {
+            mf <<- mlt(model, data, weights  = w)
+            theta <<- coef(mf)
+            ### start low!
+            offset <<- c(theta[1], log(theta[2]))
+            OM <<- matrix(offset, nrow = NROW(data), ncol = length(offset),
+                          byrow = TRUE)
+            weights <<- w
+        }
+        f <- matrix(f, nrow = NROW(y), ncol = length(coef(mf))) + OM
+        theta <- cbind(f[,1], exp(f[,2]))
+        ret <- - estfun(mf, parm = theta, w = w) * cbind(1, exp(f[,2]))
+        ### we need unweighted scores!
+        iw <- w
+        iw[iw > 0] <- 1/(iw[iw > 0])
+        ret
+    }
+    risk <- function(y, f, w) {
+        f <- matrix(f, nrow = NROW(y), ncol = length(coef(mf))) + OM
+        theta <- cbind(f[,1], exp(f[,2]))
+        -logLik(mf, parm = theta, w = w)
+    }
+    Family(ngradient = ngradient, risk = risk, 
+           offset = function(...) return(0),
+           nuisance = function() offset)
+}
+
 .tramFamily <- function(object, data, weights) {
 
     model <- mlt(object, data, fixed = c("(Intercept)" = 0), weights = weights)
@@ -74,10 +109,14 @@
            nuisance = function() offset)
 }
 
-ctmboost <- function(model, formula, data = list(), weights = NULL, ...) {
+ctmboost <- function(model, formula, data = list(), weights = NULL, 
+                     method = quote(mboost::mboost), ...) {
 
     ### note: This defines the response and MUST match data
     basedata <- model$data
+
+    if (inherits(model, "tram"))
+        model <- as.mlt(model)
 
     mf <- match.call(expand.dots = TRUE)
     mf$model <- NULL
@@ -87,40 +126,21 @@ ctmboost <- function(model, formula, data = list(), weights = NULL, ...) {
     stopifnot(is.null(model$model$bases$interacting))
     stopifnot(is.null(model$model$bases$shifting))
     myctm <- model$model
-    mf$family <- .ctmFamily(myctm, basedata, weights)
-    mf[[1L]] <- quote(mboost::mboost)
+    if (inherits(myctm$bases$response, "Bernstein_basis")) {
+        mf$family <- .ctmFamily(myctm, basedata, weights)
+        class <- "ctmboost"
+    } else if (inherits(myctm$bases$response, "log_basis") ||
+               inherits(myctm$bases$response, "polynomial_basis")) {
+        stopifnot(length(coef(as.mlt(model))) == 2)
+        mf$family <- .loglinFamily(myctm, basedata, weights)
+        class <- "loglinboost"
+    } else {
+       stop("Cannot deal with model.")
+    } 
+    mf[[1L]] <- method
     ret <- eval(mf, parent.frame())
     ret$model <- mlt(myctm, data = basedata, dofit = FALSE)
-    class(ret) <- c("ctmboost", "tbm", class(ret))
-    return(ret) 
-}
-
-drboost <- function(model, formula, data = list(), weights = NULL, ...) {
-
-    mf <- match.call(expand.dots = TRUE)
-    mf$baselearner <- "bols"
-    mf[[1L]] <- quote(ctmboost)
-    ret <- eval(mf, parent.frame())
-    return(ret) 
-}
-
-wildboost <- function(model, formula, data = list(), weights = NULL, ...) {
-
-    ### note: This defines the response and MUST match data
-    basedata <- model$data
-
-    mf <- match.call(expand.dots = TRUE)
-    mf$model <- NULL
-    if(missing(data)) data <- environment(formula)
-
-    stopifnot(is.null(model$model$bases$interacting))
-    stopifnot(is.null(model$model$bases$shifting))
-    myctm <- model$model
-    mf$family <- .ctmFamily(myctm, basedata, weights)
-    mf[[1L]] <- quote(mboost::blackboost)	
-    ret <- eval(mf, parent.frame())
-    ret$model <- mlt(myctm, data = basedata, dofit = FALSE)
-    class(ret) <- c("ctmboost", "tbm", class(ret))
+    class(ret) <- c(class, "tbm", class(ret))
     return(ret) 
 }
 
@@ -129,6 +149,9 @@ tramboost <- function(model, formula, data = list(), weights = NULL,
 
     ### note: This defines the response and MUST match data
     basedata <- model$data
+
+    if (inherits(model, "tram"))
+        model <- as.mlt(model)
 
     mf <- match.call(expand.dots = TRUE)
     mf$model <- mf$method <- NULL
@@ -163,9 +186,30 @@ predict.ctmboost <- function(object, newdata = NULL, which = NULL,
 
     pr <- matrix(pr, ncol = length(coef(object$model)))
     pr <- t(t(pr) + nuisance(object)) ### this is the OFFSET!!!
+
     CS <- diag(ncol(pr))
     CS[upper.tri(CS)] <- 1
     pr <- pr %*% CS
+    if (coef) return(pr)
+    ret <- c()
+    tmpm <- object$model$model
+    for (i in 1:nrow(pr)) {
+        coef(tmpm) <- pr[i,]
+        ret <- cbind(ret, predict(tmpm, newdata = data.frame(1), ...))
+    }
+    ret
+}
+
+predict.loglinboost <- function(object, newdata = NULL, which = NULL, 
+                                coef = FALSE, ...) {
+
+    class(object) <- class(object)[-1L]
+    pr <- predict(object, newdata, which = which)
+
+    pr <- matrix(pr, ncol = length(coef(object$model)))
+    pr <- t(t(pr) + nuisance(object)) ### this is the OFFSET!!!
+    pr <- cbind(pr[,1], exp(pr[,2]))
+
     if (coef) return(pr)
     ret <- c()
     tmpm <- object$model$model

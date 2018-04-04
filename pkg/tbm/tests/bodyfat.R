@@ -15,7 +15,7 @@ Mstop <- 500
 
 fd <- cv(rep(1, NROW(bodyfat)), type = "kfold", B = 2)
 
-bf_t <- wildboost(model = mf, formula = DEXfat ~ ., data = bodyfat)[Mstop]
+bf_t <- ctmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, method = quote(mboost::blackboost))[Mstop]
 ms <- cvrisk(bf_t, folds = fd)
 plot(ms, main = "CTM-Baum")
 bf_t <- bf_t[mstop(ms)]
@@ -28,7 +28,7 @@ bf_ctm <- bf_ctm[mstop(ms)]
 logLik(mf, parm = coef(bf_ctm))
 table(selected(bf_ctm))
 
-bf_dr <- drboost(model = mf, formula = DEXfat ~ ., data = bodyfat)[Mstop]
+bf_dr <- drboost(model = mf, formula = DEXfat ~ ., data = bodyfat, baselearner = "bols")[Mstop]
 ms <- cvrisk(bf_dr, folds = fd)
 plot(ms, main = "Distr Reg")
 bf_dr <- bf_dr[mstop(ms)]
@@ -57,6 +57,15 @@ logLik(bf_lin$model, parm = coef(bf_lin))
 table(selected(bf_lin))
 
 
+mf2 <- Lm(DEXfat ~ 1, data = bodyfat)
+
+bf_lin2 <- ctmboost(model = mf2, formula = DEXfat ~ ., data = bodyfat)[Mstop]
+ms <- cvrisk(bf_lin2, folds = fd)
+plot(ms, main = "TRAM-exp")
+bf_lin2 <- bf_lin2[mstop(ms)]
+logLik(bf_lin2$model, parm = coef(bf_lin2))
+table(selected(bf_lin2))
+
 X11()
 layout(matrix(1:6, ncol = 3, byrow = TRUE))
 
@@ -67,3 +76,6 @@ matplot(predict(bf_dr, newdata = bodyfat, type = "distribution"), type = "l", ma
 matplot(predict(bf_st, newdata = bodyfat, type = "distribution"), type = "l", main = "Baum", col = col, lty = 1)
 matplot(predict(bf_shift, newdata = bodyfat, type = "distribution"), type = "l", main = "GAM", col = col, lty = 1)
 matplot(predict(bf_lin, newdata = bodyfat, type = "distribution"), type = "l", main = "TRAM", col = col, lty = 1)
+
+
+

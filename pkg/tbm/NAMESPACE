@@ -7,8 +7,9 @@ importFrom("stats", "coef", "fitted", "model.matrix",
            "na.omit", "complete.cases", "logLik", "predict", 
            "model.frame", "model.weights", "variable.names")
 
-export("ctmboost", "drboost", "wildboost", "tramboost")
+export("ctmboost", "tramboost")
 S3method("predict", "ctmboost")
+S3method("predict", "loglinboost")
 S3method("predict", "tramboost")
 S3method("coef", "tbm")
 S3method("logLik", "tbm")
