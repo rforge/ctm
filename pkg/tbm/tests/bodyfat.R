@@ -15,45 +15,41 @@ Mstop <- 500
 
 fd <- cv(rep(1, NROW(bodyfat)), type = "kfold", B = 2)
 
-schwarzboost <- tbm:::schwarzboost
-
-bf_t <- tbm(model = mf, formula = DEXfat ~ ., data = bodyfat, baselearner = "bbaum")[Mstop]
+bf_t <- wildboost(model = mf, formula = DEXfat ~ ., data = bodyfat)[Mstop]
 ms <- cvrisk(bf_t, folds = fd)
 plot(ms, main = "CTM-Baum")
 bf_t <- bf_t[mstop(ms)]
 logLik(mf, parm = coef(bf_t))
 
-bf_ctm <- tbm(model = mf, formula = DEXfat ~ ., data = bodyfat, baselearner = "bbs")[Mstop]
+bf_ctm <- ctmboost(model = mf, formula = DEXfat ~ ., data = bodyfat)[Mstop]
 ms <- cvrisk(bf_ctm, folds = fd)
 plot(ms, main = "CTM-Add")
 bf_ctm <- bf_ctm[mstop(ms)]
 logLik(mf, parm = coef(bf_ctm))
 table(selected(bf_ctm))
 
-bf_dr <- tbm(model = mf, formula = DEXfat ~ ., data = bodyfat, baselearner = "bols")[Mstop]
+bf_dr <- drboost(model = mf, formula = DEXfat ~ ., data = bodyfat)[Mstop]
 ms <- cvrisk(bf_dr, folds = fd)
 plot(ms, main = "Distr Reg")
 bf_dr <- bf_dr[mstop(ms)]
 logLik(mf, parm = coef(bf_dr))
 table(selected(bf_dr))
 
-bf_st <- tbm(model = mf, formula = DEXfat ~ ., data = bodyfat, baselearner = "bbaum", 
-                gradient = "shift")[Mstop]
+bf_st <- tramboost(model = mf, formula = DEXfat ~ ., data = bodyfat, method =
+quote(mboost::blackboost))[Mstop]
 ms <- cvrisk(bf_st, folds = fd)
 plot(ms, main = "Baum")
 bf_st <- bf_st[mstop(ms)]
 logLik(bf_st$model, parm = coef(bf_st))
 
-bf_shift <- tbm(model = mf, formula = DEXfat ~ ., data = bodyfat, baselearner = "bbs", 
-                gradient = "shift")[Mstop]
+bf_shift <- tramboost(model = mf, formula = DEXfat ~ ., data = bodyfat, method = quote(mboost::gamboost))[Mstop]
 ms <- cvrisk(bf_shift, folds = fd)
 plot(ms, main = "GAM")
 bf_shift <- bf_shift[mstop(ms)]
 logLik(bf_shift$model, parm = coef(bf_shift))
 table(selected(bf_shift))
 
-bf_lin <- tbm(model = mf, formula = DEXfat ~ . - 1, data = bodyfat, baselearner = "bols", 
-                gradient = "shift")[Mstop]
+bf_lin <- tramboost(model = mf, formula = DEXfat ~ . - 1, data = bodyfat, method = quote(mboost:::glmboost.formula))[Mstop]
 ms <- cvrisk(bf_lin, folds = fd)
 plot(ms, main = "TRAM")
 bf_lin <- bf_lin[mstop(ms)]

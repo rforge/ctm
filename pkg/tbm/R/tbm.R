@@ -1,5 +1,5 @@
 
-shiftFamily <- function(object, data, weights) {
+.tramFamily <- function(object, data, weights) {
 
     model <- mlt(object, data, fixed = c("(Intercept)" = 0), weights = weights)
 
@@ -14,7 +14,9 @@ shiftFamily <- function(object, data, weights) {
         i <- names(coef(tmp)) == "(Intercept)"
         ### gradient wrt offset == score wrt (Intercept) = 1
         ### We need UNWEIGHTED scores
-        estfun(tmp, w = w)[,i]
+        iw <- w
+        iw[iw > 0] <- 1/(iw[iw > 0])
+        estfun(tmp, w = w)[,i] * iw
     }
 
     risk <- function(y, f, w = 1) {
@@ -35,7 +37,7 @@ shiftFamily <- function(object, data, weights) {
            })
 }
 
-ctmFamily <- function(model, data, weights) {
+.ctmFamily <- function(model, data, weights) {
     mf <- mlt(model, data, weights  = weights)
     theta <- coef(mf)
     offset <- c(theta[1], diff(theta))
@@ -58,6 +60,8 @@ ctmFamily <- function(model, data, weights) {
         theta <- f %*% CS
         ret <- - estfun(mf, parm = theta, w = w)
         ### we need unweighted scores!
+        iw <- w
+        iw[iw > 0] <- 1/(iw[iw > 0])
         ret
     }
     risk <- function(y, f, w) {
@@ -70,39 +74,8 @@ ctmFamily <- function(model, data, weights) {
            nuisance = function() offset)
 }
 
-schwarzboost <- function (formula, data = list(), weights = NULL, na.action = na.pass, 
-    offset = NULL, family = Gaussian(), control = boost_control(), 
-    oobweights = NULL, tree_controls = partykit::ctree_control(teststat = "quad", 
-        testtype = "Teststatistic", mincriterion = 0, maxdepth = 2, 
-        saveinfo = FALSE), ...) 
-{
-    cl <- match.call()
-    mf <- match.call(expand.dots = FALSE)
-    m <- match(c("formula", "data", "weights", "na.action"), 
-        names(mf), 0L)
-    mf <- mf[c(1L, m)]
-    mf$drop.unused.levels <- TRUE
-    mf[[1L]] <- quote(stats::model.frame)
-    mf <- eval(mf, parent.frame())
-    response <- model.response(mf)
-    weights <- model.weights(mf)
-    mf <- mf[, -1, drop = FALSE]
-    mf$"(weights)" <- NULL
-    bl <- list(bbaum(mf, tree_controls = tree_controls))
-    ret <- mboost_fit(bl, response = response, weights = weights, 
-        offset = offset, family = family, control = control, 
-        oobweights = oobweights, ...)
-    ret$call <- cl
-    ret$rownames <- rownames(mf)
-    class(ret) <- c("blackboost", class(ret))
-    ret
-}
+ctmboost <- function(model, formula, data = list(), weights = NULL, ...) {
 
-tbm <- function(model, formula, data = list(), weights = NULL, 
-                gradient = c("ctm", "shift"), baselearner = c("bbs", "bols", "bbaum"), ...) {
-
-    baselearner <- match.arg(baselearner)
-    gradient <- match.arg(gradient)
     ### note: This defines the response and MUST match data
     basedata <- model$data
 
@@ -111,55 +84,79 @@ tbm <- function(model, formula, data = list(), weights = NULL,
     mf$gradient <- NULL
     if(missing(data)) data <- environment(formula)
 
-    if (gradient == "shift") {
-        tmp <- model$model$bases
-        if (!is.null(tmp$shifting)) {
-            tmp$shifting <- c(int = intercept_basis(), shift = tmp$shifting)
-        } else {
-            tmp$shifting <- intercept_basis()
-        }
-        td <- model$model$todistr$name
-        td <- switch(td, "normal" = "Normal", "logistic" = "Logistic",
-                     "minimum extreme value" = "MinExtrVal")
-        myctm <- ctm(tmp$response, tmp$interacting, tmp$shifting, 
-                     todistr = td)
-        family <- shiftFamily(myctm, basedata, weights)
-        class <- "tbm_shift"
-        mf$family <- family
-        if (baselearner == "bols") {
-            mf$baselearner <- NULL
-            mf[[1L]] <- quote(mboost:::glmboost.formula)
-        } else if (baselearner == "bbaum") {
-            mf$baselearner <- NULL
-            mf[[1L]] <- quote(schwarzboost)
-        } else {          
-            mf$baselearner <- baselearner
-            mf[[1L]] <- quote(mboost::mboost)
-        }
-    } else {
-        stopifnot(is.null(model$model$bases$interacting))
-        stopifnot(is.null(model$model$bases$shifting))
-        myctm <- model$model
-        family <- ctmFamily(myctm, basedata, weights)
-        class <- "tbm_ctm"
-        mf$family <- family
-        if (baselearner == "bbaum") {
-            mf$baselearner <- NULL
-            mf[[1L]] <- quote(schwarzboost)	
-        } else {          
-            mf$baselearner <- baselearner
-            mf[[1L]] <- quote(mboost::mboost)
-        }
-    }
-
+    stopifnot(is.null(model$model$bases$interacting))
+    stopifnot(is.null(model$model$bases$shifting))
+    myctm <- model$model
+    mf$family <- .ctmFamily(myctm, basedata, weights)
+    mf[[1L]] <- quote(mboost::mboost)
     ret <- eval(mf, parent.frame())
     ret$model <- mlt(myctm, data = basedata, dofit = FALSE)
-    class(ret) <- c(class, "tbm", class(ret))
+    class(ret) <- c("ctmboost", "tbm", class(ret))
     return(ret) 
 }
 
-predict.tbm_ctm <- function(object, newdata = NULL, which = NULL, 
-                            coef = FALSE, ...) {
+drboost <- function(model, formula, data = list(), weights = NULL, ...) {
+
+    mf <- match.call(expand.dots = TRUE)
+    mf$baselearner <- "bols"
+    mf[[1L]] <- quote(ctmboost)
+    ret <- eval(mf, parent.frame())
+    return(ret) 
+}
+
+wildboost <- function(model, formula, data = list(), weights = NULL, ...) {
+
+    ### note: This defines the response and MUST match data
+    basedata <- model$data
+
+    mf <- match.call(expand.dots = TRUE)
+    mf$model <- NULL
+    if(missing(data)) data <- environment(formula)
+
+    stopifnot(is.null(model$model$bases$interacting))
+    stopifnot(is.null(model$model$bases$shifting))
+    myctm <- model$model
+    mf$family <- .ctmFamily(myctm, basedata, weights)
+    mf[[1L]] <- quote(mboost::blackboost)	
+    ret <- eval(mf, parent.frame())
+    ret$model <- mlt(myctm, data = basedata, dofit = FALSE)
+    class(ret) <- c("ctmboost", "tbm", class(ret))
+    return(ret) 
+}
+
+tramboost <- function(model, formula, data = list(), weights = NULL, 
+                      method = quote(mboost::mboost), ...) {
+
+    ### note: This defines the response and MUST match data
+    basedata <- model$data
+
+    mf <- match.call(expand.dots = TRUE)
+    mf$model <- mf$method <- NULL
+    if(missing(data)) data <- environment(formula)
+
+    tmp <- model$model$bases
+    if (!is.null(tmp$shifting)) {
+        tmp$shifting <- c(int = intercept_basis(), shift = tmp$shifting)
+    } else {
+        tmp$shifting <- intercept_basis()
+    }
+    td <- model$model$todistr$name
+    td <- switch(td, "normal" = "Normal", "logistic" = "Logistic",
+                 "minimum extreme value" = "MinExtrVal")
+    myctm <- ctm(tmp$response, tmp$interacting, tmp$shifting, 
+                 todistr = td)
+    mf$family <- .tramFamily(myctm, basedata, weights)
+    mf[[1L]] <- method
+
+    ret <- eval(mf, parent.frame())
+    ret$model <- mlt(myctm, data = basedata, dofit = FALSE)
+    class(ret) <- c("tramboost", "tbm", class(ret))
+    return(ret) 
+}
+
+
+predict.ctmboost <- function(object, newdata = NULL, which = NULL, 
+                             coef = FALSE, ...) {
 
     class(object) <- class(object)[-1L]
     pr <- predict(object, newdata, which = which)
@@ -179,7 +176,7 @@ predict.tbm_ctm <- function(object, newdata = NULL, which = NULL,
     ret
 }
 
-predict.tbm_shift <- function(object, newdata = NULL, which = NULL, 
+predict.tramboost <- function(object, newdata = NULL, which = NULL, 
                               coef = FALSE, ...) {
 
     class(object) <- class(object)[-1L]

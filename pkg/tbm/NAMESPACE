@@ -1,6 +1,5 @@
 
 import("mboost")
-import("partykit")
 import("mlt")
 importFrom("sandwich", "estfun")
 importFrom("basefun", "intercept_basis")
@@ -8,9 +7,8 @@ importFrom("stats", "coef", "fitted", "model.matrix",
            "na.omit", "complete.cases", "logLik", "predict", 
            "model.frame", "model.weights", "variable.names")
 
-export("tbm")
-export("bbaum")
-S3method("predict", "tbm_shift")
-S3method("predict", "tbm_ctm")
+export("ctmboost", "drboost", "wildboost", "tramboost")
+S3method("predict", "ctmboost")
+S3method("predict", "tramboost")
 S3method("coef", "tbm")
 S3method("logLik", "tbm")
