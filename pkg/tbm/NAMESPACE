@@ -1,8 +1,10 @@
 
 import("mboost")
 import("mlt")
+importFrom("coneproj", "qprog")
 importFrom("sandwich", "estfun")
 importFrom("basefun", "intercept_basis")
+importFrom("variables", "mkgrid")
 importFrom("stats", "coef", "fitted", "model.matrix", 
            "na.omit", "complete.cases", "logLik", "predict", 
            "model.frame", "model.weights", "variable.names")

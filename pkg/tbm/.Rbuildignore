@@ -1,3 +1,2 @@
-R/bbaum.R
-tests/regtest-bbaum.R
+tests/sim.R
 man

@@ -5,6 +5,8 @@
     offset <- c(theta[1], log(theta[2]))
     OM <- matrix(offset, nrow = NROW(data), ncol = length(offset),
                  byrow = TRUE)
+    nd <- as.data.frame(mkgrid(model, n = 50))
+    mm <- model.matrix(model$model, data = nd)
     ngradient <- function(y, f, w) {
         ### update to weights w if necessary
         if (!isTRUE(all.equal(w, weights))) {
@@ -75,6 +77,10 @@
 .ctmFamily <- function(model, data, weights) {
     mf <- mlt(model, data, weights  = weights)
     theta <- coef(mf)
+    nd <- as.data.frame(mkgrid(model, n = 50))
+    dr <- 1
+    names(dr) <- names(nd)
+    mm <- model.matrix(model$model, data = nd, deriv = dr)
     offset <- c(theta[1], diff(theta))
     OM <- matrix(offset, nrow = NROW(data), ncol = length(offset),
                  byrow = TRUE)
@@ -85,15 +91,14 @@
         if (!isTRUE(all.equal(w, weights))) {
             mf <<- mlt(model, data, weights  = w)
             theta <<- coef(mf)
-            ### start low!
-            offset <<- c(theta[1] - 2, diff(theta))
+            offset <- c(theta[1], diff(theta))
             OM <<- matrix(offset, nrow = NROW(data), ncol = length(offset),
                           byrow = TRUE)
             weights <<- w
         }
         f <- matrix(f, nrow = NROW(y), ncol = length(coef(mf))) + OM
         theta <- f %*% CS
-        ret <- - estfun(mf, parm = theta, w = w)
+        ret <- - estfun(mf, parm = theta, w = w) %*% t(CS)
         ### we need unweighted scores!
         iw <- w
         iw[iw > 0] <- 1/(iw[iw > 0])
@@ -181,20 +186,44 @@ tramboost <- function(model, formula, data = list(), weights = NULL,
 
 
 predict.ctmboost <- function(object, newdata = NULL, which = NULL, 
-                             coef = FALSE, ...) {
+                             coef = FALSE, cleanup = TRUE, ...) {
 
     class(object) <- class(object)[-1L]
-    pr <- predict(object, newdata, which = which)
+    pr0 <- predict(object, newdata, which = which)
 
-    pr <- matrix(pr, ncol = length(coef(object$model)))
-    pr <- t(t(pr) + nuisance(object)) ### this is the OFFSET!!!
+    pr0 <- matrix(pr0, ncol = length(coef(object$model)))
+    pr0 <- t(t(pr0) + nuisance(object)) ### this is the OFFSET!!!
 
-    CS <- diag(ncol(pr))
+    CS <- diag(ncol(pr0))
     CS[upper.tri(CS)] <- 1
-    pr <- pr %*% CS
+
+    pr <- pr0 %*% CS
+    nonmono <- pr0[,-1] < 0
+
+    tmpm <- object$model$model
+
+    ### check if transformation function is non-monotone
+    ### and fix
+    if (cleanup & any(nonmono)) {
+        idx <- which(nonmono, arr.ind = TRUE)[,1]
+        q <- as.data.frame(mkgrid(tmpm, n = 100)[1])
+        X <- model.matrix(tmpm, data = q)
+        for (i in idx) {
+            coef(tmpm) <- pr[i,]
+            tr <- predict(tmpm, newdata = data.frame(1), q = q[[1]], 
+                          type = "trafo")
+            if (any(diff(tr) < 0)) {
+                w <- c(0.01, c(.01, 10)[(diff(tr) > 0) + 1L])
+                l <- coneproj::qprog(crossprod(X * sqrt(w)), crossprod(X * w, tr),
+                                     as(attr(X, "constraint")$ui, "matrix"), 
+                                     attr(X, "constraint")$ci, msg = FALSE)
+                pr[i,] <- l$theta
+            }
+        }
+    } 
+
     if (coef) return(pr)
     ret <- c()
-    tmpm <- object$model$model
     for (i in 1:nrow(pr)) {
         coef(tmpm) <- pr[i,]
         ret <- cbind(ret, predict(tmpm, newdata = data.frame(1), ...))

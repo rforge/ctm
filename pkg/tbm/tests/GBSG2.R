@@ -42,8 +42,8 @@ contourplot(s ~ age + y | horTh, data = nd, at = 1:9 / 10,
 m <- Coxph(y ~ 1, data = GBSG2)
 
 tb <- ctmboost(m, y ~ bbs(age),# + bbs(age, by = horTh), 
-          control = boost_control(nu = .05, trace = TRUE), 
-          data = GBSG2)[500]
+          control = boost_control(nu = .001, trace = TRUE), 
+          data = GBSG2)[10000]
 
 fd <- cv(model.weights(tb), type = "sub", B = 5, strata = GBSG2$horTh)
 #cv <- cvrisk(tb, folds = fd)
@@ -62,12 +62,12 @@ contourplot(s2 ~ age + y | horTh, data = nd, at = 1:9 / 10,
 
 
 tb <- ctmboost(m, y ~ bbs(age) + bbs(age, by = horTh), 
-          control = boost_control(nu = .01, trace = TRUE), 
-          data = GBSG2)[1000]
+          control = boost_control(nu = .001, trace = TRUE), 
+          data = GBSG2)[10000]
 
-cv <- cvrisk(tb, folds = fd)
-plot(cv)
-tb <- tb[mstop(cv)]
+#cv <- cvrisk(tb, folds = fd)
+#plot(cv)
+#tb <- tb[mstop(cv)]
 
 logLik(m, parm = coef(tb))
 
@@ -84,8 +84,8 @@ tc <- partykit:::ctree_control(maxdepth = 3, mincriterion = 0)
 
 tb2 <- ctmboost(m, y ~ horTh + age + menostat + tsize + tgrade + pnodes + 
               progrec + estrec, data = GBSG2,
-              control = boost_control(nu = .01), method = quote(mboost::blackboost),
-              tree_control = tc)[1000]
+              control = boost_control(nu = .001, trace = TRUE), method = quote(mboost::blackboost),
+              tree_control = tc)[10000]
 
 logLik(m, parm = coef(tb2))
 

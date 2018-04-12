@@ -11,29 +11,35 @@ data("bodyfat", package = "TH.data")
 mf <- as.mlt(Colr(DEXfat ~ 1, data = bodyfat, order = 5))
 logLik(mf)
 
-Mstop <- 500
+Mstop <- 1000
 
 fd <- cv(rep(1, NROW(bodyfat)), type = "kfold", B = 2)
 
-bf_t <- ctmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, method = quote(mboost::blackboost))[Mstop]
+bctrl <- boost_control(nu = .1, trace = TRUE)
+
+bf_t <- ctmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, method =
+quote(mboost::blackboost), control = bctrl)[Mstop]
 ms <- cvrisk(bf_t, folds = fd)
 plot(ms, main = "CTM-Baum")
 bf_t <- bf_t[mstop(ms)]
 logLik(mf, parm = coef(bf_t))
 
-bf_ctm <- ctmboost(model = mf, formula = DEXfat ~ ., data = bodyfat)[Mstop]
+bf_ctm <- ctmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, control = bctrl)[Mstop]
 ms <- cvrisk(bf_ctm, folds = fd)
 plot(ms, main = "CTM-Add")
 bf_ctm <- bf_ctm[mstop(ms)]
 logLik(mf, parm = coef(bf_ctm))
 table(selected(bf_ctm))
 
-bf_dr <- ctmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, baselearner = "bols")[Mstop]
+bf_dr <- ctmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, baselearner =
+"bols", control = bctrl)[Mstop]
 ms <- cvrisk(bf_dr, folds = fd)
 plot(ms, main = "Distr Reg")
 bf_dr <- bf_dr[mstop(ms)]
 logLik(mf, parm = coef(bf_dr))
 table(selected(bf_dr))
+
+Mstop <- 500
 
 bf_st <- tramboost(model = mf, formula = DEXfat ~ ., data = bodyfat, method =
 quote(mboost::blackboost))[Mstop]
@@ -66,7 +72,7 @@ bf_lin2 <- bf_lin2[mstop(ms)]
 logLik(bf_lin2$model, parm = coef(bf_lin2))
 table(selected(bf_lin2))
 
-X11()
+# X11()
 layout(matrix(1:6, ncol = 3, byrow = TRUE))
 
 col <- rgb(.1, .1, .1, .1)
