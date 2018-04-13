@@ -1,6 +1,7 @@
 
 library("tbm")
 library("tram")
+library("partykit")
 
 set.seed(29)
 
@@ -11,14 +12,17 @@ data("bodyfat", package = "TH.data")
 mf <- as.mlt(Colr(DEXfat ~ 1, data = bodyfat, order = 5))
 logLik(mf)
 
-Mstop <- 1000
+Mstop <- 500
 
 fd <- cv(rep(1, NROW(bodyfat)), type = "kfold", B = 2)
 
 bctrl <- boost_control(nu = .1, trace = TRUE)
 
+tctrl <- ctree_control(minsplit = 2, minbucket = 1, mincriterion = 0,
+                       maxdepth = 5)
+
 bf_t <- ctmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, method =
-quote(mboost::blackboost), control = bctrl)[Mstop]
+quote(mboost::blackboost), control = bctrl, tree_control = tctrl)[Mstop]
 ms <- cvrisk(bf_t, folds = fd)
 plot(ms, main = "CTM-Baum")
 bf_t <- bf_t[mstop(ms)]
@@ -39,10 +43,8 @@ bf_dr <- bf_dr[mstop(ms)]
 logLik(mf, parm = coef(bf_dr))
 table(selected(bf_dr))
 
-Mstop <- 500
-
 bf_st <- tramboost(model = mf, formula = DEXfat ~ ., data = bodyfat, method =
-quote(mboost::blackboost))[Mstop]
+quote(mboost::blackboost), tree_control = tctrl)[Mstop]
 ms <- cvrisk(bf_st, folds = fd)
 plot(ms, main = "Baum")
 bf_st <- bf_st[mstop(ms)]

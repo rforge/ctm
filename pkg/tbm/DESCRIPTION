@@ -7,5 +7,5 @@ Authors@R: person("Torsten", "Hothorn", role = c("aut", "cre"),
 Description: Likelihood-based boosting for conditional transformation models.
 Depends: mlt (>= 1.0-0), mboost
 Imports: variables, basefun, sandwich, coneproj
-Suggests: TH.data, tram, survival
+Suggests: TH.data, tram, survival, partykit
 License: GPL-2
