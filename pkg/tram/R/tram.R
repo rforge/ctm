@@ -105,7 +105,7 @@ tram <- function(formula, data, subset, weights, offset, cluster, na.action = na
                  distribution = c("Normal", "Logistic", "MinExtrVal"),
                  transformation = c("discrete", "linear", "logarithmic", "smooth"),
                  LRtest = TRUE, 
-                 prob = c(.1, .9), support = NULL, order = 6, negative =
+                 prob = c(.1, .9), support = NULL, bounds = NULL, add = c(0, 0), order = 6, negative =
                  TRUE, scale = TRUE, model_only = FALSE, ...) 
 {
 
@@ -117,13 +117,8 @@ tram <- function(formula, data, subset, weights, offset, cluster, na.action = na
         td <- eval(mf, parent.frame())
     } 
 
-    bounds <- list(...)$bounds
-    if (is.null(bounds)) {
-        rvar <- asvar(td$response, td$rname, prob = prob, support = support)
-    } else {
-        rvar <- asvar(td$response, td$rname, prob = prob, support = support,
-                      bounds = bounds)
-    }
+    rvar <- asvar(td$response, td$rname, prob = prob, support = support,
+                  bounds = bounds, add = add)
     rbasis <- mkbasis(rvar, transformation = transformation, order = order)
 
     iS <- NULL

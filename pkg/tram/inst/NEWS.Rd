@@ -9,6 +9,7 @@
     \item{Try to implement a better guess for the \code{add} argument
           later defining the axes corresponding to the response
           in plots.}
+    \item{All models accept \code{add} and \code{bounds} arguments.}
   }
 }
 

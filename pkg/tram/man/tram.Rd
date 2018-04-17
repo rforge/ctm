@@ -11,7 +11,8 @@ Likelihood-inference for stratified linear transformation models
 tram(formula, data, subset, weights, offset, cluster, na.action = na.omit, 
      distribution = c("Normal", "Logistic", "MinExtrVal"), 
      transformation = c("discrete", "linear", "logarithmic", "smooth"), 
-     LRtest = TRUE, prob = c(0.1, 0.9), support = NULL, order = 6, 
+     LRtest = TRUE, prob = c(0.1, 0.9), support = NULL, 
+     bounds = NULL, add = c(0, 0), order = 6, 
      negative = TRUE, scale = TRUE, model_only = FALSE, ...)
 tram_data(formula, data, subset, weights, offset, cluster, na.action = na.omit) 
 }
@@ -63,6 +64,11 @@ tram_data(formula, data, subset, weights, offset, cluster, na.action = na.omit)
   }
   \item{support}{a vector of two elements; the support of a smooth
       Bernstein polynomial (if \code{transformation = "smooth"}).
+  }
+  \item{bounds}{an interval defining the bounds of a real sample space.
+  }
+  \item{add}{add these values to the support before generating a grid via
+             \code{\link[variables]{mkgrid}}.
   }
   \item{order}{integer >= 1 defining the order of the Bernstein polynomial 
                (if \code{transformation = "smooth"}).
