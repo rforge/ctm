@@ -66,15 +66,16 @@ vcov.mlt <- function(object, parm = coef(object, fixed = FALSE), complete = FALS
 }
 
 logLik.mlt <- function(object, parm = coef(object, fixed = FALSE), 
-                       w = weights(object), newdata, ...) {
+                       w = NULL, newdata, ...) {
     args <- list(...)
     if (length(args) > 0)
         warning("Arguments ", names(args), " are ignored")
     if (!missing(newdata)) {
         tmpmod <- mlt(object$model, data = newdata, dofit = FALSE)
         coef(tmpmod) <- coef(object)
-        return(logLik(tmpmod, parm = parm, w = rep(1, nrow(newdata))))
+        return(logLik(tmpmod, parm = parm, w = w))
     }
+    w <- weights(object)
     if (!is.null(object$subset)) {
         ret <- sum(object$logliki(parm, weights = w)[object$subset] * 
                    w[object$subset])

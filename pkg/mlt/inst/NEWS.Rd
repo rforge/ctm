@@ -2,6 +2,13 @@
 \name{NEWS}
 \title{NEWS file for the mlt package}
 
+\section{Changes in Version 1.0-2 (2018-04-xx)}{
+  \itemize{
+    \item{\code{logLik(..., newdata, w)} ignored weights \code{w} when
+          \code{newdata} was given.}
+  }
+}
+
 \section{Changes in Version 1.0-1 (2018-03-20)}{
   \itemize{
     \item{\code{estfun, parm = coef(object, fixed = TRUE))} evaluates
