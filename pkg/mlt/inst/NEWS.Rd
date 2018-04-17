@@ -5,7 +5,8 @@
 \section{Changes in Version 1.0-2 (2018-04-xx)}{
   \itemize{
     \item{\code{logLik(..., newdata, w)} ignored weights \code{w} when
-          \code{newdata} was given.}
+          \code{newdata} was given. Same problem was also fixed for
+          \code{estfun}.}
   }
 }
 
