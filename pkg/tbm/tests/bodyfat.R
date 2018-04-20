@@ -19,20 +19,20 @@ fd <- cv(rep(1, NROW(bodyfat)), type = "kfold", B = 2)
 bctrl <- boost_control(nu = .1, trace = TRUE)
 
 tctrl <- ctree_control(minsplit = 2, minbucket = 1, mincriterion = 0,
-                       maxdepth = 5)
+                       maxdepth = 5, splittest = TRUE, testtype = "Teststatistic")
 
 bf_t <- ctmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, method =
 quote(mboost::blackboost), control = bctrl, tree_control = tctrl)[Mstop]
 ms <- cvrisk(bf_t, folds = fd)
 plot(ms, main = "CTM-Baum")
 bf_t <- bf_t[mstop(ms)]
-logLik(mf, parm = coef(bf_t))
+logLik(bf_t)
 
 bf_ctm <- ctmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, control = bctrl)[Mstop]
 ms <- cvrisk(bf_ctm, folds = fd)
 plot(ms, main = "CTM-Add")
 bf_ctm <- bf_ctm[mstop(ms)]
-logLik(mf, parm = coef(bf_ctm))
+logLik(bf_ctm)
 table(selected(bf_ctm))
 
 bf_dr <- ctmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, baselearner =
@@ -40,7 +40,7 @@ bf_dr <- ctmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, baselearner 
 ms <- cvrisk(bf_dr, folds = fd)
 plot(ms, main = "Distr Reg")
 bf_dr <- bf_dr[mstop(ms)]
-logLik(mf, parm = coef(bf_dr))
+logLik(bf_dr)
 table(selected(bf_dr))
 
 bf_st <- tramboost(model = mf, formula = DEXfat ~ ., data = bodyfat, method =
@@ -48,20 +48,20 @@ quote(mboost::blackboost), tree_control = tctrl)[Mstop]
 ms <- cvrisk(bf_st, folds = fd)
 plot(ms, main = "Baum")
 bf_st <- bf_st[mstop(ms)]
-logLik(bf_st$model, parm = coef(bf_st))
+logLik(bf_st)
 
 bf_shift <- tramboost(model = mf, formula = DEXfat ~ ., data = bodyfat, method = quote(mboost::gamboost))[Mstop]
 ms <- cvrisk(bf_shift, folds = fd)
 plot(ms, main = "GAM")
 bf_shift <- bf_shift[mstop(ms)]
-logLik(bf_shift$model, parm = coef(bf_shift))
+logLik(bf_shift)
 table(selected(bf_shift))
 
 bf_lin <- tramboost(model = mf, formula = DEXfat ~ . - 1, data = bodyfat, method = quote(mboost:::glmboost.formula))[Mstop]
 ms <- cvrisk(bf_lin, folds = fd)
 plot(ms, main = "TRAM")
 bf_lin <- bf_lin[mstop(ms)]
-logLik(bf_lin$model, parm = coef(bf_lin))
+logLik(bf_lin)
 table(selected(bf_lin))
 
 

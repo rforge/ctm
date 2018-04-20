@@ -286,6 +286,11 @@ predict.tramboost <- function(object, newdata = NULL, which = NULL,
 coef.tbm <- function(object, newdata = NULL, ...)
     predict(object, newdata = newdata, coef = TRUE, ...)
 
-logLik.tbm <- function(object, newdata = NULL, coef = coef(object, newdata = newdata), 
-                       weights = model.weights(object), ...)
-    logLik(object$model, parm = coef, newdata = newdata, weights = weights, ...)
+logLik.tbm <- function(object, parm = coef(object, newdata = newdata), 
+                       w = NULL, newdata = NULL, ...)
+{
+    parm <- parm ### evaluate here
+    if (is.null(newdata)) newdata <- object$model$data
+    logLik(object$model, parm = parm, w = w, newdata = newdata, ...)
+}
+
