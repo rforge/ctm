@@ -1,6 +1,6 @@
 
-R version 3.4.3 (2017-11-30) -- "Kite-Eating Tree"
-Copyright (C) 2017 The R Foundation for Statistical Computing
+R Under development (unstable) (2018-04-18 r74618) -- "Unsuffered Consequences"
+Copyright (C) 2018 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -48,7 +48,7 @@ Coefficients:
 Scale= 0.748 
 
 Loglik(model)= -2609   Loglik(intercept only)= -2637
-	Chisq= 57 on 2 degrees of freedom, p= 4.2e-13 
+	Chisq= 57 on 2 degrees of freedom, p= 4e-13 
 n= 686 
 > (Smod <- Survreg(tfm, data = GBSG2, dist = "weibull"))
 
@@ -101,7 +101,7 @@ Scale:
 0.802 0.646 
 
 Loglik(model)= -2606   Loglik(intercept only)= -2636
-	Chisq= 59.7 on 2 degrees of freedom, p= 1.1e-13 
+	Chisq= 59.7 on 2 degrees of freedom, p= 1e-13 
 n= 686 
 > (Smod <- Survreg(tfms, data = GBSG2, dist = "weibull"))
 
@@ -153,7 +153,7 @@ Coefficients:
 Scale fixed at 1 
 
 Loglik(model)= -2624   Loglik(intercept only)= -2648
-	Chisq= 47.5 on 2 degrees of freedom, p= 4.8e-11 
+	Chisq= 47.5 on 2 degrees of freedom, p= 5e-11 
 n= 686 
 > (Smod <- Survreg(tfm, data = GBSG2, dist = "exponential"))
 
@@ -246,7 +246,7 @@ Coefficients:
 Scale fixed at 0.5 
 
 Loglik(model)= -2649   Loglik(intercept only)= -2688
-	Chisq= 78.7 on 2 degrees of freedom, p= 0 
+	Chisq= 78.7 on 2 degrees of freedom, p= <2e-16 
 n= 686 
 > (Smod <- Survreg(tfm, data = GBSG2, dist = "rayleigh"))
 
@@ -389,7 +389,7 @@ Scale:
 1.087 0.952 
 
 Loglik(model)= -2587   Loglik(intercept only)= -2618
-	Chisq= 63.2 on 2 degrees of freedom, p= 1.9e-14 
+	Chisq= 63.2 on 2 degrees of freedom, p= 2e-14 
 n= 686 
 > (Smod <- Survreg(tfms, data = GBSG2, dist = "lognormal"))
 
@@ -441,7 +441,7 @@ Coefficients:
 Scale= 0.606 
 
 Loglik(model)= -2596   Loglik(intercept only)= -2628
-	Chisq= 64.2 on 2 degrees of freedom, p= 1.1e-14 
+	Chisq= 64.2 on 2 degrees of freedom, p= 1e-14 
 n= 686 
 > (Smod <- Survreg(tfm, data = GBSG2, dist = "loglogistic"))
 
@@ -494,7 +494,7 @@ Scale:
 0.631 0.559 
 
 Loglik(model)= -2595   Loglik(intercept only)= -2628
-	Chisq= 65.1 on 2 degrees of freedom, p= 7.2e-15 
+	Chisq= 65.1 on 2 degrees of freedom, p= 7e-15 
 n= 686 
 > (Smod <- Survreg(tfms, data = GBSG2, dist = "loglogistic"))
 
@@ -548,7 +548,7 @@ Coefficients:
 Scale= 5.57 
 
 Loglik(model)= -28.9   Loglik(intercept only)= -29.5
-	Chisq= 1.1 on 2 degrees of freedom, p= 0.58 
+	Chisq= 1.1 on 2 degrees of freedom, p= 0.6 
 n= 20 
 > (tobinfit2 <- Survreg(Surv(durable, durable>0, type='left') ~ age + quant,
 +                          data=tobin, dist='gaussian'))
@@ -588,4 +588,4 @@ Likelihood-ratio Test: Chisq = 1.1 on 2 degrees of freedom; p = 0.576
 > 
 > proc.time()
    user  system elapsed 
-  4.096   0.048   4.143 
+  7.572   0.224   7.788 

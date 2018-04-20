@@ -1,6 +1,6 @@
 
-R version 3.4.3 (2017-11-30) -- "Kite-Eating Tree"
-Copyright (C) 2017 The R Foundation for Statistical Computing
+R Under development (unstable) (2018-04-18 r74618) -- "Unsuffered Consequences"
+Copyright (C) 2018 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -34,6 +34,13 @@ The following object is masked from 'package:variables':
 Loading required package: libcoin
 Loading required package: mvtnorm
 Loading required package: rpart
+
+Attaching package: 'rpart'
+
+The following object is masked from 'package:survival':
+
+    solder
+
 > 
 > ### Windows diffs...
 > options(digits = 3)
@@ -61,9 +68,9 @@ pnodes      1.054      0.949     1.040     1.068
 
 Concordance= 0.66  (se = 0.032 )
 Rsquare= 0.088   (max possible= 0.981 )
-Likelihood ratio test= 63.2  on 2 df,   p=1.84e-14
-Wald test            = 75.1  on 2 df,   p=0
-Score (logrank) test = 77.5  on 2 df,   p=0
+Likelihood ratio test= 63.2  on 2 df,   p=2e-14
+Wald test            = 75.1  on 2 df,   p=<2e-16
+Score (logrank) test = 77.5  on 2 df,   p=<2e-16
 
 > 
 > Cmod <- Coxph(Surv(time, cens) | 0 + horTh:tgrade ~ progrec + pnodes, 
@@ -150,4 +157,4 @@ Number of terminal nodes: 3
 > 
 > proc.time()
    user  system elapsed 
-  5.264   0.044   5.321 
+  7.460   0.256   7.709 
