@@ -16,4 +16,5 @@ Imports: Formula, multcomp, variables (>= 1.0-0), basefun (>= 1.0-0),
 Suggests: MASS, TH.data, trtf, mlbench, knitr, quantreg, ordinal, 
   colorspace, ATR
 VignetteBuilder: knitr
+Encoding: UTF-8
 License: GPL-2
