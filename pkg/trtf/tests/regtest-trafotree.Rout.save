@@ -1,6 +1,6 @@
 
-R version 3.4.3 (2017-11-30) -- "Kite-Eating Tree"
-Copyright (C) 2017 The R Foundation for Statistical Computing
+R Under development (unstable) (2018-04-18 r74618) -- "Unsuffered Consequences"
+Copyright (C) 2018 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -33,6 +33,13 @@ Loading required package: libcoin
 Loading required package: mvtnorm
 Loading required package: rpart
 > library("survival")
+
+Attaching package: 'survival'
+
+The following object is masked from 'package:rpart':
+
+    solder
+
 > data("GBSG2", package = "TH.data")
 > set.seed(290875)
 > ### Make UL and Windooze happy
@@ -108,13 +115,13 @@ Warning messages:
 > 
 > simulate(st2, newdata = GBSG2[1:3,], nsim = 3)
 [[1]]
-[1] (2000, Inf]      1715.28376539954 1942.00674506179
+[1] (2000, Inf]      1715.28376537624 1942.00674504635
 
 [[2]]
-[1] 1765.40158059741 (2000, Inf]      (2000, Inf]     
+[1] 1765.40158059915 (2000, Inf]      (2000, Inf]     
 
 [[3]]
-[1] 969.052708338817 (2000, Inf]      640.735616312281
+[1] 969.052708339234 (2000, Inf]      640.735616330802
 
 > 
 > st1 <- ctree(y ~ horTh + age + menostat + tsize + tgrade +
@@ -134,4 +141,4 @@ n1    3   4   6   7
 > 
 > proc.time()
    user  system elapsed 
-  3.792   0.024   3.845 
+  4.720   0.320   5.034 
