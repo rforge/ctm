@@ -2,7 +2,7 @@
 \name{NEWS}
 \title{NEWS file for the tram package}
 
-\section{Changes in Version 0.2-1 (2018-03-xx)}{
+\section{Changes in Version 0.2-1 (2018-04-20)}{
   \itemize{
     \item{Likelihood ratio tests with fixed parameters gave an error.}
     \item{Remove strata from linear predictor (experimental).}
@@ -18,4 +18,3 @@
     \item{\pkg{tram} first published on CRAN.}
   }
 }
-
