@@ -209,7 +209,9 @@ predict.ctmboost <- function(object, newdata = NULL, which = NULL,
         q <- as.data.frame(mkgrid(tmpm, n = 100)[1])
         X <- model.matrix(tmpm, data = q)
         for (i in idx) {
-            coef(tmpm) <- pr[i,]
+            cf <- coef(tmpm)
+            cf[] <- pr[i,]
+            coef(tmpm) <- cf
             tr <- predict(tmpm, newdata = data.frame(1), q = q[[1]], 
                           type = "trafo")
             if (any(diff(tr) < 0)) {
@@ -225,7 +227,9 @@ predict.ctmboost <- function(object, newdata = NULL, which = NULL,
     if (coef) return(pr)
     ret <- c()
     for (i in 1:nrow(pr)) {
-        coef(tmpm) <- pr[i,]
+        cf <- coef(tmpm)
+        cf[] <- pr[i,]
+        coef(tmpm) <- cf
         ret <- cbind(ret, predict(tmpm, newdata = data.frame(1), ...))
     }
     ret
@@ -245,7 +249,9 @@ predict.loglinboost <- function(object, newdata = NULL, which = NULL,
     ret <- c()
     tmpm <- object$model$model
     for (i in 1:nrow(pr)) {
-        coef(tmpm) <- pr[i,]
+        cf <- coef(tmpm)
+        cf[] <- pr[i,]
+        coef(tmpm) <- cf
         ret <- cbind(ret, predict(tmpm, newdata = data.frame(1), ...))
     }
     ret
@@ -265,7 +271,9 @@ predict.tramboost <- function(object, newdata = NULL, which = NULL,
     }
     ret <- c()
     tmpm <- object$model$model
-    coef(tmpm) <- c(nuisance(object), "(Intercept)" = 0)
+    cf <- coef(tmpm)
+    cf[] <- c(nuisance(object), "(Intercept)" = 0)
+    coef(tmpm) <- cf
     ret <- c()
     nd <- newdata[, !colnames(newdata) %in% variable.names(tmpm)[1], drop = FALSE]
     for (i in 1:NROW(pr)) {
