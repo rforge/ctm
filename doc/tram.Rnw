@@ -451,6 +451,8 @@ for simplicity)
 \end{eqnarray*}
 where we replace the cumulative distribution function of the standard normal
 $\Phi$ with the cumulative distribution function of the standard logistic.
+Note that we add the linear predictor instead of substracting it (as in the
+Cox model, see Section~\ref{sec:survival}).
 In this model, the conditional odds is given by
 \begin{eqnarray*}
 \frac{\Prob(\rY \le \ry \mid \rX = \rx)}{\Prob(\rY > \ry \mid \rX = \rx)} =
@@ -458,7 +460,9 @@ In this model, the conditional odds is given by
 \end{eqnarray*}
 The odds ratio between a subject with covariate status $\rx$ and 
 a subject with covariates such that $\tilde{\rx}^\top
-\shiftparm = 0$ is simply $\exp(\tilde{\rx}^\top \shiftparm)$. The
+\shiftparm = 0$ is simply $\exp(\tilde{\rx}^\top \shiftparm)$ (and not
+$\exp(-\tilde{\rx}^\top \shiftparm)$, therefore a positive shift makes sense
+in this model). The
 response-varying baseline transformations conveniently cancel out in this
 odds ratio. We can interpret $\beta$ as log-odds ratios, simultaneously for
 all possible binary logistic regression models with cutpoint $\ry$. The
@@ -619,7 +623,7 @@ for (i in idx) {
 \end{figure}
 
 
-\section{Survival Analysis}
+\section{Survival Analysis} \label{sec:survival}
 
 Yet another choice of $\pZ$ is motivated by the desire to obtain simple model
 interpretation. In survival analysis, we are interested in the conditional
