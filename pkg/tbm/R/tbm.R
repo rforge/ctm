@@ -80,7 +80,6 @@
     nd <- as.data.frame(mkgrid(model, n = 50))
     dr <- 1
     names(dr) <- names(nd)
-    mm <- model.matrix(model$model, data = nd, deriv = dr)
     offset <- c(theta[1], diff(theta))
     OM <- matrix(offset, nrow = NROW(data), ncol = length(offset),
                  byrow = TRUE)
