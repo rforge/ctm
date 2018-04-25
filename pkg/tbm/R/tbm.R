@@ -131,7 +131,8 @@ ctmboost <- function(model, formula, data = list(), weights = NULL,
     stopifnot(is.null(model$model$bases$interacting))
     stopifnot(is.null(model$model$bases$shifting))
     myctm <- model$model
-    if (inherits(myctm$bases$response, "Bernstein_basis")) {
+    if (inherits(myctm$bases$response, "Bernstein_basis") ||
+        inherits(myctm$bases$response, "formula_basis")) {
         mf$family <- .ctmFamily(myctm, basedata, weights)
         class <- "ctmboost"
     } else if (inherits(myctm$bases$response, "log_basis") ||
