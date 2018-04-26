@@ -10,7 +10,7 @@
     ngradient <- function(y, f, w) {
         ### update to weights w if necessary
         if (!isTRUE(all.equal(w, weights))) {
-            mf <<- mlt(model, data, weights  = w)
+            mf <<- mlt(model, data, weights  = w, theta = coef(model))
             theta <<- coef(mf)
             ### start low!
             offset <<- c(theta[1], log(theta[2]))
@@ -75,7 +75,7 @@
 }
 
 .ctmFamily <- function(model, data, weights) {
-    mf <- mlt(model, data, weights  = weights)
+    mf <- mlt(model, data, weights  = weights, theta = coef(model))
     theta <- coef(mf)
     nd <- as.data.frame(mkgrid(model, n = 50))
     dr <- 1
@@ -88,7 +88,7 @@
     ngradient <- function(y, f, w) {
         ### update to weights w if necessary
         if (!isTRUE(all.equal(w, weights))) {
-            mf <<- mlt(model, data, weights  = w)
+            mf <<- mlt(model, data, weights  = w, theta = coef(model))
             theta <<- coef(mf)
             offset <- c(theta[1], diff(theta))
             OM <<- matrix(offset, nrow = NROW(data), ncol = length(offset),
@@ -131,6 +131,7 @@ ctmboost <- function(model, formula, data = list(), weights = NULL,
     stopifnot(is.null(model$model$bases$interacting))
     stopifnot(is.null(model$model$bases$shifting))
     myctm <- model$model
+    coef(myctm) <- coef(model)
     if (inherits(myctm$bases$response, "Bernstein_basis") ||
         inherits(myctm$bases$response, "formula_basis")) {
         mf$family <- .ctmFamily(myctm, basedata, weights)
