@@ -49,6 +49,11 @@ the latter parameterised by a Bernstein polynomial. The model can be fitted
 under stratification (time-varying coefficients), all types of random
 censoring and trunction. An early reference to this parameterisation is
 McLain and Ghosh (2013).
+
+The responses is bounded (\code{bounds = c(0, Inf)}) when specified as a
+\code{Surv} object. Otherwise, \code{bounds} can be specified via
+\code{\dots}.
+
 }
 \value{
 An object of class \code{Coxph}, with corresponding \code{coef},
