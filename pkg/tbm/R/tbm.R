@@ -38,7 +38,8 @@
 
 .tramFamily <- function(object, data, weights) {
 
-    model <- mlt(object, data, fixed = c("(Intercept)" = 0), weights = weights)
+    model <- mlt(object, data, fixed = c("(Intercept)" = 0), weights = weights, 
+                 theta = coef(object)[-length(coef(object))])
 
     ngradient <- function(y, f, w = 1) {
         if (length(f) == 1) f <- rep(f, nrow(data))
@@ -176,6 +177,10 @@ tramboost <- function(model, formula, data = list(), weights = NULL,
                  "minimum extreme value" = "MinExtrVal")
     myctm <- ctm(tmp$response, tmp$interacting, tmp$shifting, 
                  todistr = td)
+    cf <- coef(myctm)
+    cf[] <- 0
+    cf[names(coef(model))] <- coef(model)
+    coef(myctm) <- cf
     mf$family <- .tramFamily(myctm, basedata, weights)
     mf[[1L]] <- method
 
