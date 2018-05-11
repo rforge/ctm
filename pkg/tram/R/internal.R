@@ -23,6 +23,7 @@ asvar.numeric <- function(object, name, prob = c(.1, .9), support = NULL, bounds
 }
 
 asvar.Surv <- function(object, name, prob = c(.1, .9), support = NULL, bounds = c(0, Inf), add = c(0, 0), ...) {
+    if (is.null(bounds)) bounds <- c(0, Inf)
     if (is.null(support)) {
         support <- quantile(survfit(y ~ 1, data = data.frame(y = object)), prob = prob)$quantile
         if (is.na(support[2])) 
