@@ -36,7 +36,7 @@
            nuisance = function() offset)
 }
 
-.tramFamily <- function(object, data, weights) {
+.stmFamily <- function(object, data, weights) {
 
     model <- mlt(object, data, fixed = c("(Intercept)" = 0), weights = weights, 
                  theta = coef(object)[-length(coef(object))])
@@ -155,7 +155,7 @@ ctmboost <- function(model, formula, data = list(), weights = NULL,
     return(ret) 
 }
 
-tramboost <- function(model, formula, data = list(), weights = NULL, 
+stmboost <- function(model, formula, data = list(), weights = NULL, 
                       method = quote(mboost::mboost), ...) {
 
     ### note: This defines the response and MUST match data
@@ -184,12 +184,12 @@ tramboost <- function(model, formula, data = list(), weights = NULL,
     cf[] <- 0
     cf[names(coef(model))] <- coef(model)
     coef(myctm) <- cf
-    mf$family <- .tramFamily(myctm, basedata, weights)
+    mf$family <- .stmFamily(myctm, basedata, weights)
     mf[[1L]] <- method
 
     ret <- eval(mf, parent.frame())
     ret$model <- mlt(myctm, data = basedata, dofit = FALSE)
-    class(ret) <- c("tramboost", "tbm", class(ret))
+    class(ret) <- c("stmboost", "tbm", class(ret))
     return(ret) 
 }
 
@@ -266,7 +266,7 @@ predict.loglinboost <- function(object, newdata = NULL, which = NULL,
     ret
 }
 
-predict.tramboost <- function(object, newdata = NULL, which = NULL, 
+predict.stmboost <- function(object, newdata = NULL, which = NULL, 
                               coef = FALSE, ...) {
 
     class(object) <- class(object)[-1L]

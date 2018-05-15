@@ -1,5 +1,5 @@
-\name{tramboost}
-\alias{tramboost}
+\name{stmboost}
+\alias{stmboost}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 %%  ~~function to do ... ~~
@@ -8,7 +8,7 @@
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-tramboost(model, formula, data = list(), weights = NULL, method = quote(mboost::mboost), ...)
+stmboost(model, formula, data = list(), weights = NULL, method = quote(mboost::mboost), ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -84,11 +84,11 @@ function (model, formula, data = list(), weights = NULL, method = quote(mboost::
         `minimum extreme value` = "MinExtrVal")
     myctm <- ctm(tmp$response, tmp$interacting, tmp$shifting, 
         todistr = td)
-    mf$family <- .tramFamily(myctm, basedata, weights)
+    mf$family <- .stmFamily(myctm, basedata, weights)
     mf[[1L]] <- method
     ret <- eval(mf, parent.frame())
     ret$model <- mlt(myctm, data = basedata, dofit = FALSE)
-    class(ret) <- c("tramboost", "tbm", class(ret))
+    class(ret) <- c("stmboost", "tbm", class(ret))
     return(ret)
   }
 }

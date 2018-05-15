@@ -43,21 +43,21 @@ bf_dr <- bf_dr[mstop(ms)]
 logLik(bf_dr)
 table(selected(bf_dr))
 
-bf_st <- tramboost(model = mf, formula = DEXfat ~ ., data = bodyfat, method =
+bf_st <- stmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, method =
 quote(mboost::blackboost), tree_control = tctrl)[Mstop]
 ms <- cvrisk(bf_st, folds = fd)
 plot(ms, main = "Baum")
 bf_st <- bf_st[mstop(ms)]
 logLik(bf_st)
 
-bf_shift <- tramboost(model = mf, formula = DEXfat ~ ., data = bodyfat, method = quote(mboost::gamboost))[Mstop]
+bf_shift <- stmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, method = quote(mboost::gamboost))[Mstop]
 ms <- cvrisk(bf_shift, folds = fd)
 plot(ms, main = "GAM")
 bf_shift <- bf_shift[mstop(ms)]
 logLik(bf_shift)
 table(selected(bf_shift))
 
-bf_lin <- tramboost(model = mf, formula = DEXfat ~ . - 1, data = bodyfat, method = quote(mboost:::glmboost.formula))[Mstop]
+bf_lin <- stmboost(model = mf, formula = DEXfat ~ . - 1, data = bodyfat, method = quote(mboost:::glmboost.formula))[Mstop]
 ms <- cvrisk(bf_lin, folds = fd)
 plot(ms, main = "TRAM")
 bf_lin <- bf_lin[mstop(ms)]

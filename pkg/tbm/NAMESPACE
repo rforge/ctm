@@ -8,10 +8,11 @@ importFrom("variables", "mkgrid")
 importFrom("stats", "coef", "fitted", "model.matrix", 
            "na.omit", "complete.cases", "logLik", "predict", 
            "model.frame", "model.weights", "variable.names")
+importFrom("methods", "as")
 
-export("ctmboost", "tramboost")
+export("ctmboost", "stmboost")
 S3method("predict", "ctmboost")
 S3method("predict", "loglinboost")
-S3method("predict", "tramboost")
+S3method("predict", "stmboost")
 S3method("coef", "tbm")
 S3method("logLik", "tbm")
