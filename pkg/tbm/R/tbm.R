@@ -45,11 +45,14 @@
         if (length(f) == 1) f <- rep(f, nrow(data))
         if (length(w) == 1) w <- rep(w, nrow(data))
         ### F(a(y) + (Intercept) + offset)
+        ### <FIXME> this requires a complete setup (model.matrix, etc)
+        ### of the model and takes tiiiiime...
         tmp <- mlt(object, data = data, weights = w, fixed = c("(Intercept)" = 0),
-                      theta = coef(model, fixed = FALSE), offset = -f)
+                   theta = coef(model, fixed = FALSE), offset = -f)
         if (logLik(tmp) < logLik(model))
             warning("risk increase; decrease stepsize nu")
         model <<- tmp
+        ### same problem here; current design of mlt not appropriate </FIXME>
         tmp <- mlt(object, data = data, dofit = FALSE, offset = -f)
         coef(tmp) <- coef(model, fixed = TRUE)
         i <- names(coef(tmp)) == "(Intercept)"
