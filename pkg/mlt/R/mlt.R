@@ -109,7 +109,7 @@
                         iYleft, iYright, ioffset, itrunc)(.parm(beta_nex))
                 return(ret)
             },
-            sc = function(beta) {
+            sc = function(beta, Xmult = TRUE) {
                 ret <- ret_sc 
                 if (is.matrix(beta)) {
                     beta_ex <- beta[es$full_ex,,drop = FALSE]
@@ -121,10 +121,10 @@
                 }
                 if (!is.null(es$full_ex))
                     ret[es$full_ex,] <- .mlt_score_exact(todistr, 
-                        exY, exYprime, exoffset, extrunc)(.parm(beta_ex))
+                        exY, exYprime, exoffset, extrunc)(.parm(beta_ex), Xmult)
                 if (!is.null(es$full_nex))
                     ret[es$full_nex,] <- .mlt_score_interval(todistr, 
-                        iYleft, iYright, ioffset, itrunc)(.parm(beta_nex))
+                        iYleft, iYright, ioffset, itrunc)(.parm(beta_nex), Xmult)
                 colnames(ret) <- colnames(Y)
                 ### in case beta contains fix parameters,
                 ### return all scores
