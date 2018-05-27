@@ -947,7 +947,7 @@ coxphtmp <- coxph(Surv(time, cens) ~ 1  + offset(of), data = GBSG2)
 b <- survfit(coxphtmp)
 layout(matrix(1:2, nc = 2))
 col <- rgb(.1, .1, .1, .1)
-ylim <- range(unlist(p))
+ylim <- range(unlist(p)[is.finite(unlist(p))])
 plot(ndtmp$y, p[[1]], type = "l", ylim =  ylim, col = col, xlab = "Survival Time (days)",
      ylab = "Log-cumulative Hazard")
 out <- sapply(p, function(y) lines(ndtmp$y, y, col = col))
@@ -1164,8 +1164,8 @@ p1 <- contourplot(d ~ lp + q, data = nd, panel = pfun,
                   xlab = "Linear predictor", ylab = "Observed", 
                   main = "Normal Linear Model")
 
-d <- predict(mlt_BH, newdata = BostonHousing2, q = q, type="distribution")
-lp <- c(predict(mlt_BH, newdata = BostonHousing2, q = 0, terms = "bshift"))
+d <- predict(mlt_BH, newdata = BostonHousing2, q = q, type = "distribution")
+lp <- c(predict(mlt_BH, newdata = BostonHousing2, q = 1, terms = "bshift"))
 nd <- expand.grid(q = q, lp = -lp)
 nd$d <- c(d)
 pfun <- function(x, y, z, subscripts, at, ...) {
