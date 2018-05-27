@@ -2,6 +2,12 @@
 \name{NEWS}
 \title{NEWS file for the mlt.docreg package}
 
+\section{Changes in Version 1.0-1 (2018-05-27)}{
+  \itemize{
+    \item{Documentation updates.}
+  }
+}
+
 \section{Changes in Version 1.0-0 (2018-03-07)}{
   \itemize{
     \item{A paper describing version 1.0-0 of the \pkg{mlt}, \pkg{basefun}, and
