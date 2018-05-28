@@ -10,6 +10,7 @@
           and may potentially have led to nonsense results.}
     \item{Some smaller improvements in computation of log-likelihoods and
           scores with respect to accuracy and speed.}
+    \item{\code{print} respects \code{options(digits)}.}
   }
 }
 
