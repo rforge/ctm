@@ -47,3 +47,21 @@ cmod <- coxph(Surv(time, cens) ~ horTh + age + menostat + tsize + tgrade +
     pnodes + progrec + estrec, data = GBSG2)
 
 plot(survfit(cmod, newdata = GBSG2[1:3,]))
+
+### sanity checks
+
+p11 <- predict(tf, newdata = GBSG2[1:11,], type = "weights")
+p12 <- predict(tf, newdata = GBSG2[1:11,], type = "weights", cores = 2)
+stopifnot(all.equal(p11, p12))
+
+p21 <- predict(tf, newdata = GBSG2[1:11,], type = "node")
+p22 <- predict(tf, newdata = GBSG2[1:11,], type = "node", cores = 2)
+stopifnot(all.equal(p21, p22))
+
+p31 <- predict(tf, newdata = GBSG2[1:11,])
+p32 <- predict(tf, newdata = GBSG2[1:11,], cores = 2)
+stopifnot(all.equal(p31, p32))
+
+p41 <- predict(tf, newdata = GBSG2[1:11,], type = "coef")
+p42 <- predict(tf, newdata = GBSG2[1:11,], cores = 2, type = "coef")
+stopifnot(all.equal(p41, p42))
