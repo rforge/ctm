@@ -41,6 +41,8 @@
     model <- mlt(object, data, fixed = c("(Intercept)" = 0), weights = weights, 
                  theta = coef(object)[-length(coef(object))])
 
+    tmp0 <- mlt(object, data = data, dofit = FALSE)
+
     ngradient <- function(y, f, w = 1) {
         if (length(f) == 1) f <- rep(f, nrow(data))
         if (length(w) == 1) w <- rep(w, nrow(data))
@@ -52,21 +54,22 @@
         if (logLik(tmp) < logLik(model))
             warning("risk increase; decrease stepsize nu")
         model <<- tmp
-        ### same problem here; current design of mlt not appropriate </FIXME>
-        tmp <- mlt(object, data = data, dofit = FALSE, offset = -f)
-        coef(tmp) <- coef(model, fixed = TRUE)
-        i <- names(coef(tmp)) == "(Intercept)"
-        ### gradient wrt offset == score wrt (Intercept) = 1
-        ### We need UNWEIGHTED scores
-        iw <- w
-        iw[iw > 0] <- 1/(iw[iw > 0])
-        estfun(tmp, w = w)[,i] * iw
+        ### this is a very bad trick to speed things up
+        ### this function generates the score function
+        ofuns <- get(".ofuns", envir = environment(tmp0$score))
+        ### inject the offset
+        assign("offset", -f, envir = environment(ofuns))
+        ### compute score wrt to an intercept term constant one
+        ret <- drop(-ofuns(w)$sc(coef(model, fixed = TRUE), Xmult = FALSE))
+        return(ret)
     }
 
     risk <- function(y, f, w = 1) {
         if (length(w) == 1) w <- rep(w, nrow(data))
-        tmp <- mlt(object, data = data, dofit = FALSE, offset = -f)
-        -logLik(tmp, w = w, parm = coef(model, fixed = TRUE))
+        ### see comments above
+        ofuns <- get(".ofuns", envir = environment(tmp0$score))
+        assign("offset", -f, envir = environment(ofuns))
+        return(-sum(w * ofuns(w)$ll(coef(model, fixed = TRUE))))
     }
 
     mboost::Family(ngradient = ngradient,
@@ -92,6 +95,9 @@
                  byrow = TRUE)
     CS <- diag(length(coef(mf)))
     CS[upper.tri(CS)] <- 1
+    ### a very bad trick to speed things up
+    ofuns <- get(".ofuns", envir = environment(mf$score))
+    score  <- ofuns(weights)$sc
     ngradient <- function(y, f, w) {
         ### update to weights w if necessary
         if (!isTRUE(all.equal(w, weights))) {
@@ -101,19 +107,17 @@
             OM <<- matrix(offset, nrow = NROW(data), ncol = length(offset),
                           byrow = TRUE)
             weights <<- w
+            ofuns <- get(".ofuns", envir = environment(mf$score))
+            score  <- ofuns(weights)$sc
         }
         f <- matrix(f, nrow = NROW(y), ncol = length(coef(mf))) + OM
         theta <- f %*% CS
-        ret <- - estfun(mf, parm = theta, w = w) %*% t(CS)
-        ### we need unweighted scores!
-        iw <- w
-        iw[iw > 0] <- 1/(iw[iw > 0])
-        ret
+        return(tcrossprod(score(theta), CS))
     }
     risk <- function(y, f, w) {
         f <- matrix(f, nrow = NROW(y), ncol = length(coef(mf))) + OM
         theta <- f %*% CS
-        -logLik(mf, parm = theta, w = w)
+        return(-sum(w * ofuns(w)$ll(theta)))
     }
     Family(ngradient = ngradient, risk = risk, 
            offset = function(...) return(0),
@@ -217,7 +221,7 @@ predict.ctmboost <- function(object, newdata = NULL, which = NULL,
     ### check if transformation function is non-monotone
     ### and fix
     if (cleanup & any(nonmono)) {
-        idx <- which(nonmono, arr.ind = TRUE)[,1]
+        idx <- which(rowSums(nonmono) > 0)
         q <- as.data.frame(mkgrid(tmpm, n = 100)[1])
         X <- model.matrix(tmpm, data = q)
         for (i in idx) {
@@ -226,6 +230,7 @@ predict.ctmboost <- function(object, newdata = NULL, which = NULL,
             coef(tmpm) <- cf
             tr <- predict(tmpm, newdata = data.frame(1), q = q[[1]], 
                           type = "trafo")
+            tr[!is.finite(tr)] <- sign(tr[!is.finite(tr)]) * 10
             if (any(diff(tr) < 0)) {
                 w <- c(0.01, c(.01, 10)[(diff(tr) > 0) + 1L])
                 l <- coneproj::qprog(crossprod(X * sqrt(w)), crossprod(X * w, tr),
