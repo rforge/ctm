@@ -20,7 +20,7 @@ Type 'q()' to quit R.
 Loading required package: basefun
 Loading required package: variables
 > library("np")
-Nonparametric Kernel Methods for Mixed Datatypes (version 0.60-6)
+Nonparametric Kernel Methods for Mixed Datatypes (version 0.60-7)
 [vignette("np_faq",package="np") provides answers to frequently asked questions]
 [vignette("np",package="np") an overview]
 [vignette("entropy_np",package="np") an overview of entropy-based methods]
@@ -65,4 +65,4 @@ Nonparametric Kernel Methods for Mixed Datatypes (version 0.60-6)
 > 
 > proc.time()
    user  system elapsed 
-  1.796   0.072   1.865 
+  2.088   0.068   2.171 

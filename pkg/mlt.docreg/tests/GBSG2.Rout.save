@@ -45,17 +45,17 @@ Loading required package: variables
 > v <- vcov(mod)[n, n]
 > coef(cmod) / cf
     horThyes          age menostatPost        tsize     tgrade.L     tgrade.Q 
-   0.9939063    0.9515362    0.9683811    0.9997614    0.9851680    0.9964934 
+   0.9921436    0.9529604    0.9651639    1.0018545    0.9844133    0.9962937 
       pnodes      progrec       estrec 
-   1.0017132    1.0035906    1.0709679 
+   1.0014457    1.0030109    1.0914889 
 > diag(vcov(cmod)) / diag(v)
     horThyes          age menostatPost        tsize     tgrade.L     tgrade.Q 
-   0.9954304    0.9972914    0.9977362    1.0009441    1.0000382    0.9996852 
+   0.9952318    0.9973617    0.9977185    1.0004079    0.9995287    0.9992544 
       pnodes      progrec       estrec 
-   1.0078981    0.9989809    0.9948581 
+   1.0080593    0.9980306    0.9935648 
 > range(vcov(cmod) / v)
-[1] 0.6699401 1.9540725
+[1] 0.6699071 1.8295563
 > 
 > proc.time()
    user  system elapsed 
-  1.780   0.032   1.809 
+  1.912   0.036   1.943 
