@@ -120,16 +120,10 @@
 
 .mlt_score_exact <- function(d, mm, mmprime, offset = 0, mmtrunc = NULL) {                          
     function(beta, Xmult = TRUE) {
-        if (Xmult) {
-            m1 <- mm
-            m2 <- mmprime
-        } else {
-            m1 <- 1
-            m2 <- 0
-        }
         mmb <- drop(.xmb(mm, beta)) + offset
-        ret <- d$dd2d(mmb) * m1 + 
-               (1 / drop(.xmb(mmprime, beta))) * m2
+        ret <- d$dd2d(mmb) 
+        if (Xmult)
+            ret <- ret * mm + mmprime / drop(.xmb(mmprime, beta))
         if (!is.null(mmtrunc))
             ret <- ret - ..mlt_score_interval(d, mmtrunc$left, 
                                               mmtrunc$right, offset, beta, Xmult) 
