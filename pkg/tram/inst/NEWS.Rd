@@ -2,10 +2,11 @@
 \name{NEWS}
 \title{NEWS file for the tram package}
 
-\section{Changes in Version 0.2-2 (2018-05-11)}{
+\section{Changes in Version 0.2-2 (2018-05-28)}{
   \itemize{
     \item{Use default \code{bounds = c(0, Inf)} for \code{Surv} objects (for example
           in \code{Coxph}.}
+    \item{Update to \pkg{mlt} 1.0-2.}
   }
 }
 
