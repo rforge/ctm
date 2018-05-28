@@ -5,6 +5,7 @@
 \section{Changes in Version 1.0-1 (2018-05-27)}{
   \itemize{
     \item{Documentation updates.}
+    \item{Update to \pkg{mlt} 1.0-2.}
   }
 }
 
