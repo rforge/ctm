@@ -128,7 +128,7 @@ n1    3   4   6   7
 > cf <- coef(mlt(m, data = GBSG2))
 > coef(m1 <- mlt(m, data = GBSG2, weights = w[,1], theta = cf))
   Bs1(y)   Bs2(y)   Bs3(y)   Bs4(y)   Bs5(y)   Bs6(y) 
--5.78913 -1.02730 -1.02730 -1.02730 -0.59181 -0.31233 
+-5.78885 -1.02739 -1.02739 -1.02739 -0.59177 -0.31235 
 > coef(m2 <- mlt(m, data = GBSG2, weights = w[,2], theta = cf))
   Bs1(y)   Bs2(y)   Bs3(y)   Bs4(y)   Bs5(y)   Bs6(y) 
 -4.64957 -0.72016 -0.72016 -0.64744 -0.51526 -0.15658 
@@ -172,4 +172,4 @@ n1    3   4   6   7
 > 
 > proc.time()
    user  system elapsed 
- 48.944   0.180  49.265 
+ 27.952   0.108  28.075 

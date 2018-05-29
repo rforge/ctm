@@ -805,7 +805,7 @@ $`3`
 > 
 > varimp(tf)
    horTh      age menostat    tsize   tgrade   pnodes  progrec   estrec 
--8.88557  0.62227  1.61531 -1.48045 -3.70367 17.43359  8.45861  4.61482 
+-8.88580  0.62224  1.61547 -1.43781 -3.70355 17.46881  8.48636  4.61486 
 > 
 > mod <- mlt(m, data = GBSG2)
 > logLik(mod)
@@ -858,4 +858,4 @@ $`3`
 > 
 > proc.time()
    user  system elapsed 
- 29.244   0.352  29.651 
+ 15.044   0.176  15.196 
