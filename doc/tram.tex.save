@@ -87,7 +87,7 @@ censoring, truncation}
 
 \footnote{Please cite this document as: Torsten Hothorn (2018)
 Transformation Models: The \pkg{tram} Package. 
-R package vignette version 0.2-0, 
+R package vignette version 0.2-2, 
 URL \url{https://CRAN.R-project.org/package=tram}.}
 
 % \input{todo}
@@ -553,6 +553,8 @@ for simplicity)
 \end{eqnarray*}
 where we replace the cumulative distribution function of the standard normal
 $\Phi$ with the cumulative distribution function of the standard logistic.
+Note that we add the linear predictor instead of substracting it (as in the
+Cox model, see Section~\ref{sec:survival}).
 In this model, the conditional odds is given by
 \begin{eqnarray*}
 \frac{\Prob(\rY \le \ry \mid \rX = \rx)}{\Prob(\rY > \ry \mid \rX = \rx)} =
@@ -560,7 +562,9 @@ In this model, the conditional odds is given by
 \end{eqnarray*}
 The odds ratio between a subject with covariate status $\rx$ and 
 a subject with covariates such that $\tilde{\rx}^\top
-\shiftparm = 0$ is simply $\exp(\tilde{\rx}^\top \shiftparm)$. The
+\shiftparm = 0$ is simply $\exp(\tilde{\rx}^\top \shiftparm)$ (and not
+$\exp(-\tilde{\rx}^\top \shiftparm)$, therefore a positive shift makes sense
+in this model). The
 response-varying baseline transformations conveniently cancel out in this
 odds ratio. We can interpret $\beta$ as log-odds ratios, simultaneously for
 all possible binary logistic regression models with cutpoint $\ry$. The
@@ -598,7 +602,7 @@ R> round(cbind(exp(coef(Colr_BH_1)), exp(confint(Colr_BH_1))), 3)
 crim       1.085  1.056     1.115
 zn         0.990  0.980     0.999
 indus      0.973  0.933     1.015
-nox     1089.637 59.160 20069.436
+nox     1089.627 59.159 20069.238
 rm         0.209  0.136     0.323
 age        1.010  1.000     1.021
 dis        1.659  1.424     1.934
@@ -725,7 +729,7 @@ monotone.
 \end{figure}
 
 
-\section{Survival Analysis}
+\section{Survival Analysis} \label{sec:survival}
 
 Yet another choice of $\pZ$ is motivated by the desire to obtain simple model
 interpretation. In survival analysis, we are interested in the conditional
@@ -1070,7 +1074,7 @@ R> coef(Polr_wine_1, with_baseline = TRUE)
 \end{Sinput}
 \begin{Soutput}
    rating1    rating2    rating3    rating4   tempwarm contactyes 
- -1.344383   1.250808   3.466887   5.006404   2.503102   1.527798 
+ -1.344380   1.250812   3.466896   5.006424   2.503109   1.527802 
 \end{Soutput}
 \end{Schunk}
 with identical results. Treating one of the variables as stratum is possible
@@ -1109,11 +1113,11 @@ R> coef(Polr_wine_2, with_baseline = TRUE)
 \end{Sinput}
 \begin{Soutput}
 rating1:(Intercept) rating2:(Intercept) rating3:(Intercept) 
-          -1.323025            1.246455            3.550072 
+          -1.323037            1.246441            3.550041 
 rating4:(Intercept)  rating1:contactyes  rating2:contactyes 
-           4.660264           -1.615099           -1.511602 
+           4.660252           -1.615083           -1.511569 
  rating3:contactyes  rating4:contactyes            tempwarm 
-          -1.674781           -1.050617            2.519071 
+          -1.674757           -1.050634            2.519041 
 \end{Soutput}
 \end{Schunk}
 and again the fit is equivalent. Changing the link function $\pZ$ from
@@ -1192,15 +1196,17 @@ R> which(wine$judge == 9)
 R> (wine$crating <- R(erating, cleft = lrating, cright = rrating))
 \end{Sinput}
 \begin{Soutput}
- [1] (1, 2]  (2, 3]  (2, 3]  (3, 4]  (3, 4]  (3, 4]  (4, NA] (4, NA]
- [9] (NA, 1] (1, 2]  (NA, 1] (2, 3]  (1, 2]  (2, 3]  (4, NA] (3, 4] 
-[17] (1, 2]  (2, 3]  (2, 3]  (1, 2]  (4, NA] (4, NA] (3, 4]  (3, 4] 
-[25] (2, 3]  (1, 2]  (2, 3]  (1, 2]  (2, 3]  (1, 2]  (4, NA] (2, 3] 
-[33] (1, 2]  (2, 3]  (3, 4]  (2, 3]  (2, 3]  (2, 3]  (2, 3]  (2, 3] 
-[41] (2, 3]  (1, 2]  (2, 3]  (1, 2]  (1, 2]  (3, 4]  (4, NA] (3, 4] 
-[49] (NA, 1] (NA, 1] (1, 2]  (1, 2]  (1, 2]  (2, 3]  (1, 2]  (2, 3] 
-[57] (1, 2]  (1, 2]  (1, 2]  (2, 3]  (2, 3]  (2, 3]  (2, 3]  (3, 4] 
-[65] (1, 2]  (1, 3]  (2, 4]  (1, 3]  (2, 4]  (1, 3]  (3, NA] (3, NA]
+ [1] ( 1,  2] ( 2,  3] ( 2,  3] ( 3,  4] ( 3,  4] ( 3,  4] ( 4, NA]
+ [8] ( 4, NA] (NA,  1] ( 1,  2] (NA,  1] ( 2,  3] ( 1,  2] ( 2,  3]
+[15] ( 4, NA] ( 3,  4] ( 1,  2] ( 2,  3] ( 2,  3] ( 1,  2] ( 4, NA]
+[22] ( 4, NA] ( 3,  4] ( 3,  4] ( 2,  3] ( 1,  2] ( 2,  3] ( 1,  2]
+[29] ( 2,  3] ( 1,  2] ( 4, NA] ( 2,  3] ( 1,  2] ( 2,  3] ( 3,  4]
+[36] ( 2,  3] ( 2,  3] ( 2,  3] ( 2,  3] ( 2,  3] ( 2,  3] ( 1,  2]
+[43] ( 2,  3] ( 1,  2] ( 1,  2] ( 3,  4] ( 4, NA] ( 3,  4] (NA,  1]
+[50] (NA,  1] ( 1,  2] ( 1,  2] ( 1,  2] ( 2,  3] ( 1,  2] ( 2,  3]
+[57] ( 1,  2] ( 1,  2] ( 1,  2] ( 2,  3] ( 2,  3] ( 2,  3] ( 2,  3]
+[64] ( 3,  4] ( 1,  2] ( 1,  3] ( 2,  4] ( 1,  3] ( 2,  4] ( 1,  3]
+[71] ( 3, NA] ( 3, NA]
 \end{Soutput}
 \end{Schunk}
 \cmd{Polr} is able to deal with such types of response variables and the
@@ -1219,7 +1225,7 @@ R> coef(Polr_wine_4)
 \end{Sinput}
 \begin{Soutput}
 tempwarm 
- 1.51489 
+1.514888 
 \end{Soutput}
 \end{Schunk}
 As expected, the difference is not very large, but more extreme forms of
@@ -1265,7 +1271,7 @@ R> BC_BH_4 <- trafotree(BC_BH_0,
 R> logLik(BC_BH_4)
 \end{Sinput}
 \begin{Soutput}
-'log Lik.' -1286.98 (df=77)
+'log Lik.' -1286.959 (df=77)
 \end{Soutput}
 \end{Schunk}
 In each terminal node of the corresponding tree (depicted in
@@ -1346,7 +1352,7 @@ R> coef(Coxph_GBSG2_3)[, "horThyes"]
 \end{Sinput}
 \begin{Soutput}
           2           4           5 
--0.49167012 -0.47043304  0.09277705 
+-0.49167012 -0.47043257  0.09277705 
 \end{Soutput}
 \end{Schunk}
 These log-hazard ratios and the tree in Figure~\ref{GBSG2-Cox-3-plot} show 

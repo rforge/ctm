@@ -73,6 +73,13 @@ The following object is masked from ‘package:variables’:
 
 Loading required package: libcoin
 Loading required package: rpart
+
+Attaching package: ‘rpart’
+
+The following object is masked from ‘package:survival’:
+
+    solder
+
 $tram
  [1] "tram"      "mlt"       "basefun"   "variables" "stats"     "graphics" 
  [7] "grDevices" "utils"     "datasets"  "methods"   "base"     
@@ -328,7 +335,7 @@ R> round(cbind(exp(coef(Colr_BH_1)), exp(confint(Colr_BH_1))), 3)
 crim       1.085  1.056     1.115
 zn         0.990  0.980     0.999
 indus      0.973  0.933     1.015
-nox     1089.637 59.160 20069.436
+nox     1089.627 59.159 20069.238
 rm         0.209  0.136     0.323
 age        1.010  1.000     1.021
 dis        1.659  1.424     1.934
@@ -487,7 +494,7 @@ R> logLik(Polr_wine_1)
 'log Lik.' -86.49192 (df=6)
 R> coef(Polr_wine_1, with_baseline = TRUE)
    rating1    rating2    rating3    rating4   tempwarm contactyes 
- -1.344383   1.250808   3.466887   5.006404   2.503102   1.527798 
+ -1.344380   1.250812   3.466896   5.006424   2.503109   1.527802 
 R> 
 R> ## ----wine-clm-2, cache = TRUE--------------------------------------------
 R> clm_wine_2 <- clm(rating ~ temp, nominal = ~ contact, data = wine)
@@ -507,11 +514,11 @@ R> logLik(Polr_wine_2)
 'log Lik.' -86.20855 (df=9)
 R> coef(Polr_wine_2, with_baseline = TRUE)
 rating1:(Intercept) rating2:(Intercept) rating3:(Intercept) 
-          -1.323025            1.246455            3.550072 
+          -1.323037            1.246441            3.550041 
 rating4:(Intercept)  rating1:contactyes  rating2:contactyes 
-           4.660264           -1.615099           -1.511602 
+           4.660252           -1.615083           -1.511569 
  rating3:contactyes  rating4:contactyes            tempwarm 
-          -1.674781           -1.050617            2.519071 
+          -1.674757           -1.050634            2.519041 
 R> 
 R> ## ----wine-clm-3, cache = TRUE--------------------------------------------
 R> clm_wine_3 <- clm(rating ~ temp, nominal = ~ contact, data = wine, 
@@ -554,15 +561,17 @@ R> rrating[wine$judge == 9] <- r9
 R> which(wine$judge == 9)
 [1] 65 66 67 68 69 70 71 72
 R> (wine$crating <- R(erating, cleft = lrating, cright = rrating))
- [1] (1, 2]  (2, 3]  (2, 3]  (3, 4]  (3, 4]  (3, 4]  (4, NA] (4, NA]
- [9] (NA, 1] (1, 2]  (NA, 1] (2, 3]  (1, 2]  (2, 3]  (4, NA] (3, 4] 
-[17] (1, 2]  (2, 3]  (2, 3]  (1, 2]  (4, NA] (4, NA] (3, 4]  (3, 4] 
-[25] (2, 3]  (1, 2]  (2, 3]  (1, 2]  (2, 3]  (1, 2]  (4, NA] (2, 3] 
-[33] (1, 2]  (2, 3]  (3, 4]  (2, 3]  (2, 3]  (2, 3]  (2, 3]  (2, 3] 
-[41] (2, 3]  (1, 2]  (2, 3]  (1, 2]  (1, 2]  (3, 4]  (4, NA] (3, 4] 
-[49] (NA, 1] (NA, 1] (1, 2]  (1, 2]  (1, 2]  (2, 3]  (1, 2]  (2, 3] 
-[57] (1, 2]  (1, 2]  (1, 2]  (2, 3]  (2, 3]  (2, 3]  (2, 3]  (3, 4] 
-[65] (1, 2]  (1, 3]  (2, 4]  (1, 3]  (2, 4]  (1, 3]  (3, NA] (3, NA]
+ [1] ( 1,  2] ( 2,  3] ( 2,  3] ( 3,  4] ( 3,  4] ( 3,  4] ( 4, NA]
+ [8] ( 4, NA] (NA,  1] ( 1,  2] (NA,  1] ( 2,  3] ( 1,  2] ( 2,  3]
+[15] ( 4, NA] ( 3,  4] ( 1,  2] ( 2,  3] ( 2,  3] ( 1,  2] ( 4, NA]
+[22] ( 4, NA] ( 3,  4] ( 3,  4] ( 2,  3] ( 1,  2] ( 2,  3] ( 1,  2]
+[29] ( 2,  3] ( 1,  2] ( 4, NA] ( 2,  3] ( 1,  2] ( 2,  3] ( 3,  4]
+[36] ( 2,  3] ( 2,  3] ( 2,  3] ( 2,  3] ( 2,  3] ( 2,  3] ( 1,  2]
+[43] ( 2,  3] ( 1,  2] ( 1,  2] ( 3,  4] ( 4, NA] ( 3,  4] (NA,  1]
+[50] (NA,  1] ( 1,  2] ( 1,  2] ( 1,  2] ( 2,  3] ( 1,  2] ( 2,  3]
+[57] ( 1,  2] ( 1,  2] ( 1,  2] ( 2,  3] ( 2,  3] ( 2,  3] ( 2,  3]
+[64] ( 3,  4] ( 1,  2] ( 1,  3] ( 2,  4] ( 1,  3] ( 2,  4] ( 1,  3]
+[71] ( 3, NA] ( 3, NA]
 R> 
 R> ## ----wine-censored-Polr, echo = TRUE-------------------------------------
 R> Polr_wine_4 <- Polr(crating | contact ~ temp, data = wine, 
@@ -571,7 +580,7 @@ R> logLik(Polr_wine_4)
 'log Lik.' -80.25516 (df=9)
 R> coef(Polr_wine_4)
 tempwarm 
- 1.51489 
+1.514888 
 R> 
 R> ## ----BostonHousing-BC-4-0, cache = TRUE----------------------------------
 R> BC_BH_0 <- BoxCox(y ~ 1, data = BostonHousing2)
@@ -585,7 +594,7 @@ R> BC_BH_4 <- trafotree(BC_BH_0,
 +                rm + age + dis + rad + tax + ptratio + b + lstat, data =
 +      BostonHousing2, control = ctree_control(minbucket = 30))
 R> logLik(BC_BH_4)
-'log Lik.' -1286.98 (df=77)
+'log Lik.' -1286.959 (df=77)
 R> 
 R> ## ----BostonHousing-BC-4-plot, fig.width = 14, fig.height = 10, echo = FALSE----
 R> library("ATR")
@@ -615,7 +624,7 @@ R> logLik(Coxph_GBSG2_3)
 'log Lik.' -2581.773 (df=24)
 R> coef(Coxph_GBSG2_3)[, "horThyes"]
           2           4           5 
--0.49167012 -0.47043304  0.09277705 
+-0.49167012 -0.47043257  0.09277705 
 R> 
 R> ## ----GBSG2-Cox-3-plot----------------------------------------------------
 R> nd <- data.frame(horTh = sort(unique(GBSG2$horTh)))
@@ -659,26 +668,26 @@ attached base packages:
 [8] base     
 
 other attached packages:
- [1] ATR_0.1-0         trtf_0.3-1        partykit_1.2-0   
+ [1] ATR_0.1-0         trtf_0.3-2        partykit_1.2-1   
  [4] rpart_4.1-13      libcoin_1.0-1     quantreg_5.35    
- [7] SparseM_1.77      colorspace_1.3-2  ordinal_2015.6-28
+ [7] SparseM_1.77      colorspace_1.3-2  ordinal_2018.4-19
 [10] multcomp_1.4-8    TH.data_1.0-8     mvtnorm_1.0-7    
-[13] mlbench_2.1-1     lattice_0.20-35   MASS_7.3-49      
-[16] survival_2.41-3   tram_0.2-0        mlt_1.0-0        
-[19] basefun_1.0-0     variables_1.0-0  
+[13] mlbench_2.1-1     lattice_0.20-35   MASS_7.3-50      
+[16] survival_2.42-3   tram_0.2-2        mlt_1.0-2        
+[19] basefun_1.0-1     variables_1.0-0  
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.15       compiler_3.4.3     RColorBrewer_1.1-2
- [4] tools_3.4.3        ucminf_1.1-4       Matrix_1.2-12     
+ [1] Rcpp_0.12.17       compiler_3.4.3     RColorBrewer_1.1-2
+ [4] tools_3.4.3        ucminf_1.1-4       Matrix_1.2-14     
  [7] polynom_1.3-9      knitr_1.20         BB_2014.10-1      
-[10] MatrixModels_0.4-1 deSolve_1.20       mstate_0.2.10     
-[13] orthopolynom_1.0-5 alabama_2015.3-1   Formula_1.2-2     
+[10] MatrixModels_0.4-1 deSolve_1.21       mstate_0.2.11     
+[13] orthopolynom_1.0-5 alabama_2015.3-1   Formula_1.2-3     
 [16] codetools_0.2-15   splines_3.4.3      numDeriv_2016.8-1 
 [19] flexsurv_1.1       quadprog_1.5-5     sandwich_2.4-0    
-[22] coneproj_1.12      muhaz_1.2.6        inum_1.0-0        
+[22] coneproj_1.14      muhaz_1.2.6        inum_1.0-0        
 [25] zoo_1.8-1         
 R> 
 R> 
 > proc.time()
    user  system elapsed 
-118.220   0.572 118.913 
+105.468   0.524 106.041 

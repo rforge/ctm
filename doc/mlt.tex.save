@@ -602,9 +602,9 @@ R> RC(polr = polr_CHFLS_1$zeta, mlt = coef(mlt_CHFLS_1))
 \end{Sinput}
 \begin{Soutput}
                                 polr     mlt (polr - mlt)/mlt
-Very unhappy|Not too happy   -4.6874 -4.6875      -2.8925e-05
-Not too happy|Somewhat happy -1.9034 -1.9034       1.7195e-06
-Somewhat happy|Very happy     1.4993  1.4993       2.8626e-05
+Very unhappy|Not too happy   -4.6874 -4.6874       1.0136e-06
+Not too happy|Somewhat happy -1.9034 -1.9034      -1.9208e-07
+Somewhat happy|Very happy     1.4993  1.4993      -1.7416e-06
 \end{Soutput}
 \end{Schunk}
 Of course, the above exercise is an extremely cumbersome way
@@ -620,15 +620,15 @@ R> RC(polr = predict(polr_CHFLS_1, newdata = data.frame(1), type = "prob"),
 \end{Sinput}
 \begin{Soutput}
                     polr       mlt        ML (polr - mlt)/mlt
-Very unhappy   0.0091265 0.0091252 0.0091265       1.3436e-04
-Not too happy  0.1205998 0.1206013 0.1205997      -1.3230e-05
-Somewhat happy 0.6877444 0.6877377 0.6877445       9.8489e-06
-Very happy     0.1825293 0.1825357 0.1825293      -3.5083e-05
+Very unhappy   0.0091265 0.0091265 0.0091265      -4.7077e-06
+Not too happy  0.1205998 0.1205997 0.1205997       6.9851e-07
+Somewhat happy 0.6877444 0.6877449 0.6877445      -6.2653e-07
+Very happy     0.1825293 0.1825289 0.1825293       2.1345e-06
                (ML - mlt)/mlt
-Very unhappy       1.3445e-04
-Not too happy     -1.3326e-05
-Somewhat happy     9.8635e-06
-Very happy        -3.5080e-05
+Very unhappy      -4.6171e-06
+Not too happy      6.0289e-07
+Somewhat happy    -6.1198e-07
+Very happy         2.1384e-06
 \end{Soutput}
 \end{Schunk}
 
@@ -887,11 +887,11 @@ R> RC(polr = c(polr_CHFLS_2$zeta, coef(polr_CHFLS_2)),
 \end{Sinput}
 \begin{Soutput}
                                     polr         mlt (polr - mlt)/mlt
-Very unhappy|Not too happy   -4.80159236 -4.80160079      -1.7555e-06
-Not too happy|Somewhat happy -2.01169559 -2.01175588      -2.9969e-05
-Somewhat happy|Very happy     1.41270713  1.41264902       4.1138e-05
-R_age                        -0.00627896 -0.00628077      -2.8825e-04
-R_income                      0.00023501  0.00023502      -3.5193e-05
+Very unhappy|Not too happy   -4.80159236 -4.80157928       2.7237e-06
+Not too happy|Somewhat happy -2.01169559 -2.01170305      -3.7091e-06
+Somewhat happy|Very happy     1.41270713  1.41270342       2.6245e-06
+R_age                        -0.00627896 -0.00627915      -2.9964e-05
+R_income                      0.00023501  0.00023501      -5.5093e-06
 \end{Soutput}
 \end{Schunk}
 The regression coefficients $\shiftparm$ are the log-odds ratios, \ie 
@@ -1144,25 +1144,25 @@ R> RC(survreg = coef(survreg_GBSG2_2)[names(cf)],
 \end{Sinput}
 \begin{Soutput}
                  survreg       phreg         mlt (survreg - mlt)/mlt
-horThyes      0.33216174  0.33216174  0.33216140          1.0237e-06
-age           0.00941967  0.00941967  0.00941963          4.1564e-06
-menostatPost -0.26853589 -0.26853589 -0.26853648         -2.1958e-06
-tsize        -0.00731794 -0.00731794 -0.00731801         -8.3396e-06
-tgrade.L     -0.51935212 -0.51935212 -0.51934918          5.6612e-06
-tgrade.Q      0.21392176  0.21392176  0.21392108          3.1583e-06
-pnodes       -0.04616647 -0.04616647 -0.04616636          2.3517e-06
-progrec       0.00206709  0.00206709  0.00206711         -1.0375e-05
-estrec       -0.00017885 -0.00017885 -0.00017883          1.1374e-04
+horThyes      0.33216174  0.33216174  0.33216140          1.0292e-06
+age           0.00941967  0.00941967  0.00941963          4.1572e-06
+menostatPost -0.26853589 -0.26853589 -0.26853648         -2.2114e-06
+tsize        -0.00731794 -0.00731794 -0.00731801         -8.3585e-06
+tgrade.L     -0.51935212 -0.51935212 -0.51934917          5.6731e-06
+tgrade.Q      0.21392176  0.21392176  0.21392108          3.1617e-06
+pnodes       -0.04616647 -0.04616647 -0.04616636          2.3501e-06
+progrec       0.00206709  0.00206709  0.00206711         -1.0394e-05
+estrec       -0.00017885 -0.00017885 -0.00017883          1.1399e-04
              (phreg - mlt)/mlt
-horThyes            1.0237e-06
-age                 4.1564e-06
-menostatPost       -2.1958e-06
-tsize              -8.3396e-06
-tgrade.L            5.6612e-06
-tgrade.Q            3.1583e-06
-pnodes              2.3517e-06
-progrec            -1.0375e-05
-estrec              1.1374e-04
+horThyes            1.0292e-06
+age                 4.1571e-06
+menostatPost       -2.2114e-06
+tsize              -8.3585e-06
+tgrade.L            5.6730e-06
+tgrade.Q            3.1617e-06
+pnodes              2.3501e-06
+progrec            -1.0394e-05
+estrec              1.1399e-04
 \end{Soutput}
 \end{Schunk}
 If we allow a scaled log-transformation $\h_\rY(\ry) = \eparm_1 \log(\ry) + \eparm_2$ (the intercept
@@ -1493,9 +1493,9 @@ R> predict(mlt_CHFLS_3, newdata = mkgrid(mlt_CHFLS_3), type = "distribution")
 \begin{Soutput}
                 R_health
 R_happy               Poor   Not good        Fair        Good    Excellent
-  Very unhappy   0.1999982 0.05035934 0.008676623 0.001718219 4.019721e-08
-  Not too happy  0.6000123 0.38129503 0.154012410 0.073883591 7.602338e-02
-  Somewhat happy 0.8999994 0.93525161 0.913232195 0.862542204 5.614046e-01
+  Very unhappy   0.1999991 0.05035963 0.008676796 0.001718215 5.012443e-08
+  Not too happy  0.5999982 0.38129488 0.154013080 0.073883186 7.602344e-02
+  Somewhat happy 0.8999975 0.93525179 0.913232107 0.862542897 5.614034e-01
   Very happy     1.0000000 1.00000000 1.000000000 1.000000000 1.000000e+00
 \end{Soutput}
 \end{Schunk}
@@ -1512,7 +1512,7 @@ R> coef(mlt_CHFLS_4)[c("R_age", "R_income")]
 \end{Sinput}
 \begin{Soutput}
        R_age     R_income 
-0.0117382832 0.0002492679 
+0.0117386981 0.0002492629 
 \end{Soutput}
 \end{Schunk}
 Because the shift basis \code{b\_R} is negative, the effects of both age and income 
@@ -1594,7 +1594,7 @@ R> RC(coxph = cf, mlt = coef(mlt_GBSG2_5)[names(cf)])
 \end{Sinput}
 \begin{Soutput}
           coxph         mlt (coxph - mlt)/mlt
-age -0.00036957 -0.00046049          -0.19744
+age -0.00036957 -0.00046447          -0.20432
 \end{Soutput}
 \end{Schunk}
 The Cox model fitted via the stratified partial likelihood (\cmd{coxph}) and
@@ -1642,9 +1642,9 @@ R> predict(mlt_CHFLS_5, newdata = mkgrid(mlt_CHFLS_5), type = "distribution")
 \begin{Soutput}
                 R_health
 R_happy               Poor   Not good        Fair        Good    Excellent
-  Very unhappy   0.1998996 0.05039632 0.008665935 0.001721158 1.013586e-06
-  Not too happy  0.5998795 0.38129624 0.153996989 0.073882498 7.602025e-02
-  Somewhat happy 0.8997576 0.93522510 0.913243808 0.862559778 5.614392e-01
+  Very unhappy   0.2001065 0.05036008 0.008680778 0.001712238 5.612700e-07
+  Not too happy  0.6001098 0.38129239 0.154015362 0.073877847 7.602102e-02
+  Somewhat happy 0.9003905 0.93524848 0.913234513 0.862546398 5.614128e-01
   Very happy     1.0000000 1.00000000 1.000000000 1.000000000 1.000000e+00
 \end{Soutput}
 \begin{Sinput}
@@ -1680,7 +1680,7 @@ R> mlt_CHFLS_7 <- mlt(ctm_CHFLS_7, data = CHFLS, scale = TRUE)
 R> logLik(mlt_CHFLS_7)
 \end{Sinput}
 \begin{Soutput}
-'log Lik.' -1182.779 (df=21)
+'log Lik.' -1182.778 (df=21)
 \end{Soutput}
 \end{Schunk}
 %Overall, we get
@@ -1719,7 +1719,7 @@ R> mlt_iris <- mlt(ctm_iris, data = iris, scale = TRUE)
 R> logLik(mlt_iris)
 \end{Sinput}
 \begin{Soutput}
-'log Lik.' -5.954736 (df=10)
+'log Lik.' -5.950196 (df=10)
 \end{Soutput}
 \begin{Sinput}
 R> p1 <- predict(mlt_iris, newdata = iris, q = sort(unique(iris$oSpecies)), 
@@ -1728,7 +1728,7 @@ R> p2 <- predict(multinom_iris, newdata = iris, type = "prob")
 R> max(abs(t(p1) - p2))
 \end{Sinput}
 \begin{Soutput}
-[1] 0.01219381
+[1] 0.00327083
 \end{Soutput}
 \end{Schunk}
 From this point of view, the multinomial model for an unordered categorical
@@ -1830,7 +1830,7 @@ R> mlt_GBSG2_7 <- mlt(ctm_GBSG2_7, data = GBSG2)
 R> logLik(mlt_GBSG2_7)
 \end{Sinput}
 \begin{Soutput}
-'log Lik.' -2605.948 (df=22)
+'log Lik.' -2605.949 (df=22)
 \end{Soutput}
 \end{Schunk}
 
@@ -1875,7 +1875,7 @@ R> mlt_GBSG2_8  <- mlt(ctm_GBSG2_8, data = GBSG2)
 R> logLik(mlt_GBSG2_8)
 \end{Sinput}
 \begin{Soutput}
-'log Lik.' -2588.758 (df=88)
+'log Lik.' -2588.757 (df=88)
 \end{Soutput}
 \end{Schunk}
 Figure~\ref{fig:GBSG2-8-plot} allows an assessment of the prognostic and
@@ -1985,7 +1985,7 @@ R> mlt_BHi <- mlt(ctm_BHi, data = BostonHousing2)
 R> logLik(mlt_BHi)
 \end{Sinput}
 \begin{Soutput}
-'log Lik.' -1223.809 (df=98)
+'log Lik.' -1224.118 (df=98)
 \end{Soutput}
 \end{Schunk}
 This takes quite some time, simply because the number of constraints is
@@ -1999,7 +1999,7 @@ R> mlt_BHi2 <- mlt(ctm_BHi2, data = BostonHousing2)
 R> logLik(mlt_BHi2)
 \end{Sinput}
 \begin{Soutput}
-'log Lik.' -1274.377 (df=98)
+'log Lik.' -1274.375 (df=98)
 \end{Soutput}
 \end{Schunk}
 
@@ -2357,20 +2357,20 @@ R> summary((sc_polr - sc_mlt) /
 +          pmax(sqrt(.Machine$double.eps), sc_mlt))
 \end{Sinput}
 \begin{Soutput}
-     R_age              R_income        Very unhappy|Not too happy
- Min.   :-58449.56   Min.   :-1646798   Min.   :  0.00            
- 1st Qu.: -9379.69   1st Qu.:  -78130   1st Qu.:  0.00            
- Median :    -0.08   Median :       0   Median :  0.00            
- Mean   : -4671.78   Mean   :    4489   Mean   : 33.86            
- 3rd Qu.:  1450.80   3rd Qu.:    6226   3rd Qu.:  0.00            
- Max.   : 43764.53   Max.   :10177798   Max.   :325.17            
+     R_age            R_income         Very unhappy|Not too happy
+ Min.   :-6484.9   Min.   :-168809.6   Min.   :  0.00            
+ 1st Qu.:-1296.4   1st Qu.: -11288.0   1st Qu.:  0.00            
+ Median : -231.0   Median :   -575.6   Median :  0.00            
+ Mean   : -710.6   Mean   :  -2095.6   Mean   : 13.12            
+ 3rd Qu.:    0.0   3rd Qu.:      0.0   3rd Qu.:  0.00            
+ Max.   : 6113.3   Max.   :1421703.2   Max.   :115.78            
  Not too happy|Somewhat happy Somewhat happy|Very happy
- Min.   :-220.68              Min.   :-972.358         
- 1st Qu.: -20.70              1st Qu.:   0.000         
- Median :   0.00              Median :   0.000         
- Mean   :  30.04              Mean   :   8.212         
- 3rd Qu.:  82.08              3rd Qu.:   0.000         
- Max.   : 497.12              Max.   : 470.410         
+ Min.   :-42.139              Min.   :-131.370         
+ 1st Qu.:-21.276              1st Qu.:   0.000         
+ Median : -6.376              Median :   0.000         
+ Mean   :-10.019              Mean   :   4.493         
+ 3rd Qu.:  0.000              3rd Qu.:   0.000         
+ Max.   : 32.054              Max.   :  67.507         
 \end{Soutput}
 \end{Schunk}
 and the standard errors of the
@@ -2382,11 +2382,11 @@ R> RC(polr = sqrt(diag(vcov(polr_CHFLS_2))),
 \end{Sinput}
 \begin{Soutput}
                                    polr        mlt (polr - mlt)/mlt
-R_age                        5.6840e-03 5.6845e-03      -7.3761e-05
-R_income                     8.5091e-05 7.0993e-05       1.9858e-01
-Very unhappy|Not too happy   3.5362e-01 3.5226e-01       3.8646e-03
-Not too happy|Somewhat happy 2.4196e-01 2.4005e-01       7.9718e-03
-Somewhat happy|Very happy    2.3724e-01 2.3550e-01       7.3959e-03
+R_age                        5.6840e-03 5.6845e-03      -0.00007372
+R_income                     8.5091e-05 7.0993e-05       0.19858100
+Very unhappy|Not too happy   3.5362e-01 3.5227e-01       0.00385550
+Not too happy|Somewhat happy 2.4196e-01 2.4005e-01       0.00797315
+Somewhat happy|Very happy    2.3724e-01 2.3550e-01       0.00739456
 \end{Soutput}
 \end{Schunk}
 The positive effect of income is ``significant'' by standard measures
@@ -2421,7 +2421,7 @@ Fit: mlt(model = ctm_CHFLS_2, data = CHFLS, scale = TRUE)
 
 Linear Hypotheses:
                 Estimate Std. Error z value Pr(>|z|)    
-R_age == 0    -6.281e-03  5.684e-03  -1.105 0.269202    
+R_age == 0    -6.279e-03  5.684e-03  -1.105 0.269326    
 R_income == 0  2.350e-04  7.099e-05   3.310 0.000932 ***
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
@@ -3595,8 +3595,7 @@ first or last level was observed)
 R> head(R(sort(unique(CHFLS$R_happy))))
 \end{Sinput}
 \begin{Soutput}
-[1] (NA, Very unhappy]              (Very unhappy, Not too happy]  
-[3] (Not too happy, Somewhat happy] (Somewhat happy, NA]           
+[1] (NA,  1] ( 1,  2] ( 2,  3] ( 3, NA]
 \end{Soutput}
 \end{Schunk}
 For integers, $\bar{\ry}$ is the observation and $\ubar{\ry} = \bar{\ry} - 1$
@@ -3605,7 +3604,7 @@ For integers, $\bar{\ry}$ is the observation and $\ubar{\ry} = \bar{\ry} - 1$
 R> R(1:5, bounds = c(1, 5))
 \end{Sinput}
 \begin{Soutput}
-[1] (NA, 1] (1, 2]  (2, 3]  (3, 4]  (4, NA]
+[1] (NA,  1] ( 1,  2] ( 2,  3] ( 3,  4] ( 4, NA]
 \end{Soutput}
 \end{Schunk}
 Numeric observations can be ``exact'' (meaning that the likelihood is
@@ -3625,16 +3624,16 @@ R> R(c(1.2, rep(NA, length(xt))), cleft = c(NA, xl), cright = c(NA, xr),
 +    tleft = -1, tright = 2)
 \end{Sinput}
 \begin{Soutput}
- [1] {1.2| (-1, 2]}                                     
- [2] {(0.143222222222222, 1.03211111111111]| (-1, 2]}   
- [3] {(-1.07566666666667, -0.409]| (-1, 2]}             
- [4] {(-0.116555555555556, Inf]| (-1, 2]}               
- [5] {(-0.940222222222222, -0.162444444444444]| (-1, 2]}
- [6] {(-Inf, 1.03444444444444]| (-1, 2]}                
- [7] {(-0.634333333333333, 0.365666666666667]| (-1, 2]} 
- [8] {(1.50488888888889, 1.94933333333333]| (-1, 2]}    
- [9] {(-0.334, -0.111777777777778]| (-1, 2]}            
-[10] {(-0.370444444444444, 0.851777777777778]| (-1, 2]} 
+ [1] {1.2| (-1, 2]}                     
+ [2] {( 0.1432222,  1.0321111]| (-1, 2]}
+ [3] {(-1.0756667, -0.4090000]| (-1, 2]}
+ [4] {(-0.1165556,        Inf]| (-1, 2]}
+ [5] {(-0.9402222, -0.1624444]| (-1, 2]}
+ [6] {(      -Inf,  1.0344444]| (-1, 2]}
+ [7] {(-0.6343333,  0.3656667]| (-1, 2]}
+ [8] {( 1.5048889,  1.9493333]| (-1, 2]}
+ [9] {(-0.3340000, -0.1117778]| (-1, 2]}
+[10] {(-0.3704444,  0.8517778]| (-1, 2]}
 \end{Soutput}
 \end{Schunk}
 Censoring and truncation (via the \code{cleft}, \code{cright}, \code{tleft}
@@ -3653,7 +3652,7 @@ R> head(geyser$duration)
 R> head(R(geyser$duration))
 \end{Sinput}
 \begin{Soutput}
-[1] 4.0166667 2.15      (4, Inf]  (4, Inf]  (4, Inf]  (0, 2]   
+[1] 4.016667  2.150000  ( 4, Inf] ( 4, Inf] ( 4, Inf] ( 0,   2]
 \end{Soutput}
 \end{Schunk}
 It should be noted that the measurement scale of the observations has
@@ -3754,11 +3753,11 @@ R> coef(fmod)
 \end{Sinput}
 \begin{Soutput}
     Bs1(y)     Bs2(y)     Bs3(y)     Bs4(y)     Bs5(y)     Bs6(y) 
--3.6238582 -1.8049433 -1.8049432 -1.6472937  0.1062599  0.1062601 
+-3.6264891 -1.8047059 -1.8047058 -1.6462021  0.1056733  0.1056734 
     Bs7(y)     Bs8(y)     Bs9(y)    Bs10(y)    Bs11(y)    Bs12(y) 
- 0.1062602  0.6365958  1.5381842  1.5381842  1.5381843  1.5381843 
+ 0.1056734  0.6375211  1.5386218  1.5386218  1.5386219  1.5386218 
    Bs13(y)    Bs14(y)    Bs15(y)    Bs16(y) 
- 2.2775632  2.5998478  2.5998482  3.5619925 
+ 2.2786435  2.5994792  2.5994794  3.5607816 
 \end{Soutput}
 \begin{Sinput}
 R> logLik(fmod)
