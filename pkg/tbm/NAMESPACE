@@ -12,7 +12,6 @@ importFrom("methods", "as")
 
 export("ctmboost", "stmboost")
 S3method("predict", "ctmboost")
-S3method("predict", "loglinboost")
 S3method("predict", "stmboost")
 S3method("coef", "tbm")
 S3method("logLik", "tbm")
