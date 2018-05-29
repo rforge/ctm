@@ -200,7 +200,6 @@ stmboost <- function(model, formula, data = list(), weights = NULL,
     return(ret) 
 }
 
-
 predict.ctmboost <- function(object, newdata = NULL, which = NULL, 
                              coef = FALSE, cleanup = TRUE, ...) {
 
