@@ -85,8 +85,8 @@ Coxph(formula = Surv(time, cens) | 0 + horTh:tgrade ~ progrec +
 
 Coefficients:
          Estimate Std. Error z value Pr(>|z|)    
-progrec -0.002280   0.000569   -4.01  6.2e-05 ***
-pnodes   0.054213   0.006803    7.97  1.6e-15 ***
+progrec -0.002277   0.000569   -4.00  6.3e-05 ***
+pnodes   0.054240   0.006803    7.97  1.6e-15 ***
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
@@ -100,7 +100,7 @@ Likelihood-ratio Test: Chisq = 68.5 on 2 degrees of freedom; p = 1.34e-15
 -0.00216  0.05240 
 > coef(Cmod)
  progrec   pnodes 
--0.00228  0.05421 
+-0.00228  0.05424 
 > 
 > vcov(cmod)
          progrec   pnodes
@@ -108,8 +108,8 @@ progrec 3.11e-07 9.71e-08
 pnodes  9.71e-08 4.69e-05
 > vcov(Cmod)
          progrec   pnodes
-progrec 3.24e-07 7.12e-08
-pnodes  7.12e-08 4.63e-05
+progrec 3.24e-07 7.13e-08
+pnodes  7.13e-08 4.63e-05
 > 
 > cmod <- coxph(Surv(time, cens) ~ ., data = GBSG2)
 > Cmod <- Coxph(Surv(time, cens) ~ ., data = GBSG2)
@@ -157,4 +157,4 @@ Number of terminal nodes: 3
 > 
 > proc.time()
    user  system elapsed 
-  5.640   0.104   5.746 
+   5.52    0.08    5.76 
