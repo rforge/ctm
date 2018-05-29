@@ -128,15 +128,15 @@ Loading required package: variables
 +            todist = "MinExtrVal")
 > coef(opt <- mlt(m, data = mydata, maxit = 5000))
 Bs1(y):(Intercept) Bs2(y):(Intercept) Bs3(y):(Intercept) Bs4(y):(Intercept) 
-        -1.9229279          1.0990286          1.0990286          1.0990286 
+        -1.9225922          1.0983738          1.0983737          1.0983737 
 Bs5(y):(Intercept) Bs6(y):(Intercept)          Bs1(y):g2          Bs2(y):g2 
-         1.0990286          2.5871857          0.2139437          1.3683111 
+         1.0983737          2.5879263          0.2130777          1.3701278 
          Bs3(y):g2          Bs4(y):g2          Bs5(y):g2          Bs6(y):g2 
-         1.3683111          1.3683111          1.3683113         -0.1198455 
+         1.3701278          1.3701278          1.3701278         -0.1194218 
          Bs1(y):g3          Bs2(y):g3          Bs3(y):g3          Bs4(y):g3 
-         0.5176089          1.7839718          1.7839718          1.7839718 
+         0.5168483          1.7853178          1.7853179          1.7853179 
          Bs5(y):g3          Bs6(y):g3 
-         1.7839720          0.2958160 
+         1.7853180          0.2957665 
 > coef(cph <- coxph(Surv(y, rep(TRUE, nrow(mydata))) ~ g, data = mydata))
       g2       g3 
 0.699808 1.022699 
@@ -156,4 +156,4 @@ Bs5(y):(Intercept) Bs6(y):(Intercept)          Bs1(y):g2          Bs2(y):g2
 > 
 > proc.time()
    user  system elapsed 
-  5.216   0.072   5.347 
+  3.236   0.052   3.291 
