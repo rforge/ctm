@@ -2,6 +2,7 @@
 library("tbm")
 library("tram")
 library("trtf")
+library("TH.data")
 
 set.seed(290875)
 

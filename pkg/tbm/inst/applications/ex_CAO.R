@@ -1,6 +1,7 @@
 
 source("setup.R")
-load("Primary_endpoint_data.rda")
+dir <- system.file("rda", package = "TH.data")
+load(file.path(dir, "Primary_endpoint_data.rda"))
 
 ldata <- CAOsurv
 

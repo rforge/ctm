@@ -1,6 +1,8 @@
 
 source("setup.R")
-load("beetles.rda")
+
+dir <- system.file("rda", package = "TH.data")
+load(file.path(dir, "beetles.rda"))
 
 ldata <- bmodel
 ldata$TS <- NULL

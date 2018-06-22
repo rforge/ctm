@@ -1,7 +1,9 @@
 
 source("setup.R")
 
-load("ALSFRSdata.rda")
+dir <- system.file("rda", package = "TH.data")
+
+load(file.path(dir, "ALSFRSdata.rda"))
 ldata <- ALSFRSdata[complete.cases(ALSFRSdata),]
 
 m_mlt <- Colr(ALSFRS.halfYearAfter ~ 1, data = ldata, prob = c(.05, .9))

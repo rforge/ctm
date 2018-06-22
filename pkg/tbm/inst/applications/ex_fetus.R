@@ -1,6 +1,7 @@
 
 source("setup.R")
-load("fetus.rda")
+dir <- system.file("rda", package = "TH.data")
+load(file.path(dir, "fetus.rda"))
 
 fetus$birthweight <- as.double(fetus$birthweight)
 ldata <- fetus

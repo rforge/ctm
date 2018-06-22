@@ -1,7 +1,7 @@
 
 source("setup.R")
-
-load("india.rda")
+dir <- system.file("rda", package = "TH.data")
+load(file.path(dir, "india.rda"))
 
 xvars <- c("cage", "breastfeeding", "mbmi", "mage", "medu", 
            "edupartner", "csex", "ctwin", "cbirthorder", 

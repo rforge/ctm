@@ -2,7 +2,9 @@
 source("setup.R")
 library("survival")
 
-load("ALSsurvdata.rda")
+dir <- system.file("rda", package = "TH.data")
+
+load(file.path(dir, "ALSsurvdata.rda"))
 
 ldata <- ALSsurvdata[complete.cases(ALSsurvdata),]
 ldata$y <- with(ldata, Surv(survival.time, cens))
