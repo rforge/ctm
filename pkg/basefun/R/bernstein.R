@@ -125,8 +125,9 @@ model.matrix.Bernstein_basis <- function(object, data,
 
     ### extrapolate linearily for x outside s
     stopifnot(!integrate)
-    ### interpolate f^d(c + x) = f^d(c) + f^d+1(c + x) * (x - c)
+    ### interpolate f^d(s + x) = f^d(s) + f^d+1(s) * (x - s)
     ### note: the code allows for maxderiv <- deriv + d, d > 1
+    ### Maybe: constrain second deriv in s to be zero
     order <- get("order", envir = environment(object))
     data[[varname]][small] <- s[1]
     data[[varname]][large] <- s[2]
