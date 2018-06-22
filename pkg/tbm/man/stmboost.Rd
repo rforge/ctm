@@ -1,98 +1,66 @@
 \name{stmboost}
 \alias{stmboost}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
+  Likelihood Boosting for Shift Transformation Models  
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+  Employs maximisation of the likelihood for estimation of shift
+  transformation models
 }
 \usage{
 stmboost(model, formula, data = list(), weights = NULL, method = quote(mboost::mboost), ...)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{model}{
-%%     ~~Describe \code{model} here~~
+  \item{model}{an object of class \code{mlt} as returned by
+\code{\link{mlt}[mlt]}.
 }
-  \item{formula}{
-%%     ~~Describe \code{formula} here~~
+  \item{formula}{a model formula describing how the parameters of
+\code{model} depend on explanatory variables, see
+\code{\link[mboost]{mboost}}.
 }
-  \item{data}{
-%%     ~~Describe \code{data} here~~
+  \item{data}{an optional data frame of observations.
 }
-  \item{weights}{
-%%     ~~Describe \code{weights} here~~
+  \item{weights}{an optional vector of weights.
 }
-  \item{method}{
-%%     ~~Describe \code{method} here~~
+  \item{method}{a call to \code{\link[mboost]{mboost}},
+\code{\link[mboost]{gamboost}}, or
+\code{\link[mboost]{blackboost}}.
 }
-  \item{\dots}{
-%%     ~~Describe \code{\dots} here~~
+  \item{\dots}{additional arguments to \code{method}.
 }
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+  The parameters of \code{model} depend on explanatory variables in a
+  possibly structured addtive way (see Hothorn, 2018). The number of boosting
+  iterations is a hyperparameter which needs careful tuning.
 }
-\value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-}
+\value{An object of class \code{stmboost} with \code{predict} and
+\code{logLik} methods.}
 \references{
-%% ~put references to the literature/web site here ~
-}
-\author{
-%%  ~~who you are~~
-}
-\note{
-%%  ~~further notes~~
-}
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
+  Torsten Hothorn (2018). Transformation Boosting Machines.
 
-\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
 
-## The function is currently defined as
-function (model, formula, data = list(), weights = NULL, method = quote(mboost::mboost), 
-    ...) 
-{
-    basedata <- model$data
-    if (inherits(model, "tram")) 
-        model <- as.mlt(model)
-    mf <- match.call(expand.dots = TRUE)
-    mf$model <- mf$method <- NULL
-    if (missing(data)) 
-        data <- environment(formula)
-    tmp <- model$model$bases
-    if (!is.null(tmp$shifting)) {
-        tmp$shifting <- c(int = intercept_basis(), shift = tmp$shifting)
-    }
-    else {
-        tmp$shifting <- intercept_basis()
-    }
-    td <- model$model$todistr$name
-    td <- switch(td, normal = "Normal", logistic = "Logistic", 
-        `minimum extreme value` = "MinExtrVal")
-    myctm <- ctm(tmp$response, tmp$interacting, tmp$shifting, 
-        todistr = td)
-    mf$family <- .stmFamily(myctm, basedata, weights)
-    mf[[1L]] <- method
-    ret <- eval(mf, parent.frame())
-    ret$model <- mlt(myctm, data = basedata, dofit = FALSE)
-    class(ret) <- c("stmboost", "tbm", class(ret))
-    return(ret)
+  if (require("TH.data") && require("tram")) {
+      data("bodyfat", package = "TH.data")
+
+      ### estimate unconditional model
+      m_mlt <- BoxCox(DEXfat ~ 1, data = bodyfat, prob = c(.1, .99))
+      ### get corresponding in-sample log-likelihood
+      logLik(m_mlt)
+
+      ### estimate conditional transformation model
+      bm <- stmboost(m_mlt, formula = DEXfat ~ ., data = bodyfat,
+                     method = quote(mboost::mboost))
+      ### in-sample log-likelihood (NEEDS TUNING OF mstop!)
+      logLik(bm)
+
+      ### evaluate conditional densities for two observations
+      predict(bm, newdata = bodyfat[1:2,], type = "density")
   }
+
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }% use one of  RShowDoc("KEYWORDS")
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{models}
+\keyword{nonlinear}
