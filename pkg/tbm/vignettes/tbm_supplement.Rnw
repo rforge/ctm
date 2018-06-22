@@ -1,0 +1,1681 @@
+
+%\VignetteEngine{knitr::knitr}
+%\VignetteIndexEntry{tbm}
+%\VignetteDepends{tram, tbm, mboost, survival, lattice, latticeExtra, partykit, TH.data}
+
+\documentclass[article,nojss,shortnames]{jss}
+
+%% packages
+\usepackage{thumbpdf}
+\usepackage{animate}
+\usepackage{amsfonts,amstext,amsmath,amssymb,amsthm}
+\usepackage{accents}
+\usepackage{color}
+\usepackage{rotating}
+\usepackage{verbatim}
+\usepackage[utf8]{inputenc}
+%%\usepackage[nolists]{endfloat}
+
+\newcommand{\cmd}[1]{\texttt{#1()}}
+
+<<setup, echo = FALSE, results = "hide", message = FALSE>>=
+set.seed(290875)
+
+dir <- system.file("applications", package = "tbm")
+datadir <- system.file("rda", package = "TH.data")
+
+
+sapply(c("tram", "survival", "tbm", "mboost", "lattice", 
+         "latticeExtra", "partykit"), library, char = TRUE)
+
+trellis.par.set(list(plot.symbol = list(col=1,pch=20, cex=0.7),
+                     box.rectangle = list(col=1),
+                     box.umbrella = list(lty=1, col=1),
+                     strip.background = list(col = "white")))
+ltheme <- canonical.theme(color = FALSE)     ## in-built B&W theme
+ltheme$strip.background$col <- "transparent" ## change strip bg
+lattice.options(default.theme = ltheme)
+
+knitr::opts_chunk$set(echo = TRUE, results = 'markup', error = FALSE,
+                      warning = FALSE, message = FALSE,
+                      tidy = FALSE, cache = FALSE, size = "small",
+                      fig.width = 6, fig.height = 4, fig.align = "center",
+                      out.width = NULL, ###'.6\\linewidth', 
+                      out.height = NULL,
+                      fig.scap = NA)
+knitr::render_sweave()  # use Sweave environments
+knitr::set_header(highlight = '')  # do not \usepackage{Sweave}
+## R settings
+options(prompt = "R> ", continue = "+  ", useFancyQuotes = FALSE)  # JSS style
+options(width = 75)
+library("colorspace")
+col <- diverge_hcl(2, h = c(246, 40), c = 96, l = c(65, 90))
+fill <- diverge_hcl(2, h = c(246, 40), c = 96, l = c(65, 90), alpha = .3)
+@
+
+\newcommand{\TODO}[1]{{\color{red} #1}}
+
+\newcommand\Torsten[1]{{\color{blue}Torsten: ``#1''}}
+
+% File with math commands etc.
+\input{defs.tex}
+
+\renewcommand{\thefootnote}{}
+
+%% code commands
+\newcommand{\Rclass}[1]{`\code{#1}'}
+%% JSS
+\author{Torsten Hothorn \\ Universit\"at Z\"urich}
+\Plainauthor{Hothorn}
+
+\title{Transformation Boosting Machines: Empirical Evaluation of the
+\textbf{tbm} Package}
+\Plaintitle{Transformation Boosting Machines}
+\Shorttitle{The \pkg{tbm} Package}
+
+\Abstract{
+This document discusses technical details on the empirical evaluation of
+the reference implementation of transformation boosting machines in the \pkg{tbm}
+package. Model estimation, interpretation, and criticism is illustrated for
+eight life science applications. Setup and detailed results of a simulation study
+based on artificial data generating processes are presented.
+}
+
+\Keywords{Conditional Transformation Model, Shift Transformation Model}
+\Plainkeywords{Conditional Transformation Model, Shift Transformation Model}
+
+\Address{
+  Torsten Hothorn\\
+  Institut f\"ur Epidemiologie, Biostatistik und Pr\"avention \\
+  Universit\"at Z\"urich \\
+  Hirschengraben 84, CH-8001 Z\"urich, Switzerland \\
+  \texttt{Torsten.Hothorn@uzh.ch} \\
+  \url{http://tiny.uzh.ch/bh}
+}
+
+\begin{document}
+
+<<citation, echo = FALSE>>=
+year <- substr(packageDescription("tbm")$Date, 1, 4)
+version <- packageDescription("tbm")$Version
+@
+\footnote{Please cite this document as: Torsten Hothorn (\Sexpr{year})
+Transformation Boosting Machines: Empirical Evaluation of the \textbf{tbm}
+Package. R package vignette version \Sexpr{version}, 
+URL \url{https://CRAN.R-project.org/package=tram}.}
+
+% \input{todo}
+
+\section{Introduction}
+
+Transformation boosting machines estimate conditional and shift
+transformation models by optimising the corresponding log-likelihood. In a
+nutshell, transformation models are fully parameterised by appropriate 
+basis functions those parameters are (in total or partially) linked to
+predictor variables. The method is applicable to a broad range of problems
+because (1) the likelihood allows to handle discrete and continuous responses
+under all forms or random censoring and truncation and (2) simple linear,
+more complex nonlinear additive, or completely unstructured (tree-based)
+conditional paramater functions can be estimated by using appropriate basis
+functions for the predictor variables.
+
+The algorithms employ the statistical view on boosting and iteratively
+improve the fit estimating (relatively) simple models to updated gradients.
+A simple illustration (for the Body Fat Mass application presented in
+Section~\ref{sec:bodyfat}) is given in Figure~\ref{fig:movie}. The inital
+frame of this animation shows the density obtained from the unconditional
+maximum likelihood estimator in the model
+\begin{eqnarray*}
+\Prob(\rY \le \ry) = \Phi(\basisy(\ry)^\top \hat{\parm}_\text{ML}).
+\end{eqnarray*}
+
+
+\begin{figure}
+\begin{center}
+\animategraphics[controls,width=\linewidth]{1}{fit_movie}{1}{101}
+\caption{Iterative boosting for the Body Fat Mass data. The left panel shows
+the unconditional (first frame) or conditional densities (other frames). The
+right panel shows the increasing in-sample log-likelihood as the model gets
+better and better. Use Adobe AcroRead to watch the animation. \label{fig:movie}}
+\end{center}
+\end{figure}
+
+
+The Bernstein basis $\basisy$ allows a relatively flexible transformation
+function, and thus density, to be estimated (the initial frame shows a
+bimodel unconditional distribution). The quality of this model is assess by
+the multivariate gradient of the log-likelihood contributions with respect to
+$\hat{\parm}_\text{ML}$. \CTM~starts by fitting potentially nonlinear
+functions of each predictor variable to this gradient and updates the
+parameter $\parm(\rx)$. Starting with the second frame, the left panel of
+Figure~\ref{fig:movie} depicts the conditional densities for all
+observations (the blue dots representing the observation) and the right
+panel shows the increasing total in-sample log-likelihood. 
+
+
+This document describes technical details of the empirical evaluation of
+transformation boosting machines by means of eight applications
+(Section~\ref{sec:app}) and artificial data generating processes
+(Section~\ref{sec:dgp}). For each of the eight applications, the exact model
+setup, the best performing model, and the corresponding model interpretation and
+model criticism is presented. The source code for these benchmark analysis
+is available from the directory
+<<src-appl, results = "hide">>=
+system.file("applications", package = "tbm")
+@
+Simulation experiments based on the data generating processes presented in
+Section~\ref{sec:dgp} can be reproduced using the source code in
+<<src-sim, results = "hide">>=
+system.file("simulations", package = "tbm")
+@
+This document also contains graphical representations of the out-of-sample
+log-likelihoods for all settings in the simulation experiments
+(Section~\ref{sec:results}).
+
+
+\section{Applications} \label{sec:app}
+
+<<results, echo = FALSE>>=
+ds <- c("Beetles Exctinction Risk",
+        "Birth Weight Prediction",
+        "Body Fat Mass",
+        "CAO/ARO/AIO-04 DFS",
+        "Childhood Malnutrition",
+        "Head Circumference",
+        "PRO-ACT ALSFRS",
+        "PRO-ACT OS")
+names(ds) <- c("ex_beetles.rda", "ex_fetus.rda", "ex_bodyfat.rda", "ex_CAO.rda", 
+        "ex_india.rda", "ex_heads.rda", "ex_ALSFRS.rda", "ex_ALSsurv.rda")
+m <- c(expression(paste("L ", bold(vartheta)(bold(x)))),
+       expression(paste("L ", beta(bold(x)))),
+       expression(paste("N ", bold(vartheta)(bold(x)))),
+       expression(paste("N ", beta(bold(x)))),
+       expression(paste("T ", bold(vartheta)(bold(x)))),
+       expression(paste("T ", beta(bold(x)))),
+       expression(paste("Tree ", bold(vartheta)(bold(x)))),
+       expression(paste("F ", bold(vartheta)(bold(x)))))
+names(m) <- c("glm_ctm", "glm_tram", "gam_ctm", "gam_tram", 
+              "tree_ctm", "tree_tram", "trtf_tree", "trtf_forest")
+mor <- c("gam_ctm", "glm_ctm", "tree_ctm", "gam_tram", "glm_tram", 
+        "tree_tram", "trtf_tree", "trtf_forest")
+
+pit <- function(object, data) {
+    cf <- predict(object, newdata = data, coef = TRUE)
+    tmp <- object$model
+    ret <- numeric(NROW(data))
+    for (i in 1:NROW(data)) {
+        coef(tmp) <- cf[i,]
+        ret[i] <- predict(tmp, newdata = data[i,,drop = FALSE], type = "distribution")
+    }
+    ret
+}
+
+pitplot <- function(object, data, main = "") {
+    u <- pit(object, data)
+    plot(1:length(u) / length(u), sort(u), xlab = "Theoretical Uniform Quantiles", 
+         ylab = "PIT Quantiles", main = main, ylim = c(0, 1), xlim = c(0, 1))
+    abline(a = 0, b = 1, col = "red")
+} 
+
+plot.ctm <- function(x, which = sort(unique(selected(object))), 
+                     obs = TRUE, ...) {
+
+    object <- x
+    q <- mkgrid(x$model, n = 100)
+    X <- model.matrix(x$model$model, data = q)
+    pfun <- function(which) {
+        stopifnot(length(which) == 1)
+        df <- model.frame(object, which = which)[[1]]
+        df <- lapply(df, function(x) seq(from = min(x), 
+                                         to = max(x), length = 50))
+        df2 <- do.call("expand.grid", c(df, q))
+        class(object) <- class(object)[-1]
+        tmp <- predict(object, newdata = df, which = which)
+        CS <- diag(ncol(tmp[[1]]))
+        CS[upper.tri(CS)] <- 1
+        cf <- tmp[[1]] %*% CS
+        df2$pr <- as.vector(t(X %*% t(cf)))
+        ret <- cbind(df2, which = names(df)[1])
+        names(ret)[1:2] <- c("x", "y")
+        ret
+    }
+
+    ret <- do.call("rbind", lapply(which, pfun))
+    at <- quantile(ret$pr, prob = 0:10/10)
+
+    pf <- function(x, y, z, subscripts, ...) {
+        xname <- as.character(unique(ret[subscripts, "which"]))
+        xo <- model.frame(object, which = xname)[[1]][[xname]]
+        yo <- object$response
+        panel.levelplot.raster(x, y, z, subscripts, ...)
+        panel.contourplot(x, y, z, subscripts, contour = TRUE, ...)
+        if (obs)
+            panel.xyplot(x = xo, y = yo, pch = 20)
+    }
+    levelplot(pr ~ x + y | which, data = ret, panel = pf,
+              scales = list(x = list(relation = "free")), region = TRUE, 
+              at = at, col.regions = grey.colors(length(at)), ...)
+}
+
+source("movie.R")
+
+@
+
+For eight prediction problems, the out-of-sample log-likelihood was
+evalulated based on $100$ subsamples ($3/4 N$ as learning sample and $1/4 N$
+as test sample). For problems with categorical responses or right-censored
+responses, subsamples were stratified with respect to the response class or
+censoring status (such that the distribution of the response or the
+the censoring rate were the same in learning and test samples). The
+out-of-sample log-likelihood was centered by the out-of-sample
+log-likelihood of the uninformative model which was estimated and tested on
+the very same folds.
+
+Transformation boosting machines were estimated using package \pkg{tbm}
+\citep{pkg:tbm}. Transformation trees and forests as implemented in package
+\pkg{trtf} \citep{pkg:trtf} served as main competitors.
+
+\CTM~(parameter $\parm(\rx)$) with nonlinear (N, B-spline) basis functions,
+linear (L) basis functions, and tree-based (T, depth two) basis functions.
+\STM~(parameter $\eshiftparm(\rx)$) with nonlinear (N, B-spline) basis functions,
+linear (L) basis functions, and tree-based (T, depth two) basis functions.
+
+\subsection{Beetles Exctinction Risk}
+
+<<riskplot, eval = FALSE, echo = FALSE>>=
+x <- risk[,mor] - ll0
+med <- apply(x, 2, median, na.rm = TRUE)
+boxplot(x, axes = FALSE, main = ds[file], outline = FALSE, var.width = TRUE,
+        ylab = "Out-of-sample log-likelihood (centered)", col = col[(med == max(med)) + 1],
+        ylim = ylim)
+abline(v = c(3.5, 6.5), col = "lightgrey")
+abline(h = 0, col = "lightgrey")
+abline(h = max(med), col = col[2])
+axis(1, at = 1:ncol(x), labels = m[colnames(x)])
+axis(2)
+box()
+@
+
+\begin{figure}[t]
+<<beetles-results, echo = FALSE, fig.width = 7, fig.height = 6>>=
+load(file.path(dir, file <- "ex_beetles.rda"))
+ylim <- c(-.5, .5)
+<<riskplot>>
+@
+\caption{\Sexpr{ds[file]}. Out-of-sample log-likelihood (centered by
+out-of-sample log-likelihood of unconditional model). \label{\Sexpr{paste0("fig", file, "oob")}}}
+\end{figure}
+
+<<beetles-setup, echo = FALSE>>=
+load(file.path(datadir, "beetles.rda"))
+
+ldata <- bmodel
+ldata$TS <- NULL
+
+X <- model.matrix(~ species - 1, data = ldata)
+ldata$species <- NULL
+
+nvars <- c("mean_body_size", "mean_elev", "flowers",
+          "niche_decay", "niche_diam", "niche_canopy", "distribution")
+fvars <- colnames(ldata)[!colnames(ldata) %in% c("RL", nvars)]
+xvars <- c(nvars, fvars)
+
+ldata[nvars] <- lapply(nvars, function(x) as.numeric(scale(ldata[[x]])))
+
+fm_gam <- c(
+"ctm" = as.formula(paste("RL ~ buser(X, K = Ainv, df = 2) + ",
+    paste("bols(", xvars, ", df = 2)", collapse = "+"), "+",
+    paste("bbs(", nvars, ", center = TRUE, df = 2)", collapse = "+"))),
+"stm" = as.formula(paste("RL ~ buser(X, K = Ainv, df = 1) + ",
+    paste("bols(", xvars, ", intercept = FALSE, df = 1)", collapse = "+"), "+",
+    paste("bbs(", nvars, ", center = TRUE, df = 1)", collapse = "+"))))
+
+fm_glm <- c(
+"ctm" = as.formula(paste("RL ~ buser(X, K = Ainv, df = 2) +",
+    paste("bols(", xvars, ", df = 2)", collapse = "+"))),
+"stm" = as.formula(paste("RL ~ buser(X, K = Ainv, df = 1) +",
+    paste("bols(", xvars, ", intercept = FALSE, df = 1)", collapse = "+"))))
+
+fm_tree <- as.formula(paste("RL ~ ", paste(xvars, collapse = "+")))
+
+mf <- model.frame(fm_tree, data = ldata)
+xf <- sum(sapply(mf[,-1], is.factor))
+N <- dim(mf)[1]
+p <- dim(mf)[2] - 1
+vars <- names(mf)[-1]
+@
+
+This problem aims at the prediction of the exctinction risk of 
+beetles \citep{Seibold_Brandl_Schmidl_2014}. The response is the
+Red List status ranging from 0 (least concern) to 5 (regionally extinct) 
+of $N = \Sexpr{N}$ saproxylic beetles, where for each
+species $\Sexpr{p}$ ($\Sexpr{p - xf}$ numeric and $\Sexpr{xf}$ categorical) predictors
+are available.
+
+We start with an unconditional proportional odds model (using $\pZ =
+\text{expit}$ and one parameter for each but the highest Red List category):
+<<beetles-model0, echo = TRUE, cache = FALSE>>=
+m_mlt <- Polr(RL ~ 1, data = ldata)
+logLik(m_mlt)
+@
+The corresponding unconditional distribution is depicted in Figure~\ref{\Sexpr{paste0("fig", file,
+"0")}}.
+
+\begin{figure}
+<<beetles-null, echo = FALSE>>=
+q <- mkgrid(m_mlt, 200)[[1]]
+p <- c(predict(m_mlt, newdata = data.frame(RL = q), type = "density"))
+names(p) <- as.character(q)
+barplot(p, xlab = "Red List Status", ylab = "Distribution")
+@
+\caption{\Sexpr{ds[file]}. Unconditional response distribution. \label{\Sexpr{paste0("fig", file, "0")}}}
+\end{figure}
+
+
+Model evaluation (Figure~\ref{\Sexpr{paste0("fig", file, "oob")}}) indicated that 
+a tree-structured model for $\eshiftparm(\rx)$ had the best performance; this
+model was fitted using
+<<beetles-model, cache = FALSE>>=
+fm_tree
+bm <- stmboost(m_mlt, formula = fm_tree, data = ldata,
+               method = quote(mboost::blackboost))[626]
+@
+(the default tree was grown to a depth of two). The in-sample log-likelihood
+is shown in Figure~\ref{\Sexpr{paste0("fig", file, "ib")}}.
+
+\begin{figure}
+<<insampleriskplot, echo = FALSE>>=
+plot(-risk(bm), xlab = "Boosting Iteration", ylab = "Log-likelihood", type = "l")
+@
+\caption{\Sexpr{ds[file]}. In-sample log-likelihood maximisation. \label{\Sexpr{paste0("fig", file, "ib")}}}
+\end{figure}
+
+The model consists of trees with two-way interactions, basically all
+variables seemed to play a role in the model (the numbers giving the
+absolute number of splits in each of these variables):
+<<beetles-prop, echo = FALSE>>=
+x <- tabulate(do.call("c", sapply(get("ens", environment(bm$predict)), 
+    function(x) nodeapply(x$model, ids = nodeids(x$model, terminal = FALSE), FUN = function(x) split_node(x)$varid - 1))), nbins = length(vars))
+names(x) <- vars
+x
+@
+
+For six selected beetle species, the conditional distribution of extinction
+as predicted from the tree-based model is given in Figure~\ref{\Sexpr{paste0("fig", file, "1")}}.
+\begin{figure}
+<<beetles-plot, echo = FALSE, fig.width = 6, fig.height = 8>>=
+idx <- sapply(levels(ldata$RL), function(x) 
+    which(ldata$RL == x)[1])
+q <- mkgrid(m_mlt, n = 200)[[1]]
+d <- predict(bm, newdata = ldata[idx,], type = "density", q = q)
+layout(matrix(1:6, nrow = 3, byrow = TRUE))
+out <- sapply(1:6, function(x) barplot(d[,x], xlab = "Red List",
+              ylab = "Density", main = paste(gsub("_", " ", rownames(ldata)[idx[x]]), " (RL:", ldata$RL[idx[x]], ")", sep = "")))
+@
+\caption{\Sexpr{ds[file]}. Conditional response distribution. \label{\Sexpr{paste0("fig", file, "1")}}}
+\end{figure}
+
+In this special case, the algorithm is identical to boosting for
+proportional odds models as implemented in the \cmd{PropOdds} family
+\citep{Schmid_Hothorn_Maloney_2011}; and
+thus the in-sample risks are essentially identical:
+<<beetles-mlt, cache = FALSE>>=
+po <- blackboost(fm_tree, data = ldata, family = PropOdds())[626]
+max(abs(risk(bm) - risk(po)))
+@
+
+\subsection{Birth Weight Prediction}
+
+Models shall be used to improve birth weight prediction in small 
+fetuses (weighting $\le 1600$ g at birth) based on 
+measurements obtained using three-dimensional (3D) sonography 
+\citep{Schild_Maringa_Siemer_2008}.
+
+\begin{figure}[t]
+<<fetus-results, echo = FALSE, fig.width = 7, fig.height = 6>>=
+load(file.path(dir, file <- "ex_fetus.rda"))
+ylim <- c(0, 1.7)
+<<riskplot>>
+@
+\caption{\Sexpr{ds[file]}. Out-of-sample log-likelihood (centered by
+out-of-sample log-likelihood of unconditional model). \label{\Sexpr{paste0("fig", file, "oob")}}}
+\end{figure}
+
+<<fetus-setup, echo = FALSE>>=
+load(file.path(datadir, "fetus.rda"))
+
+fetus$birthweight <- as.double(fetus$birthweight)
+ldata <- fetus
+
+xvars <- colnames(ldata)
+xvars <- xvars[xvars != "birthweight"]
+
+ldata[xvars] <- lapply(xvars, function(x) as.numeric(scale(ldata[[x]])))
+
+
+fm_gam <- c("ctm" = as.formula(paste("birthweight ~ ",
+                paste("bols(", xvars, ", df = 2)", collapse = "+"), "+",
+                paste("bbs(", xvars, ", center = TRUE, df = 2)", collapse = "+"))),
+            "stm" = as.formula(paste("birthweight ~ ", 
+                paste("bols(", xvars, ", intercept = FALSE)", collapse = "+"), "+",
+                paste("bbs(", xvars, ", center = TRUE, df = 1)", collapse = "+"))))
+fm_glm <- c("ctm" = as.formula(paste("birthweight ~ ",
+                paste("bols(", xvars, ", df = 2)", collapse = "+"))),
+            "stm" = as.formula(paste("birthweight ~ ", 
+                paste("bols(", xvars, ", intercept = FALSE)", collapse = "+"))))
+
+fm_tree <- birthweight ~ .
+
+mf <- model.frame(fm_tree, data = ldata)
+xf <- sum(sapply(mf[,-1], is.factor))
+N <- dim(mf)[1]
+p <- dim(mf)[2] - 1
+vars <- names(mf)[-1]
+@
+
+The response is the birth weight in gram of $N = \Sexpr{N}$ singleton fetuses, where for each
+fetus $\Sexpr{p}$ numeric predictors are available.
+
+We start with an unconditional model (using $\pZ = \Phi$ and an Bernstein
+polynomial of order six):
+<<fetus-model0, cache = FALSE>>=
+m_mlt <- BoxCox(birthweight ~ 1, data = ldata)
+logLik(m_mlt)
+@
+The corresponding unconditional distribution is depicted in Figure~\ref{\Sexpr{paste0("fig", file,
+"0")}}.
+
+\begin{figure}
+<<fetus-null, echo = FALSE>>=
+plot(as.mlt(m_mlt), newdata = data.frame(1), type = "density", K = 200,
+     xlab = "Birth Weight (in gram)", ylab = "Density", col = "black")
+@
+\caption{\Sexpr{ds[file]}. Unconditional response distribution. \label{\Sexpr{paste0("fig", file, "0")}}}
+\end{figure}
+
+
+Model evaluation (Figure~\ref{\Sexpr{paste0("fig", file, "oob")}}) indicated that 
+an additive smooth model for $\eshiftparm(\rx)$ had the best performance; this
+model was fitted using
+<<fetus-model, cache = FALSE>>=
+fm_gam[["stm"]]
+bm <- stmboost(m_mlt, formula = fm_gam[["stm"]], data = ldata,
+               method = quote(mboost::mboost))[253]
+@
+The in-sample log-likelihood is shown in Figure~\ref{\Sexpr{paste0("fig", file, "ib")}}
+and a QQ-plot based on the probability-integral transform in Figure~\ref{\Sexpr{paste0("fig", file, "qq")}}.
+It is important to note that the term $\eshiftparm(\rx)$ must not contain an
+intercept. The model was therefore composed of linear model terms (without
+intercept) and smooth deviations from linear functions (all with the same
+degree of freedom to facilitate unbiasedness). Thus, the model
+selects between linear and smooth additive functions.
+
+\begin{figure}
+<<fetus-risk, echo = FALSE>>=
+<<insampleriskplot>>
+@
+\caption{\Sexpr{ds[file]}. In-sample log-likelihood maximisation. \label{\Sexpr{paste0("fig", file, "ib")}}}
+\end{figure}
+
+\begin{figure}[t]
+<<fetus-pit, echo = FALSE, fig.width = 5, fig.height = 5>>=
+pitplot(bm, ldata, main = ds[file])
+@
+\caption{\Sexpr{ds[file]}. Probability-integral transform QQ-plot. \label{\Sexpr{paste0("fig", file, "qq")}}}
+\end{figure}
+
+The selected terms were
+<<fetus-prop, echo = FALSE>>=
+tab <- matrix(tabulate(selected(bm), nbins = length(bm$baselearner)), ncol = 1)
+rownames(tab) <- names(bm$baselearner)
+colnames(tab) <- ""
+tab
+@
+and the corresponding partial contributions are plotted in Figure~\ref{\Sexpr{paste0("fig", file, "partial")}}.
+Only minor deviations from linearity can be observed (and the out-of-sample
+risk of the linear model was almost the same). In addition, the
+baseline transformation (Figure~\ref{\Sexpr{paste0("fig", file, "base")}})
+is almost linear, indicating that a normal linear model \citep[reported by][]{Schild_Maringa_Siemer_2008}
+might be a good compromise between prediction accuracy and interpretability for this problem.
+
+\begin{figure}
+<<fetus-plot, echo = FALSE, fig.width = 6, fig.height = 6>>=
+w <- sort(unique(selected(bm)))
+mbm <- bm
+class(mbm) <- class(mbm)[-1]
+nc <- ceiling(length(w) / 2) * 2
+layout(matrix(1:nc, ncol = 2))
+plot(mbm, which = w, ylim = c(-3, 3))
+@
+\caption{\Sexpr{ds[file]}. Partial contributions to additive predictor
+$\eshiftparm(\rx)$. \label{\Sexpr{paste0("fig", file, "partial")}}}
+\end{figure}
+
+\begin{figure}
+<<fetus-base, echo = FALSE>>=
+tmp <- as.mlt(m_mlt)
+coef(tmp) <- nuisance(bm)
+plot(tmp, newdata = data.frame(1), K = 200, type = "trafo", xlab = "Birth weight (in gram)", 
+     ylab = "Transformation h", col = "black")
+@
+\caption{\Sexpr{ds[file]}. Baseline transformation. \label{\Sexpr{paste0("fig", file, "base")}}}
+\end{figure}
+
+For five selected observations, the conditional distribution of birth weight
+is shown in Figure~\ref{\Sexpr{paste0("fig", file, "1")}}. The blue dots
+indicate the actual observations. Except for the right-most density, the
+predicted conditional densities are almost perfectly symmetric (as a
+consequence of the linear baseline transformation).
+
+\begin{figure}
+<<fetus-dens, echo = FALSE>>=
+idx <- order(ldata$birthweight)[floor(c(.1, .25, .5, .75, .9) * nrow(ldata))]
+q <- mkgrid(m_mlt, n = 200)[[1]]
+matplot(x = q, y = d <- predict(bm, newdata = ldata[idx,], type = "density", q = q), type =
+        "l", col = rgb(.1, .1, .1, .6), lty = 1, xlab = "Birth Weight (in gram)", ylab = "Density")
+j <- sapply(ldata[idx, "birthweight"], function(y) which.min((q - y)^2))
+points(ldata[idx, "birthweight"], sapply(1:5, function(i) d[j[i], i]), pch = 19, col = col[1])
+@
+\caption{\Sexpr{ds[file]}. Conditional response distribution. \label{\Sexpr{paste0("fig", file, "1")}}}
+\end{figure}
+
+
+\subsection{Body Fat Mass} \label{sec:bodyfat}
+
+\begin{figure}[t]
+<<bodyfat-results, echo = FALSE, fig.width = 7, fig.height = 6>>=
+load(file.path(dir, file <- "ex_bodyfat.rda"))
+ylim <- c(0, 1.7)
+<<riskplot>>
+@
+\caption{\Sexpr{ds[file]}. Out-of-sample log-likelihood (centered by
+out-of-sample log-likelihood of unconditional model). \label{\Sexpr{paste0("fig", file, "oob")}}}
+\end{figure}
+
+<<bodyfat-setup, echo = FALSE>>=
+
+data("bodyfat", package = "TH.data")
+ldata <- bodyfat
+
+xvars <- colnames(ldata)
+xvars <- xvars[xvars != "DEXfat"]
+
+ldata[xvars] <- lapply(xvars, function(x) as.numeric(scale(ldata[[x]])))
+
+
+fm_gam <- c("ctm" = as.formula(paste("DEXfat ~ ", 
+                paste("bbs(", xvars, ")", collapse = "+"))),
+            "stm" = as.formula(paste("DEXfat ~ ", 
+                paste("bols(", xvars, ", intercept = FALSE)", collapse = "+"), "+",
+                paste("bbs(", xvars, ", center = TRUE, df = 1)", collapse = "+"))))
+fm_glm <- c("ctm" = as.formula(paste("DEXfat ~ ",
+                paste("bols(", xvars, ")", collapse = "+"))),
+            "stm" = as.formula(paste("DEXfat ~ ", 
+                paste("bols(", xvars, ", intercept = FALSE)", collapse = "+"))))
+
+fm_tree <- DEXfat ~ .
+
+mf <- model.frame(fm_tree, data = ldata)
+xf <- sum(sapply(mf[,-1], is.factor))
+N <- dim(mf)[1]
+p <- dim(mf)[2] - 1
+vars <- names(mf)[-1]
+@
+
+The response is the body fat mass (in kilogram) of $N = \Sexpr{N}$ study
+participants, where for each subject $\Sexpr{p}$ numeric predictors are available
+\citep{Garcia_Wagner_Hothorn_2005}.
+
+We start with an unconditional model (using $\pZ = \Phi$ and an Bernstein
+polynomial of order six):
+<<bodyfat-model0, cache = FALSE>>=
+m_mlt <- BoxCox(DEXfat ~ 1, data = ldata, prob = c(.1, .99))
+logLik(m_mlt)
+@
+The corresponding unconditional distribution is depicted in Figure~\ref{\Sexpr{paste0("fig", file, "0")}}.
+
+\begin{figure}
+<<bodyfat-null, echo = FALSE>>=
+plot(as.mlt(m_mlt), newdata = data.frame(1), type = "density", K = 200,
+     xlab = "Body Fat Mass (in kilogram)", ylab = "Density", col = "black")
+@
+\caption{\Sexpr{ds[file]}. Unconditional response distribution. \label{\Sexpr{paste0("fig", file, "0")}}}
+\end{figure}
+
+Model evaluation (Figure~\ref{\Sexpr{paste0("fig", file, "oob")}}) indicated that 
+an additive smooth model for $\parm(\rx)$ had the best performance; this
+model was fitted using
+<<bodyfat-model, cache = FALSE>>=
+fm_gam[["ctm"]]
+bm <- ctmboost(m_mlt, formula = fm_gam[["ctm"]], data = ldata,
+               method = quote(mboost::mboost))[1000]
+@
+The in-sample log-likelihood is shown in Figure~\ref{\Sexpr{paste0("fig", file, "ib")}}
+and a QQ-plot based on the probability-integral transform in Figure~\ref{\Sexpr{paste0("fig", file, "qq")}}.
+
+\begin{figure}
+<<bodyfat-risk, echo = FALSE>>=
+<<insampleriskplot>>
+@
+\caption{\Sexpr{ds[file]}. In-sample log-likelihood maximisation. \label{\Sexpr{paste0("fig", file, "ib")}}}
+\end{figure}
+
+\begin{figure}[t]
+<<bodyfat-pit, echo = FALSE, fig.width = 5, fig.height = 5>>=
+pitplot(bm, ldata, main = ds[file])
+@
+\caption{\Sexpr{ds[file]}. Probability-integral transform QQ-plot. \label{\Sexpr{paste0("fig", file, "qq")}}}
+\end{figure}
+
+The model is additive in the sense that $\h(\ry \mid \rx) = h_0(\ry) + \sum_{j = 1}^J
+\h_j(\ry \mid x_j)$. The partial transformation functions $\h_j$ are plotted
+in Figure~\ref{\Sexpr{paste0("fig", file, "ctm")}}.
+
+\begin{figure}
+\begin{center}
+<<bodyfat-ctmplot, echo = FALSE, fig.width = 6, fig.height = 6>>=
+plot.ctm(bm, ylab = "Body Fat Mass")
+@
+\caption{\Sexpr{ds[file]}. Scatterplots of all predictor variables and the
+response, overlaid with partial transformation functions. \label{\Sexpr{paste0("fig", file, "ctm")}}}
+\end{center}
+\end{figure}
+
+<<bodyfat-prop, echo = FALSE>>=
+tab <- matrix(tabulate(selected(bm), nbins = length(bm$baselearner)), ncol = 1)
+rownames(tab) <- names(bm$baselearner)
+colnames(tab) <- ""
+tab
+@
+
+For five selected observations, the conditional distribution of body fat
+mass
+is shown in Figure~\ref{\Sexpr{paste0("fig", file, "1")}}. The blue dots
+indicate the actual observations. 
+
+\begin{figure}
+<<bodyfat-dens, echo = FALSE>>=
+idx <- order(ldata$DEXfat)[floor(c(.1, .25, .5, .75, .9) * nrow(ldata))]
+q <- mkgrid(m_mlt, n = 200)[[1]]
+matplot(x = q, y = d <- predict(bm, newdata = ldata[idx,], type = "density", q = q), type =
+        "l", col = rgb(.1, .1, .1, .6), lty = 1, xlab = "Body Fat Mass (in kilogram)", ylab = "Density")
+j <- sapply(ldata[idx, "DEXfat"], function(y) which.min((q - y)^2))
+points(ldata[idx, "DEXfat"], sapply(1:5, function(i) d[j[i], i]), pch = 19, col = col[1])
+@
+\caption{\Sexpr{ds[file]}. Conditional response distribution. \label{\Sexpr{paste0("fig", file, "1")}}}
+\end{figure}
+
+
+\subsection{CAO/ARO/AIO-04 DFS}
+
+\begin{figure}[t]
+<<CAO-results, echo = FALSE, fig.width = 7, fig.height = 6>>=
+load(file.path(dir, file <- "ex_CAO.rda"))
+ylim <- NULL
+<<riskplot>>
+@
+\caption{\Sexpr{ds[file]}. Out-of-sample log-likelihood (centered by
+out-of-sample log-likelihood of unconditional model). \label{\Sexpr{paste0("fig", file, "oob")}}}
+\end{figure}
+
+<<CAO-setup, echo = FALSE>>=
+load(file.path(datadir, "Primary_endpoint_data.rda"))
+
+ldata <- CAOsurv
+
+xvars <- c("strat_t", "strat_n", "randarm",
+           "geschlecht", "age", "groesse", "gewicht",
+           "ecog_b", "mason",
+           "gesamt_t", "gesamt_n", 
+           "histo", "grading_b", "ap_anlage",
+           "stenose",
+           "gesamt_n_col", "UICC", "bentf")
+
+ldata <- ldata[, c("DFS", xvars)]
+ldata <- ldata[complete.cases(ldata),]
+ldata$UICC <- ldata$UICC[,drop = TRUE]
+ldata$ecog_b <- ldata$ecog_b[,drop = TRUE]
+
+
+nvars <- c("age", "groesse", "gewicht")
+fvars <- xvars[!xvars %in% nvars]
+xvars <- c(nvars, fvars)
+
+ldata[nvars] <- lapply(nvars, function(x) as.numeric(scale(ldata[[x]])))
+
+fm_gam <- c(
+"ctm" = as.formula(paste("DFS ~ ",
+    paste("bols(", xvars, ", df = 2)", collapse = "+"), "+",
+    paste("bbs(", nvars, ", center = TRUE, df = 2)", collapse = "+"))),
+"stm" = as.formula(paste("DFS ~ ",
+    paste("bols(", xvars, ", intercept = FALSE, df = 1)", collapse = "+"), "+",
+    paste("bbs(", nvars, ", center = TRUE, df = 1)", collapse = "+"))))
+
+fm_glm <- c(
+"ctm" = as.formula(paste("DFS ~ ",
+    paste("bols(", xvars, ", df = 2)", collapse = "+"))),
+"stm" = as.formula(paste("DFS ~",
+    paste("bols(", xvars, ", intercept = FALSE, df = 1)", collapse = "+"))))
+
+fm_tree <- as.formula(paste("DFS ~ ", paste(xvars, collapse = "+")))
+
+mf <- model.frame(fm_tree, data = ldata)
+xf <- sum(sapply(mf[,-1], is.factor))
+N <- dim(mf)[1]
+p <- dim(mf)[2] - 1
+vars <- names(mf)[-1]
+@
+
+The response is the disease-free survival time of rectal cancer patients
+from the CAO/ARO/AIO-04 randomised controlled clinical trial \citep{Roedel_Graeven_Fietkau_2015}.
+For $N = \Sexpr{N}$ patients, 
+$\Sexpr{p}$ ($\Sexpr{p - xf}$ numeric and $\Sexpr{xf}$ categorical)
+baseline predictors are available.
+
+We start with an unconditional Cox model ($\pZ = 1 - \exp(-\exp())$ and a
+Bernstein polynomial of order six):
+<<CAO-model0, cache = FALSE>>=
+m_mlt <- Coxph(DFS ~ 1, data = ldata, prob = c(0, .9))
+logLik(m_mlt)
+@
+The corresponding unconditional distribution is depicted in Figure~\ref{\Sexpr{paste0("fig", file, "0")}}.
+
+\begin{figure}
+<<CAO-null, echo = FALSE>>=
+plot(as.mlt(m_mlt), newdata = data.frame(1), type = "survivor", K = 200,
+     xlab = "Time (in days)", ylab = "Time", col = "black")
+@
+\caption{\Sexpr{ds[file]}. Unconditional response distribution. \label{\Sexpr{paste0("fig", file, "0")}}}
+\end{figure}
+
+Model evaluation (Figure~\ref{\Sexpr{paste0("fig", file, "oob")}}) indicated that 
+a linear model for $\eshiftparm(\rx)$ had the best performance, this model was fitted using
+<<CAO-model, cache = FALSE>>=
+fm_glm[["stm"]]
+bm <- stmboost(m_mlt, formula = fm_glm[["stm"]], data = ldata,
+               method = quote(mboost::mboost))[963]
+@
+This is, in fact, a linear Cox model which could have also been fitted using
+<<CAO-mlt, cache = FALSE>>=
+bmCoxPH <- mboost(fm_glm[["stm"]], data = ldata, family = CoxPH())[963]
+@
+The in-sample log-likelihood is shown in Figure~\ref{\Sexpr{paste0("fig", file, "ib")}}.
+
+\begin{figure}
+<<CAO-risk, echo = FALSE>>=
+<<insampleriskplot>>
+@
+\caption{\Sexpr{ds[file]}. In-sample log-likelihood maximisation. \label{\Sexpr{paste0("fig", file, "ib")}}}
+\end{figure}
+
+The model coefficients are
+<<CAO-prop>>=
+mboost:::coef.mboost(bm)
+@
+
+The negative coefficients are practically equivalent
+<<CAO-propCoxPH>>=
+coef(bmCoxPH)
+@
+
+For five selected observations, the conditional survivor functions 
+are shown in Figure~\ref{\Sexpr{paste0("fig", file, "1")}}. 
+
+\begin{figure}
+<<CAO-dens, echo = FALSE>>=
+idx <- sample(1:nrow(ldata), 5)
+q <- mkgrid(m_mlt, n = 200)[[1]]
+matplot(x = q, y = d <- predict(bm, newdata = ldata[idx,], type = "survivor", q = q), type =
+        "l", col = rgb(.1, .1, .1, .6), lty = 1, xlab = "Time (in days)", ylab = "Probability")
+@
+\caption{\Sexpr{ds[file]}. Conditional response distribution. \label{\Sexpr{paste0("fig", file, "1")}}}
+\end{figure}
+
+
+
+\subsection{Childhood Malnutrition}
+
+\begin{figure}[t]
+<<india-results, echo = FALSE, fig.width = 6, fig.height = 6>>=
+load(file.path(dir, file <- "ex_india.rda"))
+ylim <- NULL
+<<riskplot>>
+@
+\caption{\Sexpr{ds[file]}. Out-of-sample log-likelihood (centered by
+out-of-sample log-likelihood of unconditional model). \label{\Sexpr{paste0("fig", file, "oob")}}}
+\end{figure}
+
+<<india-setup, echo = FALSE>>=
+load(file.path(datadir, "india.rda"))
+
+xvars <- c("cage", "breastfeeding", "mbmi", "mage", "medu", 
+           "edupartner", "csex", "ctwin", "cbirthorder", 
+           "munemployed", "mreligion", "mresidence", "deadchildren",
+           "electricity", "radio", "television", "refrigerator", 
+           "bicycle", "motorcycle", "car")
+
+fvars <- xvars[sapply(xvars, function(x) length(unique(kids[[x]]))) < 6]
+nvars <- xvars[!xvars %in% fvars]
+kids[fvars] <- lapply(fvars, function(f) factor(kids[[f]]))
+kids[nvars] <- lapply(nvars, function(n) scale(kids[[n]]))
+
+fm_gam <- c(
+"ctm" = as.formula(paste("stunting ~ ",
+    paste("bols(", xvars, ", df = 2)", collapse = "+"), "+",
+    paste("bbs(", nvars, ", center = TRUE, df = 2)", collapse = "+"))),
+"stm" = as.formula(paste("stunting ~",
+    paste("bols(", xvars, ", intercept = FALSE, df = 1)", collapse = "+"), "+",
+    paste("bbs(", nvars, ", center = TRUE, df = 1)", collapse = "+"))))
+
+fm_glm <- c(
+"ctm" = as.formula(paste("stunting ~ ",
+    paste("bols(", xvars, ", df = 2)", collapse = "+"))),
+"stm" = as.formula(paste("stunting ~",
+    paste("bols(", xvars, ", intercept = FALSE, df = 1)", collapse = "+"))))
+
+fm_tree <- as.formula(paste("stunting ~ ", paste(xvars, collapse = "+")))
+
+kids$stunting <- as.double(kids$stunting)
+ldata <- kids
+
+mf <- model.frame(fm_tree, data = ldata)
+xf <- sum(sapply(mf[,-1], is.factor))
+N <- dim(mf)[1]
+p <- dim(mf)[2] - 1
+vars <- names(mf)[-1]
+
+@
+
+The aim is to predict childhood malnutrition, here measured as stunting,
+that is, insufficient height for age. The data for $N = \Sexpr{N}$ children
+from India were compiled by \cite{Fenske_Kneib_Hothorn_2011} and include
+$\Sexpr{p}$ ($\Sexpr{p - xf}$ numeric and $\Sexpr{xf}$ categorical)
+predictors.
+
+We start with an unconditional model (using $\pZ = \Phi$ and an Bernstein
+polynomial of order six):
+<<india-model0, cache = FALSE>>=
+m_mlt <- BoxCox(stunting ~ 1, data = ldata, prob = c(.05, .975))
+logLik(m_mlt)
+@
+The corresponding unconditional distribution is depicted in Figure~\ref{\Sexpr{paste0("fig", file,
+"0")}}.
+
+\begin{figure}
+<<india-null, echo = FALSE>>=
+plot(as.mlt(m_mlt), newdata = data.frame(1), type = "density", K = 200,
+     xlab = "Stunting", ylab = "Density", col = "black")
+@
+\caption{\Sexpr{ds[file]}. Unconditional response distribution. \label{\Sexpr{paste0("fig", file, "0")}}}
+\end{figure}
+
+
+Model evaluation (Figure~\ref{\Sexpr{paste0("fig", file, "oob")}}) indicated that 
+a tree-based model for $\parm(\rx)$ had the best performance; this
+model was fitted using
+<<india-model, cache = FALSE>>=
+fm_tree
+bm <- ctmboost(m_mlt, formula = fm_tree, data = ldata, 
+               method = quote(mboost::blackboost))[515]
+@
+The in-sample log-likelihood is shown in Figure~\ref{\Sexpr{paste0("fig", file, "ib")}}
+and a QQ-plot based on the probability-integral transform in Figure~\ref{\Sexpr{paste0("fig", file, "qq")}}.
+
+\begin{figure}
+<<india-risk, echo = FALSE, cache = FALSE>>=
+<<insampleriskplot>>
+@
+\caption{\Sexpr{ds[file]}. In-sample log-likelihood maximisation. \label{\Sexpr{paste0("fig", file, "ib")}}}
+\end{figure}
+
+\begin{figure}[t]
+<<india-pit, echo = FALSE, fig.width = 5, fig.height = 5, cache = FALSE>>=
+pitplot(bm, ldata, main = ds[file])
+@
+\caption{\Sexpr{ds[file]}. Probability-integral transform QQ-plot. \label{\Sexpr{paste0("fig", file, "qq")}}}
+\end{figure}
+
+
+The model consists of trees with two-way interactions, most splits occured
+in age and breastfeeding, birthorder, and religion:
+<<india-prop, echo = FALSE>>=
+x <- tabulate(do.call("c", sapply(get("ens", environment(bm$predict)), 
+    function(x) nodeapply(x$model, ids = nodeids(x$model, terminal = FALSE), FUN = function(x) split_node(x)$varid -
+1))), nbins = length(all.vars(fm_tree)) - 1)
+names(x) <- all.vars(fm_tree)[-1]
+x
+@
+
+For five selected observations, the conditional distribution of stunting
+is shown in Figure~\ref{\Sexpr{paste0("fig", file, "1")}}. The blue dots
+indicate the actual observations. 
+
+\begin{figure}
+<<india-dens, echo = FALSE>>=
+idx <- order(ldata$stunting)[floor(c(.1, .25, .5, .75, .9) * nrow(ldata))]
+q <- mkgrid(m_mlt, n = 200)[[1]]
+matplot(x = q, y = d <- predict(bm, newdata = ldata[idx,], type = "density", q = q), type =
+        "l", col = rgb(.1, .1, .1, .6), lty = 1, xlab = "Stunting", ylab = "Density")
+j <- sapply(ldata[idx, "stunting"], function(y) which.min((q - y)^2))
+points(ldata[idx, "stunting"], sapply(1:5, function(i) d[j[i], i]), pch = 19, col = col[1])
+@
+\caption{\Sexpr{ds[file]}. Conditional response distribution. \label{\Sexpr{paste0("fig", file, "1")}}}
+\end{figure}
+
+\subsection{Head Circumference}
+
+\begin{figure}[t]
+<<heads-results, echo = FALSE, fig.width = 7, fig.height = 6>>=
+load(file.path(dir, file <- "ex_heads.rda"))
+ylim <- NULL
+<<riskplot>>
+@
+\caption{\Sexpr{ds[file]}. Out-of-sample log-likelihood (centered by
+out-of-sample log-likelihood of unconditional model). \label{\Sexpr{paste0("fig", file, "oob")}}}
+\end{figure}
+
+The Fourth Dutch Growth Study \citep{Fredriks_Buuren_Burgmeijer_2000}
+is a cross-sectional study that measures growth and development of the
+Dutch population between the ages of 0 and 22 years. The study measured, among
+other variables, head circumference (HC) and age of 7482 males and 7018
+females. \cite{Stasinopoulos_Rigby_2007} analysed the
+head circumference of $7040$ males with explanatory variable age using
+a GAMLSS model with a Box-Cox $t$ distribution describing the first four
+moments of head circumference conditionally on age. The models show
+evidence of kurtosis, especially for older boys.
+
+<<heads-setup, echo = FALSE>>=
+### Paul Eilers: Using 1/2 is better
+data("db", package = "gamlss.data")
+db$lage <- with(db, age^(1/3))
+
+ldata <- db
+
+fm_gam <- c("ctm" = head ~ bbs(lage),
+            "stm" = head ~ bols(lage, intercept = FALSE) + bbs(lage, center = TRUE, df = 1))
+fm_glm <- c("ctm" = head ~ bols(lage),
+            "stm" = head ~ bols(lage, intercept = FALSE))
+
+fm_tree <- head ~ .
+N <- nrow(ldata)
+@
+
+We start with an unconditional model (using $\pZ = \Phi$ and an Bernstein
+polynomial of order six):
+<<heads-model0, cache = FALSE>>=
+m_mlt <- BoxCox(head ~ 1, data = ldata)
+logLik(m_mlt)
+@
+Model evaluation (Figure~\ref{\Sexpr{paste0("fig", file, "oob")}}) indicated that 
+an additive smooth model for $\parm(\rx)$ had the best performance; this
+model was fitted using
+<<heads-model, cache = FALSE>>=
+fm_gam[["ctm"]]
+bm <- ctmboost(m_mlt, formula = fm_gam[["ctm"]], data = ldata, 
+               method = quote(mboost::mboost))[1000]
+@
+The in-sample log-likelihood is shown in Figure~\ref{\Sexpr{paste0("fig", file, "ib")}}
+and a QQ-plot based on the probability-integral transform in Figure~\ref{\Sexpr{paste0("fig", file, "qq")}}.
+
+\begin{figure}
+<<heads-risk, echo = FALSE, cache = FALSE>>=
+<<insampleriskplot>>
+@
+\caption{\Sexpr{ds[file]}. In-sample log-likelihood maximisation. \label{\Sexpr{paste0("fig", file, "ib")}}}
+\end{figure}
+
+\begin{figure}[t]
+<<heads-pit, echo = FALSE, fig.width = 5, fig.height = 5, cache = FALSE>>=
+pitplot(bm, ldata, main = ds[file])
+@
+\caption{\Sexpr{ds[file]}. Probability-integral transform QQ-plot. \label{\Sexpr{paste0("fig", file, "qq")}}}
+\end{figure}
+
+
+Figure~\ref{heads-plot} shows the model as a growth curve model.  The
+observations are overlaid with quantile curves obtained via inversion of the
+estimated conditional distributions.  The figure can be directly compared
+with Figure~16 of \cite{Stasinopoulos_Rigby_2007} (the quantile curves in
+these two plots are essentially equivalent) and also indicates a
+certain asymmetry towards older boys.
+
+\begin{figure}[t]
+<<heads-plot, fig.width = 6, fig.height = 4, echo = FALSE>>=
+l <- with(db, seq(from = min(lage), to = max(lage), length = 100))
+q <- mkgrid(m_mlt, n = 200)[[1]]
+pr <- expand.grid(head = q, lage = l^3)
+pr$p <- c(predict(bm, newdata = data.frame(lage = l), q = q, type = "distribution"))
+pr$cut <- factor(pr$lage > 2.5)
+levels(pr$cut) <- c("Age < 2.5 yrs", "Age > 2.5 yrs")
+
+pfun <- function(x, y, z, subscripts, at, ...) {
+    panel.contourplot(x, y, z, subscripts, 
+        at = c(0.4, 2, 10, 25, 50, 75, 90, 98, 99.6)/ 100, ...)
+    panel.xyplot(x = db$age, y = db$head, pch = 20,
+                 col = rgb(.1, .1, .1, .1), ...)
+}
+print(contourplot(p ~ lage + head | cut, data = pr, panel = pfun, region = FALSE,
+            xlab = "Age (years)", ylab = "Head circumference (cm)", 
+            scales = list(x = list(relation = "free"))))
+@
+\caption{\Sexpr{ds[file]}. Observed head circumference and age for 
+         $7040$ boys with estimated quantile curves for 
+         $\tau = 0.04, 0.02, 0.1, 0.25, 0.5, 0.75, 0.9, 0.98, 0.996$.
+         \label{heads-plot}}
+\end{figure}
+
+
+\subsection{PRO-ACT ALSFRS}
+
+\begin{figure}[t]
+<<ALSFRS-results, echo = FALSE, fig.width = 7, fig.height = 6>>=
+load(file.path(dir, file <- "ex_ALSFRS.rda"))
+ylim <- NULL
+<<riskplot>>
+@
+\caption{\Sexpr{ds[file]}. Out-of-sample log-likelihood (centered by
+out-of-sample log-likelihood of unconditional model). \label{\Sexpr{paste0("fig", file, "oob")}}}
+\end{figure}
+
+<<ALSFRS-setup, echo = FALSE>>=
+load(file.path(datadir, "ALSFRSdata.rda"))
+ldata <- ALSFRSdata[complete.cases(ALSFRSdata),]
+
+xvars <- names(ldata)
+xvars <- xvars[xvars != "ALSFRS.halfYearAfter"]
+fvars <- xvars[sapply(ldata[xvars], is.factor)]
+nvars <- xvars[!xvars %in% fvars]
+
+ldata[nvars] <- lapply(nvars, function(x) as.numeric(scale(ldata[[x]])))
+
+fm_gam <- c(
+"ctm" = as.formula(paste("ALSFRS.halfYearAfter ~ ",
+    paste("bols(", xvars, ", df = 2)", collapse = "+"), "+",
+    paste("bbs(", nvars, ", center = TRUE, df = 2)", collapse = "+"))),
+"stm" = as.formula(paste("ALSFRS.halfYearAfter ~",
+    paste("bols(", xvars, ", intercept = FALSE, df = 1)", collapse = "+"), "+",
+    paste("bbs(", nvars, ", center = TRUE, df = 1)", collapse = "+"))))
+
+fm_glm <- c(
+"ctm" = as.formula(paste("ALSFRS.halfYearAfter ~ ",
+    paste("bols(", xvars, ", df = 2)", collapse = "+"))),
+"stm" = as.formula(paste("ALSFRS.halfYearAfter ~",
+    paste("bols(", xvars, ", intercept = FALSE, df = 1)", collapse = "+"))))
+
+fm_tree <- as.formula(paste("ALSFRS.halfYearAfter ~ ", paste(xvars, collapse = "+")))
+
+mf <- model.frame(fm_tree, data = ldata)
+xf <- sum(sapply(mf[,-1], is.factor))
+N <- dim(mf)[1]
+p <- dim(mf)[2] - 1
+vars <- names(mf)[-1]
+
+@
+
+This data origines from the PRO-ACT Prize4Life challenge 2012
+(\url{http://prize4life.org.il/en/prediction-prize/}), comprising clinical
+trials data from $N = \Sexpr{N}$ patients suffering Amypthropic Lateral
+Sclerosis (ALS). The response is the ALS-Functional Rating Scale (ALSFRS)
+six months after diagnosis. For each patient, $\Sexpr{p}$ ($\Sexpr{p - xf}$ 
+numeric and $\Sexpr{xf}$ categorical) predictors are available. An overview
+on the challenge and winning algorithms is available from \cite{Kueffner_Zach_Norel_2014}.
+
+The response is an ordinal variable, ranging from $0$ to $40$. We start with
+an unconditional proportional odds model featuring a continuous basis
+transformation of the response ($\pZ = \text{expit}$ and a Bernstein
+polynomial of order six):
+<<ALSFRS-model-0, cache = FALSE>>=
+m_mlt <- Colr(ALSFRS.halfYearAfter ~ 1, data = ldata, prob = c(.05, .9))
+logLik(m_mlt)
+@
+The corresponding unconditional distribution is depicted in Figure~\ref{\Sexpr{paste0("fig", file,
+"0")}}.
+
+\begin{figure}
+<<ALSFRS-null, echo = FALSE>>=
+plot(as.mlt(m_mlt), newdata = data.frame(1), type = "density", K = 200,
+     xlab = "ALSFRS at 6 months", ylab = "Density", col = "black")
+@
+\caption{\Sexpr{ds[file]}. Unconditional response distribution. \label{\Sexpr{paste0("fig", file, "0")}}}
+\end{figure}
+
+Model evaluation (Figure~\ref{\Sexpr{paste0("fig", file, "oob")}}) indicated that 
+a linear model for $\eshiftparm(\rx)$ (also known as ``distribution
+regression'') had the best performance; this model was fitted using
+<<ALSFRS-model, cache = FALSE>>=
+bm <- ctmboost(m_mlt, formula = fm_glm[["ctm"]], data = ldata, 
+               method = quote(mboost::mboost))[613]
+@
+The in-sample log-likelihood is shown in Figure~\ref{\Sexpr{paste0("fig", file, "ib")}}.
+
+\begin{figure}
+<<ALSFRS-risk, echo = FALSE>>=
+<<insampleriskplot>>
+@
+\caption{\Sexpr{ds[file]}. In-sample log-likelihood maximisation. \label{\Sexpr{paste0("fig", file, "ib")}}}
+\end{figure}
+
+Time since onset and ALSFRS at time of diagnosis are the two most important
+variables (roughly assessed by the selection frequency):
+<<ALSFRS-prop, echo = FALSE>>=
+tab <- matrix(tabulate(selected(bm), nbins = length(bm$baselearner)), ncol = 1)
+rownames(tab) <- names(bm$baselearner)
+colnames(tab) <- ""
+tab[tab > 0,]
+@
+
+The response-varying coefficients for these two variables are given in
+Figure~\ref{ALSFRS-plot}.
+
+\begin{figure}
+<<ALSFRS-plot, results = "hide", echo = FALSE>>=
+cf <- mboost:::coef.mboost(bm)
+q <- mkgrid(m_mlt, n = 100)[[1]]
+X <- model.matrix(m_mlt$model, data = data.frame(ALSFRS.halfYearAfter = q))
+vars <- c("time_onset_treatment", "ALSFRS.Start") 
+layout(matrix(1:length(vars), ncol = 2))
+out <- sapply(vars, function(v) {
+    cf <- matrix(cf[[grep(v, names(cf))]], ncol = 2, byrow = TRUE)
+    cf <- cumsum(cf[,2])
+    plot(q, X %*% cf, main = v, xlab = "ALSFRS at 6 months",
+         ylab = "Varying coefficient", type = "l")
+})
+@
+\caption{\Sexpr{ds[file]}. Response-varying coefficients.
+\label{ALSFRS-plot}}
+\end{figure}
+
+
+\subsection{PRO-ACT OS}
+
+\begin{figure}[t]
+<<ALSsurv-results, echo = FALSE, fig.width = 7, fig.height = 6>>=
+load(file.path(dir, file <- "ex_ALSsurv.rda"))
+ylim <- NULL
+<<riskplot>>
+@
+\caption{\Sexpr{ds[file]}. Out-of-sample log-likelihood (centered by
+out-of-sample log-likelihood of unconditional model). \label{\Sexpr{paste0("fig", file, "oob")}}}
+\end{figure}
+
+
+<<ALSsurv-setup, echo = FALSE>>=
+load(file.path(datadir, "ALSsurvdata.rda"))
+
+ldata <- ALSsurvdata[complete.cases(ALSsurvdata),]
+ldata$y <- with(ldata, Surv(survival.time, cens))
+ldata$survival.time <- NULL
+ldata$cens <- NULL
+
+nvars <- c("time_onset_treatment", "age", "height")
+fvars <- names(ldata)[!names(ldata) %in% c("y", nvars)]
+xvars <- c(nvars, fvars)
+
+ldata[nvars] <- lapply(nvars, function(x) as.numeric(scale(ldata[[x]])))
+
+
+fm_gam <- c(
+"ctm" = as.formula(paste("y ~ ",
+    paste("bols(", xvars, ", df = 2)", collapse = "+"), "+",
+    paste("bbs(", nvars, ", center = TRUE, df = 2)", collapse = "+"))),
+"stm" = as.formula(paste("y ~ ",
+    paste("bols(", xvars, ", intercept = FALSE, df = 1)", collapse = "+"), "+",
+    paste("bbs(", nvars, ", center = TRUE, df = 1)", collapse = "+"))))
+
+fm_glm <- c(
+"ctm" = as.formula(paste("y ~ ",
+    paste("bols(", xvars, ", df = 2)", collapse = "+"))),
+"stm" = as.formula(paste("y ~",
+    paste("bols(", xvars, ", intercept = FALSE, df = 1)", collapse = "+"))))
+
+fm_tree <- as.formula(paste("y ~ ", paste(xvars, collapse = "+")))
+
+mf <- model.frame(fm_tree, data = ldata)
+xf <- sum(sapply(mf[,-1], is.factor))
+N <- dim(mf)[1]
+p <- dim(mf)[2] - 1
+vars <- names(mf)[-1]
+@
+
+Overall survival data from ALS patients were compiled from the PRO-ACT
+database by \cite{Seibold_Zeileis_Hothorn_2017}.
+For each of $N = \Sexpr{N}$ patients, $\Sexpr{p}$ ($\Sexpr{p - xf}$ 
+numeric and $\Sexpr{xf}$ categorical) predictors are available.
+
+
+We start with an unconditional Cox model ($\pZ = 1 - \exp(-\exp())$ and a
+Bernstein polynomial of order six):
+<<ALSsurv-model0, cache = FALSE>>=
+m_mlt <- Coxph(y ~ 1, data = ldata)
+logLik(m_mlt)
+@
+The corresponding unconditional distribution is depicted in Figure~\ref{\Sexpr{paste0("fig", file,
+"0")}}.
+
+\begin{figure}
+<<ALSsurv-null, echo = FALSE>>=
+plot(as.mlt(m_mlt), newdata = data.frame(1), type = "survivor", K = 200,
+     xlab = "ALS Overall Survival (in days)", ylab = "Probability", col = "black")
+@
+\caption{\Sexpr{ds[file]}. Unconditional response distribution. \label{\Sexpr{paste0("fig", file, "0")}}}
+\end{figure}
+
+Model evaluation (Figure~\ref{\Sexpr{paste0("fig", file, "oob")}}) indicated that 
+tree-based model for $\eshiftparm(\rx)$ had the best performance; this model was fitted using
+<<ALSsurv-model, cache = FALSE>>=
+fm_tree
+bm <- stmboost(m_mlt, formula = fm_tree, data = ldata,
+               control = boost_control(nu = 0.01),
+               method = quote(mboost::blackboost))[451]
+@
+This model is roughly equivalent to a boosted Cox-model using trees as
+baselearners:
+<<ALSsurv-mlt, cache = FALSE, eval = FALSE>>=
+blackboost(fm_tree, data = ldata, family = CoxPH())
+@
+The in-sample log-likelihood is shown in Figure~\ref{\Sexpr{paste0("fig", file, "ib")}}.
+
+\begin{figure}
+<<ALSsurv-risk, echo = FALSE>>=
+<<insampleriskplot>>
+@
+\caption{\Sexpr{ds[file]}. In-sample log-likelihood maximisation. \label{\Sexpr{paste0("fig", file, "ib")}}}
+\end{figure}
+
+For five selected observations, the conditional survivor curves 
+are shown in Figure~\ref{\Sexpr{paste0("fig", file, "1")}}. 
+
+\begin{figure}
+<<ALSsurv-dens, echo = FALSE>>=
+idx <- sample(1:nrow(ldata), 5)
+q <- mkgrid(m_mlt, n = 200)[[1]]
+matplot(x = q, y = d <- predict(bm, newdata = ldata[idx,], type = "survivor", q = q), type =
+        "l", col = rgb(.1, .1, .1, .6), lty = 1, xlab = "ALS Overall Survival (in days)", ylab = "Probability")
+@
+\caption{\Sexpr{ds[file]}. Conditional response distribution. \label{\Sexpr{paste0("fig", file, "1")}}}
+\end{figure}
+
+\section{Artificial Data Generating Processes} \label{sec:dgp}
+
+\subsection{Simulation Models}
+
+Data were generated based on two groups and one numeric predictor variable $x \in [0, 1]$
+based on transformation models of the form
+\begin{eqnarray*}
+\Prob(\rY \le \ry \mid \text{Group}, x) = \Phi(h(\ry \mid \text{Group}, x))
+\end{eqnarray*}
+where the conditional transformation function $\h(\ry \mid \text{Group}, x) = \Phi^{-1}(\Prob(\rY \le \ry \mid \text{Group},
+x))$ for four data generating processes is given in Table~\ref{tab:dgp}.
+
+\begin{table}
+\begin{tabular}{lll} \hline
+DGP & $\Phi^{-1}(\Prob(\rY \le \ry \mid \text{Group 1}, x))$ & $\Phi^{-1}(\Prob(\rY \le \ry \mid \text{Group 2}, x))$ \\
+\hline \hline
+Linear $\eshiftparm(\rx)$ & $\h_\rY(\ry) - 2 x$ & $\h_\rY(\ry) + 2 - x$ \\
+Nonlinear $\eshiftparm(\rx)$ & $\h_\rY(\ry) - 2 g(x)$ & $\h_\rY(\ry) + 2 - g(x)$ \\
+Linear $\parm(\rx)$ & $\h_\rY(\ry) - \eshiftparm_1(\ry) -  \eshiftparm_2(\ry) x$ & $\h_\rY(\ry) + \eshiftparm_1(\ry) - (\eshiftparm_2(\ry) + \eshiftparm_3(\ry)) x$ \\
+Nonlinear $\parm(\rx)$ & $\h_\rY(\ry) - \eshiftparm_1(\ry) -  \eshiftparm_2(\ry) g(x)$ & $\h_\rY(\ry) + \eshiftparm_1(\ry) - (\eshiftparm_2(\ry) + \eshiftparm_3(\ry)) g(x)$ \\ \hline
+\end{tabular}
+\caption{Artificial Data Generating Processes (DGPs). Description of four
+simulation models. $g(x) = \sin(2 \pi x)(1 + x)$, $\h_\rY, \eshiftparm_1,
+\eshiftparm_2, \eshiftparm_3$ are Bernstein polynomials of order six.
+\label{tab:dgp}}
+\end{table}
+
+General parameters of the simulation were defined as
+<<dgp>>=
+library("tram")
+### set-up RNG
+set.seed(27031105)
+### order of Bernstein polynomials
+order <- 6
+### support of distributions
+sup <- c(-4, 6)
+### bounds (essentially for plots)
+bds <- c(-8, 8)
+### shift effects: main effect of grp, x, and interaction effect
+beta <- c(-2, 2, -1)
+@
+Group information and $x$ along with $g(x)$ was generated via
+<<dgp-data>>=
+### two groups
+grp <- gl(2, 1)
+### uniform predictor
+x <- seq(from = 0, to = 1, length.out = 1000)
+d <- expand.grid(grp = grp, x = x)
+### transformation of x: sin(2 pi x) (1 + x)
+d$g <- with(d, sin(x * 2 * pi) * (1 + x))
+### generate some response (this is NOT the 
+### response used for the simulations)
+X <- model.matrix(~ grp * x, data = d)[,-1]
+d$y <- rnorm(nrow(d), mean = X %*% beta)
+@
+
+For the first model (``Linear $\eshiftparm(\rx)$''), the 
+baseline transformation $\h_\rY$ is a nonlinear function, parameterised
+as a Bernstein polynomial with the following coefficients
+<<dgp-Linear-beta>>=
+### h_Y
+(cf0 <- seq(from = sup[1], to = sup[2], length = order + 1) + 
+        sin(seq(from = 0, to = 2*pi, length = order + 1)) * 
+        (seq(from = 0, to = 2*pi, length = order + 1) <= pi) * 2)
+m1 <- BoxCox(y ~ grp * x, data = d, order = order, 
+             model_only = TRUE, support = sup, bounds = bds)
+cf <- coef(m1)
+(cf[] <- c(cf0, beta))
+coef(m1) <- cf
+@
+The linear part simply consists of a main effect of group, a main effect of
+$x$ and an interaction effect. This is a linear transformation model with
+nonnormal response.
+
+The second model (``Nonlinear $\eshiftparm(\rx)$'') is based on the same
+coefficients, however, after the transformation $g(x)$
+<<dgp-Nonlinear-beta>>=
+m2 <- BoxCox(y ~ grp * g, data = d, order = order, 
+             model_only = TRUE, support = sup, bounds = bds)
+cf <- coef(m2)
+cf[] <- c(cf0, beta)
+coef(m2) <- cf
+@
+
+The third model (``Linear $\parm(\rx)$'') is a distribution regression
+model featuring response-varying coefficients:
+<<dgp-Linear-parm>>=
+m3 <- BoxCox(y | grp * x ~ 1, data = d, order = order, 
+             model_only = TRUE, support = sup, bounds = bds)
+cf <- coef(m3)
+
+### beta_1
+(cf1 <- sin(seq(from = 0, to = pi / 2, length.out = order + 1)) * beta[1])
+### beta_2
+(cf2 <- sqrt(seq(from = 0, to = 2, length.out = order + 1)) / sqrt(2) * beta[2])
+### beta_3
+(cf21 <- sin(seq(from = 0, to = pi / 2, length.out = order + 1)) * beta[3])
+
+cf[] <- c(cf0, cf1, cf2, cf21)
+coef(m3) <- cf
+@
+
+In the last model (``Nonlinear $\parm(\rx)$''), the same response-varying
+coefficients are used after the transformation $g(x)$:
+<<dgp-Nonlinear-parm>>=
+m4 <- BoxCox(y | grp * g ~ 1, data = d, order = order, 
+             model_only = TRUE, support = sup, bounds = bds)
+cf <- coef(m4)
+
+cf[] <- c(cf0, cf1, cf2, cf21)
+coef(m4) <- cf
+@
+
+The conditional transformation functions are depicted in
+Figure~\ref{fig:dgp}.
+
+\begin{figure}
+\begin{center}
+<<plot-dgp, echo = FALSE,  fig.width = 6, fig.height = 8>>=
+
+xlim <- c(-5, 5)
+q <- mkgrid(m1, n = 500)[["y"]]
+x <- 0:10 / 10
+nd <- expand.grid(grp = grp, x = x)
+ndq <- expand.grid(y = q, grp = grp, x = x)
+ndq$xconfig <- with(ndq, interaction(grp, factor(x)))
+nd$g <- with(nd, sin(x * 2 * pi) * (1 + x))
+
+ndq$d1 <- c(predict(m1, newdata = nd, type = "density", q = q))
+ndq$d2 <- c(predict(m2, newdata = nd, type = "density", q = q))
+ndq$d3 <- c(predict(m3, newdata = nd, type = "density", q = q))
+ndq$d4 <- c(predict(m4, newdata = nd, type = "density", q = q))
+
+ndq$t1 <- c(predict(m1, newdata = nd, type = "trafo", q = q))
+ndq$t2 <- c(predict(m2, newdata = nd, type = "trafo", q = q))
+ndq$t3 <- c(predict(m3, newdata = nd, type = "trafo", q = q))
+ndq$t4 <- c(predict(m4, newdata = nd, type = "trafo", q = q))
+
+colr <- rep(grey.colors(length(x), alpha = .9), each = 2)
+xlim <- bds
+
+ret <- do.call("rbind", list(ndq)[rep(1, 4)])
+ret$d <- with(ndq, c(d1, d2, d3, d4))
+ret$t <- with(ndq, c(t1, t2, t3, t4))
+ret$model <- gl(4, nrow(ndq))
+levels(ret$model) <- mlev <- c("GLM Tram", "GAM Tram", "DR", "CTM")
+ret$model <- factor(as.character(ret$model), levels = rev(mlev), labels = rev(mlev))
+levels(ret$grp) <- c("Group 1", "Group 2")
+
+lev <- c(expression(paste("Nonlinear ", bold(vartheta)(bold(x)))),
+         expression(paste("Linear ", bold(vartheta)(bold(x)))),
+         expression(paste("Nonlinear ", beta(bold(x)))),
+         expression(paste("Linear ", beta(bold(x)))))
+
+sc <- function(which.given, ..., factor.levels) {
+    if (which.given == 1) {
+        strip.default(which.given = which.given, ..., factor.levels)
+    } else {
+        if (which.given == 2)
+            strip.default(which.given = 2, ..., factor.levels = lev)
+   }
+}
+
+
+obj <- (xyplot(t ~ y | grp + model, data = ret, type = "l", groups = xconfig, col = colr, strip = sc,
+     lwd = 2, lty = 1, xlim = xlim, layout = c(4, 2), ylab = "Transformation h", xlab = "Response Y", 
+     scales = list(y = list(relation = "free"))))
+
+obj <- useOuterStrips(obj, strip.left = function(which.given, ..., factor.levels) 
+    strip.custom(horizontal = FALSE)(which.given = which.given, ..., factor.levels = lev))
+
+plot(obj <- update(obj, legend = list(right = list(fun = "draw.colorkey", 
+                   args = list(list(at = 1:22 / 22, col = colr, title = "x"))))))
+
+trellis.focus("legend", side="right", clipp.off=TRUE, highlight=FALSE)
+grid.text(expression(x), 0.5, 1.07, hjust=0.5, vjust=1)
+trellis.unfocus()
+@
+\caption{Artificial Data Generating Processes. Conditional transformation functions $h(\ry \mid \text{Group}, x)$ given two
+         groups (left and right panel) and $x \in [0, 1]$ (grey color
+         coding) for four different types of transformation models. \label{fig:dgp}}
+\end{center}
+\end{figure}
+
+Samples from the conditional distributions described by these four models
+were drawn as follows:
+<<simulate, eval = FALSE>>=
+y1 <- simulate(m1, newdata = d, n = 100)
+y2 <- simulate(m2, newdata = d, n = 100)
+y3 <- simulate(m3, newdata = d, n = 100)
+y4 <- simulate(m4, newdata = d, n = 100)
+@
+
+For each combination of data generating process, sample size ($N = 75, 150,
+300)$, number of additional uninformative predictor variables ($J^+ = 0, 5,
+25$), two choices of $\pZ$ (standard normal and standard logistic in the
+specification of the boosting procedure, the data were always generated
+using $\pZ = \Phi$), and two choices of the order of the Bernstein
+polynomials (six and $12$, also only for the specification of the boosting
+procedures ), the out-of-sample log-likelihood was estimated for $100$
+simulation runs.
+
+\subsection{Results} \label{sec:results}
+
+The following figures depict the out-of-sample log-likelihoods (centered by
+the out-of-sample log-likelihood of the true model) for each combination of
+distribution function $\pZ$, number of additional noninformative uniform
+predictors $J^+$, and order $M$ of the Bernstein polynomial. The panels
+correspond to the different DGPs (columns) and sample sizes (rows).
+Abbreviations of the boosting procedures and basis functions used are given
+at the x-axis. The boxplot of the best performing model is highlighted in
+yellow.
+
+<<dgp-setup, echo = FALSE>>=
+dir <- system.file("simulations", package = "tbm")
+ctm <- list.files(path = dir, pattern = "ctm.*rda", full = TRUE)
+tram <- list.files(path = dir, pattern = "tram.*rda", full = TRUE)
+
+out <- c()
+
+for (f in c(ctm, tram)) {
+
+    load(f)
+
+    out <- rbind(out, ret)
+
+}
+
+out$model <- factor(out$model, levels = c("ctm_gam", "ctm_glm", "ctm_tree", "tram_gam", "tram_glm", "tram_tree"),
+                    labels = c("gam_ctm", "glm_ctm", "tree_ctm", "gam_tram", "glm_tram", "tree_tram"))
+
+out$PNON <- factor(out$PNON)
+out$NOBS <- factor(paste("N =", out$NOBS))
+out$m <- factor(out$m)
+out$todistr <- factor(out$todistr)
+out$order <- factor(out$order)
+
+out$boost_ll[grep("rror", out$boost_ll)] <- NA
+out$boost_ll <- as.double(out$boost_ll)
+out$true_ll <- as.double(out$true_ll)
+out$mlt_ll <- as.double(out$mlt_ll)
+out$mstop <- as.double(out$mstop)
+
+out$todistr <- factor(as.character(out$todistr), levels = c("normal", "logistic"), 
+                      labels = c("Normal", "Logistic"))
+
+lev <- rev(c(expression(paste("Nonlinear ", bold(vartheta)(bold(x)))),
+         expression(paste("Linear ", bold(vartheta)(bold(x)))),
+         expression(paste("Nonlinear ", beta(bold(x)))),
+         expression(paste("Linear ", beta(bold(x))))))
+
+sc <- function(which.given, ..., factor.levels) {
+    if (which.given == 2) {
+        strip.default(which.given = which.given, ..., factor.levels)
+    } else {
+        if (which.given == 1)
+            strip.default(which.given = 1, ..., factor.levels = lev)
+   }
+}
+
+  mypanel <- function(x, y, groups, subscripts, ...) {
+    med <- tapply(y, x, median, na.rm = TRUE)
+    panel.bwplot(x = x, y = y, col = col[(med == max(med)) + 1], 
+                 fill = col[(med == max(med)) + 1], pch = "|", ...)
+    panel.abline(v = c(3.5), col = "lightgrey")
+    panel.abline(h = 0, col = "lightgrey")
+    panel.abline(h = max(med), col = col[2])
+    panel.bwplot(x = x, y = y, col = col[(med == max(med)) + 1], 
+                 fill = col[(med == max(med)) + 1], pch = "|", ...)
+#    tapply(1:length(y), groups[subscripts], function(i) {
+#        llines(x = 1:nlevels(x), y = y[i][order(x[i])], 
+#               col = rgb(0.1, 0.1, 0.1, 0.1))
+#    })
+  }
+
+
+
+@
+
+<<dgp-1, results = "asis", echo = FALSE>>=
+lto <- levels(out$todistr)
+lp <- levels(out$PNON)
+lo <- levels(out$order)
+
+ret <- c()
+
+i <- 1
+for (l1 in lto) {
+    for(l2 in lp) {
+       for (l3 in lo) {
+           os <- subset(out, todistr == l1 & PNON == l2 & order == l3)
+
+           txt <- paste("J = ", l2, "M = ", l3)
+           if (l1 == "Normal") {
+               main <- expression(F[Z] == Phi)
+           } else {
+               main <- expression(F[Z] == expit)
+           }
+           pdf(fig <- paste("sfig", i, ".pdf", sep = ""), width = 12, height = 8)
+           pl <- bwplot(I(boost_ll - true_ll) ~ model |  m + NOBS, data = os, main = main, strip = sc, 
+                        ylab = "Out-of-sample log-likelihood (centered)",
+                        xlab = txt, panel = mypanel,
+                        scales = list(y = list(relation = "free"),
+                                      x = list(at = 1:6, label = m[levels(os$model)])))
+           plot(pl)
+           dev.off()
+           ret <- c(ret, "\\begin{sidewaysfigure}",
+               "\\begin{center}",
+               paste("\\includegraphics{", fig, "}", sep = ""),
+               "\\end{center}",
+               "\\end{sidewaysfigure}", " ")
+           i <- i + 1
+        }
+    }
+}
+writeLines(ret)
+@
+
+\clearpage
+
+\bibliography{mlt,appl,packages}
+
+<<funs, echo = FALSE, results='hide', purl = FALSE, cache = FALSE>>=
+if (file.exists("packages.bib")) file.remove("packages.bib")
+pkgversion <- function(pkg) {
+    pkgbib(pkg)
+    packageDescription(pkg)$Version
+}
+pkgbib <- function(pkg) {
+    x <- citation(package = pkg, auto = TRUE)[[1]]
+    b <- toBibtex(x)
+    b <- gsub("Buehlmann", "B{\\\\\"u}hlmann", b)
+
+    i <- grep("title = \\{ICsurv", b)
+    if (length(i) == 1)
+       b[i] <- "  title = {ICsurv: A Package for Semiparametric Regression Analysis of Interval-censored Data},"
+
+    i <- grep("title = \\{dynsurv", b)
+    if (length(i) == 1)
+       b[i] <- "  title = {dynsurv: Dynamic Models for Survival Data},"
+
+    i <- grep("title = \\{np", b)
+    if (length(i) == 1)
+       b[i] <- "  title = {np: Nonparametric Kernel Smoothing Methods for Mixed Data Types},"
+
+    i <- grep("Kenneth Hess", b)
+    if (length(i) == 1)
+       b[i] <- "  author = {Kenneth Hess and Robert Gentleman},"
+
+    b <- gsub("with contributions from", "and", b)
+
+    b <- gsub("Göran Broström", "G\\\\\"oran Brostr\\\\\"om", b)
+
+    b <- gsub(" The publishers web page is", "},", b)
+    b <- gsub("http://www.crcpress.com/product/isbn/9781584885740},", "", b)
+
+    b <- gsub("R package", "\\\\proglang{R} package", b)
+
+    b[1] <- paste("@Manual{pkg:", pkg, ",", sep = "")
+    if (is.na(b["url"])) {
+        b[length(b)] <- paste("   URL = {http://CRAN.R-project.org/package=",
+                              pkg, "}", sep = "")
+        b <- c(b, "}")
+    }
+    cat(b, sep = "\n", file = "packages.bib", append = TRUE)
+}
+pkg <- function(pkg)
+    paste("\\\\pkg{", pkg, "} \\\\citep[version~",
+          pkgversion(pkg), ",][]{pkg:", pkg, "}", sep = "")
+
+pkgs <- c("mlt", "variables", "basefun", "survival", "tbm", "trtf")
+out <- sapply(pkgs, pkg)
+
+x <- readLines("packages.bib")
+for (p in pkgs)
+    x <- gsub(paste("\\{", p, ":", sep = ""), paste("\\{\\\\pkg{", p, "}:", sep = ""), x)
+cat(x, sep = "\n", file = "packages.bib", append = FALSE)
+@
+
+<<sessionInfo, echo = FALSE, results = "hide">>=
+sessionInfo()
+@
+
+\end{document}
