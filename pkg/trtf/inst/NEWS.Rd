@@ -2,7 +2,7 @@
 \name{NEWS}
 \title{NEWS file for the trtf package}
 
-\section{Changes in Version 0.3-2 (2018-05-28)}{
+\section{Changes in Version 0.3-2 (2018-06-22)}{
   \itemize{
     \item{Document \code{predict} and \code{logLik} methods.}
     \item{Add \code{applyfun} and \code{cores} arguments to \code{predict}

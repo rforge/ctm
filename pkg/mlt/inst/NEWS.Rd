@@ -2,7 +2,7 @@
 \name{NEWS}
 \title{NEWS file for the mlt package}
 
-\section{Changes in Version 1.0-2 (2018-05-27)}{
+\section{Changes in Version 1.0-2 (2018-06-22)}{
   \itemize{
     \item{Make sure transformation functions outside \code{bounds} are minus
           or plus \code{Inf}.}
