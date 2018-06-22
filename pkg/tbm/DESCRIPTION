@@ -1,11 +1,12 @@
 Package: tbm
 Title: Transformation Boosting Machines
 Version: 0.2-1
-Date: 2018-05-28
+Date: 2018-06-22
 Authors@R: person("Torsten", "Hothorn", role = c("aut", "cre"),
                   email = "Torsten.Hothorn@R-project.org", comment = c(ORCID = "0000-0001-8301-0471"))
 Description: Likelihood boosting for conditional and shift transformation models.
 Depends: mlt (>= 1.0-2), mboost (>= 2.8-2)
 Imports: variables, basefun, sandwich, coneproj, methods
-Suggests: TH.data, tram, survival, partykit
+Suggests: TH.data (>= 1.0-9), tram, survival, partykit, lattice, latticeExtra, partykit, animation
+VignetteBuilder: knitr
 License: GPL-2
