@@ -114,14 +114,19 @@ abline(h = coef(cmod <- mlt(m, data = GBSG2))["horThyes"])
 ### across age; interpretation of positive / negative treatment effect is,
 ### however, save.
 
-### computing predictions: predicted coefficients
-cf1 <- predict(tf_cmod, newdata = nd, type = "coef")
-### speedup with plenty of RAM and 4 cores
-cf2 <- predict(tf_cmod, newdata = nd, cores = 4, type = "coef")
-### memory-efficient with low RAM and _one_ core
-cf3 <- predict(tf_cmod, newdata = nd, cores = 4, applyfun = lapply, type = "coef")
-all.equal(cf1, cf2)
-all.equal(cf1, cf3)
+### mclapply doesn't work in Windows
+if (.Platform$OS.type != "windows") {
+
+  ### computing predictions: predicted coefficients
+  cf1 <- predict(tf_cmod, newdata = nd, type = "coef")
+  ### speedup with plenty of RAM and 4 cores
+  cf2 <- predict(tf_cmod, newdata = nd, cores = 4, type = "coef")
+  ### memory-efficient with low RAM and _one_ core
+  cf3 <- predict(tf_cmod, newdata = nd, cores = 4, applyfun = lapply, type = "coef")
+  all.equal(cf1, cf2)
+  all.equal(cf1, cf3)
+
+}
 
 }
 
