@@ -1,6 +1,7 @@
 
 load("dgp.rda")
 library("parallel")
+RNGkind("L'Ecuyer-CMRG")
 
 set.seed(290875)
 
@@ -53,6 +54,7 @@ simfun <- function(m, i) {
 
 }
 
+mc.reset.stream()
 x <- mclapply(1:NROW(res), 
     function(r) simfun(res[r, "m"], res[r, "i"]), mc.cores = MC_CORES)
 
