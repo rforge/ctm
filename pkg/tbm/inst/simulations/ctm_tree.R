@@ -20,7 +20,7 @@ myFUN <- function(ldata, lweights, model = c("normal", "logistic"), order) {
         fm <- paste(fm, "+", paste(nx, collapse = "+"))
     fm <- as.formula(fm)
     tctrl <- ctree_control(minsplit = 4, minbucket = 2, mincriterion = 0,
-                           maxdepth = 2, splittest = FALSE, 
+                           maxdepth = 6, splittest = FALSE, 
                            testtype = "Teststatistic")
     l1 <- ctmboost(m0, formula = fm,
                    data = ldata, method = quote(mboost::blackboost), 
