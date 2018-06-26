@@ -7,7 +7,7 @@ source("setup.R")
 
 myFUN <- function(ldata, lweights, model = c("normal", "logistic"), order) {
 
-    bctrl <- boost_control(mstop = 100, risk = "oob")
+    bctrl <- boost_control(mstop = 100, risk = "oob", nu = 0.01)
     if (model == "normal") {
         m0 <- BoxCox(y ~ 1, data = ldata, order = order, support = sup, bounds = bds)
     } else {
@@ -30,7 +30,7 @@ myFUN <- function(ldata, lweights, model = c("normal", "logistic"), order) {
     mstop <- which.min(risk(l1))
     l1 <- ctmboost(m0, formula = fm,
                    data = ldata, method = quote(mboost::blackboost), 
-                   control = bctrl)[mstop]
+                   control = bctrl, tree_control = tctrl)[mstop]
     return(l1)
 }
 
