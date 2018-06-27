@@ -7,6 +7,6 @@ Authors@R: person("Torsten", "Hothorn", role = c("aut", "cre"),
 Description: Likelihood boosting for conditional and shift transformation models.
 Depends: mlt (>= 1.0-2), mboost (>= 2.8-2)
 Imports: variables, basefun, sandwich, coneproj, methods
-Suggests: TH.data (>= 1.0-9), tram, survival, partykit, lattice, latticeExtra, partykit, animation
+Suggests: TH.data (>= 1.0-9), tram (>= 0.2-3), survival, partykit, lattice, latticeExtra, partykit, animation
 VignetteBuilder: knitr
 License: GPL-2

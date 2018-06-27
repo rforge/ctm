@@ -479,7 +479,7 @@ fetus $\Sexpr{p}$ numeric predictors are available.
 We start with an unconditional model (using $\pZ = \Phi$ and an Bernstein
 polynomial of order six):
 <<fetus-model0, cache = FALSE>>=
-m_mlt <- BoxCox(birthweight ~ 1, data = ldata)
+m_mlt <- BoxCox(birthweight ~ 1, data = ldata, extrapolate = TRUE)
 logLik(m_mlt)
 @
 The corresponding unconditional distribution is depicted in Figure~\ref{\Sexpr{paste0("fig", file,
@@ -895,7 +895,7 @@ predictors.
 We start with an unconditional model (using $\pZ = \Phi$ and an Bernstein
 polynomial of order six):
 <<india-model0, cache = FALSE>>=
-m_mlt <- BoxCox(stunting ~ 1, data = ldata, prob = c(.05, .975))
+m_mlt <- BoxCox(stunting ~ 1, data = ldata, prob = c(.05, .975), extrapolate = TRUE)
 logLik(m_mlt)
 @
 The corresponding unconditional distribution is depicted in Figure~\ref{\Sexpr{paste0("fig", file,
@@ -1125,7 +1125,7 @@ an unconditional proportional odds model featuring a continuous basis
 transformation of the response ($\pZ = \text{expit}$ and a Bernstein
 polynomial of order six):
 <<ALSFRS-model-0, cache = FALSE>>=
-m_mlt <- Colr(ALSFRS.halfYearAfter ~ 1, data = ldata, prob = c(.05, .9))
+m_mlt <- Colr(ALSFRS.halfYearAfter ~ 1, data = ldata, prob = c(.05, .9), extrapolate = TRUE)
 logLik(m_mlt)
 @
 The corresponding unconditional distribution is depicted in Figure~\ref{\Sexpr{paste0("fig", file,
