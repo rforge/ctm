@@ -6,7 +6,7 @@ dir <- system.file("rda", package = "TH.data")
 load(file.path(dir, "ALSFRSdata.rda"))
 ldata <- ALSFRSdata[complete.cases(ALSFRSdata),]
 
-m_mlt <- Colr(ALSFRS.halfYearAfter ~ 1, data = ldata, prob = c(.05, .9))
+m_mlt <- Colr(ALSFRS.halfYearAfter ~ 1, data = ldata, prob = c(.05, .9), extrapolate = TRUE)
 ll0 <- logLik(m_mlt) / nrow(ldata)
 
 xvars <- names(ldata)

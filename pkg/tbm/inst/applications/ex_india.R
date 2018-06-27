@@ -32,7 +32,7 @@ fm_tree <- as.formula(paste("stunting ~ ", paste(xvars, collapse = "+")))
 
 kids$stunting <- as.double(kids$stunting)
 ldata <- kids
-m_mlt <- BoxCox(stunting ~ 1, data = ldata, prob = c(.05, .975))
+m_mlt <- BoxCox(stunting ~ 1, data = ldata, prob = c(.05, .975), extrapolate = TRUE)
 ll0 <- logLik(m_mlt) / nrow(ldata)
 
 ### no need to adapt here

@@ -11,7 +11,7 @@ xvars <- xvars[xvars != "birthweight"]
 
 ldata[xvars] <- lapply(xvars, function(x) scale(ldata[[x]]))
 
-m_mlt <- BoxCox(birthweight ~ 1, data = ldata)
+m_mlt <- BoxCox(birthweight ~ 1, data = ldata, extrapolate = TRUE)
 ll0 <- logLik(m_mlt) / nrow(ldata)
 
 fm_gam <- c("ctm" = as.formula(paste("birthweight ~ ",
