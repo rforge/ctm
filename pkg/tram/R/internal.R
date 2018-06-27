@@ -50,7 +50,7 @@ asvar.response <- function(object, name, prob = c(.1, .9), support = NULL, bound
 }
 
 mkbasis <- function(yvar, transformation = c("discrete", "linear", "logarithmic", "smooth"), 
-                    order = 6) {
+                    order = 6, extrapolate = FALSE) {
 
   transformation <- match.arg(transformation)
 
@@ -63,7 +63,8 @@ mkbasis <- function(yvar, transformation = c("discrete", "linear", "logarithmic"
           "logarithmic" = 
               log_basis(yvar, ui = "increasing"),
           "smooth" = 
-              Bernstein_basis(yvar, ui = "increasing", order = order)
+              Bernstein_basis(yvar, ui = "increasing", order = order,
+                              extrapolate = extrapolate)
           )
       )
   }
