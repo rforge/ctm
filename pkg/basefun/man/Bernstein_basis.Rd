@@ -9,12 +9,17 @@
 \usage{
 Bernstein_basis(var, order = 2, ui = c("none", "increasing", "decreasing", 
                                        "cyclic", "zerointegral", "positive",
-                                       "negative"))
+                                       "negative"),
+                extrapolate = FALSE)
 }
 \arguments{
   \item{var}{a \code{\link[variables]{numeric_var}} object}
   \item{order}{the order of the polynomial, one defines a linear function}
   \item{ui}{a character describing possible constraints}
+  \item{extrapolate}{logical; if \code{TRUE}, the polynomial is
+                     extrapolated linearily outside \code{support(var)}.
+                     In particular, the second derivative of the polynomial
+                     at \code{support(var)} is constrained to zero.}
 }
 \details{
   \code{Bernstein_basis} returns a function for the evaluation of

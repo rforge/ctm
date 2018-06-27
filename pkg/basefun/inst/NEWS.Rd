@@ -2,11 +2,20 @@
 \name{NEWS}
 \title{NEWS file for the basefun package}
 
+\section{Changes in Version 1.0-2 (2018-06-27)}{
+  \itemize{
+    \item{Constrain Bernstein to zero second derivative at the support when
+          linear extrapolation shall be used. This avoids ugly bumps in the
+          corresponding densities in \pkg{mlt}.}
+  }
+}
+
 \section{Changes in Version 1.0-1 (2018-03-27)}{
   \itemize{
     \item{Replace \code{rBind} by \code{rbind} as requested by MM.}
   }
 }
+
 
 \section{Changes in Version 1.0-0 (2018-03-07)}{
   \itemize{
