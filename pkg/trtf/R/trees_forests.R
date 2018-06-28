@@ -1,5 +1,5 @@
 
-.ctmfit <- function(object, parm, mltargs) {
+.ctmfit <- function(object, parm, mltargs, reparm) {
     
     ctmobject <- object
 
@@ -61,6 +61,7 @@
                     ret <- tmp
                 }
                 if (!is.null(iy)) ret <- rbind(0, ret)
+                if (!is.null(reparm)) ret <- ret %*% reparm
             }
             return(list(estfun = ret, 
                         coefficients = coef(umod), 
@@ -72,13 +73,14 @@
     }
 } 
 
-trafotree <- function(object, parm = 1:length(coef(object)), mltargs = list(maxit = 10000), ...) {
+trafotree <- function(object, parm = 1:length(coef(object)), reparm = NULL,
+                      mltargs = list(maxit = 10000), ...) {
 
     if (inherits(object, "mlt")) object <- object$model
     mltargs$model <- object
     ### note: weights, offset, cluster etc. are evaluated here !!!
     args <- list(...)
-    args$ytrafo <- .ctmfit(object, parm, mltargs)
+    args$ytrafo <- .ctmfit(object, parm, mltargs, reparm)
     args$update <- TRUE
     ret <- do.call("ctree", args)
     ret$model <- object
@@ -100,13 +102,14 @@ trafotree <- function(object, parm = 1:length(coef(object)), mltargs = list(maxi
     ret
 }
 
-traforest <- function(object, parm = 1:length(coef(object)), mltargs = list(maxit = 10000), update = TRUE, ...) {
+traforest <- function(object, parm = 1:length(coef(object)), reparm = NULL,
+                      mltargs = list(maxit = 10000), update = TRUE, ...) {
 
     if (inherits(object, "mlt")) object <- object$model
     mltargs$model <- object
     ### note: weights, offset, cluster etc. are evaluated here !!!
     args <- list(...)
-    args$ytrafo <- .ctmfit(object, parm, mltargs)
+    args$ytrafo <- .ctmfit(object, parm, mltargs, reparm)
     args$update <- update
     ret <- do.call("cforest", args)
     ret$model <- object

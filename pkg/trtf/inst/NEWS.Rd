@@ -2,6 +2,13 @@
 \name{NEWS}
 \title{NEWS file for the trtf package}
 
+\section{Changes in Version 0.3-3 (2018-06-27)}{
+  \itemize{
+    \item{All reparameterisation for max-type tests; this might
+          give better (more powerful) variable selection.}
+  }
+}
+
 \section{Changes in Version 0.3-2 (2018-06-22)}{
   \itemize{
     \item{Document \code{predict} and \code{logLik} methods.}
