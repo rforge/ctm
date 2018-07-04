@@ -21,7 +21,7 @@ myFUN <- function(ldata, lweights, model = c("normal", "logistic"), order) {
     l1 <- ctmboost(m0, formula = fm,
                    data = ldata, method = quote(mboost:::mboost), 
                    weights = lweights, control = bctrl)
-    while(!(which.min(risk(l1)) < mstop(l1)) && mstop(l1) < 1000)
+    while(!(which.min(risk(l1)) < mstop(l1)) && mstop(l1) < 2000)
         l1 <- l1[2 * mstop(l1)]
     mstop <- which.min(risk(l1))
     l1 <- ctmboost(m0, formula = fm,

@@ -18,8 +18,8 @@ myFUN <- function(ldata, lweights, model = c("normal", "logistic"), order) {
     nx <- nm[grep("^nx", nm)]
     if (length(nx) > 0)
        fm <- paste(fm, "+", 
-                    paste("bols(", nx,")", collapse = "+"), "+",
-                    paste("bbs(", nx, ", center = TRUE, df = 2)", collapse = "+"))
+                    paste("bols(", nx,", intercept = FALSE)", collapse = "+"), "+",
+                    paste("bbs(", nx, ", center = TRUE, df = 1)", collapse = "+"))
     fm <- as.formula(fm)
     l1 <- stmboost(m0, formula = fm,
                    data = ldata, method = quote(mboost::mboost), 

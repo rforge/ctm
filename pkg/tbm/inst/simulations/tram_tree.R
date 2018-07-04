@@ -26,7 +26,7 @@ myFUN <- function(ldata, lweights, model = c("normal", "logistic"), order) {
     l1 <- stmboost(m0, formula = fm,
                    data = ldata, method = quote(mboost::blackboost), 
                    weights = lweights, control = bctrl, tree_control = tctrl)
-    while(!(which.min(risk(l1)) < mstop(l1))  && mstop(l1) < 1000)
+    while(!(which.min(risk(l1)) < mstop(l1))  && mstop(l1) < 2000)
         l1 <- l1[2 * mstop(l1)]
     mstop <- which.min(risk(l1))
     l1 <- stmboost(m0, formula = fm,
