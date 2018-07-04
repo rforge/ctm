@@ -1,10 +1,4 @@
 
-load("dgp.rda")
-library("parallel")
-RNGkind("L'Ecuyer-CMRG")
-
-set.seed(290875)
-
 res <- expand.grid(i = 1:NSIM, m = 1:length(model))
 
 simfun <- function(m, i) {
