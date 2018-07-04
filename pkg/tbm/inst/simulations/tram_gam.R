@@ -14,12 +14,14 @@ myFUN <- function(ldata, lweights, model = c("normal", "logistic"), order) {
     }
     fm <- "y ~ bols(x1, intercept = FALSE) + bols(x2, intercept = FALSE) + bbs(x2, center = TRUE, df = 1) + 
                bols(x2, by = x1, intercept = FALSE) + bbs(x2, by = x1, center = TRUE, df = 1)"
+    fm <- "y ~ bols(x1) + bols(x2) + bbs(x2, center = TRUE, df = 2) +
+               bols(x2, by = x1) + bbs(x2, by = x1, center = TRUE, df = 2)"
     nm <- colnames(ldata)
     nx <- nm[grep("^nx", nm)]
     if (length(nx) > 0)
        fm <- paste(fm, "+", 
-                    paste("bols(", nx,", intercept = FALSE)", collapse = "+"), "+",
-                    paste("bbs(", nx, ", center = TRUE, df = 1)", collapse = "+"))
+                    paste("bols(", nx,")", collapse = "+"), "+",
+                    paste("bbs(", nx, ", center = TRUE, df = 2)", collapse = "+"))
     fm <- as.formula(fm)
     l1 <- stmboost(m0, formula = fm,
                    data = ldata, method = quote(mboost::mboost), 
