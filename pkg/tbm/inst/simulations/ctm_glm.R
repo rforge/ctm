@@ -6,7 +6,7 @@ source("setup.R")
 
 myFUN <- function(ldata, lweights, model = c("normal", "logistic"), order) {
 
-    bctrl <- boost_control(mstop = 100, risk = "oob", nu = 0.01)
+    bctrl <- boost_control(mstop = 100, risk = "oob", nu = 0.1)
     if (model == "normal") {
         m0 <- BoxCox(y ~ 1, data = ldata, order = order, support = sup, bounds = bds)
     } else {

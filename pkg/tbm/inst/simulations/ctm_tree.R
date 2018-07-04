@@ -7,6 +7,7 @@ source("setup.R")
 
 myFUN <- function(ldata, lweights, model = c("normal", "logistic"), order) {
 
+    ### we use large trees, so train with nu = 0.01 instead of nu = 0.1k
     bctrl <- boost_control(mstop = 100, risk = "oob", nu = 0.01)
     if (model == "normal") {
         m0 <- BoxCox(y ~ 1, data = ldata, order = order, support = sup, bounds = bds)

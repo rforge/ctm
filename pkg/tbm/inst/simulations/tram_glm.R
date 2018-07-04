@@ -6,7 +6,7 @@ source("setup.R")
 
 myFUN <- function(ldata, lweights, model = c("normal", "logistic"), order) {
 
-    bctrl <- boost_control(mstop = 100, risk = "oob", nu = 0.01)
+    bctrl <- boost_control(mstop = 100, risk = "oob", nu = 0.1)
     if (model == "normal") {
         m0 <- BoxCox(y ~ 1, data = ldata, order = order, support = sup, bounds = bds)
     } else {
@@ -21,7 +21,7 @@ myFUN <- function(ldata, lweights, model = c("normal", "logistic"), order) {
     l1 <- stmboost(m0, formula = fm,
                    data = ldata, method = quote(mboost:::glmboost.formula), 
                    weights = lweights, control = bctrl)
-    while(!(which.min(risk(l1)) < mstop(l1)) && mstop(l1) < 1000)
+    while(!(which.min(risk(l1)) < mstop(l1)) && mstop(l1) < 2000)
         l1 <- l1[2 * mstop(l1)]
     mstop <- which.min(risk(l1))
     l1 <- stmboost(m0, formula = fm,
