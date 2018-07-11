@@ -186,7 +186,7 @@ ds <- c("Beetles Exctinction Risk",
         "PRO-ACT OS")
 names(ds) <- c("ex_beetles.rda", "ex_fetus.rda", "ex_bodyfat.rda", "ex_CAO.rda", 
         "ex_india.rda", "ex_heads.rda", "ex_ALSFRS.rda", "ex_ALSsurv.rda")
-m <- c(expression(paste("L ", bold(vartheta)(bold(x)))),
+models <- c(expression(paste("L ", bold(vartheta)(bold(x)))),
        expression(paste("L ", beta(bold(x)))),
        expression(paste("N ", bold(vartheta)(bold(x)))),
        expression(paste("N ", beta(bold(x)))),
@@ -194,7 +194,7 @@ m <- c(expression(paste("L ", bold(vartheta)(bold(x)))),
        expression(paste("T ", beta(bold(x)))),
        expression(paste("Tree ", bold(vartheta)(bold(x)))),
        expression(paste("F ", bold(vartheta)(bold(x)))))
-names(m) <- c("glm_ctm", "glm_tram", "gam_ctm", "gam_tram", 
+names(models) <- c("glm_ctm", "glm_tram", "gam_ctm", "gam_tram", 
               "tree_ctm", "tree_tram", "trtf_tree", "trtf_forest")
 mor <- c("gam_ctm", "glm_ctm", "tree_ctm", "gam_tram", "glm_tram", 
         "tree_tram", "trtf_tree", "trtf_forest")
@@ -291,7 +291,7 @@ boxplot(x, axes = FALSE, main = ds[file], outline = FALSE, var.width = TRUE,
 abline(v = c(3.5, 6.5), col = "lightgrey")
 abline(h = 0, col = "lightgrey")
 abline(h = max(med), col = col[2])
-axis(1, at = 1:ncol(x), labels = m[colnames(x)])
+axis(1, at = 1:ncol(x), labels = models[colnames(x)])
 axis(2)
 box()
 @
@@ -354,7 +354,7 @@ are available.
 
 We start with an unconditional proportional odds model (using $\pZ =
 \text{expit}$ and one parameter for each but the highest Red List category):
-<<beetles-model0, echo = TRUE, cache = FALSE>>=
+<<beetles-model0, echo = TRUE, cache = TRUE>>=
 m_mlt <- Polr(RL ~ 1, data = ldata)
 logLik(m_mlt)
 @
@@ -375,7 +375,7 @@ barplot(p, xlab = "Red List Status", ylab = "Distribution")
 Model evaluation (Figure~\ref{\Sexpr{paste0("fig", file, "oob")}}) indicated that 
 a tree-structured model for $\eshiftparm(\rx)$ had the best performance; this
 model was fitted using
-<<beetles-model, cache = FALSE>>=
+<<beetles-model, cache = TRUE>>=
 fm_tree
 bm <- stmboost(m_mlt, formula = fm_tree, data = ldata,
                method = quote(mboost::blackboost))[626]
@@ -419,7 +419,7 @@ In this special case, the algorithm is identical to boosting for
 proportional odds models as implemented in the \cmd{PropOdds} family
 \citep{Schmid_Hothorn_Maloney_2011}; and
 thus the in-sample risks are essentially identical:
-<<beetles-mlt, cache = FALSE>>=
+<<beetles-mlt, cache = TRUE>>=
 po <- blackboost(fm_tree, data = ldata, family = PropOdds())[626]
 max(abs(risk(bm) - risk(po)))
 @
@@ -478,7 +478,7 @@ fetus $\Sexpr{p}$ numeric predictors are available.
 
 We start with an unconditional model (using $\pZ = \Phi$ and an Bernstein
 polynomial of order six):
-<<fetus-model0, cache = FALSE>>=
+<<fetus-model0, cache = TRUE>>=
 m_mlt <- BoxCox(birthweight ~ 1, data = ldata, extrapolate = TRUE)
 logLik(m_mlt)
 @
@@ -497,7 +497,7 @@ plot(as.mlt(m_mlt), newdata = data.frame(1), type = "density", K = 200,
 Model evaluation (Figure~\ref{\Sexpr{paste0("fig", file, "oob")}}) indicated that 
 an additive smooth model for $\eshiftparm(\rx)$ had the best performance; this
 model was fitted using
-<<fetus-model, cache = FALSE>>=
+<<fetus-model, cache = TRUE>>=
 fm_gam[["stm"]]
 bm <- stmboost(m_mlt, formula = fm_gam[["stm"]], data = ldata,
                method = quote(mboost::mboost))[253]
@@ -628,7 +628,7 @@ participants, where for each subject $\Sexpr{p}$ numeric predictors are availabl
 
 We start with an unconditional model (using $\pZ = \Phi$ and an Bernstein
 polynomial of order six):
-<<bodyfat-model0, cache = FALSE>>=
+<<bodyfat-model0, cache = TRUE>>=
 m_mlt <- BoxCox(DEXfat ~ 1, data = ldata, prob = c(.1, .99))
 logLik(m_mlt)
 @
@@ -645,7 +645,7 @@ plot(as.mlt(m_mlt), newdata = data.frame(1), type = "density", K = 200,
 Model evaluation (Figure~\ref{\Sexpr{paste0("fig", file, "oob")}}) indicated that 
 an additive smooth model for $\parm(\rx)$ had the best performance; this
 model was fitted using
-<<bodyfat-model, cache = FALSE>>=
+<<bodyfat-model, cache = TRUE>>=
 fm_gam[["ctm"]]
 bm <- ctmboost(m_mlt, formula = fm_gam[["ctm"]], data = ldata,
                method = quote(mboost::mboost))[1000]
@@ -774,7 +774,7 @@ baseline predictors are available.
 
 We start with an unconditional Cox model ($\pZ = 1 - \exp(-\exp())$ and a
 Bernstein polynomial of order six):
-<<CAO-model0, cache = FALSE>>=
+<<CAO-model0, cache = TRUE>>=
 m_mlt <- Coxph(DFS ~ 1, data = ldata, prob = c(0, .9))
 logLik(m_mlt)
 @
@@ -790,13 +790,13 @@ plot(as.mlt(m_mlt), newdata = data.frame(1), type = "survivor", K = 200,
 
 Model evaluation (Figure~\ref{\Sexpr{paste0("fig", file, "oob")}}) indicated that 
 a linear model for $\eshiftparm(\rx)$ had the best performance, this model was fitted using
-<<CAO-model, cache = FALSE>>=
+<<CAO-model, cache = TRUE>>=
 fm_glm[["stm"]]
 bm <- stmboost(m_mlt, formula = fm_glm[["stm"]], data = ldata,
                method = quote(mboost::mboost))[963]
 @
 This is, in fact, a linear Cox model which could have also been fitted using
-<<CAO-mlt, cache = FALSE>>=
+<<CAO-mlt, cache = TRUE>>=
 bmCoxPH <- mboost(fm_glm[["stm"]], data = ldata, family = CoxPH())[963]
 @
 The in-sample log-likelihood is shown in Figure~\ref{\Sexpr{paste0("fig", file, "ib")}}.
@@ -894,7 +894,7 @@ predictors.
 
 We start with an unconditional model (using $\pZ = \Phi$ and an Bernstein
 polynomial of order six):
-<<india-model0, cache = FALSE>>=
+<<india-model0, cache = TRUE>>=
 m_mlt <- BoxCox(stunting ~ 1, data = ldata, prob = c(.05, .975), extrapolate = TRUE)
 logLik(m_mlt)
 @
@@ -913,7 +913,7 @@ plot(as.mlt(m_mlt), newdata = data.frame(1), type = "density", K = 200,
 Model evaluation (Figure~\ref{\Sexpr{paste0("fig", file, "oob")}}) indicated that 
 a tree-based model for $\parm(\rx)$ had the best performance; this
 model was fitted using
-<<india-model, cache = FALSE>>=
+<<india-model, cache = TRUE>>=
 fm_tree
 bm <- ctmboost(m_mlt, formula = fm_tree, data = ldata, 
                method = quote(mboost::blackboost))[515]
@@ -922,14 +922,14 @@ The in-sample log-likelihood is shown in Figure~\ref{\Sexpr{paste0("fig", file, 
 and a QQ-plot based on the probability-integral transform in Figure~\ref{\Sexpr{paste0("fig", file, "qq")}}.
 
 \begin{figure}
-<<india-risk, echo = FALSE, cache = FALSE>>=
+<<india-risk, echo = FALSE, cache = TRUE>>=
 <<insampleriskplot>>
 @
 \caption{\Sexpr{ds[file]}. In-sample log-likelihood maximisation. \label{\Sexpr{paste0("fig", file, "ib")}}}
 \end{figure}
 
 \begin{figure}[t]
-<<india-pit, echo = FALSE, fig.width = 5, fig.height = 5, cache = FALSE>>=
+<<india-pit, echo = FALSE, fig.width = 5, fig.height = 5, cache = TRUE>>=
 pitplot(bm, ldata, main = ds[file])
 @
 \caption{\Sexpr{ds[file]}. Probability-integral transform QQ-plot. \label{\Sexpr{paste0("fig", file, "qq")}}}
@@ -1002,14 +1002,14 @@ N <- nrow(ldata)
 
 We start with an unconditional model (using $\pZ = \Phi$ and an Bernstein
 polynomial of order six):
-<<heads-model0, cache = FALSE>>=
+<<heads-model0, cache = TRUE>>=
 m_mlt <- BoxCox(head ~ 1, data = ldata)
 logLik(m_mlt)
 @
 Model evaluation (Figure~\ref{\Sexpr{paste0("fig", file, "oob")}}) indicated that 
 an additive smooth model for $\parm(\rx)$ had the best performance; this
 model was fitted using
-<<heads-model, cache = FALSE>>=
+<<heads-model, cache = TRUE>>=
 fm_gam[["ctm"]]
 bm <- ctmboost(m_mlt, formula = fm_gam[["ctm"]], data = ldata, 
                method = quote(mboost::mboost))[1000]
@@ -1018,14 +1018,14 @@ The in-sample log-likelihood is shown in Figure~\ref{\Sexpr{paste0("fig", file, 
 and a QQ-plot based on the probability-integral transform in Figure~\ref{\Sexpr{paste0("fig", file, "qq")}}.
 
 \begin{figure}
-<<heads-risk, echo = FALSE, cache = FALSE>>=
+<<heads-risk, echo = FALSE, cache = TRUE>>=
 <<insampleriskplot>>
 @
 \caption{\Sexpr{ds[file]}. In-sample log-likelihood maximisation. \label{\Sexpr{paste0("fig", file, "ib")}}}
 \end{figure}
 
 \begin{figure}[t]
-<<heads-pit, echo = FALSE, fig.width = 5, fig.height = 5, cache = FALSE>>=
+<<heads-pit, echo = FALSE, fig.width = 5, fig.height = 5, cache = TRUE>>=
 pitplot(bm, ldata, main = ds[file])
 @
 \caption{\Sexpr{ds[file]}. Probability-integral transform QQ-plot. \label{\Sexpr{paste0("fig", file, "qq")}}}
@@ -1124,7 +1124,7 @@ The response is an ordinal variable, ranging from $0$ to $40$. We start with
 an unconditional proportional odds model featuring a continuous basis
 transformation of the response ($\pZ = \text{expit}$ and a Bernstein
 polynomial of order six):
-<<ALSFRS-model-0, cache = FALSE>>=
+<<ALSFRS-model-0, cache = TRUE>>=
 m_mlt <- Colr(ALSFRS.halfYearAfter ~ 1, data = ldata, prob = c(.05, .9), extrapolate = TRUE)
 logLik(m_mlt)
 @
@@ -1142,7 +1142,7 @@ plot(as.mlt(m_mlt), newdata = data.frame(1), type = "density", K = 200,
 Model evaluation (Figure~\ref{\Sexpr{paste0("fig", file, "oob")}}) indicated that 
 a linear model for $\eshiftparm(\rx)$ (also known as ``distribution
 regression'') had the best performance; this model was fitted using
-<<ALSFRS-model, cache = FALSE>>=
+<<ALSFRS-model, cache = TRUE>>=
 bm <- ctmboost(m_mlt, formula = fm_glm[["ctm"]], data = ldata, 
                method = quote(mboost::mboost))[613]
 @
@@ -1245,7 +1245,7 @@ numeric and $\Sexpr{xf}$ categorical) predictors are available.
 
 We start with an unconditional Cox model ($\pZ = 1 - \exp(-\exp())$ and a
 Bernstein polynomial of order six):
-<<ALSsurv-model0, cache = FALSE>>=
+<<ALSsurv-model0, cache = TRUE>>=
 m_mlt <- Coxph(y ~ 1, data = ldata)
 logLik(m_mlt)
 @
@@ -1262,7 +1262,7 @@ plot(as.mlt(m_mlt), newdata = data.frame(1), type = "survivor", K = 200,
 
 Model evaluation (Figure~\ref{\Sexpr{paste0("fig", file, "oob")}}) indicated that 
 tree-based model for $\eshiftparm(\rx)$ had the best performance; this model was fitted using
-<<ALSsurv-model, cache = FALSE>>=
+<<ALSsurv-model, cache = TRUE>>=
 fm_tree
 bm <- stmboost(m_mlt, formula = fm_tree, data = ldata,
                control = boost_control(nu = 0.01),
@@ -1270,7 +1270,7 @@ bm <- stmboost(m_mlt, formula = fm_tree, data = ldata,
 @
 This model is roughly equivalent to a boosted Cox-model using trees as
 baselearners:
-<<ALSsurv-mlt, cache = FALSE, eval = FALSE>>=
+<<ALSsurv-mlt, cache = TRUE, eval = FALSE>>=
 blackboost(fm_tree, data = ldata, family = CoxPH())
 @
 The in-sample log-likelihood is shown in Figure~\ref{\Sexpr{paste0("fig", file, "ib")}}.
@@ -1598,7 +1598,7 @@ for (l1 in lto) {
                         ylab = "Out-of-sample log-likelihood (centered)",
                         xlab = txt, panel = mypanel,
                         scales = list(y = list(relation = "free"),
-                                      x = list(at = 1:6, label = m[levels(os$model)])))
+                                      x = list(at = 1:6, label = models[levels(os$model)])))
            plot(pl)
            dev.off()
            ret <- c(ret, "\\begin{sidewaysfigure}",
@@ -1617,7 +1617,7 @@ writeLines(ret)
 
 \bibliography{mlt,appl,packages}
 
-<<funs, echo = FALSE, results='hide', purl = FALSE, cache = FALSE>>=
+<<funs, echo = FALSE, results='hide', purl = FALSE, cache = TRUE>>=
 if (file.exists("packages.bib")) file.remove("packages.bib")
 pkgversion <- function(pkg) {
     pkgbib(pkg)

@@ -1,0 +1,53 @@
+
+all:	tbm_supplement.pdf
+
+tbm_supplement.tex:	tbm_supplement.Rnw
+	echo "library(\"knitr\"); knit(\"tbm_supplement.Rnw\")" | R --vanilla 
+#	diff mlt.tex mlt.tex.save
+
+tbm_supplement.R:	tbm_supplement.Rnw
+	echo "library(\"knitr\"); knit(\"tbm_supplement.Rnw\", tangle = TRUE)" | R --vanilla 
+	grep -v "^opts" tbm_supplement.R > tmp.R
+	mv tmp.R tbm_supplement.R
+
+tbm_supplement.Rout:	tbm_supplement.R
+	R CMD BATCH tbm_supplement.R
+#	diff mlt.Rout mlt.Rout.save
+	
+tbm_supplement.pdf:	tbm_supplement.tex mlt.bib
+	texi2dvi --pdf tbm_supplement.tex
+	pdflatex tbm_supplement.tex
+
+
+texclean:
+	rm -rf mlt.aux
+	rm -rf mlt.pdf
+	rm -rf *.aux
+	rm -rf *.out
+	rm -rf *.blg  
+	rm -rf *.log  
+	rm -rf *.tpt
+	rm -rf *.bbl
+	rm -rf *.fff
+	rm -rf *~
+
+clean:	
+	make texclean
+	rm -rf tbm_supplement.aux
+	rm -rf tbm_supplement.pdf
+	rm -rf packages.bib
+	rm -rf .Rdata
+	rm -rf Rplots.pdf
+	rm -rf .RData
+	rm -rf tbm_supplement.tex
+	rm -rf tbm_supplement.R
+	rm -rf tbm_supplement.Rout
+	rm -rf packages.bib
+	rm -rf figure
+	
+dist-clean:
+	make clean
+	rm -rf analysis
+	rm -rf cache
+	rm -rf figure
+	

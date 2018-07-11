@@ -1,1 +1,6 @@
 tests
+vignettes/Makefile
+vignettes/figure
+vignettes/cache
+vignettes/fit
+
