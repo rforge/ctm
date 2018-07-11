@@ -13,7 +13,8 @@ tram(formula, data, subset, weights, offset, cluster, na.action = na.omit,
      transformation = c("discrete", "linear", "logarithmic", "smooth"), 
      LRtest = TRUE, prob = c(0.1, 0.9), support = NULL, 
      bounds = NULL, add = c(0, 0), order = 6, 
-     negative = TRUE, scale = TRUE, model_only = FALSE, ...)
+     negative = TRUE, scale = TRUE, extrapolate = FALSE, 
+     model_only = FALSE, ...)
 tram_data(formula, data, subset, weights, offset, cluster, na.action = na.omit) 
 }
 \arguments{
@@ -78,6 +79,12 @@ tram_data(formula, data, subset, weights, offset, cluster, na.action = na.omit)
   \item{scale}{logical defining if variables in the linear predictor shall
                be scaled. Scaling is internally used for model estimation,
                rescaled coefficients are reported in model output.
+  }
+  \item{extrapolate}{logical defining the behaviour of the Bernstein transformation
+                     function outside \code{support}. The default
+                     \code{FALSE} is to extrapolate linearily without requiring the second
+                     derivative of the transformation function to be zero at \code{support}.
+                     If \code{TRUE}, this additional constraint is respected.
   }
   \item{model_only}{logical, if \code{TRUE} the unfitted model is returned.
   }

@@ -120,7 +120,7 @@ Colr <- function(formula, data, subset, weights, offset, cluster, na.action = na
 }
 
 Polr <- function(formula, data, subset, weights, offset, cluster, na.action = na.omit, 
-                 method = c("logistic", "probit", "cloglog"), ...)
+                 method = c("logistic", "probit", "loglog", "cloglog"), ...)
 {
     mf <- match.call(expand.dots = FALSE)
     m <- match(c("formula", "data", "subset", "na.action", "weights", "offset", "cluster"), names(mf), 0L)
@@ -131,16 +131,18 @@ Polr <- function(formula, data, subset, weights, offset, cluster, na.action = na
     stopifnot(is.ordered(td$response) || inherits(td$response, "response"))
 
     method <- match.arg(method)
-    distribution <- c("logistic" = "Logistic", "probit" = "Normal", "cloglog" = "MinExtrVal")
+    distribution <- c("logistic" = "Logistic", "probit" = "Normal", 
+                      "loglog" = "MaxExtrVal", "cloglog" = "MinExtrVal")
     distribution <- distribution[method]
+    name <- c("logistic" = "Odds", "loglog" = "Lehmann-alternative",
+              "cloglog" = "Hazards")
 
     ret <- tram(td, transformation = "discrete", distribution = distribution, negative = TRUE, ...)
     if (!inherits(ret, "mlt")) return(ret)
     ret$call <- match.call(expand.dots = TRUE)
     if (method != "probit") {
         ret$tram <- paste(ifelse(is.null(td$terms$s), "", "(Stratified)"),
-                          "Proportional", ifelse(method == "logistic",
-                          "Odds", "Hazards"), "Regression Model")
+                          "Proportional", name[method], "Regression Model")
     } else {
         ret$tram <- paste(ifelse(is.null(td$terms$s), "", "(Stratified)"),
                           "Ordered Probit Regression Model")
@@ -192,3 +194,26 @@ BoxCox <- function(formula, data, subset, weights, offset, cluster, na.action = 
     class(ret) <- c("BoxCox", class(ret))
     ret
 }
+
+Lehmann <- function(formula, data, subset, weights, offset, cluster, na.action = na.omit, ...)
+{
+    mf <- match.call(expand.dots = FALSE)
+    m <- match(c("formula", "data", "subset", "na.action", "weights", "offset", "cluster"), names(mf), 0L)
+    mf <- mf[c(1L, m)]
+    mf[[1L]] <- quote(tram_data)
+    td <- eval(mf, parent.frame())
+
+    stopifnot(inherits(td$response, "Surv") ||
+              inherits(td$response, "response") ||
+              is.numeric(td$response))
+
+    ret <- tram(td, transformation = "smooth", distribution = "MaxExtrVal", 
+                negative = TRUE, ...)
+    if (!inherits(ret, "mlt")) return(ret)
+    ret$call <- match.call(expand.dots = TRUE)
+    ret$tram <- paste(ifelse(is.null(td$terms$s), "", "(Stratified)"),
+                      "Lehmann-alternative Linear Regression Model")
+    class(ret) <- c("Lehmann", class(ret))
+    ret
+}
+

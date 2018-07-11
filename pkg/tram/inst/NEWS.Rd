@@ -2,6 +2,18 @@
 \name{NEWS}
 \title{NEWS file for the tram package}
 
+\section{Changes in Version 0.2-3 (2018-08-xx)}{
+  \itemize{
+    \item{New \code{extrapolate = TRUE} option for all models constraints
+          the second derivate of the Bernstein transformation function to be
+          zero at \code{support}. This helps to get rid of possible
+          discontinuous densities at \code{support}.}
+    \item{Add \code{Lehmann} for fitting shift transformation models those
+          linear predictor can be interpreted as log-Lehmann-alternative.}
+    \item{Add \code{method = "loglog"} to \code{Polr}.}
+  }
+}
+
 \section{Changes in Version 0.2-2 (2018-06-22)}{
   \itemize{
     \item{Use default \code{bounds = c(0, Inf)} for \code{Surv} objects (for example
@@ -9,6 +21,7 @@
     \item{Update to \pkg{mlt} 1.0-2.}
   }
 }
+
 
 \section{Changes in Version 0.2-1 (2018-04-20)}{
   \itemize{

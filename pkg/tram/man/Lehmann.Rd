@@ -1,14 +1,13 @@
-\name{Polr}
-\alias{Polr}
+\name{Lehmann}
+\alias{Lehmann}
 \title{
-  Ordered Categorical Regression
+  Linear Regression for Lehrmann-alternatives
 }
 \description{
-  Some regression models for ordered categorical responses
+  Non-normal linear regression for Lehrmann-alternatives
 }
 \usage{
-Polr(formula, data, subset, weights, offset, cluster, na.action = na.omit, 
-     method = c("logistic", "probit", "loglog", "cloglog"), ...)
+Lehmann(formula, data, subset, weights, offset, cluster, na.action = na.omit, ...)
 }
 \arguments{
   \item{formula}{an object of class \code{"formula"}: a symbolic description 
@@ -37,20 +36,18 @@ Polr(formula, data, subset, weights, offset, cluster, na.action = na.omit,
           clustered covariances.
   }
   \item{na.action}{a function which indicates what should happen when the data
-          contain \code{NA}s.  The default is set by the \code{na.action} setting
-          of \code{options}, and is \code{na.fail} if that is unset.
-  }
-  \item{method}{a character describing the link function.
+          contain \code{NA}s.  The default is set to \code{na.omit}.
   }
   \item{\dots}{additional arguments to \code{\link{tram}}.}
 }
 \details{
-Models for ordered categorical responses reusing the interface of
-\code{\link[MASS]{polr}}. Allows for stratification, censoring and
-trunction.
+This transformation model uses the cumulative distribution function for the
+standard Gumbel maximum extreme value distribution to map the shifted
+transformation function into probabilities. The exponential of the shift
+paramater can be interpreted as a Lehmann-alternative.
 }
 \value{
-An object of class \code{Polr}, with corresponding \code{coef},
+An object of class \code{Lehmann}, with corresponding \code{coef},
 \code{vcov}, \code{logLik}, \code{estfun}, \code{summary}, 
 \code{print}, \code{plot} and \code{predict} methods.
 }
@@ -61,13 +58,15 @@ An object of class \code{Polr}, with corresponding \code{coef},
 }
 \examples{
 
-  data("wine", package = "ordinal")
+  data("BostonHousing2", package = "mlbench")
 
-  library("MASS")
-  polr(rating ~ temp + contact, data = wine)
+  lm(cmedv ~ crim + zn + indus + chas + nox + rm + age + dis + 
+             rad + tax + ptratio + b + lstat, data = BostonHousing2)
 
-  Polr(rating ~ temp + contact, data = wine)
-
+  Lehmann(cmedv ~ chas + crim + zn + indus + nox + 
+                  rm + age + dis + rad + tax + ptratio + b + lstat, 
+                  data = BostonHousing2)
 }
 \keyword{models}
 \keyword{regression}
+\keyword{smooth}
