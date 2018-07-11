@@ -52,9 +52,15 @@ An object of class \code{Lehmann}, with corresponding \code{coef},
 \code{print}, \code{plot} and \code{predict} methods.
 }
 \references{
+
+  Erich L. Lehmann (1953), The Power of Rank Tests,
+  \emph{The Annals of Mathematical Statistics}, \bold{24}(1),
+  23-43.
+
   Torsten Hothorn, Lisa Moest, Peter Buehlmann (2018), Most Likely
   Transformations, \emph{Scandinavian Journal of Statistics}, \bold{45}(1),
   110--134, \doi{10.1111/sjos.12291}.
+
 }
 \examples{
 
