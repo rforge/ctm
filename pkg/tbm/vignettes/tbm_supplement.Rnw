@@ -134,7 +134,8 @@ maximum likelihood estimator in the model
 \begin{center}
 \animategraphics[controls,width=\linewidth]{1}{fit_movie}{1}{101}
 \caption{Iterative boosting for the Body Fat Mass data. The left panel shows
-the unconditional (first frame) or conditional densities (other frames). The
+the unconditional (first frame) or conditional densities (other frames).
+Blue dots correspond to the likelihood of observations. The
 right panel shows the increasing in-sample log-likelihood as the model gets
 better and better. Use Adobe AcroRead to watch the animation. \label{fig:movie}}
 \end{center}
