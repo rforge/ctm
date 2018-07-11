@@ -6,7 +6,7 @@ library("TH.data")
 
 set.seed(290875)
 
-NCORES <- 5
+NCORES <- 10
 B <- 100
 M <- 1000
 
