@@ -27,8 +27,8 @@ out$true_ll <- as.double(out$true_ll)
 out$mlt_ll <- as.double(out$mlt_ll)
 out$mstop <- as.double(out$mstop)
 
-out$todistr <- factor(as.character(out$todistr), levels = c("normal", "logistic"), 
-                      labels = c("Normal", "Logistic"))
+out$todistr <- factor(as.character(out$todistr), levels = c("normal", "logistic", "minextrval"), 
+                      labels = c("Normal", "Logistic", "Gompertz"))
 
 i <- with(out, interaction(model, m, todistr, order, PNON, NOBS))
 cf <- tapply(out$boost_ll - out$true_ll, i, median, na.rm = TRUE)

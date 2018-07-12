@@ -4,14 +4,16 @@ library("tbm")
 
 source("setup.R")
 
-myFUN <- function(ldata, lweights, model = c("normal", "logistic"), order) {
+myFUN <- function(ldata, lweights, model = c("normal", "logistic", "minextrval"), order) {
 
     bctrl <- boost_control(mstop = 100, risk = "oob", nu = 0.1)
-    if (model == "normal") {
-        m0 <- BoxCox(y ~ 1, data = ldata, order = order, support = sup, bounds = bds)
-    } else {
-        m0 <- Colr(y ~ 1, data = ldata, order = order, support = sup, bounds = bds)
-    }
+
+    model <- match.arg(model)
+    m0 <- switch(model, 
+        "normal" = BoxCox(y ~ 1, data = ldata, order = order, support = sup, bounds = bds),
+        "logistic" = Colr(y ~ 1, data = ldata, order = order, support = sup, bounds = bds),
+        "minextrval" = Coxph(y ~ 1, data = ldata, order = order, support = sup, bounds = bds))
+
     fm <- "y ~ bols(x1) + bols(x2) + bols(x2, by = x1)"
     nm <- colnames(ldata)
     nx <- nm[grep("^nx", nm)]
