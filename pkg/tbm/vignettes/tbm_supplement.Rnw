@@ -1496,7 +1496,8 @@ specification of the boosting procedure, the data were always generated
 using $\pZ = \Phi$), and two choices of the order of the Bernstein
 polynomials (six and $12$, also only for the specification of the boosting
 procedures ), the out-of-sample log-likelihood was estimated for $100$
-simulation runs.
+simulation runs. Very extreme outliers (centered log-likelihoods smaller than
+$-10^5$) were not drawn.
 
 \subsection{Results} \label{sec:results}
 
@@ -1528,7 +1529,8 @@ out$model <- factor(out$model, levels = c("ctm_gam", "ctm_glm", "ctm_tree", "tra
                     labels = c("gam_ctm", "glm_ctm", "tree_ctm", "gam_tram", "glm_tram", "tree_tram"))
 
 out$PNON <- factor(out$PNON)
-out$NOBS <- factor(paste("N =", out$NOBS))
+nlab <- paste("N =", nlev <- rev(sort(unique(out$NOBS))))
+out$NOBS <- factor(out$NOBS, levels = nlev, labels = nlab)
 out$m <- factor(out$m)
 out$todistr <- factor(out$todistr)
 out$order <- factor(out$order)
@@ -1539,8 +1541,8 @@ out$true_ll <- as.double(out$true_ll)
 out$mlt_ll <- as.double(out$mlt_ll)
 out$mstop <- as.double(out$mstop)
 
-out$todistr <- factor(as.character(out$todistr), levels = c("normal", "logistic"), 
-                      labels = c("Normal", "Logistic"))
+out$todistr <- factor(as.character(out$todistr), levels = c("normal", "logistic", "minextrval"), 
+                      labels = c("Normal", "Logistic", "MEV"))
 
 lev <- rev(c(expression(paste("Nonlinear ", bold(vartheta)(bold(x)))),
          expression(paste("Linear ", bold(vartheta)(bold(x)))),
@@ -1587,12 +1589,15 @@ for (l1 in lto) {
     for(l2 in lp) {
        for (l3 in lo) {
            os <- subset(out, todistr == l1 & PNON == l2 & order == l3)
+           os <- subset(os, boost_ll - true_ll > -10000)
 
            txt <- paste("J = ", l2, "M = ", l3)
            if (l1 == "Normal") {
                main <- expression(F[Z] == Phi)
-           } else {
+           } else if (l1 == "Logistic") {
                main <- expression(F[Z] == expit)
+           } else {
+               main <- expression(F[Z] == MEV)
            }
            pdf(fig <- paste("sfig", i, ".pdf", sep = ""), width = 12, height = 8)
            pl <- bwplot(I(boost_ll - true_ll) ~ model |  m + NOBS, data = os, main = main, strip = sc, 
