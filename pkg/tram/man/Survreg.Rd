@@ -55,6 +55,13 @@ Survreg(formula, data, subset, weights, offset, cluster, na.action = na.omit,
 Parametric survival models reusing the interface of
 \code{\link[survival]{survreg}}. The parameterisation is, however, a little
 different, see the package vignette.
+
+The model is defined with a negative shift term. Large values of the
+linear predictor correspond to large values of the conditional 
+expectation response (but this relationship is nonlinear).
+Parameters are log-hazard ratios comparing a reference with 
+treatment (or a one unit increase in a numeric variable).
+
 }
 \value{
 An object of class \code{Survreg},  with corresponding \code{coef},

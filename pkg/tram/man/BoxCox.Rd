@@ -45,6 +45,11 @@ A normal model for transformed responses, where the transformation is
 estimated from the data simultaneously with the regression coefficients.
 This is similar to a Box-Cox transformation, but the technical details
 differ. Examples can be found in the package vignette.
+
+The model is defined with a negative shift term. Large values of the
+linear predictor correspond to large values of the conditional 
+expectation response (but this relationship is potentially nonlinear).
+
 }
 \value{
 An object of class \code{BoxCox}, with corresponding \code{coef},

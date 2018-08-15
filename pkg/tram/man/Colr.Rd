@@ -46,6 +46,14 @@ Colr(formula, data, subset, weights, offset, cluster, na.action = na.omit, ...)
 Simultanous estimation of all possible binary logistic models obtained 
 by dichotomisation of a continuous response. The regression coefficients can
 be constant allowing for an interpretation as log-odds ratios.
+
+The model is defined with a positive shift term, thus \code{exp(coef())} is
+the multiplicative change of the odds ratio (conditional odds of treatment
+or for a one unit increase in a numeric variable divided by conditional odds
+of reference).  Large values of the linear predictor correspond to small
+values of the conditional expectation response (but this relationship is
+nonlinear).
+
 }
 \value{
 An object of class \code{Colr}, with corresponding \code{coef},

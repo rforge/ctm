@@ -48,6 +48,14 @@ Polr(formula, data, subset, weights, offset, cluster, na.action = na.omit,
 Models for ordered categorical responses reusing the interface of
 \code{\link[MASS]{polr}}. Allows for stratification, censoring and
 trunction.
+
+The model is defined with a negative shift term, thus \code{exp(coef())}
+is the multiplicative change of the odds ratio (conditional odds for 
+reference divided by conditional odds of treatment or for a one unit
+increase in a numeric variable). Large values of the
+linear predictor correspond to large values of the conditional 
+expectation response (but this relationship is nonlinear).
+
 }
 \value{
 An object of class \code{Polr}, with corresponding \code{coef},

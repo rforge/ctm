@@ -54,6 +54,9 @@ The responses is bounded (\code{bounds = c(0, Inf)}) when specified as a
 \code{Surv} object. Otherwise, \code{bounds} can be specified via
 \code{\dots}.
 
+Parameters are log-hazard ratios comparing treatment (or a one unit increase
+in a numeric variable) with a reference.
+
 }
 \value{
 An object of class \code{Coxph}, with corresponding \code{coef},

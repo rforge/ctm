@@ -52,6 +52,10 @@ Note that the scale of the parameters is different from what is reported by
 \code{\link[stats]{lm}}; the discrepancies are explained in the package
 vignette.
 
+The model is defined with a negative shift term. Large values of the
+linear predictor correspond to large values of the conditional 
+expectation response.
+
 }
 \value{
 An object of class \code{BoxCox}, with corresponding \code{coef},
