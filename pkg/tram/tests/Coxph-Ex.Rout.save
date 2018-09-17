@@ -1,6 +1,6 @@
 
-R version 3.4.3 (2017-11-30) -- "Kite-Eating Tree"
-Copyright (C) 2017 The R Foundation for Statistical Computing
+R version 3.5.1 (2018-07-02) -- "Feather Spray"
+Copyright (C) 2018 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -33,14 +33,6 @@ The following object is masked from 'package:variables':
 
 Loading required package: libcoin
 Loading required package: mvtnorm
-Loading required package: rpart
-
-Attaching package: 'rpart'
-
-The following object is masked from 'package:survival':
-
-    solder
-
 > 
 > ### Windows diffs...
 > options(digits = 3)
@@ -157,4 +149,4 @@ Number of terminal nodes: 3
 > 
 > proc.time()
    user  system elapsed 
-   5.52    0.08    5.76 
+  2.688   0.056   2.741 
