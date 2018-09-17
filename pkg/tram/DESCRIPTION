@@ -13,7 +13,7 @@ Description: Formula-based user-interfaces to specific transformation models
 Depends: mlt (>= 1.0-2)
 Imports: Formula, multcomp, variables (>= 1.0-0), basefun (>= 1.0-2), 
   sandwich, stats, survival, graphics
-Suggests: MASS, TH.data, trtf, mlbench, knitr, quantreg, ordinal, 
+Suggests: MASS, TH.data, trtf (>= 0.3-3), mlbench, knitr, quantreg, ordinal, 
   colorspace, ATR
 VignetteBuilder: knitr
 Encoding: UTF-8
