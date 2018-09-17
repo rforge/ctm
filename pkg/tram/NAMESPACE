@@ -11,6 +11,7 @@ importFrom("stats", "model.matrix", "coef", "vcov", "nobs", "predict", "quantile
            "model.frame")
 importFrom("survival", "survfit", "Surv")
 importFrom("graphics", "plot", "lines", "polygon")
+importFrom("stats", "update")
 
 export(tram, tram_data, Coxph, Colr, Polr, Lm, BoxCox, Survreg, Lehmann)
 
@@ -29,3 +30,4 @@ S3method("model.frame", "tram")
 S3method("print", "tram")
 S3method("print", "summary.tram")
 S3method("plot", "tram")
+S3method("update", "tram")

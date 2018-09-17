@@ -5,6 +5,9 @@ as.mlt.tram <- function(object) {
     object
 }    
 
+update.tram <- function(object, ...)
+    update(as.mlt(object), ...)
+
 model.frame.tram <- function(formula, ...)
     formula$data
 
