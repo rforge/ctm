@@ -2,9 +2,11 @@
 \name{NEWS}
 \title{NEWS file for the mlt package}
 
-\section{Changes in Version 1.0-3 (2018-08-15)}{
+\section{Changes in Version 1.0-3 (2018-09-17)}{
   \itemize{
     \item{Add \code{lty} argument to \code{plot.ctm}.}
+    \item{\code{update} needs free coefficients only.}
+    \item{Internal interface changes.}
   }
 }
 
