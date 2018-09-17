@@ -9,7 +9,7 @@
 
         mltargs$data <- mf
         ctmobject <- do.call("mlt", mltargs)
-        thetastart <- coef(ctmobject)
+        thetastart <- coef(ctmobject, fixed = FALSE)
 
         function(subset = NULL, weights = NULL, info = NULL, model = FALSE, 
                  estfun = TRUE, object = FALSE) {
@@ -30,7 +30,7 @@
             if (!is.null(info$coef)) {
                 thetastart <- info$coef
             } else {
-                thetastart <- coef(ctmobject)
+                thetastart <- coef(ctmobject, fixed = FALSE)
             }
             umod <- suppressWarnings(try(update(ctmobject, weights = w, subset = subset, theta = thetastart), silent = TRUE))
             if (inherits(umod, "try-error") || umod$convergence != 0) {
@@ -53,7 +53,7 @@
             }
             ret <- NULL
             if (estfun) {
-                ret <- estfun(umod)[, parm, drop = FALSE]
+                ret <- estfun(umod, parm = coef(umod, fixed = TRUE))[, parm, drop = FALSE]
                 if (!is.null(subset)) {
                     tmp <- matrix(0, nrow = length(w), 
                                   ncol = ncol(ret))
@@ -64,7 +64,7 @@
                 if (!is.null(reparm)) ret <- ret %*% reparm
             }
             return(list(estfun = ret, 
-                        coefficients = coef(umod), 
+                        coefficients = coef(umod, fixed = FALSE), 
                         ### we always minimise risk
                         objfun = -logLik(umod), 
                         object = if (object) umod else NULL,
@@ -76,7 +76,10 @@
 trafotree <- function(object, parm = 1:length(coef(object)), reparm = NULL,
                       mltargs = list(maxit = 10000), ...) {
 
+    ### we only work with the ctm object
     if (inherits(object, "mlt")) object <- object$model
+    ### this is tricky because parm is only valid
+    ### for this ctm object (not not for tram-like objects)
     mltargs$model <- object
     ### note: weights, offset, cluster etc. are evaluated here !!!
     args <- list(...)
@@ -106,6 +109,8 @@ traforest <- function(object, parm = 1:length(coef(object)), reparm = NULL,
                       mltargs = list(maxit = 10000), update = TRUE, ...) {
 
     if (inherits(object, "mlt")) object <- object$model
+    ### this is tricky because parm is only valid
+    ### for this ctm object (not not for tram-like objects)
     mltargs$model <- object
     ### note: weights, offset, cluster etc. are evaluated here !!!
     args <- list(...)
