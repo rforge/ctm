@@ -235,8 +235,8 @@
         -sum(weights * .ofuns(weights)$ll(beta))
     ret$logliki <- function(beta, weights)
         .ofuns(weights)$ll(beta)
-    ret$score <- function(beta, weights) 
-        weights * .ofuns(weights)$sc(beta)
+    ret$score <- function(beta, weights, Xmult = FALSE) 
+        weights * .ofuns(weights)$sc(beta, Xmult = Xmult)
     ret$hessian <- function(beta, weights) 
         .ofuns(weights)$he(beta)
     ret$optimfct <- optimfct
