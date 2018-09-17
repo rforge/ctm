@@ -2,7 +2,7 @@
 \name{NEWS}
 \title{NEWS file for the tram package}
 
-\section{Changes in Version 0.2-3 (2018-08-xx)}{
+\section{Changes in Version 0.2-3 (2018-09-17)}{
   \itemize{
     \item{New \code{extrapolate = TRUE} option for all models constraints
           the second derivate of the Bernstein transformation function to be
@@ -11,6 +11,7 @@
     \item{Add \code{Lehmann} for fitting shift transformation models those
           linear predictor can be interpreted as log-Lehmann-alternative.}
     \item{Add \code{method = "loglog"} to \code{Polr}.}
+    \item{New \code{update} method.}
   }
 }
 
