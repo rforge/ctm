@@ -2,6 +2,12 @@
 \name{NEWS}
 \title{NEWS file for the variables package}
 
+\section{Changes in Version 1.0-1 (2018-08-17)}{
+  \itemize{
+    \item{Documentation update.}
+  }
+}
+
 \section{Changes in Version 1.0-0 (2018-03-07)}{
   \itemize{
     \item{A paper describing version 1.0-0 of the \pkg{mlt}, \pkg{basefun}, and
@@ -10,6 +16,7 @@
     \item{Documentation updates.}
   }
 }
+
 
 \section{Changes in Version 0.0-31 (2018-02-23)}{
   \itemize{
