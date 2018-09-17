@@ -6,6 +6,8 @@
   \itemize{
     \item{All reparameterisation for max-type tests; this might
           give better (more powerful) variable selection.}
+    \item{Allow fixed coefficients in trees and forests; this is
+          useful for log-rank splitting, for example.}
   }
 }
 
