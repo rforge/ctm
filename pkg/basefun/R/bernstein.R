@@ -64,17 +64,18 @@ Bernstein_basis <- function(var, order = 2,
         tmpdf <- as.data.frame(s)
         left <- s[[1]][1] > b[[1]][1]
         right <- s[[1]][2] < b[[1]][2]
-        if (!left && !right) break()
-        if (left && !right) tmpdf <- tmpdf[-2,,drop = FALSE]
-        if (!left && right) tmpdf <- tmpdf[-1,,drop = FALSE]
-        dr <- 2
-        names(dr) <- names(s)
-        B0 <- model.matrix(tmp, data = tmpdf, deriv = dr)
-        ### <FIXME> we don't have infrastructure for equality
-        ### constraints, so use <= and >= 
-        ### </FIXME>
-        constr$ui <- rbind(constr$ui, B0, -B0)
-        constr$ci <- c(constr$ci, rep(0, 2 * nrow(B0)))
+        if (left || right) {
+            if (left && !right) tmpdf <- tmpdf[-2,,drop = FALSE]
+            if (!left && right) tmpdf <- tmpdf[-1,,drop = FALSE]
+            dr <- 2
+            names(dr) <- names(s)
+            B0 <- model.matrix(tmp, data = tmpdf, deriv = dr)
+            ### <FIXME> we don't have infrastructure for equality
+            ### constraints, so use <= and >= 
+            ### </FIXME>
+            constr$ui <- rbind(constr$ui, B0, -B0)
+            constr$ci <- c(constr$ci, rep(0, 2 * nrow(B0)))
+        }
     }
 
     stopifnot(inherits(var, "numeric_var"))

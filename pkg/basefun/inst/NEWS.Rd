@@ -2,7 +2,7 @@
 \name{NEWS}
 \title{NEWS file for the basefun package}
 
-\section{Changes in Version 1.0-2 (2018-06-27)}{
+\section{Changes in Version 1.0-2 (2018-09-17)}{
   \itemize{
     \item{Constrain Bernstein to zero second derivative at the support when
           linear extrapolation shall be used. This avoids ugly bumps in the
