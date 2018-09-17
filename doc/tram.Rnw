@@ -1004,7 +1004,9 @@ coef(Coxph_GBSG2_1)
 @
 This model estimates a global treatment effect, \ie, a treatment effect
 which applies uniformly to all patients. We now try to find out if this
-model can be improved by a transformation tree
+model can be improved by a transformation tree (where splits are looked for
+with respect to the parameters defining the log-cumulative baseline hazard
+function, \ie the intercept, and the treatment effect parameter):
 <<GBSG2-Cox-3>>=
 Coxph_GBSG2_3 <- trafotree(Coxph_GBSG2_1, 
     formula = Surv(time, cens) ~ horTh | age + menostat + tsize + 
