@@ -2,6 +2,12 @@
 \name{NEWS}
 \title{NEWS file for the mlt package}
 
+\section{Changes in Version 1.0-3 (2018-08-15)}{
+  \itemize{
+    \item{Add \code{lty} argument to \code{plot.ctm}.}
+  }
+}
+
 \section{Changes in Version 1.0-2 (2018-06-22)}{
   \itemize{
     \item{Make sure transformation functions outside \code{bounds} are minus
