@@ -8,6 +8,7 @@
         iy <- data[["yx", type = "index"]]
 
         mltargs$data <- mf
+        mltargs$scale <- object$scale
         ctmobject <- do.call("mlt", mltargs)
         thetastart <- coef(ctmobject, fixed = FALSE)
 

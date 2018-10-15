@@ -2,7 +2,13 @@
 \name{NEWS}
 \title{NEWS file for the trtf package}
 
-\section{Changes in Version 0.3-3 (2018-06-27)}{
+\section{Changes in Version 0.3-3 (2018-10-15)}{
+  \itemize{
+    \item{Respect \code{scale} argument from \code{object}.}
+  }
+}
+
+\section{Changes in Version 0.3-3 (2018-09-18)}{
   \itemize{
     \item{All reparameterisation for max-type tests; this might
           give better (more powerful) variable selection.}
@@ -10,6 +16,7 @@
           useful for log-rank splitting, for example.}
   }
 }
+
 
 \section{Changes in Version 0.3-2 (2018-06-22)}{
   \itemize{
