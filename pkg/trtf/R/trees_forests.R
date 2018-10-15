@@ -8,7 +8,6 @@
         iy <- data[["yx", type = "index"]]
 
         mltargs$data <- mf
-        mltargs$scale <- object$scale
         ctmobject <- do.call("mlt", mltargs)
         thetastart <- coef(ctmobject, fixed = FALSE)
 
@@ -78,7 +77,11 @@ trafotree <- function(object, parm = 1:length(coef(object)), reparm = NULL,
                       mltargs = list(maxit = 10000), ...) {
 
     ### we only work with the ctm object
-    if (inherits(object, "mlt")) object <- object$model
+    if (inherits(object, "mlt")) {
+        if (is.null(mltargs$scale))
+            mltargs$scale <- object$scale
+        object <- object$model
+    }
     ### this is tricky because parm is only valid
     ### for this ctm object (not not for tram-like objects)
     mltargs$model <- object
