@@ -307,7 +307,11 @@
     }
 
     if (!is.null(ui)) {    
-        ret <- c(coneproj::qprog(Dmat, dvec, ui, ci, msg = FALSE)$thetahat)
+        ret <- try(c(coneproj::qprog(Dmat, dvec, ui, ci, msg = FALSE)$thetahat))
+        if (inherits(ret, "try-error")) {
+            diag(Dmat) <- diag(Dmat) + 1e-3
+            ret <- c(coneproj::qprog(Dmat, dvec, ui, ci, msg = FALSE)$thetahat)
+        }
         ### was: solve.QP(Dmat, dvec, t(ui), ci, meq = 0)$solution
     } else {
         ret <- lm.fit(x = X, y = Z)$coef
