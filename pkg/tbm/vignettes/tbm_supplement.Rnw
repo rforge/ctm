@@ -65,7 +65,8 @@ fill <- diverge_hcl(2, h = c(246, 40), c = 96, l = c(65, 90), alpha = .3)
 %% code commands
 \newcommand{\Rclass}[1]{`\code{#1}'}
 %% JSS
-\author{Torsten Hothorn \\ Universit\"at Z\"urich}
+\author{Torsten Hothorn \\ Universit\"at Z\"urich \And
+        Peter B\"uhlmann \\ ETH Z\"urich}
 \Plainauthor{Hothorn}
 
 \title{Transformation Boosting Machines: Empirical Evaluation of the
@@ -90,7 +91,13 @@ based on artificial data generating processes are presented.
   Universit\"at Z\"urich \\
   Hirschengraben 84, CH-8001 Z\"urich, Switzerland \\
   \texttt{Torsten.Hothorn@uzh.ch} \\
-  \url{http://tiny.uzh.ch/bh}
+  \url{http://tiny.uzh.ch/bh} \\
+
+  Peter B\"uhlmann \\
+  Seminar f\"{u}r Statistik \\
+  ETH Z\"{u}rich \\
+  R\"amistrasse 101, CH-8092 Z\"{u}rich, Switzerland \\
+
 }
 
 \begin{document}
