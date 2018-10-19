@@ -151,7 +151,7 @@ better and better. Use Adobe AcroRead to watch the animation. \label{fig:movie}}
 
 The Bernstein basis $\basisy$ allows a relatively flexible transformation
 function, and thus density, to be estimated (the initial frame shows a
-bimodel unconditional distribution). The quality of this model is assess by
+bimodel unconditional distribution). The quality of this model is assessed by
 the multivariate gradient of the log-likelihood contributions with respect to
 $\hat{\parm}_\text{ML}$. \CTM~starts by fitting potentially nonlinear
 functions of each predictor variable to this gradient and updates the
