@@ -16,6 +16,10 @@ Cmod <- Coxph(Surv(time, cens) | 0 + horTh:tgrade ~ progrec + pnodes,
               data = GBSG2)
 summary(Cmod)
 
+Cmod_lf <- Coxph(Surv(time, cens) | 0 + horTh:tgrade ~ progrec + pnodes, 
+                data = GBSG2, log_first = TRUE)
+summary(Cmod_lf)
+
 coef(cmod)
 coef(Cmod)
 
