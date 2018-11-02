@@ -23,7 +23,7 @@
 Bernstein_basis <- function(var, order = 2, 
                             ui = c("none", "increasing", "decreasing", 
                                    "cyclic", "zerointegral", "positive", "negative"),
-                            extrapolate = FALSE) {
+                            extrapolate = FALSE, log_first = FALSE) {
 
     zeroint <- FALSE
     ui <- match.arg(ui, several.ok = TRUE)
@@ -36,6 +36,14 @@ Bernstein_basis <- function(var, order = 2,
     } else {
         ui <- paste(sort(ui), collapse = ".")
     }
+
+    s <- support(var)
+    b <- bounds(var)
+    if (log_first) {
+        stopifnot(bounds(var)[[1]][1] >= 0)
+        s <- lapply(s, log)
+        b <- lapply(b, log)
+    }    
 
     constr <- switch(ui,
         "none" = list(ui = Diagonal(order + 1), 
@@ -57,10 +65,9 @@ Bernstein_basis <- function(var, order = 2,
 
     ### linear extrapolation, f''(support) = 0
     if (extrapolate) {
-        s <- support(var)
-        b <- bounds(var)
         s[[1]] <- range(s[[1]])
-        tmp <- Bernstein_basis(var, order = order, extrapolate = FALSE)
+        tmp <- Bernstein_basis(var, order = order, extrapolate = FALSE,
+                               log_first = log_first)
         tmpdf <- as.data.frame(s)
         left <- s[[1]][1] > b[[1]][1]
         right <- s[[1]][2] < b[[1]][2]
@@ -80,7 +87,7 @@ Bernstein_basis <- function(var, order = 2,
 
     stopifnot(inherits(var, "numeric_var"))
     varname <- variable.names(var)
-    support <- range(support(var)[[varname]])
+    support <- range(s[[varname]])
     stopifnot(all(diff(support) > 0))
 
     basis <- function(data, deriv = 0L, integrate = FALSE) {
@@ -92,6 +99,8 @@ Bernstein_basis <- function(var, order = 2,
             if (is.null(varname)) varname <- colnames(data)[1]
             x <- data[[varname]]
         }
+        ox <- x
+        if (log_first) x <- log(x)
 
         ### applies to all basis functions
         ### deriv = -1 => 0
@@ -109,8 +118,18 @@ Bernstein_basis <- function(var, order = 2,
         X <- do.call("cbind", lapply(0:order, function(j) 
                      .Bx(x, j, order, deriv = max(c(0, deriv)), integrate = integrate)))
 
+        dlog <- 1
+        if (log_first && deriv > 0) {
+            expr <- D(quote(log(ox)), "ox")
+            if (deriv > 1) {
+                for (d in 2:deriv)
+                    expr <- D(expr, "ox")
+            }
+            dlog <- eval(expr)
+        } 
+
         if (deriv > 0)
-            X <- X * (1 / diff(support)^deriv)
+            X <- X * (1 / diff(support)^deriv) * dlog
         if (deriv < 0)
             X[] <- 0
         colnames(X) <- paste("Bs", 1:ncol(X), "(", varname, ")", sep = "")

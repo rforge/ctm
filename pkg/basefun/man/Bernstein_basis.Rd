@@ -10,7 +10,7 @@
 Bernstein_basis(var, order = 2, ui = c("none", "increasing", "decreasing", 
                                        "cyclic", "zerointegral", "positive",
                                        "negative"),
-                extrapolate = FALSE)
+                extrapolate = FALSE, log_first = FALSE)
 }
 \arguments{
   \item{var}{a \code{\link[variables]{numeric_var}} object}
@@ -20,6 +20,8 @@ Bernstein_basis(var, order = 2, ui = c("none", "increasing", "decreasing",
                      extrapolated linearily outside \code{support(var)}.
                      In particular, the second derivative of the polynomial
                      at \code{support(var)} is constrained to zero.}
+  \item{log_first}{logical; the Bernstein polynomial is defined on the
+                   log-scale if \code{TRUE}.}
 }
 \details{
   \code{Bernstein_basis} returns a function for the evaluation of

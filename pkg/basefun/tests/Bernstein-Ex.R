@@ -54,3 +54,18 @@ stopifnot(max(abs(A - B)) < .Machine$double.eps)
 
 ### Bernstein to Legendre
 stopifnot(max(abs(solve(A) - basefun:::.B2L(4L))) < sqrt(.Machine$double.eps))
+
+### Bernstein(log(y))
+x <- 1:100 / 10
+y <- log(x)
+xvar <- numeric_var("x", bounds = c(0.01, Inf), support = c(.1, 9))
+xb <- Bernstein_basis(xvar, ui = "increasing", log_first = TRUE, order = 6)
+X <- model.matrix(xb, data = data.frame(x = x))
+Xprime <- model.matrix(xb, data = data.frame(x = x), deriv = c("x" = 1))
+cf <- coef(lm(y ~ 0 + X))
+stopifnot(max(abs(y - X %*% cf)) < .Machine$double.eps^(1/10))
+stopifnot(max(abs(1 / x[-1] - Xprime[-1,] %*% cf)) < .Machine$double.eps^(1/10))
+
+
+
+

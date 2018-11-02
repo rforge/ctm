@@ -8,7 +8,7 @@ importFrom("orthopolynom", "legendre.polynomials")
 importFrom("methods", "as")
 importFrom("stats", ".checkMFClasses", ".getXlevels", "as.formula",
            "contr.treatment", "dbeta", "model.frame", "pbeta",
-           "variable.names", "model.matrix", "predict")
+           "variable.names", "model.matrix", "predict", "D")
 
 export(Bernstein_basis, as.basis, b, 
        log_basis, polynomial_basis, Legendre_basis, intercept_basis)

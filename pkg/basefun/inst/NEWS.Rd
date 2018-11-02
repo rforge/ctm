@@ -2,6 +2,12 @@
 \name{NEWS}
 \title{NEWS file for the basefun package}
 
+\section{Changes in Version 1.0-3 (2018-11-02)}{
+  \itemize{
+    \item{Bernstein(log()) is possible with new \code{log_first} argument.}
+  }
+}
+
 \section{Changes in Version 1.0-2 (2018-09-17)}{
   \itemize{
     \item{Constrain Bernstein to zero second derivative at the support when
@@ -9,6 +15,7 @@
           corresponding densities in \pkg{mlt}.}
   }
 }
+
 
 \section{Changes in Version 1.0-1 (2018-03-27)}{
   \itemize{
