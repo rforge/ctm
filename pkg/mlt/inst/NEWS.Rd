@@ -8,6 +8,8 @@
           ignored by \code{confband} when \code{newdata}
           had multiple rows.}
     \item{Computation of starting values more robust now.}
+    \item{Order of fixed parameters (\code{fixed} argument to \code{mlt})
+          might have been wrong due to incomplete matching.}
   }
 }
 

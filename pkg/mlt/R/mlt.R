@@ -28,6 +28,7 @@
     if (!is.null(fixed)) {
         stopifnot(all(names(fixed) %in% colnames(Y)))
         fix <- colnames(Y) %in% names(fixed)
+        fixed <- fixed[colnames(Y)[fix]]
         ui <- ui[,!fix,drop = FALSE]
         .parm <- function(beta) {
             nm <- names(beta)
@@ -267,6 +268,7 @@
     if (!is.null(fixed)) {
         stopifnot(all(names(fixed) %in% colnames(Y)))
         fix <- colnames(Y) %in% names(fixed)
+        fixed <- fixed[colnames(Y)[fix]]
         ui <- ui[,!fix,drop = FALSE]
     } else {
         fix <- rep(FALSE, ncol(Y))
