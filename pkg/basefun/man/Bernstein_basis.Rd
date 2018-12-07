@@ -21,7 +21,10 @@ Bernstein_basis(var, order = 2, ui = c("none", "increasing", "decreasing",
                      In particular, the second derivative of the polynomial
                      at \code{support(var)} is constrained to zero.}
   \item{log_first}{logical; the Bernstein polynomial is defined on the
-                   log-scale if \code{TRUE}.}
+                   log-scale if \code{TRUE}. It makes sense to define the
+                   support as \code{c(1, q)}$, ie putting the first 
+                   basis function of the Bernstein polynomial on
+                   \code{log(1)}.}
 }
 \details{
   \code{Bernstein_basis} returns a function for the evaluation of
