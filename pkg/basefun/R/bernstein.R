@@ -144,6 +144,7 @@ Bernstein_basis <- function(var, order = 2,
 
     attr(basis, "variables") <- var
     attr(basis, "intercept") <- zeroint
+    attr(basis, "log_first") <- log_first
 
     class(basis) <- c("Bernstein_basis", "basis", class(basis))
     return(basis)
@@ -175,15 +176,38 @@ model.matrix.Bernstein_basis <- function(object, data,
     data[[varname]][small] <- s[1]
     data[[varname]][large] <- s[2]
     ret <- object(data = data, deriv = deriv, integrate = integrate)
+
+    expr <- D(quote(log(s)), "s")
+    if (deriv > 1) {
+        for (d in 2:deriv)
+            expr <- D(expr, "ox")
+        }
+    dlog <- eval(expr)
+
+
     if (any(small)) {
         dsmall <- data.frame(x = rep(s[1], sum(small)))
         names(dsmall) <- varname
-        xdiff <- x[small] - s[1]
+        if (attr(object, "log_first")) {
+            ### f'(s) = b'(log(s)) / s but we need b'(log(s)) only
+            xdiff <- (log(x[small]) - log(s[1]))
+        } else {
+            xdiff <- x[small] - s[1]
+        }
         dfun <- function(deriv) {
+            dlog <- rep(1L, 2)
+            if (attr(object, "log_first")) {
+                expr <- D(quote(log(s)), "s")
+                if (deriv > 1) {
+                    for (d in 2:deriv)
+                        expr <- D(expr, "s")
+                    }
+                dlog <- eval(expr)
+            }
             if (deriv >= maxderiv)
                 return(object(data = dsmall, deriv = deriv))
             return(object(data = dsmall, deriv = deriv) +
-                   dfun(deriv + 1L) * xdiff)
+                   dfun(deriv + 1L) / dlog[1] * xdiff)
         }
         ret[small,] <- dfun(deriv)
     }
@@ -191,12 +215,25 @@ model.matrix.Bernstein_basis <- function(object, data,
         dlarge <- data.frame(x = rep(s[2], sum(large)))
         names(dlarge) <- varname
         X <- object(data = dlarge)
-        xdiff <- x[large] - s[2]
+        if (attr(object, "log_first")) {
+            xdiff <- (log(x[large]) - log(s[2]))
+        } else {
+            xdiff <- x[large] - s[2]
+        }
         dfun <- function(deriv) {
+            dlog <- rep(1L, 2)
+            if (attr(object, "log_first")) {
+                expr <- D(quote(log(s)), "s")
+                if (deriv > 1) {
+                    for (d in 2:deriv)
+                        expr <- D(expr, "s")
+                    }
+                dlog <- eval(expr)
+            }
             if (deriv >= maxderiv)
                 return(object(data = dlarge, deriv = deriv))
             return(object(data = dlarge, deriv = deriv) +   
-                   dfun(deriv + 1L) * xdiff)
+                   dfun(deriv + 1L) / dlog[2] * xdiff)
         }
         ret[large,] <- dfun(deriv)
     }

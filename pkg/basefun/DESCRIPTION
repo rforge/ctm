@@ -1,7 +1,7 @@
 Package: basefun
 Title: Infrastructure for Computing with Basis Functions
 Version: 1.0-3
-Date: 2018-11-02
+Date: 2018-12-07
 Authors@R: person("Torsten", "Hothorn", role = c("aut", "cre"),
                   email = "Torsten.Hothorn@R-project.org", comment = c(ORCID = "0000-0001-8301-0471"))  
 Description: Some very simple infrastructure for basis functions.
