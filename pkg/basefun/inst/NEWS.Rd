@@ -2,7 +2,7 @@
 \name{NEWS}
 \title{NEWS file for the basefun package}
 
-\section{Changes in Version 1.0-3 (2018-12-07)}{
+\section{Changes in Version 1.0-3 (2019-01-15)}{
   \itemize{
     \item{Bernstein(log()) is possible with new \code{log_first} argument.}
   }
