@@ -2,7 +2,7 @@
 \name{NEWS}
 \title{NEWS file for the mlt package}
 
-\section{Changes in Version 1.0-4 (2018-10-03)}{
+\section{Changes in Version 1.0-4 (2018-12-03)}{
   \itemize{
     \item{Arguments \code{K} and \code{cheat} where
           ignored by \code{confband} when \code{newdata}
