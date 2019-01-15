@@ -2,9 +2,11 @@
 \name{NEWS}
 \title{NEWS file for the trtf package}
 
-\section{Changes in Version 0.3-3 (2018-10-15)}{
+\section{Changes in Version 0.3-4 (2019-01-15)}{
   \itemize{
     \item{Respect \code{scale} argument from \code{object}.}
+    \item{\code{traforest} broke in extremely rare cases due to incorrect
+          dimensions of the score matrix.}
   }
 }
 
