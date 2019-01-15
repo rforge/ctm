@@ -58,7 +58,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 progrec     0.998      1.002     0.997     0.999
 pnodes      1.054      0.949     1.040     1.068
 
-Concordance= 0.66  (se = 0.032 )
+Concordance= 0.66  (se = 0.017 )
 Rsquare= 0.088   (max possible= 0.981 )
 Likelihood ratio test= 63.2  on 2 df,   p=2e-14
 Wald test            = 75.1  on 2 df,   p=<2e-16
@@ -85,6 +85,28 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 Log-Likelihood:
  -2570 (df = 44)
 Likelihood-ratio Test: Chisq = 68.5 on 2 degrees of freedom; p = 1.34e-15
+
+> 
+> Cmod_lf <- Coxph(Surv(time, cens) | 0 + horTh:tgrade ~ progrec + pnodes, 
++                 data = GBSG2, log_first = TRUE)
+> summary(Cmod_lf)
+
+  Parametric Linear Cox Regression Model 
+
+Call:
+Coxph(formula = Surv(time, cens) | 0 + horTh:tgrade ~ progrec + 
+    pnodes, data = GBSG2, log_first = TRUE)
+
+Coefficients:
+         Estimate Std. Error z value Pr(>|z|)    
+progrec -0.002212   0.000561   -3.94  8.1e-05 ***
+pnodes   0.052377   0.006826    7.67  1.7e-14 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Log-Likelihood:
+ -2574 (df = 44)
+Likelihood-ratio Test: Chisq = 64.5 on 2 degrees of freedom; p = 9.98e-15
 
 > 
 > coef(cmod)
@@ -149,4 +171,4 @@ Number of terminal nodes: 3
 > 
 > proc.time()
    user  system elapsed 
-  2.688   0.056   2.741 
+   3.44    0.08    3.52 
