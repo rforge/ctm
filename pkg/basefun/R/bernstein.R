@@ -113,7 +113,7 @@ Bernstein_basis <- function(var, order = 2,
 
         stopifnot(order > max(c(0, deriv - 1L)))
         x <- (x - support[1]) / diff(support)
-        stopifnot(all(x >= 0 && x <= 1))
+        stopifnot(all(x >= 0 & x <= 1))
 
         X <- do.call("cbind", lapply(0:order, function(j) 
                      .Bx(x, j, order, deriv = max(c(0, deriv)), integrate = integrate)))

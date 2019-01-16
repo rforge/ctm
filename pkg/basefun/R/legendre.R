@@ -35,7 +35,7 @@ Legendre_basis <- function(var, order = 2,
 
         ### map into [0, 1]
         x <- (x - support[1]) / diff(support)
-        stopifnot(all(x >= 0 && x <= 1))
+        stopifnot(all(x >= 0 & x <= 1))
 
         ### Legendre is on [-1, 1] !
         X <- do.call("cbind", as.vector(lapply(dobject, predict, 2 * x - 1)))
