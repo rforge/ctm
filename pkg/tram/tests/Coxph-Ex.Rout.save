@@ -41,114 +41,30 @@ Loading required package: mvtnorm
 > 
 > cmod <- coxph(Surv(time, cens) ~ progrec + pnodes + strata(horTh, tgrade),
 +                data = GBSG2)
-> summary(cmod)
-Call:
-coxph(formula = Surv(time, cens) ~ progrec + pnodes + strata(horTh, 
-    tgrade), data = GBSG2)
-
-  n= 686, number of events= 299 
-
-             coef exp(coef)  se(coef)     z Pr(>|z|)    
-progrec -0.002165  0.997838  0.000558 -3.88    1e-04 ***
-pnodes   0.052405  1.053802  0.006850  7.65    2e-14 ***
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-
-        exp(coef) exp(-coef) lower .95 upper .95
-progrec     0.998      1.002     0.997     0.999
-pnodes      1.054      0.949     1.040     1.068
-
-Concordance= 0.66  (se = 0.017 )
-Rsquare= 0.088   (max possible= 0.981 )
-Likelihood ratio test= 63.2  on 2 df,   p=2e-14
-Wald test            = 75.1  on 2 df,   p=<2e-16
-Score (logrank) test = 77.5  on 2 df,   p=<2e-16
-
-> 
 > Cmod <- Coxph(Surv(time, cens) | 0 + horTh:tgrade ~ progrec + pnodes, 
 +               data = GBSG2)
-> summary(Cmod)
-
-  Parametric Linear Cox Regression Model 
-
-Call:
-Coxph(formula = Surv(time, cens) | 0 + horTh:tgrade ~ progrec + 
-    pnodes, data = GBSG2)
-
-Coefficients:
-         Estimate Std. Error z value Pr(>|z|)    
-progrec -0.002277   0.000569   -4.00  6.3e-05 ***
-pnodes   0.054240   0.006803    7.97  1.6e-15 ***
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-
-Log-Likelihood:
- -2570 (df = 44)
-Likelihood-ratio Test: Chisq = 68.5 on 2 degrees of freedom; p = 1.34e-15
-
+> 
+> round(max(abs(coef(cmod) - coef(Cmod))), 4)
+[1] 0.0018
+> round(max(abs(diag(vcov(cmod)) - diag(vcov(Cmod)))), 4)
+[1] 0
 > 
 > Cmod_lf <- Coxph(Surv(time, cens) | 0 + horTh:tgrade ~ progrec + pnodes, 
 +                 data = GBSG2, log_first = TRUE)
-> summary(Cmod_lf)
-
-  Parametric Linear Cox Regression Model 
-
-Call:
-Coxph(formula = Surv(time, cens) | 0 + horTh:tgrade ~ progrec + 
-    pnodes, data = GBSG2, log_first = TRUE)
-
-Coefficients:
-         Estimate Std. Error z value Pr(>|z|)    
-progrec -0.002212   0.000561   -3.94  8.1e-05 ***
-pnodes   0.052377   0.006826    7.67  1.7e-14 ***
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-
-Log-Likelihood:
- -2574 (df = 44)
-Likelihood-ratio Test: Chisq = 64.5 on 2 degrees of freedom; p = 9.98e-15
-
 > 
-> coef(cmod)
- progrec   pnodes 
--0.00216  0.05240 
-> coef(Cmod)
- progrec   pnodes 
--0.00228  0.05424 
+> round(max(abs(coef(cmod) - coef(Cmod_lf))), 4)
+[1] 0
+> round(max(abs(diag(vcov(cmod)) - diag(vcov(Cmod_lf)))), 4)
+[1] 0
 > 
-> vcov(cmod)
-         progrec   pnodes
-progrec 3.11e-07 9.71e-08
-pnodes  9.71e-08 4.69e-05
-> vcov(Cmod)
-         progrec   pnodes
-progrec 3.24e-07 7.13e-08
-pnodes  7.13e-08 4.63e-05
 > 
-> cmod <- coxph(Surv(time, cens) ~ ., data = GBSG2)
-> Cmod <- Coxph(Surv(time, cens) ~ ., data = GBSG2)
+> cmod_2 <- coxph(Surv(time, cens) ~ ., data = GBSG2)
+> Cmod_2 <- Coxph(Surv(time, cens) ~ ., data = GBSG2)
 > 
-> coef(cmod)
-    horThyes          age menostatPost        tsize     tgrade.L     tgrade.Q 
-   -0.346278    -0.009459     0.258445     0.007796     0.551299    -0.201091 
-      pnodes      progrec       estrec 
-    0.048789    -0.002217     0.000197 
-> coef(Cmod)
-    horThyes          age menostatPost        tsize     tgrade.L     tgrade.Q 
-   -0.353565    -0.009172     0.254562     0.007753     0.565923    -0.203673 
-      pnodes      progrec       estrec 
-    0.050066    -0.002260     0.000217 
-> 
-> diag(vcov(cmod))
-    horThyes          age menostatPost        tsize     tgrade.L     tgrade.Q 
-    1.67e-02     8.65e-05     3.37e-02     1.55e-05     3.60e-02     1.49e-02 
-      pnodes      progrec       estrec 
-    5.55e-05     3.29e-07     2.03e-07 
-> diag(vcov(Cmod))
-    horThyes          age menostatPost        tsize     tgrade.L     tgrade.Q 
-    1.67e-02     8.66e-05     3.37e-02     1.54e-05     3.60e-02     1.49e-02 
-      pnodes      progrec       estrec 
-    5.46e-05     3.32e-07     2.07e-07 
+> round(max(abs(coef(cmod_2) - coef(Cmod_2))), 4)
+[1] 0.0146
+> round(max(abs(diag(vcov(cmod_2)) - diag(vcov(Cmod_2)))), 4)
+[1] 0
 > 
 > cmod <- Coxph(Surv(time, cens) ~ horTh, data = GBSG2)
 > (tmod <- trafotree(cmod, formula = Surv(time, cens) ~ horTh | ., data = GBSG2))
@@ -171,4 +87,4 @@ Number of terminal nodes: 3
 > 
 > proc.time()
    user  system elapsed 
-   3.44    0.08    3.52 
+  6.288   0.136   6.420 

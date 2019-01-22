@@ -2,10 +2,11 @@
 \name{NEWS}
 \title{NEWS file for the tram package}
 
-\section{Changes in Version 0.2-4 (2019-01-15)}{
+\section{Changes in Version 0.2-4 (2019-01-22)}{
   \itemize{
     \item{\code{log_first = TRUE} is now accepted by \code{tram} and all 
           model functions calling \code{tram}. This is still experimental.}
+    \item{Silence regression tests on Windows.}
   }
 }
 
