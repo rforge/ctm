@@ -56,6 +56,12 @@ trafotree(object, parm = 1:length(coef(object)), reparm = NULL,
 
   Torsten Hothorn (2018). Top-Down Transformation Choice. \emph{Statistical
   Modelling}, \url{https://arxiv.org/abs/1706.08269}.
+
+  Natalia Korepanova, Heidi Seibold, Verena Steffen and Torsten Hothorn
+  (2019).  Survival Forests under Test: Impact of the Proportional Hazards
+  Assumption on Prognostic and Predictive Forests for ALS Survival.
+  \url{http://arxiv.org/abs/1902.01587}.
+
 }
 \examples{
 
