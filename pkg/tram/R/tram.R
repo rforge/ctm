@@ -162,7 +162,7 @@ tram <- function(formula, data, subset, weights, offset, cluster, na.action = na
     args$scale <- scale
     args$fixed <- fixed
     ret <- do.call("mlt", args)
-    ret$terms <- td$terms
+    ret$terms <- td$mt
     ret$cluster <- td$cluster
     if (!is.null(iX))
         ret$shiftcoef <- colnames(model.matrix(iX, data = td$mf))

@@ -2,6 +2,13 @@
 \name{NEWS}
 \title{NEWS file for the tram package}
 
+\section{Changes in Version 0.2-5 (2019-02-25)}{
+  \itemize{
+    \item{\code{tram} objects are now in line with \code{multcomp::glht},
+          allowing post-hoc multiple comparisons.}
+  }
+}
+
 \section{Changes in Version 0.2-4 (2019-01-22)}{
   \itemize{
     \item{\code{log_first = TRUE} is now accepted by \code{tram} and all 

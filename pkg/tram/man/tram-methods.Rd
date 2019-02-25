@@ -19,7 +19,7 @@
 \usage{
 \method{as.mlt}{tram}(object)
 \method{model.frame}{tram}(formula, ...)
-\method{model.matrix}{tram}(object, with_baseline = FALSE, ...) 
+\method{model.matrix}{tram}(object, data = object$data, with_baseline = FALSE, ...) 
 \method{coef}{tram}(object, with_baseline = FALSE, ...) 
 \method{coef}{Lm}(object, as.lm = FALSE, ...)
 \method{coef}{Survreg}(object, as.survreg = FALSE, ...)
@@ -38,6 +38,7 @@
 \arguments{
   \item{object, formula, x}{a fitted stratified linear transformation model inheriting
                 from class \code{tram}.}
+  \item{data}{an optional data frame.}
   \item{with_baseline}{logical, if \code{TRUE} all model parameters
                        are returned, otherwise parameters describing the
                        baseline transformation are ignored.}

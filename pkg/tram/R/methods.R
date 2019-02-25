@@ -8,16 +8,28 @@ as.mlt.tram <- function(object) {
 update.tram <- function(object, ...)
     update(as.mlt(object), ...)
 
-model.frame.tram <- function(formula, ...)
-    formula$data
+model.frame.tram <- function(formula, ...) {
+    ret <- formula$data
+    ### <FIXME>: we need different options here:
+    ### model.frame for all variables, for x and z, etc.
+    attr(ret, "terms") <- formula$terms$x
+    ### </FIXME>
+    ret
+}
 
-model.matrix.tram <- function(object, with_baseline = FALSE, ...) 
+terms.tram <- function(x, ...)
+    terms(model.frame(x))
+
+model.matrix.tram <- function(object, data = object$data, 
+                              with_baseline = FALSE, ...) 
 {
     if (with_baseline) 
-        return(model.matrix(as.mlt(object), ...))
+        return(model.matrix(as.mlt(object), data = data, ...))
     if (is.null(object$shiftcoef)) 
         return(NULL)
-    return(model.matrix(as.mlt(object)$model$model$bshifting, ...))
+    ret <- model.matrix(as.mlt(object)$model$model$bshifting, 
+                        data = data, ...)
+    ret
 }	
 
 coef.tram <- function(object, with_baseline = FALSE, ...) 
