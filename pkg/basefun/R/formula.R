@@ -66,7 +66,8 @@ as.basis.formula <- function(object, data = NULL, remove_intercept = FALSE,
         }
         if (deriv < 0)
             X[] <- 0
-        if (negative) return(-X)
+        if (negative) X <- -X
+        attr(X, "contrasts") <- contr
         return(X)
     }
 

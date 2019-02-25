@@ -2,6 +2,12 @@
 \name{NEWS}
 \title{NEWS file for the basefun package}
 
+\section{Changes in Version 1.0-4 (2019-02-25)}{
+  \itemize{
+    \item{\code{model.matrix} has \code{constrasts} attribute where appropriate.}
+  }
+}
+
 \section{Changes in Version 1.0-3 (2019-01-16)}{
   \itemize{
     \item{Bernstein(log()) is possible with new \code{log_first} argument.}
