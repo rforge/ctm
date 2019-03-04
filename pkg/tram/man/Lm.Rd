@@ -58,7 +58,7 @@ expectation response.
 
 }
 \value{
-An object of class \code{BoxCox}, with corresponding \code{coef},
+An object of class \code{Lm}, with corresponding \code{coef},
 \code{vcov}, \code{logLik}, \code{estfun}, \code{summary}, 
 \code{print}, \code{plot} and \code{predict} methods.
 }
