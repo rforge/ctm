@@ -42,8 +42,7 @@ clean:
 	rm -rf tbm_supplement.tex
 	rm -rf tbm_supplement.R
 	rm -rf tbm_supplement.Rout
-	rm -rf packages.bib
-	rm -rf figure
+	rm -rf s*pdf
 	
 dist-clean:
 	make clean

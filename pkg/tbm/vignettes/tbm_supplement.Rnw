@@ -367,9 +367,6 @@ barplot(p, xlab = "Red List Status", ylab = "Distribution")
 \caption{\Sexpr{ds[file]}. Unconditional response distribution. \label{\Sexpr{paste0("fig", file, "0")}}}
 \end{figure}
 
-
-\end{document}
-
 Model evaluation (Figure~\ref{\Sexpr{paste0("fig", file, "oob")}}) indicated that 
 a tree-structured model for $\eshiftparm(\rx)$ had the best performance; this
 model was fitted using
