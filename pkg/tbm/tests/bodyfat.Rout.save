@@ -1,0 +1,129 @@
+
+R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
+Copyright (C) 2018 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library("tbm")
+Loading required package: mlt
+Loading required package: basefun
+Loading required package: variables
+Loading required package: mboost
+Loading required package: parallel
+Loading required package: stabs
+This is mboost 2.9-1. See 'package?mboost' and 'news(package  = "mboost")'
+for a complete list of changes.
+
+> library("tram")
+> library("partykit")
+Loading required package: grid
+
+Attaching package: 'grid'
+
+The following object is masked from 'package:variables':
+
+    unit
+
+Loading required package: libcoin
+Loading required package: mvtnorm
+
+Attaching package: 'partykit'
+
+The following object is masked from 'package:mboost':
+
+    varimp
+
+> 
+> set.seed(29)
+> 
+> data("bodyfat", package = "TH.data")
+> 
+> mf <- as.mlt(Colr(DEXfat ~ 1, data = bodyfat, order = 5))
+> logLik(mf)
+'log Lik.' -267.4026 (df=6)
+> 
+> Mstop <- 50
+> 
+> fd <- cv(rep(1, NROW(bodyfat)), type = "kfold", B = 2)
+> 
+> bctrl <- boost_control(nu = .1, trace = FALSE, mstop = Mstop)
+> 
+> tctrl <- ctree_control(minsplit = 2, minbucket = 1, mincriterion = 0,
++                        maxdepth = 5, splittest = TRUE, 
++                        testtype = "Teststatistic")
+> 
+> bf_t <- ctmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, 
++                  method = quote(mboost::blackboost), control = bctrl, 
++                  tree_control = tctrl)
+> logLik(bf_t)
+'log Lik.' -179.3925 (df=NULL)
+> 
+> bf_ctm <- ctmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, 
++                    control = bctrl)
+> logLik(bf_ctm)
+'log Lik.' -198.7984 (df=NULL)
+> table(selected(bf_ctm))
+
+ 2  3  5  6  7  8 
+ 7 15  5  7  2 14 
+> 
+> bf_dr <- ctmboost(model = mf, formula = DEXfat ~ ., data = bodyfat,
++                   baselearner = "bols", control = bctrl)
+> logLik(bf_dr)
+'log Lik.' -210.6349 (df=NULL)
+> table(selected(bf_dr))
+
+ 2  3  5  6  7  8 
+ 6  6  7  2 17 12 
+> 
+> bf_st <- stmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, 
++                   method = quote(mboost::blackboost), tree_control = tctrl)
+> logLik(bf_st)
+'log Lik.' -171.002 (df=NULL)
+> 
+> bf_shift <- stmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, 
++                      method = quote(mboost::gamboost))
+> logLik(bf_shift)
+'log Lik.' -193.5962 (df=NULL)
+> table(selected(bf_shift))
+
+ 2  3  5  7  8  9 
+19 34  5 25 11  6 
+> 
+> bf_lin <- stmboost(model = mf, formula = DEXfat ~ . - 1, data = bodyfat, 
++                    method = quote(mboost:::glmboost.formula))
+Warning message:
+In mboost:::glmboost.formula(formula = DEXfat ~ . - 1, data = bodyfat,  :
+  model with centered covariates does not contain intercept
+> logLik(bf_lin)
+'log Lik.' -195.3941 (df=NULL)
+> table(selected(bf_lin))
+
+ 2  3  5  6  7  8  9 
+21 32  5  1 27  9  5 
+> 
+> mf2 <- Lm(DEXfat ~ 1, data = bodyfat)
+> 
+> bf_lin2 <- ctmboost(model = mf2, formula = DEXfat ~ ., data = bodyfat)
+> logLik(bf_lin2$model, parm = coef(bf_lin2))
+'log Lik.' -263.1077 (df=NULL)
+> table(selected(bf_lin2))
+
+ 1  2  3  4  5  6  7  8  9 
+ 6  9 12 14 11  9 21 12  6 
+> 
+> proc.time()
+   user  system elapsed 
+ 43.833   0.671  44.497 
