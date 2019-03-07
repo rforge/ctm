@@ -8,7 +8,8 @@
   transformation models
 }
 \usage{
-stmboost(model, formula, data = list(), weights = NULL, method = quote(mboost::mboost), ...)
+stmboost(model, formula, data = list(), weights = NULL, 
+         method = quote(mboost::mboost), ...)
 }
 \arguments{
   \item{model}{an object of class \code{mlt} as returned by
