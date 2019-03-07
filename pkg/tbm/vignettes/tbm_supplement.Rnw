@@ -7,7 +7,7 @@
 
 %% packages
 \usepackage{thumbpdf}
-\usepackage{animate}
+%%% \usepackage{animate}
 \usepackage{amsfonts,amstext,amsmath,amssymb,amsthm}
 \usepackage{accents}
 \usepackage{color}
@@ -139,19 +139,16 @@ functions for the predictor variables.
 %better and better. Use Adobe AcroRead to watch the animation. \label{fig:movie}}
 %\end{center}
 %\end{figure}
-
-
-The Bernstein basis $\basisy$ allows a relatively flexible transformation
-function, and thus density, to be estimated (the initial frame shows a
-bimodel unconditional distribution). The quality of this model is assessed by
-the multivariate gradient of the log-likelihood contributions with respect to
-$\hat{\parm}_\text{ML}$. \CTM~starts by fitting potentially nonlinear
-functions of each predictor variable to this gradient and updates the
-parameter $\parm(\rx)$. Starting with the second frame, the left panel of
-Figure~\ref{fig:movie} depicts the conditional densities for all
-observations (the blue dots representing the observation) and the right
-panel shows the increasing total in-sample log-likelihood. 
-
+%The Bernstein basis $\basisy$ allows a relatively flexible transformation
+%function, and thus density, to be estimated (the initial frame shows a
+%bimodel unconditional distribution). The quality of this model is assessed by
+%the multivariate gradient of the log-likelihood contributions with respect to
+%$\hat{\parm}_\text{ML}$. \CTM~starts by fitting potentially nonlinear
+%functions of each predictor variable to this gradient and updates the
+%parameter $\parm(\rx)$. Starting with the second frame, the left panel of
+%Figure~\ref{fig:movie} depicts the conditional densities for all
+%observations (the blue dots representing the observation) and the right
+%panel shows the increasing total in-sample log-likelihood. 
 
 This document describes technical details of the empirical evaluation of
 transformation boosting machines by means of eight applications
@@ -257,8 +254,7 @@ plot.ctm <- function(x, which = sort(unique(selected(object))),
               at = at, col.regions = grey.colors(length(at)), ...)
 }
 
-source("movie.R")
-
+### source("movie.R")
 @
 
 For eight prediction problems, the out-of-sample log-likelihood was
