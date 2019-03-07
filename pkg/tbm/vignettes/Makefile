@@ -35,7 +35,6 @@ clean:
 	make texclean
 	rm -rf tbm_supplement.aux
 	rm -rf tbm_supplement.pdf
-	rm -rf packages.bib
 	rm -rf .Rdata
 	rm -rf Rplots.pdf
 	rm -rf .RData

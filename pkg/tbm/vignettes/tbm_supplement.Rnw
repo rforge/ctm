@@ -1627,7 +1627,7 @@ writeLines(ret)
 
 \bibliography{mlt,appl,packages}
 
-<<funs, echo = FALSE, results='hide', purl = FALSE, cache = TRUE>>=
+<<funs, echo = FALSE, results='hide', purl = FALSE>>=
 if (file.exists("packages.bib")) file.remove("packages.bib")
 pkgversion <- function(pkg) {
     pkgbib(pkg)
