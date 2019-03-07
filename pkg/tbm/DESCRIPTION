@@ -8,6 +8,6 @@ Description: Boosting the likelihood of conditional and shift transformation mod
 Depends: mlt (>= 1.0-2), mboost (>= 2.8-2)
 Imports: variables, basefun, sandwich, coneproj, methods
 Suggests: TH.data (>= 1.0-9), tram (>= 0.2-3), survival, partykit, lattice, latticeExtra, knitr, 
-  colorspace, gamlss.data
+  colorspace, gamlss.data, trtf
 VignetteBuilder: knitr
 License: GPL-2

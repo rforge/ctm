@@ -1,7 +1,7 @@
 
 %\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{tbm}
-%\VignetteDepends{tram, tbm, mboost, survival, lattice, latticeExtra, partykit,TH.data, colorspace, gamlss.data}
+%\VignetteDepends{tram, tbm, mboost, survival, lattice, latticeExtra, partykit,TH.data, colorspace,gamlss.data,trtf}
 
 \documentclass[article,nojss,shortnames]{jss}
 
@@ -1677,6 +1677,7 @@ pkg <- function(pkg)
           pkgversion(pkg), ",][]{pkg:", pkg, "}", sep = "")
 
 pkgs <- c("mlt", "variables", "basefun", "survival", "trtf")
+library("trtf")
 out <- sapply(pkgs, pkg)
 
 cat(c("@Manual{pkg:tbm,",
