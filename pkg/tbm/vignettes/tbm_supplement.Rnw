@@ -368,6 +368,8 @@ barplot(p, xlab = "Red List Status", ylab = "Distribution")
 \end{figure}
 
 
+\end{document}
+
 Model evaluation (Figure~\ref{\Sexpr{paste0("fig", file, "oob")}}) indicated that 
 a tree-structured model for $\eshiftparm(\rx)$ had the best performance; this
 model was fitted using
