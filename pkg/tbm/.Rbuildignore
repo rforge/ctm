@@ -1,6 +1,5 @@
 GBSG2.R
 movie.R
-Makefile
+Makefile.TH
 cache
 figure
-

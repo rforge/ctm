@@ -42,6 +42,7 @@ clean:
 	rm -rf tbm_supplement.R
 	rm -rf tbm_supplement.Rout
 	rm -rf s*pdf
+	rm -rf packages.bib
 	
 dist-clean:
 	make clean
