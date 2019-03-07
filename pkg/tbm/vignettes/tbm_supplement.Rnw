@@ -119,27 +119,26 @@ more complex nonlinear additive, or completely unstructured (tree-based)
 conditional paramater functions can be estimated by using appropriate basis
 functions for the predictor variables.
 
-The algorithms employ the statistical view on boosting and iteratively
-improve the fit estimating (relatively) simple models to updated gradients.
-A simple illustration (for the Body Fat Mass application presented in
-Section~\ref{sec:bodyfat}) is given in Figure~\ref{fig:movie}. The inital
-frame of this animation shows the density obtained from the unconditional
-maximum likelihood estimator in the model
-\begin{eqnarray*}
-\Prob(\rY \le \ry) = \Phi(\basisy(\ry)^\top \hat{\parm}_\text{ML}).
-\end{eqnarray*}
-
-
-\begin{figure}
-\begin{center}
-\animategraphics[controls,width=\linewidth]{1}{fit_movie}{1}{101}
-\caption{Iterative boosting for the Body Fat Mass data. The left panel shows
-the unconditional (first frame) or conditional densities (other frames).
-Blue dots correspond to the likelihood of observations. The
-right panel shows the increasing in-sample log-likelihood as the model gets
-better and better. Use Adobe AcroRead to watch the animation. \label{fig:movie}}
-\end{center}
-\end{figure}
+%The algorithms employ the statistical view on boosting and iteratively
+%improve the fit estimating (relatively) simple models to updated gradients.
+%A simple illustration (for the Body Fat Mass application presented in
+%Section~\ref{sec:bodyfat}) is given in Figure~\ref{fig:movie}. The inital
+%frame of this animation shows the density obtained from the unconditional
+%maximum likelihood estimator in the model
+%\begin{eqnarray*}
+%\Prob(\rY \le \ry) = \Phi(\basisy(\ry)^\top \hat{\parm}_\text{ML}).
+%\end{eqnarray*}
+%%% this needs Adobe Acroread but they don't serve Linux anymore
+%\begin{figure}
+%\begin{center}
+%\animategraphics[controls,width=\linewidth]{1}{fit_movie}{1}{101}
+%\caption{Iterative boosting for the Body Fat Mass data. The left panel shows
+%the unconditional (first frame) or conditional densities (other frames).
+%Blue dots correspond to the likelihood of observations. The
+%right panel shows the increasing in-sample log-likelihood as the model gets
+%better and better. Use Adobe AcroRead to watch the animation. \label{fig:movie}}
+%\end{center}
+%\end{figure}
 
 
 The Bernstein basis $\basisy$ allows a relatively flexible transformation
@@ -791,47 +790,48 @@ plot(as.mlt(m_mlt), newdata = data.frame(1), type = "survivor", K = 200,
 
 Model evaluation (Figure~\ref{\Sexpr{paste0("fig", file, "oob")}}) indicated that 
 a linear model for $\eshiftparm(\rx)$ had the best performance, this model was fitted using
-<<CAO-model, cache = TRUE>>=
+<<CAO-model, cache = TRUE, eval = FALSE>>=
 fm_glm[["stm"]]
 bm <- stmboost(m_mlt, formula = fm_glm[["stm"]], data = ldata,
                method = quote(mboost::mboost))[963]
 @
 This is, in fact, a linear Cox model which could have also been fitted using
-<<CAO-mlt, cache = TRUE>>=
+<<CAO-mlt, cache = TRUE, eval = FALSE>>=
 bmCoxPH <- mboost(fm_glm[["stm"]], data = ldata, family = CoxPH())[963]
 @
-The in-sample log-likelihood is shown in Figure~\ref{\Sexpr{paste0("fig", file, "ib")}}.
 
-\begin{figure}
-<<CAO-risk, echo = FALSE>>=
-<<insampleriskplot>>
-@
-\caption{\Sexpr{ds[file]}. In-sample log-likelihood maximisation. \label{\Sexpr{paste0("fig", file, "ib")}}}
-\end{figure}
+%%% this takes too long in a package vignette
+%The in-sample log-likelihood is shown in Figure~\ref{\Sexpr{paste0("fig", file, "ib")}}.
 
-The model coefficients are
-<<CAO-prop>>=
-mboost:::coef.mboost(bm)
-@
-
-The negative coefficients are practically equivalent
-<<CAO-propCoxPH>>=
-coef(bmCoxPH)
-@
-
-For five selected observations, the conditional survivor functions 
-are shown in Figure~\ref{\Sexpr{paste0("fig", file, "1")}}. 
-
-\begin{figure}
-<<CAO-dens, echo = FALSE>>=
-idx <- sample(1:nrow(ldata), 5)
-q <- mkgrid(m_mlt, n = 200)[[1]]
-matplot(x = q, y = d <- predict(bm, newdata = ldata[idx,], type = "survivor", q = q), type =
-        "l", col = rgb(.1, .1, .1, .6), lty = 1, xlab = "Time (in days)", ylab = "Probability")
-@
-\caption{\Sexpr{ds[file]}. Conditional response distribution. \label{\Sexpr{paste0("fig", file, "1")}}}
-\end{figure}
-
+%\begin{figure}
+%<<CAO-risk, echo = FALSE>>=
+%<<insampleriskplot>>
+%@
+%\caption{\Sexpr{ds[file]}. In-sample log-likelihood maximisation. \label{\Sexpr{paste0("fig", file, "ib")}}}
+%\end{figure}
+%
+%The model coefficients are
+%<<CAO-prop>>=
+%mboost:::coef.mboost(bm)
+%@
+%
+%The negative coefficients are practically equivalent
+%<<CAO-propCoxPH>>=
+%coef(bmCoxPH)
+%@
+%
+%For five selected observations, the conditional survivor functions 
+%are shown in Figure~\ref{\Sexpr{paste0("fig", file, "1")}}. 
+%
+%\begin{figure}
+%<<CAO-dens, echo = FALSE>>=
+%idx <- sample(1:nrow(ldata), 5)
+%q <- mkgrid(m_mlt, n = 200)[[1]]
+%matplot(x = q, y = d <- predict(bm, newdata = ldata[idx,], type = "survivor", q = q), type =
+%        "l", col = rgb(.1, .1, .1, .6), lty = 1, xlab = "Time (in days)", ylab = "Probability")
+%@
+%\caption{\Sexpr{ds[file]}. Conditional response distribution. \label{\Sexpr{paste0("fig", file, "1")}}}
+%\end{figure}
 
 
 \subsection{Childhood Malnutrition}
@@ -911,57 +911,62 @@ plot(as.mlt(m_mlt), newdata = data.frame(1), type = "density", K = 200,
 \end{figure}
 
 
-Model evaluation (Figure~\ref{\Sexpr{paste0("fig", file, "oob")}}) indicated that 
+Model evaluation 
+%% (Figure~\ref{\Sexpr{paste0("fig", file, "oob")}}) 
+indicated that 
 a tree-based model for $\parm(\rx)$ had the best performance; this
 model was fitted using
-<<india-model, cache = TRUE>>=
+<<india-model, cache = TRUE, eval = FALSE>>=
 fm_tree
 bm <- ctmboost(m_mlt, formula = fm_tree, data = ldata, 
                method = quote(mboost::blackboost))[515]
 @
-The in-sample log-likelihood is shown in Figure~\ref{\Sexpr{paste0("fig", file, "ib")}}
-and a QQ-plot based on the probability-integral transform in Figure~\ref{\Sexpr{paste0("fig", file, "qq")}}.
 
-\begin{figure}
-<<india-risk, echo = FALSE, cache = TRUE>>=
-<<insampleriskplot>>
-@
-\caption{\Sexpr{ds[file]}. In-sample log-likelihood maximisation. \label{\Sexpr{paste0("fig", file, "ib")}}}
-\end{figure}
-
-\begin{figure}[t]
-<<india-pit, echo = FALSE, fig.width = 5, fig.height = 5, cache = TRUE>>=
-pitplot(bm, ldata, main = ds[file])
-@
-\caption{\Sexpr{ds[file]}. Probability-integral transform QQ-plot. \label{\Sexpr{paste0("fig", file, "qq")}}}
-\end{figure}
-
-
-The model consists of trees with two-way interactions, most splits occured
-in age and breastfeeding, birthorder, and religion:
-<<india-prop, echo = FALSE>>=
-x <- tabulate(do.call("c", sapply(get("ens", environment(bm$predict)), 
-    function(x) nodeapply(x$model, ids = nodeids(x$model, terminal = FALSE), FUN = function(x) split_node(x)$varid -
-1))), nbins = length(all.vars(fm_tree)) - 1)
-names(x) <- all.vars(fm_tree)[-1]
-x
-@
-
-For five selected observations, the conditional distribution of stunting
-is shown in Figure~\ref{\Sexpr{paste0("fig", file, "1")}}. The blue dots
-indicate the actual observations. 
-
-\begin{figure}
-<<india-dens, echo = FALSE>>=
-idx <- order(ldata$stunting)[floor(c(.1, .25, .5, .75, .9) * nrow(ldata))]
-q <- mkgrid(m_mlt, n = 200)[[1]]
-matplot(x = q, y = d <- predict(bm, newdata = ldata[idx,], type = "density", q = q), type =
-        "l", col = rgb(.1, .1, .1, .6), lty = 1, xlab = "Stunting", ylab = "Density")
-j <- sapply(ldata[idx, "stunting"], function(y) which.min((q - y)^2))
-points(ldata[idx, "stunting"], sapply(1:5, function(i) d[j[i], i]), pch = 19, col = col[1])
-@
-\caption{\Sexpr{ds[file]}. Conditional response distribution. \label{\Sexpr{paste0("fig", file, "1")}}}
-\end{figure}
+%%% this takes too long in a package vignette
+%The in-sample log-likelihood is shown in Figure~\ref{\Sexpr{paste0("fig", file, "ib")}}
+%and a QQ-plot based on the probability-integral transform in Figure~\ref{\Sexpr{paste0("fig", file, "qq")}}.
+%
+%\begin{figure}
+%<<india-risk, echo = FALSE, cache = TRUE>>=
+%<<insampleriskplot>>
+%@
+%\caption{\Sexpr{ds[file]}. In-sample log-likelihood maximisation. \label{\Sexpr{paste0("fig", file, "ib")}}}
+%\end{figure}
+%
+%\begin{figure}[t]
+%<<india-pit, echo = FALSE, fig.width = 5, fig.height = 5, cache = TRUE>>=
+%pitplot(bm, ldata, main = ds[file])
+%@
+%\caption{\Sexpr{ds[file]}. Probability-integral transform QQ-plot. \label{\Sexpr{paste0("fig", file, "qq")}}}
+%\end{figure}
+%
+%
+%The model consists of trees with two-way interactions, most splits occured
+%in age and breastfeeding, birthorder, and religion:
+%<<india-prop, echo = FALSE>>=
+%x <- tabulate(do.call("c", sapply(get("ens", environment(bm$predict)), 
+%    function(x) nodeapply(x$model, ids = nodeids(x$model, terminal = FALSE), FUN = function(x) split_node(x)$varid -
+%1))), nbins = length(all.vars(fm_tree)) - 1)
+%names(x) <- all.vars(fm_tree)[-1]
+%x
+%@
+%
+%For five selected observations, the conditional distribution of stunting
+%is shown in Figure~\ref{\Sexpr{paste0("fig", file, "1")}}. The blue dots
+%indicate the actual observations. 
+%
+%\begin{figure}
+%<<india-dens, echo = FALSE>>=
+%idx <- order(ldata$stunting)[floor(c(.1, .25, .5, .75, .9) * nrow(ldata))]
+%q <- mkgrid(m_mlt, n = 200)[[1]]
+%matplot(x = q, y = d <- predict(bm, newdata = ldata[idx,], type = "density", q = q), type =
+%        "l", col = rgb(.1, .1, .1, .6), lty = 1, xlab = "Stunting", ylab = "Density")
+%j <- sapply(ldata[idx, "stunting"], function(y) which.min((q - y)^2))
+%points(ldata[idx, "stunting"], sapply(1:5, function(i) d[j[i], i]), pch = 19, col = col[1])
+%@
+%\caption{\Sexpr{ds[file]}. Conditional response distribution. \label{\Sexpr{paste0("fig", file, "1")}}}
+%\end{figure}
+%
 
 \subsection{Head Circumference}
 
@@ -1261,9 +1266,11 @@ plot(as.mlt(m_mlt), newdata = data.frame(1), type = "survivor", K = 200,
 \caption{\Sexpr{ds[file]}. Unconditional response distribution. \label{\Sexpr{paste0("fig", file, "0")}}}
 \end{figure}
 
-Model evaluation (Figure~\ref{\Sexpr{paste0("fig", file, "oob")}}) indicated that 
+Model evaluation 
+%%% (Figure~\ref{\Sexpr{paste0("fig", file, "oob")}}) 
+indicated that 
 tree-based model for $\eshiftparm(\rx)$ had the best performance; this model was fitted using
-<<ALSsurv-model, cache = TRUE>>=
+<<ALSsurv-model, cache = TRUE, eval = FALSE>>=
 fm_tree
 bm <- stmboost(m_mlt, formula = fm_tree, data = ldata,
                control = boost_control(nu = 0.01),
@@ -1271,30 +1278,32 @@ bm <- stmboost(m_mlt, formula = fm_tree, data = ldata,
 @
 This model is roughly equivalent to a boosted Cox-model using trees as
 baselearners:
-<<ALSsurv-mlt, cache = TRUE, eval = FALSE>>=
+<<ALSsurv-mlt, cache = TRUE, eval = FALSE, eval = FALSE>>=
 blackboost(fm_tree, data = ldata, family = CoxPH())
 @
-The in-sample log-likelihood is shown in Figure~\ref{\Sexpr{paste0("fig", file, "ib")}}.
 
-\begin{figure}
-<<ALSsurv-risk, echo = FALSE>>=
-<<insampleriskplot>>
-@
-\caption{\Sexpr{ds[file]}. In-sample log-likelihood maximisation. \label{\Sexpr{paste0("fig", file, "ib")}}}
-\end{figure}
-
-For five selected observations, the conditional survivor curves 
-are shown in Figure~\ref{\Sexpr{paste0("fig", file, "1")}}. 
-
-\begin{figure}
-<<ALSsurv-dens, echo = FALSE>>=
-idx <- sample(1:nrow(ldata), 5)
-q <- mkgrid(m_mlt, n = 200)[[1]]
-matplot(x = q, y = d <- predict(bm, newdata = ldata[idx,], type = "survivor", q = q), type =
-        "l", col = rgb(.1, .1, .1, .6), lty = 1, xlab = "ALS Overall Survival (in days)", ylab = "Probability")
-@
-\caption{\Sexpr{ds[file]}. Conditional response distribution. \label{\Sexpr{paste0("fig", file, "1")}}}
-\end{figure}
+%%% this takes too long for a package vignette
+%The in-sample log-likelihood is shown in Figure~\ref{\Sexpr{paste0("fig", file, "ib")}}.
+%
+%\begin{figure}
+%<<ALSsurv-risk, echo = FALSE>>=
+%<<insampleriskplot>>
+%@
+%\caption{\Sexpr{ds[file]}. In-sample log-likelihood maximisation. \label{\Sexpr{paste0("fig", file, "ib")}}}
+%\end{figure}
+%
+%For five selected observations, the conditional survivor curves 
+%are shown in Figure~\ref{\Sexpr{paste0("fig", file, "1")}}. 
+%
+%\begin{figure}
+%<<ALSsurv-dens, echo = FALSE>>=
+%idx <- sample(1:nrow(ldata), 5)
+%q <- mkgrid(m_mlt, n = 200)[[1]]
+%matplot(x = q, y = d <- predict(bm, newdata = ldata[idx,], type = "survivor", q = q), type =
+%        "l", col = rgb(.1, .1, .1, .6), lty = 1, xlab = "ALS Overall Survival (in days)", ylab = "Probability")
+%@
+%\caption{\Sexpr{ds[file]}. Conditional response distribution. \label{\Sexpr{paste0("fig", file, "1")}}}
+%\end{figure}
 
 \section{Artificial Data Generating Processes} \label{sec:dgp}
 
