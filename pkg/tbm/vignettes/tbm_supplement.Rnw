@@ -1,7 +1,7 @@
 
 %\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{tbm}
-%\VignetteDepends{tram, tbm, mboost, survival, lattice, latticeExtra, partykit, TH.data}
+%\VignetteDepends{tram, tbm, mboost, survival, lattice, latticeExtra, partykit,TH.data, colorspace, gamlss.data}
 
 \documentclass[article,nojss,shortnames]{jss}
 
@@ -108,8 +108,9 @@ version <- packageDescription("tbm")$Version
 
 \section{Introduction}
 
-Transformation boosting machines estimate conditional and shift
-transformation models by optimising the corresponding log-likelihood. In a
+Transformation boosting machines estimate conditional transformation models
+(CTMs) and shift
+transformation models (STMs) by optimising the corresponding log-likelihood. In a
 nutshell, transformation models are fully parameterised by appropriate 
 basis functions those parameters are (in total or partially) linked to
 predictor variables. The method is applicable to a broad range of problems
