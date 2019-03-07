@@ -5,85 +5,52 @@ library("partykit")
 
 set.seed(29)
 
-layout(matrix(1:6, ncol = 3, byrow = TRUE))
-
 data("bodyfat", package = "TH.data")
 
 mf <- as.mlt(Colr(DEXfat ~ 1, data = bodyfat, order = 5))
 logLik(mf)
 
-Mstop <- 500
+Mstop <- 50
 
 fd <- cv(rep(1, NROW(bodyfat)), type = "kfold", B = 2)
 
-bctrl <- boost_control(nu = .1, trace = TRUE)
+bctrl <- boost_control(nu = .1, trace = FALSE, mstop = Mstop)
 
 tctrl <- ctree_control(minsplit = 2, minbucket = 1, mincriterion = 0,
-                       maxdepth = 5, splittest = TRUE, testtype = "Teststatistic")
+                       maxdepth = 5, splittest = TRUE, 
+                       testtype = "Teststatistic")
 
-bf_t <- ctmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, method =
-quote(mboost::blackboost), control = bctrl, tree_control = tctrl)[Mstop]
-ms <- cvrisk(bf_t, folds = fd)
-plot(ms, main = "CTM-Baum")
-bf_t <- bf_t[mstop(ms)]
+bf_t <- ctmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, 
+                 method = quote(mboost::blackboost), control = bctrl, 
+                 tree_control = tctrl)
 logLik(bf_t)
 
-bf_ctm <- ctmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, control = bctrl)[Mstop]
-ms <- cvrisk(bf_ctm, folds = fd)
-plot(ms, main = "CTM-Add")
-bf_ctm <- bf_ctm[mstop(ms)]
+bf_ctm <- ctmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, 
+                   control = bctrl)
 logLik(bf_ctm)
 table(selected(bf_ctm))
 
-bf_dr <- ctmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, baselearner =
-"bols", control = bctrl)[Mstop]
-ms <- cvrisk(bf_dr, folds = fd)
-plot(ms, main = "Distr Reg")
-bf_dr <- bf_dr[mstop(ms)]
+bf_dr <- ctmboost(model = mf, formula = DEXfat ~ ., data = bodyfat,
+                  baselearner = "bols", control = bctrl)
 logLik(bf_dr)
 table(selected(bf_dr))
 
-bf_st <- stmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, method =
-quote(mboost::blackboost), tree_control = tctrl)[Mstop]
-ms <- cvrisk(bf_st, folds = fd)
-plot(ms, main = "Baum")
-bf_st <- bf_st[mstop(ms)]
+bf_st <- stmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, 
+                  method = quote(mboost::blackboost), tree_control = tctrl)
 logLik(bf_st)
 
-bf_shift <- stmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, method = quote(mboost::gamboost))[Mstop]
-ms <- cvrisk(bf_shift, folds = fd)
-plot(ms, main = "GAM")
-bf_shift <- bf_shift[mstop(ms)]
+bf_shift <- stmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, 
+                     method = quote(mboost::gamboost))
 logLik(bf_shift)
 table(selected(bf_shift))
 
-bf_lin <- stmboost(model = mf, formula = DEXfat ~ . - 1, data = bodyfat, method = quote(mboost:::glmboost.formula))[Mstop]
-ms <- cvrisk(bf_lin, folds = fd)
-plot(ms, main = "TRAM")
-bf_lin <- bf_lin[mstop(ms)]
+bf_lin <- stmboost(model = mf, formula = DEXfat ~ . - 1, data = bodyfat, 
+                   method = quote(mboost:::glmboost.formula))
 logLik(bf_lin)
 table(selected(bf_lin))
 
-
 mf2 <- Lm(DEXfat ~ 1, data = bodyfat)
 
-bf_lin2 <- ctmboost(model = mf2, formula = DEXfat ~ ., data = bodyfat)[Mstop]
-ms <- cvrisk(bf_lin2, folds = fd)
-plot(ms, main = "TRAM-exp")
-bf_lin2 <- bf_lin2[mstop(ms)]
+bf_lin2 <- ctmboost(model = mf2, formula = DEXfat ~ ., data = bodyfat)
 logLik(bf_lin2$model, parm = coef(bf_lin2))
 table(selected(bf_lin2))
-
-# X11()
-layout(matrix(1:6, ncol = 3, byrow = TRUE))
-
-col <- rgb(.1, .1, .1, .1)
-matplot(predict(bf_t, newdata = bodyfat, type = "distribution"), type = "l", main = "CTM-Baum", col = col, lty = 1)
-matplot(predict(bf_ctm, newdata = bodyfat, type = "distribution"), type = "l", main = "CTM-Add", col = col, lty = 1)
-matplot(predict(bf_dr, newdata = bodyfat, type = "distribution"), type = "l", main = "Distribution Regression", col = col, lty = 1)
-matplot(predict(bf_st, newdata = bodyfat, type = "distribution"), type = "l", main = "Baum", col = col, lty = 1)
-matplot(predict(bf_shift, newdata = bodyfat, type = "distribution"), type = "l", main = "GAM", col = col, lty = 1)
-matplot(predict(bf_lin, newdata = bodyfat, type = "distribution"), type = "l", main = "TRAM", col = col, lty = 1)
-
-
-
