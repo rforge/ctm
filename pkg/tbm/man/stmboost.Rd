@@ -40,6 +40,7 @@ stmboost(model, formula, data = list(), weights = NULL,
 \references{
 
   Torsten Hothorn (2019). Transformation Boosting Machines.
+  \emph{Statistics and Computing}, in press.
 
 }
 \examples{
