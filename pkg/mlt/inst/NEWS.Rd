@@ -2,6 +2,14 @@
 \name{NEWS}
 \title{NEWS file for the mlt package}
 
+\section{Changes in Version 1.0-5 (2019-04-04)}{
+  \itemize{
+    \item{Add a \code{bread} method.}
+    \item{Check response variable against observations in \code{data}.}
+    \item{Make sure integers larger zero are handled correctly in \code{R}.}
+  }
+}
+
 \section{Changes in Version 1.0-4 (2018-12-03)}{
   \itemize{
     \item{Arguments \code{K} and \code{cheat} where
