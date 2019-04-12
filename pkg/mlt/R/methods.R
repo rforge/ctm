@@ -236,3 +236,5 @@ print.response <- function(x, digits = getOption("digits"), ...) {
     print(ret, quote = FALSE, ...)
 }
 
+bread.mlt_fit <- function(x) vcov(x) * nrow(x$data) # sandwich estimator
+bread.mlt <- function(x) vcov(x) * nrow(x$data) # sandwich estimator
