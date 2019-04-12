@@ -31,7 +31,9 @@ numeric_var <- function(name, desc = NULL, unit = NULL,
     ret$support <- support
     discrete <- is.integer(support) || (length(support) > 2L)
     if (discrete) {
+        ### <FIXME> why???
         stopifnot(is.null(bounds))
+        ### </FIXME>
         class(ret) <- c("discrete_var", "numeric_var", class(ret))
         return(ret)
     }
