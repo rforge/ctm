@@ -2,6 +2,12 @@
 \name{NEWS}
 \title{NEWS file for the basefun package}
 
+\section{Changes in Version 1.0-5 (2019-04-12)}{
+  \itemize{
+    \item{Make sure \code{bounds[1]} is positive if \code{log_first = TRUE}.}
+  }
+}
+
 \section{Changes in Version 1.0-4 (2019-02-25)}{
   \itemize{
     \item{\code{model.matrix} has \code{constrasts} attribute where appropriate.}

@@ -40,7 +40,7 @@ Bernstein_basis <- function(var, order = 2,
     s <- support(var)
     b <- bounds(var)
     if (log_first) {
-        stopifnot(bounds(var)[[1]][1] >= 0)
+        stopifnot(bounds(var)[[1]][1] > .Machine$double.eps)
         s <- lapply(s, log)
         b <- lapply(b, log)
     }    
