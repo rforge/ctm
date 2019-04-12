@@ -2,6 +2,12 @@
 \name{NEWS}
 \title{NEWS file for the tram package}
 
+\section{Changes in Version 0.2-6 (2019-04-12)}{
+  \itemize{
+    \item{Add regression test for count data and \code{log_first = TRUE}.}
+  }
+}
+
 \section{Changes in Version 0.2-5 (2019-02-25)}{
   \itemize{
     \item{\code{tram} objects are now in line with \code{multcomp::glht},
