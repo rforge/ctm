@@ -1,0 +1,117 @@
+### PAGE SETTINGS
+
+
+# TITEL (of website)
+title: "transformation models"
+
+
+# SLOGAN (on homepage in <title> and other important places)
+slogan: ""
+
+
+# DESCRIPTION (max 150 characters, on homepage and in footer for quick description)
+description: "»This is the description."
+
+
+# CREDITS (in footer) #TODO: leave in?
+credits: '<p>Created with &hearts; by <a href="http://phlow.de/">Phlow</a> with <a href="http://jekyllrb.com/" target="_blank">Jekyll</a> based on <a href="http://phlow.github.io/feeling-responsive/">Feeling Responsive</a>.</p>'
+
+
+# Main author of the website
+# See > authors.yml
+author: TH
+
+
+# main address for absolute links (no slash at end). #TODO: adapt later
+url: "http://tram.r-forge.r-project.org"
+baseurl: '/tram'
+
+
+# URL pointing directly to the images directory making
+# things easier to link to images in posts and templates (slash at the end).
+# Example: <img src="{{ site.urlimg }}{{ post.image.title }}" />
+# Markdown-Example for posts ![Image Text]({{ site.urlimg }}image.jpg)
+# urlimg: 'https://phlow.github.io/feeling-responsive/images/'
+
+
+# Logo (size 600x80 pixels)
+logo: "logo.png"
+
+
+# Plugins
+plugins:
+    - jekyll-asciidoc
+    - jekyll-gist
+    - jekyll-paginate
+
+
+### PAGINATION (for blog posts => uncomment)
+# paginate: 5                      # Paginates all X entries# 
+# paginate_path: "blog/page:num"   # Pagination path › Important for blog page in /blog/ to work
+
+markdown           : kramdown #theme works best with this
+permalink          : /:categories/:title/
+highlight          : rouge
+excerpt_separator  : "<!--more-->"
+include            : ['.htaccess']
+# Exclude these files from your production _site
+exclude:
+    - .sass-cache
+    - Gemfile
+    - Gemfile.lock
+    - LICENSE
+    - README.md
+    - INSTALL.md
+    - vendor
+
+
+# LANGUAGE SETTING (used in /includes/header.html for html-settings)
+language: 'en'
+
+
+# Used › default.html front-matter and compress.html
+# Options › http://jch.penibelst.de
+compress_html:
+  clippings: all
+  comments: ["<!-- ", " -->"]
+  endings: all
+  profile: false
+  ignore:
+    envs: [development]
+
+
+# DEFAULT SETTINGS
+defaults:
+  -
+    scope:
+      path: '' 				# an empty string here means all files in the project
+      type: 'pages'
+    values:
+      show_meta: false 	# Hide metadata for all pages
+      # sidebar:    		# Possible values › left, right › by default there will be no sidebar
+      comments: false
+      author: "Torsten Hothorn"    # Default author for pages
+  -
+    scope:
+      path: ''
+      type: 'posts'
+    values:
+      show_meta: true   # Show metadata for all posts
+      # sidebar:        # Possible values › left, right › by default there will be no sidebar
+      comments: false
+      author: "Torsten Hothorn"     # Default author for posts
+
+
+### Navigation: _data/navigation.yml to adjust the left/right topbar navigation
+
+
+### SEO: Verify Website to Webmaster Tools
+google_author:             ""
+google_site_verification:  ""
+
+
+# SASS: More › http://jekyllrb.com/docs/assets/#sassscss
+sass:
+    sass_dir : _sass
+    style    : :compressed
+
