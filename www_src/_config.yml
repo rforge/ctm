@@ -2,7 +2,7 @@
 
 
 # TITEL (of website)
-title: "transformation models"
+title: "tram"
 
 
 # SLOGAN (on homepage in <title> and other important places)
@@ -14,7 +14,8 @@ description: "»This is the description."
 
 
 # CREDITS (in footer) #TODO: leave in?
-credits: '<p>Created with &hearts; by <a href="http://phlow.de/">Phlow</a> with <a href="http://jekyllrb.com/" target="_blank">Jekyll</a> based on <a href="http://phlow.github.io/feeling-responsive/">Feeling Responsive</a>.</p>'
+# credits: '<p>Created with &hearts; by <a href="http://phlow.de/">Phlow</a> with <a
+# href="http://jekyllrb.com/" target="_blank">Jekyll</a> based on <a href="http://phlow.github.io/feeling-responsive/">Feeling Responsive</a>.</p>'
 
 
 # Main author of the website
