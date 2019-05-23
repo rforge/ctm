@@ -22,4 +22,3 @@ or
 
 {% include gallery %}
 
-Enjoy :)
