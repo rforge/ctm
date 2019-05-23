@@ -5,10 +5,9 @@ title: "Software"
 subheadline: ""
 teaser: ""
 header:
-   image_fullwidth: ""
 permalink: "/software/"
 ---
-1. ....
+add text here
 
 
 
