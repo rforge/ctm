@@ -2,7 +2,7 @@
 
 
 # TITEL (of website)
-title: "tram"
+title: "Transformation Models"
 
 
 # SLOGAN (on homepage in <title> and other important places)
@@ -10,7 +10,7 @@ slogan: ""
 
 
 # DESCRIPTION (max 150 characters, on homepage and in footer for quick description)
-description: "»This is the description."
+description: "Research and Software for Transformation Models"
 
 
 # CREDITS (in footer) #TODO: leave in?
@@ -24,8 +24,8 @@ author: TH
 
 
 # main address for absolute links (no slash at end). #TODO: adapt later
-url: "http://tram.r-forge.r-project.org"
-baseurl: '/tram'
+url: "http://ctm.r-forge.r-project.org"
+baseurl: '/'
 
 
 # URL pointing directly to the images directory making
