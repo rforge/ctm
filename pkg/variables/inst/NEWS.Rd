@@ -2,11 +2,18 @@
 \name{NEWS}
 \title{NEWS file for the variables package}
 
+\section{Changes in Version 1.0-2 (2019-05-27)}{
+  \itemize{
+    \item{Allow for censoring in factors.}
+  }
+}
+
 \section{Changes in Version 1.0-1 (2018-08-17)}{
   \itemize{
     \item{Documentation update.}
   }
 }
+
 
 \section{Changes in Version 1.0-0 (2018-03-07)}{
   \itemize{
