@@ -23,7 +23,7 @@ description: "Research and Software for Transformation Models"
 author: TH
 
 
-# main address for absolute links (no slash at end). #TODO: adapt later
+# main address for absolute links (no slash at end).
 url: "http://ctm.r-forge.r-project.org"
 baseurl: '/'
 
