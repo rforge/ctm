@@ -1,0 +1,51 @@
+---
+layout: page
+show_meta: false
+title: "Software"
+subheadline: ""
+teaser: ""
+header:
+permalink: "/software/"
+---
+
+A Simple Transformation Model
+========================================================
+
+First, install and fire-up R on your computer. Within R, one needs to
+install the tram package by typing
+
+```{r eval=FALSE}
+install.packages("tram")
+```
+
+and hitting the ENTER key. Once the package is installed, you can
+load it using
+
+```{r results: hide}
+library("tram")
+```
+
+Now all tram functions are ready to be used, for example the Colr()
+function for fitting a series of potentially stratified logistic regression
+models to a continuous outcome variable:
+
+```{r}
+data("BostonHousing2", package = "mlbench")
+library("survival")
+BostonHousing2$y <- with(BostonHousing2, Surv(cmedv, cmedv < 50))
+Colr_BH_1 <- Colr(y | 0 + chas ~ crim + zn + indus + nox + 
+                  rm + age + dis + rad + tax + ptratio + b + lstat, 
+                  data = BostonHousing2)
+summary(Colr_BH_1)
+```
+The model can be used to extract the corresponding 
+conditional distribution functions
+
+```{r fig.width=9, fig.height=6}
+nd <- BostonHousing2[c(1, 1),]
+nd$chas <- sort(unique(BostonHousing2$chas))
+library("colorspace")
+col <- diverge_hcl(2, h = c(246, 40), c = 96, l = c(65, 90))
+plot(as.mlt(Colr_BH_1), newdata = nd, type = "distribution", col = col)
+legend("bottomright", legend = levels(nd$chas), col = col, lty = 1, bty = "n")
+```

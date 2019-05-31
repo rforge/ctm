@@ -1,0 +1,33 @@
+---
+layout: page
+show_meta: false
+title: "Research"
+subheadline: ""
+teaser: ""
+header: 
+permalink: "/research/"
+---
+
+Scholary papers describing the methodology
+========================================================
+
+```{r setup, include = FALSE, cache = FALSE}
+library("RefManageR")
+bib <- ReadBib("TH.bib", check = FALSE)
+BibOptions(check.entries = FALSE, style = "html", cite.style = "authoryear",
+           bib.style = "numeric")
+```
+Conditional transformation models 
+
+`r Citep(bib, "Hothorn_Kneib_Buehlmann_2014")`.
+`r Citep(bib, "Hothorn_Moest_Buehlmann_2017")`.
+
+`r AutoCite(bib, "Hothorn_2018_JSS", before = "package mlt, ")`,
+
+
+**References**
+
+```{r results = "asis", echo = FALSE}
+PrintBibliography(bib, .opts = list(check.entries = FALSE, sorting = "ynt"))
+```
+
