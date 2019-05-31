@@ -14,8 +14,8 @@ Scholary papers describing the methodology
 ```{r setup, include = FALSE, cache = FALSE}
 library("RefManageR")
 bib <- ReadBib("TH.bib", check = FALSE)
-BibOptions(check.entries = FALSE, style = "html", cite.style = "authoryear",
-           bib.style = "numeric")
+BibOptions(check.entries = FALSE, style = "html",
+           cite.style = "authoryear", bib.style = "numeric")
 ```
 Conditional transformation models 
 
