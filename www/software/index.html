@@ -197,7 +197,7 @@
 <div id="masthead-no-image-header">
 	<div class="row">
 		<div class="small-12 columns">
-			<a id="logo" href="http://ctm.r-forge.r-project.org/" title="Transformation Models – ">
+			<a id="logo" href="/" title="Transformation Models – ">
 				<img src="http://ctm.r-forge.r-project.org//assets/img/logo.png" alt="Transformation Models – ">
 			</a>
 		</div><!-- /.small-12.columns -->
@@ -231,8 +231,82 @@
 			
 
 			<div itemprop="articleSection">
-			<p>add text here</p>
+			<h1 id="a-simple-transformation-model">A Simple Transformation Model</h1>
 
+<p>First, install and fire-up R on your computer. Within R, one needs to
+install the tram package by typing</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">install.packages</span><span class="p">(</span><span class="s2">"tram"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>and hitting the ENTER key. Once the package is installed, you can
+load it using</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">library</span><span class="p">(</span><span class="s2">"tram"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>## Loading required package: mlt
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>## Loading required package: basefun
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>## Loading required package: variables
+</code></pre></div></div>
+
+<p>Now all tram functions are ready to be used, for example the Colr()
+function for fitting a series of potentially stratified logistic regression
+models to a continuous outcome variable:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">data</span><span class="p">(</span><span class="s2">"BostonHousing2"</span><span class="p">,</span><span class="w"> </span><span class="n">package</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"mlbench"</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="s2">"survival"</span><span class="p">)</span><span class="w">
+</span><span class="n">BostonHousing2</span><span class="o">$</span><span class="n">y</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">with</span><span class="p">(</span><span class="n">BostonHousing2</span><span class="p">,</span><span class="w"> </span><span class="n">Surv</span><span class="p">(</span><span class="n">cmedv</span><span class="p">,</span><span class="w"> </span><span class="n">cmedv</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="m">50</span><span class="p">))</span><span class="w">
+</span><span class="n">Colr_BH_1</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">Colr</span><span class="p">(</span><span class="n">y</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">chas</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">crim</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">zn</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">indus</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">nox</span><span class="w"> </span><span class="o">+</span><span class="w"> 
+                  </span><span class="n">rm</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dis</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">rad</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">tax</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">ptratio</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">lstat</span><span class="p">,</span><span class="w"> 
+                  </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BostonHousing2</span><span class="p">)</span><span class="w">
+</span><span class="n">summary</span><span class="p">(</span><span class="n">Colr_BH_1</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>## 
+##   Continuous Outcome Logistic Regression 
+## 
+## Call:
+## Colr(formula = y | 0 + chas ~ crim + zn + indus + nox + rm + 
+##     age + dis + rad + tax + ptratio + b + lstat, data = BostonHousing2)
+## 
+## Coefficients:
+##          Estimate Std. Error z value Pr(&gt;|z|)    
+## crim     0.081680   0.013780   5.928 3.08e-09 ***
+## zn      -0.010332   0.004901  -2.108   0.0350 *  
+## indus   -0.026959   0.021440  -1.257   0.2086    
+## nox      6.993561   1.486431   4.705 2.54e-06 ***
+## rm      -1.564619   0.221462  -7.065 1.61e-12 ***
+## age      0.010267   0.005138   1.998   0.0457 *  
+## dis      0.506373   0.078111   6.483 9.01e-11 ***
+## rad     -0.124218   0.024848  -4.999 5.76e-07 ***
+## tax      0.006643   0.001335   4.978 6.43e-07 ***
+## ptratio  0.401472   0.048357   8.302  &lt; 2e-16 ***
+## b       -0.006171   0.001106  -5.580 2.41e-08 ***
+## lstat    0.279998   0.026532  10.553  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Log-Likelihood:
+##  -1292.479 (df = 26)
+## Likelihood-ratio Test: Chisq = 880.7501 on 12 degrees of freedom; p = &lt; 2.2e-16
+</code></pre></div></div>
+<p>The model can be used to extract the corresponding 
+conditional distribution functions</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">nd</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">BostonHousing2</span><span class="p">[</span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="m">1</span><span class="p">),]</span><span class="w">
+</span><span class="n">nd</span><span class="o">$</span><span class="n">chas</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">sort</span><span class="p">(</span><span class="n">unique</span><span class="p">(</span><span class="n">BostonHousing2</span><span class="o">$</span><span class="n">chas</span><span class="p">))</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="s2">"colorspace"</span><span class="p">)</span><span class="w">
+</span><span class="n">col</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">diverge_hcl</span><span class="p">(</span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="n">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="m">246</span><span class="p">,</span><span class="w"> </span><span class="m">40</span><span class="p">),</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">96</span><span class="p">,</span><span class="w"> </span><span class="n">l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="m">65</span><span class="p">,</span><span class="w"> </span><span class="m">90</span><span class="p">))</span><span class="w">
+</span><span class="n">plot</span><span class="p">(</span><span class="n">as.mlt</span><span class="p">(</span><span class="n">Colr_BH_1</span><span class="p">),</span><span class="w"> </span><span class="n">newdata</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nd</span><span class="p">,</span><span class="w"> </span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"distribution"</span><span class="p">,</span><span class="w"> </span><span class="n">col</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">col</span><span class="p">)</span><span class="w">
+</span><span class="n">legend</span><span class="p">(</span><span class="s2">"bottomright"</span><span class="p">,</span><span class="w"> </span><span class="n">legend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">levels</span><span class="p">(</span><span class="n">nd</span><span class="o">$</span><span class="n">chas</span><span class="p">),</span><span class="w"> </span><span class="n">col</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">col</span><span class="p">,</span><span class="w"> </span><span class="n">lty</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">bty</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"n"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p><img src="figure/unnamed-chunk-3-1.png" alt="plot of chunk unnamed-chunk-3" /></p>
 
 			</div>
 

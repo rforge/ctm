@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<!-- Pages: 14 links with priority=0.3, changefreq=monthly -->
+<!-- Pages: 16 links with priority=0.3, changefreq=monthly -->
 
 	
 	<url>
 	<loc>http://ctm.r-forge.r-project.org//404.html</loc>
 	
-		<lastmod>2019-05-31T15:07:54+02:00</lastmod>
+		<lastmod>2019-05-31T15:54:54+02:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -24,7 +24,7 @@
 	<url>
 	<loc>http://ctm.r-forge.r-project.org//atom.xml</loc>
 	
-		<lastmod>2019-05-31T15:07:54+02:00</lastmod>
+		<lastmod>2019-05-31T15:54:54+02:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -39,7 +39,7 @@
 	<url>
 	<loc>http://ctm.r-forge.r-project.org//feed.xml</loc>
 	
-		<lastmod>2019-05-31T15:07:54+02:00</lastmod>
+		<lastmod>2019-05-31T15:54:54+02:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -54,7 +54,7 @@
 	<url>
 	<loc>http://ctm.r-forge.r-project.org//humans.txt</loc>
 	
-		<lastmod>2019-05-31T15:07:54+02:00</lastmod>
+		<lastmod>2019-05-31T15:54:54+02:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -69,7 +69,7 @@
 	<url>
 	<loc>http://ctm.r-forge.r-project.org//</loc>
 	
-		<lastmod>2019-05-31T15:07:54+02:00</lastmod>
+		<lastmod>2019-05-31T15:54:54+02:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -84,7 +84,7 @@
 	<url>
 	<loc>http://ctm.r-forge.r-project.org//news/</loc>
 	
-		<lastmod>2019-05-31T15:07:54+02:00</lastmod>
+		<lastmod>2019-05-31T15:54:54+02:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -99,7 +99,7 @@
 	<url>
 	<loc>http://ctm.r-forge.r-project.org//people/</loc>
 	
-		<lastmod>2019-05-31T15:07:54+02:00</lastmod>
+		<lastmod>2019-05-31T15:54:54+02:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -114,7 +114,22 @@
 	<url>
 	<loc>http://ctm.r-forge.r-project.org//research/</loc>
 	
-		<lastmod>2019-05-31T15:07:54+02:00</lastmod>
+		<lastmod>2019-05-31T15:54:54+02:00</lastmod>
+	
+	
+		<changefreq>monthly</changefreq>
+	
+	
+		<priority>0.3</priority>
+	
+	</url>
+	
+
+	
+	<url>
+	<loc>http://ctm.r-forge.r-project.org//research/</loc>
+	
+		<lastmod>2019-05-31T15:54:54+02:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -129,7 +144,7 @@
 	<url>
 	<loc>http://ctm.r-forge.r-project.org//robots.txt</loc>
 	
-		<lastmod>2019-05-31T15:07:54+02:00</lastmod>
+		<lastmod>2019-05-31T15:54:54+02:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -146,7 +161,7 @@
 	<url>
 	<loc>http://ctm.r-forge.r-project.org//sitemap.xml</loc>
 	
-		<lastmod>2019-05-31T15:07:54+02:00</lastmod>
+		<lastmod>2019-05-31T15:54:54+02:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
@@ -161,7 +176,22 @@
 	<url>
 	<loc>http://ctm.r-forge.r-project.org//software/</loc>
 	
-		<lastmod>2019-05-31T15:07:54+02:00</lastmod>
+		<lastmod>2019-05-31T15:54:54+02:00</lastmod>
+	
+	
+		<changefreq>monthly</changefreq>
+	
+	
+		<priority>0.3</priority>
+	
+	</url>
+	
+
+	
+	<url>
+	<loc>http://ctm.r-forge.r-project.org//software/</loc>
+	
+		<lastmod>2019-05-31T15:54:54+02:00</lastmod>
 	
 	
 		<changefreq>monthly</changefreq>
