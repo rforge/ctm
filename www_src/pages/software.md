@@ -9,6 +9,3 @@ permalink: "/software/"
 ---
 add text here
 
-
-
- [1]: {{ site.url }}{{ site.baseurl }}/documentation/

@@ -9,5 +9,3 @@ permalink: "/research/"
 ---
 1. ...
 
-
- [1]: {{ site.url }}{{ site.baseurl }}/documentation/
