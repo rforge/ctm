@@ -16,6 +16,8 @@ permalink: /index.html
 homepage: true
 ---
 
-add text here!
+{% comment %}
+*add text here -> will show above widgets
+{% endcomment %}
 
 
