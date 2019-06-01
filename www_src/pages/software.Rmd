@@ -11,6 +11,11 @@ permalink: "/software/"
 A Simple Transformation Model
 ========================================================
 
+```{r include=FALSE}
+knitr::opts_chunk$set(fig.path='../assets/img/')
+```
+
+
 First, install and fire-up R on your computer. Within R, one needs to
 install the tram package by typing
 
