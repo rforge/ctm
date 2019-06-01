@@ -6,9 +6,9 @@ teaser: ""
 permalink: "/people/"
 header:
 ---
-
+<div class="row">
 {% for author in site.data.authors %}
-  <div class="images">
+  <div class="small-4 columns">
     {% if author.url %}
       <a target="_blank" href="{{ author.url }}">
     {% endif %}
@@ -23,3 +23,4 @@ header:
     <div class="desc">{{ author.name }}</div>
   </div>
 {% endfor %}
+</div>
