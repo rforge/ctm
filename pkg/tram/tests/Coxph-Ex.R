@@ -32,3 +32,23 @@ round(max(abs(diag(vcov(cmod_2)) - diag(vcov(Cmod_2)))), 4)
 cmod <- Coxph(Surv(time, cens) ~ horTh, data = GBSG2)
 (tmod <- trafotree(cmod, formula = Surv(time, cens) ~ horTh | ., data = GBSG2))
 logLik(tmod)
+
+### check residuals
+library("sandwich")
+GBSG2$y <- with(GBSG2, Surv(time, cens))
+ORDER <- 12
+### indirect computation: score wrt to int
+GBSG2$int <- 1
+m <- Coxph(y ~ int, data = GBSG2, fixed = c("int" = 0), 
+           LRtest = FALSE, order = ORDER)
+m1 <- mlt(m$model, data = GBSG2, dofit = FALSE)
+coef(m1) <- coef(as.mlt(m))
+LR1 <- estfun(m1)[, length(coef(m1))]
+
+### direct computation
+m2 <- Coxph(y ~ 1, data = GBSG2, 
+            LRtest = FALSE, order = ORDER)
+LR2 <- resid(as.mlt(m2))
+
+stopifnot(all.equal(LR1, LR2))
+

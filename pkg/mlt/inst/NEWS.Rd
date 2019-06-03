@@ -2,11 +2,12 @@
 \name{NEWS}
 \title{NEWS file for the mlt package}
 
-\section{Changes in Version 1.0-5 (2019-04-04)}{
+\section{Changes in Version 1.0-5 (2019-06-03)}{
   \itemize{
     \item{Add a \code{bread} method.}
     \item{Check response variable against observations in \code{data}.}
     \item{Make sure integers larger zero are handled correctly in \code{R}.}
+    \item{Implement \code{resid} method, ie the score wrt a constant.}
   }
 }
 
