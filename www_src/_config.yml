@@ -23,9 +23,9 @@ description: "Research and Software for Transformation Models"
 author: TH
 
 
-# main address for absolute links (no slash at end).
+# main address for absolute links
 url: "http://ctm.r-forge.r-project.org"
-baseurl: '/'
+baseurl: "/"
 
 
 # URL pointing directly to the images directory making

@@ -2,24 +2,19 @@
 layout: default
 format: frontpage
 ---
-<div id="header-home">
-    <div class="row">
-        <div class="small-12 columns">
-        </div><!-- /.medium-4.columns -->
-    </div><!-- /.row -->
-</div><!-- /#header-home -->
 
-{% unless site.posts == empty %}
 <div class="row t30 b20 homepage">
     <div class="medium-6 columns">
         {{content}}
     </div><!-- /.medium-5.columns -->
+    {% unless site.posts == empty %}
     <div class="medium-6 columns">
         <p><strong> News </strong></p>
         {% include list-posts entries='3' %}
     </div><!-- /.medium-7.columns -->
+    {% endunless %}
 </div><!-- /.row -->
-{% endunless %}
+
 
 <div class="row t60">
 	{% if page.widget1.image or page.widget1.video or page.widget1.title %}

@@ -1,13 +1,7 @@
 ---
 layout: page
-show_meta: false
-title: "Research"
-subheadline: ""
-teaser: ""
-header: 
 permalink: "/research/"
 ---
-
 Scholary papers describing the methodology
 ========================================================
 
