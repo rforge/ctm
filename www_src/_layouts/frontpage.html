@@ -9,20 +9,18 @@ format: frontpage
     </div><!-- /.row -->
 </div><!-- /#header-home -->
 
-<div class="row t30">
-    <div class="medium-12 columns">
-        <article>
-            {{ content }}
-        </article>
-    </div><!-- /.medium-12.columns -->
+{% unless site.posts == empty %}
+<div class="row t30 b20 homepage">
+    <div class="medium-6 columns">
+        {{content}}
+    </div><!-- /.medium-5.columns -->
+    <div class="medium-6 columns">
+        <p><strong> News </strong></p>
+        {% include list-posts entries='3' %}
+    </div><!-- /.medium-7.columns -->
 </div><!-- /.row -->
+{% endunless %}
 
-
-{% comment %}
-*
-* First check, if widget is empty or not by checking if there is a title
-*
-{% endcomment %}
 <div class="row t60">
 	{% if page.widget1.image or page.widget1.video or page.widget1.title %}
 		{% include _frontpage-widget.html widget=page.widget1 %}

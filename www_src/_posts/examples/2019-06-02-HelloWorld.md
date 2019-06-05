@@ -1,6 +1,6 @@
 ---
 layout: page
-title: "Welcome to transformation models"
+title: "Hello World!"
 teaser: "Hello World!"
 author: ""
 categories:
