@@ -8,5 +8,32 @@
 		<link>http://ctm.r-forge.r-project.org//</link>
 		<atom:link href="http://ctm.r-forge.r-project.org//feed.xml" rel="self" type="application/rss+xml" />
 		
+			<item>
+				<title>Transformation Models</title>
+				<link>http://ctm.r-forge.r-project.org//news/News/</link>
+				<pubDate>Tue, 04 Jun 2019 00:00:00 +0200</pubDate>
+				<description>&lt;p&gt;….&lt;/p&gt;
+</description>
+				<guid isPermaLink="true">http://ctm.r-forge.r-project.org//news/News/</guid>
+			</item>
+		
+			<item>
+				<title>Welcome</title>
+				<link>http://ctm.r-forge.r-project.org//news/Welcome/</link>
+				<pubDate>Mon, 03 Jun 2019 00:00:00 +0200</pubDate>
+				<description>&lt;p&gt;Welcome to transformation models&lt;/p&gt;
+</description>
+				<guid isPermaLink="true">http://ctm.r-forge.r-project.org//news/Welcome/</guid>
+			</item>
+		
+			<item>
+				<title>Hello World!</title>
+				<link>http://ctm.r-forge.r-project.org//news/HelloWorld/</link>
+				<pubDate>Sun, 02 Jun 2019 00:00:00 +0200</pubDate>
+				<description>&lt;p&gt;&lt;em&gt;Hello world!&lt;/em&gt;&lt;/p&gt;
+</description>
+				<guid isPermaLink="true">http://ctm.r-forge.r-project.org//news/HelloWorld/</guid>
+			</item>
+		
 	</channel>
 </rss>

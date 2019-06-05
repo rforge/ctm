@@ -4,7 +4,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 	<id>http://ctm.r-forge.r-project.org//</id>
 	<title>Transformation Models</title>
-	<updated>2019-06-01T12:32:52+02:00</updated>
+	<updated>2019-06-05T11:18:40+02:00</updated>
 
 	<subtitle>Research and Software for Transformation Models</subtitle>
 
@@ -24,5 +24,89 @@
 
 	<generator uri="http://jekyllrb.com" version="3.8.5">Jekyll</generator>
 
+	
+		<entry>
+			<id>http://ctm.r-forge.r-project.org//news/News/</id>
+			<title>Transformation Models</title>
+			<link href="http://ctm.r-forge.r-project.org//news/News/" rel="alternate" type="text/html" title="Transformation Models" />
+			<updated>2019-06-04T00:00:00+02:00</updated>
+
+			
+				
+				<author>
+					
+						<name></name>
+					
+					
+					
+				</author>
+			
+			<summary>tram with us!</summary>
+			<content type="html" xml:base="http://ctm.r-forge.r-project.org//news/News/">&lt;p&gt;….&lt;/p&gt;
+</content>
+
+			
+				<category term="News" />
+			
+			
+
+			<published>2019-06-04T00:00:00+02:00</published>
+		</entry>
+	
+		<entry>
+			<id>http://ctm.r-forge.r-project.org//news/Welcome/</id>
+			<title>Welcome</title>
+			<link href="http://ctm.r-forge.r-project.org//news/Welcome/" rel="alternate" type="text/html" title="Welcome" />
+			<updated>2019-06-03T00:00:00+02:00</updated>
+
+			
+				
+				<author>
+					
+						<name></name>
+					
+					
+					
+				</author>
+			
+			<summary>Welcome</summary>
+			<content type="html" xml:base="http://ctm.r-forge.r-project.org//news/Welcome/">&lt;p&gt;Welcome to transformation models&lt;/p&gt;
+</content>
+
+			
+				<category term="News" />
+			
+			
+
+			<published>2019-06-03T00:00:00+02:00</published>
+		</entry>
+	
+		<entry>
+			<id>http://ctm.r-forge.r-project.org//news/HelloWorld/</id>
+			<title>Hello World!</title>
+			<link href="http://ctm.r-forge.r-project.org//news/HelloWorld/" rel="alternate" type="text/html" title="Hello World!" />
+			<updated>2019-06-02T00:00:00+02:00</updated>
+
+			
+				
+				<author>
+					
+						<name></name>
+					
+					
+					
+				</author>
+			
+			<summary>Hello World!</summary>
+			<content type="html" xml:base="http://ctm.r-forge.r-project.org//news/HelloWorld/">&lt;p&gt;&lt;em&gt;Hello world!&lt;/em&gt;&lt;/p&gt;
+</content>
+
+			
+				<category term="News" />
+			
+			
+
+			<published>2019-06-02T00:00:00+02:00</published>
+		</entry>
 	
 </feed>
