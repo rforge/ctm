@@ -204,8 +204,13 @@ model.matrix.Bernstein_basis <- function(object, data,
                     }
                 dlog <- eval(expr)
             }
-            if (deriv >= maxderiv)
+            if (deriv >= maxderiv) {
+                ### <FIXME> is this correct?
+                if (attr(object, "log_first"))
+                    return((object(data = dsmall, deriv = deriv) / dlog[1]) /  x[small])
+                ### </FIXME>
                 return(object(data = dsmall, deriv = deriv))
+            }
             return(object(data = dsmall, deriv = deriv) +
                    dfun(deriv + 1L) / dlog[1] * xdiff)
         }
