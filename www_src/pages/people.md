@@ -1,14 +1,12 @@
 ---
 layout: page
 title: "People"
-subheadline: ""
-teaser: ""
 permalink: "people/"
-header:
 ---
+
 <div class="row">
 {% for author in site.data.authors %}
-  <div class="small-4 columns">
+  <div class="small-3 columns">
     {% if author.url %}
       <a target="_blank" href="{{ author.url }}">
     {% endif %}
