@@ -2,7 +2,7 @@
 layout: page
 permalink: "research/"
 ---
-Scholary papers describing the methodology
+Scholarly papers describing the methodology
 ========================================================
 
 ```{r setup, include = FALSE, cache = FALSE}
@@ -12,7 +12,7 @@ BibOptions(check.entries = FALSE, style = "html",
            cite.style = "authoryear", bib.style = "numeric")
 ```
 Transformation models have been around for more than 50 years, starting 
-with the seminal paper introducing ``Box-Cox'' power-transformations
+with the seminal paper introducing "Box-Cox" power-transformations
 published by George Box and Sir David Cox in 1964. 
 Later developments focused on a semiparametric understanding
 of these models, most importantly the partial likelihood approach to
@@ -20,13 +20,13 @@ parameter estimation in the Cox proportional hazards model.
 
 During the last decade, fully parametric versions of transformation models
 have been studied. Model inference is much simpler once all components of
-the models have been parameterised appropriately. Research on
+the models have been parametrised appropriately. Research on
 transformation models implemented in the 
 [mlt add-on package](https://CRAN.R-project.org/package=mlt) started with a
 gradient-boosting algorithm for conditional transformation models
 `r Citep(bib, "Hothorn_Kneib_Buehlmann_2014")`. This algorithm optimises the
 Brier score for model estimation. It turned out that maximum likelihood
-estimation is computationally and conceptionlly much simpler and also helps
+estimation is computationally and conceptionally much simpler and also helps
 to estimate models for discrete or censored data
 `r Citep(bib, "Hothorn_Moest_Buehlmann_2017")`. So-called most likely
 transformations are implemented in the
