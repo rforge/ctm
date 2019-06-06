@@ -197,7 +197,7 @@
 <div id="masthead-no-image-header">
 	<div class="row">
 		<div class="small-12 columns">
-			<a id="logo" href="http://ctm.r-forge.r-project.org/" title="Transformation Models – ">
+			<a id="logo" href="/" title="Transformation Models – ">
 				<img src="http://ctm.r-forge.r-project.org//assets/img/logo.png" alt="Transformation Models – ">
 			</a>
 		</div><!-- /.small-12.columns -->
@@ -235,8 +235,12 @@ install the tram package by typing</p>
 <div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">install.packages</span><span class="p">(</span><span class="s2">"tram"</span><span class="p">)</span><span class="w">
 </span></code></pre></div></div>
 
-<p>and hitting the ENTER key. Once the package is installed, you can
-load it using</p>
+<p>and hitting the ENTER key. The tram package implements simple formula-based
+interfaces to some important transformation models. The models themself are
+fitted using algorithms implemented in <a href="https://CRAN.R-project.org/package=mlt">mlt add-on
+package</a>.</p>
+
+<p>Once the package is installed, you can load it using</p>
 
 <div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">library</span><span class="p">(</span><span class="s2">"tram"</span><span class="p">)</span><span class="w">
 </span></code></pre></div></div>
@@ -252,14 +256,15 @@ load it using</p>
 
 <p>Now all tram functions are ready to be used, for example the Colr()
 function for fitting a series of potentially stratified logistic regression
-models to a continuous outcome variable:</p>
+models to a continuous outcome variable (let’s start with median 
+Boston Housing values):</p>
 
 <div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">data</span><span class="p">(</span><span class="s2">"BostonHousing2"</span><span class="p">,</span><span class="w"> </span><span class="n">package</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"mlbench"</span><span class="p">)</span><span class="w">
 </span><span class="n">library</span><span class="p">(</span><span class="s2">"survival"</span><span class="p">)</span><span class="w">
 </span><span class="n">BostonHousing2</span><span class="o">$</span><span class="n">y</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">with</span><span class="p">(</span><span class="n">BostonHousing2</span><span class="p">,</span><span class="w"> </span><span class="n">Surv</span><span class="p">(</span><span class="n">cmedv</span><span class="p">,</span><span class="w"> </span><span class="n">cmedv</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="m">50</span><span class="p">))</span><span class="w">
 </span><span class="n">Colr_BH_1</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">Colr</span><span class="p">(</span><span class="n">y</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">chas</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">crim</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">zn</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">indus</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">nox</span><span class="w"> </span><span class="o">+</span><span class="w"> 
                   </span><span class="n">rm</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dis</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">rad</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">tax</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">ptratio</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">lstat</span><span class="p">,</span><span class="w"> 
-                  </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BostonHousing2</span><span class="p">)</span><span class="w">
+                  </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BostonHousing2</span><span class="p">,</span><span class="w"> </span><span class="n">support</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="m">10</span><span class="p">,</span><span class="w"> </span><span class="m">50</span><span class="p">))</span><span class="w">
 </span><span class="n">summary</span><span class="p">(</span><span class="n">Colr_BH_1</span><span class="p">)</span><span class="w">
 </span></code></pre></div></div>
 
@@ -268,41 +273,57 @@ models to a continuous outcome variable:</p>
 ## 
 ## Call:
 ## Colr(formula = y | 0 + chas ~ crim + zn + indus + nox + rm + 
-##     age + dis + rad + tax + ptratio + b + lstat, data = BostonHousing2)
+##     age + dis + rad + tax + ptratio + b + lstat, data = BostonHousing2, 
+##     support = c(10, 50))
 ## 
 ## Coefficients:
 ##          Estimate Std. Error z value Pr(&gt;|z|)    
-## crim     0.081681   0.013780   5.928 3.07e-09 ***
-## zn      -0.010334   0.004901  -2.109   0.0350 *  
-## indus   -0.026959   0.021440  -1.257   0.2086    
-## nox      6.993759   1.486444   4.705 2.54e-06 ***
-## rm      -1.564653   0.221462  -7.065 1.61e-12 ***
-## age      0.010271   0.005138   1.999   0.0456 *  
-## dis      0.506364   0.078110   6.483 9.01e-11 ***
-## rad     -0.124231   0.024848  -5.000 5.74e-07 ***
-## tax      0.006643   0.001335   4.978 6.43e-07 ***
-## ptratio  0.401473   0.048357   8.302  &lt; 2e-16 ***
-## b       -0.006171   0.001106  -5.580 2.41e-08 ***
-## lstat    0.279999   0.026532  10.553  &lt; 2e-16 ***
+## crim     0.082644   0.013714   6.026 1.68e-09 ***
+## zn      -0.010276   0.004923  -2.088   0.0368 *  
+## indus   -0.025174   0.021447  -1.174   0.2405    
+## nox      7.050388   1.491123   4.728 2.26e-06 ***
+## rm      -1.537552   0.219014  -7.020 2.21e-12 ***
+## age      0.008455   0.005118   1.652   0.0986 .  
+## dis      0.496066   0.077776   6.378 1.79e-10 ***
+## rad     -0.120625   0.024922  -4.840 1.30e-06 ***
+## tax      0.006479   0.001334   4.859 1.18e-06 ***
+## ptratio  0.395394   0.048306   8.185 2.22e-16 ***
+## b       -0.006457   0.001112  -5.808 6.33e-09 ***
+## lstat    0.281313   0.026499  10.616  &lt; 2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Log-Likelihood:
-##  -1292.479 (df = 26)
-## Likelihood-ratio Test: Chisq = 880.7501 on 12 degrees of freedom; p = &lt; 2.2e-16
+##  -1297.487 (df = 26)
+## Likelihood-ratio Test: Chisq = 879.7671 on 12 degrees of freedom; p = &lt; 2.2e-16
 </code></pre></div></div>
+<p>Two separate transformation function are fitted (for houses near and off
+Charles river, variable chas). The remaining variables enter a linear
+predictor those coefficients can be interpreted as log-odds ratios. Note
+that median housing values larger than 50 are correctly treated as being 
+right-censored in the likelihood-</p>
+
 <p>The model can be used to extract the corresponding 
-conditional distribution functions</p>
+conditional distribution functions. Let’s put the first house into two
+locations, near and off Charles river. Then, we compute the two conditional
+distribution functions:</p>
 
 <div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">nd</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">BostonHousing2</span><span class="p">[</span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="m">1</span><span class="p">),]</span><span class="w">
 </span><span class="n">nd</span><span class="o">$</span><span class="n">chas</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">sort</span><span class="p">(</span><span class="n">unique</span><span class="p">(</span><span class="n">BostonHousing2</span><span class="o">$</span><span class="n">chas</span><span class="p">))</span><span class="w">
 </span><span class="n">library</span><span class="p">(</span><span class="s2">"colorspace"</span><span class="p">)</span><span class="w">
 </span><span class="n">col</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">diverge_hcl</span><span class="p">(</span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="n">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="m">246</span><span class="p">,</span><span class="w"> </span><span class="m">40</span><span class="p">),</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">96</span><span class="p">,</span><span class="w"> </span><span class="n">l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="m">65</span><span class="p">,</span><span class="w"> </span><span class="m">90</span><span class="p">))</span><span class="w">
 </span><span class="n">plot</span><span class="p">(</span><span class="n">as.mlt</span><span class="p">(</span><span class="n">Colr_BH_1</span><span class="p">),</span><span class="w"> </span><span class="n">newdata</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nd</span><span class="p">,</span><span class="w"> </span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"distribution"</span><span class="p">,</span><span class="w"> </span><span class="n">col</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">col</span><span class="p">)</span><span class="w">
-</span><span class="n">legend</span><span class="p">(</span><span class="s2">"bottomright"</span><span class="p">,</span><span class="w"> </span><span class="n">legend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">levels</span><span class="p">(</span><span class="n">nd</span><span class="o">$</span><span class="n">chas</span><span class="p">),</span><span class="w"> </span><span class="n">col</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">col</span><span class="p">,</span><span class="w"> </span><span class="n">lty</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">bty</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"n"</span><span class="p">)</span><span class="w">
+</span><span class="n">legend</span><span class="p">(</span><span class="s2">"bottomright"</span><span class="p">,</span><span class="w"> </span><span class="n">legend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s2">"Off"</span><span class="p">,</span><span class="w"> </span><span class="s2">"Near"</span><span class="p">),</span><span class="w"> </span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Charles river"</span><span class="p">,</span><span class="w">
+       </span><span class="n">col</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">col</span><span class="p">,</span><span class="w"> </span><span class="n">lty</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">bty</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"n"</span><span class="p">)</span><span class="w">
 </span></code></pre></div></div>
 
-<p><img src="../assets/img/unnamed-chunk-4-1.png" alt="plot of chunk unnamed-chunk-4" /></p>
+<p><img src="../assets/img/BHplot-1.png" alt="plot of chunk BHplot" />
+It appears that houses near the river are more expensive, and the
+variability is also larger compared to houses far away from the river.</p>
+
+<p>The most important feature in this model is that the shape of these
+distributions have been estimated from data although the models are fully
+parametric!</p>
 
 			</div>
 
