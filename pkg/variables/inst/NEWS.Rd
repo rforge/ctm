@@ -2,7 +2,7 @@
 \name{NEWS}
 \title{NEWS file for the variables package}
 
-\section{Changes in Version 1.0-2 (2019-05-27)}{
+\section{Changes in Version 1.0-2 (2019-06-05)}{
   \itemize{
     \item{Allow for censoring in factors.}
   }
