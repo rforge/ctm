@@ -4,7 +4,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 	<id>http://ctm.r-forge.r-project.org//</id>
 	<title>Transformation Models</title>
-	<updated>2019-06-06T14:44:40+02:00</updated>
+	<updated>2019-06-06T15:52:46+02:00</updated>
 
 	<subtitle>Research and Software for Transformation Models</subtitle>
 
@@ -22,7 +22,7 @@
 	<link href="http://ctm.r-forge.r-project.org//atom.xml" rel="self" type="application/rss+xml" />
 	<link href="http://ctm.r-forge.r-project.org//" rel="alternate" type="text/html" />
 
-	<generator uri="http://jekyllrb.com" version="3.1.6">Jekyll</generator>
+	<generator uri="http://jekyllrb.com" version="3.8.5">Jekyll</generator>
 
 	
 		<entry>
