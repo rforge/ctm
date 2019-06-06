@@ -64,7 +64,7 @@ X <- model.matrix(xb, data = data.frame(x = x))
 Xprime <- model.matrix(xb, data = data.frame(x = x), deriv = c("x" = 1))
 cf <- coef(lm(y ~ 0 + X))
 stopifnot(max(abs(y - X %*% cf)) < .Machine$double.eps^(1/2))
-stopifnot(max(abs(1 / x[-1] - Xprime[-1,] %*% cf)) < .Machine$double.eps^(1/9))
+stopifnot(max(abs(1 / x[-1] - Xprime[-1,] %*% cf)) < .Machine$double.eps^(1/2))
 
 ### log-linear function
 xvar <- numeric_var("x", bounds = c(0.01, Inf), support = c(.1, 9))
@@ -73,5 +73,48 @@ X <- model.matrix(xb, data = data.frame(x = x))
 Xprime <- model.matrix(xb, data = data.frame(x = x), deriv = c("x" = 1))
 cf <- coef(lm(y ~ 0 + X))
 stopifnot(max(abs(y - X %*% cf)) < .Machine$double.eps^(1/2))
-stopifnot(max(abs(1 / x[-1] - Xprime[-1,] %*% cf)) < .Machine$double.eps^(1/9))
+stopifnot(max(abs(1 / x[-1] - Xprime[-1,] %*% cf)) < .Machine$double.eps^(1/2))
+
+x <- 10:1000/ 1000 
+y <- 1 + 2 * log(x)
+lx <- log(x)
+xv <- numeric_var("lx", support = log(c(.3, .7)), bounds = log(c(0.01, .99)))
+b2 <- Bernstein_basis(xv, order = 6)
+X2 <- model.matrix(b2, data = data.frame(lx = lx), deriv = c(lx = 0))
+X2p <- model.matrix(b2, data = data.frame(lx = lx), deriv = c(lx = 1))
+X2pp <- model.matrix(b2, data = data.frame(lx = lx), deriv = c(lx = 2))
+m2 <- lm(y ~ 0 + X2)
+
+xv <- numeric_var("x", support = c(.3, .7), bounds = c(.01, .99))
+b3 <- Bernstein_basis(xv, order = 6, log_first = TRUE)
+X3 <- model.matrix(b3, data = data.frame(x = x), deriv = c(x = 0))
+X3p <- model.matrix(b3, data = data.frame(x = x), deriv = c(x = 1))
+X3pp <- model.matrix(b3, data = data.frame(x = x), deriv = c(x = 2))
+m3 <- lm(y ~ 0 + X3)
+
+stopifnot(max(abs(X2 %*% coef(m2) - X3 %*% coef(m3))) < .Machine$double.eps^(1/2))
+stopifnot(max(abs(X2p %*% coef(m2) / x - X3p %*% coef(m3))) <  .Machine$double.eps^(1/2))
+stopifnot((X2pp - X2p) %*% coef(m2) / (x^2) - X3pp %*% coef(m3) < .Machine$double.eps^(1/2))
+
+try(model.matrix(b3, data = data.frame(x = x), deriv = c(x = 3)))
+
+xv <- numeric_var("lx", support = log(c(.3, .7)), bounds = log(c(0.01, .99)))
+b2 <- Bernstein_basis(xv, order = 6, extrapolate = TRUE)
+X2 <- model.matrix(b2, data = data.frame(lx = lx), deriv = c(lx = 0))
+X2p <- model.matrix(b2, data = data.frame(lx = lx), deriv = c(lx = 1))
+X2pp <- model.matrix(b2, data = data.frame(lx = lx), deriv = c(lx = 2))
+m2 <- lm(y ~ 0 + X2)
+
+xv <- numeric_var("x", support = c(.3, .7), bounds = c(.01, .99))
+b3 <- Bernstein_basis(xv, order = 6, log_first = TRUE, extrapolate = TRUE)
+X3 <- model.matrix(b3, data = data.frame(x = x), deriv = c(x = 0))
+X3p <- model.matrix(b3, data = data.frame(x = x), deriv = c(x = 1))
+X3pp <- model.matrix(b3, data = data.frame(x = x), deriv = c(x = 2))
+m3 <- lm(y ~ 0 + X3)
+
+stopifnot(max(abs(X2 %*% coef(m2) - X3 %*% coef(m3))) < .Machine$double.eps^(1/2))
+stopifnot(max(abs(X2p %*% coef(m2) / x - X3p %*% coef(m3))) <  .Machine$double.eps^(1/2))
+stopifnot((X2pp - X2p) %*% coef(m2) / (x^2) - X3pp %*% coef(m3) < .Machine$double.eps^(1/2))
+
+try(model.matrix(b3, data = data.frame(x = x), deriv = c(x = 3)))
 

@@ -37,8 +37,8 @@ Bernstein_basis <- function(var, order = 2,
         ui <- paste(sort(ui), collapse = ".")
     }
 
-    s <- support(var)
-    b <- bounds(var)
+    s <- os <- support(var)
+    b <- ob <- bounds(var)
     if (log_first) {
         stopifnot(bounds(var)[[1]][1] > .Machine$double.eps)
         s <- lapply(s, log)
@@ -65,17 +65,17 @@ Bernstein_basis <- function(var, order = 2,
 
     ### linear extrapolation, f''(support) = 0
     if (extrapolate) {
-        s[[1]] <- range(s[[1]])
+        os[[1]] <- range(os[[1]])
         tmp <- Bernstein_basis(var, order = order, extrapolate = FALSE,
                                log_first = log_first)
-        tmpdf <- as.data.frame(s)
-        left <- s[[1]][1] > b[[1]][1]
-        right <- s[[1]][2] < b[[1]][2]
+        tmpdf <- as.data.frame(os)
+        left <- os[[1]][1] > ob[[1]][1]
+        right <- os[[1]][2] < ob[[1]][2]
         if (left || right) {
             if (left && !right) tmpdf <- tmpdf[-2,,drop = FALSE]
             if (!left && right) tmpdf <- tmpdf[-1,,drop = FALSE]
             dr <- 2
-            names(dr) <- names(s)
+            names(dr) <- names(os)
             B0 <- model.matrix(tmp, data = tmpdf, deriv = dr)
             ### <FIXME> we don't have infrastructure for equality
             ### constraints, so use <= and >= 
@@ -118,20 +118,27 @@ Bernstein_basis <- function(var, order = 2,
         X <- do.call("cbind", lapply(0:order, function(j) 
                      .Bx(x, j, order, deriv = max(c(0, deriv)), integrate = integrate)))
 
-        dlog <- 1
-        if (log_first && deriv > 0) {
-            expr <- D(quote(log(ox)), "ox")
-            if (deriv > 1) {
-                for (d in 2:deriv)
-                    expr <- D(expr, "ox")
-            }
-            dlog <- eval(expr)
-        } 
-
-        if (deriv > 0)
-            X <- X * (1 / diff(support)^deriv) * dlog
-        if (deriv < 0)
+        if (deriv < 0) {
             X[] <- 0
+        } else{
+            if (!log_first && deriv > 0) {
+                X <- X * (1 / diff(support)^deriv)
+            } else {
+                if (log_first && deriv > 0) {
+                    X <- switch(as.character(deriv),
+                        "1" = {
+                            X * (1 / diff(support)^deriv) / ox
+                        },
+                        "2" = {
+                            X1 <- do.call("cbind", lapply(0:order, function(j) 
+                               .Bx(x, j, order, deriv = 1L, integrate = integrate)))
+                            (X - X1) / (ox^2)
+                        },
+                        stop("deriv > 2 not implemented for log_first"))
+                }
+                ### do nothing for deriv == 0
+            }
+        }
         colnames(X) <- paste("Bs", 1:ncol(X), "(", varname, ")", sep = "")
         if (zeroint) {
             X <- X[, -ncol(X), drop = FALSE] - X[, ncol(X), drop = TRUE]
@@ -177,70 +184,69 @@ model.matrix.Bernstein_basis <- function(object, data,
     data[[varname]][large] <- s[2]
     ret <- object(data = data, deriv = deriv, integrate = integrate)
 
-    expr <- D(quote(log(s)), "s")
-    if (deriv > 1) {
-        for (d in 2:deriv)
-            expr <- D(expr, "ox")
-        }
-    dlog <- eval(expr)
-
-
     if (any(small)) {
         dsmall <- data.frame(x = rep(s[1], sum(small)))
         names(dsmall) <- varname
-        if (attr(object, "log_first")) {
-            ### f'(s) = b'(log(s)) / s but we need b'(log(s)) only
-            xdiff <- (log(x[small]) - log(s[1]))
-        } else {
+        if (!attr(object, "log_first")) {
             xdiff <- x[small] - s[1]
-        }
-        dfun <- function(deriv) {
-            dlog <- rep(1L, 2)
-            if (attr(object, "log_first")) {
-                expr <- D(quote(log(s)), "s")
-                if (deriv > 1) {
-                    for (d in 2:deriv)
-                        expr <- D(expr, "s")
-                    }
-                dlog <- eval(expr)
-            }
-            if (deriv >= maxderiv) {
-                ### <FIXME> is this correct?
-                if (attr(object, "log_first"))
-                    return((object(data = dsmall, deriv = deriv) / dlog[1]) /  x[small])
-                ### </FIXME>
-                return(object(data = dsmall, deriv = deriv))
-            }
-            return(object(data = dsmall, deriv = deriv) +
-                   dfun(deriv + 1L) / dlog[1] * xdiff)
-        }
-        ret[small,] <- dfun(deriv)
+            ret[small,] <- switch(as.character(deriv),
+                "0" = {
+                    object(data = dsmall, deriv = deriv) +
+                    object(data = dsmall, deriv = deriv + 1L) * xdiff
+                },
+                "1" = {
+                    object(data = dsmall, deriv = deriv)
+                },
+                0)
+        } else {
+            xdiff <- (log(x[small]) - log(s[1]))
+            ret[small,] <- switch(as.character(deriv),
+                "0" = {
+                    object(data = dsmall, deriv = deriv) +
+                    ### note: object(data = dsmall, deriv = deriv + 1)
+                    ### returns a'(log(s)) / s; we need a'(log(s))
+                    object(data = dsmall, deriv = deriv + 1L) * s[1] * xdiff
+                },
+                "1" = {
+                    object(data = dsmall, deriv = deriv) * s[1] / x[small]
+                },
+                "2" = {
+                    -object(data = dsmall, deriv = deriv - 1L) * s[1] / (x[small]^2)
+                },
+                stop("deriv >= 2 not implemented"))
+        } 
     }
     if (any(large)) {
         dlarge <- data.frame(x = rep(s[2], sum(large)))
         names(dlarge) <- varname
-        X <- object(data = dlarge)
-        if (attr(object, "log_first")) {
-            xdiff <- (log(x[large]) - log(s[2]))
-        } else {
+        if (!attr(object, "log_first")) {
             xdiff <- x[large] - s[2]
-        }
-        dfun <- function(deriv) {
-            dlog <- rep(1L, 2)
-            if (attr(object, "log_first")) {
-                expr <- D(quote(log(s)), "s")
-                if (deriv > 1) {
-                    for (d in 2:deriv)
-                        expr <- D(expr, "s")
-                    }
-                dlog <- eval(expr)
-            }
-            if (deriv >= maxderiv)
-                return(object(data = dlarge, deriv = deriv))
-            return(object(data = dlarge, deriv = deriv) +   
-                   dfun(deriv + 1L) / dlog[2] * xdiff)
-        }
-        ret[large,] <- dfun(deriv)
+            ret[large,] <- switch(as.character(deriv),
+                "0" = {
+                    object(data = dlarge, deriv = deriv) +
+                    object(data = dlarge, deriv = deriv + 1L) * xdiff
+                },
+                "1" = {
+                    object(data = dlarge, deriv = deriv)
+                },
+                0)
+        } else {
+            xdiff <- (log(x[large]) - log(s[2]))
+            ret[large,] <- switch(as.character(deriv),
+                "0" = {
+                    object(data = dlarge, deriv = deriv) +
+                    ### note: object(data = dlarge, deriv = deriv + 1)
+                    ### returns a'(log(s)) / s; we need a'(log(s))
+                    object(data = dlarge, deriv = deriv + 1L) * s[2] * xdiff
+                },
+                "1" = {
+                    object(data = dlarge, deriv = deriv) * s[2] / x[large]
+                },
+                "2" = {
+                    -object(data = dlarge, deriv = deriv - 1L) * s[2] / (x[large]^2)
+                },
+                stop("deriv >= 2 not implemented"))
+        } 
     }
     return(ret)
 }
