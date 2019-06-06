@@ -4,7 +4,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 	<id>http://ctm.r-forge.r-project.org//</id>
 	<title>Transformation Models</title>
-	<updated>2019-06-06T14:23:19+02:00</updated>
+	<updated>2019-06-06T14:44:40+02:00</updated>
 
 	<subtitle>Research and Software for Transformation Models</subtitle>
 
@@ -88,8 +88,8 @@ at &lt;a href=&quot;http://www.user2019.fr&quot;&gt;useR! 2019&lt;/a&gt; in Toul
 	
 		<entry>
 			<id>http://ctm.r-forge.r-project.org//news/Welcome/</id>
-			<title>New Website Only!</title>
-			<link href="http://ctm.r-forge.r-project.org//news/Welcome/" rel="alternate" type="text/html" title="New Website Only!" />
+			<title>New Website Online!</title>
+			<link href="http://ctm.r-forge.r-project.org//news/Welcome/" rel="alternate" type="text/html" title="New Website Online!" />
 			<updated>2019-06-02T00:00:00+02:00</updated>
 
 			
@@ -102,7 +102,7 @@ at &lt;a href=&quot;http://www.user2019.fr&quot;&gt;useR! 2019&lt;/a&gt; in Toul
 					
 				</author>
 			
-			<summary>Something on Transformation Models!</summary>
+			<summary>Something on Transformation Models</summary>
 			<content type="html" xml:base="http://ctm.r-forge.r-project.org//news/Welcome/">&lt;p&gt;The new &lt;a href=&quot;http://ctm.R-forge.R-project.org&quot;&gt;webpage&lt;/a&gt; features information on
 fully parametric conditional transformation models. Links to methodological
 papers, software packages, novel developments, and recent events will be
