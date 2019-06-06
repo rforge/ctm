@@ -3,7 +3,7 @@ layout: page
 title: "People"
 subheadline: ""
 teaser: ""
-permalink: "/people/"
+permalink: "people/"
 header:
 ---
 <div class="row">

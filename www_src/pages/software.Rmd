@@ -1,6 +1,6 @@
 ---
 layout: page
-permalink: "/software/"
+permalink: "software/"
 ---
 
 A Simple Transformation Model
@@ -68,4 +68,6 @@ variability is also larger compared to houses far away from the river.
 
 The most important feature in this model is that the shape of these
 distributions have been estimated from data although the models are fully
-parametric!
+parametric! An introduction to the underlying technology with many more
+examples is available from
+the [mlt.docreg package vignette](https://cran.r-project.org/web/packages/mlt.docreg/vignettes/mlt.pdf).
