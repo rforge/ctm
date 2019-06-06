@@ -2,6 +2,11 @@
 \name{NEWS}
 \title{NEWS file for the mlt.docreg package}
 
+\section{Changes in Version 1.0-3 (2019-06-05)}{
+  \itemize{
+    \item{Update to \pkg{mlt} 1.0-5.}
+  }
+}
 \section{Changes in Version 1.0-2 (2018-08-15)}{
   \itemize{
     \item{\code{compress} argment to \code{untar} is deprecated in R-devel.}
