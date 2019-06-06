@@ -16,3 +16,19 @@
   comment: ~
   url: https://stat.ethz.ch/~buhlmann/
   image: img/peter_buehlmann.jpg
+- name: Lisa Möst
+  given: Lisa
+  family: Möst
+  role: aut
+  email: ~
+  comment: ~
+  url: https://www.researchgate.net/profile/Lisa_Moest
+  image: img/lisa_moest.jpg
+- name: Thomas Kneib
+  given: Thomas
+  family: Kneib
+  role: aut
+  email: ~
+  comment: ~
+  url: https://www.uni-goettingen.de/de/prof.+dr.+thomas+kneib/264255.html
+  image: img/thomas_kneib.jpg
