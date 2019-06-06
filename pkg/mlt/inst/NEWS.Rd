@@ -8,6 +8,7 @@
     \item{Check response variable against observations in \code{data}.}
     \item{Make sure integers larger zero are handled correctly in \code{R}.}
     \item{Implement \code{resid} method, ie the score wrt a constant.}
+    \item{Cox examples with Bernstein polynomials of log-time.}
   }
 }
 
