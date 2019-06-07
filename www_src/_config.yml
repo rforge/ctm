@@ -20,20 +20,16 @@ description: "Research and Software for Transformation Models"
 
 # Main author of the website
 # See > authors.yml
-author: TH
+author: Torsten Hothorn
 
 
 # main address for absolute links
 url: "http://ctm.r-forge.r-project.org"
-baseurl: "/"
+baseurl: ""
 
-
-# URL pointing directly to the images directory making
-# things easier to link to images in posts and templates (slash at the end).
+urlimg: "http://ctm.r-forge.r-project.org/images/"
 # Example: <img src="{{ site.urlimg }}{{ post.image.title }}" />
 # Markdown-Example for posts ![Image Text]({{ site.urlimg }}image.jpg)
-# urlimg: 'https://phlow.github.io/feeling-responsive/images/'
-
 
 # Logo (size 600x80 pixels)
 logo: "logo.png"
