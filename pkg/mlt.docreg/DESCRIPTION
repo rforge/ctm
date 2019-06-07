@@ -15,4 +15,5 @@ Suggests: variables, basefun, np, eha, truncreg, lattice, MASS, TH.data,
   MIICD, TransModel, dynsurv, timereg, survivalMPL, gamlss, Matrix, 
   muhaz, ICE, ordinal, VGAM, AER, coin, gamlss.data, mlbench, tram
 VignetteBuilder: knitr
+URL: http://ctm.R-forge.R-project.org
 License: GPL-2

@@ -11,5 +11,6 @@ Depends: basefun (>= 1.0-5), variables (>= 1.0-2)
 Imports: BB, alabama, stats, coneproj, graphics, methods, grDevices, sandwich,
   numDeriv, survival
 Suggests: MASS, nnet, TH.data, multcomp
+URL: http://ctm.R-forge.R-project.org
 License: GPL-2
 Encoding: UTF-8

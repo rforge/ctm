@@ -7,4 +7,5 @@ Authors@R: person("Torsten", "Hothorn", role = c("aut", "cre"),
 Description: Some very simple infrastructure for basis functions.
 Depends: variables (>= 0.0-30), R (>= 3.2.0)
 Imports: stats, polynom, Matrix, orthopolynom, methods
+URL: http://ctm.R-forge.R-project.org
 License: GPL-2
