@@ -155,3 +155,6 @@ print.summary.tram <- function(x, digits = max(3L, getOption("digits") - 3L), ..
     cat("\n\n")
     invisible(x)
 }
+
+residuals.tram <- function(object, ...)
+    residuals(as.mlt(object), ...)
