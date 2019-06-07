@@ -6,14 +6,14 @@ title: "Transformation Models"
 
 
 # SLOGAN (on homepage in <title> and other important places)
-slogan: ""
+slogan: "Research and Software for Transformation Models"
 
 
 # DESCRIPTION (max 150 characters, on homepage and in footer for quick description)
 description: "Research and Software for Transformation Models"
 
 
-# CREDITS (in footer) #TODO: leave in?
+# CREDITS (in footer)
 # credits: '<p>Created with &hearts; by <a href="http://phlow.de/">Phlow</a> with <a
 # href="http://jekyllrb.com/" target="_blank">Jekyll</a> based on <a href="http://phlow.github.io/feeling-responsive/">Feeling Responsive</a>.</p>'
 
@@ -33,7 +33,6 @@ urlimg: "http://ctm.r-forge.r-project.org/images/"
 
 # Logo (size 600x80 pixels)
 logo: "logo.png"
-
 
 # Plugins
 plugins:
