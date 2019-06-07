@@ -1,6 +1,6 @@
 ---
 layout: page
-permalink: "contact/"
+permalink: "/contact/"
 ---
 
 [Prof. Dr. Torsten Hothorn](http://user.math.uzh.ch/hothorn/)  
