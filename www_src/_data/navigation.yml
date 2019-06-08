@@ -12,7 +12,7 @@
   side: left
 
 - title: "News" #blog-style
-  url: "/news/"
+  url: "/blog/"
   side: left
 
 - title: "People"
