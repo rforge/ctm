@@ -2,15 +2,15 @@
 
 
 # TITEL (of website)
-title: "Transformation Models"
+title: 'Transformation Models'
 
 
-# SLOGAN (on homepage in <title> and other important places)
-slogan: "Research and Software for Transformation Models"
+# SLOGAN(on homepage in <title> and other important places)
+slogan: 'Research and Software for Transformation Models'
 
 
 # DESCRIPTION (max 150 characters, on homepage and in footer for quick description)
-description: "Research and Software for Transformation Models"
+description: 'Research and Software for Transformation Models'
 
 
 # CREDITS (in footer)
@@ -40,8 +40,8 @@ plugins:
 
 
 ### PAGINATION (for blog posts => uncomment)
-# paginate: 5                      # Paginates all X entries# 
-# paginate_path: "blog/page:num"   # Pagination path › Important for blog page in /blog/ to work
+paginate: 5                      # Paginates all X entries# 
+paginate_path: "blog/page:num"   # Pagination path › Important for blog page in /blog/ to work
 
 markdown           : kramdown #theme works best with this
 permalink          : /:categories/:title/
