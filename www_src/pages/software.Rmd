@@ -7,7 +7,7 @@ A Simple Transformation Model
 ========================================================
 
 ```{r include=FALSE}
-knitr::opts_chunk$set(fig.path='../assets/img/')
+knitr::opts_chunk$set(fig.path='../images/')
 ```
 
 
