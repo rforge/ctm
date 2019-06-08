@@ -11,9 +11,9 @@ permalink: "people/"
       <a target="_blank" href="{{ author.url }}">
     {% endif %}
     {% if author.image %}
-    <img src="{{ site.urlimg }}{{ author.image }}" alt="Homepage" style="height:100px">
+    <img src="{{ site.urlimg }}{{ author.image }}" alt="Homepage" style="height:120px">
     {% else %}
-    <img src="{{ site.urlimg }}anonymous.png" alt="Homepage" style="height=100px">
+    <img src="{{ site.urlimg }}anonymous.png" alt="Homepage"  style="height:120px">
     {% endif %}
     {% if author.url %}
       </a>
