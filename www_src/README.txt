@@ -5,43 +5,59 @@
 ################################################################################
 
 Source-folder for building the html-files with Jekyll 
-Jekyll: https://jekyllrb.com
-Theme: https://phlow.github.io/feeling-responsive/
 
 Development only: jekyll serve --config _config.yml,_config_dev.yml
 for more information see: _config_dev.yml
 
 # WORK FLOW
+ change .md / .Rmd files in pages, /pages-root-folder to change content
+
+ include images in images/, either specify in .md as yml-variable (only title needed)
+ or include manually by: {{ site.urlimg }}imagetitle
+
+ pages/
+	make md
+
+ jekyll serve
+
+ cp -r _site/* ../www/
+
+
+# FILES
 _config.yml
-	adapt configuration data
+	configuration data
 	(_config_dev.yml for development only)
+
+_data/
+	navigation.yml: website outline
 
 pages/*
 	change Rmd/md-files
 	make md
 
 pages/pages-root-folder/*
-	index.md: Provided that the file has a front matter section
-
+	index.md: content and figure-setting of the front-page
 
 _layouts/: templates for frontpage/page/post
 	# {{content}}-float used to inject content from md-files
 
 _includes/: partials that can be mixed/matched '_layouts' and 'posts' to facilitate reuse
 
-_data/: contains yml-files for variables, such as authors, etc ... also navigation
-
-
-
 _drafts/: unpublished posts (format: title.MARKUP)
-
 
 _sass/
 	partials imported into "main.scss" => processed into stylesheet "main.css" (defines style of site)
 
-_posts/
-	dynamic content (format: YEAR-MONTH-DAY-title.MARKUP)
-
 _site/	# generated sites from jekyll
 	cp _site/* ../www/
 
+# BLOG
+_config.yml:	defines blogurl, pagination, posturls
+_posts/
+	dynamic content of (blogurl): format: YEAR-MONTH-DAY-title.MARKUP
+_includes/
+	listing of blog-content
+
+# FURTHER INFO
+Jekyll: https://jekyllrb.com
+Theme: https://phlow.github.io/feeling-responsive/
