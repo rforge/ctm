@@ -57,10 +57,8 @@ exclude:
     - Gemfile.lock
     - 'README.*'
     - '*.bib'
-    - 'Makefile'
+    - pages/Makefile
     - '*.Rmd'
-
-
 
 
 # LANGUAGE SETTING (used in /includes/header.html for html-settings)
