@@ -1,15 +1,15 @@
 ################################################################################
 
 # WEBSITE: Transformation Models
+Source-folder for building the html-files with Jekyll 
 
 ################################################################################
 
-Source-folder for building the html-files with Jekyll 
+# TODOs: 
+- News: move widgets
+- People: Gallery, more dynamic
 
-Development only: jekyll serve --config _config.yml,_config_dev.yml
-for more information see: _config_dev.yml
-
-# WORK FLOW
+# --------------- WORK FLOW  ---------------
  change .md / .Rmd files in pages, /pages-root-folder to change content
 
  include images in images/, either specify in .md as yml-variable (only title needed)
@@ -22,6 +22,11 @@ for more information see: _config_dev.yml
 
  cp -r _site/* ../www/
 
+# ------------------------------------------ 
+
+# DEVELOPMENT ONLY (more infos: _config_dev.yml)
+
+$ jekyll serve --config _config.yml,_config_dev.yml
 
 # FILES
 _config.yml
