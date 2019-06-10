@@ -14,7 +14,7 @@ description: 'Research and Software for Transformation Models'
 
 
 # CREDITS (in footer)
-credits: '<p>Built with <a href="http://jekyllrb.com/" target="_blank">Jekyll</a> based on <a href="http://phlow.github.io/feeling-responsive/">Feeling Responsive</a> by <a href="http://phlow.de/">Phlow</a>.</p>'
+credits: '<p>Built with <a href="http://jekyllrb.com/" target="_blank">Jekyll</a> based on <a href="http://phlow.github.io/feeling-responsive/" target="_blank">Feeling Responsive</a> by <a href="http://phlow.de/"target="_blank">Phlow</a>.</p>'
 
 # Main author of the website
 # See > authors.yml
