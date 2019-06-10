@@ -21,7 +21,8 @@
 			<div id="post-nav" class="row">
 				{% if page.previous.url %}
 				<div class="small-5 columns"><a class="button small radius prev" href="{{ site.url }}{{ site.baseurl }}{{page.previous.url}}">&laquo; {{page.previous.title}}</a></div><!-- /.small-4.columns -->
-				{% endif %}
+                {% endif %}
+                <div class="small-2 columns text-center"><a class="radius button small" href="{{ site.url }}{{ site.baseurl }}{{ site.blogurl }}" title="{{ site.data.language.blog }}">{{ site.data.language.blog }}</a></div><!-- /.small-4.columns -->
 				{% if page.next.url %}
 				<div class="small-5 columns text-right"><a class="button small radius next" href="{{ site.url }}{{ site.baseurl }}{{page.next.url}}">{{page.next.title}} &raquo;</a></div><!-- /.small-4.columns -->
 				{% endif %}
