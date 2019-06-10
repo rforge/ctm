@@ -15,7 +15,7 @@ format: frontpage
     </div>
     {% unless site.posts == empty %}
     <div class="medium-6 columns">
-        <p><strong> News </strong></p>
+        <p><strong> {{ site.data.language.blog }} </strong></p>
         {% include list-posts entries='3' %}
     </div>
     {% endunless %}

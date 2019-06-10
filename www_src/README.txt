@@ -6,8 +6,8 @@ Source-folder for building the html-files with Jekyll
 ################################################################################
 
 # TODOs: 
-- News: move widgets
 - People: Gallery, more dynamic
+- report structure
 
 # --------------- WORK FLOW  ---------------
  change .md / .Rmd files in pages, /pages-root-folder to change content
@@ -62,6 +62,11 @@ _posts/
 	dynamic content of (blogurl): format: YEAR-MONTH-DAY-title.MARKUP
 _includes/
 	listing of blog-content
+	_meta_information: link next/previous post
+
+change of naming:
+	change _config.yml: blogurl, _data/navigation: link, 
+	_data/language (for post-buttons)
 
 # FURTHER INFO
 Jekyll: https://jekyllrb.com
