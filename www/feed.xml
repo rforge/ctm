@@ -1,46 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="http://ctm.r-forge.r-project.org//assets/xslt/rss.xslt" ?>
-<?xml-stylesheet type="text/css" href="http://ctm.r-forge.r-project.org//assets/css/rss.css" ?>
+<?xml-stylesheet type="text/xsl" href="http://ctm.r-forge.r-project.org/assets/xslt/rss.xslt" ?>
+<?xml-stylesheet type="text/css" href="http://ctm.r-forge.r-project.org/assets/css/rss.css" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 	<channel>
 		<title>Transformation Models</title>
 		<description>Research and Software for Transformation Models</description>
-		<link>http://ctm.r-forge.r-project.org//</link>
-		<atom:link href="http://ctm.r-forge.r-project.org//feed.xml" rel="self" type="application/rss+xml" />
+		<link>http://ctm.r-forge.r-project.org/</link>
+		<atom:link href="http://ctm.r-forge.r-project.org/feed.xml" rel="self" type="application/rss+xml" />
+		
+			<item>
+				<title>PostDoc in Zurich Available</title>
+				<link>http://ctm.r-forge.r-project.org/news/PostDoc/</link>
+				<pubDate>Mon, 17 Jun 2019 00:00:00 +0200</pubDate>
+				<description>&lt;p&gt;A &lt;a href=&quot;https://bit.ly/2KRCK6x&quot;&gt;PostDoc&lt;/a&gt; position is available at 
+the Department of Biostatistics in the 
+&lt;a href=&quot;http://www.ebpi.uzh.ch&quot;&gt;Epidemiology, Biostatistics and Prevention
+Institute&lt;/a&gt; (&lt;a href=&quot;http://www.uzh.ch&quot;&gt;University of Zurich,
+Switzerland&lt;/a&gt;). If you are interested in pushing the
+boundaries of transformation models, &lt;a href=&quot;https://bit.ly/2KRCK6x&quot;&gt;apply&lt;/a&gt;!&lt;/p&gt;
+</description>
+				<guid isPermaLink="true">http://ctm.r-forge.r-project.org/news/PostDoc/</guid>
+			</item>
 		
 			<item>
 				<title>Zurich Tutorial</title>
-				<link>http://ctm.r-forge.r-project.org//news/zhRcourses/</link>
+				<link>http://ctm.r-forge.r-project.org/news/zhRcourses/</link>
 				<pubDate>Tue, 04 Jun 2019 00:00:00 +0200</pubDate>
 				<description>&lt;p&gt;Sit back, relax, and enjoy two days of fun with transformation models in
 Zurich, Switzerland. The course &lt;a href=&quot;https://www.zhrcourses.uzh.ch/de/programm2019/Transform.html&quot;&gt;Transformation Analysis in
 R&lt;/a&gt;
 takes place 2019-09-26/27.&lt;/p&gt;
 </description>
-				<guid isPermaLink="true">http://ctm.r-forge.r-project.org//news/zhRcourses/</guid>
+				<guid isPermaLink="true">http://ctm.r-forge.r-project.org/news/zhRcourses/</guid>
 			</item>
 		
 			<item>
 				<title>useR! 2019 Tutorial</title>
-				<link>http://ctm.r-forge.r-project.org//news/useR/</link>
+				<link>http://ctm.r-forge.r-project.org/news/useR/</link>
 				<pubDate>Mon, 03 Jun 2019 00:00:00 +0200</pubDate>
 				<description>&lt;p&gt;Sit back, relax, and enjoy three hours of fun with transformation models in
 the &lt;a href=&quot;http://www.user2019.fr/tutorials/&quot;&gt;pre-conference tutorial on 2019-07-09 (afternoon)&lt;/a&gt; 
 at &lt;a href=&quot;http://www.user2019.fr&quot;&gt;useR! 2019&lt;/a&gt; in Toulouse, France.&lt;/p&gt;
 </description>
-				<guid isPermaLink="true">http://ctm.r-forge.r-project.org//news/useR/</guid>
+				<guid isPermaLink="true">http://ctm.r-forge.r-project.org/news/useR/</guid>
 			</item>
 		
 			<item>
 				<title>New Website Online!</title>
-				<link>http://ctm.r-forge.r-project.org//news/Welcome/</link>
+				<link>http://ctm.r-forge.r-project.org/news/Welcome/</link>
 				<pubDate>Sun, 02 Jun 2019 00:00:00 +0200</pubDate>
 				<description>&lt;p&gt;The new &lt;a href=&quot;http://ctm.R-forge.R-project.org&quot;&gt;webpage&lt;/a&gt; features information on
 fully parametric conditional transformation models. Links to methodological
 papers, software packages, novel developments, and recent events will be
 presented here.&lt;/p&gt;
 </description>
-				<guid isPermaLink="true">http://ctm.r-forge.r-project.org//news/Welcome/</guid>
+				<guid isPermaLink="true">http://ctm.r-forge.r-project.org/news/Welcome/</guid>
 			</item>
 		
 	</channel>
