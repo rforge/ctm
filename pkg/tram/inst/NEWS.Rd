@@ -2,7 +2,7 @@
 \name{NEWS}
 \title{NEWS file for the tram package}
 
-\section{Changes in Version 0.2-6 (2019-06-05)}{
+\section{Changes in Version 0.2-6 (2019-06-20)}{
   \itemize{
     \item{Add regression test for count data and \code{log_first = TRUE}.}
   }
