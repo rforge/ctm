@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<?xml-stylesheet type="text/xsl" href="/assets/xslt/atom.xslt" ?>
-<?xml-stylesheet type="text/css" href="/assets/css/atom.css" ?>
+<?xml-stylesheet type="text/xsl" href="//assets/xslt/atom.xslt" ?>
+<?xml-stylesheet type="text/css" href="//assets/css/atom.css" ?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-	<id>http://ctm.r-forge.r-project.org/</id>
+	<id>http://ctm.r-forge.r-project.org//</id>
 	<title>Transformation Models</title>
-	<updated>2019-06-17T15:21:42+02:00</updated>
+	<updated>2019-06-06T14:44:40+02:00</updated>
 
 	<subtitle>Research and Software for Transformation Models</subtitle>
 
@@ -12,56 +12,23 @@
 		
 		<author>
 			
-				<name>Torsten Hothorn</name>
+				<name>TH</name>
 			
 			
 			
 		</author>
 	
 
-	<link href="http://ctm.r-forge.r-project.org/atom.xml" rel="self" type="application/rss+xml" />
-	<link href="http://ctm.r-forge.r-project.org/" rel="alternate" type="text/html" />
+	<link href="http://ctm.r-forge.r-project.org//atom.xml" rel="self" type="application/rss+xml" />
+	<link href="http://ctm.r-forge.r-project.org//" rel="alternate" type="text/html" />
 
-	<generator uri="http://jekyllrb.com" version="3.8.5">Jekyll</generator>
+	<generator uri="http://jekyllrb.com" version="3.1.6">Jekyll</generator>
 
 	
 		<entry>
-			<id>http://ctm.r-forge.r-project.org/news/PostDoc/</id>
-			<title>PostDoc in Zurich Available</title>
-			<link href="http://ctm.r-forge.r-project.org/news/PostDoc/" rel="alternate" type="text/html" title="PostDoc in Zurich Available" />
-			<updated>2019-06-17T00:00:00+02:00</updated>
-
-			
-				
-				<author>
-					
-						<name></name>
-					
-					
-					
-				</author>
-			
-			<summary>PostDoc Researching Transformation Models</summary>
-			<content type="html" xml:base="http://ctm.r-forge.r-project.org/news/PostDoc/">&lt;p&gt;A &lt;a href=&quot;https://bit.ly/2KRCK6x&quot;&gt;PostDoc&lt;/a&gt; position is available at 
-the Department of Biostatistics in the 
-&lt;a href=&quot;http://www.ebpi.uzh.ch&quot;&gt;Epidemiology, Biostatistics and Prevention
-Institute&lt;/a&gt; (&lt;a href=&quot;http://www.uzh.ch&quot;&gt;University of Zurich,
-Switzerland&lt;/a&gt;). If you are interested in pushing the
-boundaries of transformation models, &lt;a href=&quot;https://bit.ly/2KRCK6x&quot;&gt;apply&lt;/a&gt;!&lt;/p&gt;
-</content>
-
-			
-				<category term="News" />
-			
-			
-
-			<published>2019-06-17T00:00:00+02:00</published>
-		</entry>
-	
-		<entry>
-			<id>http://ctm.r-forge.r-project.org/news/zhRcourses/</id>
+			<id>http://ctm.r-forge.r-project.org//news/zhRcourses/</id>
 			<title>Zurich Tutorial</title>
-			<link href="http://ctm.r-forge.r-project.org/news/zhRcourses/" rel="alternate" type="text/html" title="Zurich Tutorial" />
+			<link href="http://ctm.r-forge.r-project.org//news/zhRcourses/" rel="alternate" type="text/html" title="Zurich Tutorial" />
 			<updated>2019-06-04T00:00:00+02:00</updated>
 
 			
@@ -75,7 +42,7 @@ boundaries of transformation models, &lt;a href=&quot;https://bit.ly/2KRCK6x&quo
 				</author>
 			
 			<summary>Tutorial on Transformation Models in Zurich</summary>
-			<content type="html" xml:base="http://ctm.r-forge.r-project.org/news/zhRcourses/">&lt;p&gt;Sit back, relax, and enjoy two days of fun with transformation models in
+			<content type="html" xml:base="http://ctm.r-forge.r-project.org//news/zhRcourses/">&lt;p&gt;Sit back, relax, and enjoy two days of fun with transformation models in
 Zurich, Switzerland. The course &lt;a href=&quot;https://www.zhrcourses.uzh.ch/de/programm2019/Transform.html&quot;&gt;Transformation Analysis in
 R&lt;/a&gt;
 takes place 2019-09-26/27.&lt;/p&gt;
@@ -90,9 +57,9 @@ takes place 2019-09-26/27.&lt;/p&gt;
 		</entry>
 	
 		<entry>
-			<id>http://ctm.r-forge.r-project.org/news/useR/</id>
+			<id>http://ctm.r-forge.r-project.org//news/useR/</id>
 			<title>useR! 2019 Tutorial</title>
-			<link href="http://ctm.r-forge.r-project.org/news/useR/" rel="alternate" type="text/html" title="useR! 2019 Tutorial" />
+			<link href="http://ctm.r-forge.r-project.org//news/useR/" rel="alternate" type="text/html" title="useR! 2019 Tutorial" />
 			<updated>2019-06-03T00:00:00+02:00</updated>
 
 			
@@ -106,7 +73,7 @@ takes place 2019-09-26/27.&lt;/p&gt;
 				</author>
 			
 			<summary>Tutorial on Transformation Models in Toulouse</summary>
-			<content type="html" xml:base="http://ctm.r-forge.r-project.org/news/useR/">&lt;p&gt;Sit back, relax, and enjoy three hours of fun with transformation models in
+			<content type="html" xml:base="http://ctm.r-forge.r-project.org//news/useR/">&lt;p&gt;Sit back, relax, and enjoy three hours of fun with transformation models in
 the &lt;a href=&quot;http://www.user2019.fr/tutorials/&quot;&gt;pre-conference tutorial on 2019-07-09 (afternoon)&lt;/a&gt; 
 at &lt;a href=&quot;http://www.user2019.fr&quot;&gt;useR! 2019&lt;/a&gt; in Toulouse, France.&lt;/p&gt;
 </content>
@@ -120,9 +87,9 @@ at &lt;a href=&quot;http://www.user2019.fr&quot;&gt;useR! 2019&lt;/a&gt; in Toul
 		</entry>
 	
 		<entry>
-			<id>http://ctm.r-forge.r-project.org/news/Welcome/</id>
+			<id>http://ctm.r-forge.r-project.org//news/Welcome/</id>
 			<title>New Website Online!</title>
-			<link href="http://ctm.r-forge.r-project.org/news/Welcome/" rel="alternate" type="text/html" title="New Website Online!" />
+			<link href="http://ctm.r-forge.r-project.org//news/Welcome/" rel="alternate" type="text/html" title="New Website Online!" />
 			<updated>2019-06-02T00:00:00+02:00</updated>
 
 			
@@ -136,7 +103,7 @@ at &lt;a href=&quot;http://www.user2019.fr&quot;&gt;useR! 2019&lt;/a&gt; in Toul
 				</author>
 			
 			<summary>Something on Transformation Models</summary>
-			<content type="html" xml:base="http://ctm.r-forge.r-project.org/news/Welcome/">&lt;p&gt;The new &lt;a href=&quot;http://ctm.R-forge.R-project.org&quot;&gt;webpage&lt;/a&gt; features information on
+			<content type="html" xml:base="http://ctm.r-forge.r-project.org//news/Welcome/">&lt;p&gt;The new &lt;a href=&quot;http://ctm.R-forge.R-project.org&quot;&gt;webpage&lt;/a&gt; features information on
 fully parametric conditional transformation models. Links to methodological
 papers, software packages, novel developments, and recent events will be
 presented here.&lt;/p&gt;
