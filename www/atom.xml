@@ -4,7 +4,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 	<id>http://ctm.r-forge.r-project.org/</id>
 	<title>Transformation Models</title>
-	<updated>2019-06-26T13:52:47+02:00</updated>
+	<updated>2019-06-27T10:53:07+02:00</updated>
 
 	<subtitle>Research and Software for Transformation Models</subtitle>
 
@@ -22,7 +22,7 @@
 	<link href="http://ctm.r-forge.r-project.org/atom.xml" rel="self" type="application/rss+xml" />
 	<link href="http://ctm.r-forge.r-project.org/" rel="alternate" type="text/html" />
 
-	<generator uri="http://jekyllrb.com" version="3.8.5">Jekyll</generator>
+	<generator uri="http://jekyllrb.com" version="3.1.6">Jekyll</generator>
 
 	
 		<entry>
@@ -47,7 +47,7 @@
 2019-07-09) at &lt;a href=&quot;http://www.user2019.fr&quot;&gt;useR!  2019&lt;/a&gt; in Toulouse, France, is
 now available.&lt;/p&gt;
 
-&lt;p&gt;The zip archive [useR2019_transformation_models.zip]{http://ctm.R-forge.R-project.org/assets/docs/useR2019_transformation_models.zip}
+&lt;p&gt;The zip archive &lt;a href=&quot;http://ctm.R-forge.R-project.org/assets/docs/useR2019_transformation_models.zip&quot;&gt;useR2019_transformation_models.zip&lt;/a&gt;
 contains a PDF file with slides (4up in case you want to bring a hard copy)
 as well as an R transcript file for reproducing all results. Some models
 take a little longer to fit (roughly 10mins on my computer). You don’t need
