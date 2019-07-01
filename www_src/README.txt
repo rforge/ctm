@@ -7,59 +7,91 @@ Source-folder for building the html-files with Jekyll
 
 # TODOs: 
 - People: Gallery, more dynamic
-- report structure
 
 # --------------- WORK FLOW  ---------------
- change .md / .Rmd files in pages, /pages-root-folder to change content
 
- include images in images/, either specify in .md as yml-variable (only title needed)
- or include manually by: {{ site.urlimg }}imagetitle
+ change content of page in pages/*
+	in md / Rmd files in pages/* OR pages/pages-root-folder/* for front-page
+ 
+ for changes in pages/Rmd files:
+	$ cd pages
+	$ make md 
 
- pages/
-	make md
+ include images in images/* 
+	either specify image-title as yml-variable (in html/md-file) OR include in html/md-file as: {{ site.urlimg }}imagetitle
+	# Example: <img src="{{ site.urlimg }}img.title"/>
+	# Markdown-Example for posts ![Image Text]({{ site.urlimg }}image.jpg)
 
- jekyll serve
+ include documents in docs/* 
+	either specify image-title as yml-variable (in html/md-file) OR include in html/md-file as: {{ site.urlimg }}imagetitle
+	# Example: <img src="{{ site.urlimg }}img.title"/>
+	# Markdown-Example for posts ![Image Text]({{ site.urlimg }}image.jpg)
 
- cp -r _site/* ../www/
+ new entry in "News": 
+	add new file _posts/YEAR-MONTH-DAY-title.md
 
-# ------------------------------------------ 
+ build html-files:
+ 	$ bundle exec jekyll build
+	$ cp -r _site/* ../www/
 
-# DEVELOPMENT ONLY (more infos: _config_dev.yml)
 
-$ jekyll serve --config _config.yml,_config_dev.yml
+# FOR DEVELOPMENT ONTLY: $ bundle exec jekyll serve --config _config.yml,_config_dev.yml (more infos in _config_dev.yml)
 
-# FILES
+
+# --------------- FILE-STRUCTURE ---------------
+
 _config.yml
-	configuration data
+	configuration data: 
 	(_config_dev.yml for development only)
 
 _data/
 	navigation.yml: website outline
-
+	authors.yml: Feed for people.md
+	
 pages/*
-	change Rmd/md-files
-	make md
+	Rmd/md-files
 
 pages/pages-root-folder/*
 	index.md: content and figure-setting of the front-page
 
-_layouts/: templates for frontpage/page/post
-	# {{content}}-float used to inject content from md-files
+images/
+	image-folder
 
-_includes/: partials that can be mixed/matched '_layouts' and 'posts' to facilitate reuse
+docs/
+	document-folder
 
-_drafts/: unpublished posts (format: title.MARKUP)
+_layouts/
+	templates for frontpage/page/post
+	COMMENT: {{content}}-float used to inject content from md-files
+
+_includes/
+	two types of partials: "_includes" are used for templates, "includes" can be used in pages or posts
+
+_drafts/:
+	unpublished posts (format: title.MARKUP)
 
 _sass/
 	partials imported into "main.scss" => processed into stylesheet "main.css" (defines style of site)
 
-_site/	# generated sites from jekyll
-	cp _site/* ../www/
+aseets/
+	css/ used to format content of webpage
+	img/ not changing images of webpage e.g logo
 
-# BLOG
-_config.yml:	defines blogurl, pagination, posturls
+_site/	
+	generated sites from jekyll
+
+
+# --------------- SETUP: NEWS-PAGE (Blog-style) ---------------
+
+_config.yml
+	defines blogurl, pagination, posturls
+
 _posts/
 	dynamic content of (blogurl): format: YEAR-MONTH-DAY-title.MARKUP
+
+_posts/_drafts
+	unpublished content
+
 _includes/
 	listing of blog-content
 	_meta_information: link next/previous post
@@ -68,6 +100,7 @@ change of naming:
 	change _config.yml: blogurl, _data/navigation: link, 
 	_data/language (for post-buttons)
 
-# FURTHER INFO
+
+# --------------- FURTHER INFO ---------------
 Jekyll: https://jekyllrb.com
 Theme: https://phlow.github.io/feeling-responsive/
