@@ -32,8 +32,8 @@ logo: "logo.png"
 
 ## PLUGINS
 plugins:
-    - jekyll-asciidoc
-    - jekyll-gist
+#    - jekyll-asciidoc
+#    - jekyll-gist
     - jekyll-paginate
 
 
