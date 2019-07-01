@@ -1,48 +1,46 @@
 ### PAGE SETTINGS
 
-
-# TITEL (of website)
+## TITEL (of website)
 title: 'Transformation Models'
 
 
-# SLOGAN(on homepage in <title> and other important places)
+## SLOGAN(on homepage in <title> and other important places)
 slogan: 'Research and Software for Transformation Models'
 
 
-# DESCRIPTION (max 150 characters, on homepage and in footer for quick description)
+## DESCRIPTION (max 150 characters, on homepage and in footer for quick description)
 description: 'Research and Software for Transformation Models'
 
 
-# CREDITS (in footer)
+## CREDITS (in footer)
 credits: '<p>Built with <a href="http://jekyllrb.com/" target="_blank">Jekyll</a> based on <a href="http://phlow.github.io/feeling-responsive/" target="_blank">Feeling Responsive</a> by <a href="http://phlow.de/"target="_blank">Phlow</a>.</p>'
 
-# Main author of the website
-# See > authors.yml
-author: "Torsten Hothorn"
-
-
-# main address for absolute links
+## MAIN ADDRESS FOR ABSOLUTE LINKS
 url: "http://ctm.r-forge.r-project.org"
 baseurl: ""
 
 urlimg: "http://ctm.r-forge.r-project.org/images/"
-# Example: <img src="{{ site.urlimg }}{{ post.image.title }}" />
-# Markdown-Example for posts ![Image Text]({{ site.urlimg }}image.jpg)
+# Example: <img src="{{ site.urlimg }}img.title"/>
+# OR ![Image Text]({{ site.urlimg }}image.jpg)
 
-# Logo (size 600x80 pixels)
+urldoc: "http://ctm.r-forge.r-project.org/docs/"
+# Example:  <a href="{{ site.urldoc }}doc.title">
+# OR ![Link Text]({{ site.urldoc }}doc.title)
+
+## LOGO (include in assets/img/*, size 600x80 pixels)
 logo: "logo.png"
 
-# Plugins
+## PLUGINS
 plugins:
     - jekyll-asciidoc
     - jekyll-gist
     - jekyll-paginate
 
 
-### PAGINATION (BLOG: NEWS)
+## PAGINATION (BLOG: NEWS)
 blogurl: "/news/"
 paginate: 5                      # Paginates all X entries# 
-paginate_path: "/news/page:num"   # Pagination path › Important for blog page in /blog/ to work
+paginate_path: "/news/page:num"   # Pagination path › Important for blog page in /news/ to work
 
 markdown           : kramdown #theme works best with this
 permalink          : /news/:title/
@@ -50,7 +48,8 @@ highlight          : rouge
 excerpt_separator  : "<!--more-->"
 include            : ['.htaccess']
 
-# Exclude these files from your production _site
+
+## JEKYLL-IGNORE (ignored for _site)
 exclude:
     - .sass-cache
     - Gemfile
@@ -61,22 +60,11 @@ exclude:
     - '*.Rmd'
 
 
-# LANGUAGE SETTING (used in /includes/header.html for html-settings)
+## LANGUAGE SETTING (used in /includes/header.html for html-settings)
 language: 'en'
 
 
-# Used › default.html front-matter and compress.html
-# Options › http://jch.penibelst.de
-compress_html:
-  clippings: all
-  comments: ["<!-- ", " -->"]
-  endings: all
-  profile: false
-  ignore:
-    envs: [development]
-
-
-# DEFAULT SETTINGS
+## DEFAULT SETTINGS
 defaults:
   -
     scope:
@@ -97,17 +85,26 @@ defaults:
       comments: false
       author: "Torsten Hothorn"     # Default author for posts
 
+# Used › default.html front-matter and compress.html
+# Options › http://jch.penibelst.de
+compress_html:
+  clippings: all
+  comments: ["<!-- ", " -->"]
+  endings: all
+  profile: false
+  ignore:
+    envs: [development]
 
-### Navigation: _data/navigation.yml to adjust the left/right topbar navigation
+## SEO: Verify Website to Webmaster Tools
+# google_author:             ""
+# google_site_verification:  ""
 
-
-### SEO: Verify Website to Webmaster Tools
-google_author:             ""
-google_site_verification:  ""
-
-
-# SASS: More › http://jekyllrb.com/docs/assets/#sassscss
+## SASS: More › http://jekyllrb.com/docs/assets/#sassscss
 sass:
     sass_dir : _sass
     style    : :compressed
+
+
+# LANGUAGE SETTING (used in /includes/header.html for html-settings)
+language: 'en'
 
