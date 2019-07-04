@@ -23,7 +23,7 @@
 \method{coef}{tram}(object, with_baseline = FALSE, ...) 
 \method{coef}{Lm}(object, as.lm = FALSE, ...)
 \method{coef}{Survreg}(object, as.survreg = FALSE, ...)
-\method{vcov}{tram}(object, with_baseline = FALSE, ...) 
+\method{vcov}{tram}(object, with_baseline = FALSE, complete = FALSE, ...) 
 \method{logLik}{tram}(object, parm = coef(as.mlt(object), fixed = FALSE), ...)
 \method{estfun}{tram}(object, parm = coef(as.mlt(object), fixed = FALSE), ...)
 \method{predict}{tram}(object, newdata = model.frame(object), 
@@ -47,6 +47,7 @@
   \item{as.survreg}{logical, return parameters in the \code{\link[survival]{survreg}}
                parameterisation in \code{TRUE}.}
   \item{parm}{model parameters, including baseline parameters.}
+  \item{complete}{currently ignored}
   \item{newdata}{an optional data frame of new observations.}
   \item{type}{type of prediction, current options include
               linear predictors (\code{"lp"}, of \code{x} variables in the

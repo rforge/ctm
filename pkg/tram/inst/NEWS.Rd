@@ -2,11 +2,18 @@
 \name{NEWS}
 \title{NEWS file for the tram package}
 
+\section{Changes in Version 0.2-7 (2019-07-04)}{
+  \itemize{
+    \item{Compute \code{vcov.tram} via Schur complement when possible.}
+  }
+}
+
 \section{Changes in Version 0.2-6 (2019-06-20)}{
   \itemize{
     \item{Add regression test for count data and \code{log_first = TRUE}.}
   }
 }
+
 
 \section{Changes in Version 0.2-5 (2019-02-25)}{
   \itemize{
