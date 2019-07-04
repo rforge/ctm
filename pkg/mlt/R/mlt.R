@@ -149,8 +149,10 @@
                 if (is.matrix(beta)) {
                     beta_ex <- beta[es$full_ex,,drop = FALSE]
                     beta_nex <- beta[es$full_nex,,drop = FALSE]
+                    nm <- colnames(beta)
                 } else {
                     beta_ex <- beta_nex <- beta
+                    nm <- names(beta)
                 }
                 if (!is.null(es$full_ex))
                     ret <- ret + .mlt_hessian_exact(todistr, 
@@ -161,6 +163,13 @@
                         iYleft, iYright, ioffset, itrunc, 
                         iweights)(.parm(beta_nex))
                 colnames(ret) <- rownames(ret) <- colnames(Y)
+                ### in case beta contains fix parameters,
+                ### return all scores
+                if (!is.null(fixed)) {
+                    if (all(names(fixed) %in% nm))
+                        return(ret)
+                }
+
                 return(ret[!fix, !fix, drop = FALSE])
             })
         )

@@ -2,6 +2,12 @@
 \name{NEWS}
 \title{NEWS file for the mlt package}
 
+\section{Changes in Version 1.0-6 (2019-07-04)}{
+  \itemize{
+    \item{Return Hessian for fixed parameters if requested.}
+  }
+}
+
 \section{Changes in Version 1.0-5 (2019-06-20)}{
   \itemize{
     \item{Add a \code{bread} method.}
