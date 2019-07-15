@@ -35,7 +35,7 @@ if (!file.exists("analysis/DVC.rda")) {
     untar("DVC.tgz", file = "analysis/DVC.rda")
 }
 load("analysis/DVC.rda")
-dvc <- c(margin.table(obs, 2))
+dvc <- c(margin.table(obs[,,"wild"], 2))
 
 logLik.phreg <- function(object) {
     ret <- object$loglik[2]
