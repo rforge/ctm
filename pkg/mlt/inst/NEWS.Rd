@@ -5,6 +5,7 @@
 \section{Changes in Version 1.0-6 (2019-07-04)}{
   \itemize{
     \item{Return Hessian for fixed parameters if requested.}
+    \item{Fix subsetting problem in \code{R.numeric}.}
   }
 }
 
