@@ -2408,18 +2408,31 @@ incomprehensible for most of its potential users.  Because transformation
 models seldomly receive the attention they deserve in statistics courses,
 the unorthodox presentation of regression models ignoring the fences between
 the traditionally compartmentalised fields of ``regression analysis'',
-``survival analysis'', or ``categorical data analysis'' in this documentation
-of \pkg{mlt} will likely also confuse many statisticians, let alone data or
-subject-matter scientists.  Current efforts concentrate on the
+``survival analysis'', or ``categorical data analysis'' in this
+documentation of \pkg{mlt} will likely also confuse many statisticians, let
+alone data or subject-matter scientists.  Current efforts concentrate on the
 implementation of convenience interfaces, \ie higher-level user interfaces
 for special forms of transformation models, which resemble the traditional
 notational and naming conventions from the statistical modelling literature. 
 Standard formula-based interfaces to the underlying \pkg{mlt} implementation
 of Cox models, parametric survival models, models for ordered categorical
-data, normal linear and non-normal linear models are available in package
-\pkg{tram} \citep{pkg:tram}.  The corresponding package vignette
-demonstrates how some of the model outputs presented in this paper can be
-obtained in simpler ways.
+data, normal linear and non-normal linear models \citep[including \cmd{Colr}
+implementing continuous outcome logistic
+regression,][]{Lohse_Rohrmann_Faeh_2017} are available in package \pkg{tram}
+\citep{pkg:tram}.  The corresponding package vignette demonstrates how some
+of the model outputs presented in this paper can be obtained in simpler
+ways.
+
+The core functionality provided by \pkg{mlt} was instrumental in developing
+statistical learning procedures based on transformation models. 
+Transformation trees and corresponding transformation forests were
+introduced by \cite{Hothorn_Zeileis_2017} and implemented in package
+\pkg{trtf}; an application to conditional distributions for body mass
+indices was described by \cite{Hothorn_2018_SM} and novel survival forests have
+been evaluated by \cite{Korepanova_Seibold_Steffen_2019}.  Two different
+gradient boosting schemes allowing complex models to be built in the
+transformation modelling framework were proposed by \cite{Hothorn_2019} and
+are implemented in package \pkg{tbm}.
 
 \bibliography{mlt,packages}
 
