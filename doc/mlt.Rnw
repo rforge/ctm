@@ -1057,6 +1057,25 @@ The estimated scale parameters $\hat{\eparm}_1$ are $\Sexpr{round(1 / survreg_GB
 4)}$ (\cmd{survreg}), $\Sexpr{round(exp(coef(phreg_GBSG2_3)["log(shape)"]), 4)}$ 
 (\cmd{phreg}) and $\Sexpr{round(coef(mlt_GBSG2_3)["log(y)"], 4)}$ (\cmd{mlt}).
 
+It is also possible to combine the log-transformation with the Bernstein
+polynomial. In this case, Bernstein basis functions are computed for log-transformed
+survival times, thus a linear Bernstein polynomial is equivalent to a
+Weibull model. The \code{log\_first = TRUE} argument to
+\cmd{Bernstein\_basis} implements this concept; the Cox model for the GBSG2
+study can be implemented as
+<<GBSG2-3a>>=
+log_GBSG2y <- numeric_var("y", support = c(100.0, max(GBSG2$time)), 
+                          bounds = c(0.1, Inf))
+lBy <- Bernstein_basis(log_GBSG2y, order = 10, ui = "increasing", 
+                       log_first = TRUE)
+ctm_GBSG2_3a <- ctm(lBy, shifting = fm_GBSG2[-2L], data = GBSG2, 
+                   negative = FALSE, todistr = "MinExtrVal")
+mlt_GBSG2_3a <- mlt(ctm_GBSG2_3a, data = GBSG2, scale = TRUE)
+logLik(mlt_GBSG2_3a)
+RC(coxph = cf, mlt = coef(mlt_GBSG2_3a)[names(cf)])
+@
+
+
 \paragraph{Non-normal Linear Regression: Boston Housing Data}
 
 The Boston Housing data are a prominent test-bed for parametric and
