@@ -89,7 +89,9 @@ vcov.tram <- function(object, with_baseline = FALSE, complete = FALSE, ...)
     Hlin <- H[shift, shift]
     Hbase <- H[-shift, -shift]
     Hoff <- H[shift, -shift]
-    return(solve(Hlin - tcrossprod(Hoff %*% solve(Hbase), Hoff)))
+    ret <- solve(Hlin - tcrossprod(Hoff %*% solve(Hbase), Hoff))
+    colnames(ret) <- rownames(ret) <- object$shiftcoef
+    return(ret)
 }
 
 nobs.tram <- function(object, ...) {
