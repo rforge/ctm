@@ -1,0 +1,232 @@
+
+### marginally interpretable linear transformation models for clustered
+### observations
+
+mtramc <- function(object, formula, data, standardise = FALSE,
+                   grd = SparseGrid::createSparseGrid(type = "KPU", dimension = length(rt$cnms[[1]]), 
+                                                      k = 10),
+                   Hessian = FALSE,
+                   ...) {
+
+    stopifnot(inherits(object, "mlt_fit"))
+
+    bar.f <- lme4::findbars(formula)
+    mf <- model.frame(lme4::subbars(formula), data = data)
+    rt <- lme4::mkReTrms(bar.f, mf)
+
+    ZtW <- rt$Zt
+    Lambdat <- rt$Lambdat
+    Lind <- rt$Lind
+    mapping <- function(theta)
+        theta[Lind]
+    theta <- rt$theta
+
+    eY <- get("eY", environment(object$loglik))
+    iY <- get("iY", environment(object$loglik))
+    fixed <- get("fixed", environment(object$loglik))
+    offset <- get("offset", environment(object$loglik))
+    wf <- 1:length(coef(as.mlt(object)))
+    if (!is.null(eY)) {
+        tmp <- attr(eY$Y, "constraint")
+        wf <- !colnames(eY$Y) %in% names(fixed)
+        eY$Y <- eY$Y[, wf,drop = FALSE]
+        attr(eY$Y, "constraint") <- tmp
+    }
+    if (!is.null(iY)) {
+        tmp <- attr(iY$Yleft, "constraint")
+        wf <- !colnames(iY$Yleft) %in% names(fixed)
+        iY$Yleft <- iY$Yleft[, wf,drop = FALSE]
+        iY$Yright <- iY$Yright[, wf,drop = FALSE]
+        attr(iY$Yleft, "constraint") <- tmp
+        attr(iY$Yright, "constraint") <- tmp
+    }
+    if (length(eY$which) > 0 && length(iY$which))
+        stop("cannot deal with mixed censoring")
+
+    w <- object$weights
+
+    NORMAL <- FALSE
+    if (object$todistr$name == "normal") {
+        NORMAL <- TRUE
+        PF <- function(z) z
+    } else {
+        PF <- function(z) qnorm(object$todistr$p(z))
+    }
+
+    gr <- NULL
+
+    if (length(eY$which) > 0) {
+        if (standardise) stop("standardise not yet implemented for continuous case")
+        L <- Cholesky(crossprod(Lambdat %*% ZtW), LDL = FALSE, Imult=1)
+        ll <- function(parm) {
+            theta <- parm[1:ncol(eY$Y)]
+            gamma <- parm[-(1:ncol(eY$Y))]
+            z <- PF(c(eY$Y %*% theta + offset))
+            Lambdat@x[] <- mapping(gamma)
+            L <- update(L, t(Lambdat %*% ZtW), mult = 1)
+            Linv <- solve(as(L, "Matrix"))
+            logdet <- 2 * determinant(L, logarithm = TRUE)$modulus
+            ret <- -0.5 * (logdet + sum((Linv %*% z)^2))
+            ret <- ret - object$loglik(theta, weights = w) + .5 * sum(z^2)
+            return(-ret)
+        }
+        X <- eY$Y
+        if (NORMAL) {
+            gr <- function(parm) {
+                theta <- parm[1:ncol(eY$Y)]
+                gamma <- parm[-(1:ncol(eY$Y))]
+                devLambda <- devSigma <- vector(mode = "list", 
+                                                length = length(gamma))
+                dgamma <- numeric(length(gamma))
+                z <- c(eY$Y %*% theta + offset)
+                Lambdat@x[] <- mapping(gamma)
+                L <- update(L, t(Lambdat %*% ZtW), mult = 1)
+                Linv <- solve(as(L, "Matrix"))
+                Sigma <- tcrossprod(as(L, "Matrix"))
+                SigmaInv <- crossprod(Linv)
+                LambdaInd <- t(Lambdat)
+                LambdaInd@x[] <- 1:length(gamma)
+                for (i in 1:length(gamma)) {
+                    ### Wang & Merkle (2018, JSS) compute derivative of G!
+                    ### We need derivative of Lambda!
+                    dLtL <- (LambdaInd == i) %*% Lambdat
+                    devLambda[[i]] <- dLtL + t(dLtL)
+                    devSigma[[i]] <- crossprod(ZtW, devLambda[[i]] %*% ZtW)
+                    t1 <- SigmaInv %*% devSigma[[i]]
+                    t2 <- t1 %*% SigmaInv
+                    dgamma[i] <- -.5 * (sum(diag(t1)) - crossprod(z, t2) %*% z)
+                }
+                dtheta <- - z %*% SigmaInv %*% eY$Y + 
+                            colSums(eY$Yprime / c(eY$Yprime %*% theta))
+                return(-c(c(as(dtheta, "matrix")), dgamma))
+            }
+        }
+    } else {
+        stopifnot(length(rt$flist) == 1)
+        grp <- rt$flist[[1]]
+        idx <- 1:length(grp)
+        wh <- 1:length(rt$cnms[[1]])
+        grd$nodes <- qnorm(grd$nodes)
+        ll <- function(parm) {
+            theta <- parm[1:ncol(iY$Yleft)]
+            gamma <- parm[-(1:ncol(iY$Yleft))]
+            Lambdat@x[] <- mapping(gamma)
+            lplower <- c(iY$Yleft %*% theta + offset)
+            lplower[is.na(lplower)] <- -Inf
+            lpupper <- c(iY$Yright %*% theta + offset)
+            lpupper[is.na(lpupper)] <- Inf
+
+## don't spend time on Matrix dispatch
+            mZtW <- as(ZtW, "matrix")
+            mL <- as(Lambdat[wh, wh], "matrix")
+
+            ret <- tapply(idx, grp, function(i) {
+
+## needs a lot of time in Matrix
+#                z <- ZtW[,i,drop = FALSE]
+#                z <- z[rowSums(abs(z)) > 0,,drop = FALSE]
+#                V <- t(as(Lambdat[wh, wh] %*% z, "matrix"))
+## a bit faster
+                z <- mZtW[,i,drop = FALSE]
+                z <- z[rowSums(abs(z)) > 0,,drop = FALSE]
+                V <- t(mL %*% z)
+
+                if (standardise) {
+                    sd <- sqrt(rowSums(V^2) + 1)
+                } else {
+                    sd <- 1
+                }
+                zlower <- PF(lplower[i] / sd) * sd
+                zupper <- PF(lpupper[i] / sd) * sd
+                .Marsaglia_1963(zlower, zupper, mean = 0, V = V, 
+                                do_qnorm = FALSE, grd = grd)
+            })
+            return(-sum(log(pmax(.Machine$double.eps, ret))))
+        }
+        X <- iY$Yleft
+    }            
+
+    ui <- attr(X, "constraint")$ui[, wf, drop = FALSE]
+    ci <- attr(X, "constraint")$ci
+    ui <- as(bdiag(ui, Diagonal(length(theta))), "matrix")
+    ci <- c(ci, rt$lower)
+
+    start <- c(coef(as.mlt(object), fixed = FALSE), theta)
+
+    if (is.null(gr)) {
+        opt <- alabama::auglag(par = start, fn = ll, 
+            hin = function(par) ui %*% par - ci, 
+            hin.jac = function(par) ui,
+            control.outer = list(trace = FALSE))[c("par", "value", "gradient")]
+    } else {
+        opt <- alabama::auglag(par = start, fn = ll, gr = gr,
+            hin = function(par) ui %*% par - ci, 
+            hin.jac = function(par) ui,
+            control.outer = list(trace = FALSE))[c("par", "value", "gradient")]
+    }
+    if (length(eY$which) > 0) {
+        gamma <- opt$par[-(1:ncol(eY$Y))]
+        names(opt$par)[-(1:ncol(eY$Y))] <- paste0("gamma", 1:length(gamma))
+    } else {
+        gamma <- opt$par[-(1:ncol(iY$Yleft))]
+        names(opt$par)[-(1:ncol(iY$Yleft))] <- paste0("gamma", 1:length(gamma))
+    }
+    Lambdat@x[] <- mapping(gamma)
+    opt$G <- crossprod(Lambdat)[1:length(rt$cnms[[1]]),1:length(rt$cnms[[1]])]
+    if (Hessian) opt$Hessian <- numDeriv::hessian(ll, opt$par)
+    opt$loglik <- ll
+    class(opt) <- "mtramc"
+    opt
+}
+
+logLik.mtramc <- function(object, parm = NULL, ...) {
+    if (!is.null(parm)) {
+        ret <- -c(object$loglik(parm))
+    } else {
+        ret <- -c(object$value)
+    }
+    attr(ret, "df") <- length(coef(object))
+    class(ret) <- "logLik"
+    ret
+}
+
+coef.mtramc <- function(object, ...)
+    object$par
+
+.Marsaglia_1963 <- function(lower = rep(-Inf, nrow(sigma)), 
+                           upper = rep(Inf, nrow(sigma)), 
+                           mean = rep(0, nrow(sigma)), 
+                           V = diag(2), 
+                           grd = SparseGrid::createSparseGrid(type = "KPU", dimension =
+                                                              ncol(V), k = 10), 
+                           do_qnorm = TRUE,
+                           ...) {
+
+    k <- nrow(V)
+    l <- ncol(V)
+#    stopifnot(l <= k - 1)
+
+    VVt <- tcrossprod(V)
+    sd <- sqrt(diag(VVt) + 1)
+    
+    lower <- (lower - mean) / sd
+    upper <- (upper - mean) / sd
+
+    if (k == 1)
+        return(pnorm(upper) - pnorm(lower))
+
+    V <- diag(1 / sd) %*% V
+
+    ### y = qnorm(x)
+    inner <- function(y) {
+        Vy <- V %*% y
+        ret <- pnorm((upper - Vy) * sd) - pnorm((lower - Vy) * sd)
+        ret <- matrix(pmax(.Machine$double.eps, ret), nrow = nrow(ret),
+                      ncol = ncol(ret))
+        exp(colSums(log(ret)))
+    }
+
+    if (do_qnorm) grd$nodes <- qnorm(grd$nodes)
+    ev <- inner(t(grd$nodes))
+    c(value = sum(grd$weights * ev))
+}
