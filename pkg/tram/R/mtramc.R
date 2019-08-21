@@ -224,6 +224,7 @@ coef.mtramc <- function(object, ...)
         ### ret <- pnorm(upper - Vy) - pnorm(lower - Vy)
         ### ~ 3x speed-up
         ret <- .Call("pnormMRS", c(upper - Vy)) - .Call("pnormMRS", c(lower - Vy))
+        if (nrow(Vy) == 1) return(ret)
         ret <- matrix(pmax(.Machine$double.eps, ret), nrow = nrow(Vy),
                       ncol = ncol(Vy))
         exp(colSums(log(ret)))
