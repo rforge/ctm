@@ -107,6 +107,8 @@ mtramc <- function(object, formula, data, standardise = FALSE,
         idx <- 1:length(grp)
         wh <- 1:length(rt$cnms[[1]])
         grd$nodes <- qnorm(grd$nodes)
+## don't spend time on Matrix dispatch
+            mZtW <- as(ZtW, "matrix")
         ll <- function(parm) {
             theta <- parm[1:ncol(iY$Yleft)]
             gamma <- parm[-(1:ncol(iY$Yleft))]
@@ -117,7 +119,6 @@ mtramc <- function(object, formula, data, standardise = FALSE,
             lpupper[is.na(lpupper)] <- Inf
 
 ## don't spend time on Matrix dispatch
-            mZtW <- as(ZtW, "matrix")
             mL <- as(Lambdat[wh, wh], "matrix")
 
             ret <- tapply(idx, grp, function(i) {
@@ -207,20 +208,19 @@ coef.mtramc <- function(object, ...)
 #    stopifnot(l <= k - 1)
 
     VVt <- tcrossprod(V)
-    sd <- sqrt(diag(VVt) + 1)
     
-    lower <- (lower - mean) / sd
-    upper <- (upper - mean) / sd
+    lower <- lower - mean
+    upper <- upper - mean
 
-    if (k == 1)
-        return(pnorm(upper) - pnorm(lower))
-
-    V <- diag(1 / sd) %*% V
+    if (k == 1) {
+        sd <- sqrt(diag(VVt) + 1)
+        return(pnorm(upper / sd) - pnorm(lower / sd))
+    }
 
     ### y = qnorm(x)
     inner <- function(y) {
         Vy <- V %*% y
-        ret <- pnorm((upper - Vy) * sd) - pnorm((lower - Vy) * sd)
+        ret <- pnorm(upper - Vy) - pnorm(lower - Vy)
         ret <- matrix(pmax(.Machine$double.eps, ret), nrow = nrow(ret),
                       ncol = ncol(ret))
         exp(colSums(log(ret)))
@@ -230,3 +230,4 @@ coef.mtramc <- function(object, ...)
     ev <- inner(t(grd$nodes))
     c(value = sum(grd$weights * ev))
 }
+
