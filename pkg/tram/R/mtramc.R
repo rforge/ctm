@@ -220,9 +220,12 @@ coef.mtramc <- function(object, ...)
     ### y = qnorm(x)
     inner <- function(y) {
         Vy <- V %*% y
-        ret <- pnorm(upper - Vy) - pnorm(lower - Vy)
-        ret <- matrix(pmax(.Machine$double.eps, ret), nrow = nrow(ret),
-                      ncol = ncol(ret))
+        ### this needs ~ 75% of the total runtime
+        ### ret <- pnorm(upper - Vy) - pnorm(lower - Vy)
+        ### ~ 3x speed-up
+        ret <- .Call("pnormMRS", c(upper - Vy)) - .Call("pnormMRS", c(lower - Vy))
+        ret <- matrix(pmax(.Machine$double.eps, ret), nrow = nrow(Vy),
+                      ncol = ncol(Vy))
         exp(colSums(log(ret)))
     }
 

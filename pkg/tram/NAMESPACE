@@ -1,4 +1,6 @@
 
+useDynLib("tram", .registration = TRUE)
+
 import("mlt")
 import("variables")
 import("basefun")
