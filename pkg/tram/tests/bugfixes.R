@@ -67,3 +67,9 @@ m3 <- Colr(y.p1 ~ x, data = d,
 l1 <- m1$logliki(coef(as.mlt(m1)), rep(1, nrow(d)))
 l3 <- m3$logliki(coef(as.mlt(m3)), rep(1, nrow(d)))
 stopifnot(cor(l1, l3) > .96)
+
+### normal CDF approximation by Matic et al (2018)
+x <- -600:600 / 100
+p1 <- .Call("R_pnormMRS", x)
+p2 <- pnorm(x)
+stopifnot(max(abs(p1 - p2)) < 5.79e-6) ### max absolute error
