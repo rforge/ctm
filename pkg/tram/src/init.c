@@ -5,10 +5,12 @@
 #include <R_ext/Rdynload.h>
 
 /* .Call calls */
-extern SEXP pnormMRS(SEXP);
+extern SEXP R_pnormMRS(SEXP);
+extern SEXP R_inner(SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
-    {"pnormMRS", (DL_FUNC) &pnormMRS, 1},
+    {"R_pnormMRS", (DL_FUNC) &R_pnormMRS, 1},
+    {"R_inner", (DL_FUNC) &R_inner, 1},
     {NULL, NULL, 0}
 };
 

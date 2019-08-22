@@ -50,7 +50,8 @@ mtramc <- function(object, formula, data, standardise = FALSE,
         NORMAL <- TRUE
         PF <- function(z) z
     } else {
-        PF <- function(z) qnorm(object$todistr$p(z))
+        P <- object$todistr$p
+        PF <- function(z) qnorm(P(z))
     }
 
     gr <- NULL
@@ -104,11 +105,25 @@ mtramc <- function(object, formula, data, standardise = FALSE,
     } else {
         stopifnot(length(rt$flist) == 1)
         grp <- rt$flist[[1]]
-        idx <- 1:length(grp)
+        idx <- split(1:length(grp), grp)
         wh <- 1:length(rt$cnms[[1]])
-        grd$nodes <- qnorm(grd$nodes)
+        ### .Marsaglia_1963 expects t(nodes) !!!
+        grd$nodes <- t(qnorm(grd$nodes))
+
 ## don't spend time on Matrix dispatch
-            mZtW <- as(ZtW, "matrix")
+        mZtW <- as(ZtW, "matrix")
+        zt <- lapply(idx, function(i) {
+            z <- mZtW[,i,drop = FALSE]
+            t(z[base::rowSums(abs(z)) > 0,,drop = FALSE])
+        })
+        mLt <- t(as(Lambdat[wh, wh], "matrix"))
+        ONE <- matrix(1, nrow = NCOL(mLt))
+
+## because this needs a lot of time in Matrix
+#                z <- ZtW[,i,drop = FALSE]
+#                z <- z[rowSums(abs(z)) > 0,,drop = FALSE]
+#                V <- t(as(Lambdat[wh, wh] %*% z, "matrix"))
+
         ll <- function(parm) {
             theta <- parm[1:ncol(iY$Yleft)]
             gamma <- parm[-(1:ncol(iY$Yleft))]
@@ -118,27 +133,17 @@ mtramc <- function(object, formula, data, standardise = FALSE,
             lpupper <- c(iY$Yright %*% theta + offset)
             lpupper[is.na(lpupper)] <- Inf
 
-## don't spend time on Matrix dispatch
-            mL <- as(Lambdat[wh, wh], "matrix")
-
-            ret <- tapply(idx, grp, function(i) {
-
-## needs a lot of time in Matrix
-#                z <- ZtW[,i,drop = FALSE]
-#                z <- z[rowSums(abs(z)) > 0,,drop = FALSE]
-#                V <- t(as(Lambdat[wh, wh] %*% z, "matrix"))
-## a bit faster
-                z <- mZtW[,i,drop = FALSE]
-                z <- z[rowSums(abs(z)) > 0,,drop = FALSE]
-                V <- t(mL %*% z)
-
+            ret <- sapply(1:length(idx), function(i) {
+                V <- zt[[i]] %*% mLt
+                ii <- idx[[i]]
                 if (standardise) {
-                    sd <- sqrt(rowSums(V^2) + 1)
+                    sd <- c(sqrt((V^2) %*% ONE + 1))
+                    zlower <- PF(lplower[ii] / sd) * sd
+                    zupper <- PF(lpupper[ii] / sd) * sd
                 } else {
-                    sd <- 1
+                    zlower <- PF(lplower[ii])
+                    zupper <- PF(lpupper[ii])
                 }
-                zlower <- PF(lplower[i] / sd) * sd
-                zupper <- PF(lpupper[i] / sd) * sd
                 .Marsaglia_1963(zlower, zupper, mean = 0, V = V, 
                                 do_qnorm = FALSE, grd = grd)
             })
@@ -195,25 +200,29 @@ coef.mtramc <- function(object, ...)
     object$par
 
 .Marsaglia_1963 <- function(lower = rep(-Inf, nrow(sigma)), 
-                           upper = rep(Inf, nrow(sigma)), 
-                           mean = rep(0, nrow(sigma)), 
-                           V = diag(2), 
-                           grd = SparseGrid::createSparseGrid(type = "KPU", dimension =
-                                                              ncol(V), k = 10), 
-                           do_qnorm = TRUE,
-                           ...) {
-
+                            upper = rep(Inf, nrow(sigma)), 
+                            mean = rep(0, nrow(sigma)), 
+                            V = diag(2), 
+                            grd = NULL,
+                            do_qnorm = TRUE,
+                            ...) {
+ 
     k <- nrow(V)
     l <- ncol(V)
-#    stopifnot(l <= k - 1)
 
-    VVt <- tcrossprod(V)
+    if (is.null(grd)) {
+        stopifnot(do_qnorm)
+        grd <- SparseGrid::createSparseGrid(type = "KPU", dimension = ncol(V), k = 10)
+        ### Note: We expect t(nodes) below
+        grd$nodes <- t(grd$nodes)
+    }
     
     lower <- lower - mean
     upper <- upper - mean
 
     if (k == 1) {
-        sd <- sqrt(diag(VVt) + 1)
+        VVt <- base::tcrossprod(V)
+        sd <- sqrt(base::diag(VVt) + 1)
         return(pnorm(upper / sd) - pnorm(lower / sd))
     }
 
@@ -221,17 +230,17 @@ coef.mtramc <- function(object, ...)
     inner <- function(y) {
         Vy <- V %*% y
         ### this needs ~ 75% of the total runtime
-        ret <- pnorm(upper - Vy) - pnorm(lower - Vy)
+        #ret <- pnorm(upper - Vy) - pnorm(lower - Vy)
         ### ~ 3x speed-up
         ### ret <- .Call("pnormMRS", c(upper - Vy)) - .Call("pnormMRS", c(lower - Vy))
-        if (nrow(Vy) == 1) return(ret)
-        ret <- matrix(pmax(.Machine$double.eps, ret), nrow = nrow(Vy),
-                      ncol = ncol(Vy))
-        exp(colSums(log(ret)))
+        #if (nrow(Vy) == 1) return(ret)
+        #ret <- matrix(pmax(.Machine$double.eps, ret), nrow = nrow(Vy),
+        #              ncol = ncol(Vy))
+        #exp(colSums(log(ret)))
+        .Call("R_inner", upper - Vy, lower - Vy)
     }
 
     if (do_qnorm) grd$nodes <- qnorm(grd$nodes)
-    ev <- inner(t(grd$nodes))
+    ev <- inner(grd$nodes)
     c(value = sum(grd$weights * ev))
 }
-
