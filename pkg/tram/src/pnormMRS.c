@@ -4,6 +4,14 @@
 #include <Rinternals.h>
 #include <Rdefines.h>
 
+/* see https://ssrn.com/abstract=2842681 */
+const double g2 =  -0.0150234471495426236132;
+const double g4 = 0.000666098511701018747289;
+const double g6 = 5.07937324518981103694e-06;
+const double g8 = -2.92345273673194627762e-06;
+const double g10 = 1.34797733516989204361e-07;
+const double m2dpi = -2.0 / M_PI; //3.141592653589793115998;
+
 /* nrow of a matrix */
 
 int NROW
@@ -47,15 +55,9 @@ int NCOL
 
 void C_pnormMRS (double *dx, int n, double *da) {
 
-    double g2, g4, g6, g8, g10, tmp;
+    double tmp;
     double x2, x4, x6, x8, x10, tx;
-    double m2dpi = -2.0 / 3.141592653589793115998;
-    
-    g2 =  -0.0150234471495426236132;
-    g4 = 0.000666098511701018747289;
-    g6 = 5.07937324518981103694e-06;
-    g8 = -2.92345273673194627762e-06;
-    g10 = 1.34797733516989204361e-07;
+//    double m2dpi = -2.0 / 3.141592653589793115998;
     
     for (int i = 0; i < n; i++) {
         tx = dx[i];
@@ -113,8 +115,13 @@ SEXP R_inner (SEXP upper, SEXP lower) {
    for (int j = 0; j < ncol; j++) {
        C_pnormMRS(du + j * nrow, nrow, tmpu);
        C_pnormMRS(dl + j * nrow, nrow, tmpl);
-       for (int i = 0; i < nrow; i++)
+       for (int i = 0; i < nrow; i++) {
+           /* also possible to use more accurate normal CDFs
+           tmpu[i] = pnorm(du[j * nrow + i], 0.0, 1.0, 1.0, 0.0);
+           tmpl[i] = pnorm(dl[j * nrow + i], 0.0, 1.0, 1.0, 0.0);
+           */
            da[j] = da[j] * (tmpu[i] - tmpl[i]);
+       }
    }
    
    Free(tmpl); Free(tmpu);
