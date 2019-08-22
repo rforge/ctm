@@ -109,20 +109,12 @@ mtramc <- function(object, formula, data, standardise = FALSE,
         wh <- 1:length(rt$cnms[[1]])
         ### .Marsaglia_1963 expects t(nodes) !!!
         grd$nodes <- t(qnorm(grd$nodes))
-
 ## don't spend time on Matrix dispatch
         mZtW <- as(ZtW, "matrix")
         zt <- lapply(idx, function(i) {
             z <- mZtW[,i,drop = FALSE]
             t(z[base::rowSums(abs(z)) > 0,,drop = FALSE])
         })
-        mLt <- t(as(Lambdat[wh, wh], "matrix"))
-        ONE <- matrix(1, nrow = NCOL(mLt))
-
-## because this needs a lot of time in Matrix
-#                z <- ZtW[,i,drop = FALSE]
-#                z <- z[rowSums(abs(z)) > 0,,drop = FALSE]
-#                V <- t(as(Lambdat[wh, wh] %*% z, "matrix"))
 
         ll <- function(parm) {
             theta <- parm[1:ncol(iY$Yleft)]
@@ -133,16 +125,22 @@ mtramc <- function(object, formula, data, standardise = FALSE,
             lpupper <- c(iY$Yright %*% theta + offset)
             lpupper[is.na(lpupper)] <- Inf
 
-            ret <- sapply(1:length(idx), function(i) {
+## don't spend time on Matrix dispatch
+            mLt <- t(as(Lambdat[wh, wh], "matrix"))
+            ONE <- matrix(1, nrow = NCOL(mLt))
+
+        ret <- sapply(1:length(idx), function(i) {
                 V <- zt[[i]] %*% mLt
-                ii <- idx[[i]]
+                i <- idx[[i]]
                 if (standardise) {
                     sd <- c(sqrt((V^2) %*% ONE + 1))
-                    zlower <- PF(lplower[ii] / sd) * sd
-                    zupper <- PF(lpupper[ii] / sd) * sd
+                    zlower <- PF(lplower[i] / sd) * sd
+                    zupper <- PF(lpupper[i] / sd) * sd
+                    sd <- sqrt(rowSums(V^2) + 1)
                 } else {
-                    zlower <- PF(lplower[ii])
-                    zupper <- PF(lpupper[ii])
+                    zlower <- PF(lplower[i])
+                    zupper <- PF(lpupper[i])
+                    sd <- 1
                 }
                 .Marsaglia_1963(zlower, zupper, mean = 0, V = V, 
                                 do_qnorm = FALSE, grd = grd)
