@@ -221,9 +221,9 @@ coef.mtramc <- function(object, ...)
     inner <- function(y) {
         Vy <- V %*% y
         ### this needs ~ 75% of the total runtime
-        ### ret <- pnorm(upper - Vy) - pnorm(lower - Vy)
+        ret <- pnorm(upper - Vy) - pnorm(lower - Vy)
         ### ~ 3x speed-up
-        ret <- .Call("pnormMRS", c(upper - Vy)) - .Call("pnormMRS", c(lower - Vy))
+        ### ret <- .Call("pnormMRS", c(upper - Vy)) - .Call("pnormMRS", c(lower - Vy))
         if (nrow(Vy) == 1) return(ret)
         ret <- matrix(pmax(.Machine$double.eps, ret), nrow = nrow(Vy),
                       ncol = ncol(Vy))
