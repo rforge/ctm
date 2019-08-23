@@ -2,11 +2,27 @@
 \name{NEWS}
 \title{NEWS file for the tram package}
 
+\section{Changes in Version 0.3-0 (2019-08-23)}{
+  \subsection{Bugfixes}{
+    \itemize{
+      \item{\code{y | s1:s2 ~ x} lead to rank-deficit model, the intercept is
+            now removed.}
+    }
+  }
+  \subsection{New Features}        
+    \itemize{
+      \item{Compute \code{vcov.tram} via Schur complement when possible.}
+      \item{Add some (not yet exported) infrastructure for clustered data.}
+    }
+  }
+}
+
 \section{Changes in Version 0.2-7 (2019-07-04)}{
   \itemize{
     \item{Compute \code{vcov.tram} via Schur complement when possible.}
   }
 }
+
 
 \section{Changes in Version 0.2-6 (2019-06-20)}{
   \itemize{

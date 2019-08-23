@@ -1,6 +1,7 @@
 
 library("tram")
 library("sandwich")
+library("survival")
 
 ### scores for fixed parameters
 cars$int <- 1
@@ -73,3 +74,11 @@ x <- -600:600 / 100
 p1 <- .Call("R_pnormMRS", x)
 p2 <- pnorm(x)
 stopifnot(max(abs(p1 - p2)) < 5.79e-6) ### max absolute error
+
+### 0.3-0
+data("GBSG2", package = "TH.data")
+### this model included an additional intercept
+m1 <- Coxph(Surv(time, cens) | menostat:tgrade ~ horTh, data = GBSG2)
+m2 <- Coxph(Surv(time, cens) | 0 + menostat:tgrade ~ horTh, data = GBSG2)
+stopifnot(max(abs(coef(as.mlt(m1)) - coef(as.mlt(m2)))) < 
+          sqrt(.Machine$double.eps))

@@ -127,8 +127,19 @@ tram <- function(formula, data, subset, weights, offset, cluster, na.action = na
                       extrapolate = extrapolate, log_first = log_first)
 
     iS <- NULL
-    if (!is.null(td$mt$s)) 
+    if (!is.null(td$mt$s)) {
+        ### model.matrix(~ s1) has intercept
+        ### model.matrix(~ 0 + s1) hasn't
         iS <- as.basis(formula(Formula(td$mt$s)[-3]), data = td$mf)
+        ### model.matrix(~ s1:s2) is cell-means model WITH intercept
+        ### remove if necessary
+        tmp <- model.matrix(iS, data = td$mf)
+        if (isTRUE(all.equal(tmp[,1], rowSums(tmp[,-1]), 
+                             check.attributes = FALSE)))
+            iS <- as.basis(formula(Formula(td$mt$s)[-3]), data = td$mf, 
+                           remove_intercept = TRUE)
+    }
+
     iX <- NULL
     if (!is.null(td$mt$x)) {
         ### NOTE: this triggers sumconstr = TRUE
