@@ -134,7 +134,7 @@ tram <- function(formula, data, subset, weights, offset, cluster, na.action = na
         ### model.matrix(~ s1:s2) is cell-means model WITH intercept
         ### remove if necessary
         tmp <- model.matrix(iS, data = td$mf)
-        if (isTRUE(all.equal(tmp[,1], rowSums(tmp[,-1]), 
+        if (isTRUE(all.equal(tmp[,1], rowSums(tmp[,-1, drop = FALSE]), 
                              check.attributes = FALSE)))
             iS <- as.basis(formula(Formula(td$mt$s)[-3]), data = td$mf, 
                            remove_intercept = TRUE)
