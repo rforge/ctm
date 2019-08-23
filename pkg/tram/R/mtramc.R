@@ -130,13 +130,12 @@ mtramc <- function(object, formula, data, standardise = FALSE,
             ONE <- matrix(1, nrow = NCOL(mLt))
 
         ret <- sapply(1:length(idx), function(i) {
-                V <- zt[[i]] %*% mLt
+                V <- zt[[i]] %*% mLt  ### = U_i %*% Lambda(\varparm)
                 i <- idx[[i]]
                 if (standardise) {
-                    sd <- c(sqrt((V^2) %*% ONE + 1))
+                    sd <- c(sqrt((V^2) %*% ONE + 1)) ### D(\varparm)
                     zlower <- PF(lplower[i] / sd) * sd
                     zupper <- PF(lpupper[i] / sd) * sd
-                    sd <- sqrt(rowSums(V^2) + 1)
                 } else {
                     zlower <- PF(lplower[i])
                     zupper <- PF(lpupper[i])
@@ -215,6 +214,12 @@ coef.mtramc <- function(object, ...)
         grd$nodes <- t(grd$nodes)
     }
     
+    ### Note: The appendix describes the standardised version
+    ### in order to be compliant with the notation in Genz & Bretz (2009).
+    ### Standardisation of lower/upper and V AND division by diagonal
+    ### elements in the Marsaglia formula cancel out and are thus
+    ### left-out in the code
+
     lower <- lower - mean
     upper <- upper - mean
 
