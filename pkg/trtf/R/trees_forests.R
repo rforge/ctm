@@ -48,8 +48,19 @@
                 if (!estfun) 
                     return(list(coef = thetastart, objfun = NA,
                                 converged = FALSE))
-                return(list(estfun = matrix(0, nrow = nrow(mf), ncol = length(w)),
-                            coef = thetastart, objfun = NA,  converged = FALSE))
+                ### estfun was requested and thus a tree wants to look for
+                ### splits. We cannot update the model, so we simply reuse
+                ### the start parameters. This amounts to treating the
+                ### scores as fix when building the subtree. This was always
+                ### the case in party::ctree (the "model" was once estimated
+                ### in the root node) and Stefan Wager suggested to apply
+                ### this scheme in model-based trees in a discussion 2019-09-06.
+                mltargs$weights <- w
+                mltargs$doFit <- FALSE
+                umod <- try(do.call("mlt", mltargs))
+                coef(umod) <- thetastart
+                umod$convergence <- 0L ### this is FAKE but extree would stop
+                                       ### after non-convergence
             }
             ret <- NULL
             if (estfun) {
