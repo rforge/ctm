@@ -1,8 +1,10 @@
 
-.ctmfit <- function(object, parm, mltargs, reparm) {
+.ctmfit <- function(object, parm, mltargs, reparm, 
+                    min_update = length(coef(object)) * 2) {
     
     ctmobject <- object
 
+    ### note: control is never used but expected by partykit::ctree
     function(data, weights, control, ...) {
         mf <- model.frame(data, yxonly = TRUE)
         iy <- data[["yx", type = "index"]]
@@ -32,15 +34,25 @@
             } else {
                 thetastart <- coef(ctmobject, fixed = FALSE)
             }
-            umod <- suppressWarnings(try(update(ctmobject, weights = w, subset = subset, theta = thetastart), silent = TRUE))
-            if (inherits(umod, "try-error") || umod$convergence != 0) {
-                umod <- suppressWarnings(try(update(ctmobject, weights = w, subset = subset), silent = TRUE))
+            ### update parameters when there are more than min_update
+            ### observations
+            if (length(subset) > min_update) {
+                umod <- suppressWarnings(try(update(ctmobject, weights = w, 
+                    subset = subset, theta = thetastart), silent = TRUE))
                 if (inherits(umod, "try-error") || umod$convergence != 0) {
-                    mltargs$weights <- w
-                    ### [1]: no subset allowed here, so used zero weights (see
-                    ### above AND below)!!!
-                    umod <- try(do.call("mlt", mltargs))
+                    umod <- suppressWarnings(try(update(ctmobject, weights = w, subset = subset), 
+                                                  silent = TRUE))
+                    if (inherits(umod, "try-error") || umod$convergence != 0) {
+                        mltargs$weights <- w
+                        ### [1]: no subset allowed here, so used zero weights (see
+                        ### above AND below)!!!
+                        umod <- try(do.call("mlt", mltargs))
+                    }
                 }
+            } else {
+                ### reuse parameters from root node (next if statement)
+                umod <- 0
+                class(umod) <- "try-error"
             }
             if (inherits(umod, "try-error")) {
                 ### we badly need some estimate in each node, even if fitting
@@ -58,7 +70,7 @@
                 mltargs$weights <- w
                 mltargs$doFit <- FALSE
                 umod <- try(do.call("mlt", mltargs))
-                coef(umod) <- thetastart
+                coef(umod)[names(thetastart)] <- thetastart
                 umod$convergence <- 0L ### this is FAKE but extree would stop
                                        ### after non-convergence
             }
@@ -89,7 +101,8 @@
     }
 } 
 
-trafotree <- function(object, parm = 1:length(coef(object)), reparm = NULL,
+trafotree <- function(object, parm = 1:length(coef(object)), reparm = NULL, 
+                      min_update = length(coef(object)) * 2, 
                       mltargs = list(maxit = 10000), ...) {
 
     ### we only work with the ctm object
@@ -103,7 +116,9 @@ trafotree <- function(object, parm = 1:length(coef(object)), reparm = NULL,
     mltargs$model <- object
     ### note: weights, offset, cluster etc. are evaluated here !!!
     args <- list(...)
-    args$ytrafo <- .ctmfit(object, parm, mltargs, reparm)
+    args$ytrafo <- .ctmfit(object = object, parm = parm, 
+                           mltargs = mltargs, reparm = reparm, 
+                           min_update = min_update)
     args$update <- TRUE
     ret <- do.call("ctree", args)
     ret$model <- object
@@ -126,7 +141,8 @@ trafotree <- function(object, parm = 1:length(coef(object)), reparm = NULL,
 }
 
 traforest <- function(object, parm = 1:length(coef(object)), reparm = NULL,
-                      mltargs = list(maxit = 10000), update = TRUE, ...) {
+                      update = TRUE, min_update = length(coef(object)) * 2, 
+                      mltargs = list(maxit = 10000), ...) {
 
     if (inherits(object, "mlt")) object <- object$model
     ### this is tricky because parm is only valid
@@ -134,7 +150,9 @@ traforest <- function(object, parm = 1:length(coef(object)), reparm = NULL,
     mltargs$model <- object
     ### note: weights, offset, cluster etc. are evaluated here !!!
     args <- list(...)
-    args$ytrafo <- .ctmfit(object, parm, mltargs, reparm)
+    args$ytrafo <- .ctmfit(object = object, parm = parm, 
+                           mltargs = mltargs, reparm = reparm,
+                           min_update = min_update)
     args$update <- update
     ret <- do.call("cforest", args)
     ret$model <- object
