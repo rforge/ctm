@@ -27,7 +27,7 @@
 set.seed(290875)
 
 sapply(c("mlt", "survival", "tram", "lme4", "gridExtra", 
-         "corrplot", "lattice", "latticeExtra", "mvtnorm", "ordinalCont"), library, char = TRUE)
+         "lattice", "latticeExtra", "mvtnorm", "ordinalCont"), library, char = TRUE)
 
 trellis.par.set(list(plot.symbol = list(col=1,pch=20, cex=0.7),
                      box.rectangle = list(col=1),
