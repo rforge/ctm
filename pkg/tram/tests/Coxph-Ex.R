@@ -13,8 +13,8 @@ cmod <- coxph(Surv(time, cens) ~ progrec + pnodes + strata(horTh, tgrade),
 Cmod <- Coxph(Surv(time, cens) | 0 + horTh:tgrade ~ progrec + pnodes, 
               data = GBSG2)
 
-round(max(abs(coef(cmod) - coef(Cmod))), 4)
-round(max(abs(diag(vcov(cmod)) - diag(vcov(Cmod)))), 4)
+round(max(abs(coef(cmod) - coef(Cmod))), 3)
+round(max(abs(diag(vcov(cmod)) - diag(vcov(Cmod)))), 3)
 
 Cmod_lf <- Coxph(Surv(time, cens) | 0 + horTh:tgrade ~ progrec + pnodes, 
                 data = GBSG2, log_first = TRUE)

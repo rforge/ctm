@@ -1,5 +1,5 @@
 
-R version 3.6.0 (2019-04-26) -- "Planting of a Tree"
+R version 3.6.1 (2019-07-05) -- "Action of the Toes"
 Copyright (C) 2019 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -44,9 +44,9 @@ Loading required package: mvtnorm
 > Cmod <- Coxph(Surv(time, cens) | 0 + horTh:tgrade ~ progrec + pnodes, 
 +               data = GBSG2)
 > 
-> round(max(abs(coef(cmod) - coef(Cmod))), 4)
-[1] 0.0018
-> round(max(abs(diag(vcov(cmod)) - diag(vcov(Cmod)))), 4)
+> round(max(abs(coef(cmod) - coef(Cmod))), 3)
+[1] 0.002
+> round(max(abs(diag(vcov(cmod)) - diag(vcov(Cmod)))), 3)
 [1] 0
 > 
 > Cmod_lf <- Coxph(Surv(time, cens) | 0 + horTh:tgrade ~ progrec + pnodes, 
@@ -107,4 +107,4 @@ Number of terminal nodes: 3
 > 
 > proc.time()
    user  system elapsed 
-  4.699   0.092   4.785 
+  3.419   0.068   3.480 
