@@ -11,8 +11,9 @@
   }
   \subsection{New Features}{
     \itemize{
-      \item{Compute \code{vcov.tram} via Schur complement when possible.}
-      \item{Add some (not yet exported) infrastructure for clustered data.}
+      \item{New marginally interpretable models for clustered data
+            in \code{mtram}, see \code{mtram} vignette. This is still
+            experimental and very rough, so please be careful.}
     }
   }
 }
