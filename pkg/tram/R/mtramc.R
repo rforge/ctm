@@ -2,11 +2,11 @@
 ### marginally interpretable linear transformation models for clustered
 ### observations
 
-mtramc <- function(object, formula, data, standardise = FALSE,
-                   grd = SparseGrid::createSparseGrid(type = "KPU", dimension = length(rt$cnms[[1]]), 
-                                                      k = 10),
-                   Hessian = FALSE,
-                   ...) {
+mtram <- function(object, formula, data, standardise = FALSE,
+                  grd = SparseGrid::createSparseGrid(type = "KPU", dimension = length(rt$cnms[[1]]), 
+                                                     k = 10),
+                  Hessian = FALSE,
+                  ...) {
 
     stopifnot(inherits(object, "mlt_fit"))
 
@@ -178,11 +178,11 @@ mtramc <- function(object, formula, data, standardise = FALSE,
     opt$G <- crossprod(Lambdat)[1:length(rt$cnms[[1]]),1:length(rt$cnms[[1]])]
     if (Hessian) opt$Hessian <- numDeriv::hessian(ll, opt$par)
     opt$loglik <- ll
-    class(opt) <- "mtramc"
+    class(opt) <- "mtram"
     opt
 }
 
-logLik.mtramc <- function(object, parm = NULL, ...) {
+logLik.mtram <- function(object, parm = NULL, ...) {
     if (!is.null(parm)) {
         ret <- -c(object$loglik(parm))
     } else {
@@ -193,7 +193,7 @@ logLik.mtramc <- function(object, parm = NULL, ...) {
     ret
 }
 
-coef.mtramc <- function(object, ...)
+coef.mtram <- function(object, ...)
     object$par
 
 .Marsaglia_1963 <- function(lower = rep(-Inf, nrow(sigma)), 
