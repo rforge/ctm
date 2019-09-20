@@ -90,8 +90,6 @@ mypanel <- function (x, y, f.value = NULL, type = "s", groups = NULL, qtype = 7,
 }
 library("colorspace")
 col <- diverge_hcl(2, h = c(246, 40), c = 120, l = c(65, 90), alpha = .75)
-
-
 @
 
 \newcommand{\TODO}[1]{{\color{red} #1}}
@@ -538,14 +536,15 @@ col <- diverge_hcl(2, h = c(246, 40), c = 120, l = c(65, 90), alpha = .75)
 
 \Abstract{
 Owing to their generality, transformation models can be used to set-up and
-compute regression models for discrete and continuous responses.  This
+compute many interesting regression models for discrete and continuous responses.  This
 document focuses on the analysis of clustered observations.  Marginal
 predictive distributions are defined by transformation models and their
 joint normal distribution depends on a structured covariance matrix. 
 Applications with skewed, bounded, and survival continuous outcomes as well
-as binary and ordered categorical responses are presented. Data was analysed
-by a proof-of-concept implementation of parametric transformation models for
-clustered observations available in the \pkg{tram} add-on package.
+as binary and ordered categorical responses are presented. Data is analysed
+by a proof-of-concept implementation of parametric linear transformation models for
+clustered observations available in the \pkg{tram} add-on package to the
+\proglang{R} system for statistical computing.
 }
 
 \Keywords{transformation model, transformation analysis, distribution regression, conditional
@@ -586,11 +585,16 @@ addition, novel transformation models going beyond the capabilities of
 convential mixed-effects models are estimated and interpreted.  A
 proof-of-concept implementation (meaning: the algorithms work but need
 optimisation, the user interface is very rough) available in package
-\pkg{tram} \citep{pkg:tram} is applied.
+\pkg{tram} \citep{pkg:tram} is applied. The results presented in this
+document can be reproduced from the \code{mtram} package vignette
+<<mtram-vignette, eval = FALSE>>=
+install.packages("tram")
+vignette("mtram", package = "tram")
+@
 
 \section{Normal and Non-normal Mixed-effects Models}
 
-First I consider mixed-effects models for reaction times in the sleep
+First we consider mixed-effects models for reaction times in the sleep
 deprivation study \citep{Belenky_Wesensten_Thorne_2003}.  The average
 reaction times to a specific task over several days of sleep deprivation are
 given for $18$ subjects in Figure~\ref{fig:sleepstudy}.
@@ -635,14 +639,22 @@ with $\sigma^{-2}\mG = \mLambda(\varparm) \mLambda(\varparm)^\top$ and
 
 The same model, however using the alternative parameterisation and an
 independent (of \pkg{lme4}, only the \cmd{update} method for Cholesky
-factors is reused) gradient-based maximisation of the log-likelihood, is estimated as
+factors is reused) gradient-based maximisation of the log-likelihood, is estimated 
+in a two-step approach as
 <<mtram-sleep_mtram, cache = TRUE>>=
 sleep_LM <- Lm(Reaction ~ Days, data = sleepstudy)
 sleep_LMmer <- mtram(sleep_LM, ~ (Days | Subject), data = sleepstudy)
 @
 %
-The combination of \cmd{Lm} and \cmd{mtram} obtains estimates for the 
-model parameters $\eparm_1, \tilde{\alpha}, \tilde{\beta}$, and $\varparm$
+The first call to \cmd{Lm} computes the equivalent of a normal linear
+regression model parameterised as a linear transformation model
+\emph{ignoring} the longitudinal nature of the observations. The purpose if
+to set-up the necessary model infrastructure (model matrices, inverse link
+functions, etc.) and to compute reasonable starting values for the fixed
+effects. The second call to \cmd{mtram} specifies the random effects
+structure (here a correlated pair of random intercept for subject 
+and random slope for days) and optimises the likelihood for all model
+parameters $\eparm_1, \tilde{\alpha}, \tilde{\beta}$, and $\varparm$
 in the model (here also looking at the conditional model for subject $i$)
 %
 \begin{eqnarray*}
@@ -651,12 +663,15 @@ in the model (here also looking at the conditional model for subject $i$)
 \end{eqnarray*}
 %
 that is, all fixed and random effect parameters are 
-divided by the residual standard deviation $\sigma$.
+divided by the residual standard deviation $\sigma$ (this is the
+reparameterisation applied by \cmd{Lm}).
 Of course, the parameter $\eparm_1$, the inverse residual standard
-deviation, is ensured to be positive.
+deviation, is ensured to be positive via an additional constraint in the
+optimiser maximising the log-likelihood.
 %
 
-The log-likelihoods of the two fitted models are very close
+The log-likelihoods of the two models fitted by \cmd{lmer} and \cmd{mtram} 
+are very close
 <<mtram-sleep_cmp>>=
 logLik(sleep_lmer)
 logLik(sleep_LMmer)
@@ -684,13 +699,17 @@ sleep_LMmer$G * (1 / sdinv)^2
 cov2cor(sleep_LMmer$G * (1 / sdinv)^2)
 unclass(VarCorr(sleep_lmer))$Subject
 @
-are practically equivalent. This results indicates the correctness of the
+are practically equivalent. This result indicates the correctness of the
 alternative implementation of normal linear mixed-effects models in the
-transformation model framework.
+transformation model framework: \cmd{mtram} reuses some infrastructure from
+\pkg{lme4} and \pkg{Matrix}, most importantly fast update methods for
+Cholesky factors, but the likelihood and corresponding optimisation relies
+on an independent implementation. So why are we doing this? Because
+\cmd{mtram} is able to deal with models or likelihoods 
+not available in \pkg{lme4}, for example the likelihood for
+interval-censored observations.
 
-The framework can also be used to
-estimate models in the presence of random censoring. Let's assume that the
-timing of the reaction times was less accurate than suggested by the
+Let's assume that the timing of the reaction times was less accurate than suggested by the
 numerical representation of the results. The following code
 <<mtram-sleep-Surv>>=
 library("survival")
@@ -706,7 +725,7 @@ sleep_LM_I <- Lm(Reaction_I ~ Days, data = sleepstudy)
 sleep_LMmer_I <- mtram(sleep_LM_I, ~ (Days | Subject), data = sleepstudy)
 @
 Of course, the log-likelihood changes (because this is a log-probability and
-not a log-density) but the parameter estimates are reasonably close
+not a log-density of a continuous distribution) but the parameter estimates are reasonably close
 <<mtram-sleep-interval-results>>=
 logLik(sleep_LMmer_I)
 coef(sleep_LMmer_I)
@@ -724,21 +743,21 @@ the non-normal linear mixed-effects transformation model
 \quad (\tilde{\alpha}_i, \tilde{\beta}_i) \sim \ND_2(\nullvec, \mLambda(\varparm) \mLambda(\varparm))
 \end{eqnarray*}
 %
-where $\h(\ry) = \basisy(\ry)^\top \parm$ represents a monotone increasing
+where $\h(\ry) = \basisy(\ry)^\top \parm$ represents a monotone non-decreasing
 transformation function. The function implementing such a more flexible
 model in named in honor of the first paper on the analysis of
 transformed responses by \cite{BoxCox_1964} but it \emph{does not} simply apply
 what is known as a Box-Cox transformation. Bernstein polynomials
-$\basisy(\ry)^\top \parm$ under suitable constraints are applied instead by
+$\h(\ry) = \basisy(\ry)^\top \parm$ under suitable constraints are applied instead by
 <<mtram-sleep_BoxCox, cache = TRUE>>=
 sleep_BC <- BoxCox(Reaction ~ Days, data = sleepstudy)
 sleep_BCmer <- mtram(sleep_BC, ~ (Days | Subject), data = sleepstudy, 
-                      Hessian = TRUE)
+                     Hessian = TRUE)
 logLik(sleep_BCmer)
 @
 %
 The increase in the log-likelihood compared to the normal model is not a big
-surprise.  Plotting the transformation function $\basisy(\ry)^\top \parm$ as
+surprise.  Plotting the transformation function $\h(\ry) = \basisy(\ry)^\top \parm$ as
 a function of reaction time can help to assess deviations from normality
 because the latter assumption implies a linear transformation function. 
 Figure~\ref{fig:sleepstudy_trafo} clearly indicates that models allowing a
@@ -776,7 +795,7 @@ distribution of reaction times at each single day of study participation.
 days <- 0:9
 q <- seq(from = min(sleepstudy$Reaction), to = max(sleepstudy$Reaction), 
          length.out = 100)
-meth <- c("Normal Linear Mixed-effects Model", "Non-normal Linear Transformation Model")
+meth <- c("Normal linear mixed-effects model", "Non-norma linear transformation model")
 ex <- expand.grid(Reaction = q, Days = days,
                   Method = factor(meth, levels = meth, labels = meth))
 U <- cbind(1, days)
@@ -810,7 +829,7 @@ plotfun <- function(prob, data, ...) {
 grey <- rgb(.75, .75, .75)
 nd <- ex
 plotfun("prob", ex, layout = c(5, 2), par.settings = simpleTheme(col=c(grey, col), lwd = 3),
-  auto.key = list(text = c("Empirical Cumulative Distribution Function", levels(nd$Method)), 
+  auto.key = list(text = c("Empirical cumulative distribution function", levels(nd$Method)), 
                   points = FALSE, lines = TRUE))
 @
 \caption{Sleep deprivation: Marginal distribution of reaction times, separately for each day of
@@ -898,6 +917,7 @@ The random intercept probit model fitted by Laplace and Adaptive
 Gauss-Hermite Quadrature (AGQ) approximations to the
 likelihood give quite different results:
 <<mtram-toenail_glmer_RI, cache = TRUE>>=
+### Laplace
 toenail_glmer_RI_1 <- 
     glmer(outcome ~ treatment * time + (1 | patientID),
           data = toenail, family = binomial(link = "probit"), 
@@ -905,6 +925,7 @@ toenail_glmer_RI_1 <-
 summary(toenail_glmer_RI_1)
 toenail_glmer_RI_1@theta
 
+### Adaptive Gaussian Quadrature
 toenail_glmer_RI_2 <- 
     glmer(outcome ~ treatment * time + (1 | patientID),
           data = toenail, family = binomial(link = "probit"), 
@@ -924,9 +945,11 @@ toenail_glmm_RI_3 <-
 summary(toenail_glmm_RI_3)
 @
 
-Because of the probit link, the transformation models are identical to
-the classical mixed model, a third algorithm is available for optimisation
-of the exact log-likelihood
+Because of the probit link, this binary generalised linear model is
+equivalent to a linear transformation model and we can thus use the exact
+likelihood implemented for the latter model in \cmd{mtram} for parameter
+estimation (it is still a bit nasty to set-up a constant transformation function
+$\h(\ry) = \alpha$, I plan to add a more convenient interface later)
 <<mtram-toenail_mtram_RI, cache = TRUE>>=
 m <- ctm(as.basis(~ outcome, data = toenail), 
          shifting = ~ treatment * time, 
@@ -935,7 +958,7 @@ toenail_probit <- mlt(m, data = toenail,
                       fixed = c("outcomemoderate or severe" = 0))
 toenail_mtram_RI <- 
     mtram(toenail_probit, ~ (1 | patientID), 
-           data = toenail, Hessian = TRUE)
+          data = toenail, Hessian = TRUE)
 logLik(toenail_mtram_RI)
 coef(toenail_mtram_RI)
 @
@@ -999,7 +1022,7 @@ framework gives
 <<mtram-toenail_mtram_RS, cache = TRUE>>=
 toenail_mtram_RS <- 
     mtram(toenail_probit, ~ (1 + time | patientID), 
-           data = toenail)
+          data = toenail)
 logLik(toenail_mtram_RS)
 coef(toenail_mtram_RS)
 @
@@ -1031,10 +1054,10 @@ m <- ctm(as.basis(~ outcome, data = toenail),
 toenail_logit <- mlt(m, data = toenail, 
                      fixed = c("outcomemoderate or severe" = 0))
 toenail_mtram_logit <- mtram(toenail_logit, ~ (1 | patientID), 
-                               data = toenail)
+                              data = toenail)
 toenail_mtram_logit_s <- mtram(toenail_logit, ~ (1 | patientID), 
-                                 data = toenail, standardise = TRUE, 
-                                 Hessian = TRUE)
+                               data = toenail, standardise = TRUE, 
+                               Hessian = TRUE)
 @
 
 From the standardised model, we can compute marginally interpretable 
@@ -1059,7 +1082,7 @@ estimators to obtain an idea about the uncertainty
 (Figure~\ref{fig:toenailOR}).
 
 \begin{figure}[t]
-<<mtram-toenail_OR_2, dev = "png", cache = TRUE, echo = FALSE>>=
+<<mtram-toenail_OR_2, dev = "png", cache = TRUE, echo = FALSE, dpi = 300>>=
 X <- model.matrix(~ treatment * time, data = nd)
 rbeta <- rmvnorm(10000, mean = coef(toenail_mtram_logit_s), 
                  sigma = solve(toenail_mtram_logit_s$Hessian))
@@ -1111,7 +1134,7 @@ very similar as shown in Figure~\ref{fig:toenailprob}.
 <<mtram-toenail_probplot, echo = FALSE>>=
 nd2 <- nd[rep(1:nrow(nd), 3),]
 nd2$prob <- c(nd$prob_probit, nd$prob_logit_s, nd$prob_logit)
-lev <- c("Probit", "Logit (M1)", "Logit (M2)")
+lev <- c("Probit (M1) = (M2)", "Logit (M1)", "Logit (M2)")
 nd2$model <- rep(factor(lev, labels = lev, levels = lev), each = nrow(nd))
 
 xyplot(prob ~ time | model, data = nd2, group = treatment, ylim = c(0, 1), 
@@ -1130,16 +1153,17 @@ xyplot(prob ~ time | model, data = nd2, group = treatment, ylim = c(0, 1),
 
 \section{Proportional Odds Models for Bounded Responses} \label{sec:logit}
 
-\cite{Manuguerra_Heller_2010} proposed a mixed-effects model for ordinal
-outcomes whose fixed effects can be interpreted as log-odds ratios. 
-I compare the results of their model to a conditional and marginal model for
+\cite{Manuguerra_Heller_2010} proposed a mixed-effects model for bounded
+responses  whose fixed effects can be interpreted as log-odds ratios. 
+We fit a transformation model to data from
 a randomised controlled trial on chronic neck pain treatment
 \citep{Chow_Heller_2006}. The data are visualised in
 Figure~\ref{fig:neck_pain}. Subjective neck pain levels were assessed on a 
 visual analog scale, that is, on a bounded interval.
 
 \begin{figure}[t]
-<<mtram-neck_plot, echo = FALSE>>=
+<<mtram-neck_plot, echo = FALSE, fig.height = 4, fig.width = 7>>=
+data("neck_pain", package = "ordinalCont")
 pain_df <- neck_pain
 idt <- xtabs(~ id, data = pain_df)
 miss <- names(idt)[idt < 3]
@@ -1147,9 +1171,13 @@ pain_df <- subset(pain_df, !id %in% miss)
 pain_df$id <- factor(pain_df$id)
 levels(pain_df$laser) <- c("Placebo", "Active")
 levels(pain_df$time) <- c("Baseline", "7 weeks", "12 weeks")
-xyplot(vas ~ time | laser, data = pain_df, 
-       groups = id, type = "l", col = rgb(.1, .1, .1, .1), lwd = 2,
+pain <- rbind(subset(pain_df, laser == levels(pain_df$laser)[1]),
+              subset(pain_df, laser == levels(pain_df$laser)[2]))
+p1 <- xyplot(vas ~ time | laser, data = pain, 
+       groups = id, type = "l", col = rgb(.1, .1, .1, .1),
+       lwd = 2, layout = c(2, 1),
        ylab = "Neck pain (on visual analog scale)", xlab = "Examinations")
+plot(p1)
 @
 \caption{Neck pain: Trajectories of neck pain assessed on a visual analog
          scale with and without low-level laser therapy.
@@ -1202,28 +1230,14 @@ neck_Colr <- Colr(vas ~ laser * time, data = pain_df,
                   bounds = c(0, 1), support = c(0, 1),
                   extrapolate = TRUE)
 neck_Colrmer <- mtram(neck_Colr, ~ (1 | id), data = pain_df, 
-                       Hessian = TRUE)
+                      Hessian = TRUE)
 logLik(neck_Colrmer)
-coef(neck_Colrmer)
 @
-The estimated odds ratios and corresponding confidence intervals
-<<mtram-neck_Colr_ci>>=
-cf <- coef(neck_Colrmer)
-sd <- sqrt(diag(solve(neck_Colrmer$Hessian)))
-exp(cbind("Est" = cf[8:12], "Lower" = cf[8:12] - qnorm(.975) * sd[8:12], 
-          "Upper" = cf[8:12] + qnorm(.975) * sd[8:12]))
-@
-are quite different, but the interpretation is still equivalent
-to the interpretation of the output of \cmd{ocm}. The standard deviation of
-the random intercepts was $\Sexpr{round(coef(neck_Colrmer)[13], 3)}$, which
-is substantially lower.
-
-We can depict the marginal distribution functions in the two groups based on
-this conditional model, see Figure~\ref{fig:distr_pain}.
-
+Based on this model of form (M1), it is possible to derive the marginal 
+distribution functions in the two groups, see Figure~\ref{fig:distr_pain}.
 
 \begin{figure}[t]
-<<mtram-neck_Colr_distr, echo = FALSE>>=
+<<mtram-neck_Colr_distr, echo = FALSE, fig.height = 4, fig.width = 7>>=
 nd <- expand.grid(laser = unique(pain_df$laser),
                   time = unique(pain_df$time))
 tmp <- as.mlt(neck_Colr)
@@ -1235,64 +1249,20 @@ tmp <- as.mlt(neck_Colr)
 sd <- sqrt(coef(neck_Colrmer)[13]^2 + 1)
 prb <- predict(tmp, newdata = nd, type = "distribution", q = q)
 nd2$prob <- c(pnorm(qnorm(prb) / sd))
-xyplot(prob ~ vas | time, data = nd2, groups = laser, type = "l", 
+p2 <- xyplot(prob ~ vas | time, data = nd2, groups = laser, type = "l", 
        col = col, 
+       layout = c(3, 1),
        xlab = "Neck pain (on visual analog scale)", 
        ylab = "Marginal distribution", 
        par.settings = simpleTheme(col=col),
        auto.key = list(text = levels(nd2$laser), 
                        points = FALSE, lines = TRUE))
+plot(p2)
 @
 \caption{Neck pain: Marginal distribution functions of chronic neck pain
          evaluated at three different time points under placebo or active
          low-level laser therapy. \label{fig:distr_pain}}
 \end{figure}
-
-The question remains which of the two implementation provides a better
-fitting model. Following \cite{Manuguerra_Heller_2010}, we fall back to a
-discrete model cutting the visual analog scale observations into $11$
-classes and employing the discrete log-likelihood for ordinal outcomes:
-<<mtram-neck_Polr, cache = TRUE>>=
-pain_df$vascat <- with(pain_df, cut(vas, breaks = c(-.1, 1:10/10), 
-                                    ordered = TRUE))
-neck_Polr <- Polr(vascat ~ laser * time, data = pain_df)
-neck_Polrmer <- mtram(neck_Polr, ~ (1 | id), data = pain_df, 
-                       Hessian = TRUE)
-logLik(neck_Polrmer)
-coef(neck_Polrmer)
-@
-The confidence intervals are close to the once obtained with the combination
-of \cmd{Colr} and \cmd{mtram}:
-<<mtram-neck_Polr_ci>>=
-cf <- coef(neck_Polrmer)
-sd <- sqrt(diag(solve(neck_Polrmer$Hessian)))
-exp(-cbind("Est" = cf[10:14], "Lower" = cf[10:14] + qnorm(.975) * sd[10:14], 
-          "Upper" = cf[10:14] - qnorm(.975) * sd[10:14]))
-@
-
-Based on this discrete model, we can also estimate marginal log-odds ratios
-<<mtram-neck_Polr_m, cache = TRUE>>=
-neck_Polrmer_m <- mtram(neck_Polr, ~ (1 | id), data = pain_df, 
-                         Hessian = TRUE, standardise = TRUE)
-logLik(neck_Polrmer_m)
-coef(neck_Polrmer_m)
-@
-<<mtram-neck_Polr_m_cf>>=
-cf <- coef(neck_Polrmer_m)
-exp(-cf[10:14] / sqrt(rev(cf)[1]^2 + 1))
-@
-These marginal effects are less extreme and thus more reasonable.
-
-The discrete version of \cmd{ocm} with conditional log-odds ratio
-interpretation can be fitted by a Laplace approximation using
-<<mtram-neck_ordinal>>=
-library("ordinal")
-neck_clmm2 <- clmm2(vascat ~ laser * time, data = pain_df, 
-                    random = id, nAGQ = 1, link = "logistic", 
-                    Hess = TRUE)
-logLik(neck_clmm2)
-summary(neck_clmm2)
-@
 
 \section{Marginally Interpretable Weibull and Cox Models}
 
@@ -1365,7 +1335,7 @@ CAOsurv$iDFS2 <- tmp
 
 We start with the random intercept model
 \begin{eqnarray*}
-\Prob(\rY > \ry \mid \text{treatment}, i) = 
+\Prob(\rY > \ry \mid \text{treatment}) = 
 \exp\left(-\exp\left(\frac{\eparm_1 + \eparm_2 \log(\ry) - 
                      \eshiftparm_\text{5-FU + Ox}}{\sqrt{\gamma_1^2 + 1}}\right)\right)
 \end{eqnarray*}
@@ -1375,7 +1345,7 @@ tumour grading, and study center) random intercept:
 <<mtram-CAO_SR, cache = TRUE>>=
 CAO_SR <- Survreg(iDFS2 ~ randarm, data = CAOsurv)
 CAO_SR_mtram_s <- mtram(CAO_SR, ~ (1 | Block), data = CAOsurv,
-                          standardise = TRUE, Hessian = TRUE)
+                        standardise = TRUE, Hessian = TRUE)
 logLik(CAO_SR_mtram_s)
 (cf <- coef(CAO_SR_mtram_s))
 (OR <- exp(-cf["randarm5-FU + Oxaliplatin"] / sqrt(cf["gamma1"]^2 + 1)))
@@ -1407,7 +1377,7 @@ $\eparm_2$ are estimated separately:
 <<mtram-CAO_SR_2, cache = TRUE>>=
 CAO_SR_2 <- Survreg(iDFS2 | 0 + strat_n:strat_t ~ randarm, data = CAOsurv)
 CAO_SR_2_mtram_s <- mtram(CAO_SR_2, ~ (1 | Block), data = CAOsurv,
-                            standardise = TRUE, Hessian  = TRUE)
+                          standardise = TRUE, Hessian  = TRUE)
 logLik(CAO_SR_2_mtram_s)
 (cf <- coef(CAO_SR_2_mtram_s))
 (OR_2 <- exp(-cf["randarm5-FU + Oxaliplatin"] / sqrt(cf["gamma1"]^2 + 1)))
@@ -1426,7 +1396,7 @@ quantile(exp(-rbeta[, ncol(rbeta)]), prob = c(.025, .5, .975))
 @
 We now relax the Weibull assumption in the Cox model
 \begin{eqnarray*}
-\Prob(\rY > \ry \mid \text{treatment}, i) = 
+\Prob(\rY > \ry \mid \text{treatment}) = 
 \exp\left(-\exp\left(\frac{\basisy(\log(\ry))^\top \parm + 
                      \eshiftparm_\text{5-FU + Ox}}{\sqrt{\gamma_1^2 + 1}}\right)\right)
 \end{eqnarray*}
@@ -1436,7 +1406,7 @@ CAO_Cox_2 <- Coxph(iDFS2 | 0 + strat_n:strat_t ~ randarm, data = CAOsurv,
                    support = c(1, 1700), log_first = TRUE, order = 4)
 logLik(CAO_Cox_2)
 CAO_Cox_2_mtram_s <- mtram(CAO_Cox_2, ~ (1 | Block), data = CAOsurv, 
-                             standardise = TRUE, Hessian = TRUE)
+                           standardise = TRUE, Hessian = TRUE)
 logLik(CAO_Cox_2_mtram_s)
 coef(CAO_Cox_2_mtram_s)
 @
@@ -1578,7 +1548,7 @@ appropriate to interpret $\shiftparm$ as log-odds ratios. Larger values of
 $\gamma_1$ indicate a more variable distribution and thus the choice $\pZ =
 \text{expit}$ might be questionable.
 
-%%% this takes too long because we have 3000+ independent clusters...
+%%% this takes too long because we have 1531 independent clusters...
 %We obtain
 %<<mtram-CHFLS-Polr, cache = TRUE>>=
 %CHFLS_Polr <- Polr(orgasm ~ AincomeSD + AheightSD + RAdurationSD + 
@@ -1587,11 +1557,11 @@ $\gamma_1$ indicate a more variable distribution and thus the choice $\pZ =
 %logLik(CHFLS_Polr)
 %orgAcc$ID <- factor(1:nrow(orgAcc))
 %CHFLS_mtram <- mtram(CHFLS_Polr, ~ (1 | ID), 
-%                       data = orgAcc)
+%                     data = orgAcc)
 %logLik(CHFLS_mtram)
 %coef(CHFLS_mtram)
 %@
-%and from $\hat{\gamma_1} = \Sexpr{round(coef(CHFLS_mtram)["gamma1"], 2)}$ 
+%and from $\hat{\gamma}_1 = \Sexpr{round(coef(CHFLS_mtram)["gamma1"], 3)}$ 
 %can conclude that the proportional odds model is appropriate here.
 
 We obtain
@@ -1608,7 +1578,7 @@ R> logLik(CHFLS_Polr)
 \begin{Sinput}
 R> orgAcc$ID <- factor(1:nrow(orgAcc))
 R> CHFLS_mtram <- mtram(CHFLS_Polr, ~ (1 | ID), 
-+                         data = orgAcc)
++                       data = orgAcc)
 R> logLik(CHFLS_mtram)
 \end{Sinput}
 \begin{Soutput}
@@ -1634,7 +1604,7 @@ Rhappyrelatively       Rhappyvery  RegionNortheast      RegionNorth
       0.49050565       0.20059228       0.58338272       0.01678467 
 \end{Soutput}
 \end{Schunk}
-and from $\hat{\gamma_1} = 0.02$ 
+and from $\hat{\gamma}_1 = 0.017$ 
 can conclude that the proportional odds model is appropriate here.
 
 

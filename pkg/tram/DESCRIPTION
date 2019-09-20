@@ -14,7 +14,7 @@ Description: Formula-based user-interfaces to specific transformation models
 Depends: mlt (>= 1.0-5)
 Imports: Formula, multcomp, variables (>= 1.0-2), basefun (>= 1.0-5), 
   sandwich, stats, survival, graphics, Matrix, methods
-Suggests: MASS, TH.data, trtf (>= 0.3-3), mlbench, knitr, quantreg, ordinal, 
+Suggests: MASS, TH.data, trtf (>= 0.3-3), mlbench, knitr, quantreg, 
   colorspace, ATR, lme4, merDeriv, SparseGrid, alabama, numDeriv,
   gridExtra, lattice, latticeExtra, HSAUR3, mvtnorm, ordinalCont, coxme, 
   glmmsr, mlt.docreg
