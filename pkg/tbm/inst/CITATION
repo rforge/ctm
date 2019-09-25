@@ -1,0 +1,15 @@
+
+citHeader("To cite tbm in publications use")
+
+citEntry(entry="Article",
+         title = "Transformation Boosting Machines",
+         author = personList(as.person("Torsten Hothorn")),
+         journal      = "Statistics and Computing",
+         year         = "2019",
+         doi          = "10.1007/s11222-019-09870-4",
+
+         textVersion =
+         paste("Torsten Hothorn (2019).",
+               "Transformation Boosting Machines.",
+               "Statistics and Computing, forthcoming.")
+)
