@@ -67,9 +67,12 @@
                 ### the case in party::ctree (the "model" was once estimated
                 ### in the root node) and Stefan Wager suggested to apply
                 ### this scheme in model-based trees in a discussion 2019-09-06.
-                mltargs$weights <- w
-                mltargs$doFit <- FALSE
-                umod <- try(do.call("mlt", mltargs))
+                # mltargs$weights <- w
+                # mltargs$doFit <- FALSE
+                # umod <- try(do.call("mlt", mltargs))
+                umod <- ctmobject
+                umod$weights <- w
+                umod$subset <- subset
                 coef(umod)[names(thetastart)] <- thetastart
                 umod$convergence <- 0L ### this is FAKE but extree would stop
                                        ### after non-convergence
