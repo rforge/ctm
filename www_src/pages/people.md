@@ -6,7 +6,7 @@ permalink: "people/"
 
 <div class="row">
 {% for author in site.data.authors %}
-  <div class="small-3 columns">
+<div class="small-3 columns end">
     {% if author.url %}
       <a target="_blank" href="{{ author.url }}">
     {% endif %}
