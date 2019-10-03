@@ -2,7 +2,7 @@
 \name{NEWS}
 \title{NEWS file for the trtf package}
 
-\section{Changes in Version 0.3-6 (2019-08-18)}{
+\section{Changes in Version 0.3-6 (2019-10-03)}{
   \itemize{
     \item{Add \code{min\_update} parameter; model parameters are only
           updated when the number of observations in a node exceeds this number.
