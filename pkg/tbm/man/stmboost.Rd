@@ -9,7 +9,7 @@
 }
 \usage{
 stmboost(model, formula, data = list(), weights = NULL, 
-         method = quote(mboost::mboost), ...)
+         method = quote(mboost::mboost), mltargs = list(), ...)
 }
 \arguments{
   \item{model}{an object of class \code{mlt} as returned by
@@ -27,6 +27,8 @@ stmboost(model, formula, data = list(), weights = NULL,
 \code{\link[mboost]{gamboost}}, or
 \code{\link[mboost]{blackboost}}.
 }
+  \item{mltargs}{a list with arguments to be passed to
+\code{\link[mlt]{mlt}}.}
   \item{\dots}{additional arguments to \code{method}.
 }
 }
