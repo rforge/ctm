@@ -36,40 +36,50 @@
            nuisance = function() offset)
 }
 
-.stmFamily <- function(object, data, weights) {
+.stmFamily <- function(object, data, weights, negative = FALSE,
+                       mltargs = list()) {
 
-    model <- mlt(object, data, fixed = c("(Intercept)" = 0), weights = weights, 
-                 theta = coef(object)[-length(coef(object))])
+    mltargs$model <- object
+    mltargs$data <- data
+    mltargs$weights <- weights
+    model <- do.call("mlt", mltargs)
 
-    tmp0 <- mlt(object, data = data, dofit = FALSE)
+    mltargs$dofit <- FALSE
+    tmp0 <- do.call("mlt", mltargs)
 
     ngradient <- function(y, f, w = 1) {
         if (length(f) == 1) f <- rep(f, nrow(data))
         if (length(w) == 1) w <- rep(w, nrow(data))
-        ### F(a(y) + (Intercept) + offset)
-        ### <FIXME> this requires a complete setup (model.matrix, etc)
-        ### of the model and takes tiiiiime...
-        tmp <- mlt(object, data = data, weights = w, fixed = c("(Intercept)" = 0),
-                   theta = coef(model, fixed = FALSE), offset = -f)
+        if (negative) {
+            offset <- -f
+        } else {
+            offset <- f
+        }
+        tmp <- update(model, weights = w, theta = coef(model, fixed = FALSE), 
+                      offset = offset)
         if (logLik(tmp) < logLik(model))
             warning("risk increase; decrease stepsize nu")
         model <<- tmp
-        ### this is a very bad trick to speed things up
-        ### this function generates the score function
-        ofuns <- get(".ofuns", envir = environment(tmp0$score))
-        ### inject the offset
-        assign("offset", -f, envir = environment(ofuns))
         ### compute score wrt to an intercept term constant one
-        ret <- drop(-ofuns(w)$sc(coef(model, fixed = TRUE), Xmult = FALSE))
+        ### NOTE resid is score wrt to "+ intercept", always!
+        if (negative) { 
+            ret <- resid(tmp)
+        } else {
+            ret <- -resid(tmp)
+        }
         return(ret)
     }
 
     risk <- function(y, f, w = 1) {
         if (length(w) == 1) w <- rep(w, nrow(data))
-        ### see comments above
-        ofuns <- get(".ofuns", envir = environment(tmp0$score))
-        assign("offset", -f, envir = environment(ofuns))
-        return(-sum(w * ofuns(w)$ll(coef(model, fixed = TRUE))))
+        ### inject offset and calculate log-lik without refitting
+        if (negative) {
+            offset <- -f
+        } else {
+            offset <- f
+        }
+        ofuns <- get(".ofuns", envir = environment(model$score))
+        return(-sum(w * ofuns(weights = w, offset = offset)$ll(coef(model, fixed = TRUE))))
     }
 
     mboost::Family(ngradient = ngradient,
@@ -163,39 +173,50 @@ ctmboost <- function(model, formula, data = list(), weights = NULL,
 }
 
 stmboost <- function(model, formula, data = list(), weights = NULL, 
-                      method = quote(mboost::mboost), ...) {
+                     method = quote(mboost::mboost), mltargs = list(), ...) {
 
     ### note: This defines the response and MUST match data
     basedata <- model$data
 
-    if (inherits(model, "tram"))
+    if (inherits(model, "tram")) {
         model <- as.mlt(model)
+        negative <- model$negative
+    } else {
+        negative <- FALSE
+    }
 
     mf <- match.call(expand.dots = TRUE)
-    mf$model <- mf$method <- NULL
-    mf$method <- NULL
+    mf$model <- mf$method <- mf$mltargs <- NULL
     if(missing(data)) data <- environment(formula)
+
+    mf$family <- .stmFamily(model$model, basedata, weights, 
+                            negative = negative, mltargs = mltargs)
+    mf[[1L]] <- method
+
+    ret <- eval(mf, parent.frame())
 
     tmp <- model$model$bases
     if (!is.null(tmp$shifting)) {
-        tmp$shifting <- c(int = intercept_basis(), shift = tmp$shifting)
+        tmp$shifting <- c(shift = tmp$shifting,
+                          int = intercept_basis(negative = negative))
     } else {
-        tmp$shifting <- intercept_basis()
+        tmp$shifting <- intercept_basis(negative = negative)
     }
     td <- model$model$todistr$name
     td <- switch(td, "normal" = "Normal", "logistic" = "Logistic",
                  "minimum extreme value" = "MinExtrVal")
     myctm <- ctm(tmp$response, tmp$interacting, tmp$shifting, 
                  todistr = td)
-    cf <- coef(myctm)
-    cf[] <- 0
-    cf[names(coef(model))] <- coef(model)
-    coef(myctm) <- cf
-    mf$family <- .stmFamily(myctm, basedata, weights)
-    mf[[1L]] <- method
 
-    ret <- eval(mf, parent.frame())
-    ret$model <- mlt(myctm, data = basedata, dofit = FALSE)
+    mltargs$model <- myctm
+    mltargs$data <- basedata
+    mltargs$weights <- weights
+    mltargs$dofit <- FALSE
+
+    ret$model <- do.call("mlt", mltargs)
+    cf <- coef(model, fixed = TRUE)
+    coef(ret$model)[names(cf)] <- cf
+    ret$negative <- negative
     class(ret) <- c("stmboost", "tbm", class(ret))
     return(ret) 
 }
@@ -280,20 +301,23 @@ predict.stmboost <- function(object, newdata = NULL, which = NULL,
     pr <- predict(object, newdata, which = which)
 
     if (coef) {
-        cf <- nuisance(object)
+        cf <- coef(object$model, fixed = TRUE)
+        nui <- nuisance(object)
+        cf[names(nui)] <- nui
         ret <- matrix(cf, nrow = NROW(pr), ncol = length(cf), byrow = TRUE)
-        ret <- cbind(ret, -pr)
+        ret[, length(cf)] <- pr
         return(ret)
     }
     ret <- c()
     tmpm <- object$model$model
-    cf <- coef(tmpm)
-    cf[] <- c(nuisance(object), "(Intercept)" = 0)
+    cf <- coef(tmpm, fixed = TRUE)
+    nui <- nuisance(object)
+    cf[names(nui)] <- nui
     coef(tmpm) <- cf
     ret <- c()
     nd <- newdata[, !colnames(newdata) %in% variable.names(tmpm)[1], drop = FALSE]
     for (i in 1:NROW(pr)) {
-        coef(tmpm)["(Intercept)"] <- -pr[i]
+        coef(tmpm)[length(cf)] <- pr[i]
         ret <- cbind(ret, predict(tmpm, newdata = nd, ...))
     }
     ret
