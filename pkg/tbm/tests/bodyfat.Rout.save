@@ -1,6 +1,6 @@
 
-R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
-Copyright (C) 2018 The R Foundation for Statistical Computing
+R version 3.6.1 (2019-07-05) -- "Action of the Toes"
+Copyright (C) 2019 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -91,7 +91,7 @@ The following object is masked from 'package:mboost':
 > bf_st <- stmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, 
 +                   method = quote(mboost::blackboost), tree_control = tctrl)
 > logLik(bf_st)
-'log Lik.' -171.002 (df=NULL)
+'log Lik.' -170.9971 (df=NULL)
 > 
 > bf_shift <- stmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, 
 +                      method = quote(mboost::gamboost))
@@ -124,6 +124,28 @@ In mboost:::glmboost.formula(formula = DEXfat ~ . - 1, data = bodyfat,  :
  1  2  3  4  5  6  7  8  9 
  6  9 12 14 11  9 21 12  6 
 > 
+> ### test against L_2 glmboost
+> m <- Lm(DEXfat ~ 1, data = bodyfat, fixed = c("DEXfat" = 1))
+> bf_1 <- stmboost(model = m, formula = DEXfat ~ 0 + ., data = bodyfat, 
++                   control = bctrl,
++                   method = quote(mboost:::glmboost.formula), 
++                   mltargs = list(fixed = c("DEXfat" = 1)))
+Warning messages:
+1: In mboost:::glmboost.formula(formula = DEXfat ~ 0 + ., data = bodyfat,  :
+  model with centered covariates does not contain intercept
+2: In c.basis(bresponse = response, bshifting = shifting) :
+  more than one basis contains an intercept term
+> bf_2 <- glmboost(DEXfat ~ ., data = bodyfat, offset = mean(bodyfat$DEXfat),
++                   control = bctrl)
+> stopifnot(max(abs(mboost:::coef.glmboost(bf_1) - coef(bf_2)[-1])) < 
++           sqrt(.Machine$double.eps))
+> r <- risk(bf_1)
+> stopifnot(r[length(r)] + logLik(bf_1) < sqrt(.Machine$double.eps))
+> 
+> stopifnot(max(abs(-nuisance(bf_1) + mboost:::predict.glmboost(bf_1) - predict(bf_2))) < 
++           sqrt(.Machine$double.eps))
+> 
+> 
 > proc.time()
    user  system elapsed 
- 43.833   0.671  44.497 
+ 33.903   0.292  34.187 

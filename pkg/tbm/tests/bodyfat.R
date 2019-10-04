@@ -54,3 +54,20 @@ mf2 <- Lm(DEXfat ~ 1, data = bodyfat)
 bf_lin2 <- ctmboost(model = mf2, formula = DEXfat ~ ., data = bodyfat)
 logLik(bf_lin2$model, parm = coef(bf_lin2))
 table(selected(bf_lin2))
+
+### test against L_2 glmboost
+m <- Lm(DEXfat ~ 1, data = bodyfat, fixed = c("DEXfat" = 1))
+bf_1 <- stmboost(model = m, formula = DEXfat ~ 0 + ., data = bodyfat, 
+                  control = bctrl,
+                  method = quote(mboost:::glmboost.formula), 
+                  mltargs = list(fixed = c("DEXfat" = 1)))
+bf_2 <- glmboost(DEXfat ~ ., data = bodyfat, offset = mean(bodyfat$DEXfat),
+                  control = bctrl)
+stopifnot(max(abs(mboost:::coef.glmboost(bf_1) - coef(bf_2)[-1])) < 
+          sqrt(.Machine$double.eps))
+r <- risk(bf_1)
+stopifnot(r[length(r)] + logLik(bf_1) < sqrt(.Machine$double.eps))
+
+stopifnot(max(abs(-nuisance(bf_1) + mboost:::predict.glmboost(bf_1) - predict(bf_2))) < 
+          sqrt(.Machine$double.eps))
+
