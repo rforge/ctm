@@ -2,12 +2,21 @@
 \name{NEWS}
 \title{NEWS file for the basefun package}
 
+\section{Changes in Version 1.0-6 (2019-10-05)}{
+  \itemize{
+    \item{Change name of parameter in \code{intercept\_basis} to 
+          \code{(_Intercept_)}; this helps to detect 
+          intercepts originating from other calls to \code{model.matrix}.}.
+  }
+}
+
 \section{Changes in Version 1.0-5 (2019-06-20)}{
   \itemize{
     \item{Make sure \code{bounds[1]} is positive if \code{log_first = TRUE}.}
     \item{Correct behaviour outside support when \code{log_first = TRUE}.}
   }
 }
+
 
 \section{Changes in Version 1.0-4 (2019-02-25)}{
   \itemize{

@@ -12,12 +12,12 @@ intercept_basis <- function(ui = c("none", "increasing", "decreasing"), negative
         X <- matrix(1, nrow = NROW(data))
         if (negative) X <- -X
         if (deriv > 0L) {
-            if (!"(Intercept)" %in% names(deriv)) X[] <- 0
+            if (!"(_Intercept_)" %in% names(deriv)) X[] <- 0
         }
         if (deriv < 0L) X[] <- 0
-        colnames(X) <- "(Intercept)"
+        colnames(X) <- "(_Intercept_)"
         attr(X, "constraint") <- list(ui = ui, ci = ci)
-        attr(X, "Assign") <- "(Intercept)"
+        attr(X, "Assign") <- "(_Intercept_)"
         X
     }
 
@@ -29,4 +29,4 @@ intercept_basis <- function(ui = c("none", "increasing", "decreasing"), negative
 }
 
 model.matrix.intercept_basis <- function(object, data, deriv = 0L, ...)
-    object(data, deriv = .deriv("(Intercept)", deriv))
+    object(data, deriv = .deriv("(_Intercept_)", deriv))
