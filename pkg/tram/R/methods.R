@@ -1,6 +1,6 @@
 
 as.mlt.tram <- function(object) {
-    cls <- which(class(object) == "mlt")
+    cls <- which(class(object) == "mlt_fit")
     class(object) <- class(object)[-(1:(cls - 1))]
     object
 }    

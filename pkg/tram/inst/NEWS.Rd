@@ -10,6 +10,8 @@
       \item{Not really a bug, but time-consuming examples were removed
             (or replaced by static output) in package vignettes to make
             CRAN happy.}
+      \item{\code{as.mlt} returned an object of class \code{mlt} but not
+            \code{mlt_fit}.}
     }
   }
   \subsection{New Features}{
