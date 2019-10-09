@@ -580,7 +580,8 @@ URL \url{https://CRAN.R-project.org/package=tram}.}
 \section{Introduction}
 
 The purpose of this document is to compare marginally interpretable linear
-transformation models for clustered observations to conventional conditional
+transformation models for clustered observations 
+\citep{Hothorn_2019_mtram} to conventional conditional
 formulations of mixed-effects models where such an overlap exists.  In
 addition, novel transformation models going beyond the capabilities of
 convential mixed-effects models are estimated and interpreted.  A
