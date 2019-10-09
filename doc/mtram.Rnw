@@ -935,16 +935,56 @@ summary(toenail_glmer_RI_2)
 toenail_glmer_RI_2@theta
 @
 
+%%%% this takes too long for CRAN
+%The sequential reduction (SR) algorithm \citep{Ogden_2015} gives results close to
+%AGQ
+%<<mtram-toenail_glmmsr_RI, cache = TRUE>>=
+%library("glmmsr")
+%toenail_glmm_RI_3 <- 
+%    glmm(outcome ~ treatment * time + (1 | patientID),
+%         data = toenail, family = binomial(link = "probit"), 
+%         method = "SR", control = list(nSL = 3))
+%summary(toenail_glmm_RI_3)
+%@
+
+%%% start of static output
 The sequential reduction (SR) algorithm \citep{Ogden_2015} gives results close to
 AGQ
-<<mtram-toenail_glmmsr_RI, cache = TRUE>>=
-library("glmmsr")
-toenail_glmm_RI_3 <- 
-    glmm(outcome ~ treatment * time + (1 | patientID),
-         data = toenail, family = binomial(link = "probit"), 
-         method = "SR", control = list(nSL = 3))
-summary(toenail_glmm_RI_3)
-@
+\begin{Schunk}
+\begin{Sinput}
+R> library("glmmsr")
+R> toenail_glmm_RI_3 <- 
++      glmm(outcome ~ treatment * time + (1 | patientID),
++           data = toenail, family = binomial(link = "probit"), 
++           method = "SR", control = list(nSL = 3))
+\end{Sinput}
+\begin{Soutput}
+Fitting the model......................... done.
+\end{Soutput}
+\begin{Sinput}
+R> summary(toenail_glmm_RI_3)
+\end{Sinput}
+\begin{Soutput}
+Generalized linear mixed model fit by maximum likelihood [glmmFit] 
+Likelihood approximation: Sequential reduction at level 3 
+ 
+Family: binomial ( probit ) 
+Formula: outcome ~ treatment * time + (1 | patientID)
+
+Random effects:
+ Groups    Name        Estimate Std.Error
+ patientID (Intercept) 2.119    0.1954   
+Number of obs: 1903, groups: patientID, 289; 
+
+Fixed effects: 
+                          Estimate Std. Error z value  Pr(>|z|)
+(Intercept)               -0.93105    0.23217  4.0102 6.066e-05
+treatmentterbinafine      -0.07618    0.30945  0.2462 8.055e-01
+time                      -0.19076    0.02060  9.2618 2.010e-20
+treatmentterbinafine:time -0.06420    0.03099  2.0713 3.834e-02
+\end{Soutput}
+\end{Schunk}
+%%% end of static output
 
 Because of the probit link, this binary generalised linear model is
 equivalent to a linear transformation model and we can thus use the exact
@@ -977,24 +1017,24 @@ the AGQ and SR approximations. We can also compare the corresponding covariances
 vcov(toenail_glmer_RI_2)
 solve(toenail_mtram_RI$Hessian)[1:4, 1:4]
 @
-We can compare the in-sample log-likelihood (as defined by the
-transformation model) for parameter estimates obtained from 
-the different procedures
-<<mtram-toenail_RI_mlt_glmmsr>>=
-### logLik of transformation model for glmer (Laplace) parameters
-logLik(toenail_mtram_RI, c(-fixef(toenail_glmer_RI_1), 
-                            toenail_glmer_RI_1@theta))
-### logLik of transformation model for glmer (AGQ) parameters
-logLik(toenail_mtram_RI, c(-fixef(toenail_glmer_RI_2), 
-                            toenail_glmer_RI_2@theta))
-### logLik of transformation model for glmmsr (SR) parameters
-logLik(toenail_mtram_RI, parm = c(-toenail_glmm_RI_3$estim[-1], 
-                                   toenail_glmm_RI_3$estim[1]))
-### logLik of transformation model
-logLik(toenail_mtram_RI)
-@
-Except for the Laplace approximation, the in-sample log-likelihoods
-coincide.
+%We can compare the in-sample log-likelihood (as defined by the
+%transformation model) for parameter estimates obtained from 
+%the different procedures
+%<<mtram-toenail_RI_mlt_glmmsr>>=
+%### logLik of transformation model for glmer (Laplace) parameters
+%logLik(toenail_mtram_RI, c(-fixef(toenail_glmer_RI_1), 
+%                            toenail_glmer_RI_1@theta))
+%### logLik of transformation model for glmer (AGQ) parameters
+%logLik(toenail_mtram_RI, c(-fixef(toenail_glmer_RI_2), 
+%                            toenail_glmer_RI_2@theta))
+%### logLik of transformation model for glmmsr (SR) parameters
+%logLik(toenail_mtram_RI, parm = c(-toenail_glmm_RI_3$estim[-1], 
+%                                   toenail_glmm_RI_3$estim[1]))
+%### logLik of transformation model
+%logLik(toenail_mtram_RI)
+%@
+%Except for the Laplace approximation, the in-sample log-likelihoods
+%coincide.
 
 Things get a bit less straightforward when a random slope is added to the
 model. The two implementations of the Laplace approximation in packages
@@ -1007,16 +1047,45 @@ summary(toenail_glmer_RS)
 toenail_glmer_RS@theta
 @
 and \pkg{glmmsr}
-<<mtram-toenail_glmmsr_RS, cache = TRUE>>=
-toenail_glmm_RS_1 <- 
-    glmm(outcome ~ treatment * time + (1 + time | patientID),
-         data = toenail, family = binomial(link = "probit"), 
-         method = "Laplace")
-toenail_glmm_RS_1$estim[1:3]
-toenail_glmm_RS_1$estim[-(1:3)]
-@
+%%%% this takes too long for CRAN
+%<<mtram-toenail_glmmsr_RS, cache = TRUE>>=
+%toenail_glmm_RS_1 <- 
+%    glmm(outcome ~ treatment * time + (1 + time | patientID),
+%         data = toenail, family = binomial(link = "probit"), 
+%         method = "Laplace")
+%toenail_glmm_RS_1$estim[1:3]
+%toenail_glmm_RS_1$estim[-(1:3)]
+%@
+%do not quite agree. Note that the standard deviation of the random intercept
+%is twice as large in the \cmd{glmer} output.
+%%% start of static output
+\begin{Schunk}
+\begin{Sinput}
+R> toenail_glmm_RS_1 <- 
++      glmm(outcome ~ treatment * time + (1 + time | patientID),
++           data = toenail, family = binomial(link = "probit"), 
++           method = "Laplace")
+\end{Sinput}
+\begin{Soutput}
+Fitting the model..... done.
+\end{Soutput}
+\begin{Sinput}
+R> toenail_glmm_RS_1$estim[1:3]
+\end{Sinput}
+\begin{Soutput}
+[1]  4.9992215 -0.5644628  0.4110986
+\end{Soutput}
+\begin{Sinput}
+R> toenail_glmm_RS_1$estim[-(1:3)]
+\end{Sinput}
+\begin{Soutput}
+[1] -3.49232631  0.04197115 -0.06769437 -0.12100940
+\end{Soutput}
+\end{Schunk}
 do not quite agree. Note that the standard deviation of the random intercept
 is twice as large in the \cmd{glmer} output.
+%%% end of static output
+
 
 The optimisation of the exact discrete likelihood in the transformation
 framework gives
@@ -1028,18 +1097,19 @@ logLik(toenail_mtram_RS)
 coef(toenail_mtram_RS)
 @
 The variance parameters are not too far off the results reported by
-\cmd{glmm}, but the fixed effects differ quite a bit. Again, we can
-compare the in-sample log-likelihoods:
-<<mtram-toenail_RS_mlt_glmmsr>>=
-### logLik of transformation model for glmer (Laplace) parameters
-logLik(toenail_mtram_RS, c(-fixef(toenail_glmer_RS), 
-                            toenail_glmer_RS@theta))
-### logLik of transformation model for glmmsr (Laplace) parameters
-logLik(toenail_mtram_RS, parm = c(-toenail_glmm_RS_1$estim[-(1:3)], 
-                                   toenail_glmm_RS_1$estim[1:3]))
-### logLik of transformation model
-logLik(toenail_mtram_RS)
-@
+\cmd{glmm}, but the fixed effects differ quite a bit. 
+%Again, we can
+%compare the in-sample log-likelihoods:
+%<<mtram-toenail_RS_mlt_glmmsr>>=
+%### logLik of transformation model for glmer (Laplace) parameters
+%logLik(toenail_mtram_RS, c(-fixef(toenail_glmer_RS), 
+%                            toenail_glmer_RS@theta))
+%### logLik of transformation model for glmmsr (Laplace) parameters
+%logLik(toenail_mtram_RS, parm = c(-toenail_glmm_RS_1$estim[-(1:3)], 
+%                                   toenail_glmm_RS_1$estim[1:3]))
+%### logLik of transformation model
+%logLik(toenail_mtram_RS)
+%@
 
 At least in biostatistics, the probit model is less popular than the logit
 model owing to the better interpretability of the fixed effects as
@@ -1395,32 +1465,96 @@ s <- rbeta[,ncol(rbeta)]
 rbeta <- rbeta[,-ncol(rbeta)] / sqrt(s^2 + 1)
 quantile(exp(-rbeta[, ncol(rbeta)]), prob = c(.025, .5, .975))
 @
+%%% this takes too long for CRAN, so just print the text
+%We now relax the Weibull assumption in the Cox model
+%\begin{eqnarray*}
+%\Prob(\rY > \ry \mid \text{treatment}) = 
+%\exp\left(-\exp\left(\frac{\basisy(\log(\ry))^\top \parm + 
+%                     \eshiftparm_\text{5-FU + Ox}}{\sqrt{\gamma_1^2 + 1}}\right)\right)
+%\end{eqnarray*}
+%(note the positive sign of the treatment effect).
+%<<mtram-CAO_Cox_2, cache = TRUE>>=
+%CAO_Cox_2 <- Coxph(iDFS2 | 0 + strat_n:strat_t ~ randarm, data = CAOsurv, 
+%                   support = c(1, 1700), log_first = TRUE, order = 4)
+%logLik(CAO_Cox_2)
+%CAO_Cox_2_mtram_s <- mtram(CAO_Cox_2, ~ (1 | Block), data = CAOsurv, 
+%                           standardise = TRUE, Hessian = TRUE)
+%logLik(CAO_Cox_2_mtram_s)
+%coef(CAO_Cox_2_mtram_s)
+%@
+%with confidence interval
+%<<mtram-CAO-CI-3, echo = FALSE>>=
+%H <- CAO_Cox_2_mtram_s$Hessian
+%S <- solve(H + .1 * diag(nrow(H)))
+%rbeta <- rmvnorm(10000, mean = coef(CAO_Cox_2_mtram_s), 
+%                 sigma = S)
+%s <- rbeta[,ncol(rbeta)]
+%rbeta <- rbeta[,-ncol(rbeta)] / sqrt(s^2 + 1)
+%quantile(exp(rbeta[, ncol(rbeta)]), prob = c(.025, .5, .975))
+%@
+
+%%% start of static output
 We now relax the Weibull assumption in the Cox model
 \begin{eqnarray*}
-\Prob(\rY > \ry \mid \text{treatment}) = 
+\Prob(\rY > \ry \mid \text{treatment}, i) = 
 \exp\left(-\exp\left(\frac{\basisy(\log(\ry))^\top \parm + 
                      \eshiftparm_\text{5-FU + Ox}}{\sqrt{\gamma_1^2 + 1}}\right)\right)
 \end{eqnarray*}
 (note the positive sign of the treatment effect).
-<<mtram-CAO_Cox_2, cache = TRUE>>=
-CAO_Cox_2 <- Coxph(iDFS2 | 0 + strat_n:strat_t ~ randarm, data = CAOsurv, 
-                   support = c(1, 1700), log_first = TRUE, order = 4)
-logLik(CAO_Cox_2)
-CAO_Cox_2_mtram_s <- mtram(CAO_Cox_2, ~ (1 | Block), data = CAOsurv, 
-                           standardise = TRUE, Hessian = TRUE)
-logLik(CAO_Cox_2_mtram_s)
-coef(CAO_Cox_2_mtram_s)
-@
+\begin{Schunk}
+\begin{Sinput}
+R> CAO_Cox_2 <- Coxph(iDFS2 | 0 + strat_n:strat_t ~ randarm, data = CAOsurv, 
++                     support = c(1, 1700), log_first = TRUE, order = 4)
+R> logLik(CAO_Cox_2)
+\end{Sinput}
+\begin{Soutput}
+'log Lik.' -2021.875 (df=21)
+\end{Soutput}
+\begin{Sinput}
+R> CAO_Cox_2_mtram_s <- mtram(CAO_Cox_2, ~ (1 | Block), data = CAOsurv, 
++                               standardise = TRUE, Hessian = TRUE)
+R> logLik(CAO_Cox_2_mtram_s)
+\end{Sinput}
+\begin{Soutput}
+'log Lik.' -2031.051 (df=22)
+\end{Soutput}
+\begin{Sinput}
+R> coef(CAO_Cox_2_mtram_s)
+\end{Sinput}
+\begin{Soutput}
+Bs1(iDFS2):strat_ncN0:strat_tcT1-3 Bs2(iDFS2):strat_ncN0:strat_tcT1-3 
+                     -5.832796e+01                      -3.163149e+00 
+Bs3(iDFS2):strat_ncN0:strat_tcT1-3 Bs4(iDFS2):strat_ncN0:strat_tcT1-3 
+                     -3.161654e+00                      -2.181838e+00 
+Bs5(iDFS2):strat_ncN0:strat_tcT1-3 Bs1(iDFS2):strat_ncN+:strat_tcT1-3 
+                     -7.656357e-01                      -1.653595e+01 
+Bs2(iDFS2):strat_ncN+:strat_tcT1-3 Bs3(iDFS2):strat_ncN+:strat_tcT1-3 
+                     -8.143542e+00                      -2.071762e+00 
+Bs4(iDFS2):strat_ncN+:strat_tcT1-3 Bs5(iDFS2):strat_ncN+:strat_tcT1-3 
+                     -1.792342e+00                      -7.614334e-01 
+  Bs1(iDFS2):strat_ncN0:strat_tcT4   Bs2(iDFS2):strat_ncN0:strat_tcT4 
+                     -2.525002e+00                      -2.519727e+00 
+  Bs3(iDFS2):strat_ncN0:strat_tcT4   Bs4(iDFS2):strat_ncN0:strat_tcT4 
+                     -2.330486e+00                      -3.587793e-01 
+  Bs5(iDFS2):strat_ncN0:strat_tcT4   Bs1(iDFS2):strat_ncN+:strat_tcT4 
+                     -1.456236e-01                      -4.096546e+01 
+  Bs2(iDFS2):strat_ncN+:strat_tcT4   Bs3(iDFS2):strat_ncN+:strat_tcT4 
+                     -2.000965e+00                      -1.987891e+00 
+  Bs4(iDFS2):strat_ncN+:strat_tcT4   Bs5(iDFS2):strat_ncN+:strat_tcT4 
+                     -3.570476e-01                       1.919546e-14 
+         randarm5-FU + Oxaliplatin                             gamma1 
+                     -1.806504e-01                      -1.215448e-06 
+\end{Soutput}
+\end{Schunk}
 with confidence interval
-<<mtram-CAO-CI-3, echo = FALSE>>=
-H <- CAO_Cox_2_mtram_s$Hessian
-S <- solve(H + .1 * diag(nrow(H)))
-rbeta <- rmvnorm(10000, mean = coef(CAO_Cox_2_mtram_s), 
-                 sigma = S)
-s <- rbeta[,ncol(rbeta)]
-rbeta <- rbeta[,-ncol(rbeta)] / sqrt(s^2 + 1)
-quantile(exp(rbeta[, ncol(rbeta)]), prob = c(.025, .5, .975))
-@
+\begin{Schunk}
+\begin{Soutput}
+     2.5%       50%     97.5% 
+0.6911201 0.8325653 1.0084011 
+\end{Soutput}
+\end{Schunk}
+%%% end of static output
+
 Because the estimated variance parameter $\gamma_1$ is not very large, we
 would expect to see similar results in a conditional Cox model with normal
 frailty term
@@ -1565,6 +1699,7 @@ $\gamma_1$ indicate a more variable distribution and thus the choice $\pZ =
 %and from $\hat{\gamma}_1 = \Sexpr{round(coef(CHFLS_mtram)["gamma1"], 3)}$ 
 %can conclude that the proportional odds model is appropriate here.
 
+%%% start of static output
 We obtain
 \begin{Schunk}
 \begin{Sinput}
@@ -1607,6 +1742,7 @@ Rhappyrelatively       Rhappyvery  RegionNortheast      RegionNorth
 \end{Schunk}
 and from $\hat{\gamma}_1 = 0.017$ 
 can conclude that the proportional odds model is appropriate here.
+%%% end of static output
 
 
 \bibliography{mlt,packages}
