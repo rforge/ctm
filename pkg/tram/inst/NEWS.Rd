@@ -2,10 +2,10 @@
 \name{NEWS}
 \title{NEWS file for the tram package}
 
-\section{Changes in Version 0.3-0 (2019-09-19)}{
+\section{Changes in Version 0.3-0 (2019-10-09)}{
   \subsection{Bugfixes}{
     \itemize{
-      \item{\code{y | s1:s2 ~ x} lead to rank-deficit model, the intercept is
+      \item{\code{y | s1:s2 ~ x} lead to rank-deficit models, the intercept is
             now removed.}
     }
   }
@@ -14,16 +14,10 @@
       \item{New marginally interpretable models for clustered data
             in \code{mtram}, see \code{mtram} vignette. This is still
             experimental and very rough, so please be careful.}
-    }
+      \item{Compute \code{vcov.tram} via Schur complement when possible.}
+  }
   }
 }
-
-\section{Changes in Version 0.2-7 (2019-07-04)}{
-  \itemize{
-    \item{Compute \code{vcov.tram} via Schur complement when possible.}
-  }
-}
-
 
 \section{Changes in Version 0.2-6 (2019-06-20)}{
   \itemize{
