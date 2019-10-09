@@ -7,6 +7,9 @@
     \itemize{
       \item{\code{y | s1:s2 ~ x} lead to rank-deficit models, the intercept is
             now removed.}
+      \item{Not really a bug, but time-consuming examples were removed
+            (or replaced by static output) in package vignettes to make
+            CRAN happy.}
     }
   }
   \subsection{New Features}{
