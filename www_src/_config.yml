@@ -58,6 +58,7 @@ exclude:
     - '*.bib'
     - pages/Makefile
     - '*.Rmd'
+    - vendor
 
 
 ## LANGUAGE SETTING (used in /includes/header.html for html-settings)
