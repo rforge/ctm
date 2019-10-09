@@ -105,7 +105,7 @@ version <- packageDescription("tram")$Version
 @
 \footnote{Please cite this document as: Torsten Hothorn (\Sexpr{year})
 Transformation Models: The \pkg{tram} Package. 
-R package vignette version \Sexpr{version}, 
+\textsf{R} package vignette version \Sexpr{version}, 
 URL \url{https://CRAN.R-project.org/package=tram}.}
 
 % \input{todo}

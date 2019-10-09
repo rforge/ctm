@@ -569,10 +569,11 @@ truncation}
 year <- substr(packageDescription("mlt.docreg")$Date, 1, 4)
 version <- packageDescription("mlt.docreg")$Version
 @
-%\footnote{Please cite this document as: Torsten Hothorn (2018)
-%Most Likely Transformations: The \pkg{mlt} Package. 
-%\emph{Journal of Statistical Software}, accepted for publication 2018-03-05,
-%URL \url{https://CRAN.R-project.org/package=mlt}.}
+\footnote{Please cite this document as: Torsten Hothorn (\Sexpr{year})
+Some Applications of Marginally Interpretable Parametric Linear 
+Transformation Models for Clustered Observations.
+\textsf{R} package vignette version \Sexpr{version}, 
+URL \url{https://CRAN.R-project.org/package=tram}.}
 
 % \input{todo}
 
