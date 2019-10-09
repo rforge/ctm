@@ -5,9 +5,6 @@ Source-folder for building the html-files with Jekyll
 
 ################################################################################
 
-# TODOs: 
-- People: Gallery, more dynamic
-
 # --------------- WORK FLOW  ---------------
 
  change content of page in pages/*
@@ -35,7 +32,7 @@ Source-folder for building the html-files with Jekyll
 	$ cp -r _site/* ../www/
 
 
-# FOR DEVELOPMENT ONTLY: $ bundle exec jekyll serve --config _config.yml,_config_dev.yml (more infos in _config_dev.yml)
+# FOR DEVELOPMENT ONLY: $ bundle exec jekyll serve --config _config.yml,_config_dev.yml (more infos in _config_dev.yml)
 
 
 # --------------- FILE-STRUCTURE ---------------
@@ -73,7 +70,7 @@ _drafts/:
 _sass/
 	partials imported into "main.scss" => processed into stylesheet "main.css" (defines style of site)
 
-aseets/
+assets/
 	css/ used to format content of webpage
 	img/ not changing images of webpage e.g logo
 
@@ -99,6 +96,24 @@ _includes/
 change of naming:
 	change _config.yml: blogurl, _data/navigation: link, 
 	_data/language (for post-buttons)
+
+
+# --------------- INSTALLATION ---------------
+Install according to https://jekyllrb.com/docs/installation/
+
+Check whether ruby >2.4.0 is installed: 
+	$ ruby -v
+Check whether RubyGems works:
+        $ gem -v
+
+## Encountered Problems:
+Although following the instruction, when running 
+        $ bundle 
+I got the following error:  can't find gem bundler (>= 0.a) with executable bundle (Gem::GemNotFoundException)
+
+The following solved it:
+           $ gem update --system
+ctm/www_src$ bundle install
 
 
 # --------------- FURTHER INFO ---------------
