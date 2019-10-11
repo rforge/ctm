@@ -15,14 +15,14 @@ Source-folder for building the html-files with Jekyll
 	$ make md 
 
  include images in images/* 
-	either specify image-title as yml-variable (in html/md-file) OR include in html/md-file as: {{ site.urlimg }}imagetitle
-	# Example: <img src="{{ site.urlimg }}img.title"/>
-	# Markdown-Example for posts ![Image Text]({{ site.urlimg }}image.jpg)
+	either specify image-title as yml-variable (in html/md-file) OR include in html/md-file as: {{ site.urlimg }}title.jpg
+	# html-Example: <img src="{{ site.urlimg }}title.jpg"/>
+	# Markdown-Example: ![Image Text]({{ site.urlimg }}title.jpg)
 
- include documents in docs/* 
-	either specify image-title as yml-variable (in html/md-file) OR include in html/md-file as: {{ site.urlimg }}imagetitle
-	# Example: <img src="{{ site.urlimg }}img.title"/>
-	# Markdown-Example for posts ![Image Text]({{ site.urlimg }}image.jpg)
+ include documents in docs/*
+	either specify image-title as yml-variable (in html/md-file) OR include in html/md-file as: {{ site.urldoc }}title.pdf
+        # html-Example: <a href="{{ site.urldoc }}title.pdf">Link Text</a>
+	# Markdown-Example: [Link Text]({{ site.urldoc }}title.pdf)
 
  new entry in "News": 
 	add new file _posts/YEAR-MONTH-DAY-title.md
@@ -101,7 +101,7 @@ change of naming:
 # --------------- INSTALLATION ---------------
 Install according to https://jekyllrb.com/docs/installation/
 
-Check whether ruby >2.4.0 is installed: 
+Check whether ruby > 2.4.0 is installed: 
 	$ ruby -v
 Check whether RubyGems works:
         $ gem -v
