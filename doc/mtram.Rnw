@@ -529,7 +529,7 @@ col <- diverge_hcl(2, h = c(246, 40), c = 120, l = c(65, 90), alpha = .75)
 \author{Torsten Hothorn \\ Universit\"at Z\"urich}
 \Plainauthor{Hothorn}
 
-\title{Some Applications of Marginally Interpretable Parametric Linear 
+\title{Some Applications of Marginally Interpretable Linear 
        Transformation Models for Clustered Observations}
 \Plaintitle{Marginally Interpretable Transformation Models}
 \Shorttitle{Marginally Interpretabel Transformation Models}
@@ -547,12 +547,10 @@ clustered observations available in the \pkg{tram} add-on package to the
 \proglang{R} system for statistical computing.
 }
 
-\Keywords{transformation model, transformation analysis, distribution regression, conditional
-distribution function, conditional quantile function, censoring,
-truncation}
-\Plainkeywords{transformation model, transformation analysis, distribution regression, conditional
-distribution function, conditional quantile function, censoring,
-truncation}
+\Keywords{conditional mixed models, marginal models, marginal predictive
+distributions, survival analysis, categorical data analysis}
+\Plainkeywords{conditional mixed models, marginal models, marginal predictive
+distributions, survival analysis, categorical data analysis}
 
 \Address{
   Torsten Hothorn\\
@@ -570,7 +568,7 @@ year <- substr(packageDescription("mlt.docreg")$Date, 1, 4)
 version <- packageDescription("mlt.docreg")$Version
 @
 \footnote{Please cite this document as: Torsten Hothorn (\Sexpr{year})
-Some Applications of Marginally Interpretable Parametric Linear 
+Some Applications of Marginally Interpretable Linear 
 Transformation Models for Clustered Observations.
 \textsf{R} package vignette version \Sexpr{version}, 
 URL \url{https://CRAN.R-project.org/package=tram}.}
@@ -850,9 +848,9 @@ cov2cor(sleep_BCmer$G)
 @
 What is the uncertainty associated with this parameter? The correlation is a
 non-linear function of $\varparm$ and therefore the direct computation of
-confidence intervals questionable. However, from the model, we
+confidence intervals questionable. However, we
 can extract an estimate of the covariance of the estimated model parameters
-and, relying on the asymptotic normality of the maximum likelihood
+from the model and, relying on the asymptotic normality of the maximum likelihood
 estimators, we can sample from the asymptotic distribution
 of the variance of the random intercept $\tilde{\alpha}$, the random slope
 $\tilde{\beta}$, and their correlation
@@ -1131,6 +1129,10 @@ toenail_mtram_logit_s <- mtram(toenail_logit, ~ (1 | patientID),
                                data = toenail, standardise = TRUE, 
                                Hessian = TRUE)
 @
+It is important to note that this model is \emph{not} a logistic 
+mixed-effects model and thus we can't expect to obtain identical 
+results from \cmd{glmer} as it was (partially) the case for the probit
+model.
 
 From the standardised model, we can compute marginally interpretable 
 probabilities and odds ratios over time
