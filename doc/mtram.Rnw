@@ -564,8 +564,8 @@ distributions, survival analysis, categorical data analysis}
 \begin{document}
 
 <<mtram-citation, echo = FALSE>>=
-year <- substr(packageDescription("mlt.docreg")$Date, 1, 4)
-version <- packageDescription("mlt.docreg")$Version
+year <- substr(packageDescription("tram")$Date, 1, 4)
+version <- packageDescription("tram")$Version
 @
 \footnote{Please cite this document as: Torsten Hothorn (\Sexpr{year})
 Some Applications of Marginally Interpretable Linear 
