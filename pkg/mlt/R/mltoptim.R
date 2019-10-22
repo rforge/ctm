@@ -1,6 +1,7 @@
 
 mltoptim <- function(auglag = list(maxtry = 5, kkt2.check = FALSE), 
                      spg = list(maxit = 10000, quiet = TRUE, checkGrad = FALSE),
+                     nloptr = list(algorithm = "NLOPT_LD_MMA", xtol_rel = 1.0e-8),
                      trace = FALSE) 
 {
     ret <- list()
@@ -47,5 +48,35 @@ mltoptim <- function(auglag = list(maxtry = 5, kkt2.check = FALSE),
                 ret <- list(par = theta, convergence = 1)
             return(ret)
         }
+    if (!is.null(nloptr))
+        ret$nloptr <- function(theta, f, g, ui = NULL, ci = NULL) {
+            control <- nloptr
+            if (trace) control$print_level <- 2
+            atheta <- theta
+            if (!is.null(ui)) {
+                mui <- -ui
+                ret <- try(nloptr::nloptr(
+                    x0 = atheta, 
+                    eval_f = f, 
+                    eval_grad = g, opts = control,
+                    eval_g_ineq = function(par) mui %*% par + ci,
+                    eval_jac_g_ineq = function(par) mui))
+                ret$convergence <- 0L # (0:1)[ret$status %in% c(1L, 4L) + 0L]
+            } else { 
+                control$algorithm <- "NLOPT_LD_LBFGS"
+                ret <- try(nloptr::nloptr(
+                    x0 = atheta, 
+                    eval_f = f, 
+                    eval_grad = g, opts = control))
+                ret$convergence <- 0L # (0:1)[ret$status %in% c(1L, 4L) + 0L]
+            }
+            if (inherits(ret, "try-error")) {
+                ret <- list(par = theta, convergence = 1)
+            } else {
+                ret$par <- ret$solution
+            }
+            return(ret)
+        }
+
     return(ret)
 }

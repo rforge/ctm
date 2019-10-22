@@ -2,6 +2,12 @@
 \name{NEWS}
 \title{NEWS file for the mlt package}
 
+\section{Changes in Version 1.1-0 (2019-10-09)}{
+  \itemize{
+    \item{Add support for \pkg{nloptr}.}
+  }
+}
+
 \section{Changes in Version 1.0-7 (2019-10-07)}{
   \itemize{
     \item{Less paranoia in \file{bugfixes.R}.}
