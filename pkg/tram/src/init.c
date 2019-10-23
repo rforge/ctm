@@ -6,11 +6,11 @@
 
 /* .Call calls */
 extern SEXP R_pnormMRS(SEXP);
-extern SEXP R_inner(SEXP);
+extern SEXP R_inner(SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
     {"R_pnormMRS", (DL_FUNC) &R_pnormMRS, 1},
-    {"R_inner", (DL_FUNC) &R_inner, 1},
+    {"R_inner", (DL_FUNC) &R_inner, 2},
     {NULL, NULL, 0}
 };
 
