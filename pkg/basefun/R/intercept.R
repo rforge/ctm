@@ -28,5 +28,9 @@ intercept_basis <- function(ui = c("none", "increasing", "decreasing"), negative
     return(basis)
 }
 
-model.matrix.intercept_basis <- function(object, data, deriv = 0L, ...)
+model.matrix.intercept_basis <- function(object, data, deriv = 0L, 
+                                         dim = NULL, ...) {
+    ### this is an intercept, so coef * 1 is everything we need
+    if (!is.null(dim)) data <- data.frame(1)
     object(data, deriv = .deriv("(_Intercept_)", deriv))
+}
