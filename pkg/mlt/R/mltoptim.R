@@ -17,6 +17,7 @@ mltoptim <- function(auglag = list(maxtry = 5, kkt2.check = FALSE),
                     ret <- try(alabama::auglag(par = atheta, fn = f, gr = g, hin = function(par) ui %*% par - ci, hin.jac = function(par) ui,
                                                control.outer = control)[c("par", "convergence", "value")])
                     atheta <- runif(length(atheta))
+                    names(atheta) <- names(theta)
                     if (inherits(ret, "try-error")) next()
                     if (ret$convergence == 0) break()
                 }

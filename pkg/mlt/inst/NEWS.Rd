@@ -5,6 +5,7 @@
 \section{Changes in Version 1.1-0 (2019-10-09)}{
   \itemize{
     \item{Add support for \pkg{nloptr}.}
+    \item{Make sure \code{coef()} always returns named argument.}
   }
 }
 
