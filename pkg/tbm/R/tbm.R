@@ -318,7 +318,9 @@ predict.stmboost <- function(object, newdata = NULL, which = NULL,
     nd <- newdata[, !colnames(newdata) %in% variable.names(tmpm)[1], drop = FALSE]
     for (i in 1:NROW(pr)) {
         coef(tmpm)[length(cf)] <- pr[i]
-        ret <- cbind(ret, predict(tmpm, newdata = nd, ...))
+        ### for a conditional base model, we need newdata; otherwise this
+        ### will be ignored
+        ret <- cbind(ret, predict(tmpm, newdata = nd[i,,drop = FALSE], ...))
     }
     ret
 }
