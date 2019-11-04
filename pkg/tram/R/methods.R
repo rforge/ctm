@@ -37,7 +37,7 @@ coef.tram <- function(object, with_baseline = FALSE, ...)
     cf <- coef(as.mlt(object), ...)
     if (with_baseline) return(cf)
     if (is.null(object$shiftcoef)) return(NULL)
-    return(cf[object$shiftcoef])
+    return(cf[names(cf) %in% object$shiftcoef])
 }
 
 coef.Lm <- function(object, as.lm = FALSE, ...) {
