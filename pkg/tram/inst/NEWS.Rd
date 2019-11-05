@@ -4,7 +4,9 @@
 
 \section{Changes in Version 0.3-1 (2019-11-05)}{
   \subsection{Bugfixes}{
-    \itemize{Fix problem in C header file.}
+    \itemize{
+      \item{Fix problem in C header file.}
+    }
   }
 }
 
