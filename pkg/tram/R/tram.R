@@ -35,7 +35,11 @@ tram_data <- function(formula, data, subset, weights, offset, cluster, na.action
         ### set-up a formula without response
         lhs <- formula[c(1, 2)]
         rhs <- formula[c(1, 3)]
-        if (npart[1L] > 1) lhs <- terms(as.Formula(lhs), rhs = 2, lhs = 0)
+        if (npart[1L] > 1) {
+            lhs <- terms(as.Formula(lhs), rhs = 2, lhs = 0)
+        } else {
+            lhs <- terms(~ 1)
+        }
         sxzfm <- as.Formula(lhs, rhs)
 
         ### get all x, s and z variables first WITHOUT subsetting or
