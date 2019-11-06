@@ -141,6 +141,17 @@ In .checkR(y, weights) : response contains left-censored observations only
 > stopifnot(all.equal(cf[c("(Intercept)", "x")], 
 +                     c("(Intercept)" = .5, "x" = 1)))
 > 
+> ### by Balint Tamasi
+> exact <- c(1, NA, NA)
+> cleft <- c(NA, 2, -Inf)
+> cright <- c(NA, Inf, 3)
+> (resp <- R(exact, cleft = cleft, cright = cright))
+[1]  1          (   2, Inf] (-Inf,   3]
+> ### was not the same
+> (surv <- as.Surv(resp))
+[1] 1  2+ 3-
+> 
+> 
 > proc.time()
    user  system elapsed 
-  2.760   0.123   2.902 
+  1.557   0.044   1.596 
