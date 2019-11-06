@@ -95,3 +95,12 @@ m <- ctm(as.basis(~ y, data = d, ui = matrix(c(0, 1), nr = 1), ci = 0),
 cf <- coef(mlt(m, data = d, fixed = c("x" = 1, "(Intercept)" = .5)))
 stopifnot(all.equal(cf[c("(Intercept)", "x")], 
                     c("(Intercept)" = .5, "x" = 1)))
+
+### by Balint Tamasi
+exact <- c(1, NA, NA)
+cleft <- c(NA, 2, -Inf)
+cright <- c(NA, Inf, 3)
+(resp <- R(exact, cleft = cleft, cright = cright))
+### was not the same
+(surv <- as.Surv(resp))
+
