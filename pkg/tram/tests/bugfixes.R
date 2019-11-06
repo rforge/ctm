@@ -82,3 +82,22 @@ m1 <- Coxph(Surv(time, cens) | menostat:tgrade ~ horTh, data = GBSG2)
 m2 <- Coxph(Surv(time, cens) | 0 + menostat:tgrade ~ horTh, data = GBSG2)
 stopifnot(max(abs(coef(as.mlt(m1)) - coef(as.mlt(m2)))) < 
           sqrt(.Machine$double.eps))
+
+### problems with responses of class "R", spotted by Balint Tamasi
+data("wine", package = "ordinal")
+erating <- wine$rating
+lrating <- erating
+rrating <- erating
+l9 <- lrating[wine$judge == 9]
+l9[l9 > 1] <- levels(l9)[unclass(l9[l9 > 1]) - 1]
+r9 <- rrating[wine$judge == 9]
+r9[r9 < 5] <- levels(r9)[unclass(r9[r9 < 5]) + 1]
+lrating[wine$judge != 9] <- rrating[wine$judge != 9] <- NA
+erating[wine$judge == 9] <- NA
+lrating[wine$judge == 9] <- l9
+rrating[wine$judge == 9] <- r9
+which(wine$judge == 9)
+wine$crating <- R(erating, cleft = lrating, cright = rrating)
+### gave an error
+m <- Polr(crating ~ temp, data = wine, method = "probit")
+
