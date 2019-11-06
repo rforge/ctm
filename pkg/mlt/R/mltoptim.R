@@ -1,7 +1,7 @@
 
 mltoptim <- function(auglag = list(maxtry = 5, kkt2.check = FALSE), 
                      spg = list(maxit = 10000, quiet = TRUE, checkGrad = FALSE),
-                     nloptr = list(algorithm = "NLOPT_LD_MMA", xtol_rel = 1.0e-8),
+                     nloptr = NULL, ### list(algorithm = "NLOPT_LD_MMA", xtol_rel = 1.0e-8),
                      trace = FALSE) 
 {
     ret <- list()
@@ -50,6 +50,7 @@ mltoptim <- function(auglag = list(maxtry = 5, kkt2.check = FALSE),
             return(ret)
         }
     if (!is.null(nloptr))
+        ### Note: This is still experimental (and switched off by default)
         ret$nloptr <- function(theta, f, g, ui = NULL, ci = NULL) {
             control <- nloptr
             if (trace) control$print_level <- 2
