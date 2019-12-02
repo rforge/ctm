@@ -63,24 +63,24 @@ lines(survfit(cph, newdata = data.frame(g = gf[3])))
 
 ### right censoring
 mydata <- data.frame(y = Surv(y, sample(0:1, length(y), replace = TRUE)), g = g)
-coef(opt <- mlt(m, data = mydata))
+coef(opt <- mlt(m, data = mydata, scale = TRUE))
 coef(cph <- coxph(y ~ g, data = mydata))
 
 ### left censoring
 mydata <- data.frame(y = Surv(y, sample(0:1, length(y), replace = TRUE), type = "left"), g = g)
-coef(opt <- mlt(m, data = mydata))
+coef(opt <- mlt(m, data = mydata, scale = TRUE))
 
 ### interval censoring
 mydata <- data.frame(y = Surv(y, y + 1, sample(0:3, length(y), replace = TRUE), type = "interval"), 
                      g = g)
-coef(opt <- mlt(m, data = mydata))
+coef(opt <- mlt(m, data = mydata, scale = TRUE))
 
 ### uncensored, time-varying coefficients in both groups
 mydata <- data.frame(y = y, g = g)
 m <- ctm(response = logBb, 
            interacting = as.basis(~ g, data = mydata),
            todist = "MinExtrVal")
-coef(opt <- mlt(m, data = mydata, maxit = 5000))
+coef(opt <- mlt(m, data = mydata, maxit = 5000, scale = TRUE))
 coef(cph <- coxph(Surv(y, rep(TRUE, nrow(mydata))) ~ g, data = mydata))
 ## visualize
 a <- predict(opt, newdata = data.frame(g = gf[1]), q = yn)

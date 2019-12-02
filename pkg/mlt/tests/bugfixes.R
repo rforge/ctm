@@ -15,7 +15,7 @@ ctmm2 <- ctm(response = Bernstein_basis(y, order = 4, ui = "increasing"),
                               x2=Bernstein_basis(x2, order= 3)))
 ### fit model
 mltm2 <- mlt(ctmm2, data = dat, scale = TRUE)
-(p <- predict(mltm2, newdata = data.frame(x1=0, x2 = 0), q = mkgrid(mltm2, n = 10)[["y"]]))
+round(p <- predict(mltm2, newdata = data.frame(x1=0, x2 = 0), q = mkgrid(mltm2, n = 10)[["y"]]), 2)
 ### plot data
 plot(mltm2,newdata=expand.grid(x1=0:1, x2 = 0:1))
 

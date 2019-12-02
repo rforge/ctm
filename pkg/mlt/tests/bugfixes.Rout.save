@@ -34,19 +34,19 @@ Loading required package: variables
 +                               x2=Bernstein_basis(x2, order= 3)))
 > ### fit model
 > mltm2 <- mlt(ctmm2, data = dat, scale = TRUE)
-> (p <- predict(mltm2, newdata = data.frame(x1=0, x2 = 0), q = mkgrid(mltm2, n = 10)[["y"]]))
+> round(p <- predict(mltm2, newdata = data.frame(x1=0, x2 = 0), q = mkgrid(mltm2, n = 10)[["y"]]), 2)
         
-y              [,1]
-  -2.43  -2.4279556
-  -1.92  -1.7822417
-   -1.4  -1.1665552
-  -0.89  -0.6071155
-  -0.375 -0.1117967
-  0.139   0.3298724
-  0.654   0.7467080
-   1.17   1.1858717
-   1.68   1.7128702
-    2.2   2.4115555
+y         [,1]
+  -2.43  -2.43
+  -1.92  -1.78
+   -1.4  -1.17
+  -0.89  -0.61
+  -0.375 -0.11
+  0.139   0.33
+  0.654   0.75
+   1.17   1.19
+   1.68   1.71
+    2.2   2.41
 > ### plot data
 > plot(mltm2,newdata=expand.grid(x1=0:1, x2 = 0:1))
 > 
@@ -154,4 +154,4 @@ In .checkR(y, weights) : response contains left-censored observations only
 > 
 > proc.time()
    user  system elapsed 
-  1.557   0.044   1.596 
+  1.250   0.068   1.312 

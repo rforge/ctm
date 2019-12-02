@@ -92,9 +92,9 @@ Loading required package: variables
 > 
 > ### right censoring
 > mydata <- data.frame(y = Surv(y, sample(0:1, length(y), replace = TRUE)), g = g)
-> coef(opt <- mlt(m, data = mydata))
+> coef(opt <- mlt(m, data = mydata, scale = TRUE))
     Bs1(y)     Bs2(y)     Bs3(y)     Bs4(y)     Bs5(y)     Bs6(y)         g2 
--0.8001702 -0.5067529 -0.3021120  0.2543729  0.2543729  1.2022230  0.6669576 
+-0.8001701 -0.5067528 -0.3021118  0.2543729  0.2543729  1.2022233  0.6669575 
         g3 
  1.1941690 
 > coef(cph <- coxph(y ~ g, data = mydata))
@@ -103,35 +103,35 @@ Loading required package: variables
 > 
 > ### left censoring
 > mydata <- data.frame(y = Surv(y, sample(0:1, length(y), replace = TRUE), type = "left"), g = g)
-> coef(opt <- mlt(m, data = mydata))
+> coef(opt <- mlt(m, data = mydata, scale = TRUE))
    Bs1(y)    Bs2(y)    Bs3(y)    Bs4(y)    Bs5(y)    Bs6(y)        g2        g3 
-0.4378917 0.6470606 1.0503774 1.0503774 1.0503774 1.7944348 0.4891169 0.6650021 
+0.4381039 0.6472794 1.0505030 1.0505030 1.0505030 1.7944770 0.4889079 0.6648251 
 > 
 > ### interval censoring
 > mydata <- data.frame(y = Surv(y, y + 1, sample(0:3, length(y), replace = TRUE), type = "interval"), 
 +                      g = g)
-> coef(opt <- mlt(m, data = mydata))
+> coef(opt <- mlt(m, data = mydata, scale = TRUE))
     Bs1(y)     Bs2(y)     Bs3(y)     Bs4(y)     Bs5(y)     Bs6(y)         g2 
--0.4800620 -0.1852435  0.2686854  0.5746312  0.5746312  1.2724903  0.8012525 
+-0.4800571 -0.1852375  0.2686561  0.5746432  0.5746432  1.2724920  0.8012506 
         g3 
- 0.9886387 
+ 0.9886372 
 > 
 > ### uncensored, time-varying coefficients in both groups
 > mydata <- data.frame(y = y, g = g)
 > m <- ctm(response = logBb, 
 +            interacting = as.basis(~ g, data = mydata),
 +            todist = "MinExtrVal")
-> coef(opt <- mlt(m, data = mydata, maxit = 5000))
+> coef(opt <- mlt(m, data = mydata, maxit = 5000, scale = TRUE))
 Bs1(y):(Intercept) Bs2(y):(Intercept) Bs3(y):(Intercept) Bs4(y):(Intercept) 
-        -0.1210797          0.1468304          0.7852533          0.8488801 
+        -0.1217383          0.1461328          0.7859991          0.8485231 
 Bs5(y):(Intercept) Bs6(y):(Intercept)          Bs1(y):g2          Bs2(y):g2 
-         0.8488801          1.6373746          0.7462537          0.7982918 
+         0.8485231          1.6371710          0.7481326          0.8003261 
          Bs3(y):g2          Bs4(y):g2          Bs5(y):g2          Bs6(y):g2 
-         0.7795823          0.7159555          0.7159556          2.7244656 
+         0.7777003          0.7151763          0.7151763          2.7576592 
          Bs1(y):g3          Bs2(y):g3          Bs3(y):g3          Bs4(y):g3 
-         1.0901616          1.1582839          0.5198610          1.7059024 
+         1.0898326          1.1579143          0.5180481          1.3490348 
          Bs5(y):g3          Bs6(y):g3 
-         1.7059056         30.5442363 
+         5.2495552         10.4349764 
 > coef(cph <- coxph(Surv(y, rep(TRUE, nrow(mydata))) ~ g, data = mydata))
       g2       g3 
 0.699808 1.022699 
@@ -151,4 +151,4 @@ Bs5(y):(Intercept) Bs6(y):(Intercept)          Bs1(y):g2          Bs2(y):g2
 > 
 > proc.time()
    user  system elapsed 
-  1.718   0.061   1.774 
+  1.551   0.079   1.625 
