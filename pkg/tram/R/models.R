@@ -55,8 +55,24 @@ Survreg <- function(formula, data, subset, weights, offset, cluster, na.action =
                                    "exponential" = "logarithmic",
                                    "rayleigh" = "logarithmic")
 
-    ret <- tram(td, transformation = transformation, 
-                distribution = distribution, negative = TRUE, model_only = TRUE, ...)
+    args <- list(...)
+    args$formula <- td
+    args$transformation <- transformation
+    args$distribution <- distribution
+    args$negative <- TRUE
+    ### check if user asked for model_only = TRUE
+    if (is.null(args$model_only)) {
+        args$model_only <- TRUE
+        ret <- do.call("tram", args)
+    } else {
+        if (args$model_only) {
+            ret <- do.call("tram", args)
+            return(ret)
+        } else {
+            args$model_only <- TRUE
+            ret <- do.call("tram", args)
+        }
+    }
 
     rname <- names(td$mf)[1]    
     cfnm <- names(coef(ret))

@@ -11,6 +11,18 @@
   }
 }
 
+\section{Changes in Version 0.3-2 (2019-12-02)}{
+  \itemize{
+    \item{Add new demo.}
+  }
+  \subsection{Bugfixes}{
+    \itemize{
+      \item{Deal with \code{model_only} in \code{Survreg}, spotted by Balint Tamasi.}
+    }
+  }
+}
+
+
 \section{Changes in Version 0.3-0 (2019-10-09)}{
   \subsection{Bugfixes}{
     \itemize{
