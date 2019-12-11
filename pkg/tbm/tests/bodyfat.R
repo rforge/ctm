@@ -16,8 +16,8 @@ fd <- cv(rep(1, NROW(bodyfat)), type = "kfold", B = 2)
 
 bctrl <- boost_control(nu = .1, trace = FALSE, mstop = Mstop)
 
-tctrl <- ctree_control(minsplit = 2, minbucket = 1, mincriterion = 0,
-                       maxdepth = 5, splittest = TRUE, 
+tctrl <- ctree_control(minsplit = 8, minbucket = 5, mincriterion = 0,
+                       maxdepth = 4, splittest = TRUE, 
                        testtype = "Teststatistic")
 
 bf_t <- ctmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, 
@@ -37,7 +37,7 @@ table(selected(bf_dr))
 
 bf_st <- stmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, 
                   method = quote(mboost::blackboost), tree_control = tctrl)
-logLik(bf_st)
+round(logLik(bf_st), 1)
 
 bf_shift <- stmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, 
                      method = quote(mboost::gamboost))

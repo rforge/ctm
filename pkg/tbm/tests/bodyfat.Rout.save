@@ -60,15 +60,15 @@ The following object is masked from 'package:mboost':
 > 
 > bctrl <- boost_control(nu = .1, trace = FALSE, mstop = Mstop)
 > 
-> tctrl <- ctree_control(minsplit = 2, minbucket = 1, mincriterion = 0,
-+                        maxdepth = 5, splittest = TRUE, 
+> tctrl <- ctree_control(minsplit = 8, minbucket = 5, mincriterion = 0,
++                        maxdepth = 4, splittest = TRUE, 
 +                        testtype = "Teststatistic")
 > 
 > bf_t <- ctmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, 
 +                  method = quote(mboost::blackboost), control = bctrl, 
 +                  tree_control = tctrl)
 > logLik(bf_t)
-'log Lik.' -179.3925 (df=NULL)
+'log Lik.' -193.7836 (df=NULL)
 > 
 > bf_ctm <- ctmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, 
 +                    control = bctrl)
@@ -90,8 +90,8 @@ The following object is masked from 'package:mboost':
 > 
 > bf_st <- stmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, 
 +                   method = quote(mboost::blackboost), tree_control = tctrl)
-> logLik(bf_st)
-'log Lik.' -170.9971 (df=NULL)
+> round(logLik(bf_st), 1)
+'log Lik.' -178.5 (df=NULL)
 > 
 > bf_shift <- stmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, 
 +                      method = quote(mboost::gamboost))
@@ -148,4 +148,4 @@ Warning messages:
 > 
 > proc.time()
    user  system elapsed 
- 33.903   0.292  34.187 
+ 23.879   0.197  24.099 

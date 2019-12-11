@@ -1,7 +1,7 @@
 Package: tbm
 Title: Transformation Boosting Machines
-Version: 0.3-1
-Date: 2019-10-04
+Version: 0.3-2
+Date: 2019-12-11
 Authors@R: person("Torsten", "Hothorn", role = c("aut", "cre"),
                   email = "Torsten.Hothorn@R-project.org", comment = c(ORCID = "0000-0001-8301-0471"))
 Description: Boosting the likelihood of conditional and shift transformation models.
