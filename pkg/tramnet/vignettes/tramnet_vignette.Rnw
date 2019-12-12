@@ -1350,14 +1350,16 @@ yields the generalized residual with respect to $\gamma$ for the model
 residuals(mtmbo)[1:5]
 @
 In residual analysis and boosting it is common practice to check for associations
-between residuals and covariates that are not included in the model or constrained
-to zero. In the prostate cancer example one could investigate, whether the
-variables \code{age} and \code{lcp} should be included in the model. To illustrate
-this particular case a \cmd{independence\_test} from \pkg{coin} can be used
-\citep{coinjss}. First, the uncoditional transformation model \code{m0} is fit.
-Afterwards, the tramnet models excluding either \code{age} and \code{lcp} are
-estimated and their residuals extracted. Lastly, an independence test yields the
-results printed below.
+between residuals and covariates that are not included in the model.
+In the prostate cancer example one could investigate, whether the variables \code{age}
+and \code{lcp} should be included in the model. To illustrate this particular case
+a non-parametric \cmd{independence\_test} from package \pkg{coin} can be used \citep{coinjss}.
+First, the uncoditional transformation model \code{m0} is fit. Afterwards, the tramnet
+models excluding \code{age} and \code{lcp} are estimated and their residuals
+extracted using the \cmd{residuals.tramnet} method. Lastly, an independence test
+using a maximum statistic (\code{teststat~=~"max"}) and a Monte Carlo based
+approximation of the null distribution based on resampling $10^6$ times
+(\code{distribution~=~approximate(1e6)}), yields the results printed below.
 <<coin_illustration>>=
 library("coin")
 m0 <- BoxCox(lpsa ~ 1, data = Prostate, extrapolate = TRUE)
@@ -1369,8 +1371,8 @@ it <- independence_test(r ~ age + lcp, data = Prostate,
 pvalue(it, "single-step")
 @
 Because there is substantial evidence to reject the null hypothesis, that the
-residuals are independent from lcp or age, we can conclude that it is worthwhile
-to include \code{age} and \code{lcp} in the model.
+residuals are independent from either lcp or age, we can conclude that it is
+worthwhile to include \code{age} and \code{lcp} in the model.
 Packages \pkg{trtf} \citep{pkg:trtf} and \pkg{tbm} \citep{hothorn2019tbm,pkg:tbm}
 make use of this definition of a residual for estimating and boosting transformation models,
 trees and random forests. For more theoretical insight the reader is referred to
