@@ -1,0 +1,68 @@
+
+R version 3.6.1 (2019-07-05) -- "Action of the Toes"
+Copyright (C) 2019 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> # Tests for Lm models
+> 
+> ## Dependencies
+> library("tramnet")
+Loading required package: tram
+Loading required package: mlt
+Loading required package: basefun
+Loading required package: variables
+Loading required package: CVXR
+
+Attaching package: 'CVXR'
+
+The following object is masked from 'package:stats':
+
+    power
+
+Loading required package: mlrMBO
+Loading required package: mlr
+Loading required package: ParamHelpers
+Loading required package: smoof
+Loading required package: BBmisc
+
+Attaching package: 'BBmisc'
+
+The following object is masked from 'package:base':
+
+    isFALSE
+
+Loading required package: checkmate
+> options(digits = 4)
+> 
+> ## Data
+> dat <- data.frame(y = runif(100), s = factor(rep(c(1, 2), each = 50)))
+> x <- matrix(rnorm(100 * 20, mean = 0, sd = 1), nrow = 100)
+> colnames(x) <- paste0("X", 1:20)
+> y2 <- Lm(y | 0 + s ~ 1, data = dat)
+> mod2 <- tramnet(y2, x, lambda = 8, alpha = 1)
+Warning message:
+In .tramnet_checks(model = model, x = x, lambda = lambda, alpha = alpha) :
+  Unscaled design matrices are not sensible under regularization.
+            Consider scaling and centering the design matrix.
+> 
+> ## --- Truncated, stratified
+> dat$ytr <- R(dat$y, tleft = c(-Inf, -2, rep(0, length(dat$y)-2)))
+> y3 <- Colr(ytr | 0 + s ~ 1, data = dat, order = 4)
+> ## TODO: Implement truncation
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  5.844   0.284   6.128 

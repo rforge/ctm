@@ -1,0 +1,71 @@
+
+R version 3.6.1 (2019-07-05) -- "Action of the Toes"
+Copyright (C) 2019 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library("tramnet")
+Loading required package: tram
+Loading required package: mlt
+Loading required package: basefun
+Loading required package: variables
+Loading required package: CVXR
+
+Attaching package: 'CVXR'
+
+The following object is masked from 'package:stats':
+
+    power
+
+Loading required package: mlrMBO
+Loading required package: mlr
+Loading required package: ParamHelpers
+Loading required package: smoof
+Loading required package: BBmisc
+
+Attaching package: 'BBmisc'
+
+The following object is masked from 'package:base':
+
+    isFALSE
+
+Loading required package: checkmate
+> library("penalized")
+Loading required package: survival
+Welcome to penalized. For extended examples, see vignette("penalized").
+> library("survival")
+> options(digits = 4)
+> 
+> ## --- Comparison with penalized
+> data("nki70", package = "penalized")
+> resp <- with(nki70, Surv(time, event))
+> x <- scale(model.matrix( ~ 0 + DIAPH3 + NUSAP1 + TSPYL5 + C20orf46, data = nki70))
+> fit <- penalized(response = resp, penalized = x, lambda1 = 1, lambda2 = 0,
++                  standardize = FALSE, data = nki70)
+# nonzero coefficients: 4# nonzero coefficients: 3          # nonzero coefficients: 4          # nonzero coefficients: 3          # nonzero coefficients: 3          # nonzero coefficients: 3          # nonzero coefficients: 3          # nonzero coefficients: 2          # nonzero coefficients: 2          # nonzero coefficients: 2          # nonzero coefficients: 2          # nonzero coefficients: 2          # nonzero coefficients: 2          
+> y <- Coxph(Surv(time, event) ~ 1, data = nki70, order = 10, log_first = TRUE)
+> fit2 <- tramnet(y, x, lambda = 1, alpha = 1) ## L1 only
+> coef(fit)
+ DIAPH3  NUSAP1 
+-0.1288  0.6704 
+> coef(fit2)
+ DIAPH3  NUSAP1 
+-0.1392  0.6796 
+> 
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  4.592   0.236   4.825 

@@ -1,0 +1,23 @@
+Package: tramnet
+Title: Penalised Transformation Models
+Version: 0.0-2
+Date: 2019-11-11
+Authors@R: c(person("Lucas Heinrich", "Kook", role = "aut"),
+             person("Balint", "Tamasi", role = "aut"),
+             person("Sandra", "Siegfried", role = "ctb"),
+             person("Samuel", "Pawel", role = "ctb"),
+             person("Torsten", "Hothorn", role = c("cre"),
+                    email = "Torsten.Hothorn@R-project.org", 
+                    comment = c(ORCID = "0000-0001-8301-0471")))
+Description: Partially penalised versions of specific transformation models
+  implemented in package 'mlt'. Available models include Cox models, some parametric 
+  survival models (Weibull, etc.), models for ordered categorical variables,
+  normal and non-normal (Box-Cox type) linear models, and continuous outcome logistic regression.
+Depends: R (>= 3.6.0), tram (>= 0.3-1), CVXR (>= 0.99-4), mlrMBO (>= 1.1-2)
+Imports: mlt, basefun, sandwich, ParamHelpers, lhs, mlr, smoof, stats
+Suggests: penalized, TH.data, survival, knitr, mlbench, colorspace,
+        mvtnorm, glmnet, trtf, Matrix, lasso2, lattice, kableExtra,
+        coin
+VignetteBuilder: knitr
+Encoding: UTF-8
+License: GPL-2

@@ -1,0 +1,130 @@
+
+R version 3.6.1 (2019-07-05) -- "Action of the Toes"
+Copyright (C) 2019 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> # Test for profiling cfx trajectory functions
+> 
+> library("tramnet")
+Loading required package: tram
+Loading required package: mlt
+Loading required package: basefun
+Loading required package: variables
+Loading required package: CVXR
+
+Attaching package: 'CVXR'
+
+The following object is masked from 'package:stats':
+
+    power
+
+Loading required package: mlrMBO
+Loading required package: mlr
+Loading required package: ParamHelpers
+Loading required package: smoof
+Loading required package: BBmisc
+
+Attaching package: 'BBmisc'
+
+The following object is masked from 'package:base':
+
+    isFALSE
+
+Loading required package: checkmate
+> library("penalized")
+Loading required package: survival
+Welcome to penalized. For extended examples, see vignette("penalized").
+> library("survival")
+> options(digits = 4)
+> 
+> ## --- Comparison with penalized
+> data("nki70", package = "penalized")
+> nki70$resp <- with(nki70, Surv(time, event))
+> x <- scale(model.matrix( ~ 0 + DIAPH3 + NUSAP1 + TSPYL5 + C20orf46, data = nki70))
+> y <- Coxph(resp ~ 1, data = nki70, order = 10, log_first = TRUE)
+> fit2 <- tramnet(y, x, lambda = 0, alpha = 1)
+> (pfl <- prof_lambda(fit2))
+Step 1/5 at lambda = 0
+Step 2/5 at lambda = 0.35
+Step 3/5 at lambda = 1.22
+Step 4/5 at lambda = 4.29
+Step 5/5 at lambda = 15
+$lambdas
+[1]  0.000  0.350  1.225  4.286 15.000
+
+$cfx
+         DIAPH3 NUSAP1    TSPYL5   C20orf46
+[1,] -2.193e-01 0.7690 2.109e-02 -1.316e-02
+[2,] -1.916e-01 0.7379 1.191e-02 -4.710e-03
+[3,] -1.215e-01 0.6597 1.078e-08 -9.815e-09
+[4,] -5.714e-10 0.4808 6.477e-11 -4.085e-10
+[5,]  4.603e-10 0.2016 4.258e-11 -3.451e-11
+
+$lls
+[1] -182.4 -182.7 -183.5 -185.2 -188.9
+
+attr(,"class")
+[1] "prof_lambda"
+Warning messages:
+1: In coef.tramnet(mod, with_baseline = FALSE, tol = 0, as.lm = as.lm) :
+  additional arguments ignored
+2: In coef.tramnet(mod, with_baseline = FALSE, tol = 0, as.lm = as.lm) :
+  additional arguments ignored
+3: In coef.tramnet(mod, with_baseline = FALSE, tol = 0, as.lm = as.lm) :
+  additional arguments ignored
+4: In coef.tramnet(mod, with_baseline = FALSE, tol = 0, as.lm = as.lm) :
+  additional arguments ignored
+5: In coef.tramnet(mod, with_baseline = FALSE, tol = 0, as.lm = as.lm) :
+  additional arguments ignored
+> plot_path(pfl)
+> fit3 <- tramnet(y, x, lambda = 1, alpha = 1)
+> (pfa <- prof_alpha(fit3))
+Step 1/5 at alpha = 0
+Step 2/5 at alpha = 0.25
+Step 3/5 at alpha = 0.5
+Step 4/5 at alpha = 0.75
+Step 5/5 at alpha = 1
+$alphas
+[1] 0.00 0.25 0.50 0.75 1.00
+
+$cfx
+      DIAPH3 NUSAP1    TSPYL5   C20orf46
+[1,] -0.1860 0.7230 1.917e-02 -1.454e-02
+[2,] -0.1751 0.7130 1.318e-02 -8.322e-03
+[3,] -0.1638 0.7025 7.117e-03 -2.160e-03
+[4,] -0.1516 0.6912 1.730e-03 -1.320e-08
+[5,] -0.1392 0.6796 1.036e-08 -4.762e-09
+
+$lls
+[1] -182.7 -182.8 -183.0 -183.1 -183.3
+
+attr(,"class")
+[1] "prof_alpha"
+Warning messages:
+1: In coef.tramnet(mod, with_baseline = FALSE, tol = 0, as.lm = as.lm) :
+  additional arguments ignored
+2: In coef.tramnet(mod, with_baseline = FALSE, tol = 0, as.lm = as.lm) :
+  additional arguments ignored
+3: In coef.tramnet(mod, with_baseline = FALSE, tol = 0, as.lm = as.lm) :
+  additional arguments ignored
+4: In coef.tramnet(mod, with_baseline = FALSE, tol = 0, as.lm = as.lm) :
+  additional arguments ignored
+5: In coef.tramnet(mod, with_baseline = FALSE, tol = 0, as.lm = as.lm) :
+  additional arguments ignored
+> plot_path(pfa)
+> 
+> proc.time()
+   user  system elapsed 
+ 25.000   0.332  25.332 

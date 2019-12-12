@@ -1,0 +1,152 @@
+
+R version 3.6.1 (2019-07-05) -- "Action of the Toes"
+Copyright (C) 2019 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> # Test for cvl_tramnet
+> 
+> library("survival")
+> library("tramnet")
+Loading required package: tram
+Loading required package: mlt
+Loading required package: basefun
+Loading required package: variables
+Loading required package: CVXR
+
+Attaching package: 'CVXR'
+
+The following object is masked from 'package:stats':
+
+    power
+
+Loading required package: mlrMBO
+Loading required package: mlr
+Loading required package: ParamHelpers
+Loading required package: smoof
+Loading required package: BBmisc
+
+Attaching package: 'BBmisc'
+
+The following object is masked from 'package:base':
+
+    isFALSE
+
+Loading required package: checkmate
+> library("TH.data")
+Loading required package: MASS
+
+Attaching package: 'MASS'
+
+The following object is masked from 'package:CVXR':
+
+    huber
+
+
+Attaching package: 'TH.data'
+
+The following object is masked from 'package:MASS':
+
+    geyser
+
+> options(digits = 4)
+> 
+> set.seed(241068)
+> data("GBSG2", package = "TH.data")
+> X <- 1 * matrix(GBSG2$horTh == "yes", ncol = 1)
+> colnames(X) <- "horThyes"
+> GBSG2$surv <- with(GBSG2, Surv(time, cens))
+> m <- Coxph(surv ~ 1, data = GBSG2)
+> mt <- tramnet(model = m, x = X, lambda = 0, alpha = 0)
+> mc <- Coxph(surv ~ horTh, data = GBSG2)
+> cvl_tramnet(mt, fold = 2, lambda = c(0, 1), alpha = c(0, 1))
+Performing 2-fold cross validation
+Fold: 1
+Fold: 2
+Performing 2-fold cross validation
+Fold: 1
+Fold: 2
+Performing 2-fold cross validation
+Fold: 1
+Fold: 2
+Performing 2-fold cross validation
+Fold: 1
+Fold: 2
+$logLik_tab
+  lambda alpha logLik_fold_1 logLik_fold_2 sum_logLik
+1      0     0         -1257         -1376      -2633
+2      1     0         -1257         -1376      -2633
+3      0     1         -1257         -1376      -2633
+4      1     1         -1257         -1376      -2634
+
+$optimal
+  lambda alpha logLik_fold_1 logLik_fold_2 sum_logLik
+1      0     0         -1257         -1376      -2633
+
+$coefficients
+$coefficients$coef_fold_1
+  lambda alpha horThyes
+1      0     0  -0.2444
+2      1     0  -0.2374
+3      0     1  -0.2444
+4      1     1  -0.2149
+
+$coefficients$coef_fold_2
+  lambda alpha horThyes
+1      0     0  -0.5068
+2      1     0  -0.4906
+3      0     1  -0.5068
+4      1     1  -0.4738
+
+
+$folds
+  [1] 2 2 2 1 2 1 1 1 1 2 2 2 1 2 2 2 2 1 1 2 2 1 1 1 2 1 1 2 2 2 2 1 1 1 2 1 1
+ [38] 2 2 1 1 2 2 2 2 1 2 2 2 1 2 2 2 1 1 2 1 1 1 2 1 2 2 1 1 1 1 2 2 1 2 1 1 1
+ [75] 2 2 1 1 2 2 1 1 2 2 1 1 1 2 1 1 2 1 1 2 2 2 2 2 2 2 1 1 2 2 2 1 1 1 2 1 2
+[112] 1 2 1 1 1 1 1 2 2 2 1 2 1 1 2 1 1 1 1 1 2 1 1 2 1 2 1 1 2 1 1 1 1 2 2 2 1
+[149] 2 2 2 2 1 2 1 1 2 2 1 2 1 1 2 1 1 1 2 1 1 1 1 2 1 1 2 1 2 2 1 1 2 2 1 2 1
+[186] 2 1 2 2 2 2 1 2 2 2 2 1 2 2 1 2 1 1 1 1 1 2 1 2 1 2 2 2 2 1 1 1 2 2 2 1 2
+[223] 1 1 1 1 2 2 2 2 1 1 1 1 1 1 2 1 1 2 2 1 1 2 2 1 2 2 1 2 1 1 2 2 1 2 1 2 1
+[260] 2 2 2 2 2 2 1 2 1 2 1 2 1 2 1 2 1 1 1 2 2 1 2 2 1 2 1 2 2 1 1 1 1 2 2 2 1
+[297] 2 1 2 1 2 2 1 2 2 2 2 2 2 2 2 2 1 1 2 1 2 1 2 1 2 2 2 1 1 2 1 2 1 1 1 1 1
+[334] 1 1 2 2 1 1 1 2 2 2 2 2 2 2 2 2 2 2 1 1 1 1 2 1 1 2 1 1 1 1 1 1 2 2 1 1 1
+[371] 1 2 2 1 1 1 2 1 2 2 2 2 1 2 2 2 1 2 2 2 1 1 2 2 1 2 2 2 2 1 2 2 2 2 1 2 1
+[408] 2 1 1 2 2 1 1 1 1 1 1 1 2 1 1 2 1 2 2 2 1 2 1 2 2 1 1 1 2 1 1 2 2 1 1 1 1
+[445] 2 1 1 1 1 2 2 2 2 1 1 2 1 2 2 2 1 2 1 1 2 2 2 1 1 1 2 1 2 1 1 2 1 2 1 2 1
+[482] 1 2 1 1 2 1 2 1 1 1 2 2 2 2 2 2 1 2 2 1 1 2 2 2 1 2 2 1 1 1 2 2 1 1 2 2 1
+[519] 1 1 2 2 2 2 1 2 1 2 1 1 2 1 1 2 2 2 2 1 2 2 2 1 1 1 1 1 2 2 2 2 1 1 2 1 1
+[556] 2 1 1 1 1 2 2 2 2 1 1 1 1 1 1 1 1 1 2 2 2 2 1 1 1 2 2 2 1 1 2 2 2 1 2 1 1
+[593] 2 2 1 1 1 1 2 2 1 1 2 2 1 2 2 1 1 2 1 2 2 1 2 2 1 2 1 2 1 1 1 1 1 2 2 2 1
+[630] 1 1 2 1 1 2 2 2 1 1 2 1 1 1 2 1 2 2 1 2 2 1 2 2 2 1 2 2 1 2 1 2 2 1 1 2 2
+[667] 2 2 1 1 2 2 1 2 2 1 1 2 1 1 1 1 1 2 2 1
+
+attr(,"class")
+[1] "cvl_tramnet"
+Warning messages:
+1: In .tramnet_checks(model = model, x = x, lambda = lambda, alpha = alpha) :
+  Unscaled design matrices are not sensible under regularization.
+            Consider scaling and centering the design matrix.
+2: In .tramnet_checks(model = model, x = x, lambda = lambda, alpha = alpha) :
+  Unscaled design matrices are not sensible under regularization.
+            Consider scaling and centering the design matrix.
+3: In .tramnet_checks(model = model, x = x, lambda = lambda, alpha = alpha) :
+  Unscaled design matrices are not sensible under regularization.
+            Consider scaling and centering the design matrix.
+4: In .tramnet_checks(model = model, x = x, lambda = lambda, alpha = alpha) :
+  Unscaled design matrices are not sensible under regularization.
+            Consider scaling and centering the design matrix.
+> 
+> proc.time()
+   user  system elapsed 
+ 21.384   0.288  21.670 
