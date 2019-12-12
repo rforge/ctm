@@ -1,5 +1,5 @@
 
-R version 3.6.1 (2019-07-05) -- "Action of the Toes"
+R version 3.6.2 (2019-12-12) -- "Dark and Stormy Night"
 Copyright (C) 2019 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -44,7 +44,7 @@ The following object is masked from 'package:base':
     isFALSE
 
 Loading required package: checkmate
-> options(digits = 4)
+> options(digits = 3)
 > 
 > ## Data
 > dat <- data.frame(y = runif(100), s = factor(rep(c(1, 2), each = 50)))
@@ -65,4 +65,4 @@ In .tramnet_checks(model = model, x = x, lambda = lambda, alpha = alpha) :
 > 
 > proc.time()
    user  system elapsed 
-  5.844   0.284   6.128 
+  5.776   0.216   5.991 

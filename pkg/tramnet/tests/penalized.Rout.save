@@ -1,5 +1,5 @@
 
-R version 3.6.1 (2019-07-05) -- "Action of the Toes"
+R version 3.6.2 (2019-12-12) -- "Dark and Stormy Night"
 Copyright (C) 2019 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -46,7 +46,7 @@ Loading required package: checkmate
 Loading required package: survival
 Welcome to penalized. For extended examples, see vignette("penalized").
 > library("survival")
-> options(digits = 4)
+> options(digits = 3)
 > 
 > ## --- Comparison with penalized
 > data("nki70", package = "penalized")
@@ -58,14 +58,14 @@ Welcome to penalized. For extended examples, see vignette("penalized").
 > y <- Coxph(Surv(time, event) ~ 1, data = nki70, order = 10, log_first = TRUE)
 > fit2 <- tramnet(y, x, lambda = 1, alpha = 1) ## L1 only
 > coef(fit)
- DIAPH3  NUSAP1 
--0.1288  0.6704 
+DIAPH3 NUSAP1 
+-0.129  0.670 
 > coef(fit2)
- DIAPH3  NUSAP1 
--0.1392  0.6796 
+DIAPH3 NUSAP1 
+-0.139  0.680 
 > 
 > 
 > 
 > proc.time()
    user  system elapsed 
-  4.592   0.236   4.825 
+   4.66    0.18    4.84 

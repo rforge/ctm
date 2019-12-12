@@ -1,5 +1,5 @@
 
-R version 3.6.1 (2019-07-05) -- "Action of the Toes"
+R version 3.6.2 (2019-12-12) -- "Dark and Stormy Night"
 Copyright (C) 2019 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -60,7 +60,7 @@ The following object is masked from 'package:MASS':
 
     geyser
 
-> options(digits = 4)
+> options(digits = 3)
 > 
 > set.seed(241068)
 > data("GBSG2", package = "TH.data")
@@ -97,17 +97,17 @@ $optimal
 $coefficients
 $coefficients$coef_fold_1
   lambda alpha horThyes
-1      0     0  -0.2444
-2      1     0  -0.2374
-3      0     1  -0.2444
-4      1     1  -0.2149
+1      0     0   -0.244
+2      1     0   -0.237
+3      0     1   -0.244
+4      1     1   -0.215
 
 $coefficients$coef_fold_2
   lambda alpha horThyes
-1      0     0  -0.5068
-2      1     0  -0.4906
-3      0     1  -0.5068
-4      1     1  -0.4738
+1      0     0   -0.507
+2      1     0   -0.491
+3      0     1   -0.507
+4      1     1   -0.474
 
 
 $folds
@@ -149,4 +149,4 @@ Warning messages:
 > 
 > proc.time()
    user  system elapsed 
- 21.384   0.288  21.670 
+ 21.712   0.204  21.915 

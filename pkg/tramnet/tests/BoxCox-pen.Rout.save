@@ -1,5 +1,5 @@
 
-R version 3.6.1 (2019-07-05) -- "Action of the Toes"
+R version 3.6.2 (2019-12-12) -- "Dark and Stormy Night"
 Copyright (C) 2019 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -44,7 +44,7 @@ The following object is masked from 'package:base':
     isFALSE
 
 Loading required package: checkmate
-> options(digits = 4)
+> options(digits = 3)
 > 
 > ## Data
 > data("BostonHousing2", package = "mlbench")
@@ -57,7 +57,7 @@ Loading required package: checkmate
 > 
 > max(abs(coef(mt, with_baseline = FALSE) -
 +         coef(m2, with_baseline = FALSE)))
-[1] 4.307e-07
+[1] 4.31e-07
 > logLik(mt)
 'log Lik.' -1470 (df=NA)
 > logLik(m2)
@@ -69,7 +69,7 @@ Loading required package: checkmate
 > 
 > max(abs(coef(mt, with_baseline = FALSE) -
 +         coef(m2, with_baseline = FALSE)[-2]))
-[1] 6.361e-08
+[1] 6.36e-08
 > logLik(mt)
 'log Lik.' -1492 (df=NA)
 > logLik(m2)
@@ -77,4 +77,4 @@ Loading required package: checkmate
 > 
 > proc.time()
    user  system elapsed 
-  9.228   0.220   9.448 
+  9.396   0.216   9.610 

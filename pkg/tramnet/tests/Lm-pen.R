@@ -2,7 +2,7 @@
 
 ## Dependencies
 library("tramnet")
-options(digits = 4)
+options(digits = 3)
 
 ## Data
 dat <- data.frame(y = runif(100), s = factor(rep(c(1, 2), each = 50)))

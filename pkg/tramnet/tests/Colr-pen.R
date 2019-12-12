@@ -4,7 +4,7 @@
 library("tramnet")
 library("survival")
 library("sandwich")
-options(digits = 4)
+options(digits = 3)
 
 ## Exact and Right censored
 data("GBSG2", package = "TH.data")

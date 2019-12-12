@@ -3,7 +3,7 @@
 ## Dependencies
 library("survival")
 library("tramnet")
-options(digits = 4)
+options(digits = 3)
 
 ## Data
 data("GBSG2", package = "TH.data")

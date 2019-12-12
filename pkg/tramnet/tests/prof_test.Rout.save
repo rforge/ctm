@@ -1,5 +1,5 @@
 
-R version 3.6.1 (2019-07-05) -- "Action of the Toes"
+R version 3.6.2 (2019-12-12) -- "Dark and Stormy Night"
 Copyright (C) 2019 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -47,7 +47,7 @@ Loading required package: checkmate
 Loading required package: survival
 Welcome to penalized. For extended examples, see vignette("penalized").
 > library("survival")
-> options(digits = 4)
+> options(digits = 3)
 > 
 > ## --- Comparison with penalized
 > data("nki70", package = "penalized")
@@ -62,18 +62,18 @@ Step 3/5 at lambda = 1.22
 Step 4/5 at lambda = 4.29
 Step 5/5 at lambda = 15
 $lambdas
-[1]  0.000  0.350  1.225  4.286 15.000
+[1]  0.00  0.35  1.22  4.29 15.00
 
 $cfx
-         DIAPH3 NUSAP1    TSPYL5   C20orf46
-[1,] -2.193e-01 0.7690 2.109e-02 -1.316e-02
-[2,] -1.916e-01 0.7379 1.191e-02 -4.710e-03
-[3,] -1.215e-01 0.6597 1.078e-08 -9.815e-09
-[4,] -5.714e-10 0.4808 6.477e-11 -4.085e-10
-[5,]  4.603e-10 0.2016 4.258e-11 -3.451e-11
+        DIAPH3 NUSAP1   TSPYL5  C20orf46
+[1,] -2.19e-01  0.769 2.11e-02 -1.32e-02
+[2,] -1.92e-01  0.738 1.19e-02 -4.71e-03
+[3,] -1.22e-01  0.660 1.08e-08 -9.82e-09
+[4,] -5.71e-10  0.481 6.48e-11 -4.09e-10
+[5,]  4.60e-10  0.202 4.26e-11 -3.45e-11
 
 $lls
-[1] -182.4 -182.7 -183.5 -185.2 -188.9
+[1] -182 -183 -183 -185 -189
 
 attr(,"class")
 [1] "prof_lambda"
@@ -100,15 +100,15 @@ $alphas
 [1] 0.00 0.25 0.50 0.75 1.00
 
 $cfx
-      DIAPH3 NUSAP1    TSPYL5   C20orf46
-[1,] -0.1860 0.7230 1.917e-02 -1.454e-02
-[2,] -0.1751 0.7130 1.318e-02 -8.322e-03
-[3,] -0.1638 0.7025 7.117e-03 -2.160e-03
-[4,] -0.1516 0.6912 1.730e-03 -1.320e-08
-[5,] -0.1392 0.6796 1.036e-08 -4.762e-09
+     DIAPH3 NUSAP1   TSPYL5  C20orf46
+[1,] -0.186  0.723 1.92e-02 -1.45e-02
+[2,] -0.175  0.713 1.32e-02 -8.32e-03
+[3,] -0.164  0.703 7.12e-03 -2.16e-03
+[4,] -0.152  0.691 1.73e-03 -1.32e-08
+[5,] -0.139  0.680 1.04e-08 -4.76e-09
 
 $lls
-[1] -182.7 -182.8 -183.0 -183.1 -183.3
+[1] -183 -183 -183 -183 -183
 
 attr(,"class")
 [1] "prof_alpha"
@@ -127,4 +127,4 @@ Warning messages:
 > 
 > proc.time()
    user  system elapsed 
- 25.000   0.332  25.332 
+ 26.408   0.388  26.809 

@@ -3,7 +3,7 @@
 library("survival")
 library("tramnet")
 library("TH.data")
-options(digits = 4)
+options(digits = 3)
 
 set.seed(241068)
 data("GBSG2", package = "TH.data")

@@ -3,7 +3,7 @@
 library("tramnet")
 library("penalized")
 library("survival")
-options(digits = 4)
+options(digits = 3)
 
 ## --- Comparison with penalized
 data("nki70", package = "penalized")

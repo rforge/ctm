@@ -1,5 +1,5 @@
 
-R version 3.6.1 (2019-07-05) -- "Action of the Toes"
+R version 3.6.2 (2019-12-12) -- "Dark and Stormy Night"
 Copyright (C) 2019 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -45,7 +45,7 @@ The following object is masked from 'package:base':
 
 Loading required package: checkmate
 > library("survival")
-> options(digits = 4)
+> options(digits = 3)
 > 
 > ## Exact and Right censored
 > data("GBSG2", package = "TH.data")
@@ -58,7 +58,7 @@ Loading required package: checkmate
 > yCOLRb <- Coxph(Surv(time, cens) ~ horTh, data = GBSG2, log_first = TRUE, order = 10)
 > max(abs(coef(yCOLRb, with_baseline = FALSE) -
 +         coef(modCOLR, with_baseline = FALSE)))
-[1] 3.215e-05
+[1] 3.22e-05
 > logLik(yCOLRb)
 'log Lik.' -2606 (df=12)
 > logLik(modCOLR)
@@ -100,4 +100,4 @@ Loading required package: checkmate
 > 
 > proc.time()
    user  system elapsed 
-  5.556   0.240   5.795 
+  4.996   0.248   5.242 

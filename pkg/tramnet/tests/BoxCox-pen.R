@@ -2,7 +2,7 @@
 
 ## Dependencies
 library("tramnet")
-options(digits = 4)
+options(digits = 3)
 
 ## Data
 data("BostonHousing2", package = "mlbench")
