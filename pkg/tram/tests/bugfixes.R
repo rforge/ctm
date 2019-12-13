@@ -101,3 +101,11 @@ wine$crating <- R(erating, cleft = lrating, cright = rrating)
 ### gave an error
 m <- Polr(crating ~ temp, data = wine, method = "probit")
 
+### another one
+data("GBSG2", package = "TH.data")
+tmp <- GBSG2
+tmp$y <- R(with(GBSG2, Surv(time, cens)))
+m1 <- Coxph(Surv(time, cens) ~ horTh, data = tmp)
+m2 <- Coxph(y ~ horTh, data = tmp)
+stopifnot(all.equal(coef(as.mlt(m1)), coef(as.mlt(m2)), 
+                    check.attributes = FALSE))

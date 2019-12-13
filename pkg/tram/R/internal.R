@@ -44,7 +44,7 @@ asvar.response <- function(object, name, prob = c(.1, .9), support = NULL, bound
     if (is.null(support)) {
         support <- quantile(survfit(y ~ 1, data = data.frame(y = as.Surv(object))), prob = prob)$quantile
         if (is.na(support[2])) 
-            support[2] <- max(object[, 1])
+            support[2] <- max(object$approxy)
     }
     variables::numeric_var(name, support = support, bounds = bounds, ...)
 }

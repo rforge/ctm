@@ -6,7 +6,7 @@
   \subsection{Bugfixes}{
     \itemize{
       \item{Fix problem in C header file.}
-      \item{Fix problem with responses of class \code{R}, spotted by Balint Tamasi.}
+      \item{Fix problems with responses of class \code{R}, spotted by Balint Tamasi.}
     }
   }
 }
