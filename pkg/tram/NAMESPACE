@@ -15,7 +15,7 @@ importFrom("stats", "model.matrix", "coef", "vcov", "nobs", "predict", "quantile
 import("Matrix")
 importFrom("survival", "survfit", "Surv")
 importFrom("graphics", "plot", "lines", "polygon")
-#importFrom("stats", "update")
+importFrom("stats", "qchisq")
 
 export(tram, tram_data, Coxph, Colr, Polr, Lm, BoxCox, Survreg, Lehmann, mtram)
 

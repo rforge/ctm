@@ -89,7 +89,12 @@ vcov.tram <- function(object, with_baseline = FALSE, complete = FALSE, ...)
     Hlin <- H[shift, shift]
     Hbase <- H[-shift, -shift]
     Hoff <- H[shift, -shift]
-    ret <- solve(Hlin - tcrossprod(Hoff %*% solve(Hbase), Hoff))
+    H <- try(Hlin - tcrossprod(Hoff %*% solve(Hbase), Hoff))
+    if (inherits(H, "try-error"))
+        return(vcov(as.mlt(object))[shift, shift])
+    ret <- solve(H)
+    if (inherits(ret, "try-error"))
+        return(vcov(as.mlt(object))[shift, shift])
     colnames(ret) <- rownames(ret) <- object$shiftcoef
     return(ret)
 }
@@ -191,15 +196,7 @@ profile.tram <- function(fitted, which = 1:p, alpha = 0.01,
     p <- length(Pnames)
     if(is.character(which)) which <- match(which, Pnames)
 
-    ### try to find a reasonable step-size, either from
-    ### standard errors or adaptively (start with 1e-3 here)
-    vc <- try(vcov(fitted))
-    if (!inherits(vc, "try-error")) {
-        diff <- sqrt(diag(vc))
-    } else {
-        diff <- rep(1e-3, length(Pnames))
-        maxsteps <- maxsteps * 5
-    }
+    diff <- sqrt(diag(vcov(fitted)))
     names(diff) <- Pnames
 
     X <- model.matrix(fitted)
@@ -256,9 +253,6 @@ profile.tram <- function(fitted, which = 1:p, alpha = 0.01,
                 if(zz > - 1e-3) zz <- max(zz, 0)
                 else stop("profiling has found a better solution, so original fit had not converged")
 
-                ### if the increase in the profile loglik is not
-                ### large enough, increase step-size
-                if(zz < 1e-3) diff <- diff * 2
                 z <- sgn * sqrt(zz)
                 zi <- c(zi, z)
             }
