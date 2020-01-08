@@ -2,6 +2,18 @@
 \name{NEWS}
 \title{NEWS file for the tram package}
 
+\section{Changes in Version 0.3-2 (2020-01-08)}{
+  \itemize{
+    \item{\code{profile} method added for computing 
+          profile likelihood confidence intervals.}
+  }
+  \subsection{Bugfixes}{
+    \itemize{
+      \item{}
+    }
+  }
+}
+
 \section{Changes in Version 0.3-1 (2019-11-05)}{
   \subsection{Bugfixes}{
     \itemize{

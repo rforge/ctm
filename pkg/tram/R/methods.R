@@ -174,3 +174,102 @@ print.summary.tram <- function(x, digits = max(3L, getOption("digits") - 3L), ..
 
 residuals.tram <- function(object, ...)
     residuals(as.mlt(object), ...)
+
+# profile.tram was modified from
+# File MASS/profiles.q copyright (C) 1996 D. M. Bates and W. N. Venables.
+#
+# port to R by B. D. Ripley copyright (C) 1998
+#
+# corrections copyright (C) 2000,3,6,7 B. D. Ripley
+
+profile.tram <- function(fitted, which = 1:p, alpha = 0.01,
+                         maxsteps = 10, del = zmax/5, trace = FALSE, ...)
+{
+    Pnames <- names(B0 <- coef(fitted))
+    nonA <- !is.na(B0)
+    pv0 <- t(as.matrix(B0))
+    p <- length(Pnames)
+    if(is.character(which)) which <- match(which, Pnames)
+
+    ### try to find a reasonable step-size, either from
+    ### standard errors or adaptively (start with 1e-3 here)
+    vc <- try(vcov(fitted))
+    if (!inherits(vc, "try-error")) {
+        diff <- sqrt(diag(vc))
+    } else {
+        diff <- rep(1e-3, length(Pnames))
+        maxsteps <- maxsteps * 5
+    }
+    names(diff) <- Pnames
+
+    X <- model.matrix(fitted)
+    n <- NROW(X)
+    O <- fitted$offset
+    if(!length(O)) O <- rep(0, n)
+    W <- fitted$weights
+    if(length(W) == 0L) W <- rep(1, n)
+
+    OriginalDeviance <- -2 * logLik(fitted)
+    zmax <- sqrt(qchisq(1 - alpha, 1))
+
+    prof <- vector("list", length=length(which))
+    names(prof) <- Pnames[which]
+    for(i in which) {
+        if(!nonA[i]) next
+        zi <- 0
+        pvi <- pv0
+        pi <- Pnames[i]
+        fx <- 0
+        names(fx) <- pi
+
+        ### set-up new model with fixed parameter pi such that
+        ### update can be called
+        theta <- coef(as.mlt(fitted))
+        theta <- theta[!names(theta) %in% pi]
+        fm <- m <- mlt(fitted$model, data = fitted$data, weights = W, 
+                       fixed = fx, theta = theta,
+                       scale = fitted$scale, 
+                       optim = fitted$optim)
+
+        for(sgn in c(-1, 1)) {
+            if(trace)
+                message("\nParameter: ", pi, " ",
+                        c("down", "up")[(sgn + 1)/2 + 1])
+            step <- 0
+            z <- 0
+
+            while((step <- step + 1) < maxsteps && abs(z) < zmax) {
+                bi <- B0[i] + sgn * step * del * diff[i]
+                o <- O + X[, i] * bi
+
+                ### compute profile likelihood
+                fm <- update(m, weights = W, offset = o, 
+                             theta = coef(fm, fixed = FALSE))
+                pl <- logLik(fm)
+
+                ri <- pv0
+                ri[, Pnames] <- coef(fm)[Pnames]
+                ri[, pi] <- bi
+                pvi <- rbind(pvi, ri)
+                zz <- -2 * pl - OriginalDeviance
+
+                if(zz > - 1e-3) zz <- max(zz, 0)
+                else stop("profiling has found a better solution, so original fit had not converged")
+
+                ### if the increase in the profile loglik is not
+                ### large enough, increase step-size
+                if(zz < 1e-3) diff <- diff * 2
+                z <- sgn * sqrt(zz)
+                zi <- c(zi, z)
+            }
+        }
+        si <- order(zi)
+        prof[[pi]] <- structure(data.frame(zi[si]), names = "z")
+        prof[[pi]]$par.vals <- pvi[si, ,drop=FALSE]
+    }
+    val <- structure(prof, original.fit = fitted, summary = NULL)
+    ### inheriting from profile.glm is maybe not so smart but
+    ### _currently_ works when calling MASS::confint.profile.glm
+    class(val) <- c("profile.tram", "profile.glm", "profile")
+    val
+}

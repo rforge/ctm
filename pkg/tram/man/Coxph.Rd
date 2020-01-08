@@ -80,9 +80,15 @@ An object of class \code{Coxph}, with corresponding \code{coef},
   data("GBSG2", package = "TH.data")
 
   library("survival")
-  coxph(Surv(time, cens) ~ horTh, data = GBSG2)
+  (m1 <- coxph(Surv(time, cens) ~ horTh, data = GBSG2))
 
-  Coxph(Surv(time, cens) ~ horTh, data = GBSG2)
+  (m2 <- Coxph(Surv(time, cens) ~ horTh, data = GBSG2))
+
+  ### Wald intervals
+  confint(m1)
+  confint(m2)
+  ### profile likelihood intervals
+  confint(profile(m2))
 
 }
 \keyword{models}
