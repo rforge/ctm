@@ -2,6 +2,12 @@
 \name{NEWS}
 \title{NEWS file for the mlt package}
 
+\section{Changes in Version 1.1-1 (2020-01-08)}{
+  \itemize{
+    \item{Try harder to invert Hessians.}
+  }
+}
+
 \section{Changes in Version 1.1-0 (2019-11-06)}{
   \itemize{
     \item{Add support for \pkg{nloptr} (still experimental and thus switched off by default).}
@@ -9,6 +15,7 @@
     \item{Fix problem in \code{as.Surv} reported by Balint Tamasi.}
   }
 }
+
 
 \section{Changes in Version 1.0-7 (2019-10-07)}{
   \itemize{
