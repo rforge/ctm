@@ -1,5 +1,5 @@
 
-R version 3.6.1 (2019-07-05) -- "Action of the Toes"
+R version 3.6.2 (2019-12-12) -- "Dark and Stormy Night"
 Copyright (C) 2019 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -21,6 +21,7 @@ Loading required package: basefun
 Loading required package: variables
 > library("sandwich")
 > set.seed(29)
+> options(digits = 5)
 > 
 > ### Nadja Klein
 > dat <- data.frame(matrix(rnorm(300),ncol=3))
@@ -85,9 +86,9 @@ Call:
 mlt(model = m, data = bodyfat, scale = TRUE, checkGrad = FALSE)
 
 Type:  continuous linear transformation model (transformed normal distribution)
-Log-Likelihood: -171.1428 (df = 12)
+Log-Likelihood: -171.14 (df = 12)
 
-Coefficients: 30.95069 38.88527 42.5229 -0.01507979 -0.05890574 -0.121357 -0.05406142 -0.4769787 -0.344239 -2.414345 -1.131853 0.369285
+Coefficients: 30.951 38.885 42.523 -0.01508 -0.058906 -0.12136 -0.054061 -0.47698 -0.34424 -2.4143 -1.1319 0.36928
 
 > 
 > ### parm can be a matrix with subject-specific parameters
@@ -154,4 +155,4 @@ In .checkR(y, weights) : response contains left-censored observations only
 > 
 > proc.time()
    user  system elapsed 
-  1.250   0.068   1.312 
+  1.310   0.045   1.348 

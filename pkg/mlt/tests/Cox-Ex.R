@@ -2,6 +2,8 @@
 library("mlt")
 library("survival")
 set.seed(29)
+options(digits = 5)
+
 
 ### true dgp
 rY <- function(n, ...) rexp(n, ...)

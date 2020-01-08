@@ -2,6 +2,7 @@
 library("mlt")
 library("sandwich")
 set.seed(29)
+options(digits = 5)
 
 ### Nadja Klein
 dat <- data.frame(matrix(rnorm(300),ncol=3))
