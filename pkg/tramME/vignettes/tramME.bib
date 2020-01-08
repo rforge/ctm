@@ -1,0 +1,143 @@
+@article{hothorn_transformation_nodate,
+	title = {Transformation {Models}: {The} tram {Package}},
+	abstract = {The tram package allows a range of stratiﬁed linear transformation models to be ﬁtted using standard formula-based R interfaces. Functions for the estimation of potentially stratiﬁed Cox models, several survival regression models including log-normal or log-logistic models, models for ordered categorical responses (proportional odds, proportional hazards, probit) are available. Likelihood-based inference, also in the presense of random left-, right-, and interval-censoring and arbitrary forms of truncation, is performed using infrastructure from package mlt. More complex models, allowing non-linear and interaction functions of covariates, can be estimated using corresponding transformation trees and forests in package trtf with the same simple user interface.},
+	language = {en},
+	author = {Hothorn, Torsten},
+	pages = {27},
+	file = {Hothorn - Transformation Models The tram Package.pdf:/home/balint/Zotero/storage/YNEMX672/Hothorn - Transformation Models The tram Package.pdf:application/pdf}
+}
+
+@article{hothorn_most_2018,
+	title = {Most {Likely} {Transformations}: {Most} likely transformations},
+	volume = {45},
+	issn = {03036898},
+	shorttitle = {Most {Likely} {Transformations}},
+	url = {http://doi.wiley.com/10.1111/sjos.12291},
+	doi = {10.1111/sjos.12291},
+	abstract = {We propose and study properties of maximum likelihood estimators in the class of conditional transformation models. Based on a suitable explicit parameterization of the unconditional or conditional transformation function, we establish a cascade of increasingly complex transformation models that can be estimated, compared and analysed in the maximum likelihood framework. Models for the unconditional or conditional distribution function of any univariate response variable can be set up and estimated in the same theoretical and computational framework simply by choosing an appropriate transformation function and parameterization thereof. The ability to evaluate the distribution function directly allows us to estimate models based on the exact likelihood, especially in the presence of random censoring or truncation. For discrete and continuous responses, we establish the asymptotic normality of the proposed estimators. A reference software implementation of maximum likelihood-based estimation for conditional transformation models that allows the same ﬂexibility as the theory developed here was employed to illustrate the wide range of possible applications.},
+	language = {en},
+	number = {1},
+	urldate = {2019-02-07},
+	journal = {Scandinavian Journal of Statistics},
+	author = {Hothorn, Torsten and Möst, Lisa and Bühlmann, Peter},
+	month = mar,
+	year = {2018},
+	pages = {110--134},
+	file = {Hothorn et al. - 2018 - Most Likely Transformations Most likely transform.pdf:/home/balint/Zotero/storage/W3IP5BL6/Hothorn et al. - 2018 - Most Likely Transformations Most likely transform.pdf:application/pdf}
+}
+
+@mastersthesis{tamasi_transformation_2019,
+	address = {Zurich},
+	title = {Transformation models for correlated observations using "{Template} {Model} {Builder}"},
+	abstract = {Transformation models provide a general and flexible approach to model the distribution function
+of the response variable of interest. The maximum likelihood estimation described by Hothorn
+et al. (2018) assumes independent observations, and thus needs to be modified to accommodate
+data with correlated outcomes, which are abundant in the statistical practice. This master thesis
+proposes a possible extension of the model class to incorporate mixed effects that can be used
+to estimate transformation models on grouped data. We also implement maximum likelihood
+estimation and inference in this set of models using the Template Model Builder package by
+Kristensen et al. (2016) in the R programming language. Our implementation provides a formula-
+based interface to specify stratified linear transformation mixed models with complex random
+effects structures. Through a series of examples on various datasets and model specifications,
+we present the features of our package and compare the results to estimates from available
+alternatives. The new mixed effects transformation model approach not only poses a viable
+general alternative of several popular mixed effects regression packages, but also provides features
+that are not available elsewhere.},
+	school = {University of Zurich},
+	author = {Tamási, Bálint},
+	month = jun,
+	year = {2019},
+	file = {Tamási - 2019 - Transformation models for correlated observations .pdf:/home/balint/Zotero/storage/8VELCZH3/Tamási - 2019 - Transformation models for correlated observations .pdf:application/pdf}
+}
+
+@article{tian_empirical_nodate,
+	title = {An empirical comparison of two novel transformation models},
+	volume = {n/a},
+	copyright = {© 2019 John Wiley \& Sons, Ltd.},
+	issn = {1097-0258},
+	url = {https://onlinelibrary.wiley.com/doi/abs/10.1002/sim.8425},
+	doi = {10.1002/sim.8425},
+	abstract = {Continuous response variables are often transformed to meet modeling assumptions, but the choice of the transformation can be challenging. Two transformation models have recently been proposed: semiparametric cumulative probability models (CPMs) and parametric most likely transformation models (MLTs). Both approaches model the cumulative distribution function and require specifying a link function, which implicitly assumes that the responses follow a known distribution after some monotonic transformation. However, the two approaches estimate the transformation differently. With CPMs, an ordinal regression model is fit, which essentially treats each continuous response as a unique category and therefore nonparametrically estimates the transformation; CPMs are semiparametric linear transformation models. In contrast, with MLTs, the transformation is parameterized using flexible basis functions. Conditional expectations and quantiles are readily derived from both methods on the response variable's original scale. We compare the two methods with extensive simulations. We find that both methods generally have good performance with moderate and large sample sizes. MLTs slightly outperformed CPMs in small sample sizes under correct models. CPMs tended to be somewhat more robust to model misspecification and outcome rounding. Except in the simplest situations, both methods outperform basic transformation approaches commonly used in practice. We apply both methods to an HIV biomarker study.},
+	language = {en},
+	number = {n/a},
+	urldate = {2019-12-09},
+	journal = {Statistics in Medicine},
+	author = {Tian, Yuqi and Hothorn, Torsten and Li, Chun and Harrell, Frank E. and Shepherd, Bryan E.},
+	keywords = {transformation model, HIV, nonparametric maximum likelihood estimation, ordinal regression model},
+	file = {Full Text PDF:/home/balint/Zotero/storage/MSIYD8VA/Tian et al. - An empirical comparison of two novel transformatio.pdf:application/pdf;Snapshot:/home/balint/Zotero/storage/VUPUTEMA/sim.html:text/html}
+}
+
+@article{hothorn_applications_nodate,
+	title = {Some {Applications} of {Marginally} {Interpretable} {Linear} {Transformation} {Models} for {Clustered} {Observations}},
+	abstract = {Owing to their generality, transformation models can be used to set-up and compute many interesting regression models for discrete and continuous responses. This document focuses on the analysis of clustered observations. Marginal predictive distributions are deﬁned by transformation models and their joint normal distribution depends on a structured covariance matrix. Applications with skewed, bounded, and survival continuous outcomes as well as binary and ordered categorical responses are presented. Data is analysed by a proof-of-concept implementation of parametric linear transformation models for clustered observations available in the tram add-on package to the R system for statistical computing.},
+	language = {en},
+	author = {Hothorn, Torsten},
+	pages = {26},
+	file = {Hothorn - Some Applications of Marginally Interpretable Line.pdf:/home/balint/Zotero/storage/8LK39F3T/Hothorn - Some Applications of Marginally Interpretable Line.pdf:application/pdf}
+}
+
+@article{hothorn_marginally_2019,
+	title = {Marginally {Interpretable} {Linear} {Transformation} {Models} for {Clustered} {Observations}},
+	url = {http://arxiv.org/abs/1910.09219},
+	abstract = {Clustered observations are ubiquitous in controlled and observational studies and arise naturally in multicenter trials or longitudinal surveys. I present two novel models for the analysis of clustered observations where the marginal distributions are described by a linear transformation model and the correlations by a joint multivariate normal distribution. Both models provide analytic formulae for the marginal distributions, one of which features directly interpretable parameters. Owing to the richness of transformation models, the techniques are applicable to any type of response variable, including bounded, skewed, binary, ordinal, or survival responses. I present re-analyses of five applications from different domains, including models for non-normal and discrete responses, and explain how specific models for the estimation of marginal distributions can be defined within this novel modelling framework and how the results can be interpreted in a marginal way.},
+	urldate = {2019-12-13},
+	journal = {arXiv:1910.09219 [math, stat]},
+	author = {Hothorn, Torsten},
+	month = oct,
+	year = {2019},
+	note = {arXiv: 1910.09219},
+	keywords = {Mathematics - Statistics Theory, Statistics - Methodology},
+	file = {arXiv Fulltext PDF:/home/balint/Zotero/storage/MLQW4KK6/Hothorn - 2019 - Marginally Interpretable Linear Transformation Mod.pdf:application/pdf;arXiv.org Snapshot:/home/balint/Zotero/storage/NY883JAW/1910.html:text/html}
+}
+
+
+@article{muff_marginal_2016,
+	title = {Marginal or conditional regression models for correlated non‐normal data?},
+	language = {en},
+	journal = {Methods in Ecology and Evolution},
+	author = {Muff, Stefanie and Held, Leonhard and Keller, Lukas F},
+	year = {2016},
+	pages = {11},
+	file = {Muff et al. - 2016 - Marginal or conditional regression models for corr.pdf:/home/balint/Zotero/storage/H9GLLKJK/Muff et al. - 2016 - Marginal or conditional regression models for corr.pdf:application/pdf}
+}
+
+@article{bates_fitting_2015,
+	title = {Fitting {Linear} {Mixed}-{Effects} {Models} {Using} lme4},
+	volume = {67},
+	copyright = {Copyright (c) 2015 Douglas Bates, Martin Mächler, Ben Bolker, Steve Walker},
+	issn = {1548-7660},
+	url = {https://www.jstatsoft.org/index.php/jss/article/view/v067i01},
+	doi = {10.18637/jss.v067.i01},
+	language = {en},
+	number = {1},
+	urldate = {2019-02-27},
+	journal = {Journal of Statistical Software},
+	author = {Bates, Douglas and Mächler, Martin and Bolker, Ben and Walker, Steve},
+	month = oct,
+	year = {2015},
+	keywords = {Cholesky decomposition, linear mixed models, penalized least squares, sparse matrix methods},
+	pages = {1--48},
+	file = {Bates et al. - 2015 - Fitting Linear Mixed-Effects Models Using lme4.pdf:/home/balint/Zotero/storage/QPKMLIR8/Bates et al. - 2015 - Fitting Linear Mixed-Effects Models Using lme4.pdf:application/pdf;Snapshot:/home/balint/Zotero/storage/5PGTJHNZ/v067i01.html:text/html}
+}
+
+@article{lee_conditional_2004,
+	title = {Conditional and {Marginal} {Models}: {Another} {View}},
+	volume = {19},
+	issn = {0883-4237, 2168-8745},
+	shorttitle = {Conditional and {Marginal} {Models}},
+	url = {https://projecteuclid.org/euclid.ss/1105714159},
+	doi = {10.1214/088342304000000305},
+	abstract = {There has existed controversy about the use of marginal and conditional models, particularly in the analysis of data from longitudinal studies. We show that alleged differences in the behavior of parameters in so-called marginal and conditional models are based on a failure to compare like with like. In particular, these seemingly apparent differences are meaningless because they are mainly caused by preimposed unidentifiable constraints on the random effects in models. We discuss the advantages of conditional models over marginal models. We regard the conditional model as fundamental, from which marginal predictions can be made.},
+	language = {en},
+	number = {2},
+	urldate = {2019-12-06},
+	journal = {Statistical Science},
+	author = {Lee, Youngjo and Nelder, John A.},
+	month = may,
+	year = {2004},
+	mrnumber = {MR2140539},
+	zmnumber = {1100.62591},
+	keywords = {Generalized linear model, hierarchical generalized linear model, joint modeling of mean and dispersion, spatial correlation, temporal correlation},
+	pages = {219--238},
+	file = {Full Text PDF:/home/balint/Zotero/storage/VSA5KWMW/Lee and Nelder - 2004 - Conditional and Marginal Models Another View.pdf:application/pdf;Snapshot:/home/balint/Zotero/storage/3MYMI8KM/1105714159.html:text/html}
+}

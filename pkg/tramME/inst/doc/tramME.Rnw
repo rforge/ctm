@@ -1,0 +1,299 @@
+%\VignetteEngine{knitr::knitr}
+%\VignetteIndexEntry{Introduction to tramME}
+%\VignetteDepends{variables, basefun, mlt, tram, survival, lme4, tramME, coxme, ordinal}
+%\VignetteDepends{ggplot2}
+
+\documentclass[10pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{amsfonts,amstext,amsmath,amssymb,amsthm}
+\usepackage[utf8]{inputenc}
+\usepackage[comma,authoryear]{natbib}
+\usepackage{xcolor}
+\usepackage[colorlinks=true, citecolor=blue]{hyperref}
+
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\todo}[1]{\textbf{\color{red} TODO: #1}}
+\newcommand{\note}[1]{\textbf{\color{orange} NOTE: #1}}
+
+% Math notation
+\newcommand{\IP}{{\mathbb{P}}}
+\newcommand{\U}{{\mathbf{U}}}
+\newcommand{\X}{{\mathbf{X}}}
+\newcommand{\Y}{{\boldsymbol{Y}}}
+\newcommand{\y}{{\boldsymbol{y}}}
+\newcommand{\bbeta}{{\boldsymbol{\beta}}}
+\newcommand{\bvartheta}{{\boldsymbol{\vartheta}}}
+\newcommand{\bgamma}{{\boldsymbol{\gamma}}}
+\newcommand{\bGamma}{{\boldsymbol{\Gamma}}}
+\newcommand{\bSigma}{{\boldsymbol{\Sigma}}{}}
+\newcommand{\vect}[1]{\boldsymbol{#1}}
+\newcommand{\cN}{{\mathcal{N}}}
+\newcommand{\0}{{\mathbf{0}}}
+\renewcommand{\a}{{\mathbf{a}}}
+\newcommand{\T}{^{\top}}
+
+
+\title{\code{tramME}: Mixed Effects Transformation Models Using Template Model Builder}
+\author{B\'alint Tam\'asi}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+  Linear transformation models constitute a general family of parametric
+  regression models for discrete and continuous responses. In the case of
+  grouped data structures, the model has to take the into account the
+  correlation between observations to make the inference valid. One way of doing
+  this is to use mixed effects models, which capture the conditional
+  distribution of the outcome variable. The \code{tramME} package of the \code{R}
+  programming language \todo{one sentence description refer to TMB}.
+\end{abstract}
+
+<<setopts, echo=FALSE, message=FALSE>>=
+knitr::opts_chunk$set(size = "footnotesize",
+                      fig.width = 6, fig.height = 4, fig.align = "center")
+knitr::opts_knit$set(global.par = TRUE)
+options(digits = 6)
+@
+
+<<defs, include=FALSE>>=
+mycolors <- function(nr, type = "line") {
+  cols <- list()
+  cols[[1]] <- c(red = 0, green = 84, blue = 150)
+  cols[[2]] <- c(red = 202, green = 108, blue = 24)
+  out <- as.list(cols[[nr]])
+  out$alpha <- switch(type, line = 255L, fill = 140L)
+  out$maxColorValue <- 255
+  do.call("rgb", out)
+}
+@
+
+\section{Introduction}
+
+\todo{transformation models, new literature, clustered observations, marginally
+  interpretable, as opposed our approach}
+
+\section{Transformation Mixed Models}
+
+\todo{describe the conditional approach} \citet{tamasi_transformation_2019}
+
+\section{Applications}
+
+In this section several applications of the transformation mixed models, and
+wherever it is possible, we also compare to other existing implementations.
+
+\subsection{Normal Linear Mixed Model}
+
+\todo{model description compared to the LMM parametrization}
+
+As a first example, we model the reaction times of a sleep deprivation study
+\todo{describe in two sentences, plot data, give reference}
+
+<<>>=
+data("sleepstudy", package = "lme4")
+## plot
+@
+
+<<message=FALSE>>=
+library("tramME")
+sleep_lm <- LmME(Reaction ~ Days + (Days | Subject), data = sleepstudy)
+logLik(sleep_lm)
+@
+
+<<echo=FALSE, fig.width=6, fig.height=3.5>>=
+par(mfrow = c(1, 2), cex = 0.75)
+plot(sleep_lm, type = "trafo")
+plot(sleep_lm, type = "distribution")
+@
+
+\todo{Compare the results to lme4 \citet{bates_fitting_2015} }
+
+<<message=FALSE>>=
+library("lme4")
+sleep_lmer <- lmer(Reaction ~ Days + (Days | Subject), data = sleepstudy, REML = FALSE)
+logLik(sleep_lmer)
+@
+
+Note, that we set \code{REML = FALSE}, as the transformation mixed model
+implementation only supports the maximum likelihood estimation of the normal
+linear mixed model specification.
+
+The \code{as.lm = TRUE} option of various methods of \code{tramME} facilitates the
+comparisons between the transformation model parametrization and the results of
+a linear mixed model parametrization.
+
+Coefficient estimates and their standard errors from the \code{tramME} estimation are
+<<>>=
+cbind(coef = coef(sleep_lm, as.lm = TRUE),
+      se = sqrt(diag(vcov(sleep_lm, as.lm = TRUE, pargroup = "fixef"))))
+@
+while the results from \code{lmer} are
+<<>>=
+summary(sleep_lmer)$coefficients
+@
+
+Similarly, the standard deviations and correlations of the random effects, as
+well as the standard deviations of the error terms are essentially the same
+<<>>=
+VarCorr(sleep_lm, as.lm = TRUE) ## random effects
+sigma(sleep_lm) ## residual SD
+VarCorr(sleep_lmer)
+@
+
+As the results show, the transformation model approach leads to the same results
+as the maximum likelihood estimation of the traditional linear mixed model
+parametrization. \todo{Introduce the interval-censored example, we can't do this with lme4}
+
+<<>>=
+library("survival")
+ub <- ceiling(sleepstudy$Reaction / 50) * 50
+lb <- floor(sleepstudy$Reaction / 50) * 50
+lb[ub == 200] <- 0
+sleepstudy$Reaction_ic <- Surv(lb, ub, type = "interval2")
+head(sleepstudy$Reaction_ic)
+@
+
+Estimating the normal linear model
+
+<<>>=
+sleep_lm2 <- LmME(Reaction_ic ~ Days + (Days | Subject), data = sleepstudy)
+logLik(sleep_lm2)
+@
+
+The value of the likelihood is different \todo{why?}, but the parameter
+estimates are close to what we got in the exactly observed case
+
+<<>>=
+cbind(coef = coef(sleep_lm2, as.lm = TRUE),
+      se = sqrt(diag(vcov(sleep_lm2, as.lm = TRUE, pargroup = "fixef"))))
+sigma(sleep_lm2)
+VarCorr(sleep_lm2, as.lm = TRUE)
+@
+
+\subsection{Box-Cox-type Mixed Effects Models}
+
+Using the transformation model approach, we are able to abandon the conditional
+normality assumption for the outcome variable. \todo{switching the linear
+  baseline transformation function to a general non-linear monotone increasing one}
+
+A Box-Cox type transformation mixed model can be estimated using the
+\code{BoxCoxME} function of the \code{tramME} addon package.
+<<>>=
+sleep_bc <- BoxCoxME(Reaction ~ Days + (Days | Subject), data = sleepstudy)
+logLik(sleep_bc)
+@
+Note, that the log-likelihood of this model is higher than in the case of the
+normal linear model. \todo{At the expense of some additional parameters, we made
+it more flexible.}
+
+Plotting the baseline transformation $h(y) = \a(y)\T\bvartheta$ \todo{compare
+  baseline trafo with the LmME}. \note{kink in the lower part, slightly right
+  skewed distribution}
+
+<<echo=FALSE,fig.width=4.5, fig.height=4>>=
+par(mfrow = c(1, 1), cex = 0.8)
+plot(sleep_bc, newdata = data.frame(Days = 0, Subject = 1),
+     ranef = c(0, 0), type = "trafo", col = 1, lwd = 2,
+     xlab = "Average reaction time (ms)", ylab = expression(h(y)))
+plot(sleep_lm, newdata = data.frame(Days = 0, Subject = 1),
+     ranef = c(0, 0), type = "trafo", add = TRUE,
+     col = 1, lty = 2, lwd = 2)
+rug(sleepstudy$Reaction, col = rgb(.1, .1, .1, .1))
+legend("topleft", c("BoxCoxME", "LmME"), lty = c(1, 2), lwd = 2,
+       bty = "n", cex = 0.8)
+@
+
+\todo{integrate out: find analytic for LmME?}
+
+<<eval=FALSE>>=
+ndraws <- 1000
+nd <- expand.grid(
+  Reaction = seq(min(sleepstudy$Reaction), max(sleepstudy$Reaction), length.out = 100),
+  Days = 0:9,
+  Subject = 1)
+
+re <- simulate(sleep_bc, newdata = nd, nsim = ndraws, what = "ranef", seed = 100)
+cp <- parallel::mclapply(re, function(x) {
+  predict(sleep_bc, newdata = nd, ranef = x, type = "distribution")
+}, mc.cores = 8)
+cp <- array(unlist(cp), dim = c(100, 10, ndraws))
+mp_bc <- apply(cp, c(1, 2), mean)
+@
+
+<<echo=FALSE, eval=FALSE>>=
+## Numerical integration of the Box-Cox and Lm models. Does not run.
+ndraws <- 1000
+nd <- expand.grid(
+  Reaction = seq(min(sleepstudy$Reaction), max(sleepstudy$Reaction), length.out = 100),
+  Days = 0:9,
+  Subject = 1)
+
+## --- Box-Cox
+re <- simulate(sleep_bc, newdata = nd, nsim = ndraws, what = "ranef", seed = 100)
+cp <- parallel::mclapply(re, function(x) {
+  predict(sleep_bc, newdata = nd, ranef = x, type = "distribution")
+}, mc.cores = 8)
+cp <- array(unlist(cp), dim = c(100, 10, ndraws))
+mp_bc <- apply(cp, c(1, 2), mean)
+
+## --- Lm
+re <- simulate(sleep_lm, newdata = nd, nsim = ndraws, what = "ranef", seed = 100)
+cp <- parallel::mclapply(re, function(x) {
+  predict(sleep_lm, newdata = nd, ranef = x, type = "distribution")
+}, mc.cores = 8)
+cp <- array(unlist(cp), dim = c(100, 10, ndraws))
+mp_lm <- apply(cp, c(1, 2), mean)
+
+save(nd, mp_bc, mp_lm, file = "tramME/inst/vignette_data/marg_int.rda")
+@
+
+<<echo=FALSE, message=FALSE, fig.width=7, fig.height=4.5>>=
+load(system.file("vignette_data", "marg_int.rda", package = "tramME"))
+dat <- nd
+dat$Days <- paste0("Days = ", dat$Days)
+dat$mp_lm <- c(mp_lm)
+dat$mp_bc <- c(mp_bc)
+dat2 <- sleepstudy
+dat2$Days <- paste0("Days = ", dat2$Days)
+library("ggplot2")
+ggplot(dat, aes(x = Reaction)) +
+  facet_wrap(~ Days) +
+  geom_line(aes(y = mp_bc, colour = "BoxCoxME")) +
+  geom_line(aes(y = mp_lm, colour = "LmME")) +
+  stat_ecdf(aes(x = Reaction, colour = "ECDF"), data = dat2, geom = "step") +
+  xlab("Average reaction time (ms)") +
+  ylab("Marginal distribution") +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"),
+        legend.title = element_blank(),
+        legend.justification = c(0, 1),
+        legend.position = c(0.5, 0.3),
+        legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+  scale_color_manual(
+    values = c(rgb(0, 84, 150, maxColorValue = 255),
+               rgb(.5, .5, .5, .5),
+               rgb(202, 108, 24, maxColorValue = 255)),
+    breaks = c("BoxCoxME", "LmME", "ECDF"))
+@
+
+\subsection{Mixed Effects Continuous Outcome Logistic Regression}
+
+\subsection{Mixed Effects Transformation Models for Discrete Ordinal Outcomes}
+
+\subsection{Mixed Effects Transformation Models for Time-to-event Outcomes}
+
+\section{Discussion}
+
+\todo{Laplace approximation}
+
+\todo{Marginal vs conditional}
+
+\clearpage
+
+\bibliographystyle{plainnat}
+\bibliography{tramME}
+
+\end{document}
