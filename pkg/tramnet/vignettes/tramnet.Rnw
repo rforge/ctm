@@ -627,8 +627,8 @@ ordered and continuous responses, as well as exponential, Weibull and Rayleigh
 regression and the Cox model in survival analysis. Thus, by appropriately choosing
 and parametrizing $F$ and $\h$ one can understand all those models in the same
 maximum likelihood-based framework. One can formulate the corresponding likelihood
-contributions not only for exact observations, but under any form of random censoring
-and truncation.
+contributions not only for exact observations, but under any form of uninformative
+censoring and truncation.
 
 Given a univariate response $\rY$ and a set of covariates $\rX$ one can specify
 the following cumulative distribution function and density valid for any linear
@@ -644,7 +644,7 @@ From here, the log-likelihood contributions for exact, right, left, and interval
 censored responses can be derived as
 \begin{eqnarray*}
   \begin{aligned}
-  	\ull &=
+  	\ell_i(\parm,\shiftparm;\ry_i, \rx_i) &=
   	\left\{
   	\begin{array}{lll}
   	  \log\left(F'\left(\h\left(\ry_i \right) - \rx_i^\top \shiftparm
@@ -890,11 +890,11 @@ hyperparameter tuning.
 including their name throughout the manuscript, the \textsf{R}~code to fit them
 and the mathematical formulation of their conditional cumulative distribution function.
 For comparison \code{mp} is included as an ordinary linear model, which is equivalent
-to model \code{mtp} in terms of log-likelihood, but differs in the parametrization of
+to model \code{mt} in terms of log-likelihood, but differs in the parametrization of
 the transformation function $\h$ and thus yields scaled coefficient estimates
 (\emph{cf.} Table \ref{tab:prostatemods}).
-Model \code{mt} is a linear model parametrized in terms of a Bernstein basis of
-maximum order 1. This will yield the same coefficient estimates as \code{mtp} but
+Model \code{mtp} is a linear model parametrized in terms of a Bernstein basis of
+maximum order 1. This will yield the same coefficient estimates as \code{mt} but
 a log-likelihood that is comparable to models \code{mt1} and \code{mt2}, whose
 transformation functions are parametrized in terms of higher order Bernstein bases.
 The \code{log\_first} argument specifies whether the basis expansion is calculated
@@ -908,9 +908,9 @@ on the log-transformed or untransformed response.
 \midrule
 \code{mp}     & \code{penalized(response = lpsa, penalized = x)}            &
   $\pN\left(\eparm_1 + \eparm_2\log(\ry) - \rx^\top\shiftparm \right)$  \\
-\code{mtp}    & \code{Lm(lpsa $\sim$ .)}                                    &
+\code{mt}    & \code{Lm(lpsa $\sim$ .)}                                    &
   $\pN\left(\eparm_1 + \eparm_2\log(\ry) - \rx^\top\shiftparm \right)$  \\
-\code{mt}     & \code{BoxCox(psa $\sim$ ., log\_first = TRUE, order = 1)}   &
+\code{mtp}     & \code{BoxCox(psa $\sim$ ., log\_first = TRUE, order = 1)}   &
   $\pN\left(\bern{1}(\log(\ry))^\top\parm - \rx^\top\shiftparm \right)$ \\
 \code{mt1}    & \code{BoxCox(psa $\sim$ ., log\_first = TRUE, order = 7)}   &
   $\pN\left(\bern{7}(\log(\ry))^\top\parm - \rx^\top\shiftparm \right)$ \\
@@ -963,7 +963,7 @@ transformation by a more flexible one. In the case of the Box-Cox type regressio
 model the linear baseline transformation $\h(\ry) = \eparm_1 + \eparm_2 \log\ry$
 is replaced by the basis expansion $\h(\ry) = \bern{7}(\log\ry)^\top \parm$.
 <<BH_BoxCox1>>=
-ord <- 7 # flexibel baseline transformation
+ord <- 7 # flexible baseline transformation
 m01 <- BoxCox(psa ~ 1, data = Prostate, order = ord,
               extrapolate = TRUE, log_first = TRUE)
 mt1 <- tramnet(m01, x = x, alpha = 0, lambda = 0)
@@ -1021,7 +1021,7 @@ K <- 1e3
 nd <- Prostate[rep(1, K),]
 nd$lpsa <- seq(min(Prostate$lpsa), max(Prostate$lpsa), length.out = K)
 nd$psa <- exp(nd$lpsa)
-nd$pred1 <- predict(mtp, type = "trafo", newdata = nd)
+nd$pred1 <- predict(mt, type = "trafo", newdata = nd)
 nd$pred2 <- predict(mt1, type = "trafo", newdata = nd)
 nd$pred3 <- predict(mt2, type = "trafo", newdata = nd)
 
