@@ -82,7 +82,9 @@ mydata <- data.frame(y = y, g = g)
 m <- ctm(response = logBb, 
            interacting = as.basis(~ g, data = mydata),
            todist = "MinExtrVal")
+## IGNORE_RDIFF_BEGIN
 coef(opt <- mlt(m, data = mydata, maxit = 5000, scale = TRUE))
+## IGNORE_RDIFF_END
 coef(cph <- coxph(Surv(y, rep(TRUE, nrow(mydata))) ~ g, data = mydata))
 ## visualize
 a <- predict(opt, newdata = data.frame(g = gf[1]), q = yn)
