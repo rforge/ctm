@@ -1,5 +1,5 @@
 
-R version 3.6.0 (2019-04-26) -- "Planting of a Tree"
+R version 3.6.2 (2019-12-12) -- "Dark and Stormy Night"
 Copyright (C) 2019 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -20,6 +20,7 @@ Type 'q()' to quit R.
 Loading required package: basefun
 Loading required package: variables
 > library("survival")
+> options(digits = 3)
 > 
 > data("GBSG2", package = "TH.data")
 > 
@@ -45,17 +46,17 @@ Loading required package: variables
 > v <- vcov(mod)[n, n]
 > coef(cmod) / cf
     horThyes          age menostatPost        tsize     tgrade.L     tgrade.Q 
-   0.9917170    0.9579617    0.9687874    1.0025933    0.9845297    0.9958201 
+       0.992        0.958        0.969        1.003        0.985        0.996 
       pnodes      progrec       estrec 
-   1.0010173    1.0029480    1.0753056 
+       1.001        1.003        1.075 
 > diag(vcov(cmod)) / diag(v)
     horThyes          age menostatPost        tsize     tgrade.L     tgrade.Q 
-   0.9949458    0.9970593    0.9973873    1.0000650    0.9993094    0.9990143 
+       0.995        0.997        0.997        1.000        0.999        0.999 
       pnodes      progrec       estrec 
-   1.0083450    0.9980730    0.9946746 
+       1.008        0.998        0.995 
 > range(vcov(cmod) / v)
-[1] 0.6744464 1.9231223
+[1] 0.674 1.923
 > 
 > proc.time()
    user  system elapsed 
-  1.060   0.063   1.118 
+  1.039   0.039   1.071 
