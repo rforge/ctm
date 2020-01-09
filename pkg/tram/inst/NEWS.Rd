@@ -6,6 +6,8 @@
   \itemize{
     \item{\code{profile} method added for computing 
           profile likelihood confidence intervals.}
+    \item{Allow additional linear inequality constraints for regression
+          coefficients.}
   }
   \subsection{Bugfixes}{
     \itemize{

@@ -14,7 +14,7 @@ tram(formula, data, subset, weights, offset, cluster, na.action = na.omit,
      LRtest = TRUE, prob = c(0.1, 0.9), support = NULL, 
      bounds = NULL, add = c(0, 0), order = 6, 
      negative = TRUE, scale = TRUE, extrapolate = FALSE, 
-     log_first = FALSE, model_only = FALSE, ...)
+     log_first = FALSE, model_only = FALSE, constraints = NULL, ...)
 tram_data(formula, data, subset, weights, offset, cluster, na.action = na.omit) 
 }
 \arguments{
@@ -90,6 +90,12 @@ tram_data(formula, data, subset, weights, offset, cluster, na.action = na.omit)
                    defined on the log-scale.}
   \item{model_only}{logical, if \code{TRUE} the unfitted model is returned.
   }
+  \item{constraints}{additional constraints on regression coefficients in
+    the linear predictor of the form \code{lhs %*% coef(object) >= rhs},
+    where \code{lhs} and \code{rhs} can be specified as a character (as in
+    \code{\link[multcomp]{glht}}) or by a matrix of \code{lhs} (assuming
+    \code{rhs = 0}, or as a list containing the two elements \code{lhs} and
+    \code{rhs}.}}
   \item{\dots}{additional arguments.}
 }
 \details{
@@ -128,6 +134,35 @@ An object of class \code{tram} inheriting from \code{mlt}.
   Torsten Hothorn (2018), Most Likely Transformations: The mlt Package,
   \emph{Journal of Statistical Software}, forthcoming. URL: 
   \url{https://cran.r-project.org/package=mlt.docreg}
+
+}
+\examples{
+
+  data("BostonHousing2", package = "mlbench")
+
+  ### unconstrained regression coefficients
+  ### BoxCox calls tram internally
+  m1 <- BoxCox(cmedv ~ chas + crim + zn + indus + nox + 
+               rm + age + dis + rad + tax + ptratio + b + lstat, 
+               data = BostonHousing2)
+
+  ### now with two constraints on regression coefficients
+  m2 <- BoxCox(cmedv ~ chas + crim + zn + indus + nox + 
+               rm + age + dis + rad + tax + ptratio + b + lstat, 
+               data = BostonHousing2, 
+               constraints = c("crim >= 0", "chas1 + rm >= 1.5"))
+  coef(m1)
+  coef(m2)
+
+  K <- matrix(0, nrow = 2, ncol = length(coef(m2)))
+  colnames(K) <- names(coef(m2))
+  K[1, "crim"] <- 1
+  K[2, c("chas1", "rm")] <- 1
+  m3 <- BoxCox(cmedv ~ chas + crim + zn + indus + nox + 
+               rm + age + dis + rad + tax + ptratio + b + lstat, 
+               data = BostonHousing2, 
+               constraints = list(K, c(0, 1.5)))
+  all.equal(coef(m2), coef(m3))
 
 }
 \keyword{models}

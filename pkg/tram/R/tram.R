@@ -110,8 +110,17 @@ tram <- function(formula, data, subset, weights, offset, cluster, na.action = na
                  transformation = c("discrete", "linear", "logarithmic", "smooth"),
                  LRtest = TRUE, 
                  prob = c(.1, .9), support = NULL, bounds = NULL, add = c(0, 0), order = 6, negative =
-                 TRUE, scale = TRUE, extrapolate = FALSE, log_first = FALSE, model_only = FALSE, ...) 
+                 TRUE, scale = TRUE, extrapolate = FALSE, log_first = FALSE, model_only = FALSE, 
+                 constraints = NULL, ...) 
 {
+
+    call <- match.call()
+    fitted <- NULL
+    if (!is.null(constraints)) {
+        call$constraints <- NULL
+#        call$dofit <- FALSE
+        fitted <- eval(call, parent.frame())
+    }
 
     if (!inherits(td <- formula, "tram_data")) {
         mf <- match.call(expand.dots = FALSE)
@@ -146,9 +155,32 @@ tram <- function(formula, data, subset, weights, offset, cluster, na.action = na
 
     iX <- NULL
     if (!is.null(td$mt$x)) {
+        ### user-supplied constraints
+        if (!is.null(constraints)) {
+            if (is.list(constraints)) {
+                uici <- glht(fitted, linfct = constraints[[1]],
+                                     rhs = constraints[[2]], 
+                                     alternative = "less")
+            } else {
+                if (is.character(constraints)) {
+                    uici <- glht(fitted, linfct = constraints)
+                } else {
+                    uici <- glht(fitted, linfct = constraints, 
+                                 alternative = "less")
+                }
+            }
+            ui <- uici$linfct
+            ci <- uici$rhs
+            if (uici$alternative == "greater") {
+                ui <- -ui
+                ci <- -ci
+            }
+        } else {
+            ui <- ci <- NULL
+        }
         ### NOTE: this triggers sumconstr = TRUE
         iX <- as.basis(td$mt$x, data = td$mf, remove_intercept = TRUE, 
-                       negative = negative)
+                       negative = negative, ui = ui, ci = ci)
     } 
 
     model <- ctm(response = rbasis, interacting = iS, shifting = iX, 

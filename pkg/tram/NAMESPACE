@@ -7,7 +7,7 @@ import("basefun")
 import("Formula")
 importFrom("methods", "as")
 importFrom("sandwich", "vcovCL", "estfun")
-importFrom("multcomp", "cftest", "adjusted_calpha", "univariate_calpha")
+importFrom("multcomp", "cftest", "adjusted_calpha", "univariate_calpha", "glht")
 importFrom("stats", "model.matrix", "coef", "vcov", "nobs", "predict", "quantile", "na.omit",
            "logLik", "model.response", "model.weights", "model.offset", "terms", "as.formula",
            "printCoefmat", "qqline", "qqplot", "qunif", "variable.names", "pchisq",
