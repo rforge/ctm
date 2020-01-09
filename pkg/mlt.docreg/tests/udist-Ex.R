@@ -1,6 +1,8 @@
 
 library("mlt")
+## IGNORE_RDIFF_BEGIN
 library("np")
+## IGNORE_RDIFF_END
 set.seed(29)
 
 ### true dgp

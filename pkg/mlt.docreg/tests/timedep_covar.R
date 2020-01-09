@@ -86,5 +86,5 @@ m <- mlt(ctm(by, interacting = btg,
          shift = ~ karno + karno:timegroup + age + trt, data = vet2, todistr = "MinExtr"),
          data = vet2, scale = TRUE)
 
-max(abs(coef(fit1) - coef(m)[-(1:12)]))
-max(abs(diag(vcov(m))[-(1:12)] - diag(vcov(fit1))))
+max(abs(coef(fit1) - coef(m)[-(1:12)])) < 1e-2
+max(abs(diag(vcov(m))[-(1:12)] - diag(vcov(fit1)))) < 1e-2

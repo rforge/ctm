@@ -1,6 +1,7 @@
 
 library("mlt")
 library("survival")
+options(digits = 3)
 
 data("GBSG2", package = "TH.data")
 
