@@ -2,9 +2,10 @@
 \name{NEWS}
 \title{NEWS file for the mlt package}
 
-\section{Changes in Version 1.1-1 (2020-01-08)}{
+\section{Changes in Version 1.1-1 (2020-01-09)}{
   \itemize{
     \item{Try harder to invert Hessians.}
+    \item{Update reference output.}
   }
 }
 
