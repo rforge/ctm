@@ -1,6 +1,7 @@
 
 library("mlt")
 library("lattice")
+options(digits = 4)
 
 data("faithful")
 
