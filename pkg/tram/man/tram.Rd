@@ -91,11 +91,11 @@ tram_data(formula, data, subset, weights, offset, cluster, na.action = na.omit)
   \item{model_only}{logical, if \code{TRUE} the unfitted model is returned.
   }
   \item{constraints}{additional constraints on regression coefficients in
-    the linear predictor of the form \code{lhs %*% coef(object) >= rhs},
+    the linear predictor of the form \code{lhs \%*\% coef(object) >= rhs},
     where \code{lhs} and \code{rhs} can be specified as a character (as in
-    \code{\link[multcomp]{glht}}) or by a matrix of \code{lhs} (assuming
-    \code{rhs = 0}, or as a list containing the two elements \code{lhs} and
-    \code{rhs}.}}
+    \code{\link[multcomp]{glht}}) or by a matrix \code{lhs} (assuming
+    \code{rhs = 0}), or as a list containing the two elements \code{lhs} and
+    \code{rhs}.}
   \item{\dots}{additional arguments.}
 }
 \details{
