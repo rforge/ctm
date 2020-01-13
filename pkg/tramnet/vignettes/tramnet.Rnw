@@ -1201,13 +1201,16 @@ pfl <- prof_lambda(mt)
 as arguments and internally generates an equi-spaced sequence from \code{min\_lambda}
 to \code{max\_lambda} on the log scale of length \code{nprof}. By default this
 sequence ranges from $0$ to $15$ and is of length $5$.
+<<profplotcode, eval=FALSE, echo=TRUE>>=
+plot_path(pfl, plot_logLik = FALSE, las = 1, col = coll)
+@
 
 \begin{figure}
 \centering
 <<plot_setup, include=FALSE, echo=FALSE>>=
 coll <- qualitative_hcl(n = ncol(pfl$cfx))
 @
-<<profiling_plot, fig.height=4, fig.width=6.5, out.width="1\\textwidth">>=
+<<profiling_plot, fig.height=4, fig.width=6.5, out.width="1\\textwidth", echo=FALSE>>=
 plot_path(pfl, plot_logLik = FALSE, las = 1, col = coll)
 @
 \caption{Full regularization paths for the tuning parameter $\lambda$ using the
@@ -1220,13 +1223,15 @@ default values of \cmd{plot\_path}.}
 In some applications, the specification of additional constraints on the shift
 parameters $\shiftparm$ are of interest. Most commonly, either positivity or
 negativity for some or all regression coefficients is aimed at. In \pkg{tramnet}
-additional inequality constraints can be specified via the \code{beta\_const} argument,
-which are internally handled as \code{beta\_const \%*\% beta $>$ 0}. Hence, to specify
-the constraint of strictly positive regression coefficients, one would supply an
-identity matrix of dimension $p$, as done in the following example.
+additional inequality constraints can be specified via the \code{constraints} argument,
+which are internally handled as \code{constraints[[1]] \%*\% beta $>$ constraints[[2]]}. 
+Hence, to specify the constraint of strictly positive regression coefficients, 
+one would supply an identity matrix of dimension $p$ for the left hand side and
+the zero $p$-vector for the left hand side, as done in the following example.
 <<addconst>>=
 m0 <- BoxCox(lpsa ~ 1, data = Prostate, extrapolate = TRUE)
-mt <- tramnet(m0, x, alpha = 0, lambda = 0, beta_const = diag(rep(1, 8)))
+mt <- tramnet(m0, x, alpha = 0, lambda = 0, constraints = list(diag(rep(1, 8)),
+                                                               rep(0, 8)))
 coef(mt)
 @
 The coefficients with a negative sign in the model without additional positivity
@@ -1235,12 +1240,15 @@ as well.
 <<addconst_sparsity>>=
 summary(mt)$sparsity
 @
-One can compare this model to the implementation in \pkg{tram}, where it is possible
-to specify fixed coefficients. Here, it is sufficient to specify
-\code{fixed = c("age" = 0, "lcp" = 0)} for the two non-positive coefficient estimates.
+One can compare this model to the implementation in \pkg{tram}, where it is also
+possible to specify linear inequality constraints on the regression coefficients
+$\shiftparm$. Here, it is sufficient to specify
+\code{constraints = c("age >= 0", "lcp >= 0")}
+for the two non-positive coefficient estimates, due to the convexity of the
+underlying problem.
 <<addconst_tram_cmp>>=
 m <- BoxCox(lpsa ~ . - psa, data = Prostate, extrapolate = TRUE,
-            fixed = c("age" = 0, "lcp" = 0))
+            constraints = c("age >= 0", "lcp >= 0"))
 max(abs(coef(m) - coef(mt, tol = 0)))
 @
 Indeed, both optimizers arrive at virtually the same coefficient estimates.

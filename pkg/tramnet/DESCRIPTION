@@ -15,7 +15,7 @@ Description: Partially penalized versions of specific transformation models
   binary and ordered categorical variables, normal and transformed-normal (Box-Cox type)
   linear models, and continuous outcome logistic regression. Hyperparameter tuning
   is facilitated through model-based optimization functionalities from package 'mlrMBO'.
-Depends: tram (>= 0.3-1), CVXR (>= 0.99-4), mlrMBO (>= 1.1-2)
+Depends: tram (>= 0.3-2), CVXR (>= 0.99-4), mlrMBO (>= 1.1-2)
 Imports: mlt, basefun, sandwich, ParamHelpers, lhs, mlr, smoof, stats
 Suggests: penalized, TH.data, survival, knitr, mlbench, colorspace, mvtnorm, 
     glmnet, trtf, Matrix, lasso2, lattice, kableExtra, coin

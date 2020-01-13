@@ -19,8 +19,11 @@ logLik(mt)
 logLik(m2)
 
 ## Test for additional inequality constraints on beta
-mt <- tramnet(m, X, alpha = 0, lambda = 0, beta_const = matrix(0:1, nrow = 1))
-m2 <- BoxCox(cmedv ~ lstat + tax, data = BostonHousing2, fixed = c("tax" = 0))
+m2 <- BoxCox(cmedv ~ lstat + tax, data = BostonHousing2, constraints = c("tax >= 0"))
+lhs <- attr(model.matrix(m2), "constraint")$ui
+rhs <- attr(model.matrix(m2), "constraint")$ci
+mt <- tramnet(m, X, alpha = 0, lambda = 0, 
+              constraints = list(lhs, rhs))
 
 max(abs(coef(mt, with_baseline = FALSE) -
         coef(m2, with_baseline = FALSE)[-2]))

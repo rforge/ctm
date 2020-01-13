@@ -3,7 +3,7 @@
 \alias{tramnet}
 \title{Regularised Transformation Models}
 \usage{
-tramnet(model, x, lambda, alpha, beta_const = NULL, ...)
+tramnet(model, x, lambda, alpha, constraints = NULL, ...)
 }
 \arguments{
 \item{model}{an object of class \code{"tram"} as returned by any of the
@@ -12,13 +12,14 @@ modelling functions from package tram.}
 \item{x}{a numeric matrix, where each row corresponds to the same row in the
 \code{data} argument used to fit \code{model}}
 
-\item{lambda}{a positive penalty parameter for the whole penalty function.}
+\item{lambda}{a positive penalty parameter for the whole penalty function}
 
 \item{alpha}{a mixing parameter (between zero and one) defining the fraction
 between absolute and quadratic penalty terms}
 
-\item{beta_const}{an optional matrix of linear inequality contraints on the
-regression coefficients}
+\item{constraints}{an optional list containing a matrix of linear inequality 
+    contraints on the regression coefficients and a vector specifying the rhs
+    of the inequality}
 
 \item{\dots}{additional parameters to \code{\link[CVXR]{solve}}}
 }

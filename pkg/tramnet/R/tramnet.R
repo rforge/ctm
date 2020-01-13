@@ -1,7 +1,7 @@
 # tramnet main function
 
 tramnet <-
-  function(model, x, lambda, alpha, beta_const = NULL, ...) {
+  function(model, x, lambda, alpha, constraints = NULL, ...) {
     ### <FIXME> handle offset and maybe fixed parameters </FIXME>
     .tramnet_checks(model = model, x = x, lambda = lambda, alpha = alpha)
     call <- match.call()
@@ -12,7 +12,7 @@ tramnet <-
     theta <- Variable(nth)
     beta  <- Variable(nb)
     prob <- .tramnet_objective(trdat, x, theta, beta,
-                               alpha, lambda, beta_const)
+                               alpha, lambda, constraints)
     res <- solve(prob, ...)
     ret <- list(call = call, model = model, x = x, result = res,
                 beta = res$getValue(beta), theta = res$getValue(theta),
@@ -40,7 +40,7 @@ tramnet <-
 }
 
 .tramnet_objective <-
-  function(trdat, x, theta, beta, alpha, lambda, beta_const) {
+  function(trdat, x, theta, beta, alpha, lambda, constraints) {
     xe <- x[trdat$exact$which, , drop = FALSE]
     xl <- x[trdat$censl$which, , drop = FALSE]
     xr <- x[trdat$censr$which, , drop = FALSE]
@@ -159,8 +159,8 @@ tramnet <-
       lambda * (0.5 * (1 - alpha) * power(p_norm(beta, 2), 2) +
                   alpha * p_norm(beta, 1))
     const <- list(trdat$const$ui %*% theta > trdat$const$ci)
-    if (!is.null(beta_const)) {
-      const[[2]] <- beta_const %*% beta > 0
+    if (!is.null(constraints)) {
+      const[[2]] <- constraints[[1]] %*% beta > constraints[[2]]
     }
     prob <- Problem(Minimize(obj), constraints = const)
     return(prob)
