@@ -1,7 +1,9 @@
 # Tests for Lm models
 
 ## Dependencies
+## IGNORE_RDIFF_BEGIN
 library("tramnet")
+## IGNORE_RDIFF_END
 options(digits = 3)
 
 ## Data

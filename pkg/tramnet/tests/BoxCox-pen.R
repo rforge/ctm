@@ -1,7 +1,9 @@
 # Tests for Box-Cox type regularized regression models
 
 ## Dependencies
+## IGNORE_RDIFF_BEGIN
 library("tramnet")
+## IGNORE_RDIFF_END
 options(digits = 3)
 
 ## Data
@@ -26,6 +28,6 @@ mt <- tramnet(m, X, alpha = 0, lambda = 0,
               constraints = list(lhs, rhs))
 
 max(abs(coef(mt, with_baseline = FALSE) -
-        coef(m2, with_baseline = FALSE)[-2]))
+        coef(m2, with_baseline = FALSE)[-2])) < 1e-5
 logLik(mt)
 logLik(m2)

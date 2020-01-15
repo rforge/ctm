@@ -1,7 +1,7 @@
 
-R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
-Copyright (C) 2018 The R Foundation for Statistical Computing
-Platform: x86_64-apple-darwin15.6.0 (64-bit)
+R version 3.6.2 (2019-12-12) -- "Dark and Stormy Night"
+Copyright (C) 2019 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -18,6 +18,7 @@ Type 'q()' to quit R.
 > # Tests for Box-Cox type regularized regression models
 > 
 > ## Dependencies
+> ## IGNORE_RDIFF_BEGIN
 > library("tramnet")
 Loading required package: tram
 Loading required package: mlt
@@ -34,6 +35,8 @@ The following object is masked from 'package:stats':
 Loading required package: mlrMBO
 Loading required package: mlr
 Loading required package: ParamHelpers
+'mlr' is in maintenance mode since July 2019. Future development
+efforts will go into its successor 'mlr3' (<https://mlr3.mlr-org.com>).
 Loading required package: smoof
 Loading required package: BBmisc
 
@@ -44,6 +47,7 @@ The following object is masked from 'package:base':
     isFALSE
 
 Loading required package: checkmate
+> ## IGNORE_RDIFF_END
 > options(digits = 3)
 > 
 > ## Data
@@ -71,8 +75,8 @@ Loading required package: checkmate
 +               constraints = list(lhs, rhs))
 > 
 > max(abs(coef(mt, with_baseline = FALSE) -
-+         coef(m2, with_baseline = FALSE)[-2]))
-[1] 4.6e-06
++         coef(m2, with_baseline = FALSE)[-2])) < 1e-5
+[1] TRUE
 > logLik(mt)
 'log Lik.' -1492 (df=NA)
 > logLik(m2)
@@ -80,4 +84,4 @@ Loading required package: checkmate
 > 
 > proc.time()
    user  system elapsed 
- 14.796   0.275  15.066 
+  8.379   0.141   8.511 

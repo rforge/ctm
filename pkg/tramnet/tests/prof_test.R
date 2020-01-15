@@ -1,8 +1,10 @@
 # Test for profiling cfx trajectory functions
 
+## IGNORE_RDIFF_BEGIN
 library("tramnet")
 library("penalized")
 library("survival")
+## IGNORE_RDIFF_END
 options(digits = 3)
 
 ## --- Comparison with penalized

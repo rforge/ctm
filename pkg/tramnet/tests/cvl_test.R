@@ -1,8 +1,10 @@
 # Test for cvl_tramnet
 
-library("survival")
+## IGNORE_RDIFF_BEGIN
 library("tramnet")
+library("survival")
 library("TH.data")
+## IGNORE_RDIFF_END
 options(digits = 3)
 
 set.seed(241068)

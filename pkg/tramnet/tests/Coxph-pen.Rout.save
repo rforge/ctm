@@ -18,6 +18,7 @@ Type 'q()' to quit R.
 > # Tests for Coxph models
 > 
 > ## Dependencies
+> ## IGNORE_RDIFF_BEGIN
 > library("tramnet")
 Loading required package: tram
 Loading required package: mlt
@@ -34,6 +35,8 @@ The following object is masked from 'package:stats':
 Loading required package: mlrMBO
 Loading required package: mlr
 Loading required package: ParamHelpers
+'mlr' is in maintenance mode since July 2019. Future development
+efforts will go into its successor 'mlr3' (<https://mlr3.mlr-org.com>).
 Loading required package: smoof
 Loading required package: BBmisc
 
@@ -45,6 +48,7 @@ The following object is masked from 'package:base':
 
 Loading required package: checkmate
 > library("survival")
+> ## IGNORE_RDIFF_END
 > options(digits = 3)
 > 
 > ## Exact and Right censored
@@ -100,4 +104,4 @@ Loading required package: checkmate
 > 
 > proc.time()
    user  system elapsed 
-  4.996   0.248   5.242 
+  4.739   0.118   4.849 

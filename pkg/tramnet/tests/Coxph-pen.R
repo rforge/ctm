@@ -1,8 +1,10 @@
 # Tests for Coxph models
 
 ## Dependencies
+## IGNORE_RDIFF_BEGIN
 library("tramnet")
 library("survival")
+## IGNORE_RDIFF_END
 options(digits = 3)
 
 ## Exact and Right censored

@@ -1,8 +1,10 @@
 # Tests for Lehmann alternative models
 
 ## Dependencies
-library("survival")
+## IGNORE_RDIFF_BEGIN
 library("tramnet")
+library("survival")
+## IGNORE_RDIFF_END
 options(digits = 3)
 
 ## Data

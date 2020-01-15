@@ -16,6 +16,7 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > 
+> ## IGNORE_RDIFF_BEGIN
 > library("tramnet")
 Loading required package: tram
 Loading required package: mlt
@@ -32,6 +33,8 @@ The following object is masked from 'package:stats':
 Loading required package: mlrMBO
 Loading required package: mlr
 Loading required package: ParamHelpers
+'mlr' is in maintenance mode since July 2019. Future development
+efforts will go into its successor 'mlr3' (<https://mlr3.mlr-org.com>).
 Loading required package: smoof
 Loading required package: BBmisc
 
@@ -42,10 +45,10 @@ The following object is masked from 'package:base':
     isFALSE
 
 Loading required package: checkmate
-> library("penalized")
-Loading required package: survival
-Welcome to penalized. For extended examples, see vignette("penalized").
 > library("survival")
+> library("penalized")
+Welcome to penalized. For extended examples, see vignette("penalized").
+> ## IGNORE_RDIFF_END
 > options(digits = 3)
 > 
 > ## --- Comparison with penalized
@@ -68,4 +71,4 @@ DIAPH3 NUSAP1
 > 
 > proc.time()
    user  system elapsed 
-   4.66    0.18    4.84 
+  4.009   0.141   4.142 
