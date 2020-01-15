@@ -9,11 +9,6 @@
     \item{Allow additional linear inequality constraints for regression
           coefficients.}
   }
-  \subsection{Bugfixes}{
-    \itemize{
-      \item{}
-    }
-  }
 }
 
 \section{Changes in Version 0.3-1 (2019-11-05)}{
