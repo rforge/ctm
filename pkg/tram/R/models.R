@@ -131,7 +131,7 @@ Colr <- function(formula, data, subset, weights, offset, cluster, na.action = na
     ret$call <- match.call(expand.dots = TRUE)
     ret$tram <- paste(ifelse(is.null(td$terms$s), "", "(Stratified)"),
                       "Continuous Outcome Logistic Regression")
-    class(ret) <- c("colr", class(ret))
+    class(ret) <- c("Colr", class(ret))
     ret
 }
 
