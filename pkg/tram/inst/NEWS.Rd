@@ -2,6 +2,13 @@
 \name{NEWS}
 \title{NEWS file for the tram package}
 
+\section{Changes in Version 0.3-3 (2020-01-16)}{
+  \itemize{
+    \item{\code{scoretest} generic and method added for computing 
+          score tests and corresponding confidence intervals.}
+  }
+}
+
 \section{Changes in Version 0.3-2 (2020-01-08)}{
   \itemize{
     \item{\code{profile} method added for computing 

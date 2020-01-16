@@ -267,3 +267,90 @@ profile.tram <- function(fitted, which = 1:p, alpha = 0.01,
     class(val) <- c("profile.tram", "profile.glm", "profile")
     val
 }
+
+### score tests and confidence intervals
+### hm, can't find such a generic
+scoretest <- function(object, ...)
+    UseMethod("scoretest")
+
+scoretest.tram <- function(object, parm = names(coef(object)), 
+    alternative = c("two.sided", "less", "greater"), nullvalue = 0, 
+    confint = TRUE, level = .95, ...) {
+
+    cf <- coef(object)
+    stopifnot(all(parm %in% names(cf)))
+    alternative <- match.arg(alternative)
+    
+    if (length(parm) > 1)
+        return(lapply(parm, scoretest, object = object, 
+                      alternative = alternative, 
+                      nullvalue = nullvalue,
+                      confint = confint, 
+                      level = level, 
+                      ...))
+
+    m1 <- as.mlt(object)
+
+    fx <- 0
+    names(fx) <- parm
+    off <- object$offset
+    theta <- coef(as.mlt(object))
+    theta <- theta[names(theta) != parm]
+    m0 <- mlt(object$model, data = object$data, weights = object$weights,
+              offset = off, scale = object$scale, fixed = fx,
+              mltoptim = object$optim, theta = theta)
+
+    cf <- coef(m1)
+    X <- model.matrix(object)[, parm]
+
+    sc <- function(b) {
+        cf[] <- coef(update(m0, offset = off + b * X))
+        cf[parm] <- b
+        coef(m1) <- cf
+        sum(estfun(m1)[, parm]) * sqrt(vcov(m1)[parm, parm])
+    }
+    stat <- c("Z" = sc(nullvalue))
+    pval <- switch(alternative, 
+        "two.sided" = pnorm(-abs(stat)) * 2,
+        "less" = pnorm(-abs(stat)),
+        "greater" = pnorm(abs(stat)))
+
+    if (confint) {
+        alpha <- (1 - level)
+        if (alternative == "two.sided") alpha <- alpha / 2
+        Wci <- confint(object, level = 1 - alpha / 5)[parm,]
+        grd <- seq(from = Wci[1], to = Wci[2], length.out = 50)
+        s <- spline(x = grd, y = sapply(grd, sc), method = "hyman")
+        Sci <- approx(x = s$y, y = s$x, 
+                      xout = qnorm(c(alpha, 1 - alpha)))$y
+        est <- coef(object)[parm]
+        attr(Sci, "conf.level") <- level
+        if (alternative == "less")
+            Sci[1] <- -Inf
+        if (alternative == "greater")
+            Sci[2] <- Inf
+    }
+
+    parameter <- paste(switch(class(object)[1], 
+                                  "Colr" = "Log-odds ratio",
+                                   "Coxph" = "Log-hazard ratio",
+                                   "Lm" = "Standardised difference",
+                                   "Lehmann" = "Lehmann parameter",
+                                   "BoxCox" = "Standardised difference"))
+    parameter <- paste(tolower(parameter), "for", parm)
+    names(est) <- parameter
+    names(nullvalue) <- parameter
+
+    ret <- list(statistic = stat,
+                p.value = pval, 
+                null.value = nullvalue, 
+                alternative = alternative, 
+                method = "Transformation score test",
+                data.name = deparse(object$call))
+    if (confint) {
+        ret$conf.int <- Sci
+        ret$estimate <- est
+    }
+    class(ret) <- "htest"
+    ret
+}
