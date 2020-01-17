@@ -350,7 +350,6 @@ score_test.tram <- function(object, parm = names(coef(object)),
                                    "Lehmann" = "Lehmann parameter",
                                    "BoxCox" = "Standardised difference"))
     parameter <- paste(tolower(parameter), "for", parm)
-    names(est) <- parameter
     names(nullvalue) <- parameter
 
     ret <- list(statistic = stat,
@@ -361,6 +360,7 @@ score_test.tram <- function(object, parm = names(coef(object)),
                 data.name = deparse(object$call))
     if (confint) {
         ret$conf.int <- Sci
+        names(est) <- parameter
         ret$estimate <- est
     }
     class(ret) <- "htest"
@@ -497,7 +497,6 @@ perm_test.tram <- function(object, parm = names(coef(object)),
                                    "Lehmann" = "Lehmann parameter",
                                    "BoxCox" = "Standardised difference"))
     parameter <- paste(tolower(parameter), "for", parm)
-    names(est) <- parameter
     names(nullvalue) <- parameter
 
 
@@ -509,6 +508,7 @@ perm_test.tram <- function(object, parm = names(coef(object)),
                 data.name = deparse(object$call))
     if (confint) {
         ret$conf.int <- Sci
+        names(est) <- parameter
         ret$estimate <- est
     }
     class(ret) <- "htest"
