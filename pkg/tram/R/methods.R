@@ -270,24 +270,31 @@ profile.tram <- function(fitted, which = 1:p, alpha = 0.01,
 
 ### score tests and confidence intervals
 ### hm, can't find such a generic
-scoretest <- function(object, ...)
-    UseMethod("scoretest")
+score_test <- function(object, ...)
+    UseMethod("score_test")
 
-scoretest.tram <- function(object, parm = names(coef(object)), 
+score_test.default <- function(object, ...)
+    stop("no score_test method implemented for class", class(object)[1])
+
+score_test.tram <- function(object, parm = names(coef(object)), 
     alternative = c("two.sided", "less", "greater"), nullvalue = 0, 
-    confint = TRUE, level = .95, ...) {
+    confint = TRUE, level = .95, maxsteps = 25, ...) {
 
     cf <- coef(object)
     stopifnot(all(parm %in% names(cf)))
     alternative <- match.arg(alternative)
     
-    if (length(parm) > 1)
-        return(lapply(parm, scoretest, object = object, 
+    if (length(parm) > 1) {
+        ret <- lapply(parm, score_test, object = object, 
                       alternative = alternative, 
                       nullvalue = nullvalue,
                       confint = confint, 
                       level = level, 
-                      ...))
+                      ...)
+        names(ret) <- parm
+        class(ret) <- "htests"
+        return(ret)
+    }
 
     m1 <- as.mlt(object)
 
@@ -307,6 +314,10 @@ scoretest.tram <- function(object, parm = names(coef(object)),
         cf[] <- coef(update(m0, offset = off + b * X))
         cf[parm] <- b
         coef(m1) <- cf
+        ### see Lehmann, Elements of Large-sample Theory,
+        ### 1999, 539-540, for score tests in the presence
+
+        ### of additional parameters
         sum(estfun(m1)[, parm]) * sqrt(vcov(m1)[parm, parm])
     }
     stat <- c("Z" = sc(nullvalue))
@@ -319,7 +330,7 @@ scoretest.tram <- function(object, parm = names(coef(object)),
         alpha <- (1 - level)
         if (alternative == "two.sided") alpha <- alpha / 2
         Wci <- confint(object, level = 1 - alpha / 5)[parm,]
-        grd <- seq(from = Wci[1], to = Wci[2], length.out = 50)
+        grd <- seq(from = Wci[1], to = Wci[2], length.out = maxsteps)
         s <- spline(x = grd, y = sapply(grd, sc), method = "hyman")
         Sci <- approx(x = s$y, y = s$x, 
                       xout = qnorm(c(alpha, 1 - alpha)))$y
@@ -354,3 +365,29 @@ scoretest.tram <- function(object, parm = names(coef(object)),
     class(ret) <- "htest"
     ret
 }
+
+confint.htest <- function(object, parm, level = .95, ...) {
+    ci <- object$conf.int
+    if (is.null(ci)) return(NULL)
+    stopifnot(attr(ci, "conf.level") == level)
+    return(ci)
+}
+
+confint.htests <- function(object, parm, level = .95, ...) {
+    ret <- do.call("rbind", lapply(object, confint))
+    rownames(ret) <- names(object)
+    alt <- unique(sapply(object, function(x) x$alternative))
+    stopifnot(length(alt) == 1)
+    rn <- switch(alt, 
+        "two.sided" = {
+            a <- (1 - level)/2
+            a <- c(a, 1 - a)
+            paste(round(100 * a, 1), "%")
+        }, 
+        "less" = c("", paste(round(100 * level, 1), "%")),
+        "greater" = c(paste(round(100 * level, 1), "%"), ""))
+    colnames(ret) <- rn
+    ret
+}
+
+    

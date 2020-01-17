@@ -16,7 +16,7 @@ import("Matrix")
 importFrom("survival", "survfit", "Surv")
 importFrom("graphics", "plot", "lines", "polygon")
 
-export(tram, tram_data, Coxph, Colr, Polr, Lm, BoxCox, Survreg, Lehmann, mtram, scoretest)
+export(tram, tram_data, Coxph, Colr, Polr, Lm, BoxCox, Survreg, Lehmann, mtram, score_test)
 
 S3method("as.mlt", "tram")
 S3method("model.matrix", "tram")
@@ -39,4 +39,7 @@ S3method("plot", "tram")
 S3method("update", "tram")
 S3method("residuals", "tram")
 S3method("profile", "tram")
-S3method("scoretest", "tram")
+S3method("score_test", "tram")
+S3method("confint", "htest")
+S3method("confint", "htests")
+

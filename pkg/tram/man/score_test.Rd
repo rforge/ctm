@@ -1,6 +1,6 @@
-\name{scoretest}
-\alias{scoretest}
-\alias{scoretest.tram}
+\name{score_test}
+\alias{score_test}
+\alias{score_test.tram}
 \title{
   Transformation Score Tests and Confidence Intervals
 }
@@ -9,10 +9,10 @@
   models obtained from by the score test principle
 }
 \usage{
-scoretest(object, ...)
-\method{scoretest}{tram}(object, parm = names(coef(object)), 
+score_test(object, ...)
+\method{score_test}{tram}(object, parm = names(coef(object)), 
     alternative = c("two.sided", "less", "greater"), nullvalue = 0, 
-    confint = TRUE, level = .95, ...)
+    confint = TRUE, level = .95, maxsteps = 25, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -26,7 +26,9 @@ scoretest(object, ...)
           null hypothesis.}
   \item{confint}{a logical indicating whether a confidence interval should be
           computed.}
-  \item{level}{the confidence level}
+  \item{level}{the confidence level.}
+  \item{maxsteps}{number of function evaluations when inverting the score statistic
+                  for computing confidence intervals.}
   \item{\dots}{additional arguments, currently ignored.}
 }
 \details{
