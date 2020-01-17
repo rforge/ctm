@@ -290,6 +290,7 @@ score_test.tram <- function(object, parm = names(coef(object)),
                       nullvalue = nullvalue,
                       confint = confint, 
                       level = level, 
+                      maxsteps = maxsteps, 
                       ...)
         names(ret) <- parm
         class(ret) <- "htests"
@@ -412,6 +413,8 @@ perm_test.tram <- function(object, parm = names(coef(object)),
                       nullvalue = nullvalue,
                       confint = confint, 
                       level = level, 
+                      maxsteps = maxsteps, add = add,
+                      block_permutation = block_permutation,
                       ...)
         names(ret) <- parm
         class(ret) <- "htests"
