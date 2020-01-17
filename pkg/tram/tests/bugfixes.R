@@ -109,3 +109,6 @@ m1 <- Coxph(Surv(time, cens) ~ horTh, data = tmp)
 m2 <- Coxph(y ~ horTh, data = tmp)
 stopifnot(all.equal(coef(as.mlt(m1)), coef(as.mlt(m2)), 
                     check.attributes = FALSE))
+
+### check probabilistic index <-> log-odds ratio conversion
+stopifnot(max(abs(PI(prob = PI(-15:15)) - (-15:15))) < 1e5)

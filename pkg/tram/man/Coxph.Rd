@@ -90,7 +90,9 @@ An object of class \code{Coxph}, with corresponding \code{coef},
   ### profile likelihood interval
   confint(profile(m2))
   ### score interval
-  confint(score_test(m2, confint = TRUE))
+  confint(score_test(m2))
+  ### permutation score interval
+  confint(perm_test(m2))
 
 }
 \keyword{models}

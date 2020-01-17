@@ -38,5 +38,7 @@ score_test(object, ...)
 }
 \value{
   An object of class \code{htest} or a list thereof. See \code{\link{Coxph}}
-  for an example.
+  for an example. A corresponding permutation test for parameters in a
+  transformation models is available in
+  \code{\link[tram]{perm_test}}.
 }

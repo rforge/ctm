@@ -20,7 +20,7 @@ Imports: Formula, multcomp, variables (>= 1.0-2), basefun (>= 1.0-5),
 Suggests: MASS, TH.data, trtf (>= 0.3-3), mlbench, knitr, quantreg, 
   colorspace, ATR, lme4, merDeriv, SparseGrid, alabama, numDeriv,
   gridExtra, lattice, latticeExtra, HSAUR3, mvtnorm, ordinalCont, coxme, 
-  glmmsr, mlt.docreg, ordinal
+  glmmsr, mlt.docreg, ordinal, coin, asht
 VignetteBuilder: knitr
 URL: http://ctm.R-forge.R-project.org
 Encoding: UTF-8

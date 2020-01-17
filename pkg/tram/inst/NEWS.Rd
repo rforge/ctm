@@ -4,8 +4,12 @@
 
 \section{Changes in Version 0.3-3 (2020-01-16)}{
   \itemize{
-    \item{\code{scoretest} generic and method added for computing 
+    \item{\code{score_test} generic and method added for computing 
           score tests and corresponding confidence intervals.}
+    \item{\code{perm_test} generic and method added for computing 
+          permutation score tests and corresponding confidence intervals.}
+    \item{\code{PI} converts log-odds ratios to probabilistic indices and 
+          vice versa.}
   }
 }
 
