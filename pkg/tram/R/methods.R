@@ -463,6 +463,12 @@ perm_test.tram <- function(object, parm = names(coef(object)),
     stat <- c("Z" = coin::statistic(it0, "standardized"))
     pval <- coin::pvalue(it0)
 
+    distname <- switch(class(it0@distribution),
+        "AsymptNullDistribution" = "Asymptotic",
+        "ApproxNullDistribution" = "Approximative",
+        "ExactNullDistribution"  = "Exact"
+    )
+
     if (confint) {
         alpha <- (1 - level)
         if (alternative == "two.sided") alpha <- alpha / 2
@@ -472,7 +478,8 @@ perm_test.tram <- function(object, parm = names(coef(object)),
         s <- spline(x = grd, 
                     y = sapply(grd, function(g) 
                         coin::pvalue(sc(g, alternative = "less"))), 
-                    method = "hyman")
+                    ### input can be non-monotone from approximated p-values
+                    method = ifelse(distname == "Approximative", "fmm", "hyman"))
         Sci <- approx(x = s$y, y = s$x, 
                       xout = c(alpha, 1 - alpha))$y
         est <- coef(object)[parm]
@@ -493,11 +500,6 @@ perm_test.tram <- function(object, parm = names(coef(object)),
     names(est) <- parameter
     names(nullvalue) <- parameter
 
-    distname <- switch(class(it0@distribution),
-        "AsymptNullDistribution" = "Asymptotic",
-        "ApproxNullDistribution" = "Approximative",
-        "ExactNullDistribution"  = "Exact"
-    )
 
     ret <- list(statistic = stat,
                 p.value = pval, 
