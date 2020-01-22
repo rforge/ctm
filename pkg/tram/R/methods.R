@@ -399,21 +399,18 @@ perm_test.default <- function(object, ...)
     stop("no perm_test method implemented for class", class(object)[1])
 
 perm_test.tram <- function(object, parm = names(coef(object)), 
-    alternative = c("two.sided", "less", "greater"), nullvalue = 0, 
-    confint = TRUE, level = .95, maxsteps = 25, add = 2,
+    alternative = c("two.sided", "less", "greater"), 
     block_permutation = TRUE, ...) {
 
     cf <- coef(object)
+    if (length(cf) > 1)
+        warning("procedure only suitable for one single covariable")
     stopifnot(all(parm %in% names(cf)))
     alternative <- match.arg(alternative)
 
     if (length(parm) > 1) {
         ret <- lapply(parm, perm_test, object = object, 
                       alternative = alternative, 
-                      nullvalue = nullvalue,
-                      confint = confint, 
-                      level = level, 
-                      maxsteps = maxsteps, add = add,
                       block_permutation = block_permutation,
                       ...)
         names(ret) <- parm
@@ -448,18 +445,16 @@ perm_test.tram <- function(object, parm = names(coef(object)),
             block <- do.call("interaction", block)
     }
 
-    sc <- function(b, alternative) {
-        cf[] <- coef(update(m0, offset = off + b * X))
-        cf[parm] <- b
-        coef(m1) <- cf
-        r1 <- resid(m1)
-        if (is.null(block))
-            return(coin::independence_test(r1 ~ Xf, teststat = "scalar", 
-                       alternative = alternative, ...))
-        coin::independence_test(r1 ~ X | block, teststat = "scalar", 
-                       alternative = alternative, ...)
+    r <- resid(m0)
+    if (is.null(block)) {
+        it0 <- coin::independence_test(r ~ Xf, 
+            teststat = "scalar", 
+            alternative = alternative, ...)
+    } else {
+        it0 <- coin::independence_test(r1 ~ X | block, 
+            teststat = "scalar", 
+            alternative = alternative, ...)
     }
-    it0 <- sc(nullvalue, alternative = alternative)
     stat <- c("Z" = coin::statistic(it0, "standardized"))
     pval <- coin::pvalue(it0)
 
@@ -469,27 +464,6 @@ perm_test.tram <- function(object, parm = names(coef(object)),
         "ExactNullDistribution"  = "Exact"
     )
 
-    if (confint) {
-        alpha <- (1 - level)
-        if (alternative == "two.sided") alpha <- alpha / 2
-        Wci <- confint(object, level = 1 - alpha / 5)[parm,]
-        grd <- seq(from = Wci[1] - add, to = Wci[2] + add, 
-                   length.out = maxsteps)
-        s <- spline(x = grd, 
-                    y = sapply(grd, function(g) 
-                        coin::pvalue(sc(g, alternative = "less"))), 
-                    ### input can be non-monotone from approximated p-values
-                    method = ifelse(distname == "Approximative", "fmm", "hyman"))
-        Sci <- approx(x = s$y, y = s$x, 
-                      xout = c(alpha, 1 - alpha))$y
-        est <- coef(object)[parm]
-        attr(Sci, "conf.level") <- level
-        if (alternative == "less")
-            Sci[1] <- -Inf
-        if (alternative == "greater")
-            Sci[2] <- Inf
-    }
-
     parameter <- paste(switch(class(object)[1], 
                                   "Colr" = "Log-odds ratio",
                                    "Coxph" = "Log-hazard ratio",
@@ -497,8 +471,8 @@ perm_test.tram <- function(object, parm = names(coef(object)),
                                    "Lehmann" = "Lehmann parameter",
                                    "BoxCox" = "Standardised difference"))
     parameter <- paste(tolower(parameter), "for", parm)
+    nullvalue <- 0
     names(nullvalue) <- parameter
-
 
     ret <- list(statistic = stat,
                 p.value = pval, 
@@ -506,11 +480,6 @@ perm_test.tram <- function(object, parm = names(coef(object)),
                 alternative = alternative, 
                 method = paste(distname, "Permutation Transformation Score Test"),
                 data.name = deparse(object$call))
-    if (confint) {
-        ret$conf.int <- Sci
-        names(est) <- parameter
-        ret$estimate <- est
-    }
     class(ret) <- "htest"
     ret
 }
