@@ -7,7 +7,7 @@
     \item{\code{score_test} generic and method added for computing 
           score tests and corresponding confidence intervals.}
     \item{\code{perm_test} generic and method added for computing 
-          permutation score tests and corresponding confidence intervals.}
+          permutation score tests.}
     \item{\code{PI} converts log-odds ratios to probabilistic indices and 
           vice versa.}
   }

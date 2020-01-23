@@ -2,6 +2,12 @@
 \name{NEWS}
 \title{NEWS file for the mlt package}
 
+\section{Changes in Version 1.1-2 (2020-01-22)}{
+  \itemize{
+    \item{Allow permutations of single variables.}
+  }
+}
+
 \section{Changes in Version 1.1-1 (2020-01-09)}{
   \itemize{
     \item{Try harder to invert Hessians.}

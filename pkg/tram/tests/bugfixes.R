@@ -112,3 +112,17 @@ stopifnot(all.equal(coef(as.mlt(m1)), coef(as.mlt(m2)),
 
 ### check probabilistic index <-> log-odds ratio conversion
 stopifnot(max(abs(PI(prob = PI(-15:15)) - (-15:15))) < 1e5)
+
+### check updating with permutations
+data("BostonHousing2", package = "mlbench")
+m <- Colr(Surv(cmedv, cmedv < 50) ~ chas + crim, data = BostonHousing2)
+mm <- as.mlt(m)
+p <- sample(1:NROW(BostonHousing2))
+## model with crim permuted
+m1 <- update(mm, perm = "crim", permutation = p)
+## permute data directly
+tmp <- BostonHousing2
+tmp[, "crim"] <- tmp[p, "crim"]
+m2 <- Colr(Surv(cmedv, cmedv < 50) ~ chas + crim, data = tmp)
+stopifnot(all.equal(coef(m1), coef(as.mlt(m2)), tol = 1e-4))
+stopifnot(all.equal(logLik(m1), logLik(m2)))
