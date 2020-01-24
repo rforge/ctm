@@ -504,7 +504,7 @@ perm_test.tram <- function(object, parm = names(coef(object)),
             stopifnot(isTRUE(all.equal(nullvalue, coef(object)[parm],
                                        check.attributes = FALSE)))
 
-        off <- object$offset + 
+        off <- object$offset + c(1, -1)[object$negative + 0L] *
             model.matrix(object)[, parm, drop = FALSE] %*% nullvalue
 
         theta <- coef(as.mlt(object), fixed = FALSE)
