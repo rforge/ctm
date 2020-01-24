@@ -13,7 +13,7 @@ perm_test(object, ...)
 \method{perm_test}{tram}(object, parm = names(coef(object)), 
     statistic = c("Score", "Likelihood", "Wald"),
     alternative = c("two.sided", "less", "greater"), 
-    nullvalue = ifelse(confint, coef(object)[parm], 0), 
+    nullvalue = if (confint) coef(object)[parm] else 0,
     confint = FALSE, level = .95, 
     block_permutation = TRUE, ...)
 }
