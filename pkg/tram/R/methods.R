@@ -399,70 +399,16 @@ perm_test.default <- function(object, ...)
     stop("no perm_test method implemented for class", class(object)[1])
 
 perm_test.tram <- function(object, parm = names(coef(object)), 
+    statistic = c("Score", "Likelihood", "Wald"),
     alternative = c("two.sided", "less", "greater"), 
-    block_permutation = TRUE, ...) {
+    nullvalue = if (confint) coef(object)[parm] else 0, 
+    confint = FALSE, level = .95, block_permutation = TRUE, ...) {
 
     cf <- coef(object)
-    if (length(cf) > 1)
-        warning("procedure only suitable for one single covariable")
     stopifnot(all(parm %in% names(cf)))
+    statistic <- match.arg(statistic, several.ok = TRUE)
+    if ("Score" %in% statistic) statistic <- "Score"
     alternative <- match.arg(alternative)
-
-    if (length(parm) > 1) {
-        ret <- lapply(parm, perm_test, object = object, 
-                      alternative = alternative, 
-                      block_permutation = block_permutation,
-                      ...)
-        names(ret) <- parm
-        class(ret) <- "htests"
-        return(ret)
-    }
-
-    m1 <- as.mlt(object)
-
-    fx <- 0
-    names(fx) <- parm
-    off <- object$offset
-    theta <- coef(as.mlt(object))
-    theta <- theta[names(theta) != parm]
-    m0 <- mlt(object$model, data = object$data, weights = object$weights,
-              offset = off, scale = object$scale, fixed = fx,
-              mltoptim = object$optim, theta = theta)
-
-    cf <- coef(m1)
-    X <- Xf <- model.matrix(object)[, parm]
-    ### this is a hack and not really necessary but
-    ### distribution = "exact" needs factors @ 2 levels
-    ### use baseline level 1 such that p-values are increasing
-    if (all(X %in% c(0, 1))) 
-        Xf <- relevel(factor(X, levels = 0:1, labels = 0:1), "1")
-
-    block <- NULL
-    if (!is.null(m0$model$interacting) && block_permutation) {
-        svar <- variable.names(m0$model$bases$interacting)
-        block <- object$data[, svar]
-        if (is.data.frame(block))
-            block <- do.call("interaction", block)
-    }
-
-    r <- resid(m0)
-    if (is.null(block)) {
-        it0 <- coin::independence_test(r ~ Xf, 
-            teststat = "scalar", 
-            alternative = alternative, ...)
-    } else {
-        it0 <- coin::independence_test(r1 ~ X | block, 
-            teststat = "scalar", 
-            alternative = alternative, ...)
-    }
-    stat <- c("Z" = coin::statistic(it0, "standardized"))
-    pval <- coin::pvalue(it0)
-
-    distname <- switch(class(it0@distribution),
-        "AsymptNullDistribution" = "Asymptotic",
-        "ApproxNullDistribution" = "Approximative",
-        "ExactNullDistribution"  = "Exact"
-    )
 
     parameter <- paste(switch(class(object)[1], 
                                   "Colr" = "Log-odds ratio",
@@ -470,16 +416,201 @@ perm_test.tram <- function(object, parm = names(coef(object)),
                                    "Lm" = "Standardised difference",
                                    "Lehmann" = "Lehmann parameter",
                                    "BoxCox" = "Standardised difference"))
-    parameter <- paste(tolower(parameter), "for", parm)
-    nullvalue <- 0
-    names(nullvalue) <- parameter
 
-    ret <- list(statistic = stat,
+    block <- NULL
+    if (!is.null(object$model$model$interacting) && block_permutation) {
+        svar <- variable.names(object$model$model$bases$interacting)
+        block <- object$data[, svar]
+        if (is.data.frame(block))
+            block <- do.call("interaction", block)
+    }
+    if ("Score" %in% statistic) {
+
+        stopifnot(isTRUE(all.equal(nullvalue, 0)))
+
+        if (length(parm) > 1) {
+            ret <- lapply(parm, perm_test, object = object, 
+                          alternative = alternative, 
+                          nullvalue = nullvalue,
+                          confint = confint, 
+                          level = level, 
+                          block_permutation = block_permutation,
+                          ...)
+            names(ret) <- parm
+            class(ret) <- "htests"
+            return(ret)
+        }
+
+        m1 <- as.mlt(object)
+
+        fx <- 0
+        names(fx) <- parm
+        off <- object$offset
+        theta <- coef(as.mlt(object))
+        theta <- theta[names(theta) != parm]
+        m0 <- mlt(object$model, data = object$data, weights = object$weights,
+                  offset = off, scale = object$scale, fixed = fx,
+                  mltoptim = object$optim, theta = theta)
+
+        cf <- coef(m1)
+        X <- Xf <- model.matrix(object)[, parm]
+        ### this is a hack and not really necessary but
+        ### distribution = "exact" needs factors @ 2 levels
+        ### use baseline level 1 such that p-values are increasing
+        if (all(X %in% c(0, 1))) 
+            Xf <- relevel(factor(X, levels = 0:1, labels = 0:1), "1")
+
+        r0 <- resid(m0)
+        if (is.null(block)) {
+            it0 <- coin::independence_test(r0 ~ Xf, teststat = "scalar", 
+                alternative = alternative, ...)
+        } else {
+            it0 <- coin::independence_test(r1 ~ X | block, teststat = "scalar", 
+                alternative = alternative, ...)
+        }
+        stat <- c("Z" = coin::statistic(it0, "standardized"))
+        pval <- coin::pvalue(it0)
+
+        distname <- switch(class(it0@distribution),
+            "AsymptNullDistribution" = "Asymptotic",
+            "ApproxNullDistribution" = "Approximative",
+            "ExactNullDistribution"  = "Exact"
+        )
+
+        parameter <- paste(tolower(parameter), "for", parm)
+        names(nullvalue) <- parameter
+  
+        ret <- list(statistic = stat,
+                    p.value = pval, 
+                    null.value = nullvalue, 
+                    alternative = alternative, 
+                    method = paste(distname, "Permutation Transformation Score Test"),
+                    data.name = deparse(object$call))
+        class(ret) <- "htest"
+        return(ret)
+
+    } else {
+
+        if ("Wald" %in% statistic) {
+            stopifnot(length(parm) == 1)
+        } else {
+            stopifnot(alternative == "two.sided")
+        }
+
+        if (length(nullvalue) != length(parm))
+            nullvalue <- rep(nullvalue, length(parm))
+
+        if (confint)
+            stopifnot(isTRUE(all.equal(nullvalue, coef(object)[parm],
+                                       check.attributes = FALSE)))
+
+        off <- object$offset + 
+            model.matrix(object)[, parm, drop = FALSE] %*% nullvalue
+
+        theta <- coef(as.mlt(object), fixed = FALSE)
+        thetafix <- coef(as.mlt(object), fixed = TRUE)
+        fx <- NULL
+        if (length(thetafix) > length(theta))
+            fx <- thetafix[-names(theta)]
+        m0 <- mlt(object$model, data = object$data, weights = object$weights,
+                  offset = off, scale = object$scale, fixed = fx,
+                  mltoptim = object$optim, theta = theta)
+
+        if (length(list(...)) == 0) {
+            nperm <- 1000
+        } else {
+            nperm <- sapply(list(...), function(x) {
+                np <- get("nresample", environment(x))
+                if (is.numeric(np)) return(np)
+                return(NA)
+            })
+            if (!all(is.na(nperm))) nperm <- max(nperm, na.rm = TRUE)
+        }
+
+        ll <- numeric(nperm)
+        cf <- matrix(0, nrow = nperm, ncol = length(parm))
+        colnames(cf) <- parm
+
+        idx <- perm <- 1:NROW(object$data)
+        if (!is.null(block))
+            sidx <- do.call("c", tapply(idx, block, function(i) i))
+        for (b in 1:nperm) {
+            if (!is.null(block)) {
+                perm[sidx] <- do.call("c", tapply(idx, block, sample))
+            } else {
+                perm <- sample(idx)
+            }
+
+            um0 <- update(m0, perm = parm, permutation = perm)
+            ll[b] <- -um0$value
+            cf[b,] <- coef(um0)[parm]
+        }
+
+        if ("Likelihood" %in% statistic) {
+            stat <- logLik(object)
+            sull <- sort(unique(ll))
+            s <- spline(x = sull, y = ecdf(ll)(sull), method = "hyman")
+            pval <- NA
+            if (!confint)
+                pval <- approx(x = s$x, y = 1 - s$y, xout = stat)$y
+            qlevel <- approx(x = s$y, y = s$x, xout = level)$y
+            if (confint) {
+                if(length(parm) > 1)
+                    return(list(stat = stat, pval = pval, 
+                                confcoef = t(t(cf[ll < qlevel, ]) + nullvalue)))
+                conf.int <- range(cf[ll < qlevel, 1]) + nullvalue
+            }
+            retL <- list(statistic = stat,
                 p.value = pval, 
                 null.value = nullvalue, 
                 alternative = alternative, 
-                method = paste(distname, "Permutation Transformation Score Test"),
+                method = "Permutation Transformation Likelihood Test",
                 data.name = deparse(object$call))
-    class(ret) <- "htest"
-    ret
+            if (confint) {
+                retL$conf.int <- conf.int
+                retL$estimate <- coef(object)[parm]
+                names(retL$estimate) <- parameter
+            }
+            class(retL) <- "htest"
+            if (length(statistic) == 1)
+                return(retL)
+        } 
+
+        if ("Wald" %in% statistic) {
+            stat <- coef(object)
+            sucf <- sort(unique(cf))
+            s <- spline(x = sucf, y = ecdf(cf)(sucf), method = "hyman")
+            pval <- NA
+            if (!confint) {
+                pval <- approx(x = s$x, y = s$y, xout = stat)$y
+                if (alternative == "greater") pval <- 1 - pval
+                if (alternative == "two.sided") 
+                    pval <- 2 * min(pval, 1 - pval)
+            }
+            alpha <- 1 - level
+            if (alternative == "two.sided")
+                alpha <- alpha / 2
+            qlevel <- approx(x = s$y, y = s$x, xout = c(alpha, 1 - alpha))$y
+            if (confint) {
+                conf.int <- nullvalue + qlevel
+                if (alternative == "less") confint[1] <- -Inf
+                if (alternative == "greater") confint[1] <- -Inf
+            }
+            retW <- list(statistic = stat,
+                p.value = pval, 
+                null.value = nullvalue, 
+                alternative = alternative, 
+                method = "Permutation Transformation Wald Test",
+                data.name = deparse(object$call))
+            if (confint) {
+                retW$conf.int <- conf.int
+                retW$estimate <- coef(object)[parm]
+                names(retW$estimate) <- parameter
+            }
+            class(retW) <- "htest"
+            if (length(statistic) == 1)
+                return(retW)
+         }
+         return(list(Likelihood = retL, Wald = retW))
+    }
 }

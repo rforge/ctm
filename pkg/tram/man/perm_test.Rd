@@ -11,7 +11,10 @@
 \usage{
 perm_test(object, ...)
 \method{perm_test}{tram}(object, parm = names(coef(object)), 
+    statistic = c("Score", "Likelihood", "Wald"),
     alternative = c("two.sided", "less", "greater"), 
+    nullvalue = ifelse(confint, coef(object)[parm], 0), 
+    confint = FALSE, level = .95, 
     block_permutation = TRUE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -19,9 +22,21 @@ perm_test(object, ...)
   \item{object}{an object of class \code{\link{tram}}}
   \item{parm}{a vector of names of parameters to be tested.
               These parameters must be present in \code{object}.}
+  \item{statistic}{a character string specifying the statistic to be
+          permuted. The default \code{Score} is the classical permutation
+          test for the esiduals of a model excluding the parameter \code{parm}.
+          Only available for \code{nullvalue = 0}, confidence intervals are
+          not available. Permuting the likelihood or the model coefficients
+          under the nullvalue is highly expermimental as are the
+          corresponding confidence intervals.}
   \item{alternative}{a character string specifying the alternative hypothesis,
           must be one of \code{"two.sided"} (default), \code{"greater"} 
           or \code{"less"}.}
+  \item{nullvalue}{a number specifying an optional parameter used to form the
+          null hypothesis.}
+  \item{confint}{a logical indicating whether a confidence interval should be
+          computed.}
+  \item{level}{the confidence level.}
   \item{block_permutation}{a logical indicating wheather stratifying
       variables shall be interpreted as blocks defining admissible
       permutations.}
@@ -81,6 +96,10 @@ perm_test(object, ...)
   ### exact permutation score test
   (pt <- perm_test(md, distribution = "exact"))
 
+  ### approximate permutation likelihood and Wald test
+  (pt <- perm_test(md, statistic = c("Likelihood", "Wald"), confint = TRUE,
+                   distribution = coin::approximate(1e3)))
+
   ### compare with probabilistic indices obtained from asht::wmwTest
   if (require("asht")) {
       (wt2 <- wmwTest(pd ~ I(relevel(age, "At term")), 
@@ -88,6 +107,5 @@ perm_test(object, ...)
       ### as log-odds ratios
       PI(prob = wt2$conf.int)
       PI(prob = wt2$estimate)
-       
   }
 }
