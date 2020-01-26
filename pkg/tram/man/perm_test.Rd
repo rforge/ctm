@@ -2,20 +2,20 @@
 \alias{perm_test}
 \alias{perm_test.tram}
 \title{
-  Permutation Transformation Score Tests 
+  Permutation Transformation Tests 
 }
 \description{
   P-values for a parameter in a linear transformation
-  model obtained from by the permutation score test principle
+  model and corresponding confidence intervals 
+  obtained from by the permutation principle
 }
 \usage{
 perm_test(object, ...)
 \method{perm_test}{tram}(object, parm = names(coef(object)), 
     statistic = c("Score", "Likelihood", "Wald"),
     alternative = c("two.sided", "less", "greater"), 
-    nullvalue = if (confint) coef(object)[parm] else 0,
-    confint = FALSE, level = .95, 
-    block_permutation = TRUE, ...)
+    nullvalue = 0, confint = FALSE, level = .95, 
+    block_permutation = TRUE, maxsteps = 25, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -40,12 +40,15 @@ perm_test(object, ...)
   \item{block_permutation}{a logical indicating wheather stratifying
       variables shall be interpreted as blocks defining admissible
       permutations.}
+  \item{maxsteps}{number of function evaluations when inverting the score statistic
+                  for computing confidence intervals.}
   \item{\dots}{additional arguments to \code{\link[coin]{independence_test}}.}
 }
 \details{
-  A permuation score test for one single parameters in the linear
+  Permutation test for one single parameters in the linear
   predictor of \code{object} is computed. This parameters must be present
-  in \code{object}.
+  in \code{object}. This is highly experimental and not recommended for
+  practical use.
 }
 \value{
   An object of class \code{htest} or a list thereof. See \code{\link{Coxph}}
@@ -68,8 +71,8 @@ perm_test(object, ...)
   ### for a median shift
   wilcox.test(pd ~ age, data = diffusion, conf.int = TRUE, exact = TRUE)
 
-  ### a corresponding transformation model with a log-odds ratio
-  ### difference parameter
+  ### a corresponding parametric transformation model with a log-odds ratio
+  ### difference parameter, ie a difference on the log-odds scale
   md <- Colr(pd ~ age, data = diffusion)
 
   ### assess model fit by plotting estimated distribution fcts
@@ -94,18 +97,18 @@ perm_test(object, ...)
   confint(score_test(md))
 
   ### exact permutation score test
-  (pt <- perm_test(md, distribution = "exact"))
+  (pt <- perm_test(md, confint = TRUE, distribution = "exact"))
 
   ### approximate permutation likelihood and Wald test
   (pt <- perm_test(md, statistic = c("Likelihood", "Wald"), confint = TRUE,
                    distribution = coin::approximate(1e3)))
-
+ 
   ### compare with probabilistic indices obtained from asht::wmwTest
-  if (require("asht")) {
-      (wt2 <- wmwTest(pd ~ I(relevel(age, "At term")), 
+  if (require("asht", warn.conflicts = FALSE)) {
+      print(wt2 <- wmwTest(pd ~ I(relevel(age, "At term")), 
                       data = diffusion, method = "exact.ce"))
       ### as log-odds ratios
-      PI(prob = wt2$conf.int)
-      PI(prob = wt2$estimate)
+      print(PI(prob = wt2$conf.int))
+      print(PI(prob = wt2$estimate))
   }
 }

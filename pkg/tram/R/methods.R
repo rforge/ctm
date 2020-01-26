@@ -401,8 +401,8 @@ perm_test.default <- function(object, ...)
 perm_test.tram <- function(object, parm = names(coef(object)), 
     statistic = c("Score", "Likelihood", "Wald"),
     alternative = c("two.sided", "less", "greater"), 
-    nullvalue = if (confint) coef(object)[parm] else 0, 
-    confint = FALSE, level = .95, block_permutation = TRUE, ...) {
+    nullvalue = 0, confint = FALSE, level = .95, 
+    block_permutation = TRUE, maxsteps = 25, ...) {
 
     cf <- coef(object)
     stopifnot(all(parm %in% names(cf)))
@@ -474,7 +474,6 @@ perm_test.tram <- function(object, parm = names(coef(object)),
         pval <- coin::pvalue(it0)
 
         if (confint) {
-
             s <- function(b) {
                 cf[] <- coef(update(m0, offset = off + b * X))
                 cf[parm] <- b
@@ -487,11 +486,10 @@ perm_test.tram <- function(object, parm = names(coef(object)),
             alpha <- (1 - level)
             if (alternative == "two.sided") alpha <- alpha / 2
             Wci <- confint(object, level = 1 - alpha / 5)[parm,]
-            maxsteps <- 25
             grd <- seq(from = Wci[1], to = Wci[2], length.out = maxsteps)
             s <- spline(x = grd, y = sapply(grd, s), method = "hyman")
-            qp <- qperm(it0, c(alpha, 1 - alpha)) * sqrt(variance(it0)) +
-                expectation(it0)
+            qp <- coin::qperm(it0, c(alpha, 1 - alpha)) * sqrt(coin::variance(it0)) +
+                coin::expectation(it0)
             Sci <- approx(x = s$y, y = s$x, xout = qp)$y
             est <- coef(object)[parm]
             attr(Sci, "conf.level") <- level
@@ -535,9 +533,9 @@ perm_test.tram <- function(object, parm = names(coef(object)),
         if (length(nullvalue) != length(parm))
             nullvalue <- rep(nullvalue, length(parm))
 
-        if (confint)
-            stopifnot(isTRUE(all.equal(nullvalue, coef(object)[parm],
-                                       check.attributes = FALSE)))
+        if (confint && !isTRUE(all.equal(nullvalue, coef(object)[parm],
+                                         check.attributes = FALSE)))
+            nullvalue <- coef(object)[parm]
 
         off <- object$offset + c(1, -1)[object$negative + 1L] *
             model.matrix(object)[, parm, drop = FALSE] %*% nullvalue
