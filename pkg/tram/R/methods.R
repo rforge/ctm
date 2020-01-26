@@ -460,7 +460,9 @@ perm_test.tram <- function(object, parm = names(coef(object)),
         if (all(X %in% c(0, 1))) 
             Xf <- relevel(factor(X, levels = 0:1, labels = 0:1), "1")
 
-        r0 <- resid(m0)
+        cf[] <- c(coef(m0, fixed = FALSE), 0)
+        coef(m1) <- cf
+        r0 <- resid(m1) * sqrt(vcov(m1)[parm,parm])
         if (is.null(block)) {
             it0 <- coin::independence_test(r0 ~ Xf, teststat = "scalar", 
                 alternative = alternative, ...)
@@ -470,6 +472,34 @@ perm_test.tram <- function(object, parm = names(coef(object)),
         }
         stat <- c("Z" = coin::statistic(it0, "standardized"))
         pval <- coin::pvalue(it0)
+
+        if (confint) {
+
+            s <- function(b) {
+                cf[] <- coef(update(m0, offset = off + b * X))
+                cf[parm] <- b
+                coef(m1) <- cf
+                ### see Lehmann, Elements of Large-sample Theory,
+                ### 1999, 539-540, for score tests in the presence
+                ### of additional parameters
+                sum(estfun(m1)[, parm]) * sqrt(vcov(m1)[parm, parm])
+            }
+            alpha <- (1 - level)
+            if (alternative == "two.sided") alpha <- alpha / 2
+            Wci <- confint(object, level = 1 - alpha / 5)[parm,]
+            maxsteps <- 25
+            grd <- seq(from = Wci[1], to = Wci[2], length.out = maxsteps)
+            s <- spline(x = grd, y = sapply(grd, s), method = "hyman")
+            qp <- qperm(it0, c(alpha, 1 - alpha)) * sqrt(variance(it0)) +
+                expectation(it0)
+            Sci <- approx(x = s$y, y = s$x, xout = qp)$y
+            est <- coef(object)[parm]
+            attr(Sci, "conf.level") <- level
+            if (alternative == "less")
+                Sci[1] <- -Inf
+            if (alternative == "greater")
+                Sci[2] <- Inf
+        }
 
         distname <- switch(class(it0@distribution),
             "AsymptNullDistribution" = "Asymptotic",
@@ -486,6 +516,11 @@ perm_test.tram <- function(object, parm = names(coef(object)),
                     alternative = alternative, 
                     method = paste(distname, "Permutation Transformation Score Test"),
                     data.name = deparse(object$call))
+        if (confint) {
+            ret$conf.int <- Sci
+            names(est) <- parameter
+            ret$estimate <- est
+        }
         class(ret) <- "htest"
         return(ret)
 
@@ -504,7 +539,7 @@ perm_test.tram <- function(object, parm = names(coef(object)),
             stopifnot(isTRUE(all.equal(nullvalue, coef(object)[parm],
                                        check.attributes = FALSE)))
 
-        off <- object$offset + c(1, -1)[object$negative + 0L] *
+        off <- object$offset + c(1, -1)[object$negative + 1L] *
             model.matrix(object)[, parm, drop = FALSE] %*% nullvalue
 
         theta <- coef(as.mlt(object), fixed = FALSE)
