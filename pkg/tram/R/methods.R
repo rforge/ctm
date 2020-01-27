@@ -474,8 +474,9 @@ perm_test.tram <- function(object, parm = names(coef(object)),
         pval <- coin::pvalue(it0)
 
         if (confint) {
-            s <- function(b) {
-                cf[] <- coef(update(m0, offset = off + b * X))
+            sc <- function(b) {
+                cf[] <- coef(update(m0, offset = off + b * X, 
+                                    theta = theta))
                 cf[parm] <- b
                 coef(m1) <- cf
                 ### see Lehmann, Elements of Large-sample Theory,
@@ -487,7 +488,7 @@ perm_test.tram <- function(object, parm = names(coef(object)),
             if (alternative == "two.sided") alpha <- alpha / 2
             Wci <- confint(object, level = 1 - alpha / 5)[parm,]
             grd <- seq(from = Wci[1], to = Wci[2], length.out = maxsteps)
-            s <- spline(x = grd, y = sapply(grd, s), method = "hyman")
+            s <- spline(x = grd, y = sapply(grd, sc), method = "hyman")
             qp <- coin::qperm(it0, c(alpha, 1 - alpha)) * sqrt(coin::variance(it0)) +
                 coin::expectation(it0)
             Sci <- approx(x = s$y, y = s$x, xout = qp)$y
@@ -548,7 +549,7 @@ perm_test.tram <- function(object, parm = names(coef(object)),
         m0 <- mlt(object$model, data = object$data, weights = object$weights,
                   offset = off, scale = object$scale, fixed = fx,
                   mltoptim = object$optim, theta = theta)
-
+        
         if (length(list(...)) == 0) {
             nperm <- 1000
         } else {
