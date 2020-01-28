@@ -457,8 +457,9 @@ perm_test.tram <- function(object, parm = names(coef(object)),
         ### this is a hack and not really necessary but
         ### distribution = "exact" needs factors @ 2 levels
         ### use baseline level 1 such that p-values are increasing
-        if (all(X %in% c(0, 1))) 
-            Xf <- relevel(factor(X, levels = 0:1, labels = 0:1), "1")
+        if (length(unique(X)) == 2)
+            Xf <- relevel(factor(X, levels = sort(unique(X)), 
+                          labels = 0:1), "1")
 
         cf[] <- c(coef(m0, fixed = FALSE), 0)
         coef(m1) <- cf
