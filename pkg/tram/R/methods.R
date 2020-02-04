@@ -332,7 +332,13 @@ score_test.tram <- function(object, parm = names(coef(object)),
         if (alternative == "two.sided") alpha <- alpha / 2
         Wci <- confint(object, level = 1 - alpha / 5)[parm,]
         grd <- seq(from = Wci[1], to = Wci[2], length.out = maxsteps)
-        s <- spline(x = grd, y = sapply(grd, sc), method = "hyman")
+        grd_sc <- sapply(grd, sc) 
+        method <- "fmm"
+        ### theoretically, sc is monotone (increasing or decreasing)
+        ### but the optimiser might not always know this
+        if (all(diff(grd_sc) < 0) || all(diff(grd_sc) > 0))
+            method <- "hyman"
+        s <- spline(x = grd, y = grd_sc, method = method)
         Sci <- approx(x = s$y, y = s$x, 
                       xout = qnorm(c(alpha, 1 - alpha)))$y
         est <- coef(object)[parm]
@@ -418,8 +424,8 @@ perm_test.tram <- function(object, parm = names(coef(object)),
                                    "BoxCox" = "Standardised difference"))
 
     block <- NULL
-    if (!is.null(object$model$model$interacting) && block_permutation) {
-        svar <- variable.names(object$model$model$bases$interacting)
+    if (!is.null(object$model$bases$interacting) && block_permutation) {
+        svar <- variable.names(object$model$bases$interacting)
         block <- object$data[, svar]
         if (is.data.frame(block))
             block <- do.call("interaction", block)
@@ -470,7 +476,7 @@ perm_test.tram <- function(object, parm = names(coef(object)),
             it0 <- coin::independence_test(r0 ~ Xf, teststat = "scalar", 
                 alternative = alternative, weights = ~ w, ...)
         } else {
-            it0 <- coin::independence_test(r1 ~ X | block, teststat = "scalar", 
+            it0 <- coin::independence_test(r0 ~ X | block, teststat = "scalar", 
                 alternative = alternative, weights = ~ w, ...)
         }
         stat <- c("Z" = coin::statistic(it0, "standardized"))
@@ -492,7 +498,13 @@ perm_test.tram <- function(object, parm = names(coef(object)),
             if (alternative == "two.sided") alpha <- alpha / 2
             Wci <- confint(object, level = 1 - alpha / 5)[parm,]
             grd <- seq(from = Wci[1], to = Wci[2], length.out = maxsteps)
-            s <- spline(x = grd, y = sapply(grd, sc), method = "hyman")
+            grd_sc <- sapply(grd, sc) 
+            method <- "fmm"
+            ### theoretically, sc is monotone (increasing or decreasing)
+            ### but the optimiser might not always know this
+            if (all(diff(grd_sc) < 0) || all(diff(grd_sc) > 0))
+                method <- "hyman"
+            s <- spline(x = grd, y = grd_sc, method = method)
 
             ### we always have Prob(Q(alpha) <= S) >= alpha
             ### for alpha < .5, we need Prob(Q(alpha) <= S) <= alpha
