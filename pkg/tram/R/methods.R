@@ -448,6 +448,7 @@ perm_test.tram <- function(object, parm = names(coef(object)),
         off <- object$offset
         theta <- coef(as.mlt(object))
         theta <- theta[names(theta) != parm]
+        w <- object$weights
         m0 <- mlt(object$model, data = object$data, weights = object$weights,
                   offset = off, scale = object$scale, fixed = fx,
                   mltoptim = object$optim, theta = theta)
@@ -463,13 +464,14 @@ perm_test.tram <- function(object, parm = names(coef(object)),
 
         cf[] <- c(coef(m0, fixed = FALSE), 0)
         coef(m1) <- cf
-        r0 <- resid(m1) * sqrt(vcov(m1)[parm,parm])
+        ### resid is weighted, remove weights and feed them to coin
+        r0 <- (resid(m1) / w) * sqrt(vcov(m1)[parm,parm])
         if (is.null(block)) {
             it0 <- coin::independence_test(r0 ~ Xf, teststat = "scalar", 
-                alternative = alternative, ...)
+                alternative = alternative, weights = ~ w, ...)
         } else {
             it0 <- coin::independence_test(r1 ~ X | block, teststat = "scalar", 
-                alternative = alternative, ...)
+                alternative = alternative, weights = ~ w, ...)
         }
         stat <- c("Z" = coin::statistic(it0, "standardized"))
         pval <- coin::pvalue(it0)
@@ -483,6 +485,7 @@ perm_test.tram <- function(object, parm = names(coef(object)),
                 ### see Lehmann, Elements of Large-sample Theory,
                 ### 1999, 539-540, for score tests in the presence
                 ### of additional parameters
+                ### estfun is already weighted
                 sum(estfun(m1)[, parm]) * sqrt(vcov(m1)[parm, parm])
             }
             alpha <- (1 - level)
@@ -490,11 +493,32 @@ perm_test.tram <- function(object, parm = names(coef(object)),
             Wci <- confint(object, level = 1 - alpha / 5)[parm,]
             grd <- seq(from = Wci[1], to = Wci[2], length.out = maxsteps)
             s <- spline(x = grd, y = sapply(grd, sc), method = "hyman")
-            qp <- coin::qperm(it0, c(alpha, 1 - alpha)) * sqrt(coin::variance(it0)) +
+
+            ### we always have Prob(Q(alpha) <= S) >= alpha
+            ### for alpha < .5, we need Prob(Q(alpha) <= S) <= alpha
+            qa <- coin::qperm(it0, p = alpha)
+            if (coin::pperm(it0, q = qa) > alpha - 1e3) {
+                sprt <- coin::support(it0)
+                if (!all(is.na(sprt))) {
+                    qa <- max(sprt[sprt < qa])
+                } else {
+                    a <- alpha
+                    while(coin::pperm(it0, qa) > alpha) {
+                        a <- a - 1e-4
+                        qa <- coin::qperm(it0, p = a)
+                    }
+                }
+            }
+            q1a <- coin::qperm(it0, p = 1 - alpha)
+            qp <- c(qa, q1a)
+            achieved <- coin::pperm(it0, q = qp)
+            achieved <- 1 - (achieved[1] + (1 - achieved[2]))
+            qp <- qp * sqrt(coin::variance(it0)) +
                 coin::expectation(it0)
             Sci <- approx(x = s$y, y = s$x, xout = qp)$y
             est <- coef(object)[parm]
             attr(Sci, "conf.level") <- level
+            attr(Sci, "achieved.conf.level") <- achieved
             if (alternative == "less")
                 Sci[1] <- -Inf
             if (alternative == "greater")
