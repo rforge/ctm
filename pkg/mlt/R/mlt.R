@@ -60,6 +60,11 @@
         exY <- NULL
         iYleft <- NULL
 
+        if (!is.null(perm)) {
+            if (length(unique(weights)) > 1 || !is.null(subset))
+                stop("permutations not implemented for weights or subsets")
+        }
+
         nm <- colnames(Y)
         if (!is.null(perm)) {
             stopifnot(all(perm %in% nm))
