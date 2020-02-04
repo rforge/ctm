@@ -8,9 +8,9 @@ tramnet <-
     trdat <- .get_tram_data(model)
     stopifnot(trdat$nobs == nrow(x))
     nth <- trdat$npar
-    nb  <- ncol(x)
+    nb <- ncol(x)
     theta <- Variable(nth)
-    beta  <- Variable(nb)
+    beta <- Variable(nb)
     prob <- .tramnet_objective(trdat, x, theta, beta,
                                alpha, lambda, constraints)
     res <- solve(prob, ...)
@@ -158,9 +158,9 @@ tramnet <-
     obj <- -(lle + lll + llr + lli) +
       lambda * (0.5 * (1 - alpha) * power(p_norm(beta, 2), 2) +
                   alpha * p_norm(beta, 1))
-    const <- list(trdat$const$ui %*% theta > trdat$const$ci)
+    const <- list(trdat$const$ui %*% theta >= trdat$const$ci)
     if (!is.null(constraints)) {
-      const[[2]] <- constraints[[1]] %*% beta > constraints[[2]]
+      const[[2]] <- constraints[[1]] %*% beta >= constraints[[2]]
     }
     prob <- Problem(Minimize(obj), constraints = const)
     return(prob)

@@ -24,8 +24,9 @@ logLik.tramnet <- function(object,
 coef.tramnet <- function(object, with_baseline = FALSE, tol = 1e-6, ...) {
   if (length(list(...)) > 0L)
     warning("additional arguments ignored")
-
   beta <- c(object$beta[abs(object$beta) > tol])
+  if (all(object$x == 0))
+    beta <- NULL
   theta <- c(object$theta)
   names(theta) <- names(coef(as.mlt(object$model)))
   if (!with_baseline)
@@ -143,7 +144,11 @@ print.summary.tramnet <- function(x, digits = max(3L, getOption("digits") - 3L),
   cat("\nLog-Likelihood: ", x$logLik)
   cat("\n")
   cat("\nCoefficients:\n")
-  print(round(x$coef, digits = digits))
+  if (!is.null(x$coef)) {
+    print(round(x$coef, digits = digits))
+  } else {
+    print(NULL)
+  }
   cat("\nSparsity: ", x$sparsity, "\n")
   cat("\nTuning parameters:\n")
   print(round(x$tuning_parm, digits = digits))
@@ -155,6 +160,7 @@ print.summary.tramnet <- function(x, digits = max(3L, getOption("digits") - 3L),
 
 .tramnet2ctm <- function(object) {
   data <- .get_tramnet_data(object)
+  cfx <- coef(object, with_baseline = TRUE, tol = 0)
   if (!is.null(object$model$model$model$binteracting)) {
     yBasis <- object$model$model$model$binteracting$iresponse
     iBasis <- object$model$model$model$binteracting$iinteracting
@@ -177,8 +183,6 @@ print.summary.tramnet <- function(x, digits = max(3L, getOption("digits") - 3L),
         ), data = data, remove_intercept = TRUE
       )
   }
-
-  cfx <- coef(object, with_baseline = TRUE, tol = 0)
   mod <- ctm(response = yBasis, shifting = shifting,
              interacting = iBasis, todistr = todistr, data = data)
   coef(mod) <- cfx
@@ -201,6 +205,8 @@ print.summary.tramnet <- function(x, digits = max(3L, getOption("digits") - 3L),
   lambda <- object$tuning_parm[1]
   alpha <- object$tuning_parm[2]
   cfx <- coef(object, tol = 0)
+  if (is.null(cfx))
+    return(0)
   L1 <- sum(abs(cfx))
   L2 <- sqrt(sum(cfx^2))
   ret <- lambda * (0.5 * (1 - alpha) * L2^2 + alpha * L1)
