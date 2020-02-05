@@ -489,9 +489,9 @@ from <- function(todistr, n, p, n0p, dd, cfx, ord, support, add, seed) {
 
 print_mbo <- function(x, ...) {
   op = x$opt.path
-  catf("Recommended parameters:")
-  catf(paramValueToString(op$par.set, x$x))
-  catf("Objective: %s = %.3f\n", op$y.names[1], x$y)
+  cat("Recommended parameters:\n")
+  cat(paramValueToString(op$par.set, x$x), "\n")
+  cat("Objective:", op$y.names[1], "=", round(x$y, 3), "\n")
 }
 
 # Dependencies
