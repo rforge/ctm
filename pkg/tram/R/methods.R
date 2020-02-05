@@ -405,7 +405,7 @@ perm_test.default <- function(object, ...)
     stop("no perm_test method implemented for class", class(object)[1])
 
 perm_test.tram <- function(object, parm = names(coef(object)), 
-    statistic = c("Score", "Likelihood", "Wald"),
+    statistic = c("Score", "LinearScore", "Likelihood", "Wald"),
     alternative = c("two.sided", "less", "greater"), 
     nullvalue = 0, confint = FALSE, level = .95, 
     block_permutation = TRUE, maxsteps = 25, ...) {
@@ -413,7 +413,8 @@ perm_test.tram <- function(object, parm = names(coef(object)),
     cf <- coef(object)
     stopifnot(all(parm %in% names(cf)))
     statistic <- match.arg(statistic, several.ok = TRUE)
-    if ("Score" %in% statistic) statistic <- "Score"
+    SCORE <- grep("Score", statistic)
+    if (length(SCORE) > 0) statistic <- statistic[SCORE[1]]
     alternative <- match.arg(alternative)
 
     parameter <- paste(switch(class(object)[1], 
@@ -430,7 +431,7 @@ perm_test.tram <- function(object, parm = names(coef(object)),
         if (is.data.frame(block))
             block <- do.call("interaction", block)
     }
-    if ("Score" %in% statistic) {
+    if (length(grep("Score", statistic)) > 0) {
 
         stopifnot(isTRUE(all.equal(nullvalue, 0)))
 
@@ -483,28 +484,9 @@ perm_test.tram <- function(object, parm = names(coef(object)),
         pval <- coin::pvalue(it0)
 
         if (confint) {
-            sc <- function(b) {
-                cf[] <- coef(update(m0, offset = off + b * X, 
-                                    theta = theta))
-                cf[parm] <- b
-                coef(m1) <- cf
-                ### see Lehmann, Elements of Large-sample Theory,
-                ### 1999, 539-540, for score tests in the presence
-                ### of additional parameters
-                ### estfun is already weighted
-                sum(estfun(m1)[, parm]) * sqrt(vcov(m1)[parm, parm])
-            }
+
             alpha <- (1 - level)
             if (alternative == "two.sided") alpha <- alpha / 2
-            Wci <- confint(object, level = 1 - alpha / 5)[parm,]
-            grd <- seq(from = Wci[1], to = Wci[2], length.out = maxsteps)
-            grd_sc <- sapply(grd, sc) 
-            method <- "fmm"
-            ### theoretically, sc is monotone (increasing or decreasing)
-            ### but the optimiser might not always know this
-            if (all(diff(grd_sc) < 0) || all(diff(grd_sc) > 0))
-                method <- "hyman"
-            s <- spline(x = grd, y = grd_sc, method = method)
 
             ### we always have Prob(Q(alpha) <= S) >= alpha
             ### for alpha < .5, we need Prob(Q(alpha) <= S) <= alpha
@@ -527,8 +509,35 @@ perm_test.tram <- function(object, parm = names(coef(object)),
             achieved <- 1 - (achieved[1] + (1 - achieved[2]))
             qp <- qp * sqrt(coin::variance(it0)) +
                 coin::expectation(it0)
-            Sci <- approx(x = s$y, y = s$x, xout = qp)$y
+
             est <- coef(object)[parm]
+
+            if ("LinearScore" %in% statistic) {
+                Sci <- coef(object) + sqrt(vcov(object)[parm, parm]) * qp
+            } else {
+                sc <- function(b) {
+                    cf[] <- coef(update(m0, offset = off + b * X, 
+                                        theta = theta))
+                    cf[parm] <- b
+                    coef(m1) <- cf
+                    ### see Lehmann, Elements of Large-sample Theory,
+                    ### 1999, 539-540, for score tests in the presence
+                    ### of additional parameters
+                    ### estfun is already weighted
+                    sum(estfun(m1)[, parm]) * sqrt(vcov(m1)[parm, parm])
+                }
+                Wci <- confint(object, level = 1 - alpha / 5)[parm,]
+                grd <- seq(from = Wci[1], to = Wci[2], length.out = maxsteps)
+                grd_sc <- sapply(grd, sc) 
+                method <- "fmm"
+                ### theoretically, sc is monotone (increasing or decreasing)
+                ### but the optimiser might not always know this
+                if (all(diff(grd_sc) < 0) || all(diff(grd_sc) > 0))
+                    method <- "hyman"
+                s <- spline(x = grd, y = grd_sc, method = method)
+                Sci <- approx(x = s$y, y = s$x, xout = qp)$y
+            } 
+            
             attr(Sci, "conf.level") <- level
             attr(Sci, "achieved.conf.level") <- achieved
             if (alternative == "less")

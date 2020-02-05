@@ -12,7 +12,7 @@
 \usage{
 perm_test(object, ...)
 \method{perm_test}{tram}(object, parm = names(coef(object)), 
-    statistic = c("Score", "Likelihood", "Wald"),
+    statistic = c("Score", "LinearScore", "Likelihood", "Wald"),
     alternative = c("two.sided", "less", "greater"), 
     nullvalue = 0, confint = FALSE, level = .95, 
     block_permutation = TRUE, maxsteps = 25, ...)
@@ -35,7 +35,11 @@ perm_test(object, ...)
   \item{nullvalue}{a number specifying an optional parameter used to form the
           null hypothesis.}
   \item{confint}{a logical indicating whether a confidence interval should be
-          computed.}
+          computed. Score confidence intervals are computed by default. A
+          linear approximation to the Score function is used with
+          \code{LinearScore}. For the remaining options, confidence
+          intervals are highly experimental (and probably not worth looking
+          at).}
   \item{level}{the confidence level.}
   \item{block_permutation}{a logical indicating wheather stratifying
       variables shall be interpreted as blocks defining admissible
@@ -47,8 +51,8 @@ perm_test(object, ...)
 \details{
   Permutation test for one single parameters in the linear
   predictor of \code{object} is computed. This parameters must be present
-  in \code{object}. This is highly experimental and not recommended for
-  practical use.
+  in \code{object}. This is somewhat experimental and not recommended for
+  serious practical use (yet!).
 }
 \value{
   An object of class \code{htest} or a list thereof. See \code{\link{Coxph}}
