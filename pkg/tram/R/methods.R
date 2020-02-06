@@ -330,6 +330,11 @@ score_test.tram <- function(object, parm = names(coef(object)),
     if (confint) {
         alpha <- (1 - level)
         if (alternative == "two.sided") alpha <- alpha / 2
+
+        Sci <- coef(object) + sqrt(vcov(object)[parm, parm]) * qp
+
+
+if (FALSE) {
         Wci <- confint(object, level = 1 - alpha / 5)[parm,]
         grd <- seq(from = Wci[1], to = Wci[2], length.out = maxsteps)
         grd_sc <- sapply(grd, sc) 
@@ -341,6 +346,7 @@ score_test.tram <- function(object, parm = names(coef(object)),
         s <- spline(x = grd, y = grd_sc, method = method)
         Sci <- approx(x = s$y, y = s$x, 
                       xout = qnorm(c(alpha, 1 - alpha)))$y
+}
         est <- coef(object)[parm]
         attr(Sci, "conf.level") <- level
         if (alternative == "less")
