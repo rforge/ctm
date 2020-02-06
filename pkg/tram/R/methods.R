@@ -331,7 +331,7 @@ score_test.tram <- function(object, parm = names(coef(object)),
         alpha <- (1 - level)
         if (alternative == "two.sided") alpha <- alpha / 2
 
-        Sci <- coef(object) + sqrt(vcov(object)[parm, parm]) * qp
+        Sci <- coef(object) + sqrt(vcov(object)[parm, parm]) * qnorm(c(alpha, 1 - alpha))
 
 
 if (FALSE) {
