@@ -278,7 +278,7 @@ score_test.default <- function(object, ...)
 
 score_test.tram <- function(object, parm = names(coef(object)), 
     alternative = c("two.sided", "less", "greater"), nullvalue = 0, 
-    confint = TRUE, level = .95, maxsteps = 25, ...) {
+    confint = TRUE, level = .95, Taylor = FALSE, maxsteps = 25, ...) {
 
     cf <- coef(object)
     stopifnot(all(parm %in% names(cf)))
@@ -331,22 +331,22 @@ score_test.tram <- function(object, parm = names(coef(object)),
         alpha <- (1 - level)
         if (alternative == "two.sided") alpha <- alpha / 2
 
-        Sci <- coef(object) + sqrt(vcov(object)[parm, parm]) * qnorm(c(alpha, 1 - alpha))
+        Sci <- NULL
+        if (!Taylor) {
+            ### invert sc numerically; this may fail
+            Wci <- confint(object, level = 1 - alpha / 5)[parm,]
+            grd <- seq(from = Wci[1], to = Wci[2], length.out = maxsteps)
+            grd_sc <- sapply(grd, sc) 
+            if (all(diff(grd_sc) < 0) || all(diff(grd_sc) > 0)) {
+                s <- spline(x = grd, y = grd_sc, method = "hyman")
+                Sci <- approx(x = s$y, y = s$x, 
+                              xout = qnorm(c(alpha, 1 - alpha)))$y
+            }
+        }
+        ### use Taylor approximation
+        if (is.null(Sci))
+            Sci <- coef(object) + sqrt(vcov(object)[parm, parm]) * qnorm(c(alpha, 1 - alpha))
 
-
-if (FALSE) {
-        Wci <- confint(object, level = 1 - alpha / 5)[parm,]
-        grd <- seq(from = Wci[1], to = Wci[2], length.out = maxsteps)
-        grd_sc <- sapply(grd, sc) 
-        method <- "fmm"
-        ### theoretically, sc is monotone (increasing or decreasing)
-        ### but the optimiser might not always know this
-        if (all(diff(grd_sc) < 0) || all(diff(grd_sc) > 0))
-            method <- "hyman"
-        s <- spline(x = grd, y = grd_sc, method = method)
-        Sci <- approx(x = s$y, y = s$x, 
-                      xout = qnorm(c(alpha, 1 - alpha)))$y
-}
         est <- coef(object)[parm]
         attr(Sci, "conf.level") <- level
         if (alternative == "less")
@@ -411,10 +411,10 @@ perm_test.default <- function(object, ...)
     stop("no perm_test method implemented for class", class(object)[1])
 
 perm_test.tram <- function(object, parm = names(coef(object)), 
-    statistic = c("Score", "LinearScore", "Likelihood", "Wald"),
+    statistic = c("Score", "Likelihood", "Wald"),
     alternative = c("two.sided", "less", "greater"), 
     nullvalue = 0, confint = FALSE, level = .95, 
-    block_permutation = TRUE, maxsteps = 25, ...) {
+    Taylor = FALSE, block_permutation = TRUE, maxsteps = 25, ...) {
 
     cf <- coef(object)
     stopifnot(all(parm %in% names(cf)))
@@ -518,9 +518,8 @@ perm_test.tram <- function(object, parm = names(coef(object)),
 
             est <- coef(object)[parm]
 
-            if ("LinearScore" %in% statistic) {
-                Sci <- coef(object) + sqrt(vcov(object)[parm, parm]) * qp
-            } else {
+            Sci <- NULL
+            if (!Taylor) {
                 sc <- function(b) {
                     cf[] <- coef(update(m0, offset = off + b * X, 
                                         theta = theta))
@@ -535,14 +534,13 @@ perm_test.tram <- function(object, parm = names(coef(object)),
                 Wci <- confint(object, level = 1 - alpha / 5)[parm,]
                 grd <- seq(from = Wci[1], to = Wci[2], length.out = maxsteps)
                 grd_sc <- sapply(grd, sc) 
-                method <- "fmm"
-                ### theoretically, sc is monotone (increasing or decreasing)
-                ### but the optimiser might not always know this
-                if (all(diff(grd_sc) < 0) || all(diff(grd_sc) > 0))
-                    method <- "hyman"
-                s <- spline(x = grd, y = grd_sc, method = method)
-                Sci <- approx(x = s$y, y = s$x, xout = qp)$y
+                if (all(diff(grd_sc) < 0) || all(diff(grd_sc) > 0)) {
+                    s <- spline(x = grd, y = grd_sc, method = "hyman")
+                    Sci <- approx(x = s$y, y = s$x, xout = qp)$y
+                }
             } 
+            if (is.null(Sci))
+                Sci <- coef(object) + sqrt(vcov(object)[parm, parm]) * qp
             
             attr(Sci, "conf.level") <- level
             attr(Sci, "achieved.conf.level") <- achieved

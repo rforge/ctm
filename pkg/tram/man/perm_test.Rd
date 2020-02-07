@@ -12,10 +12,10 @@
 \usage{
 perm_test(object, ...)
 \method{perm_test}{tram}(object, parm = names(coef(object)), 
-    statistic = c("Score", "LinearScore", "Likelihood", "Wald"),
+    statistic = c("Score", "Likelihood", "Wald"),
     alternative = c("two.sided", "less", "greater"), 
     nullvalue = 0, confint = FALSE, level = .95, 
-    block_permutation = TRUE, maxsteps = 25, ...)
+    Taylor = FALSE, block_permutation = TRUE, maxsteps = 25, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -36,14 +36,18 @@ perm_test(object, ...)
           null hypothesis.}
   \item{confint}{a logical indicating whether a confidence interval should be
           computed. Score confidence intervals are computed by default. A
-          linear approximation to the Score function is used with
-          \code{LinearScore}. For the remaining options, confidence
+          1st order Taylor approximation to the Score statistc is used with
+          \code{Taylor = TRUE} (in case numerical inversion of the score
+          statistic fails, Wald-type confidence intervals relying from this approximation are
+          returned) . For the remaining likelihood and Wald statistics, confidence
           intervals are highly experimental (and probably not worth looking
           at).}
   \item{level}{the confidence level.}
   \item{block_permutation}{a logical indicating wheather stratifying
       variables shall be interpreted as blocks defining admissible
       permutations.}
+  \item{Taylor}{a logical requesting the use of a 1st order Taylor
+                approximation when inverting the score statistic.}
   \item{maxsteps}{number of function evaluations when inverting the score statistic
                   for computing confidence intervals.}
   \item{\dots}{additional arguments to \code{\link[coin]{independence_test}}.}
@@ -99,14 +103,17 @@ perm_test(object, ...)
 
   ### Score confidence interval
   confint(score_test(md))
+  confint(score_test(md, Taylor = TRUE))
 
   ### exact permutation score test
   (pt <- perm_test(md, confint = TRUE, distribution = "exact"))
+  (pt <- perm_test(md, confint = TRUE, distribution = "exact", 
+                   Taylor = TRUE))
 
   ### approximate permutation likelihood and Wald test
   (pt <- perm_test(md, statistic = c("Likelihood", "Wald"), confint = TRUE,
                    distribution = coin::approximate(1e3)))
- 
+
   ### compare with probabilistic indices obtained from asht::wmwTest
   if (require("asht", warn.conflicts = FALSE)) {
       print(wt2 <- wmwTest(pd ~ I(relevel(age, "At term")), 

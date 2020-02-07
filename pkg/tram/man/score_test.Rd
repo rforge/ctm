@@ -12,7 +12,7 @@
 score_test(object, ...)
 \method{score_test}{tram}(object, parm = names(coef(object)), 
     alternative = c("two.sided", "less", "greater"), nullvalue = 0, 
-    confint = TRUE, level = .95, maxsteps = 25, ...)
+    confint = TRUE, level = .95, Taylor = FALSE, maxsteps = 25, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -25,8 +25,14 @@ score_test(object, ...)
   \item{nullvalue}{a number specifying an optional parameter used to form the
           null hypothesis.}
   \item{confint}{a logical indicating whether a confidence interval should be
-          computed.}
+          computed. Score confidence intervals are computed by default. A
+          1st order Taylor approximation to the Score statistc is used with
+          \code{Taylor = TRUE} (in case numerical inversion of the score
+          statistic fails, Wald confidence intervals relying from this approximation are
+          returned).}
   \item{level}{the confidence level.}
+  \item{Taylor}{a logical requesting the use of a 1st order Taylor
+                approximation when inverting the score statistic.}
   \item{maxsteps}{number of function evaluations when inverting the score statistic
                   for computing confidence intervals.}
   \item{\dots}{additional arguments, currently ignored.}
