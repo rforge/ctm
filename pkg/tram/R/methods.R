@@ -340,7 +340,7 @@ score_test.tram <- function(object, parm = names(coef(object)),
             grd_sc <- numeric(length(grd))
             for (i in 1:length(grd)) {
                 grd_sc[i] <- sc(grd[i])
-                if (!is.finite(grd_sc)) break()
+                if (!is.finite(grd_sc)[1]) break()
             }
 
             if (all(is.finite(grd_sc))) {
@@ -545,7 +545,7 @@ perm_test.tram <- function(object, parm = names(coef(object)),
                 grd_sc <- numeric(length(grd))
                 for (i in 1:length(grd)) {
                     grd_sc[i] <- sc(grd[i])
-                    if (!is.finite(grd_sc)) break()
+                    if (!is.finite(grd_sc)[i]) break()
                 }
 
                 if (all(is.finite(grd_sc))) {
