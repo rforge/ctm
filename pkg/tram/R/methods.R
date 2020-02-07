@@ -336,11 +336,19 @@ score_test.tram <- function(object, parm = names(coef(object)),
             ### invert sc numerically; this may fail
             Wci <- confint(object, level = 1 - alpha / 5)[parm,]
             grd <- seq(from = Wci[1], to = Wci[2], length.out = maxsteps)
-            grd_sc <- sapply(grd, sc) 
-            if (all(diff(grd_sc) < 0) || all(diff(grd_sc) > 0)) {
-                s <- spline(x = grd, y = grd_sc, method = "hyman")
-                Sci <- approx(x = s$y, y = s$x, 
-                              xout = qnorm(c(alpha, 1 - alpha)))$y
+
+            grd_sc <- numeric(length(grd))
+            for (i in 1:length(grd)) {
+                grd_sc[i] <- sc(grd[i])
+                if (!is.finite(grd_sc)) break()
+            }
+
+            if (all(is.finite(grd_sc))) {
+                if (all(diff(grd_sc) < 0) || all(diff(grd_sc) > 0)) {
+                    s <- spline(x = grd, y = grd_sc, method = "hyman")
+                    Sci <- approx(x = s$y, y = s$x, 
+                                  xout = qnorm(c(alpha, 1 - alpha)))$y
+                }
             }
         }
         ### use Taylor approximation
@@ -533,10 +541,18 @@ perm_test.tram <- function(object, parm = names(coef(object)),
                 }
                 Wci <- confint(object, level = 1 - alpha / 5)[parm,]
                 grd <- seq(from = Wci[1], to = Wci[2], length.out = maxsteps)
-                grd_sc <- sapply(grd, sc) 
-                if (all(diff(grd_sc) < 0) || all(diff(grd_sc) > 0)) {
-                    s <- spline(x = grd, y = grd_sc, method = "hyman")
-                    Sci <- approx(x = s$y, y = s$x, xout = qp)$y
+                
+                grd_sc <- numeric(length(grd))
+                for (i in 1:length(grd)) {
+                    grd_sc[i] <- sc(grd[i])
+                    if (!is.finite(grd_sc)) break()
+                }
+
+                if (all(is.finite(grd_sc))) {
+                    if (all(diff(grd_sc) < 0) || all(diff(grd_sc) > 0)) {
+                        s <- spline(x = grd, y = grd_sc, method = "hyman")
+                        Sci <- approx(x = s$y, y = s$x, xout = qp)$y
+                    }
                 }
             } 
             if (is.null(Sci))
