@@ -2,6 +2,12 @@
 \name{NEWS}
 \title{NEWS file for the basefun package}
 
+\section{Changes in Version 1.0-7 (2020-02-13)}{
+  \itemize{
+    \item{Update citation info.}
+  }
+}
+
 \section{Changes in Version 1.0-6 (2019-10-05)}{
   \itemize{
     \item{Change name of parameter in \code{intercept\_basis} to 
@@ -9,6 +15,7 @@
           intercepts originating from other calls to \code{model.matrix}.}.
   }
 }
+
 
 \section{Changes in Version 1.0-5 (2019-06-20)}{
   \itemize{

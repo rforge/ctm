@@ -2,11 +2,18 @@
 \name{NEWS}
 \title{NEWS file for the mlt.docreg package}
 
+\section{Changes in Version 1.0-5 (2020-02-13)}{
+  \itemize{
+    \item{Update reference output.}
+  }
+}
+
 \section{Changes in Version 1.0-4 (2020-01-09)}{
   \itemize{
     \item{Update reference output.}
   }
 }
+
 
 \section{Changes in Version 1.0-3 (2019-06-20)}{
   \itemize{

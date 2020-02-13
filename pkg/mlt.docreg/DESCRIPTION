@@ -1,7 +1,7 @@
 Package: mlt.docreg
 Title: Most Likely Transformations: Documentation and Regression Tests
-Version: 1.0-4
-Date: 2020-01-09
+Version: 1.0-5
+Date: 2020-02-13
 Authors@R: person("Torsten", "Hothorn", role = c("aut", "cre"),
                   email = "Torsten.Hothorn@R-project.org", comment = c(ORCID = "0000-0001-8301-0471"))  
 Description: Additional documentation, a package vignette and 

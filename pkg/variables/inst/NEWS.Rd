@@ -2,6 +2,12 @@
 \name{NEWS}
 \title{NEWS file for the variables package}
 
+\section{Changes in Version 1.0-3 (2020-02-13)}{
+  \itemize{
+    \item{Update citation info.}
+  }
+}
+
 \section{Changes in Version 1.0-2 (2019-06-20)}{
   \itemize{
     \item{Allow for censoring in factors.}

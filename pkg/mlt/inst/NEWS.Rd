@@ -2,9 +2,10 @@
 \name{NEWS}
 \title{NEWS file for the mlt package}
 
-\section{Changes in Version 1.1-2 (2020-01-22)}{
+\section{Changes in Version 1.1-2 (2020-02-13)}{
   \itemize{
     \item{Allow permutations of single variables.}
+    \item{Update citation info.}
   }
 }
 
