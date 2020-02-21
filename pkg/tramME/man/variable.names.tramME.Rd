@@ -2,18 +2,19 @@
 % Please edit documentation in R/methods.R
 \name{variable.names.tramME}
 \alias{variable.names.tramME}
-\title{Get the baseline transformation function and its confidence
-interval}
+\title{Return variable names.}
 \usage{
-\method{variable.names}{tramME}(object, type = c("all", "response",
-  "group"), ...)
+\method{variable.names}{tramME}(object, which = c("all", "response",
+  "grouping", "shifting", "interacting"), ...)
 }
 \arguments{
 \item{object}{a tramME object (fitted or unfitted)}
 
-\item{type}{all: all non-eliminated variable names,
+\item{which}{all: all non-eliminated variable names,
 response: response variable,
-group: grouping factors for random effects.}
+grouping: grouping factors for random effects,
+shifting: shifting variables,
+interacting: interacting variables.}
 
 \item{...}{optional parameters}
 }
@@ -21,11 +22,6 @@ group: grouping factors for random effects.}
 A vector of variable names.
 }
 \description{
-For stratified models, it returns a list of data frames for each
-  evaluated on.
-Return variable names.
-}
-\details{
 Returns the variable names corresponding the selected group.
 The returned names are derived names as tramME uses them. For example, when the
 response is a Surv object, \code{variable.names} returns the name of that object, and

@@ -9,8 +9,11 @@
 ##
 ##' Unfitted tramME models can also be used for prediction as long as the coefficent
 ##' parameter are set manually (with \code{coef<-}).
+##'
+##' When \code{ranef} is equal to "zero", a vector of zeros with the right size is
+##' substituted.
 ##' @param object A tramME object
-##' @param ranef Vector of random effects
+##' @param ranef Vector of random effects or the word "zero". See details.
 ##' @param ... Additional arguments, passed to \code{\link[mlt]{predict.mlt}}.
 ##' @inheritParams mlt::predict.ctm
 ##' @return A numeric matrix of the predicted values invisibly
@@ -35,6 +38,8 @@ predict.tramME <- function(object, newdata = NULL, ranef = NULL, ...) {
   }
   stopifnot(!is.null(newdata) && !is.null(ranef))
   rsiz <- .re_size(object$model, newdata)
+  if (identical(ranef, "zero"))
+    ranef <- rep(0, sum(rsiz$bsize * rsiz$nlev))
   stopifnot(sum(rsiz$bsize * rsiz$nlev) == length(ranef)) ## check if the vector of random effects has enough distinct values
   re_struct <- .re_data(object$call$formula[-2L], data = newdata,
                         negative = FALSE) ## NOTE: set in .dummy_ctm
@@ -53,8 +58,11 @@ predict.tramME <- function(object, newdata = NULL, ranef = NULL, ...) {
 ##'
 ##' Plot the conditional distribution evaluated at a grid of possible response
 ##' values and a set of covariate and random effects values on a specified scale.
+##'
+##' When \code{ranef} is equal to "zero", a vector of zeros with the right size is
+##' substituted.
 ##' @param x A tramME object
-##' @param ranef Vector of random effects
+##' @param ranef Vector of random effects or the word "zero". See details.
 ##' @param ... Additional arguments, passed to \code{\link[mlt]{plot.mlt}}.
 ##' @inheritParams mlt::predict.ctm
 ##' @return A numeric matrix of the predicted values invisibly
@@ -75,6 +83,8 @@ plot.tramME <- function(x, newdata = NULL, ranef = NULL, ...) {
   }
   stopifnot(!is.null(newdata) && !is.null(ranef))
   rsiz <- .re_size(x$model, newdata)
+  if (identical(ranef, "zero"))
+    ranef <- rep(0, sum(rsiz$bsize * rsiz$nlev))
   stopifnot(sum(rsiz$bsize * rsiz$nlev) == length(ranef)) ## check if the vector of random effects has enough distinct values
   re_struct <- .re_data(x$call$formula[-2L], data = newdata,
                         negative = FALSE) ## NOTE: set in .dummy_ctm

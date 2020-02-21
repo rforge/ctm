@@ -10,10 +10,6 @@ fit <- CoxphME(Surv(y, uncens) ~ trt, data = eortc, log_first = TRUE, nofit = TR
 inherits(fit, "ctm")
 names(fit)
 
-## variable names
-variable.names(fit, which = "response")
-variable.names(fit)
-
 ## setting parameters
 data("sleepstudy", package = "lme4")
 mod <- LmME(Reaction ~ Days + (Days | Subject), data = sleepstudy, nofit = TRUE)
@@ -66,6 +62,12 @@ mod <- BoxCoxME(Reaction ~ Days + (Days | Subject), data = sleepstudy, nofit = T
                 order = 10, log_first = TRUE)
 chk(length(coef(mod, with_baseline = TRUE)), 11+1)
 attr(mod$model$response$basis, "log_first")
+
+## variable names
+variable.names(fit1, which = "response")
+variable.names(fit1, which = "shifting")
+variable.names(fit1, which = "grouping")
+variable.names(fit1)
 
 ## outputs/print methods
 fit1

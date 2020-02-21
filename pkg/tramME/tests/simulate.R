@@ -37,6 +37,12 @@ set.seed(123)
 s2 <- simulate(fit, bysim = FALSE, nsim = 4)
 chk(s1, s2)
 
+## check "zero" option for ranef
+nd <- sleepstudy
+s1 <- simulate(fit, newdata = nd, ranef = rep(0, 2 * nlevels(sleepstudy$Subject)), seed = 10)
+s2 <- simulate(fit, newdata = nd, ranef = "zero", seed = 10)
+chk(s1, s2)
+
 ## simulating from an unfitted model
 mod <- LmME(Reaction ~ Days + (Days | Subject), data = sleepstudy, nofit = TRUE)
 coef(mod) <- c(-1, 4, 1)

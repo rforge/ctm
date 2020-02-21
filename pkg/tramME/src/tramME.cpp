@@ -28,7 +28,8 @@ Type cdf(Type hy, int errdist) {
       out = pnorm(hy);
       break;
     case Logistic:
-      out = Type(1) / (Type(1) + exp(-hy));
+      //out = Type(1) / (Type(1) + exp(-hy));
+      out = invlogit(hy);
       break;
     case MinExtrVal:
       out = Type(1) - exp(-exp(hy));

@@ -4,9 +4,9 @@
 \alias{CoxphME}
 \title{ME version of tram::Coxph}
 \usage{
-CoxphME(formula, data, subset, weights, offset, cluster,
-  na.action = na.omit, silent = TRUE, nofit = FALSE,
-  optim_control = list(outer = list(), optim = list()), ...)
+CoxphME(formula, data, subset, weights, offset, na.action = na.omit,
+  silent = TRUE, nofit = FALSE, optim_control = list(outer = list(),
+  optim = list()), ...)
 }
 \arguments{
 \item{formula}{an object of class \code{"formula"}: a symbolic description 
@@ -34,10 +34,6 @@ CoxphME(formula, data, subset, weights, offset, cluster,
           be included in the linear predictor during fitting.  This
           should be \code{NULL} or a numeric vector of length equal to the
           number of cases.
-  }
-
-\item{cluster}{optional factor with a cluster ID employed for computing
-          clustered covariances.
   }
 
 \item{na.action}{a function which indicates what should happen when the data

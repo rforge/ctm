@@ -11,7 +11,7 @@
 
 \item{newdata}{an optional data frame of observations}
 
-\item{ranef}{Vector of random effects}
+\item{ranef}{Vector of random effects or the word "zero". See details.}
 
 \item{...}{Additional arguments, passed to \code{\link[mlt]{predict.mlt}}.}
 }
@@ -26,6 +26,10 @@ done for those values. When no response values are supplied, prediction is done 
 a grid of values.
 Unfitted tramME models can also be used for prediction as long as the coefficent
 parameter are set manually (with \code{coef<-}).
+}
+\details{
+When \code{ranef} is equal to "zero", a vector of zeros with the right size is
+substituted.
 }
 \examples{
 data("sleepstudy", package = "lme4")

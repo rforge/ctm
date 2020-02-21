@@ -34,14 +34,14 @@ chktol(names(re), rep("Subject", 2))
 
 ## confidence intervals
 data("neck_pain", package = "ordinalCont")
-fit <- ColrME(vas ~ laser * time + (1 | id), data = neck_pain,
-              bounds = c(0, 1), support = c(0, 1))
-ci <- confint(fit, pargroup = "shift", estimate = TRUE)
+fit_np <- ColrME(vas ~ laser * time + (1 | id), data = neck_pain,
+                 bounds = c(0, 1), support = c(0, 1))
+ci <- confint(fit_np, pargroup = "shift", estimate = TRUE)
 chktol(dim(ci), c(5, 3))
-ci <- confint(fit, parm = "time2", pmatch = TRUE, type = "profile",
+ci <- confint(fit_np, parm = "time2", pmatch = TRUE, type = "profile",
               parallel = "multicore", ncpus = 2)
 chktol(dim(ci), c(2, 2))
-ci <- confint(fit, "foo")
+ci <- confint(fit_np, "foo")
 chktol(dim(ci), c(0, 2))
 
 ## logLik and LR test
@@ -56,3 +56,23 @@ fit2b <- clmm2(rating ~ temp, nominal = ~ contact, random = judge, data = wine,
 lrt1 <- anova(fit1a, fit1b)
 lrt2 <- anova(fit2a, fit2b)
 chktol(lrt1$Chisq[2], lrt2$`LR stat.`[2], tol = 1e-5)
+
+## trafo (using fit_np, from CI example)
+tr <- trafo(fit_np, type = "trafo", confidence = "none", K = 100)
+nd <- data.frame(laser = factor(2, levels = c(2, 1)),
+                 time = factor(1, levels = 1:3),
+                 id = 1)
+tr2 <- predict(fit_np, newdata = nd, K = 100, ranef = "zero")
+sum((tr - tr2)[-c(1, 100)]) ## vals at bounds removed
+## -- stratified
+fit_np2 <- ColrME(vas | 0 + laser ~ time + (1 | id), data = neck_pain,
+                  bounds = c(0, 1), support = c(0, 1), order = 6)
+tr3 <- trafo(fit_np2, type = "distribution", confidence = "interval", K = 20)
+chktol(length(tr3), 2)
+chktol(dim(tr3[[1]]), c(20, 3))
+pdf(file = NULL)
+plot(tr3, xlim = c(0, 1), ylim = c(0, 1), col = c(1, 2), lwd = 2, fill = grey(0.1, 0.1),
+     main = "foo")
+tr4 <- trafo(fit_np, type = "distribution", confidence = "none", K = 100)
+plot(tr4,  col = 3, lwd = 2, add = TRUE)
+dev.off()

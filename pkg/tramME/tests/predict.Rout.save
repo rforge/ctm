@@ -56,6 +56,11 @@ null device
 > pr2 <- pnorm(as.numeric(prtr))
 > chk(c(pr), pr2)
 > 
+> ## check "zero" option of ranef
+> nd <- sleepstudy[c(4, 14, 24), ]
+> pr1 <- predict(fit, newdata = nd, ranef = rep(0, 6), q = c(300, 320), type = "distribution")
+> pr2 <- predict(fit, newdata = nd, ranef = "zero", q = c(300, 320), type = "distribution")
+> chk(pr1, pr2)
 > 
 > ## Prediction with Surv objects as response
 > data("eortc", package = "coxme")
@@ -89,4 +94,4 @@ Reaction         [,1]         [,2]
 > 
 > proc.time()
    user  system elapsed 
-  3.293   0.071   3.359 
+  4.256   0.099   4.344 

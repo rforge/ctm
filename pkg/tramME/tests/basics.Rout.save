@@ -36,12 +36,6 @@ In .tramME(formula, data, na.action = na.action, silent = silent,  :
 > names(fit)
 [1] "model"    "response" "todistr"  "bases"    "coef"    
 > 
-> ## variable names
-> variable.names(fit, which = "response")
-[1] "Surv(y, uncens)"
-> variable.names(fit)
-[1] "Surv(y, uncens)" "trt"            
-> 
 > ## setting parameters
 > data("sleepstudy", package = "lme4")
 > mod <- LmME(Reaction ~ Days + (Days | Subject), data = sleepstudy, nofit = TRUE)
@@ -104,6 +98,16 @@ Error in na.fail.default(structure(list(.index. = 1:2323, trt = c(1L,  :
 > chk(length(coef(mod, with_baseline = TRUE)), 11+1)
 > attr(mod$model$response$basis, "log_first")
 [1] TRUE
+> 
+> ## variable names
+> variable.names(fit1, which = "response")
+[1] "Surv(y, uncens)"
+> variable.names(fit1, which = "shifting")
+[1] "trt"
+> variable.names(fit1, which = "grouping")
+[1] "center"
+> variable.names(fit1)
+[1] "Surv(y, uncens)" "trt"             "center"         
 > 
 > ## outputs/print methods
 > fit1
@@ -272,4 +276,4 @@ Standard deviation:
 > 
 > proc.time()
    user  system elapsed 
-  8.991   0.071   9.057 
+  9.058   0.067   9.123 

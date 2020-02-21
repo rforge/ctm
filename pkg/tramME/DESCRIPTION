@@ -2,16 +2,16 @@ Package: tramME
 Title: Transformation Models with Mixed Effects
 Version: 0.0.1
 Authors@R: person("Balint", "Tamasi", email = "balint.tamasi@uzh.ch", role = c("aut", "cre"))
-Description: Likelihood-based estimation of mixed effects transfromation mixed models the Template
+Description: Likelihood-based estimation of mixed effects transformation models using the Template
   Model Builder (TMB). The technical details of transfromation models are given in Hothorn et al. (2018)
   <doi:10.1111/sjos.12291>. The random effects are assumed to be normally distributed on the scale of the
-  transfromation function, the marginal likelihood is approximated using Laplace's method,
+  transfromation function, the marginal likelihood is approximated using Laplace\'s method,
   and the gradients are calculated with automatic differentiation (AD).
 Depends: R (>= 3.5.0), tram (>= 0.3.2), mlt (>= 1.1.0)
 Imports: alabama, lme4 (>= 1.1.19), Matrix, methods, nlme, TMB (>=
         1.7.15), stats, variables (>= 1.0.2), basefun (>= 1.0.6)
-Suggests: parallel, survival, knitr, coxme, ordinal, ordinalCont,
-        ggplot2
+Suggests: multcomp, parallel, survival, knitr, coxme, ordinal,
+        ordinalCont, ggplot2
 LinkingTo: TMB, RcppEigen
 VignetteBuilder: knitr
 License: GPL-2
@@ -19,6 +19,6 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
 NeedsCompilation: yes
-Packaged: 2020-01-08 09:59:45 UTC; balint
+Packaged: 2020-02-21 14:29:54 UTC; balint
 Author: Balint Tamasi [aut, cre]
 Maintainer: Balint Tamasi <balint.tamasi@uzh.ch>

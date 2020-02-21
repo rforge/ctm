@@ -11,7 +11,7 @@
 
 \item{newdata}{an optional data frame of observations}
 
-\item{ranef}{Vector of random effects}
+\item{ranef}{Vector of random effects or the word "zero". See details.}
 
 \item{...}{Additional arguments, passed to \code{\link[mlt]{plot.mlt}}.}
 }
@@ -21,6 +21,10 @@ A numeric matrix of the predicted values invisibly
 \description{
 Plot the conditional distribution evaluated at a grid of possible response
 values and a set of covariate and random effects values on a specified scale.
+}
+\details{
+When \code{ranef} is equal to "zero", a vector of zeros with the right size is
+substituted.
 }
 \examples{
 data("sleepstudy", package = "lme4")

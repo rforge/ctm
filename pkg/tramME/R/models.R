@@ -215,7 +215,7 @@
 ##' @inheritParams .tramME
 ##' @importFrom stats na.omit
 ##' @export
-ColrME <- function(formula, data, subset, weights, offset, cluster, na.action = na.omit,
+ColrME <- function(formula, data, subset, weights, offset, na.action = na.omit,
                    silent = TRUE, nofit = FALSE,
                    optim_control = list(outer = list(), optim = list()),
                    ...) {
@@ -230,7 +230,7 @@ ColrME <- function(formula, data, subset, weights, offset, cluster, na.action = 
 ##' @inheritParams .tramME
 ##' @importFrom stats na.omit
 ##' @export
-LmME <- function(formula, data, subset, weights, offset, cluster, na.action = na.omit,
+LmME <- function(formula, data, subset, weights, offset, na.action = na.omit,
                  silent = TRUE, nofit = FALSE,
                  optim_control = list(outer = list(), optim = list()),
                  ...) {
@@ -245,7 +245,7 @@ LmME <- function(formula, data, subset, weights, offset, cluster, na.action = na
 ##' @inheritParams .tramME
 ##' @importFrom stats na.omit
 ##' @export
-PolrME <- function(formula, data, subset, weights, offset, cluster, na.action = na.omit,
+PolrME <- function(formula, data, subset, weights, offset, na.action = na.omit,
                    method = c("logistic", "probit", "loglog", "cloglog"),
                    silent = TRUE, nofit = FALSE,
                    optim_control = list(outer = list(), optim = list()),
@@ -261,7 +261,7 @@ PolrME <- function(formula, data, subset, weights, offset, cluster, na.action = 
 ##' @inheritParams .tramME
 ##' @importFrom stats na.omit
 ##' @export
-CoxphME <- function(formula, data, subset, weights, offset, cluster, na.action = na.omit,
+CoxphME <- function(formula, data, subset, weights, offset, na.action = na.omit,
                     silent = TRUE, nofit = FALSE,
                     optim_control = list(outer = list(), optim = list()),
                     ...) {
@@ -276,7 +276,7 @@ CoxphME <- function(formula, data, subset, weights, offset, cluster, na.action =
 ##' @inheritParams .tramME
 ##' @importFrom stats na.omit
 ##' @export
-BoxCoxME <- function(formula, data, subset, weights, offset, cluster, na.action = na.omit,
+BoxCoxME <- function(formula, data, subset, weights, offset, na.action = na.omit,
                      silent = TRUE, nofit = FALSE,
                      optim_control = list(outer = list(), optim = list()),
                      ...) {
@@ -295,7 +295,7 @@ BoxCoxME <- function(formula, data, subset, weights, offset, cluster, na.action 
 ##' @section Warning:
 ##'   Fixing the scale parameter is currently not available.
 ##' @export
-SurvregME <- function(formula, data, subset, weights, offset, cluster, na.action = na.omit,
+SurvregME <- function(formula, data, subset, weights, offset, na.action = na.omit,
                       dist = c("weibull", "logistic", "gaussian", "exponential",
                                "rayleigh", "loggaussian", "lognormal", "loglogistic"),
                       scale = 0,
@@ -319,7 +319,7 @@ SurvregME <- function(formula, data, subset, weights, offset, cluster, na.action
 ##' @inheritParams .tramME
 ##' @importFrom stats na.omit
 ##' @export
-LehmannME <- function(formula, data, subset, weights, offset, cluster, na.action = na.omit,
+LehmannME <- function(formula, data, subset, weights, offset, na.action = na.omit,
                       silent = TRUE, nofit = FALSE,
                       optim_control = list(outer = list(), optim = list()),
                       ...) {

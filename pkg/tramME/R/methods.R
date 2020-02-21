@@ -635,52 +635,6 @@ confint.LmME <- function(object, parm = NULL, level = 0.95,
   return(ci)
 }
 
-## @export
-## get_trafo <- function(x, ...) {
-##   UseMethod("get_trafo", x)
-## }
-
-##' Get the baseline transformation function and its confidence
-##' interval
-##'
-##' For stratified models, it returns a list of data frames for each
-## stratum.
-## @param object A fitted tramME object.
-## @param K Integer, number of points in the grid the function is
-##'   evaluated on.
-## @param level Confidence level.
-## @export
-## get_trafo.tramME <- function(object, K = 100L, level = 0.95) {
-##   yb <- object$model_structure$tram_model$model$bases$response
-##   ib <- object$model_structure$tram_model$model$bases$interacting
-##   ndy <- as.data.frame(mkgrid(yb, n = K))
-##   ynm <- attr(yb, "variables")$name
-##   names(ndy) <- ynm ## setting the varname to be the same as in the data
-##   ay <- model.matrix(yb, data = ndy)
-##   if (!is.null(ib)) {
-##     ndi <- expand.grid(mkgrid(ib, n = K))
-##     int <- model.matrix(ib, data = ndi)
-##     ay <- kronecker(int, ay)
-##   }
-##   th <- .par(object, "baseline")
-##   hy <- drop(ay %*% th) ## TODO: use predict from basefun?
-##   va <- drop(rowSums(ay * tcrossprod(ay, vcov(object, type = "baseline"))))
-##   se <- sqrt(va)
-##   ci <- hy + qnorm((1-level)/2) * se %o% c(1, -1)
-##   out <- cbind(ndy, data.frame(trafo = hy, lwr = ci[, 1], upr = ci[, 2]))
-##   if (!is.null(ib)) {
-##     nm <- apply(mapply(FUN = function(n, v) paste(n, "=", v),
-##                        n = colnames(ndi), v = ndi),
-##                 1, paste, collapse = ", ")
-##     out <- split(out, factor(rep(nm, each = K)))
-##   }
-##   return(out)
-## }
-## TODO: this works well with discrete strata but returns hard to interpret results,
-## when the conditioning is on continuous variables (see distribution regression)
-## write another method that retunrs the effect functionals in these cases, and call this
-## __get_trafo_ongrid__ or smth.
-
 
 ##' Return variable names.
 ##'
@@ -689,10 +643,12 @@ confint.LmME <- function(object, parm = NULL, level = 0.95,
 ##' response is a Surv object, \code{variable.names} returns the name of that object, and
 ##' the names of the variables used to create it.
 ##' @param object a tramME object (fitted or unfitted)
-##' @param type
+##' @param which
 ##'   all: all non-eliminated variable names,
 ##'   response: response variable,
-##'   group: grouping factors for random effects.
+##'   grouping: grouping factors for random effects,
+##'   shifting: shifting variables,
+##'   interacting: interacting variables.
 ##' @param ... optional parameters
 ##' @return A vector of variable names.
 ##' @examples
@@ -702,15 +658,18 @@ confint.LmME <- function(object, parm = NULL, level = 0.95,
 ##' variable.names(mod, "response")
 ##' @importFrom stats variable.names
 ##' @export
-variable.names.tramME <- function(object, type = c("all", "response", "group"), ...) {
-  type <- type[1]
+variable.names.tramME <- function(object,
+    which = c("all", "response", "grouping", "shifting", "interacting"), ...) {
+  which <- match.arg(which)
   rn <- object$model$response$name
   fen <- object$model$fixef$names
   ren <- names(object$model$ranef$names)
-  out <- switch(type,
+  out <- switch(which,
                 all = c(rn, fen, ren),
                 response = rn,
-                group = ren,
+                grouping = ren,
+                shifting = unname(variable.names(object$model$fixef$bases$shifting)),
+                interacting = unname(variable.names(object$model$fixef$bases$interacting)),
                 stop("Unknown variable group."))
   return(out)
 }

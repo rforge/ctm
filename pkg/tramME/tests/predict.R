@@ -33,6 +33,11 @@ prtr <- predict(br, newdata = nd2, coef = cf[-length(cf)]) + predict(bs, newdata
 pr2 <- pnorm(as.numeric(prtr))
 chk(c(pr), pr2)
 
+## check "zero" option of ranef
+nd <- sleepstudy[c(4, 14, 24), ]
+pr1 <- predict(fit, newdata = nd, ranef = rep(0, 6), q = c(300, 320), type = "distribution")
+pr2 <- predict(fit, newdata = nd, ranef = "zero", q = c(300, 320), type = "distribution")
+chk(pr1, pr2)
 
 ## Prediction with Surv objects as response
 data("eortc", package = "coxme")

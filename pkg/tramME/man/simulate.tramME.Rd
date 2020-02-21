@@ -17,16 +17,18 @@
 
 \item{newdata}{an optional data frame of observations}
 
-\item{ranef}{If NULL, random effects are simulated from their estimated distribution for
-each draw in nsim, i.e. the simulation is from the marginal/joint distribution of the
-response (and random effects). Otherwise the simulation is conditional on the supplied
-random effects.}
+\item{ranef}{If NULL, random effects are simulated from their estimated
+distribution for each draw in nsim, i.e. the simulation is from the
+marginal/joint distribution of the response (and random effects).
+Otherwise the simulation is conditional on the supplied random effects.
+When \code{ranef = "zero"}, a vector of zeros with the right size is
+substituted.}
 
-\item{what}{Defaults to \code{'response'}. \code{'ranef'} returns draws from the
-random effects distribution, \code{'joint'} results in simulated data from the joint
-distribution of random effects and responses.
-When it is set to other than 'response', \code{ranef=NULL} and \code{bysim=TRUE} must be
-set.}
+\item{what}{Defaults to \code{'response'}. \code{'ranef'} returns draws from
+the random effects distribution, \code{'joint'} results in simulated data
+from the joint distribution of random effects and responses. When it is
+set to other than 'response', \code{ranef=NULL} and \code{bysim=TRUE} must
+be set.}
 
 \item{bysim}{logical, if \code{TRUE} a list with \code{nsim} elements is returned,
                each element is of length \code{nrow(newdata)} and 
