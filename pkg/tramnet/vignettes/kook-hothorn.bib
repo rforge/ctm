@@ -2,10 +2,21 @@
   title = {L1 penalized estimation in the {Cox} proportional hazards model},
   author = {J. J. Goeman},
   journal = {Biometrical Journal},
-  number = {52},
-  issue = {1},
+  volume = {52},
+  number = {1},
   pages = {-14},
   year = {2010},
+}
+
+@Article{         Gneiting_Raftery_2007,
+  author        = {T. Gneiting and A. E. Raftery},
+  title         = {Strictly Proper Scoring Rules, Prediction, and
+                  Estimation},
+  year          = {2007},
+  journal       = {Journal of the American Statistical Association},
+  volume        = {102},
+  number        = {477},
+  pages         = {359--378},
 }
 
 @Article{glmnetpaper,
@@ -22,7 +33,7 @@
 @Article{COLRpaper,
   AUTHOR = {Lohse, T and Rohrmann, S and Faeh, D and Hothorn, T},
   TITLE = {Continuous outcome logistic regression for analyzing body mass
-           index distributions [version 1; peer review: 3 approved]},
+           index distributions},
   JOURNAL = {F1000Research},
   VOLUME = {6},
   YEAR = {2017},
@@ -30,18 +41,10 @@
   DOI = {10.12688/f1000research.12934.1}
 }
 
-@article{trampkg,
-  title={Transformation Models: The tram Package},
-  year = {2019},
-  author={Hothorn, Torsten},
-  note={R package vignette version 0.2-6},
-  URL = {https://CRAN.R-project.org/package=tram}
-}
-
 @article{boxcox,
   title={An analysis of transformations},
   author={Box, George EP and Cox, David R},
-  journal={Journal of the Royal Statistical Society: Series B (Methodological)},
+  journal={Journal of the Royal Statistical Society: Series B (Statistical Methodology)},
   volume={26},
   number={2},
   pages={211--243},
@@ -71,18 +74,19 @@
   publisher={Wiley Online Library}
 }
 
-@Manual{CVXRpaper,
-  title = {CVXR: Disciplined Convex Optimization},
-  author = {Anqi Fu and Balasubramanian Narasimhan and Steven Diamond and John Miller},
-  year = {2019},
-  note = {R package version 0.99-5},
-  url = {https://CRAN.R-project.org/package=CVXR},
+@article{CVXRpaper,
+  title = {{CVXR}: {An} {R} Package for Disciplined Convex Optimization},
+  author = {Anqi Fu and Balasubramanian Narasimhan and Stephen Boyd},
+  year = {2020},
+  journal = {Journal of Statistical Software},
+  note = {Accepted for publication},
+  url = {https://web.stanford.edu/~boyd/papers/pdf/cvxr_paper.pdf},
 }
 
 @article{lasso1996,
   title={Regression shrinkage and selection via the {LASSO}},
   author={Tibshirani, Robert},
-  journal={Journal of the Royal Statistical Society: Series B (Methodological)},
+  journal={Journal of the Royal Statistical Society: Series B (Statistical Methodology)},
   volume={58},
   number={1},
   pages={267--288},
@@ -115,7 +119,7 @@
 @article{efron2004,
   title={Least angle regression},
   author={Efron, Bradley and Hastie, Trevor and Johnstone, Iain and Tibshirani, Robert and others},
-  journal={The Annals of statistics},
+  journal={The Annals of Statistics},
   volume={32},
   number={2},
   pages={407--499},
@@ -126,31 +130,27 @@
 @incollection{DCPpaper,
   title={Disciplined convex programming},
   author={Grant, Michael and Boyd, Stephen and Ye, Yinyu},
-  booktitle={Global optimization},
+  booktitle={Global Optimization},
   pages={155--210},
   year={2006},
   publisher={Springer}
 }
 
-@Manual{mltdocreg,
-  title = {mlt.docreg: Most Likely Transformations: Documentation and Regression Tests},
-  author = {Torsten Hothorn},
-  year = {2019},
-  note = {R package version 1.0-3},
-  url = {https://CRAN.R-project.org/package=mlt.docreg},
-}
-
 @Article{mltjss,
-    title = {Most Likely Transformations: The mlt Package},
-    author = {Torsten Hothorn},
-    journal = {Journal of Statistical Software},
-    year = {2018},
+  author = {Torsten Hothorn},
+  title = {Most Likely Transformations: The mlt Package},
+  journal = {Journal of Statistical Software},
+  year = 2020,
+  doi = {10.18637/jss.v092.i01},
+  volume = 92,
+  number = 1,
+  pages = {1--68},
 }
 
 @incollection{BH2,
   title={The hedonic price approach to measuring demand for neighborhood characteristics},
   author={Freeman III, A Myrick},
-  booktitle={The economics of neighborhood},
+  booktitle={The Economics of Neighborhood},
   pages={191--217},
   year={1979},
   publisher={Elsevier}
@@ -172,7 +172,7 @@
 
 @article{lehmann1953,
   title={The power of rank tests},
-  author={Lehmann, Erich L and others},
+  author={Erich L.~Lehmann},
   journal={The Annals of Mathematical Statistics},
   volume={24},
   number={1},
@@ -181,42 +181,14 @@
   publisher={Institute of Mathematical Statistics}
 }
 
-@article{good1952,
- URL = {http://www.jstor.org/stable/2984087},
- abstract = {This paper deals first with the relationship between the theory of probability and the theory of rational behaviour. A method is then suggested for encouraging people to make accurate probability estimates, a connection with the theory of information being mentioned. Finally Wald's theory of statistical decision functions is summarised and generalised and its relation to the theory of rational behaviour is discussed.},
- author = {I. J. Good},
- journal = {Journal of the Royal Statistical Society. Series B (Methodological)},
- number = {1},
- pages = {107--114},
- publisher = {[Royal Statistical Society, Wiley]},
- title = {Rational Decisions},
- volume = {14},
- year = {1952}
-}
-
-@Manual{pkg:trtf,
-  title = {trtf: Transformation Trees and Forests},
-  author = {Torsten Hothorn},
-  year = {2019},
-  note = {R package version 0.3-5},
-  url = {https://CRAN.R-project.org/package=trtf},
-}
-
 @article{hothorn2019tbm,
-  title={Transformation boosting machines},
-  author={Hothorn, Torsten},
-  journal={Statistics and Computing},
-  pages={1--12},
-  year={2019},
-  publisher={Springer}
-}
-
-@Manual{pkg:tbm,
-  title = {tbm: Transformation Boosting Machines},
   author = {Torsten Hothorn},
-  year = {2019},
-  note = {R package version 0.3-0},
-  url = {https://CRAN.R-project.org/package=tbm},
+  title = {Transformation Boosting Machines},
+  year = 2020,
+  journal = {Statistics and Computing},
+  volume = 30,
+  pages = {141--152},
+  doi = {10.1007/s11222-019-09870-4}
 }
 
 @Manual{mlrMBO,
@@ -267,8 +239,8 @@
 }
 
 @book{boyd2004convex,
-  title={Convex optimization},
+  title={Convex Optimization},
   author={Boyd, Stephen and Vandenberghe, Lieven},
   year={2004},
-  publisher={Cambridge university press}
+  publisher={Cambridge University Press}
 }

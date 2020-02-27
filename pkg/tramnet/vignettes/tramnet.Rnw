@@ -1,6 +1,6 @@
 %\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{tramnet}
-%\VignetteDepends{tramnet, lattice, colorspace, penalized, glmnet, mvtnorm, Matrix, kableExtra, coin}
+%\VignetteDepends{tramnet, lattice, colorspace, penalized, glmnet, mvtnorm, Matrix, kableExtra, coin, trtf, tbm, tram}
 
 \documentclass[a4paper]{report}
 \usepackage[utf8]{inputenc}
@@ -437,8 +437,8 @@
 
 \newcommand{\cmd}[1]{\texttt{#1()}}
 \newcommand{\cls}[1]{\texttt{"#1"}}
-\newcommand{\pll}{\tilde\ell(\parm,\shiftparm,\lambda,\alpha;\ry, \rx)}
-\newcommand{\ull}{\ell(\parm,\shiftparm;\ry, \rx)}
+\newcommand{\pll}{\tilde\ell(\parm,\shiftparm,\lambda,\alpha;\ry, \rs, \rx)}
+\newcommand{\ull}{\ell(\parm,\shiftparm;\ry, \rs, \rx)}
 \newcommand{\llpen}{\lambda\left(\alpha \norm{\shiftparm}_1 + \frac{1}{2}
 	(1-\alpha) \norm{\shiftparm}_2^2 \right)}
 \newcommand{\norm}[1]{\left\lVert#1\right\rVert}
@@ -522,18 +522,18 @@ library("Matrix")
 \maketitle
 
 \abstract{
-  The \pkg{tramnet} package implements regularized linear and stratified linear
+  The \pkg{tramnet} package implements regularized linear 
   transformation models by combining the flexible class of transformation
   models from \pkg{tram} with constrained convex optimization implemented in \pkg{CVXR}.
   Regularized transformation models unify many existing and novel regularized regression
-  models under one theoretical and computational framework by harnessing the known
-  curvature of the transformation model log-likelihood under any form of censoring.
-  Regularization strategies include the LASSO, ridge regression and the elastic net and
+  models under one theoretical and computational framework.
+  Regularization strategies implemented for transformation models in \pkg{tramnet} 
+  include the LASSO, ridge regression and the elastic net and
   follow the parametrization in \pkg{glmnet}. Several functionalities
   for optimizing the hyperparameters, including model-based optimization based on
   the \pkg{mlrMBO} package, are implemented. A multitude of \code{S3} methods
   are deployed for visualization, handling and simulation purposes. This work
-  aims at illustrating all facets of \pkg{tramnet} in real-world data and comparing
+  aims at illustrating all facets of \pkg{tramnet} in realistic settings and comparing
   regularized transformation models with existing implementations of similar models.
 }%%%
 
@@ -547,27 +547,26 @@ models via penalized maximum likelihood, such as \pkg{penalized}
 \citep{penalizedpaper} and \pkg{glmnet} \citep{glmnetpaper}. Both packages come
 with an extension to fit a penalized form of the Cox proportional hazard model.
 The \pkg{tramnet} package aims at unifying the above mentioned and several
-novel models in one maximum-likelihood-based framework, namely
-regularized transformation models. Novel models include Continuous Outcome
+novel models using the theoretical and computational framework of
+transformation models. Novel models in this class include Continuous Outcome
 Logistic Regression (COLR) as introduced by \citet{COLRpaper} and Box-Cox type
 regression models with a transformed conditionally normal response \citep{boxcox,
-trampkg}. In addition to the common underlying statistical theory,
-\pkg{tramnet}'s models can be estimated in a common computational framework by
-making use of the known curvature of the log-likelihood with respect to the model
-parameters.
-The disciplined convex optimization package \pkg{CVXR} \citep{CVXRpaper} is used
-to solve the constrained convex optimization problems that arise when fitting
-regularized transformation models. Transformation models are introduced in section
-\ref{subsec:tram}, for a more theoretical treatise see \citet{ctmpaper, mltpaper, mltjss}.
-Convex optimization and domain specific languages are briefly discussed in section
-\ref{subsec:CVXR}, followed by a treatment of model-based optimization for
-hyperparameter tuning (\ref{subsec:mbo}).
+pkg:tram}. 
+
+The disciplined convex optimization package \pkg{CVXR} \citep{CVXRpaper} is
+applied to solve the constrained convex optimization problems that arise
+when fitting regularized transformation models.  Transformation models are
+introduced in Section~\ref{subsec:tram}, for a more theoretical treatise we
+refer to \citet{ctmpaper, mltpaper, mltjss}.  Convex optimization and domain
+specific languages are briefly discussed in Section~\ref{subsec:CVXR},
+followed by a treatment of model-based optimization for hyperparameter
+tuning (\ref{subsec:mbo}).
 
 \subsection{Transformation models} \label{subsec:tram}
 
 In stark contrast to penalized generalized linear models, regularized
-transformation models estimate the response's whole conditional distribution
-instead of focusing on a single moment, e.g. the conditional mean.
+transformation models aim at estimating the response's whole conditional distribution
+instead of focusing on a single moment, \eg the conditional mean.
 This conditional distribution function of a response $\rY$ is decomposed into an
 \textit{a priori} chosen absolute continuous and log-concave error distribution
 $F$ and a conditional transformation function $\h(\ry \given \rx, \rs)$ that depends
@@ -578,9 +577,8 @@ increasing in $\ry$.
 %   \Prb\left(\rY \le \ry \given \rX = \rx\right) = \pY\left(\rY \given \rX = \rx\right)
 % \end{aligned}
 % \end{eqnarray}
-In theory this complex baseline transformation $\h(\ry \given \rx, \rs)$ allows
-response varying effects for all covariates. However, packages \pkg{tram} and
-\pkg{tramnet} focus on stratified linear transformation models of the form
+Although the model class is more flexible, 
+packages \pkg{tram} and \pkg{tramnet} focus on stratified linear transformation models of the form
 % \begin{eqnarray*}
 % 	F\left(\h(\ry \given \rx)\right) = F\left(\h(\ry) -
 % 	\tilde\rx^\top\shiftparm\right),
@@ -589,22 +587,23 @@ response varying effects for all covariates. However, packages \pkg{tram} and
 % transformation $\h(\ry)$ which now only depends on the response $\ry$. An
 % additional layer of complexity, akin to equation \eqref{eq:ctm}, can be introduced
 % using stratum variables $\rs$, resulting in transformation models of the form
-\begin{eqnarray*}
+\begin{eqnarray} \label{fm:trafo}
 	\Prb\left(\rY \le \ry \given \rX = \rx, \rS = \rs \right) =
 	F\left(\h(\ry \given \rs, \rx)\right) = F\left(\h(\ry \given \rs) -
 	\rx^\top\shiftparm\right).
-\end{eqnarray*}
+\end{eqnarray}
 Here, the baseline transformation is allowed to vary with stratum variables $\rs$,
 while covariate effects $\shiftparm$ are restricted to be shifts common to all
 baseline transformations $\h(\ry \given \rs)$.
 
 % \subsection{Parametrization of the baseline transformation}
 
-In order for $\pY$ to be a valid cumulative distribution function,
-$F\left(\h(\ry \given \rx)\right)$ has to be monotone increasing in $\ry$ and thus in
-$\h$. To ensure monotonicity, $\h$ is parametrized in terms of a basis
-expansion using Bernstein polynomials as implemented in the \pkg{basefun} package
-\citep{mltdocreg}. Hence, $\h$ is of the form
+In order for the model to represent a valid cumulative distribution function,
+$F\left(\h(\ry \given \rs, \rx)\right)$ has to be monotone increasing in $\ry$ and thus in
+$\h$ for all possible strata $\rs$ and all possible configurations of the
+covariates $\rx$. To ensure monotonicity, $\h$ is parametrized in terms of a basis
+expansion using Bernstein polynomials as implemented in the \pkg{basefun}
+package \citep{mltjss}. Hence, $\h$ is of the form
 \begin{eqnarray*}
 	\h(\ry) = \bern{p}(\ry)^\top \parm,
 \end{eqnarray*}
@@ -617,7 +616,7 @@ $\bern{p}(\ry)^\top \parm$ is monotone increasing in $\ry$ as long as
 \end{array}
 \end{eqnarray}
 holds. For the concrete parameterization of stratified linear transformation
-models the reader is referred to \citet{trampkg}.
+models the reader is referred to \citet{pkg:tram}.
 
 % \subsection{Likelihood contributions} \label{subsec:likelihoods}
 
@@ -627,35 +626,36 @@ ordered and continuous responses, as well as exponential, Weibull and Rayleigh
 regression and the Cox model in survival analysis. Thus, by appropriately choosing
 and parametrizing $F$ and $\h$ one can understand all those models in the same
 maximum likelihood-based framework. One can formulate the corresponding likelihood
-contributions not only for exact observations, but under any form of uninformative
-censoring and truncation.
+contributions not only for exact observations, but under any form of random 
+censoring and truncation for continuous and discrete or ordered categorical
+responses.
 
 Given a univariate response $\rY$ and a set of covariates $\rX$ one can specify
 the following cumulative distribution function and density valid for any linear
 transformation model,
 \begin{eqnarray*}
   \begin{aligned}
-  	\pYx(\ry \given \rx) &= F\left(\h(\ry) - \rx^\top \shiftparm \right), \\
-  	\dYx(\ry \given \rx) &= F'\left(\h(\ry) - \rx^\top \shiftparm \right)
-  	\cdot \h'(\ry).
+  	\pYx(\ry \given \rs, \rx) &= F\left(\h(\ry \mid \rs) - \rx^\top \shiftparm \right), \\
+  	\dYx(\ry \given \rs, \rx) &= F'\left(\h(\ry \mid \rs) - \rx^\top \shiftparm \right)
+  	\cdot \h'(\ry \mid \rs).
   \end{aligned}
 \end{eqnarray*}
 From here, the log-likelihood contributions for exact, right, left, and interval
 censored responses can be derived as
 \begin{eqnarray*}
   \begin{aligned}
-  	\ell_i(\parm,\shiftparm;\ry_i, \rx_i) &=
+  	\ell_i(\parm,\shiftparm;\ry_i, \rs_i, \rx_i) &=
   	\left\{
   	\begin{array}{lll}
-  	  \log\left(F'\left(\h\left(\ry_i \right) - \rx_i^\top \shiftparm
-  	  \right)\right) + \log\left(\h'(\ry_i)\right) & \ry_i & \text{exact}\\
-  	  \log\left(F\left(\h(\bar{\ry}) - \rx_i^\top \shiftparm\right)
+  	  \log\left(F'\left(\h\left(\ry_i \mid \rs_i \right) - \rx_i^\top \shiftparm
+  	  \right)\right) + \log\left(\h'(\ry_i \mid \rs_i)\right) & \ry_i & \text{exact}\\
+  	  \log\left(F\left(\h(\bar{\ry} \mid \rs_i) - \rx_i^\top \shiftparm\right)
   	  \right) & \ry_i  \in (-\infty, \bar{y}] & \text{left} \\
   	   \log\left(1 -
-  	  F\left(\h(\ubar{\ry}) - \rx_i^\top \shiftparm\right)\right) &
+  	  F\left(\h(\ubar{\ry} \mid \rs_i) - \rx_i^\top \shiftparm\right)\right) &
   	  \ry_i \in (\ubar{\ry}, \infty) & \text{right} \\
-  	  \log\left(F\left(\h(\bar{\ry}) - \rx_i^\top \shiftparm\right) -
-  	  F\left(\h(\ubar{\ry}) - \rx_i^\top \shiftparm\right)\right) &
+  	  \log\left(F\left(\h(\bar{\ry} \mid \rs_i) - \rx_i^\top \shiftparm\right) -
+  	  F\left(\h(\ubar{\ry} \mid \rs_i) - \rx_i^\top \shiftparm\right)\right) &
   	  \ry_i \in (\ubar{\ry}, \bar{\ry}] & \text{interval}.  \\
   	\end{array}
   	\right.
@@ -663,7 +663,8 @@ censored responses can be derived as
 \end{eqnarray*}
 The joint log-likelihood of several observations $\ry_1, \dots, \ry_n$ is obtained
 by summing over the individual log-likelihood contributions $\ell_i$ under the
-assumption that the individual samples are independent and identically distributed.
+assumption that the individual samples are independent and identically
+distributed, the case exclusively dealt with by \pkg{tramnet}.
 
 \subsection{Regularization} \label{regul}
 
@@ -734,8 +735,9 @@ $\mA \in \mathbb{R}^{n \times p}$ and $\bvec \in \mathbb{R}^p$ parametrize any
 equality constraints on $\parm$. Importantly, the objective function and all
 inequality constraint functions are convex \citep{boyd2004convex}.
 
-In the case of transformation model negative log-likelihoods the requirement of
-convexity is fulfilled by construction \citep{mltpaper}. Log-convexity
+The likelihood $\sum_i \ell_i(\parm, \shiftparm; \ry_i, \rs_i, \rx_i)$ for
+transformation models of the form (\ref{fm:trafo}) are convex for error
+distributions with log-concave density, because log-convexity
 of $-{F'}$ ensures the existence and uniqueness of the most likely transformation
 $\hat\h(\ry)$ and the convexity of $-\ell(\h; \ry, \rx)$.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -759,13 +761,16 @@ $\hat\h(\ry)$ and the convexity of $-\ell(\h; \ry, \rx)$.
 % holds $\forall\rz\in\mathbb{R}$. Log-convexity of $-{F'}$ then follows.
 % \end{exmpl}
 %-------------------------------------------------------------------------------
-Since the penalty term $$\llpen$$ is convex in $\shiftparm$, it can
+Because the penalty term $$\llpen$$ is convex in $\shiftparm$, it can
 be added to the negative log-likelihood while conserving convexity.
 However, monotonicity of $\h$ imposes inequality constraints on the parameters
 of the baseline transformation as illustrated in equation~\eqref{eq:const}.
 The elegance of domain-specific language based optimizers comes to play when adding
 these and potential other inequality or equality constraints to the objective
-function, which will be showcased in section \ref{subsec:otherconstr}.
+function, which will be showcased in Section~\ref{subsec:otherconstr}.
+Thus, the optimisation routines implemented in package \pkg{CVXR} can be
+applied for computing maximum likelihood estimates of the parameters of
+model (\ref{fm:trafo}).
 
 \subsection{Model-based optimization} \label{subsec:mbo}
 
@@ -776,7 +781,7 @@ advantages and disadvantages. Naive or random grid search for more than one
 tuning parameter are computationally demanding, especially if the objective function
 is expensive to evaluate. Model-based optimization circumvents this issue by
 fitting a surrogate model, usually a Gaussian process, to the objective function.
-The objective function is evaluated at an initial, e.g. a random latin hypercube,
+The objective function is evaluated at an initial, \eg a random latin hypercube,
 design, to which the Gaussian process is subsequently fit. The surrogate model
 then proposes the next set of hyperparameters to evaluate the objective function
 at by some  infill criterion \citep{mbopaper}.
@@ -818,7 +823,7 @@ S3 methods accompanying the \cls{tramnet} class will be discussed in section
 
 Specific combinations of $F$ and the form of censoring yield log-log-concave
 log-likelihoods. Under these circumstances \pkg{tramnet} is not yet able to solve
-the resulting optimization problem. With the next update of \pkg{CVXR}, disciplined
+the resulting optimization problem. In future versions \pkg{CVXR}, disciplined
 geometric programming will be added, which will solve this problem. Table \ref{tab:models}
 indicates which model class can be fitted under what type of censoring in the
 current version of \pkg{tramnet}.
@@ -870,10 +875,11 @@ Gleason score 4 or 5 (\code{pgg45}) as covariates.
 
 \subsection{Linear and Box-Cox type regression models}
 
-Zou \& Hastie imposed a strong assumption on the conditional distribution of the
+\citet{zou2005regularization} imposed an assumption on the conditional distribution of the
 response by log-transforming and fitting a linear model. In the following it is
-shown that this restrictive assumption may be overcome by estimating the baseline
-transformation from the data. The linear models in \code{lpsa} and $\log($\code{psa}$)$
+shown that the impact of this assumption may be assessed by estimating the baseline
+transformation from the data, followed by a comparison with the
+log-transformation applied by \citet{zou2005regularization}. The linear models in \code{lpsa} and $\log($\code{psa}$)$
 are compared to transformation models with basis expansions in both $\log($\code{psa}$)$
 and \code{psa}, while specifying conditional normality of the transformed response.
 Additionally, the models are compared to an alternative implementation of regularized
@@ -969,8 +975,8 @@ m01 <- BoxCox(psa ~ 1, data = Prostate, order = ord,
 mt1 <- tramnet(m01, x = x, alpha = 0, lambda = 0)
 @
 The Box-Cox type regression model is then estimated with the \cmd{BoxCox} function,
-while specifying the appropriate maximum order of the Bernstein polynomial. Since
-the more flexible transformation slightly deviates from being linear, the normal
+while specifying the appropriate maximum order of the Bernstein polynomial.
+Because, the more flexible transformation slightly deviates from being linear, the normal
 linear model yields a smaller log-likelihood (\emph{cf.} Table \ref{tab:prostatemods}).
 To make sure that this improvement is not due to the increased number of parameters
 and hence overfitting, the models predictive capacities could be compared via
@@ -1100,7 +1106,7 @@ In the framework of regularized transformation models it is very natural to choo
 the out-of-sample log-likelihood as the objective function, because
 the notion of a mean square loss does not make sense for survival, let alone
 censored outcomes. The out-of-sample log-likelihood is in fact the log score,
-which is a proper scoring rule \citep{good1952}.
+which is a proper scoring rule \citep{Gneiting_Raftery_2007}.
 <<cvl_prof_setup>>=
 m0 <- BoxCox(lpsa ~ 1, data = Prostate, order = 7, extrapolate = TRUE)
 mt <- tramnet(m01, x = x, alpha = 1, lambda = 0)
@@ -1230,7 +1236,7 @@ one would supply an identity matrix of dimension $p$ for the left hand side and
 the zero $p$-vector for the left hand side, as done in the following example.
 <<addconst>>=
 m0 <- BoxCox(lpsa ~ 1, data = Prostate, extrapolate = TRUE)
-mt <- tramnet(m0, x, alpha = 0, lambda = 0, constraints = list(diag(rep(1, 8)),
+mt <- tramnet(m0, x, alpha = 0, lambda = 0, constraints = list(diag(8),
                                                                rep(0, 8)))
 coef(mt)
 @
@@ -1347,12 +1353,12 @@ Lastly, \cmd{residuals.tramnet} computes the generalized residual $r$ defined as
 the score contribution for sample $i$ with respect to a newly introduced intercept
 parameter $\gamma$, which is restricted to be zero. In particular,
 \begin{eqnarray*}
-  r = \frac{\partial \ell\left(\parm,\shiftparm,\gamma;\ry,\rx\right)}{\partial
+  r = \frac{\partial \ell\left(\parm,\shiftparm,\gamma;\ry, \rs, \rx\right)}{\partial
     \gamma} \bigg\rvert_{\gamma = 0}
 \end{eqnarray*}
 yields the generalized residual with respect to $\gamma$ for the model
 \begin{eqnarray*}
-  \pY(\ry \given \rx) = F\left(\h(y) - \rx^\top \shiftparm - \gamma \right).
+  \pY(\ry \given \rs, \rx) = F\left(\h(y \mid \rs) - \rx^\top \shiftparm - \gamma \right).
 \end{eqnarray*}
 <<residuals_method>>=
 residuals(mtmbo)[1:5]
@@ -1378,8 +1384,8 @@ it <- independence_test(r ~ age + lcp, data = Prostate,
                         teststat = "max", distribution = approximate(1e6))
 pvalue(it, "single-step")
 @
-Because there is substantial evidence to reject the null hypothesis, that the
-residuals are independent from either lcp or age, we can conclude that it is
+Because there is substantial evidence against independence of the models' residuals 
+to either lcp or age, we can conclude that it is
 worthwhile to include \code{age} and \code{lcp} in the model.
 Packages \pkg{trtf} \citep{pkg:trtf} and \pkg{tbm} \citep{hothorn2019tbm,pkg:tbm}
 make use of this definition of a residual for estimating and boosting transformation models,
@@ -1389,7 +1395,7 @@ the above mentioned publications.
 %EOF%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
-\bibliography{kook-hothorn}
+\bibliography{kook-hothorn,packages}
 
 \address{Lucas Kook, Torsten Hothorn\\
   Institut f\"ur Epidemiologie, Biostatistik und Pr\"avention \\
@@ -1399,6 +1405,33 @@ the above mentioned publications.
   \email{lucasheinrich.kook@uzh.ch}, \email{Torsten.Hothorn@R-project.org}}
 
 \newpage
+
+<<packages, echo = FALSE, results = "hide">>=
+if (file.exists("packages.bib")) file.remove("packages.bib")
+pkgversion <- function(pkg) {
+    pkgbib(pkg)
+    packageDescription(pkg)$Version
+}
+pkgbib <- function(pkg) {
+    x <- citation(package = pkg, auto = TRUE)[[1]]
+    b <- toBibtex(x)
+    b <- gsub("Buehlmann", "B{\\\\\"u}hlmann", b)
+    b[1] <- paste("@Manual{pkg:", pkg, ",", sep = "")
+    if (is.na(b["url"])) {
+        b[length(b)] <- paste("   URL = {http://CRAN.R-project.org/package=",
+                              pkg, "}", sep = "")
+        b <- c(b, "}")
+    }
+    cat(b, sep = "\n", file = "packages.bib", append = TRUE)
+}
+pkg <- function(pkg)
+    paste("\\\\pkg{", pkg, "} \\\\citep[version~",
+          pkgversion(pkg), ",][]{pkg:", pkg, "}", sep = "")
+pkg("tram")
+pkg("trtf")
+pkg("tbm")
+@
+
 <<sesinf, echo=FALSE>>=
 sessionInfo()
 @
