@@ -2,11 +2,11 @@ Package: tramnet
 Title: Penalized Transformation Models
 Version: 0.0-2
 Date: 2019-11-11
-Authors@R: c(person("Lucas Heinrich", "Kook", role = "aut"),
+Authors@R: c(person("Lucas Heinrich", "Kook", role = "cre"),
              person("Balint", "Tamasi", role = "aut"),
              person("Sandra", "Siegfried", role = "ctb"),
              person("Samuel", "Pawel", role = "ctb"),
-             person("Torsten", "Hothorn", role = c("cre"),
+             person("Torsten", "Hothorn", role = "ctb",
                     email = "Torsten.Hothorn@R-project.org", 
                     comment = c(ORCID = "0000-0001-8301-0471")))
 Description: Partially penalized versions of specific transformation models
