@@ -18,7 +18,7 @@ Description: Partially penalized versions of specific transformation models
 Depends: R (>= 3.5.0), tram (>= 0.3-2), CVXR (>= 0.99-4), mlrMBO (>= 1.1-2)
 Imports: mlt, basefun, sandwich, ParamHelpers, lhs, mlr, smoof, stats
 Suggests: penalized, TH.data, survival, knitr, mlbench, colorspace, mvtnorm, 
-    glmnet, trtf, Matrix, lasso2, lattice, kableExtra, coin
+    glmnet, trtf, Matrix, lasso2, lattice, kableExtra, coin, tbm
 VignetteBuilder: knitr
 Encoding: UTF-8
 License: GPL-2
