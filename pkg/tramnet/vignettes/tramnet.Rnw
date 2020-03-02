@@ -823,10 +823,11 @@ S3 methods accompanying the \cls{tramnet} class will be discussed in section
 
 Specific combinations of $F$ and the form of censoring yield log-log-concave
 log-likelihoods. Under these circumstances \pkg{tramnet} is not yet able to solve
-the resulting optimization problem. In future versions \pkg{CVXR}, disciplined
-geometric programming will be added, which will solve this problem. Table \ref{tab:models}
-indicates which model class can be fitted under what type of censoring in the
-current version of \pkg{tramnet}.
+the resulting optimization problem. 
+% In future versions \pkg{CVXR}, disciplined
+% geometric programming will be added, which will solve this problem. 
+Table \ref{tab:models} indicates which model class can be fitted under what type 
+of censoring in the current version of \pkg{tramnet}.
 
 \begin{table}
   \centering
