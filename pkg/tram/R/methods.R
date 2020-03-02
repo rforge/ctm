@@ -86,10 +86,11 @@ vcov.tram <- function(object, with_baseline = FALSE, complete = FALSE, ...)
     ### return Schur complement
     H <- Hessian(as.mlt(object), ...)
     shift <- which(colnames(H) %in% object$shiftcoef)
-    Hlin <- H[shift, shift]
-    Hbase <- H[-shift, -shift]
-    Hoff <- H[shift, -shift]
-    H <- try(Hlin - tcrossprod(Hoff %*% solve(Hbase), Hoff))
+    Hlin <- H[shift, shift, drop = FALSE]
+    Hbase <- H[-shift, -shift, drop = FALSE]
+    Hoff <- H[shift, -shift, drop = FALSE]
+    ### H <- try(Hlin - tcrossprod(Hoff %*% solve(Hbase), Hoff))
+    H <- try(Hlin - Hoff %*% solve(Hbase, t(Hoff)))
     if (inherits(H, "try-error"))
         return(vcov(as.mlt(object))[shift, shift])
     ret <- solve(H)
