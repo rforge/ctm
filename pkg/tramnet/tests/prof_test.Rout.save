@@ -34,8 +34,6 @@ The following object is masked from 'package:stats':
 Loading required package: mlrMBO
 Loading required package: mlr
 Loading required package: ParamHelpers
-'mlr' is in maintenance mode since July 2019. Future development
-efforts will go into its successor 'mlr3' (<https://mlr3.mlr-org.com>).
 Loading required package: smoof
 Loading required package: BBmisc
 
@@ -72,9 +70,9 @@ $cfx
         DIAPH3 NUSAP1   TSPYL5  C20orf46
 [1,] -2.19e-01  0.769 2.11e-02 -1.32e-02
 [2,] -1.92e-01  0.738 1.19e-02 -4.71e-03
-[3,] -1.22e-01  0.660 1.08e-08 -9.82e-09
-[4,] -5.71e-10  0.481 6.48e-11 -4.09e-10
-[5,]  4.60e-10  0.202 4.26e-11 -3.45e-11
+[3,] -1.22e-01  0.660 3.90e-09 -3.58e-09
+[4,] -4.90e-10  0.481 5.55e-11 -3.51e-10
+[5,]  2.29e-10  0.202 1.38e-11 -1.13e-11
 
 $lls
 [1] -182 -183 -183 -185 -189
@@ -109,7 +107,7 @@ $cfx
 [2,] -0.175  0.713 1.32e-02 -8.32e-03
 [3,] -0.164  0.703 7.12e-03 -2.16e-03
 [4,] -0.152  0.691 1.73e-03 -1.32e-08
-[5,] -0.139  0.680 1.04e-08 -4.76e-09
+[5,] -0.139  0.680 2.84e-08 -1.30e-08
 
 $lls
 [1] -183 -183 -183 -183 -183
@@ -131,4 +129,4 @@ Warning messages:
 > 
 > proc.time()
    user  system elapsed 
- 21.474   0.163  21.628 
+ 96.360   0.612  97.048 

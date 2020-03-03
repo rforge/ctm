@@ -35,8 +35,6 @@ The following object is masked from 'package:stats':
 Loading required package: mlrMBO
 Loading required package: mlr
 Loading required package: ParamHelpers
-'mlr' is in maintenance mode since July 2019. Future development
-efforts will go into its successor 'mlr3' (<https://mlr3.mlr-org.com>).
 Loading required package: smoof
 Loading required package: BBmisc
 
@@ -62,7 +60,7 @@ Loading required package: checkmate
 > yCOLRb <- Coxph(Surv(time, cens) ~ horTh, data = GBSG2, log_first = TRUE, order = 10)
 > max(abs(coef(yCOLRb, with_baseline = FALSE) -
 +         coef(modCOLR, with_baseline = FALSE)))
-[1] 3.22e-05
+[1] 3.21e-05
 > logLik(yCOLRb)
 'log Lik.' -2606 (df=12)
 > logLik(modCOLR)
@@ -104,4 +102,4 @@ Loading required package: checkmate
 > 
 > proc.time()
    user  system elapsed 
-  4.739   0.118   4.849 
+ 19.308   0.368  19.690 

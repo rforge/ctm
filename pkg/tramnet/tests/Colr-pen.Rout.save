@@ -35,8 +35,6 @@ The following object is masked from 'package:stats':
 Loading required package: mlrMBO
 Loading required package: mlr
 Loading required package: ParamHelpers
-'mlr' is in maintenance mode since July 2019. Future development
-efforts will go into its successor 'mlr3' (<https://mlr3.mlr-org.com>).
 Loading required package: smoof
 Loading required package: BBmisc
 
@@ -63,7 +61,7 @@ Loading required package: checkmate
 > yCOLRb <- Colr(surv ~ horTh, data = GBSG2, log_first = TRUE, order = 10)
 > max(abs(coef(yCOLRb, with_baseline = FALSE) -
 +         coef(modCOLR, with_baseline = FALSE)))
-[1] 0.000298
+[1] 0.000299
 > logLik(yCOLRb)
 'log Lik.' -2606 (df=12)
 > logLik(modCOLR)
@@ -97,10 +95,10 @@ Response []
 <EMPTY BODY>
 > head(estfun(modCOLR))
      Bs1(surv) Bs2(surv) Bs3(surv) Bs4(surv) Bs5(surv) Bs6(surv) Bs7(surv)
-[1,]  1.92e-06  6.75e-05   0.00104   0.00931    0.0523   0.18927  0.424167
+[1,]  1.92e-06  6.75e-05   0.00104   0.00931    0.0523   0.18927  0.424166
 [2,]  8.23e-08  4.32e-06   0.00010   0.00134    0.0114   0.06352  0.225441
 [3,]  1.11e-01  3.20e-01   0.28112  -0.10830   -0.4408  -0.43257 -0.236106
-[4,]  2.09e-06  7.23e-05   0.00110   0.00966    0.0533   0.18843  0.408452
+[4,]  2.09e-06  7.23e-05   0.00110   0.00966    0.0533   0.18843  0.408451
 [5,]  7.30e-02  2.79e-01   0.39193   0.13843   -0.2838  -0.46049 -0.335369
 [6,]  8.86e-01 -6.62e-01  -0.67059  -0.22353   -0.0411  -0.00475 -0.000363
      Bs8(surv) Bs9(surv) Bs10(surv) Bs11(surv)   horTh
@@ -143,7 +141,7 @@ lambda  alpha
 > yCOLRb <- Colr(Surv(time, time, cens, type = "interval") ~ horTh, data = GBSG2, log_first = TRUE, order = 10)
 > max(abs(coef(yCOLRb, with_baseline = FALSE) -
 +         coef(modCOLR, with_baseline = FALSE)))
-[1] 4.29e-05
+[1] 4.21e-05
 > logLik(yCOLRb)
 'log Lik.' -2621 (df=12)
 > logLik(modCOLR)
@@ -216,9 +214,9 @@ Response []
      Bs4(Surv(time, time, cens, type = "interval"))
 [1,]                                       0.006631
 [2,]                                       0.000957
-[3,]                                       0.071988
+[3,]                                       0.071989
 [4,]                                       0.006898
-[5,]                                       0.264369
+[5,]                                       0.264371
 [6,]                                      -0.427886
      Bs5(Surv(time, time, cens, type = "interval"))
 [1,]                                        0.04041
@@ -242,10 +240,10 @@ Response []
 [5,]                                       -0.39888
 [6,]                                       -0.00527
      Bs8(Surv(time, time, cens, type = "interval"))
-[1,]                                       0.520500
-[2,]                                       0.457087
-[3,]                                      -0.136635
-[4,]                                       0.475977
+[1,]                                       0.520502
+[2,]                                       0.457090
+[3,]                                      -0.136636
+[4,]                                       0.475980
 [5,]                                      -0.210984
 [6,]                                      -0.000512
      Bs9(Surv(time, time, cens, type = "interval"))
@@ -362,7 +360,7 @@ Type:   Continuous Outcome Logistic Regression
 Log-Likelihood:  -2621
 
 Coefficients:
-numeric(0)
+NULL
 
 Sparsity:  0 regression coefficients, 0 of which are non-zero 
 
@@ -389,4 +387,4 @@ lambda  alpha
 > 
 > proc.time()
    user  system elapsed 
- 17.284   0.224  17.502 
+ 77.316   0.608  77.985 
