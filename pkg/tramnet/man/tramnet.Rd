@@ -31,6 +31,7 @@ Partially penalized and constrained transformation models,
 including Cox models and continuous outcome logistic regression.
 }
 \examples{
+\dontrun{
 library("penalized")
 library("survival")
 ## --- Comparison with penalized
@@ -44,7 +45,7 @@ y <- Coxph(resp ~ 1, data = nki70, order = 10, log_first = TRUE)
 fit2 <- tramnet(y, x, lambda = 1, alpha = 1) ## L1 only
 coef(fit)
 coef(fit2)
-
+}
 }
 \author{
 Lucas Kook, Balint Tamasi, Sandra Sigfried
