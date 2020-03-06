@@ -5,13 +5,14 @@
 
 \documentclass[10pt]{article}
 \usepackage[margin=0.8in]{geometry}
-\usepackage[margin=0.5in]{caption}
+\usepackage[margin=0.5in, font=small]{caption}
 \usepackage{amsfonts,amstext,amsmath,amssymb,amsthm}
 \usepackage[utf8]{inputenc}
 \usepackage[comma,authoryear]{natbib}
 \usepackage{xcolor}
 \usepackage[colorlinks=true, citecolor=blue]{hyperref}
 \usepackage{booktabs}
+\usepackage{doi}
 
 \renewcommand{\tt}[1]{\texttt{#1}}
 \newcommand{\todo}[1]{\textbf{\color{red} TODO: #1}}
@@ -51,17 +52,19 @@
 \setlength{\parskip}{0.5em}
 \renewcommand{\baselinestretch}{1.2}
 
+\newcommand{\address}[1]{
+  \addvspace{\baselineskip}\noindent
+  \textbf{Affiliations:} \\
+  \emph{#1}}
+\newcommand{\email}[1]{\href{mailto:#1}{\normalfont\texttt{#1}}}
 
 <<setup, echo=FALSE, message=FALSE, results="hide">>=
-## knitr::opts_chunk$set(highlight=FALSE, background="white",
-##                       size = "small",
-##                       out.width = NULL, out.height = NULL,
-##                       fig.scap = NA)
-## knitr::opts_knit$set(global.par = TRUE)
-## knitr::render_sweave()  # use Sweave environments
-## knitr::set_header(highlight = '')  # do not \usepackage{Sweave}
 knitr::opts_chunk$set(size = "small", prompt = TRUE, comment = NA,
                       out.width=".9\\linewidth")
+knitr::knit_hooks$set(
+  document = function(x) {sub('\\usepackage[]{color}', '\\usepackage{xcolor}',
+                              x, fixed = TRUE)}
+)
 options(prompt = "R> ", continue = "+  ")
 options(width = 80, digits = 3)
 
@@ -115,6 +118,7 @@ ggth <- theme(panel.grid.major = element_blank(), panel.grid.minor = element_bla
 
 \title{\pkg{tramME}: Mixed-Effects Transformation Models Using \\ Template Model Builder}
 \author{B\'alint Tam\'asi \and Torsten Hothorn}
+
 \date{\today}
 
 \begin{document}
@@ -125,35 +129,32 @@ ggth <- theme(panel.grid.major = element_blank(), panel.grid.minor = element_bla
 \abstract{
   Linear transformation models constitute a general family of
   parametric regression models for discrete and continuous responses. To
-  accommodate correlated responses, the model is extended by incorporating
-  mixed-effects. This article presents the R package \pkg{tramME}, which builds on
-  existing implementations of transformation models (\pkg{mlt} and \pkg{tram}
+  accommodate correlated responses, the model is extended by incorporating mixed
+  effects. This article presents the \textsf{R} package \pkg{tramME}, which builds
+  on existing implementations of transformation models (\pkg{mlt} and \pkg{tram}
   packages) as well as Laplace approximation and automatic differentiation (using
   the \pkg{TMB} package), to calculate estimates and perform likelihood inference
   in mixed-effects transformation models. The resulting framework can be readily
   applied to a wide range of regression problems with grouped data structures.
 }
 
-\vspace{.5cm}
-\noindent
-{\color{red} A version of this article is submitted for publication to The R Journal.}
 
 \section{Introduction}
 
 Datasets with grouped observations are abundant in the applied statistical
 practice. Clustering, hierarchical designs, longitudinal studies or repeated
-measurements all can lead to grouped data structures. The common property of
-these data structures is that observations within groups defined by one or more
-grouping factors cannot be treated as independent. In order to draw valid
+measurements can all lead to grouped data structures. The common property of
+these datasets is that observations within groups, defined by one or more
+grouping factors, cannot be treated as independent. In order to draw valid
 inference, the statistical model has to address the issue of correlated
 observations. Mixed-effects models represent one of the main approaches dealing
-with this type of regression problems. In this approach the observations are
+with this type of regression problems. In this approach, the observations are
 assumed to be independent \emph{conditionally} on a set of random effects that
 aim to capture unmodeled group-level heterogeneity. The reader is referred, for
 example, to the textbook by \citet{demidenko_mixed_2013} for an exposition and
-examples of the usage of mixed-effects models. Several R packages exist that
-implement mixed-effects models for specific types of regression problems. The
-two most notable examples are \CRANpkg{nlme} by \citet{pinheiro_nlme} and
+examples of the usage of mixed-effects models. Several \textsf{R} packages exist
+that implement mixed-effects models for specific types of regression problems.
+The two most notable examples are \CRANpkg{nlme} by \citet{pinheiro_nlme} and
 \CRANpkg{lme4} by \citet{bates_fitting_2015} for linear, non-linear and
 generalized linear mixed-effects models, respectively.
 
@@ -164,19 +165,28 @@ monotone increasing transformation function that is estimated from the data. The
 resulting general model family can be applied to a wide range of problems with
 at least ordered discrete outcome variables. In fact, many of the popular
 regression models can be expressed as special cases of the linear transformation
-approach. Most recently, \citet{tian_2020} reviewed the approach followed in
-this study and compared to an alternative semiparametric formulation
-using extensive simulations. With introducing random effects in the linear
-transformation model framework, the model becomes applicable in a very diverse
-set of regression problems, where the observations are correlated due to
-repeated measurements or grouped designs.
+model framework. Most recently, \citet{tian_2020} reviewed the approach followed
+in this study and compared it to an alternative semiparametric formulation using
+extensive simulations. With introducing random effects in the linear
+transformation model, it becomes applicable in a very diverse set of regression
+problems where the observations are correlated due to repeated measurements or
+grouped designs.
 
-\section{Mixed-effects transformation models}
+The structure of this article is as follows: After a brief, and somewhat
+technical, introduction of the methodology and the implementation in
+Section~\ref{sec:metrafo}, Section~\ref{sec:applications} demonstrates, through
+a series of examples, that the package \pkg{tramME} can be flexibly applied to
+regression models with various response types and data structures. Finally,
+Section~\ref{sec:discussion} discusses a few issues concerning the
+implementation of our model.
 
-The model class in the R package \pkg{tramME} is an extension of the
-transformation model approach described by \citet{hothorn_most_2018} and implemented in
-the R packages \CRANpkg{mlt} and \CRANpkg{tram} by \citet{hothorn_mlt}
-and \citet{Hothorn2020_tram}, respectively.
+
+\section{Mixed-effects transformation models} \label{sec:metrafo}
+
+The model class in the \textsf{R} package \pkg{tramME} is an extension of the
+transformation model approach described by \citet{hothorn_most_2018} and
+implemented in the \textsf{R} packages \CRANpkg{mlt} and \CRANpkg{tram} by
+\citet{hothorn_mlt} and \citet{Hothorn2020_tram}, respectively.
 
 Formally, we are interested in models that parameterize the conditional
 distribution function directly,
@@ -187,7 +197,7 @@ distribution function directly,
     \cN_{q}(\0, \bSigma), \label{eq:memodel}
 \end{align}
 %
-where $F_{Z}$ denotes an pre-specified error distribution function (or
+where $F_{Z}$ denotes a pre-specified error distribution function (or
 inverse-link function) which is monotone increasing and maps from the real
 numbers to the closed interval $[0, 1]$. Typically, $F_{Z}$ is set to the CDF of
 a simple continuous distribution, hence the name ``error distribution''.
@@ -197,12 +207,12 @@ and $\bfu\T$ are the suitable row vectors of fixed effects and random effects
 design matrices, respectively. The vector $\bbeta$ contains the fixed effects,
 while $\bgamma$ comprises of the stacked (possibly multiple) random effects. The
 distribution of the random effects is assumed to be multivariate Gaussian with
-zero mean and the covariance matrix $\bSigma$, which is typically has a sparse
+zero mean and covariance matrix $\bSigma$, which typically has a sparse
 block structure.
 
 As Table~\ref{tbl:models} shows, specific choices for the error distribution and
 the baseline transformation function lead to different types of regression
-models. In the R package \pkg{tramME}, seven main model types are
+models. In the \textsf{R} package \pkg{tramME}, seven main model types are
 distinguished, mainly based on the class of their outcome variable. Moreover, the
 functions \code{SurvregME()} and \code{PolrME()} allow to specify multiple
 error distributions or baseline transformations and hence increasing the number
@@ -257,13 +267,6 @@ of order $p$ Bernstein polynomials for the approximation of a general function,
 this restriction conveniently translates to the parameter restriction
 $\vartheta_{i} \leq \vartheta_{i+1}$ for all $i = 0,\dots,p-1$.
 
-The transformation model framework by \citet{Hothorn2020_tram} allows for
-stratification, i.e defining separate transformation functions depending on the
-value of a stratification variable, $s$. $h(y; \bvartheta)$ then becomes
-$h(y\mid s;\bvartheta^{\prime})$. By stratifying to numeric variables, we are
-allowing for response-varying effect sizes. Note that stratification leads to a
-larger number of parameters in the baseline transformation function.
-
 The observations are assumed to be \emph{conditionally independent}, and hence
 the likelihood has the form
 %
@@ -283,8 +286,8 @@ $\bSigma$. This latter function can be factorized further according to the
 covariance structure of the random effects.
 
 One of the main advantages of working directly with the distribution function of
-the outcome is that it is simple to introduce (independent) censoring and
-truncation in the estimation process. The conditional likelihood contributions
+the outcome is that it is simple to introduce (random) censoring and
+truncation in the estimation procedure. The conditional likelihood contributions
 under different types of censoring can be written as
 %
 \begin{align*}
@@ -317,7 +320,7 @@ of $Y$.
 
 The multidimensional integral in Equation~\eqref{eq:lik}, in general, does not
 have an analytical solution, but its value can be approximated using numerical
-methods. The add-on package \pkg{tramME} applies the Laplace approximation to
+methods. The package \pkg{tramME} applies the Laplace approximation to
 this problem, which relies on the quadratic Taylor expansion of the
 corresponding joint log-likelihood function.
 
@@ -327,27 +330,27 @@ $\bvartheta$ to make $h(y;\bvartheta)$ monotone increasing, results in the
 maximum likelihood estimates of the model parameters. Standard likelihood
 theory, utilizing the ability to evaluate the log-likelihood function, the score
 function, and the Hessian, provides a basis for asymptotic inference in this
-family of models. See \citet{hothorn_most_2018} for more details on likelihood
+family of models; see \citet{hothorn_most_2018} for more details on likelihood
 inference in transformation models.
 
-The maximum likelihood estimation in \pkg{tramME} is done using the \CRANpkg{TMB}
-package by \citet{kristensen_tmb}. Template Model Builder (\pkg{TMB}) allows
-the user to define and estimate general, non-linear mixed effects models. It was
-built on well-tested and high-performance C++ libraries, which results in
-a flexible yet efficient framework for estimating mixed models with possibly
-complex random effects structures. See for example \citet{Brooks2017_glmmTMB}
-for performance comparisons in the context of the package \CRANpkg{glmmTMB}. In
-\pkg{tramME}, \pkg{TMB} is used to evaluate the integral in
-Equation~\eqref{eq:lik}, using Laplace's method, and to calculate the
-derivatives of the log-likelihood function using automatic (or algorithmic)
+The maximum likelihood estimation in \pkg{tramME} is done using the
+\CRANpkg{TMB} package by \citet{kristensen_tmb}. The Template Model Builder
+(\pkg{TMB}) allows the user to define and estimate general, non-linear mixed
+effects models. It was built on well-tested and high-performance C++ libraries,
+which results in a flexible yet efficient framework for estimating mixed models
+with possibly complex random effects structures; see for example
+\citet{Brooks2017_glmmTMB} for performance comparisons in the context of the
+package \CRANpkg{glmmTMB}. In \pkg{tramME}, \pkg{TMB} is used to evaluate the
+integral in Equation~\eqref{eq:lik}, using Laplace's method, and to calculate
+the derivatives of the log-likelihood function using automatic (or algorithmic)
 differentiation.
 
-\section{Applications}
+\section{Applications} \label{sec:applications}
 
 In this section several applications of the transformation mixed models are
 presented, and wherever it is possible, also compared to other existing
 implementations. The examples shown here are by no means intended as complete
-analyses. They demonstrate how mixed effects transformation models can be used
+analyses. They demonstrate how mixed-effects transformation models can be used
 in a broad range of regression problems, and showcase the most important
 features implemented in the package \pkg{tramME}.
 
@@ -394,22 +397,22 @@ deprivation.
 \end{align}
 %
 Note that when the transformation function is assumed to be linear in the
-outcome variable, i.e. $h(y) = \vartheta_{1} + \vartheta_{2}y$, we arrive at a
-re-parameterized version of the normal linear mixed effects model, and hence the
-results from \code{tramME::LmME()} are directly comparable to estimates using
-other mixed effects regression packages such as \pkg{lme4}. Estimating the
-normal linear model with the \pkg{tramME}:
+outcome variable, \textit{i.e.}, $h(y) = \vartheta_{1} + \vartheta_{2}y$, we
+arrive at a re-parameterized version of the normal linear mixed effects model,
+and hence the results from \code{tramME::LmME()} are directly comparable to
+estimates using other mixed-effects regression packages such as \pkg{lme4}.
+Estimating the normal linear model with the \pkg{tramME}:
 %
 <<message=FALSE>>=
 library("tramME")
-sleep_lm <- LmME(Reaction ~ Days + (Days | Subject), data = sleepstudy)
-logLik(sleep_lm)
+sleep_lmME <- LmME(Reaction ~ Days + (Days | Subject), data = sleepstudy)
+logLik(sleep_lmME)
 @
 %
 \noindent
 To make the results from \pkg{lme4} comparable to the previous results, we set
 \code{REML = FALSE}, as the transformation mixed model implementation only
-supports the maximum likelihood estimation of the normal linear mixed model
+supports the maximum likelihood estimation of the normal linear model
 specification.
 %
 <<message=FALSE>>=
@@ -425,8 +428,8 @@ of a linear mixed model parametrization. Coefficient estimates and their
 standard errors from the transformation model approach are
 %
 <<>>=
-cbind(coef = coef(sleep_lm, as.lm = TRUE),
-      se = sqrt(diag(vcov(sleep_lm, as.lm = TRUE, pargroup = "fixef"))))
+cbind(coef = coef(sleep_lmME, as.lm = TRUE),
+      se = sqrt(diag(vcov(sleep_lmME, as.lm = TRUE, pargroup = "fixef"))))
 @
 %
 \noindent
@@ -441,8 +444,8 @@ Similarly, the standard deviations and correlations of the random effects, as
 well as the standard deviations of the error terms are essentially the same
 %
 <<>>=
-VarCorr(sleep_lm, as.lm = TRUE) ## random effects
-sigma(sleep_lm) ## residual SD
+VarCorr(sleep_lmME, as.lm = TRUE) ## random effects
+sigma(sleep_lmME) ## residual SD
 VarCorr(sleep_lmer)
 @
 
@@ -450,12 +453,12 @@ As the results show, the transformation model approach implemented by
 \code{LmME()} leads to the same results as the maximum likelihood estimation of
 the traditional linear mixed model parametrization. The advantage using the
 package \pkg{tramME}, as opposed to other well established implementations, is
-that it allows for incorporating independently censored outcomes. Let us assume
-that the device used in the sleep deprivation study is only able to measure
-reaction times larger than 200 ms and only in 50 ms step sizes. If the want to
-take this reduced accuracy in measuring the reaction times into account, we have
-to deal with interval-censored observations, as ignoring the censored nature of
-the outcomes could lead to biased parameter estimates.
+that it allows for incorporating randomly censored outcomes. Let us assume that
+the device in the sleep deprivation study is only able to measure reaction times
+larger than 200 ms and only in 50 ms step sizes. If we want to take this reduced
+accuracy in the measurements into account, we have to deal with
+interval-censored observations, as ignoring the censored nature of the outcomes
+could lead to biased parameter estimates.
 
 With the following code, we create the interval-censored outcome vector using
 the \code{Surv} function of the \CRANpkg{survival} package by \citet{survival-package}.
@@ -474,8 +477,8 @@ Using the interval-censored outcomes in the \code{LmME()} function call will
 maximize the correct likelihood function.
 %
 <<>>=
-sleep_lm2 <- LmME(Reaction_ic ~ Days + (Days | Subject), data = sleepstudy)
-logLik(sleep_lm2)
+sleep_lmME2 <- LmME(Reaction_ic ~ Days + (Days | Subject), data = sleepstudy)
+logLik(sleep_lmME2)
 @
 %
 \noindent
@@ -485,10 +488,10 @@ despite the decreased precision of the measurements, the parameter estimates are
 similar to what we got from the exactly observed outcomes.
 %
 <<>>=
-cbind(coef = coef(sleep_lm2, as.lm = TRUE),
-      se = sqrt(diag(vcov(sleep_lm2, as.lm = TRUE, pargroup = "fixef"))))
-sigma(sleep_lm2)
-VarCorr(sleep_lm2, as.lm = TRUE)
+cbind(coef = coef(sleep_lmME2, as.lm = TRUE),
+      se = sqrt(diag(vcov(sleep_lmME2, as.lm = TRUE, pargroup = "fixef"))))
+sigma(sleep_lmME2)
+VarCorr(sleep_lmME2, as.lm = TRUE)
 @
 
 The small estimated value of the correlation coefficient between the random
@@ -497,29 +500,34 @@ be more appropriate. To estimate such a model, we can use the same notation as
 in \pkg{lme4}
 %
 <<>>=
-sleep_lm3 <- LmME(Reaction_ic ~ Days + (Days || Subject), data = sleepstudy)
-logLik(sleep_lm3)
+sleep_lmME3 <- LmME(Reaction_ic ~ Days + (Days || Subject), data = sleepstudy)
+logLik(sleep_lmME3)
 @
 %
 \noindent
 Comparing the two models using a likelihood ratio test, we see no evidence
-against the more parsimonious model (\code{sleep\_lm3}).
+against the more parsimonious model (\code{sleep\_lmME3}).
 %
 <<>>=
-anova(sleep_lm2, sleep_lm3)
+anova(sleep_lmME2, sleep_lmME3)
 @
 
-\subsection{Box-Cox-type mixed effects models} \label{sec:boxcox}
+\subsection{Box-Cox-type mixed-effects models} \label{sec:boxcox}
 
 Substituting the linear baseline transformation function, $h(y) = \vartheta_{1}
 + \vartheta_{2}y$, with a general, monotonic increasing smooth function, we can
 relax the conditional normality assumption of the model discussed in
 Section~\ref{sec:nlmm}. The transformation model approach proposed by
-\citet{hothorn_most_2018} uses Bernstein bases to approximate the this general
-increasing function in a fully parametric manner, i.e. $h(y) = \a_{\text{Bs},
-K+1}(y)\T\bvartheta$. The resulting model can be regarded as a version of the
-Box-Cox regression \citep{box_analysis_1964}, where the transformation of the
-response is estimated simultaneously with the model parameters.
+\citet{hothorn_most_2018} uses Bernstein bases to approximate this general
+increasing function in a fully parametric manner, \textit{i.e.}, $h(y) =
+\a_{\text{Bs}, K+1}(y)\T\bvartheta$. The resulting model can be regarded as a
+version of the Box-Cox regression \citep{box_analysis_1964}, where the
+transformation of the response is estimated simultaneously with the model
+parameters. It should be pointed out that, although its approach is similar in
+spirit, \pkg{tramME} does not use the Box-Cox power transformation to
+approximate $h(y)$. For an implementation utilizing the original Box-Cox
+transform in the context of mixed-effects models, see the \textsf{R} package
+\CRANpkg{boxcoxmix} by \citet{boxcoxmix}.
 
 A more flexible version of the model described in \eqref{eq:lm} will take the form
 %
@@ -547,18 +555,19 @@ Note that the log-likelihood of this model is higher than that of the normal
 linear model, because we are now approximating the baseline transformation
 function flexibly, at the expense of a larger number of parameters.
 
-Plotting the baseline transformation , $h(y) = \a(y)\T\bvartheta$, in
-Figure~\ref{fig:comp_lm_bc} reveals a slight departure from the conditional
-normality of the outcome variable.
+Plotting the baseline transformation, $h(y) = \a(y)\T\bvartheta$, can be used as
+a tool for checking the conditional normality assumption in the normal linear
+mixed model. In our example, Figure~\ref{fig:comp_lm_bc} reveals a slight
+departure from conditional normality in the outcome variable.
 
-\begin{figure}[htbp]
+\begin{figure}[!htb]
   \begin{center}
-<<sleepstudy-trafo, echo=FALSE,fig.width=4.5, fig.height=4, out.width="0.75\\linewidth">>=
+<<sleepstudy-trafo, echo=FALSE,fig.width=4.5, fig.height=4, out.width="0.7\\linewidth">>=
 par(mfrow = c(1, 1), cex = 0.8)
 tr_bc <- trafo(sleep_bc, type = "trafo", confidence = "none", K = 100)
 plot(tr_bc, lty = 1, xlab = "Average reaction time (ms)", ylab = expression(h(y)),
      lwd = 2)
-tr_lm <- trafo(sleep_lm, type = "trafo", confidence = "none", K = 100)
+tr_lm <- trafo(sleep_lmME, type = "trafo", confidence = "none", K = 100)
 plot(tr_lm, lty = 2, lwd = 2, add = TRUE)
 rug(sleepstudy$Reaction, col = rgb(.1, .1, .1, .1))
 legend("topleft", c("BoxCoxME", "LmME"), lty = c(1, 2), lwd = 2,
@@ -566,15 +575,15 @@ legend("topleft", c("BoxCoxME", "LmME"), lty = c(1, 2), lwd = 2,
 @
   \end{center}
   \caption{Comparison of baseline trasformations from the normal linear
-    (\code{LmME}) and the Box-Cox-type (\code{BoxCoxME}) mixed effects models
+    (\code{LmME}) and the Box-Cox-type (\code{BoxCoxME}) mixed-effects models
     fitted to the \code{sleepstudy} dataset.}
   \label{fig:comp_lm_bc}
 \end{figure}
 
 In many cases, the goal of the analysis is to estimate the \emph{marginal}
-distribution of the outcomes, i.e. integrating out the random effects from the
-conditional model~\eqref{eq:memodel}. In the general case, there is no
-analyitical solution of the integral, but we can use numerical methods to
+distribution of the outcomes, \textit{i.e.}, integrating out the random effects
+from the conditional model~\eqref{eq:memodel}. In the general formulation, there
+is no analytical solution for the integral, but we can use numerical methods to
 approximate the marginal distributions at various values of the outcome. The
 following code utilizes the \code{simulate} and \code{predict} methods
 implemented in the \pkg{tramME} package to get Monte Carlo estimates of the
@@ -869,15 +878,15 @@ by integrating over the vector of random effects in models~\eqref{eq:lm} and
   \begin{center}
 <<sleepstudy-margdist,echo=FALSE,message=FALSE,fig.width=7,fig.height=4,cache=TRUE>>=
 ## --- Lm
-## re <- simulate(sleep_lm, newdata = nd, nsim = ndraws, what = "ranef", seed = 100)
+## re <- simulate(sleep_lmME, newdata = nd, nsim = ndraws, what = "ranef", seed = 100)
 ## cp <- parallel::mclapply(re, function(x) {
-##   predict(sleep_lm, newdata = nd, ranef = x, type = "distribution")
+##   predict(sleep_lmME, newdata = nd, ranef = x, type = "distribution")
 ## }, mc.cores = 8)
 ## cp <- array(unlist(cp), dim = c(100, 10, ndraws))
-## mp_lm <- apply(cp, c(1, 2), mean)
+## mp_lmME <- apply(cp, c(1, 2), mean)
 
 ## Saved for faster execution
-mp_lm <-
+mp_lmME <-
 structure(c(0.0478858079664213, 0.0565943025983427, 0.0664902339037705,
 0.0776589376654088, 0.0901786676639275, 0.104118163899217, 0.119534212868745,
 0.136469280170928, 0.154949300485965, 0.174981711479834, 0.196553816033614,
@@ -1132,7 +1141,7 @@ structure(c(0.0478858079664213, 0.0565943025983427, 0.0664902339037705,
 
 dat <- nd
 dat$Days <- paste0("Days = ", dat$Days)
-dat$mp_lm <- c(mp_lm)
+dat$mp_lm <- c(mp_lmME)
 dat$mp_bc <- c(mp_bc)
 dat2 <- sleepstudy
 dat2$Days <- paste0("Days = ", dat2$Days)
@@ -1154,9 +1163,9 @@ ggplot(dat, aes(x = Reaction)) +
 @
   \end{center}
   \caption{Comparison of the marginal distributions implied by the normal
-    linear(\code{LmME}) and the Box-Cox-type (\code{BoxCoxME}) mixed effects
+    linear(\code{LmME}) and the Box-Cox-type (\code{BoxCoxME}) mixed-effects
     models fitted to the sleep deprivation study dataset. The empirical
-    cumulative distribution functions (ECDF) are also plotted conditionally on the
+    cumulative distribution functions (ECDF) are also plotted, conditionally on the
     days of sleep deprivation.}
   \label{fig:margdist_lm_bc}
 \end{figure}
@@ -1164,18 +1173,18 @@ ggplot(dat, aes(x = Reaction)) +
 
 \subsection{Mixed-effects continuous outcome logistic regression} \label{sec:colr}
 
-The increased flexibility of the Box-Cox-type model, i.e. using a general
-baseline transformation function instead of a linear one, comes with the price
-that the coefficient estimates will not be easily interpretable as expected
-changes in the mean in the conditional model. Switching to the standard logistic
-error distribution provides a solution to this problem, as the parameter estimates
-in the resulting model can be interpreted as log-odds ratios. This
-\emph{continuous outcome logistic regression} model was used by
+The increased flexibility of the Box-Cox-type model, \textit{i.e.}, using a
+general baseline transformation function instead of a linear one, comes with the
+price that the coefficient estimates will not be easily interpretable as
+expected changes in the mean in the conditional model. Switching to the standard
+logistic error distribution provides a solution to this problem, as the
+parameter estimates in the resulting model can be interpreted as log-odds
+ratios. This \emph{continuous outcome logistic regression} model was used by
 \citet{Lohse2017} to analyze body mass index (BMI) distributions.
 
-\citet{Manuguerra2010} proposed a mixed effects logistic regression model for
+\citet{Manuguerra2010} proposed a mixed-effects logistic regression model for
 bounded, continuous measurements of pain levels in a randomized, double-blind,
-placebo-contolled trial of low-level laser therapy for subjects with chronic
+placebo-controlled trial of low-level laser therapy for subjects with chronic
 neck pain presented by \citet{chow_effect_2006}. The levels of pain, measured on
 a visual analog scale, and normalized between 0 and 1, are plotted in
 Figure~\ref{fig:neckpain} for each subject at the different follow-up times.
@@ -1187,13 +1196,13 @@ data("neck_pain", package = "ordinalCont")
 dat <- within(neck_pain, {
   trt <- ifelse(laser == 1, "Active", "Placebo")
   t   <- ifelse(time == 1, "Baseline",
-         ifelse(time == 2, "week 7", "week 12"))
+         ifelse(time == 2, "Week 7", "Week 12"))
 })
 ggplot(dat, aes(t, vas, group = id)) +
   facet_wrap(~ trt) +
   geom_line(col = "grey", alpha = 0.5) +
   geom_point(col = "grey", alpha = 0.5, size = 0.75) +
-  scale_x_discrete(limits = c("Baseline", "week 7", "week 12")) +
+  scale_x_discrete(limits = c("Baseline", "Week 7", "Week 12")) +
   xlab("Follow-up times") +
   ylab("Pain level (VAS)") +
   ggth
@@ -1205,8 +1214,8 @@ ggplot(dat, aes(t, vas, group = id)) +
   \label{fig:neckpain}
 \end{figure}
 
-The mixed effects model suggested by \citet{Manuguerra2010} parameterizes the
-logodds of experiencing smaller pain levels as a linear function of fixed and
+The mixed-effects model suggested by \citet{Manuguerra2010} parameterizes the
+log-odds of experiencing smaller pain levels as a linear function of fixed and
 random effects and the baseline transformation. With the treatment group
 indicator, \tt{laser}, and \tt{time} denoting the follow-up times,
 %
@@ -1220,7 +1229,7 @@ indicator, \tt{laser}, and \tt{time} denoting the follow-up times,
 \end{align*}
 %
 where $h(y)$ is an increasing function of the outcome. Rearranging the terms in
-the model above reveals that this model is indeed a mixed-effects transformation
+the model above reveals that this indeed is a mixed-effects transformation
 model, with the distribution function of the standard logistic distribution
 (``expit'' function) as $F_{Z}$
 %
@@ -1258,11 +1267,12 @@ library("ordinalCont")
 neck_ocm <- ocm(vas ~ laser * time + (1 | id), data = neck_pain, scale = c(0, 1))
 @
 
-Figure~\ref{fig:colr_cmp} compares the results of the mixed-effects transformation model
-approach to the estimates obtained using the \pkg{ordinalCont} package. Because
-the two models are not exactly the same, we see some differences in the
-parameter estimates as well as in the fitted baseline transformation function,
-but the two model fits are reasonably close to each other.
+Figure~\ref{fig:colr_cmp} compares the results of the mixed-effects
+transformation model approach to the estimates obtained using the
+\pkg{ordinalCont} package. Because the two models are not exactly the same, we
+see some differences in the parameter estimates as well as in the fitted
+baseline transformation functions, but the two model fits are reasonably close
+to each other.
 
 \begin{figure}[htbp]
 \begin{center}
@@ -1295,9 +1305,9 @@ plot_cicomp(ci_tr, ci_ocm, labels = labs, xlas = 1,
 \caption{Left: Baseline transformations in continuous outcome logistic
   regressions estimated with the \pkg{tramME} and \pkg{ordinalCont} packages
   on the \code{neck\_pain} dataset. The solid lines denote the point estimates
-  and the areas indicate the 95\% point-wise confidence intervals. Right:
-  Coefficient estimates from \pkg{tramME} and \pkg{ordinalCont} packages and
-  their 95\% Wald confidence intervals.}
+  and the areas indicate the 95\% point-wise confidence intervals.
+  Right:~Coefficient estimates from \pkg{tramME} and \pkg{ordinalCont} packages
+  and their 95\% Wald confidence intervals.}
 \label{fig:colr_cmp}
 \end{figure}
 
@@ -1308,12 +1318,12 @@ exp(coef(neck_tr))
 @
 %
 \noindent
-as well as the results from the \pkg{ordinalCont} package, suggest that there
-is an imbalance in the sample at baseline, i.e. the odds of experiencing less
-pain in the active treatment group is only about 10\% that of in the control
-group for any pain levels. \todo{is this a correct interpretation?} Based on
-the estimates, the treatment has strong significant effect, especially at the
-seven-week follow-up, which seems to level off after 12 weeks.
+as well as the results from the \pkg{ordinalCont} package, suggest that there is
+an imbalance in the sample at baseline, \textit{i.e.}, the odds of experiencing
+less pain in the active treatment group is only about 10\% that of in the
+control group for any pain levels. Based on the estimates, the treatment has
+strong significant effect, especially at the seven-week follow-up, but seems to
+level off after 12 weeks.
 
 If we want to compare the marginal distributions in the treatment and control
 groups directly, we have to average over the distribution of the random effects.
@@ -1858,14 +1868,14 @@ treatment effect dynamics.
 dat <- within(mp_colr, {
   trt <- factor(ifelse(laser == 1, "Active", "Placebo"), levels = c("Active", "Placebo"))
   t   <- factor(ifelse(time == 1, "Baseline",
-                ifelse(time == 2, "week 7", "week 12")),
-                levels = c("Baseline", "week 7", "week 12"))
+                ifelse(time == 2, "Week 7", "Week 12")),
+                levels = c("Baseline", "Week 7", "Week 12"))
 })
 dat2 <- within(neck_pain, {
   trt <- factor(ifelse(laser == 1, "Active", "Placebo"), levels = c("Active", "Placebo"))
   t   <- factor(ifelse(time == 1, "Baseline",
-                ifelse(time == 2, "week 7", "week 12")),
-                levels = c("Baseline", "week 7", "week 12"))
+                ifelse(time == 2, "Week 7", "Week 12")),
+                levels = c("Baseline", "Week 7", "Week 12"))
 })
 ggplot() +
   facet_wrap(~ t) +
@@ -1899,7 +1909,7 @@ Consider the example dataset \code{eortc} in the \CRANpkg{coxme} package by
 \citet{thereneau_coxme}. The simulated dataset emulates the structure of the
 outcomes of a breast cancer trial by the European Organization for Research and
 Treatment of Cancer, and consists of 2323, possibly right censored, data points
-from 37 enrolling centers. We define a proportional hazards mixed effects model
+from 37 enrolling centers. We define a proportional hazards mixed-effects model
 with random center ($i=1, \dots, 37$) and treatment (\tt{trt}) effects (nested
 within centers and indexed by $j=0, 1$).
 %
@@ -1911,7 +1921,7 @@ within centers and indexed by $j=0, 1$).
   \quad \beta_{j(i)} \sim \cN(0, \tau_{2}^{2}) \nonumber
 \end{align}
 %
-This model corresponds to a mixed effects transformation model with the
+This model corresponds to a mixed-effects transformation model with the
 \emph{minimum extreme value distribution} as the error distribution. Treating
 the baseline transformation as a general smooth function, approximated using
 Bernstein polynomials, we get the fully parametric version of the Cox
@@ -1949,12 +1959,15 @@ exp(confint(eortc_cp, pargroup = "ranef", type = "profile", estimate = TRUE,
             ncpus = 2, parallel = "multicore"))
 @
 
-To check visually the appropriateness of the proportional hazards assumption
-between treatment and control groups, we re-estimate the model stratifying for
-the treatment indicator, i.e. fitting baseline cumulative hazards for the
-treatment and control groups separately, and check whether the two baseline
-transformation functions, which are the log-cumulative baseline hazards when the
-error distribution is the minimum extreme value distribution, are parallel.
+The transformation model framework by \citet{Hothorn2020_tram} allows for
+stratification, \textit{i.e.}, specifying separate transformation functions for
+different groups defined by a stratification factor. To check the
+appropriateness of the proportional hazards assumption between treatment and
+control groups visually, we re-estimate the model stratifying for the treatment
+indicator, \textit{i.e.}, fitting baseline cumulative hazards for the treatment and
+control groups separately, and inspect whether the two baseline transformation
+functions, which are the log-cumulative baseline hazards when the error
+distribution is the minimum extreme value distribution, are parallel.
 %
 <<cache=TRUE, warning=FALSE>>=
 eortc_cp2 <- CoxphME(Surv(y, uncens) | 0 + trt ~ 0 + (1 | center/trt), data = eortc,
@@ -1965,10 +1978,10 @@ tr <- trafo(eortc_cp2, confidence = "interval")
 \noindent
 Figure~\ref{fig:baseline_cph} plots the stratified transformation functions
 against log-time. The two curves are very close to parallel, which indicates
-that the treatment effect is constant over time, i.e. the proportionality
-assumption is appropriate in the original model specification.
+that the treatment effect is constant over time, \textit{i.e.}, the
+proportionality assumption is appropriate in the original model specification.
 
-\begin{figure}[htbp]
+\begin{figure}[!htb]
   \begin{center}
 <<eortc-trafo, echo=FALSE, fig.width=4.5, fig.height=4, warning=FALSE, out.width="0.75\\linewidth">>=
 x <- log(as.numeric(rownames(tr[[1]]))[-1])
@@ -1995,23 +2008,27 @@ legend("topleft", c("treatment", "control"),
 In addition to proportionality, Figure~\ref{fig:baseline_cph} reveals another
 important aspect of the data generating process: The fact that the baseline
 log-cumulative hazards are linear in log-time suggests that the conditional
-distributions are close to the Weibull distribution, i.e. we can substitute the
-general baseline transformation function with $h(y) = \vartheta_1 +
-\vartheta_2\log(y)$. Flipping the signs of the fixed and random effects terms of
-\eqref{eq:coxph} and substituting the log-linear function to the baseline
+distributions are close to the Weibull distribution, \textit{i.e.}, we can
+substitute the general baseline transformation function with $h(y) = \vartheta_1
++ \vartheta_2\log(y)$. Flipping the signs of the fixed and random effects terms
+of \eqref{eq:coxph} and substituting the log-linear function to the baseline
 transfromation, we get the model
 %
 \begin{align*}
   \IP\left(Y\leq y\mid \tt{trt}, \alpha_{i}, \beta_{j(i)}\right)
 &= 1 - \exp\left(-\exp\left(\vartheta_{1}+\vartheta_{2}\log(y) - \beta_{\tt{trt}}
   - \alpha_{i} - \beta_{j(i)} \right)\right) \\
-  \alpha_{i} &\sim \cN(0, \tau_{1}^{2}), \quad \beta_{j(i)} \sim \cN(0, \tau_{2}^{2})
+  \alpha_{i} &\sim \cN(0, \tau_{1}^{2}), \quad \beta_{j(i)} \sim \cN(0, \tau_{2}^{2}).
 \end{align*}
 
-The \code{SurvregME()} function of the \pkg{tramME} package implements a
-variety of parametric mixed-effects models that represent specific choices of
-the error distribution and the baseline transformation function in the general
-formulation of Equation~\eqref{eq:memodel}.
+The \code{SurvregME()} function of the \pkg{tramME} package implements a variety
+of parametric mixed-effects models that represent specific choices of the error
+distribution and the baseline transformation function in the general formulation
+of Equation~\eqref{eq:memodel}. There are several other \textsf{R} packages
+available for estimating parametric survival models with mixed effects, such as
+\CRANpkg{parfm} by \citet{parfm} and \CRANpkg{frailtypack} by
+\citet{frailtypack}, but they typically do not allow for nested random-effects
+structures when assuming (log-)normally distributed frailty terms.
 
 Fitting a mixed-effects Weibull model to the dataset \code{eortc}
 %
@@ -2021,7 +2038,7 @@ eortc_w <- SurvregME(Surv(y, uncens) ~ trt + (1 | center/trt), data = eortc,
 @
 
 Comparing the parameter estimates of the Cox proportional hazards model to
-those from the mixed effect Weibull model,
+those from the mixed-effects Weibull model,
 %
 <<cache=TRUE>>=
 ## --- CoxphME
@@ -2040,10 +2057,10 @@ c(logLik(eortc_cp), logLik(eortc_w))
 @
 %
 \noindent
-confirms our suspicion that the dataset was simulated from a conditional Weibull model.
+confirms our suspicion that the dataset was indeed simulated from a conditional Weibull model.
 
-Finally, we might want to compare the results from \pkg{tramME} to parameters
-estimated with the R package \pkg{coxme}.
+Finally, we can compare the results from \pkg{tramME} to parameters
+estimated with the \textsf{R} package \pkg{coxme}.
 %
 <<message=FALSE, cache=TRUE>>=
 library("coxme")
@@ -2058,8 +2075,6 @@ partial likelihood. As a result, the parameter estimates are slightly different
 from the ones we got using the \code{CoxphME()} function, but the results are
 comparable and the conclusions are identical, nevertheless.
 
-\todo{Should I include another example (e.g. kidney data) to demonstrate
-  identical results from parfm and frailtypack?}
 
 \subsection{Mixed-effects transformation models for discrete ordinal outcomes}
 
@@ -2098,18 +2113,18 @@ ggplot(data = dat, aes(x = prod, fill = SURENESS)) +
 \caption{Data from the soup tasting study reported by
   \citet{christensen_statistical_2011}: Proportions of responses of sureness
   levels (six levels, ranging from ``reference, sure'' to ``not reference,
-  sure'') after tasting test and reference products. The datapoints are grouped
-  by how often the respondent consume soup (more than once a week, one to four times
+  sure'') after tasting test and reference products. The data points are grouped
+  by how often the respondents consume soup (more than once a week, one to four times
   a month, less than once a month).}
 \label{fig:soup}
 \end{figure}
 
-Let us assume that we are interested in comparing the distribution of sureness
+Let us assume that we are interested in comparing the distributions of sureness
 ratings for reference products and test products, while taking the repeated
 nature of the design into account. Moreover, in doing so, we also want to
 control for how often the respondents usually consume soup (denoted by the
 covariate \tt{freq}). With $k=1\dots 5$, indicating the sureness levels except the
-last one, $i=1\dots, 185$ indexing of the respondents, and $j=0,1$
+last one, $i=1\dots, 185$ indexing the respondents, and $j=0,1$
 indexing the reference and test products (covariate \tt{prod}), respectively,
 the regression model we estimate can be written as
 %
@@ -2134,9 +2149,9 @@ logLik(soup_pr)
 @
 %
 \noindent
-The R package \CRANpkg{ordinal} by \citet{christensen_ordinal} also
-implements mixed effects regression models for ordered discrete outcomes. As a
-cross-check can re-estimate the same model with the function \code{clmm()},
+The \textsf{R} package \CRANpkg{ordinal} by \citet{christensen_ordinal} also
+implements mixed-effects regression models for ordered discrete outcomes. As a
+cross-check, we can re-estimate the same model with the function \code{clmm()},
 %
 <<cache=TRUE, message=FALSE>>=
 library("ordinal")
@@ -2176,56 +2191,79 @@ logLik(soup_pr2)
 @
 %
 \noindent
-The likelihood ratio test comparing the two specifications suggests that there
-is some evidence that the extended, partially proportional model fits the data
-better.
+The likelihood ratio test comparing the two specifications suggests some
+evidence that the extended, partially proportional model fits the data better.
 %
 <<>>=
 anova(soup_pr, soup_pr2)
 @
 
-\section{Discussion}
+\section{Discussion} \label{sec:discussion}
 
-Building the implementation of mixed effects transformation models on the
+Building the implementation of mixed-effects transformation models on the
 package \pkg{TMB} leads to significant efficiency gains in the computationally
-intensive steps of the maximum likelihood estimation. Howewer, a disadvantage of
-this approach is that \pkg{TMB} uses Laplace approximation to integrate over
-the vector of random effects. As several sources point out, Laplace's method can
-lead to biased estimates in some distributional settings.
-\citet{Pinheiro2006_AGQ} provides detailed numerical comparisons of the
-Laplacian approximation to adaptive Gaussian quadrature algorithms in the
-context of multilevel generalized models. Evaluating the method in the case of
-discrete outcome mixed effects models, \citet{Joe2008} concludes that the
-inaccuracy increases with the amount of discreteness of the response variable,
-and decreases as the cluster sizes increase.
+intensive steps of the maximum likelihood estimation. This computational
+efficiency is partly due to the use of Laplace approximation to integrate over
+the vector of random effects. However, several sources point out that Laplace's
+method can lead to biased estimates in some distributional settings.
+\citet{Pinheiro2006_AGQ} provide detailed numerical comparisons of the Laplacian
+approximation to adaptive Gaussian quadrature algorithms in the context of
+multilevel generalized models. \citet{Joe2008} evaluates the method in the case
+of discrete outcome mixed-effects models, and concludes that the inaccuracy
+increases with the amount of discreteness of the response variable and
+decreases as the cluster sizes increase.
 
 It is worth mentioning that the conditional approach of modeling the
-distribution of the outcome, which is the basis of the transformation models
-implemented in the \pkg{tramME} package is not the only way one could approach
+distribution of the response, which is the basis of the transformation models
+implemented in the \pkg{tramME} package, is not the only way one could approach
 the problem of correlated outcomes in regression settings. The main alternative
-to a conditional (mixed effects) modeling approach is a marginal model that
+to a conditional (mixed-effects) modeling approach is a marginal model that
 parameterizes the marginal distribution of the outcome and treats the covariance
-structure as nuisance parameters. Generalized estimating equations (GEE,
-\citealp{hardin_generalized_2013}) models constitute prominent examples of such
-an approach. Proponents of marginal models point out that the fixed effects
-parameter estimates cannot be interpreted as population averages which is
-usually of primary interest of a regression analysis.
+structure as nuisance parameters. Generalized estimating equations
+\citep[GEE,][]{hardin_generalized_2013} models represent prominent examples of
+such an approach. Proponents of marginal models point out that, in a conditional
+model, the fixed effects parameter estimates cannot be interpreted as population
+averages, which is usually of primary interest in a regression analysis.
 \citet{lindsey_appropriateness_1998} emphasize that marginal parameter estimates
 from longitudinal studies can only be interpreted as population averages when
 the participants are representative to their populations, which is usually not
 the case. Moreover, they argue that defining models based on marginal
-distribution very often lead to complicated and implausible conditional
+distributions very often leads to complicated and implausible conditional
 distributions, whereas conditional models can more easily express
 physiologically plausible mechanisms on the level of the individual.
 \citet{lee_conditional_2004} argue that conditional models are more fundamental
 as they allow for both marginal and conditional inferences, which is not true in
-the case of marginal models. As we demonstarted in Sections~\ref{sec:boxcox} and
+the case of marginal models. As we demonstrated in Sections~\ref{sec:boxcox} and
 \ref{sec:colr}, the marginal distributions implied by the conditional
 transformation model can be easily approximated using numerical techniques.
+
+The \pkg{tramME} package, introduced in this article, extends the
+available options for modeling grouped data structures with mixed-effects
+regressions in several ways: Through its dense code base, \pkg{tramME} provides
+an unified and efficient estimation framework for a broad range of regression
+models. Examples in Section~\ref{sec:applications} demonstrate that, using this
+single package, several very specific regression problems can be addressed.
+Relying only on a limited number of packages, in turn, decreases the likelihood
+of errors in the statistical analysis. As the examples showed, the modular
+structure of our approach naturally leads to extensions of existing models (such
+as accounting for censoring or introducing nested or crossed random effects
+structures) that would otherwise require a lot of effort to re-implement from
+scratch. Moreover, the underlying theory of linear transformation models
+provides a flexible basis for the implementation of the package and for its
+future extensions.
 
 \clearpage
 
 \bibliographystyle{plainnat}
 \bibliography{tramME}
+
+
+\address{B\'alint Tam\'asi and Torsten Hothorn\\
+  Institut f\"ur Epidemiologie, Biostatistik und Pr\"avention \\
+  Universit\"at Z\"urich \\
+  Hirschengraben 84, CH-8001 Z\"urich\\
+  Switzerland\\
+  \email{balint.tamasi@uzh.ch}, \email{Torsten.Hothorn@R-project.org}}
+
 
 \end{document}
