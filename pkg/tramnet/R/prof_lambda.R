@@ -91,6 +91,7 @@ plot_path <- function(object, plot_logLik = FALSE, ...) {
     plot(object$lambdas, object$lls, xlab = expression(lambda),
          ylab = "logLik", ...)
   opar <- par("mar")
+  on.exit(par(opar))
   par(mar = c(5, 5, 2, 2))
   matplot(object$lambdas, object$cfx, type = "l", xlab = expression(lambda),
           ylab = expression(hat(beta)[j](lambda)), ...)
