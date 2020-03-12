@@ -24,14 +24,15 @@ between absolute and quadratic penalty terms}
 \item{\dots}{additional parameters to \code{\link[CVXR]{solve}}}
 }
 \value{
-An object of class \code{"tramnet"} with \code{coef} and \code{logLik}
+An object of class \code{"tramnet"} with \code{coef}, \code{logLik}, 
+\code{summary}, \code{simulate}, \code{residuals} and \code{plot} methods
 }
 \description{
 Partially penalized and constrained transformation models,
 including Cox models and continuous outcome logistic regression.
 }
 \examples{
-\dontrun{
+\donttest{
 library("penalized")
 library("survival")
 ## --- Comparison with penalized

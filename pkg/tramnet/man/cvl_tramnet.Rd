@@ -21,15 +21,16 @@ cvl_tramnet(object, fold = 2, lambda = 0, alpha = 0, folds = NULL,
 parameters}
 }
 \value{
-Returns out of sample logLik and coefficient estimates for
-    corresponding folds and values of the hyperparameters
+Returns out-of-sample logLik and coefficient estimates for
+    corresponding folds and values of the hyperparameters as an object of
+    class \code{"cvl_tramnet"}
 }
 \description{
 k-fold cross validation for \code{"tramnet"} objects over a grid of
-    the tuning parameters based on out of sample log likelihood.
+    the tuning parameters based on out-of-sample log-likelihood.
 }
 \examples{
-\dontrun{
+\donttest{
 set.seed(241068)
 library(survival)
 data("GBSG2", package = "TH.data")

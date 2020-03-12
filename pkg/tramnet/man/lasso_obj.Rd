@@ -23,5 +23,9 @@ be random for each iteration, leading to a noisy objective function
 \item{fold}{fold for cross validation}
 }
 \description{
-Lasso objective function for model based optimization
+This function generates an objective function for model-based optimization
+based on the cross-validated log-likelihood of a \code{tramnet} model with
+a lasso penalty only. It is not intended to be called by the user directly,
+instead it will be given as an argument to \code{\link[tramnet]{mbo_tramnet}}.
 }
+\value{Single objective function for model based optimization.}

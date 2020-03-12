@@ -15,5 +15,7 @@ mbo_recommended(mbo_obj, m0, x, ...)
 \item{...}{additional arguments to \code{tramnet()}}
 }
 \description{
-Fit recommended regularized tram based on model based optimization output
+Extracts the "optimal" tuning parameters from an object of class
+\code{"MBOSingleObjResult"} and fits the corresponding \code{tramnet} model
 }
+\value{Object of class \code{"tramnet"}}
