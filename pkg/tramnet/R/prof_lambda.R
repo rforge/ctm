@@ -98,7 +98,6 @@ plot_path <- function(object, plot_logLik = FALSE, ...) {
   text(x = min(object$lambdas) + 0.05 * abs(diff(range(object$lambdas))),
        y = object$cfx[which.min(object$lambdas), ],
        labels = colnames(object$cfx), ...)
-  par(mar = opar)
 }
 
 .plot_apath <- function(object, plot_logLik, ...) {
