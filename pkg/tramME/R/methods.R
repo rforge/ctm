@@ -199,7 +199,10 @@ logLik.tramME <- function(object, ...) {
 ##' @param ... Optional arguments, for compatibility with the generic. (Ignored)
 ##' @return A data.frame with the calculated statistics.
 ##' @examples
-##' \dontrun{anova(mod1, mod2)}
+##' data("sleepstudy", package = "lme4")
+##' mod1 <- LmME(Reaction ~ Days + (Days | Subject), data = sleepstudy)
+##' mod2 <- LmME(Reaction ~ Days + (Days || Subject), data = sleepstudy)
+##' anova(mod1, mod2)
 ##' @importFrom stats anova pchisq
 ##' @export
 anova.tramME <- function(object, object2, ...) {

@@ -65,6 +65,8 @@ knitr::knit_hooks$set(
   document = function(x) {sub('\\usepackage[]{color}', '\\usepackage{xcolor}',
                               x, fixed = TRUE)}
 )
+oldpar <- par(no.readonly = TRUE) ## NOTE: for setting back at the end
+oldopt <- options()
 options(prompt = "R> ", continue = "+  ")
 options(width = 80, digits = 3)
 
@@ -2265,5 +2267,10 @@ future extensions.
   Switzerland\\
   \email{balint.tamasi@uzh.ch}, \email{Torsten.Hothorn@R-project.org}}
 
+<<include=FALSE>>=
+## NOTE: reset user's options and pars (as per CRAN submission request)
+options(oldopt)
+par(oldpar)
+@
 
 \end{document}

@@ -28,5 +28,8 @@ will be ignored.
 The nestedness of the models is not checked.
 }
 \examples{
-\dontrun{anova(mod1, mod2)}
+data("sleepstudy", package = "lme4")
+mod1 <- LmME(Reaction ~ Days + (Days | Subject), data = sleepstudy)
+mod2 <- LmME(Reaction ~ Days + (Days || Subject), data = sleepstudy)
+anova(mod1, mod2)
 }
