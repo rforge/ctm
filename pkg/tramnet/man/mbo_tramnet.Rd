@@ -52,8 +52,6 @@ Uses model based optimization to find the optimal tuning parameter(s)
     Here the tramnet package makes use of the mlrMBO interface for Bayesian
     Optimization in machine learning problems to maximize the cv-logLik
     as a black-box function of the tuning parameters alpha and lambda.
-    The methodology is described in Horn et al. (2016)
-    <doi:10.1109/SSCI.2016.7850221>.
 }
 \examples{
 \dontrun{

@@ -20,8 +20,6 @@
 \description{
 \code{estfun} method for class \code{"tramnet"} which computes
 the score contributions w.r.t. each model parameter.
-The use in residual analysis and transformation bossting machines
-is outlined in Hothorn (2019) <doi:10.1007/s11222-019-09870-4>.
 }
 \author{
 Lucas Kook

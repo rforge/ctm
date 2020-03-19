@@ -32,8 +32,6 @@ Partially penalized and constrained transformation models,
 including Cox models and continuous outcome logistic regression.
 The methodology is described in the \code{tramnet} vignette
 accompanying this package.
-Hothorn et al. (2018) <doi:10.1111/sjos.12291> describe
-transformation models in detail.
 }
 \examples{
 \donttest{
