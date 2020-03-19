@@ -18,7 +18,7 @@ of class \code{"prof_alpha"} and \code{"prof_lambda"}. Coefficient names are
 automatically added to the plot.
 }
 \examples{
-\donttest{
+\dontrun{
 library("tramnet")
 library("survival")
 
