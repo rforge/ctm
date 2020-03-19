@@ -30,7 +30,7 @@ k-fold cross validation for \code{"tramnet"} objects over a grid of
     the tuning parameters based on out-of-sample log-likelihood.
 }
 \examples{
-\donttest{
+\dontrun{
 set.seed(241068)
 library(survival)
 data("GBSG2", package = "TH.data")
