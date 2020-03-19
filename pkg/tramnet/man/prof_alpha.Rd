@@ -28,7 +28,7 @@ Lucas Kook
 path of all coefficients and the log-likelihood over the mixing parameter
 alpha}
 \examples{
-\donttest{
+\dontrun{
 library("tramnet")
 library("survival")
 
