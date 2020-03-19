@@ -88,7 +88,8 @@ cvl_tramnet <- function(object, fold = 2, lambda = 0, alpha = 0, folds = NULL,
   stopifnot(inherits(object, "cvl_tramnet"))
   ll <- object[["logLik_tab"]]
   cfx <- object[["coefficients"]]
-  opar <- par("mar")
+  opar <- par(no.readonly = TRUE)
+  on.exit(par(opar)
   par(mar = c(5, 5, 2, 2))
   plot(ll$lambda, ll$sum_logLik, ylab = "CV logLik",
        xlab = expression(lambda))
@@ -97,5 +98,4 @@ cvl_tramnet <- function(object, fold = 2, lambda = 0, alpha = 0, folds = NULL,
             xlab = expression(lambda),
             ylab = expression(hat(beta)[j](lambda)), ...)
   })
-  par(mar = opar)
 }
