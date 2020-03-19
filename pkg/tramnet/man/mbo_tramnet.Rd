@@ -54,7 +54,7 @@ Uses model based optimization to find the optimal tuning parameter(s)
     as a black-box function of the tuning parameters alpha and lambda.
 }
 \examples{
-\dontrun{
+\donttest{
 set.seed(24101968)
 data("Prostate", package = "lasso2")
 x <- scale(model.matrix(lpsa ~ . - 1, data = Prostate))

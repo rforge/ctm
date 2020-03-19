@@ -23,7 +23,7 @@ and not returned (default: \code{1e-6})}
 coef method for class \code{"tramnet_Lm"}
 }
 \examples{
-\dontrun{
+\donttest{
 data(cars)
 m0 <- Lm(dist ~ 1, data = cars)
 x <- as.matrix(cars[, "speed", drop = FALSE])
