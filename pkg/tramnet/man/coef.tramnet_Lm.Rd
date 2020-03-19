@@ -37,3 +37,6 @@ coef(lm(dist ~ speed, data = cars))
 \author{
 Torsten Hothorn, Lucas Kook
 }
+\value{Numeric vector containing the linear model shift parameter 
+estimates
+}

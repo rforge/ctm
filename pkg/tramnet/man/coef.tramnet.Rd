@@ -22,3 +22,6 @@ coef method for class \code{"tramnet"}
 \author{
 Torsten Hothorn, Lucas Kook
 }
+\value{Numeric vector containing the model shift 
+parameter estimates
+}
