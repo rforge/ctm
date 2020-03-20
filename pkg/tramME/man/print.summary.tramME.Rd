@@ -20,6 +20,9 @@
 
 \item{...}{Optional arguments passed to \code{\link[stats]{printCoefmat}}}
 }
+\value{
+The input summary.tramME object, invisibly.
+}
 \description{
 Print method for tramME model summary
 }

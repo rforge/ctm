@@ -1,6 +1,7 @@
 ##' Generic method for extracting baseline transformations
 ##' @param object A model object
 ##' @param ... Optional parameters
+##' @return The value of the baseline transfromation function at certain points.
 ##' @export
 trafo <- function(object, ...) {
   UseMethod("trafo", object)
@@ -116,7 +117,7 @@ trafo.tramME <- function(object, newdata = NULL,
 ##' @param lty Line types.
 ##' @param add If \code{TRUE} add to an existing plot.
 ##' @param ... Additional arguments, passed to \code{plot} or \code{lines}.
-##' @return The original \code{trafo.tramME} object.
+##' @return The original \code{trafo.tramME} object, invisibly.
 ##' @examples
 ##' data("sleepstudy", package = "lme4")
 ##' fit <- BoxCoxME(Reaction ~ Days + (Days | Subject), data = sleepstudy)

@@ -49,6 +49,9 @@ ColrME(formula, data, subset, weights, offset, na.action = na.omit,
 
 \item{...}{additional arguments to \code{\link{tram}}.}
 }
+\value{
+A ColrME object.
+}
 \description{
 ME version of tram::Colr
 }

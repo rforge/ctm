@@ -16,6 +16,9 @@
 
 \item{...}{optional arguments}
 }
+\value{
+Invisibly returns the input VarCorr.tramME object.
+}
 \description{
 Print method for the variance-correlation parameters of a tramME object
 }

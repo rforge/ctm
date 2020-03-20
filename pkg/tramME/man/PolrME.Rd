@@ -53,6 +53,9 @@ PolrME(formula, data, subset, weights, offset, na.action = na.omit,
 
 \item{...}{additional arguments to \code{\link{tram}}.}
 }
+\value{
+A PolrME object.
+}
 \description{
 ME version of tram::Polr
 }

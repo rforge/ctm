@@ -22,7 +22,7 @@
 \item{...}{Additional arguments, passed to \code{plot} or \code{lines}.}
 }
 \value{
-The original \code{trafo.tramME} object.
+The original \code{trafo.tramME} object, invisibly.
 }
 \description{
 Plotting method for \code{trafo.tramME} objects

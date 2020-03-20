@@ -11,6 +11,9 @@ trafo(object, ...)
 
 \item{...}{Optional parameters}
 }
+\value{
+The value of the baseline transfromation function at certain points.
+}
 \description{
 Generic method for extracting baseline transformations
 }

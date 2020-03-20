@@ -11,6 +11,10 @@ varcov(object) <- value
 
 \item{value}{The new value of the covariance matrix}
 }
+\value{
+An object with the same class as \code{object}, with updated
+  variance-covariance matrix.
+}
 \description{
 Generic method for \code{"varcov<-"}
 }

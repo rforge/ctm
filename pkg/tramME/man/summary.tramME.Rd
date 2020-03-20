@@ -11,6 +11,9 @@
 
 \item{...}{Optional arguments (for consistency with the generic)}
 }
+\value{
+A summary.tramME object.
+}
 \description{
 Summary method for tramME model
 }

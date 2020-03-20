@@ -13,6 +13,9 @@
 
 \item{...}{Additional parameters passed to various print methods.}
 }
+\value{
+The input simulate.tramME object, invisibly.
+}
 \description{
 Automatically hides the seed attribute of the object.
 }

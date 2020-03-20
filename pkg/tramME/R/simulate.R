@@ -131,6 +131,7 @@ simulate.tramME <- function(object, nsim = 1, seed = NULL,
 ##' @param x A \code{simulate.tramME} object
 ##' @param suppress_seed Logical, suppress seed if true.
 ##' @param ... Additional parameters passed to various print methods.
+##' @return The input simulate.tramME object, invisibly.
 ##' @export
 print.simulate.tramME <- function(x, suppress_seed = TRUE, ...) {
   pr <- x

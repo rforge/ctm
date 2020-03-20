@@ -213,6 +213,7 @@
 ##' ME version of tram::Colr
 ##' @inheritParams tram::Colr
 ##' @inheritParams .tramME
+##' @return A ColrME object.
 ##' @importFrom stats na.omit
 ##' @export
 ColrME <- function(formula, data, subset, weights, offset, na.action = na.omit,
@@ -228,6 +229,7 @@ ColrME <- function(formula, data, subset, weights, offset, na.action = na.omit,
 ##' ME version of tram::Lm
 ##' @inheritParams tram::Lm
 ##' @inheritParams .tramME
+##' @return A LmME object.
 ##' @importFrom stats na.omit
 ##' @export
 LmME <- function(formula, data, subset, weights, offset, na.action = na.omit,
@@ -243,6 +245,7 @@ LmME <- function(formula, data, subset, weights, offset, na.action = na.omit,
 ##' ME version of tram::Polr
 ##' @inheritParams tram::Polr
 ##' @inheritParams .tramME
+##' @return A PolrME object.
 ##' @importFrom stats na.omit
 ##' @export
 PolrME <- function(formula, data, subset, weights, offset, na.action = na.omit,
@@ -259,6 +262,7 @@ PolrME <- function(formula, data, subset, weights, offset, na.action = na.omit,
 ##' ME version of tram::Coxph
 ##' @inheritParams tram::Coxph
 ##' @inheritParams .tramME
+##' @return A CoxphME object.
 ##' @importFrom stats na.omit
 ##' @export
 CoxphME <- function(formula, data, subset, weights, offset, na.action = na.omit,
@@ -274,6 +278,7 @@ CoxphME <- function(formula, data, subset, weights, offset, na.action = na.omit,
 ##' ME version of tram::BoxCox
 ##' @inheritParams tram::BoxCox
 ##' @inheritParams .tramME
+##' @return A BoxCoxME object.
 ##' @importFrom stats na.omit
 ##' @export
 BoxCoxME <- function(formula, data, subset, weights, offset, na.action = na.omit,
@@ -291,6 +296,7 @@ BoxCoxME <- function(formula, data, subset, weights, offset, na.action = na.omit
 ##' ME version of tram::Survreg
 ##' @inheritParams tram::Survreg
 ##' @inheritParams .tramME
+##' @return A SurvregME object.
 ##' @importFrom stats na.omit
 ##' @section Warning:
 ##'   Fixing the scale parameter is currently not available.
@@ -317,6 +323,7 @@ SurvregME <- function(formula, data, subset, weights, offset, na.action = na.omi
 ##' ME version of tram::Lehmann
 ##' @inheritParams tram::Lehmann
 ##' @inheritParams .tramME
+##' @return A LehmannME object.
 ##' @importFrom stats na.omit
 ##' @export
 LehmannME <- function(formula, data, subset, weights, offset, na.action = na.omit,

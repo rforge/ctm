@@ -48,6 +48,9 @@ BoxCoxME(formula, data, subset, weights, offset, na.action = na.omit,
 
 \item{...}{additional arguments to \code{\link{tram}}.}
 }
+\value{
+A BoxCoxME object.
+}
 \description{
 ME version of tram::BoxCox
 }

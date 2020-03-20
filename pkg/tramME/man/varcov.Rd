@@ -11,6 +11,9 @@ varcov(object, ...)
 
 \item{...}{Optional parameters}
 }
+\value{
+A variance-covariance matrix.
+}
 \description{
 Generic method for \code{varcov}
 }

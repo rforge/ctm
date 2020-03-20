@@ -29,6 +29,8 @@
 ##' Generic method for \code{"varcov<-"}
 ##' @param object A model object
 ##' @param value The new value of the covariance matrix
+##' @return An object with the same class as \code{object}, with updated
+##'   variance-covariance matrix.
 ##' @export
 "varcov<-" <- function(object, value)
   UseMethod("varcov<-")
@@ -72,6 +74,7 @@
 ##' Generic method for \code{varcov}
 ##' @param object A model object
 ##' @param ... Optional parameters
+##' @return A variance-covariance matrix.
 ##' @export
 varcov <- function(object, ...)
   UseMethod("varcov")
@@ -436,6 +439,7 @@ VarCorr.tramME <- function(x, ...) {
 ##' @param sd Logical. Print standard deviations instead of variances.
 ##' @param digits Number of digits
 ##' @param ... optional arguments
+##' @return Invisibly returns the input VarCorr.tramME object.
 ##' @export
 print.VarCorr.tramME <- function(x, sd = TRUE,
                                 digits = max(getOption("digits") - 2L, 3L),
@@ -729,6 +733,7 @@ print.tramME <- function(x, digits = max(getOption("digits") - 2L, 3L), ...) {
 ##'
 ##' @param object A tramME object
 ##' @param ... Optional arguments (for consistency with the generic)
+##' @return A summary.tramME object.
 ##' @importFrom stats pnorm
 ##' @export
 summary.tramME <- function(object, ...) {
@@ -765,6 +770,7 @@ summary.tramME <- function(object, ...) {
 ##'
 ##' @param x a \code{summary.tramME} object
 ##' @param ... Optional arguments passed to \code{\link[stats]{printCoefmat}}
+##' @return The input summary.tramME object, invisibly.
 ##' @inheritParams stats::printCoefmat
 ##' @export
 print.summary.tramME <- function(x, digits = max(getOption("digits") - 2L, 3L),
