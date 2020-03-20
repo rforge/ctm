@@ -65,3 +65,7 @@ mt <- tramnet(m0, x = x, lambda = 0, alpha = 1, check_dcp = FALSE)
                           obj_type = "lasso"))
 }
 }
+\value{
+returns an object of class \code{"MBOSingleObjResult"} which is
+documented in \code{\link[mlrMBO]{mbo}}
+}
