@@ -23,3 +23,7 @@ logLik method for class \code{"tramnet"}
 \author{
 Lucas Kook, Torsten Hothorn
 }
+\value{
+returns potentially weighted (\code{w}) log-likelihood based on 
+\code{object} evaluated at parameters \code{parm} and data \code{newdata}
+}

@@ -19,3 +19,7 @@ predict method for class \code{"tramnet"}
 \author{
 Lucas Kook
 }
+\value{
+Vector of predictions based on \code{object} evaluated at each row
+of \code{newdata}
+}

@@ -35,3 +35,4 @@ plot method for class \code{"tramnet"}
 \author{
 Lucas Kook
 }
+\value{None}

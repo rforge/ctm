@@ -16,3 +16,8 @@ summary method for class \code{"tramnet"}
 \author{
 Lucas Kook
 }
+\value{
+Returns an object of class \code{"summary.tramnet"} containing
+information about the model, optimization status, sparsity and
+tuning parameters
+}

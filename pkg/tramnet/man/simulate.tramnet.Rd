@@ -25,3 +25,7 @@ simulate method for class \code{"tramnet"}
 \author{
 Lucas Kook
 }
+\value{
+returns a \code{list} of \code{data.frames} containing parametric bootstrap
+samples based on the data supplied in \code{newdata}
+}

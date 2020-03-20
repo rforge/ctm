@@ -23,3 +23,6 @@ residuals method for class \code{"tramnet"}
 \author{
 Lucas Kook
 }
+\value{
+Returns a numeric vector of residuals for each row in \code{newdata}
+}
