@@ -18,8 +18,8 @@ Description: Partially penalized versions of specific transformation models
     is facilitated through model-based optimization functionalities from package 'mlrMBO'.
     The accompanying vignette describes the methodology used in 'tramnet' in detail.
     Transformation models and model-based optimization are described here:
-    Hothorn et al. (2019) <doi:10.1007/s11222-019-09870-4>,
-    Horn et al. (2016) <doi:10.1007/s11222-019-09870-4>.
+    Hothorn et al. (2019) <doi:10.1111/sjos.12291>,
+    Bischl et al. (2016) <arxiv:1703.03373>.
 Depends: R (>= 3.5.0), tram (>= 0.3-2), CVXR (>= 0.99-4), mlrMBO (>= 1.1-2)
 Imports: mlt, basefun, sandwich, ParamHelpers, lhs, mlr, smoof, stats
 Suggests: penalized, TH.data, survival, knitr, mlbench, colorspace, mvtnorm, 
