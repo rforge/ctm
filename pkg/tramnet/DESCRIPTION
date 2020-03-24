@@ -2,7 +2,7 @@ Package: tramnet
 Title: Penalized Transformation Models
 Version: 0.0-2
 Date: 2020-03-19
-Authors@R: c(person("Lucas", "Kook", role = "cre",
+Authors@R: c(person("Lucas", "Kook", role = c("cre", "aut"),
                     email = "lucasheinrich.kook@uzh.ch"),
              person("Balint", "Tamasi", role = "aut"),
              person("Sandra", "Siegfried", role = "ctb"),
@@ -17,9 +17,9 @@ Description: Partially penalized versions of specific transformation models
     linear models, and continuous outcome logistic regression. Hyperparameter tuning
     is facilitated through model-based optimization functionalities from package 'mlrMBO'.
     The accompanying vignette describes the methodology used in 'tramnet' in detail.
-    Transformation models and model-based optimization are described here:
-    Hothorn et al. (2019) <doi:10.1111/sjos.12291>,
-    Bischl et al. (2016) <arxiv:1703.03373>.
+    Transformation models and model-based optimization are described in
+    Hothorn et al. (2019) <doi:10.1111/sjos.12291> and
+    Bischl et al. (2016) <arxiv:1703.03373>, respectively.
 Depends: R (>= 3.5.0), tram (>= 0.3-2), CVXR (>= 0.99-4), mlrMBO (>= 1.1-2)
 Imports: mlt, basefun, sandwich, ParamHelpers, lhs, mlr, smoof, stats
 Suggests: penalized, TH.data, survival, knitr, mlbench, colorspace, mvtnorm, 
