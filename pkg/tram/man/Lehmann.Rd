@@ -1,10 +1,10 @@
 \name{Lehmann}
 \alias{Lehmann}
 \title{
-  Linear Regression for Lehrmann-alternatives
+  Linear Regression for Lehmann-alternatives
 }
 \description{
-  Non-normal linear regression for Lehrmann-alternatives
+  Non-normal linear regression for Lehmann-alternatives
 }
 \usage{
 Lehmann(formula, data, subset, weights, offset, cluster, na.action = na.omit, ...)
