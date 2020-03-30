@@ -1,0 +1,496 @@
+
+%\VignetteEngine{knitr::knitr}
+%\VignetteIndexEntry{cotram}
+%\VignetteDepends{cotram, tram, mlt, lattice}
+
+\documentclass[article,nojss,shortnames]{jss}
+
+%% packages
+\usepackage{thumbpdf}
+\usepackage{amsfonts,amstext,amsmath,amssymb,amsthm}
+\usepackage{accents}
+\usepackage{color}
+\usepackage{rotating}
+\usepackage{verbatim}
+\usepackage[utf8]{inputenc}
+\usepackage{nicefrac}
+\usepackage{pdfpages}
+%% need no \usepackage{Sweave.sty}
+%%\usepackage[nolists]{endfloat}
+
+\newcommand{\cmd}[1]{\texttt{#1()}}
+
+<<setup, echo = FALSE, results = "hide", message = FALSE, warning = FALSE>>=
+set.seed(290875)
+
+sapply(c("cotram", "tram", "mlt", "lattice"), library, char = TRUE)
+
+trellis.par.set(list(plot.symbol = list(col=1,pch=20, cex=0.7),
+                     box.rectangle = list(col=1),
+                     box.umbrella = list(lty=1, col=1),
+                     strip.background = list(col = "white"), 
+                     axis.components = list(top = list(tck = 0),
+                                            right = list(tck = 0)))
+                )
+ltheme <- canonical.theme(color = FALSE)     ## in-built B&W theme
+ltheme$strip.background$col <- "transparent" ## change strip bg
+lattice.options(default.theme = ltheme)
+
+panel <- function(x, y, ...) {
+  panel.abline(h = 1, col = "grey")
+  panel.xyplot(x, y, type = "l", col = "black")
+}
+
+knitr::opts_chunk$set(echo = TRUE, results = 'markup', error = FALSE,
+                      warning = FALSE, message = FALSE,
+                      tidy = FALSE, cache = FALSE, size = "small",
+                      fig.width = 6, fig.height = 4, fig.align = "center",
+                      out.width = NULL, ###'.6\\linewidth', 
+                      out.height = NULL,
+                      fig.scap = NA)
+knitr::render_sweave()  # use Sweave environments
+knitr::set_header(highlight = '')  # do not \usepackage{Sweave}
+
+## R settings
+opt <- options(prompt = "R> ", continue = "+  ", useFancyQuotes = FALSE, width = 75)  # JSS style
+library("colorspace")
+col <- diverge_hcl(10, h = c(246, 40), c = 96, l = c(65, 90))
+fill <- diverge_hcl(10, h = c(246, 40), c = 96, l = c(65, 90), alpha = .3)
+@
+
+\newcommand{\TODO}[1]{{\color{red} #1}}
+\renewcommand{\thefootnote}{}
+
+%% File with math commands etc.
+\input{defs.tex}
+
+%% code commands
+\newcommand{\Rclass}[1]{`\code{#1}'}
+%% JSS
+\author{Sandra Siegfried \and Torsten Hothorn \\ Universit\"at Z\"urich}
+\Plainauthor{Siegfried and Hothorn}
+
+\title{Count Transformation Models: The \pkg{cotram} Package}
+\Plaintitle{Count Transformation Models: The cotram Package}
+\Shorttitle{The \pkg{cotram} Package}
+
+\Abstract{
+The \pkg{cotram} package offers a ready-to-use \proglang{R} implementation of
+count transformation models, providing a simple but flexible approach for the 
+regression analysis of count responses arising from various, and possibly complex,
+data-generating processes. In this unified maximum-likelihood framework count models
+can be formulated, estimated, and evaluated easily. Specific models in the class
+can be flexibly customised by the choice of the link function and the parameterisation
+of the transformation function. Interpretation of explanatory variables in the linear
+predictor is possible at the scales of the discrete odds ratio, hazard ratio, or reverse
+time hazard ratio, or as conditional mean of transformed counts. The imple\-mented methods
+for the model class further provide simple tools for model evaluation. The package
+simplifies the use of transformation models for modelling counts, while ensuring
+appropriate settings for count data specifically. Extension to the formulated models
+can be made by the inclusion of response-varying effects, strata-specific
+transformation functions, or offsets, based on the underlying infrastructure of
+the \pkg{tram} and \pkg{mlt} \proglang{R} add-on packages, which further ensure
+the correct handling of the likelihood for censored or truncated observations.
+}
+
+\Keywords{conditional distribution function, conditional quantile function, count
+regression, deer-vehicle collisions, transformation model}
+\Plainkeywords{conditional distribution function, conditional quantile function,
+count regression, deer-vehicle collisions, transformation model}
+
+\Address{
+Sandra Siegfried and Torsten Hothorn\\
+Institut f\"ur Epidemiologie, Biostatistik und Pr\"avention \\
+Universit\"at Z\"urich \\
+Hirschengraben 84, CH-8001 Z\"urich, Switzerland \\
+\texttt{Torsten.Hothorn@uzh.ch}
+}
+
+\begin{document}
+
+<<citation, echo = FALSE>>=
+year <- substr(packageDescription("cotram")$Date, 1, 4)
+version <- packageDescription("cotram")$Version
+@
+
+% \input{todo}
+
+<<DVC-data, echo = FALSE, results = "hide", message = FALSE>>=
+# loading data
+if (!file.exists("analysis/DVC.rda")) {
+  download.file("https://zenodo.org/record/17179/files/DVC.tgz", "DVC.tgz")
+  untar("DVC.tgz", file = "analysis/DVC.rda")
+}
+load("analysis/DVC.rda")
+
+# set-ups
+loc <- Sys.setlocale("LC_ALL", "en_US.UTF-8")
+rm(loc)
+
+# data-frame setup
+df <- data.frame(margin.table(obs[,,"wild"], 2))
+colnames(df) <- c("day", "DVC")
+df$day <- as.Date(df$day)
+df$weekday <- factor(format(df$day, "%A"),
+                      levels = c("Monday", "Tuesday", "Wednesday", "Thursday",
+                                 "Friday", "Saturday", "Sunday"))
+df$weekday[weekdays$ArbZeitFaktor == 0] <- "Sunday"
+df$year <- factor(format(df$day, "%Y"))
+df$time <- as.numeric(difftime(df$day, start, unit = "days"))
+
+# harmonics
+sfm <- function(timevar, freq = 365, S = 10) {
+  S <- 1:S * 2
+  paste("I(", rep(c("sin", "cos"), length(S)), "(",
+        rep(S, rep(2, length(S))), "* pi *", timevar, "/", freq, "))",
+        collapse = "+")
+}
+
+Xtime <- model.matrix(as.formula(paste("~", sfm("time"))), data = df)[,-1]
+Xtime <- as.data.frame(Xtime)
+colnames(Xtime) <- paste0("tvar", 1:ncol(Xtime))
+
+df <- cbind(df, Xtime)
+@
+
+\section{Introduction}
+
+Count transformation models are a novel model class, offering a flexible and
+data-driven approach to regressing count data. The diverse set of models in the 
+class, as proposed and discussed in \cite{Siegfried_Hothorn_2020}, are 
+tailored to analyse count responses from various underlying 
+data-generating processes in a unified maximum-likelihood framework. 
+The \proglang{R} add-on package \pkg{cotram} features the implementation of the 
+proposed model class, providing a simple and user-friendly interface
+to fit and evaluate count transformation models. The package is built using the
+general infrastructure of the \proglang{R} add-on packages \pkg{tram} \citep{pkg:tram}
+and \pkg{mlt} \citep{Hothorn_2020_JSS,pkg:mlt} for likelihood-based inference and
+further extensions to the implemented model specifications.
+
+Count transformation models arise from the direct modelling of the conditional
+discrete distribution function capturing changes governed
+by a linear predictor $\rx^\top \shiftparm$. The models in the class can be represented
+by the general formulation of the conditional distribution function for any $\ry$
+%
+\begin{eqnarray} \label{mod:trafo}
+\pYx(\ry \mid \rx) = \Prob(\rY \le \ry \mid \rx) = 
+\pZ\left(\h\left(\lfloor \ry \rfloor\right) - \rx^\top \shiftparm \right),
+\quad \ry \in \RR^{+}
+\end{eqnarray}
+%
+with specific models originating from the choice of the different link functions $\g = \pZ^{-1}$. 
+The model class includes models with a logit, complementary log-log (cloglog),
+log-log, and probit link and thus offers interpretability of the linear predictor
+at various scales. The framework allows evaluating and interpreting the models
+in a discrete way, while using a computationally attractive, low-dimensional,
+continuous representation. The models are designed to simultaneously estimate
+the transformation function $\h$ and the regression coefficients $\shiftparm$
+optimising the exact discrete log-likelihood. Simultaneous estimation
+of the parameters \citep[developed by][]{Hothorn_Moest_Buehlmann_2017} is performed
+based on the underlying infrastructure provided by the \pkg{mlt} package \citep{pkg:mlt}.
+
+All models in the class (\ref{mod:trafo}) can be fitted using the general function call
+%
+\begin{verbatim}
+R> cotram(<formula>, method = <link>, ...)
+\end{verbatim}
+%
+with \code{<formula>} being any \proglang{R} formula featuring counts as the response
+and the right hand side as series of terms determining a linear predictor.
+The specific models in the class can be fitted by choosing one of the link
+functions for \code{method = <link>}. The set of models specified by the different
+link functions and the interpretation of the explanatory variables in the
+linear predictor $\rx^\top\shiftparm$ are outlined in more detail below.
+
+The package further offers \cmd{predict} and \cmd{plot} functions to assess and
+illustrate the estimated linear predictor, conditional distribution and
+density function, quantiles and the estimated transformation function,
+both as step-functions and continuously (setting \code{smooth = TRUE}).
+Functionalities for model
+interpretation and evaluation, such as \cmd{summary}, \cmd{coef}, \cmd{confint},
+and \cmd{logLik} are available in this framework.
+
+\section{Discrete Hazards Cox Count Transformation Model}\label{sec:cloglog}
+
+The count transformation model with complementary log-log link function 
+$\g = \pZ^{-1}$ (\code{method = "cloglog"}) offers a discrete version of the Cox
+proportional hazards model with fully parameterised transformation function
+$\h$ and interpretation of the linear predictor as discrete hazard ratio.
+The model explains the effects of the exponentiated linear predictor
+$\exp(-\rx^\top \shiftparm)$ on observed counts as multiplicative changes in discrete hazards
+$\Prob(\rY = \ry \mid \rY \ge \ry, \rx)$, comparing the conditional cumulative
+hazard function $\log(1 - \pYx)$ with the baseline cumulative hazard function
+$\log(1 - \pY)$, with $\rx^\top \shiftparm = 0$. 
+
+Using the deer-vehicle collisions data from \cite{Hothorn_Mueller_Held_2015},
+we can fit the Cox count transformation model to the roe deer-vehicle collision counts
+per day, recorded from 2002 to 2011 in Bavaria, Germany, and obtain the estimated
+multiplicative temporal changes in ``risk'' as discrete hazards. The
+\code{tvar} variables are sin-cosine transformed times \citep[see][]{Hothorn_Mueller_Held_2015}.
+%
+<<mod_HR>>=
+mod_cloglog <- cotram(DVC ~ year + weekday + tvar1 + tvar2 + tvar3 +
+                      tvar4 + tvar5 + tvar6 + tvar7 + tvar8 + tvar9 + 
+                      tvar10 + tvar11 + tvar12 + tvar13 + tvar14 + 
+                      tvar15 + tvar16 + tvar17 + tvar18 + tvar19 + tvar20,
+                      data = df, method = "cloglog")
+logLik(mod_cloglog)
+@
+%
+To assess how the risk varies across days and seasons, we can now compute
+the estimated discrete hazards ratio for each day of the year, based on the 
+predictor values of the year 2011. The results, shown in Figure~\ref{fig:cloglog-lp},
+illustrate the changes in the hazard ratios, relative to baseline on January 1st
+(note that we plot $\exp(\rx(\text{day})^\top \shiftparm -
+\rx(\text{2011--01--01})^\top \shiftparm)$, such that large values
+correspond to large number of collisions and thus higher risk).
+%
+<<nd_day>>=
+nd <- model.frame(mod_cloglog)[which(df$year == "2011"), -1]
+nd$day <- df[which(df$year == "2011"), "day"]
+nd$weekday <- factor("Monday", levels = levels(nd$weekday))
+@
+%
+\begin{figure}[h]
+<<cloglog_lp>>=
+fit_cloglog <- predict(mod_cloglog, type = "lp", newdata = nd) - 
+  predict(mod_cloglog, type = "lp", newdata = nd)[1]
+xyplot(exp(fit_cloglog) ~ day , data = cbind(nd, fit_cloglog),
+       ylab = "Hazard ratio", xlab = "Day of year", panel = panel)
+@
+\caption{Deer-vehicle collisions. Temporal changes in risk for 
+deer-vehicle collisions across the year as discrete hazard ratios estimated by model
+\code{mod\_cloglog} with reference: January 1st. The curve indicates, that the
+hazard ratio is increased associated with animal activity due to search for new
+habitats and food resources in April and rut season in July and August. 
+The peak in October does not seem to have a clear explanation in terms of increased
+roe deer activity.
+\label{fig:cloglog-lp}}
+\end{figure}
+
+\section{Logistic Count Transformation Model}
+
+Odds ratios are often used in practice to compare two different
+configurations of the set of explanatory variables $\rx$. Conveniently, for the
+class of count transformation models we can obtain the estimated effects on this
+scale by specifying a logit link. The exponentiated linear predictor
+$\exp(-\rx^\top \shiftparm)$ estimated by such a logistic count transformation model
+can be interpreted as odds ratio
+%
+\begin{eqnarray*}
+\frac{\Prob(\rY \le \ry \mid \rx)}{\Prob(\rY > \ry \mid \rx)} =
+\frac{\Prob(\rY \le \ry)}{\Prob(\rY > \ry)}\exp(-\rx^\top \shiftparm) ,
+\end{eqnarray*}
+%
+comparing the conditional odds of a configuration $\rx$ with the baseline odds
+$\nicefrac{\pY}{1 - \pY}$ (with $\rx^\top \shiftparm = 0$). The response-varying intercept 
+$\h(\ry)$ cancels out in the odds ratio, resulting in an estimate, which
+can be interpreted simultaneously across all cut-offs $\ry$.
+
+To explain the temporal risk of roe deer-vehicle collisions on the odds ratio scale,
+the only modification to the model formulation of Section~\ref{sec:cloglog} required,
+is the link specification in the function call as \code{method = "logit"}.
+%
+<<mod_logit>>=
+mod_logit <- cotram(DVC ~ year + weekday + tvar1 + tvar2 + tvar3 +
+                    tvar4 + tvar5 + tvar6 + tvar7 + tvar8 + tvar9 +
+                    tvar10 + tvar11 + tvar12 + tvar13 + tvar14 +
+                    tvar15 + tvar16 + tvar17 + tvar18 + tvar19 + tvar20,
+                    data = df, method = "logit")
+logLik(mod_logit)
+@
+%
+Comparison of the log-likelihoods of the fitted model and the Cox count
+transformation model from Section~\ref{sec:cloglog} shows almost matching values,
+with a slight improvement in model fit, when replacing the cloglog with the logit link.
+
+We now could further assess the effect of the factor \code{year} on the 
+deer-vehicle collision counts by computing the odds ratios (small values
+correspond to moving the distribution to the right and thus to larger number
+of collisions) along with the likelihood-based confidence intervals.
+%
+<<coefs_logit>>=
+years <- grep("year", names(coef(mod_logit)), value = TRUE)
+coef <- exp(-coef(mod_logit)[years])
+ci <- exp(-confint(mod_logit)[years,])
+round(cbind(coef, ci), 3)
+@
+%
+Plotting the estimated conditional distribution functions of model \code{mod\_logit}
+in Figure~\ref{fig:logit-cdf}, demonstrates the linear shift
+in $\pYx$ guided by the different levels of the factor \code{year}.
+%
+\begin{figure}[h]
+<<logit_cdf, echo = FALSE>>=
+nd <- model.frame(mod_logit)[unique(df$year), -1]
+nd$year <- factor(levels(nd$year), levels = levels(nd$year))
+nd$weekday <- factor("Monday", levels = levels(nd$weekday))
+nd[, grep("tvar", colnames(nd))] <- 0
+plot(mod_logit, type = "distribution", newdata = nd, q = 20:200, smooth = TRUE,
+     xlab = "Number deer-vehicle collisions", ylab = "Distribution function",
+     col = col, lwd = 1.5)
+legend(120, .6, legend = levels(nd$year)[1:5], lty = 1, lwd = 1.5, col = col[1:5],
+       bty = "n")
+legend(160, .6, legend = levels(nd$year)[6:10], lty = 1, lwd = 1.5, col = col[6:10],
+       bty = "n")
+@
+\caption{Deer-vehicle collisions. Illustration of the estimated conditional
+distribution functions of each year between 2002 and 2011.\label{fig:logit-cdf}}
+\end{figure}
+%
+
+\section{Discrete Reverse Time Hazards Count Transformation Model}
+
+Specifying a count transformation model with log-log link $\g = \pZ^{-1}$ we
+get the model formulation
+%
+\begin{eqnarray*} \label{mod:loglog}
+\pYx(\ry \mid \rx) = \Prob(\rY \le \ry \mid \rx)
+=  \exp \left(-\exp\left(\h(\lfloor \ry \rfloor) - \rx^\top \shiftparm \right)\right)
+\end{eqnarray*}
+%
+with interpretation of the linear predictor $\exp(\rx^\top \shiftparm)$ as 
+discrete reverse hazard ratio with multiplicative changes in $\log(\pY)$.
+To fit the model, we again only need to adapt the model specification in terms
+of the link function by setting \code{method = "loglog"}.
+%
+<<mod_loglog>>=
+mod_loglog <- cotram(DVC ~ year + weekday + tvar1 + tvar2 + tvar3 +
+                     tvar4 + tvar5 + tvar6 + tvar7 + tvar8 + tvar9 +
+                     tvar10 + tvar11 + tvar12 + tvar13 + tvar14 +
+                     tvar15 + tvar16 + tvar17 + tvar18 + tvar19 + tvar20,
+                     data = df, method = "loglog")
+logLik(mod_loglog)
+@
+%
+For further assessment we could evaluate the discrete conditional density of
+a set of $\rx$. Figure~\ref{fig:loglog-pmf} illustrates the estimated density function 
+in terms of the predictor values recorded on \mbox{2002--01--01} along with the actually
+observed deer-vehicle collision count.
+%
+<<nd_density>>=
+nd <- model.frame(mod_loglog)[1,]
+@
+%
+\begin{figure}[h]
+<<loglog_density>>=
+plot(mod_loglog, type = "density", newdata = nd, q = 0:150, col = col,
+     xlab = "Number of deer-vehicle collisions", ylab = "Density function")
+abline(v = nd$DVC)
+@
+\caption{Deer-vehicle collisions. Estimated discrete density function for model
+\code{mod\_loglog} with the actual observed count shown as vertical black line.\label{fig:loglog-pmf}}
+\end{figure}
+%
+
+\section{Probit Count Transformation Model}
+
+When applying a count transformation model with a probit link (\code{method = "probit"})
+we can interpret the estimated effects as changes in the conditional mean of the
+transformed counts $\Ex(\h(\ry) \mid \rX = \rx) = \rx^\top \shiftparm$. This
+interpretation is the same, as obtained from fitting a normal linear regression
+model on a priori transformed counts, by \eg a log or square-root transformation.
+However, for the probit count transformation model, as implemented in the
+\pkg{cotram} package, the transformation of the response $\ry$ was not heuristically
+chosen, as in a least-squares approach, but estimated from data by optimising the
+exact count log-likelihood.
+%
+<<probit_mod>>=
+mod_probit <- cotram(DVC ~ year + weekday + tvar1 + tvar2 + tvar3 +
+                     tvar4 + tvar5 + tvar6 + tvar7 + tvar8 + tvar9 +
+                     tvar10 + tvar11 + tvar12 + tvar13 + tvar14 +
+                     tvar15 + tvar16 + tvar17 + tvar18 + tvar19 + tvar20,
+                     data = df, method = "probit")
+logLik(mod_probit)
+@
+%
+A simple tool in this framework to check, whether, for example a log transformation,
+would have been appropriate, is to inspect the estimated
+transformation function $\h(\ry)$.
+%
+<<probit_trafo>>=
+nd <- model.frame(mod_probit)[1, ]
+trafo_probit <- predict(mod_probit, type = "trafo",
+                        newdata = nd, smooth = TRUE)
+@
+%
+The variability associated with the estimated transformation functions can be further assessed by an asymptotic confidence band.
+%
+<<probit_cb>>=
+cb_probit <- confband(mod_probit, type = "trafo",
+                      newdata = nd, smooth = TRUE)
+@
+%
+The results are shown in Figure~\ref{fig:probit-trafo} for both the transformation
+function and the conditional distribution function.
+%
+\begin{figure}[h]
+<<probit_plot, echo = FALSE>>=
+layout(matrix(1:2, nrow = 1))
+plot(mod_probit, type = "trafo", newdata = df[1,], smooth = TRUE, 
+     xlab = "Number of deer-vehicle collisions",
+     ylab = expression(paste("Transformation function ", alpha(y))),
+     col = col[10], lwd = 2, confidence = "band")
+plot(mod_probit, type = "distribution", newdata = df[1,], smooth = TRUE, 
+     xlab = "Number of deer-vehicle collisions",
+     ylab = "Distribution function",
+     col = col[1], lwd = 2, confidence = "band")
+@
+\caption{Deer-vehicle collisions. Baseline transformation $\h$ and conditional
+distribution function estimated by the model \code{mod\_probit} along with 
+95\% asymptotic confidence bands.\label{fig:probit-trafo}}
+\end{figure}
+%
+
+\section{Summary}
+
+The implemented models and methods in the \pkg{cotram} package offer a unified
+framework for users to fit and evaluate transformation models for counts, by 
+ensuring the correct handling of the discrete nature of the data.
+Simplifying the modelling procedure, the models are parameterised under general
+and empirically tested settings, eliminating the need for overly complicated model
+specifications.
+
+\clearpage
+
+\bibliography{count_mlt,packages}
+
+<<funs, echo = FALSE, results='hide', purl = FALSE>>=
+if (file.exists("packages.bib")) file.remove("packages.bib")
+pkgversion <- function(pkg) {
+  pkgbib(pkg)
+  packageDescription(pkg)$Version
+}
+pkgbib <- function(pkg) {
+  x <- citation(package = pkg, auto = TRUE)[[1]]
+  b <- toBibtex(x)
+  
+  b <- gsub("R package", "\\\\proglang{R} package", b)
+  
+  b[1] <- paste("@Manual{pkg:", pkg, ",", sep = "")
+  if (is.na(b["url"])) {
+    b[length(b)] <- paste("   URL = {http://CRAN.R-project.org/package=",
+                          pkg, "}", sep = "")
+    b <- c(b, "}")
+  }
+  cat(b, sep = "\n", file = "packages.bib", append = TRUE)
+}
+pkg <- function(pkg)
+  paste("\\\\pkg{", pkg, "} \\\\citep[version~",
+        pkgversion(pkg), ",][]{pkg:", pkg, "}", sep = "")
+
+pkgs <- c("mlt", "tram", "variables", "basefun")
+out <- sapply(pkgs, pkg)
+
+x <- readLines("packages.bib")
+for (p in pkgs)
+  x <- gsub(paste("\\{", p, ":", sep = ""), paste("\\{\\\\pkg{", p, "}:", sep = ""), x)
+cat(x, sep = "\n", file = "packages.bib", append = FALSE)
+@
+
+<<sessionInfo, echo = FALSE, results = "hide">>=
+sessionInfo()
+options(opt)
+@
+
+\end{document}

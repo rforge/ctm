@@ -1,0 +1,1477 @@
+@article{Siegfried_Hothorn_2020,
+  author = {Sandra Siegfried and Torsten Hothorn},
+  title = {Count Transformation Models},
+  year = {2020},
+  journal = {Methods in Ecology and Evolution},
+  doi = {10.1111/2041-210X.13383}
+}
+
+%-------------------------------------
+% CountReg: Discussion
+%-------------------------------------
+
+@techreport{Klein_Hothorn_Kneib_2019,
+  author = {Nadja Klein and Torsten Hothorn and Thomas Kneib},
+  title = {Multivariate Conditional Transformation Models},
+  year = {2019},
+  institution = {arXiv 1906.03151},
+  url = {https://arxiv.org/abs/1906.03151}
+}
+
+
+@article{Clark_2017,
+  author = {James S. Clark and Diana Nemergut and Bijan Seyednasrollah and
+            Phillip J. Turner and Stacy Zhang},
+  title = {Generalized Joint Attribute Modeling for Biodiversity Analysis: 
+           Median-zero, Multivariate, Multifarious Data},
+  journal = {Ecological Monographs},
+  volume = {87},
+  number = {1},
+  pages = {34--56},
+  doi = {10.1002/ecm.1241},
+  year = {2017}
+}
+
+
+
+@article{McCullagh_1980,
+  title = {Regression Models for Ordinal Data},
+  author = {Peter McCullagh},
+  journal = {Journal of the Royal Statistical Society. Series B
+  (Methodological)},
+  year = 1980,
+  volume = 42,
+  number = 2,
+  pages = {109--142},
+  doi = {10.1111/j.2517-6161.1980.tb01109.x}
+}
+
+@article{Ohara_Kotze_2010,
+  author = {O'Hara, Robert B. and Kotze, D. Johan},
+  title = {Do not log-transform count data},
+  year = {2010},
+  journal = {Methods in Ecology and Evolution},
+  volume = {1},
+  number = {2},
+  pages = {118--122},
+  doi = {10.1111/j.2041-210X.2010.00021.x}
+}
+
+% discussion of use of count GLM, LM in practice
+@article{StPierre_Shikon_Schneider_2018,
+  author = {St-Pierre, Anne P. and Shikon, Violaine and Schneider, David C.},
+  title = {Count data in biology - Data transformation or model reformation?},
+  year = {2018},
+  journal = {Ecology and Evolution},
+  volume = {8},
+  number = {6},
+  pages = {3077--3085},
+  doi = {10.1002/ece3.3807}
+}
+
+@article{Warton_2018,
+  author = {Warton, David I.},
+  title = {Why you cannot transform your way out of trouble for small counts},
+  year = {2018},
+  journal = {Biometrics},
+  volume = {74},
+  number = {1},
+  pages = {362--368},
+  doi = {10.1111/biom.12728}
+}
+
+
+@article{Warton_Lyons_Stoklosa_2016,
+  author = {Warton, David I. and Lyons, Mitchell and Stoklosa, Jakub and Ives, Anthony R.},
+  title = {Three points to consider when choosing a {LM} or {GLM} test for count data},
+  year = {2016},
+  journal = {Methods in Ecology and Evolution},
+  volume = {7},
+  number = {8},
+  pages = {882--890},
+  doi = {10.1111/2041-210X.12552}
+}
+
+% early article on transformation vs GLM
+%  propose test
+%  Argue for TM-OLS: GLM models can yield very imprecise estimates if the log-scale error is heavy-tailed
+@article{ Manning_Mullahy_2001,
+  title = {Estimating log models: to transform or not to transform?},
+  author = {Manning, Willard G and Mullahy, John},
+  journal = {Journal of health economics},
+  volume = {20},
+  number = {4},
+  pages = {461--494},
+  year = {2001},
+  publisher = {Elsevier}, 
+  doi = {10.1016/S0167-6296(01)00086-8}
+}
+
+% Problems with choosing transformation
+@article{Manning_1998,
+  title = {The logged dependent variable, heteroscedasticity, and the retransformation problem},
+  author = {Manning, Willard G},
+  journal = {Journal of health economics},
+  volume = {17},
+  number = {3},
+  pages = {283--295},
+  year = {1998},
+  publisher = {Elsevier}, 
+  doi = {10.1016/S0167-6296(98)00025-3}
+}
+
+% Empeval for TMLM & GLM
+@article{Gray_2005,
+  title={Selecting a distributional assumption for modelling relative densities of benthic macroinvertebrates},
+  author={Gray, Brian R},
+  journal={Ecological Modelling},
+  volume={185},
+  number={1},
+  pages={1--12},
+  year={2005},
+  publisher={Elsevier}, 
+  doi = {10.1016/j.ecolmodel.2004.11.006}
+}
+
+% data transformation: how to present results
+@misc{Rblogger_Transformation,
+  title = {Stabilising transformations: how do I present my results?},
+  howpublished = {\url{https://www.r-bloggers.com/stabilising-transformations-how-do-i-present-my-results/}},
+  note = {Accessed: 2019-07-02}
+}
+
+% data transformation: how to present results - corresponding paper
+@article{ Onofri_2010,
+  title = {Current statistical issues in Weed Research},
+  author = {Onofri, A and Carbonell, EA and Piepho, H-P and Mortimer, AM and Cousens, RD},
+  year = {2010},
+  journal = {Weed Research},
+  volume = {50},
+  number = {1},
+  pages = {5--24},
+  publisher = {Wiley Online Library},
+  doi = {10.1111/j.1365-3180.2009.00758.x}
+}
+
+% suggest data-transformation
+@article{Ives_2015,
+  author = {Ives, Anthony R.},
+  title = {For testing the significance of regression coefficients, go ahead and log-transform count data},
+  year = {2015},
+  journal = {Methods in Ecology and Evolution},
+  volume = {6},
+  number = {7},
+  pages = {828--835},
+  doi = {10.1111/2041-210X.12386}
+}
+
+% suggest data-transformation for count-example: p 194, 700
+@book{Dean_Voss_Draguljic_2017,
+author = {Dean, Angela and Voss, Daniel and Dragulji{\'c}, Danel},
+title = {Design and Analysis of Experiments},
+year = {2017},
+series = {Springer Texts in Statistics},
+publisher = {Springer International Publishing},
+edition = {2nd},
+doi = {10.1007/978-3-319-52250-0}
+}
+
+% suggest data-transformation: p 232, 233
+@book{Gotelli_Ellison_2013,
+author = {Gotelli, Nicholas J and Ellison, Aaron M},
+title = {A Primer of Ecological Statistics},
+year = {2013},
+publisher = {Sinauer Associates},
+edition = {2nd},
+}
+
+% overdispersion
+@article{VerHoef_Boveng_2007,
+  author = {Ver Hoef, Jay M. and Boveng, Peter L.},
+  title = {Quasi-Poisson vs. Negative Binomial Regression: How should we model overdispersed count data?},
+  year = {2007},
+  journal = {Ecology},
+  volume = {88},
+  number = {11},
+  pages = {2766--2772},
+  doi = {10.1890/07-0043.1}
+  }
+  
+% overdispersion
+ @article{Harrison_2014,
+  author = {Harrison, Xavier A},
+  title = {Using observation-level random effects to model overdispersion in count data in ecology and evolution},
+  year = {2014},
+  journal = {PeerJ},
+  volume = {2},
+  pages = {e616},
+  publisher = {PeerJ Inc.}, 
+  doi = {10.7717/peerj.616}
+}
+
+% overdispersion 
+@article{Linden_Maentyniemi_2011,
+  author = {Lind{\'e}n, Andreas and M{\"a}ntyniemi, Samu},
+  title = {Using the negative binomial distribution to model overdispersion in ecological count data},
+  year = {2011},
+  journal = {Ecology},
+  volume = {92},
+  number = {7},
+  pages = {1414--1421},
+  doi = {10.1890/10-1831.1}
+  }
+
+% on overdispersion in crop-science % Empeval with CMP, GLM, GLMM 
+@article{Kosma_et_al_2019,
+  author = {Kosma, Micha{\l} and Studnicki, Marcin and W{\'o}jcik-Seliga, Justyna and Michalska-Klimczak,
+                 Beata and Wyszy{\'n}ski, Zdzis{\l}aw and W{\'o}jcik-Gront, El{\.z}bieta},
+  title = {Over-dispersed count data in crop and agronomy research},
+  year = {2019},
+  journal = {Journal of Agronomy and Crop Science},
+  volume = {0},
+  number = {0},
+  pages = {},
+  doi = {10.1111/jac.12333}
+}
+
+% Psychology % Recommendation GLM over TM-LM
+@article{Lo_Andrews_2015,
+  author = {Lo, Steson and Andrews, Sally},   
+  title = {To transform or not to transform: using generalized linear mixed models to analyse reaction time data},   
+  year = {2015},
+  journal = {Frontiers in Psychology}, 
+  volume = {6},
+  pages = {1171},
+  doi = {10.3389/fpsyg.2015.01171}
+}
+
+% Psychology % good outline for LM to Poisson to NB, QP
+@article{Gardner_Mulvey_Shaw_1995,
+  title = {Regression analyses of counts and rates: Poisson, overdispersed Poisson, and negative binomial models.},
+  author = {Gardner, William and Mulvey, Edward P and Shaw, Esther C},
+  year = {1995},
+  journal = {Psychological bulletin},
+  volume = {118},
+  number = {3},
+  pages = {392},
+  doi = {10.1037/0033-2909.118.3.392}
+}
+
+% new method for overdisp
+@article{Okamuara_Punt_Amano_2012,
+  title = {A generalized model for overdispersed count data},
+  author = {Okamura, Hiroshi and Punt, Andr{\'e} E and Amano, Tatsuya},
+  year = {2012},
+  journal = {Population ecology},
+  volume = {54},
+  number = {3},
+  pages = {467--474},
+  doi = {10.1007/s10144-012-0319-4}
+}
+  
+ % QP vs NB
+@techreport{Xu_Grunwald_Jones_2008,
+  author = {Xu, Stanley and Grunwald, Gary and Jones, Richard},
+  title = {A simulation study comparing likelihood and non-likelihood approaches in analyzing overdispersed count data},
+  year = {2008},
+  institution = {arXiv 0809.1024, v1},
+  url = {https://arxiv.org/abs/0809.1024v1}
+}
+
+@article{Richards_2008,
+  title = {Dealing with overdispersed count data in applied ecology},
+  author = {Richards, Shane A},
+  year = {2008},
+  journal = {Journal of Applied Ecology},
+  volume = {45},
+  number = {1},
+  pages = {218--227},
+  publisher = {Wiley Online Library},
+  doi = {10.1111/j.1365-2664.2007.01377.x}
+}
+
+%-------------------------------------
+% CountReg: Transformation: Application
+%-------------------------------------
+% if more needed, check: Appendix StPierre et al. (2018)
+
+% Application: ANOVA/LM(log(y + 1) ~ ...)
+@article{Mooney_etal_2016,
+  author = {Mooney, Emily H and Phillips, Joseph S and Tillberg, Chadwick V and Sandrow, Cheryl and Nelson, Annika S and Mooney, Kailen A},
+  title = {Abiotic mediation of a mutualism drives herbivore abundance},
+  year = {2016},
+  journal = {Ecology Letters},
+  volume = {19},
+  number = {1},
+  pages = {37--44},
+  publisher = {Wiley Online Library},
+  doi = {10.1111/ele.12540}
+}
+
+% Application: ANOVA(sqrt(y) ~ ...)
+@article{DeFelipe_etal_2019,
+  title = {Environmental factors influencing road use in a nocturnal insectivorous bird},
+  author = {De Felipe, Miguel and S{\'a}ez-G{\'o}mez, Pedro and Camacho, Carlos},
+  year = {2019},
+  journal = {European Journal of Wildlife Research},
+  volume = {65},
+  number = {3},
+  pages = {31},
+  publisher = {Springer}, 
+  doi = {10.1007/s10344-019-1267-5}
+}
+
+% Application: ANOVA(sqrt(y) ~ ...)
+@article{McCay_MacCay_Czajka_2009,
+  author = {McCay, Timothy S and McCay, Deanna H and Czajka, Jessica L},
+  title = {Deposition of exotic bird-dispersed seeds into three habitats of a fragmented landscape in the northeastern United States},
+  year = {2009},
+  journal = {Plant Ecology},
+  volume = {203},
+  number = {1},
+  pages = {59--67},
+  publisher = {Springer}, 
+  doi = {10.1007/s11258-008-9509-8}
+}
+
+% Application: LM(log(y) ~ ...)
+@article{Thomson_2016,
+  title = {Local bumble bee decline linked to recovery of honey bees, drought effects on floral resources},
+  author = {Thomson, Diane M},
+  journal = {Ecology letters},
+  volume = {19},
+  number = {10},
+  pages = {1247--1255},
+  year = {2016},
+  publisher = {Wiley Online Library}, 
+  doi = {10.1111/ele.12659}
+}
+  
+%-------------------------------------
+% CountReg: Basics
+%-------------------------------------
+
+@article{Nelder_Wedderburn_1972,
+  author = {Nelder, John Ashworth and Wedderburn, Robert WM},
+  title = {Generalized linear models},
+  year = {1972},
+  journal = {Journal of the Royal Statistical Society: Series A (General)},
+  volume = {135},
+  number = {3},
+  pages = {370--384},
+  doi = {10.2307/2344614}
+}
+
+% describes adjustments to Poisson likelihood required to maximize the likelihood corresponding to Cox's method by including block-factor
+@article{Whitehead_1980,
+  author = {Whitehead, John},
+  title = {Fitting Cox's regression model to survival data using GLIM},
+  year = {1980},
+  journal = {Journal of the Royal Statistical Society: Series C (Applied Statistics)},
+  volume = {29},
+  number = {3},
+  pages = {268--275},
+  doi = {10.2307/2346901}
+}
+
+% before GLM
+@book{Snedecor_Cochran_1967,
+  title = {Statistical Methods},
+  author = {Snedecor, George W and Cochran, William G},
+  year = {1967},
+  edition = {6},
+  publisher = {The Iowa State University Press},
+  doi = {}
+}
+% before GLM
+@book{Sokal_Rohlf_1967,
+  title = {Biometry},
+  author = {Robert R. Sokal and F. James Rohlf},
+  year = {1967},
+  publisher = {W.H. Freeman and Company},
+  place = {San Francisco},
+  doi = {}
+}
+
+% basics of overdispersion % no discussion
+@article{Cox_1983,
+  author = {Cox, David R},
+  title = {Some remarks on overdispersion},
+  year = {1983},
+  journal = {Biometrika},
+  volume = {70},
+  number = {1},
+  pages = {269--274},
+  doi = {10.1093/biomet/70.1.269}
+}
+
+% discussion overdisp
+@article{Hinde_Demetrio_1998,
+  author = {Hinde, John and Dem{\'e}trio, Clarice GB},
+  title = {Overdispersion: Models and estimation},
+  year = {1998},
+  journal = {Computational Statistics \& Data Analysis},
+  volume = {27},
+  number = {2},
+  pages = {151--170},
+  doi = {10.1016/S0167-9473(98)00007-3}
+}
+
+@inbook{Cameron_Trivedi_2013, 
+  author = {Cameron, A. Colin and Trivedi, Pravin K.},
+  title = {Basic Count Regression},
+  booktitle = {Regression Analysis of Count Data},
+  year = {2013},
+  edition = {2},
+  pages = {69--110},
+  series = {Econometric Society Monographs},
+  publisher = {Cambridge University Press},
+  place = {Cambridge},
+  doi = {10.1017/CBO9781139013567.006},
+}
+
+@book{McCullagh_Nelder_2018,
+  title = {Generalized linear models},
+  author = {McCullagh, Peter and Nelder, John A.},
+  year = {2018},
+  edition = {2}, 
+  publisher = {Chapman and Hall/CRC},
+  series = {Chapman \& Hall/CRC Monographs on Statistics and Applied Probability},
+  doi = {}
+}
+
+@article{Barlett_1936,
+  title = {The square root transformation in analysis of variance},
+  author = {Bartlett, Maurice S},
+  year = {1936},
+  journal = {Supplement to the Journal of the Royal Statistical Society},
+  volume = {3},
+  number = {1},
+  pages = {68--78},
+  doi = {10.2307/2983678}
+}
+
+@article{Barlett_1947,
+  title = {The use of transformations},
+  author = {Bartlett, Maurice S},
+  year = {1947},
+  journal = {Biometrics},
+  volume = {3},
+  number = {1},
+  pages = {39--52},
+  doi = {10.2307/3001536}
+}
+
+@article{Anscombe_1948,
+  author = {Anscombe, Francis J},
+  title = {The transformation of Poisson, binomial and negative-binomial data},
+  year = {1948},
+  journal = {Biometrika},
+  volume = {35},
+  number = {3/4},
+  pages = {246--254},
+  doi = {10.2307/2332343}
+}
+
+%-------------------------------------
+% CountReg: Methods
+%-------------------------------------
+
+@techreport{Kowal_Canale_2019,
+	author = {Daniel R. Kowal adn Antonio Canale},
+ 	title = {A Simultaneous Transformation and Rounding Approach for Modeling Integer-Valued Data},
+	year = {2019},
+	institution = {arXiv 1906.11653, v1},
+	url = {https://arxiv.org/abs/1906.11653v1}
+}
+
+
+@article{Valle_Toh_Laporta_2019,
+  title = {Ordinal regression models for zero-inflated and/or over-dispersed count data},
+  author = {Valle, Denis and Toh, Kok Ben and Laporta, Gabriel Zorello and Zhao, Qing},
+  year = {2019},
+  journal = {Scientific reports},
+  volume = {9},
+  number = {1},
+  pages = {3046}, 
+  doi = {10.1038/s41598-019-39377-x}
+}
+
+@Article{Sroka_Nagaraja_2018,
+  author = {Sroka, Christopher J. and Nagaraja, Haikady N.},
+  title = {Odds ratios from logistic, geometric, Poisson, and negative binomial regression models},
+  year = {2018},
+  journal = {BMC Medical Research Methodology},
+  volume = {18},
+  number = {1},
+  pages = {112},
+  doi = {10.1186/s12874-018-0568-9}
+}
+
+% acceptedmanuscript % underdispersion
+@article{Brooks_Kristensen_Darrigo_2019,
+  author = {Brooks, Mollie E. and Kristensen, Kasper and Darrigo, Maria Rosa and Rubim, Paulo and Uriarte,  
+                 Mar{\'\i}a and Bruna, Emilio and Bolker, Benjamin M.},
+  title = {Statistical modeling of patterns in annual reproductive rates},
+  year = {2019},
+  journal = {Ecology},
+  volume = {},
+  number = {},
+  pages = {e02706},
+  doi = {10.1002/ecy.2706}
+  }
+  
+% general discussion on GLMMs
+@article{Bolker_Brooks_Clark_2009,
+  author = {Bolker, Benjamin M and Brooks, Mollie E and Clark, Connie J and Geange, Shane W
+                 and Poulsen, John R and Stevens, M Henry H and White, Jada-Simone S},
+  title = {Generalized linear mixed models: a practical guide for ecology and evolution},
+  year = {2009},
+  journal = {Trends in ecology \& evolution},
+  volume = {24},
+  number = {3},
+  pages = {127--135},
+  doi = {10.1016/j.tree.2008.10.008}
+}
+
+%-------------------------------------
+% Methods: Others
+%-------------------------------------
+
+% analog idea for quantile regression
+@techreport{Padellini_Rue_2019,
+ 	title = {Model-aware Quantile Regression for Discrete Data},
+	author = {Padellini, Tullia and Rue, Haavard},
+	year = {2019},
+  institution = {arXiv 1804.03714, v2},
+  url = {https://arxiv.org/abs/1804.03714v2}
+}
+
+% special case of transformation models
+@article{Peluso_Vinciotti_Yu_2019,
+  author = {Peluso, Alina and Vinciotti, Veronica and Yu, Keming},
+	title = {Discrete {Weibull} generalized additive model: an application to count fertility data},
+	year = {2019},
+	journal = {Journal of the Royal Statistical Society: Series C (Applied Statistics)},
+	volume = {68},
+	number = {3},
+	pages = {565--583},
+	doi = {10.1111/rssc.12311}
+}
+
+% original reference for discretized weibull distribution
+@article{Nakagawa_Osaki_1975,
+  title = {The discrete {Weibull} distribution},
+  year = {1975},
+  author = {Nakagawa, Toshio and Osaki, Shunji},
+  journal = {IEEE Transactions on Reliability},
+  volume = {24},
+  number = {5},
+  pages = {300--301},
+  publisher = {IEEE},
+  doi = {10.1109/TR.1975.5214915}
+}
+
+% also DW as in Peluso_Vinciotti_Yu_2019
+@Article{Klakattaw_Vinciotti_Yu_2018,
+author = {Klakattawi, Hadeel S. and Vinciotti, Veronica and Yu, Keming},
+title = {A Simple and Adaptive Dispersion Regression Model for Count Data},
+year = {2018},
+journal = {Entropy},
+volume = {20},
+number = {2},
+doi = {10.3390/e20020142}
+}
+
+%-------------------------------------
+% Methods: MLT
+%-------------------------------------
+
+@article{Hothorn_Moest_Buehlmann_2017,
+  author = {Torsten Hothorn and Lisa M\"ost and Peter B\"uhlmann},
+  title = {Most Likely Transformations},
+  year = {2018},
+  journal = {Scandinavian Journal of Statistics},
+  volume = {45},
+  number = {1},
+  pages = {110--134},
+  doi = {10.1111/sjos.12291}
+}
+
+@article{Hothorn_2020_JSS,
+  author = {Torsten Hothorn},
+  title = {Most Likely Transformations: The \textbf{mlt} Package},
+  journal = {Journal of Statistical Software},
+  year = {2020},
+  volume = {92},
+  number = {1},
+  pages = {1--68},
+  doi = {10.18637/jss.v092.i01},
+}
+
+
+@techreport{Hothorn_arxiv_2016,
+  author = {Torsten Hothorn and Lisa M\"ost and Peter B\"uhlmann},
+  title = {Most Likely Transformations},
+  year = {2017},
+  institution = {arXiv 1508.06749, v4},
+  url = {https://arxiv.org/abs/1508.06749v4}
+}
+
+@article{Hothorn_Kneib_Buehlmann_2014,
+  author = {Torsten Hothorn and Thomas Kneib and Peter B{\"u}hlmann},
+  title = {Conditional Transformation Models},
+  year = {2014},
+  journal = {Journal of the Royal Statistical Society: Series B (Statistical Methodology)},
+  volume = 76,
+  number = 1,   
+  pages = {3--27},
+  code = {http://R-forge.R-project.org/projects/ctm},
+  data = {http://R-forge.R-project.org/projects/ctm},
+  doi = {10.1111/rssb.12017}
+}
+
+@article{Lohse_Rohrmann_Faeh_Hothorn_2017,
+	author = {Lohse, Tina and Rohrmann, Sabine and Faeh, David and Hothorn, Torsten},
+	title = {Continuous outcome logistic regression for analyzing body mass index distributions},
+	journal = {F1000Research},
+	year = {2017},
+	volume = {6},
+	pages = {1933},
+	doi = {10.12688/f1000research.12934.1}
+}
+
+@article{Farouki_2012,
+  author = {Rida T. Farouki},
+  title = {The {Bernstein} Polynomial Basis: A Centennial Retrospective},
+  year = {2012},
+  journal = {Computer Aided Geometric Design},
+  volume = {29},
+  number = {6},
+  doi = {10.1016/j.cagd.2012.03.001},
+  pages = {379--419}
+}
+
+@article{Chang_Hsiung_Wu_2005,
+  author = {I. Chang and Chao A. Hsiung and Yuh-Jenn Wu and Che-Chi Yany},
+  title = {Bayesian Survival Analysis Using {Bernstein} Polynomials},
+  year = {2005},
+  journal = {Scandinavian Journal of Statistics},
+  volume = {32},
+  number = {3},
+  pages = {447--466},
+  doi = {10.1111/j.1467-9469.2005.00451.x}
+}
+
+@article{Curtis_Ghosh_2011,
+  author = {S. McKay Curtis and Sujit K. Ghosh},
+  title = {A Variable Selection Approach to Monotonic Regression 
+           with {Bernstein} Polynomials},
+  year = {2011},
+  journal = {Journal of Applied Statistics},
+  volume = {38},
+  number = {5},
+  DOI = {10.1080/02664761003692423},
+  pages = {961--976}
+}
+
+@article{Hothorn_2020,
+  author = {Torsten Hothorn},
+  title = {Transformation boosting machines},
+  year = {2020},
+  journal = {Statistics and Computing},
+  volume = {30},
+  pages = {141--152},
+  doi = {10.1007/s11222-019-09870-4}
+}
+
+@techreport{Hothorn_arxiv_2019,
+    author = {Torsten Hothorn},
+    title = {Marginally Interpretable Linear Transformation Models for Clustered Observations},
+    year = {2019},
+    institution = {arXiv 1910.09219, v1},
+    url = {https://arxiv.org/abs/1910.09219v1}
+}
+
+@techreport{Hothorn_Zeileis_2017,
+  author = {Torsten Hothorn and Achim Zeileis},
+  title = {Transformation Forests},
+  year = {2017},
+  institution = {arXiv 1701.02110},
+  url = {https://arxiv.org/abs/1701.02110}
+}
+
+@article{Bove_Held_2013,
+  author = {Daniel {Saban{\'e}s Bov{\'e}} and Leonhard Held},
+  title = {Comment on {Cai} and {Betensky} (2003), {On} the {Poisson} Approximation 
+           for Hazard Regression},
+  year = {2013},
+  journal = {Biometrics},
+  volume = {69},
+  number = {3},
+  DOI = {10.1111/biom.12088},
+  pages = {795--795}
+}
+
+@article{Horowitz_1996,
+  author = {Joel L. Horowitz},
+  title = {Semiparametric Estimation of a Regression Model with an 
+           Unknown Transformation of the Dependent Variable},
+  journal = {Econometrica},
+  volume = 64,
+  number = 1,
+  year = 1996,
+  pages = {103--137}
+}
+
+@article{Sun_Sundaram_Zhao_2009,
+  author = {Yanqing Sun and Rajeshwari Sundaram and Yichuan Zhao},
+  title = {Empirical Likelihood Inference for the {Cox} Model with Time-dependent
+           Coefficients via Local Partial Likelihood},
+  year = {2009},
+  journal = {Scandinavian Journal of Statistics},
+  volume = {36},
+  number = {3},
+  DOI = {10.1111/j.1467-9469.2008.00634.x},
+  pages = {444--462}
+}
+
+@Book{Venables_Ripley_2002,
+    title = {Modern Applied Statistics with S},
+    author = {W. N. Venables and B. D. Ripley},
+    publisher = {Springer-Verlag},
+    edition = {Fourth},
+    address = {New York, U.S.A.},
+    year = {2002},
+    note = {ISBN 0-387-95457-0},
+    url = {http://www.stats.ox.ac.uk/pub/MASS4},
+}
+
+%-------------------------------------
+% Empeval: DVC
+%-------------------------------------
+
+% original analysis
+@article{Hothorn_Mueller_Held_2015,
+  author = {Torsten Hothorn and J\"org M\"uller and Leonhard Held and Lisa M\"ost and Atle Mysterud},
+  title = {Temporal Patterns of Deer-vehicle Collisions Consistent with Deer Activity Pattern and Density
+            Increase but not General Accident Risk},
+  year = {2015},
+  journal = {Accident Analysis \& Prevention},
+  volume = {81},
+  pages = {143--152},
+  doi = {10.1016/j.aap.2015.04.037}
+}
+
+% implementation of seasonal effect
+@article{Held_Paul_2012,
+  author = {Leonhard Held and Michaela Paul},
+  title = {Modeling seasonality in space-time infectious disease surveillance data},
+  year = {2012},
+  journal = {Biometrical Journal},
+  doi = {10.1002/bimj.20120003},
+  volume = {54},
+  number = {6},
+  pages = {824--843},
+}
+
+% WVC %REs
+@article{Benten_Hothorn_Vor_2018,
+  author = {Anke Benten and Torsten Hothorn and Torsten Vor and Christian Ammer},
+  title = {Wildlife Warning Reflectors Do not Mitigate Wildlife-Vehicle Collisions on Roads},
+  journal = {Accident Analysis \& Prevention},
+  year = {2018},
+  volume = {120},
+  pages = {64--73},
+  doi = {10.1016/j.aap.2018.08.003}
+}
+
+%-------------------------------------
+% Software
+%-------------------------------------
+@Manual{R,
+    title = {R: A Language and Environment for Statistical Computing},
+    author = {{R Core Team}},
+    organization = {R Foundation for Statistical Computing},
+    address = {Vienna, Austria},
+    year = {2019},
+    url = {https://www.R-project.org/},
+  }
+
+%-------------------------------------
+% MLT
+%-------------------------------------
+
+%VIP %flex_int %spezi %full_lik %splines
+% Note: Parametrisations for conditional and unconditional log-hazard functions.
+% PH models, PH models with time-varying effects, nonparametric PH models are included.
+@article{Kooperbergetal_1995,
+  title = {Hazard Regression},
+  author = {Kooperberg, Charles and Stone, Charles J. and Truong, Young K.},
+  journal = {Journal of the American Statistical Association},
+  volume = {90},
+  number = {429},
+  pages = {78--94},
+  year = {1995}
+}
+
+%optional %flex_int %spezi %full_lik %splines
+% Note: Extension of Kooperberg et al. (1995) to interval-censored data and 
+%       time-dependent covariates.
+%       Modified Newton-Raphson algorithm because the log-likelihood is not 
+%       necessarily concave for interval-censored data.
+@article{KooperbergClarkson_1997,
+  title = {Hazard Regression with Interval-Censored Data},
+  author = {Kooperberg, Charles and Clarkson, Douglas B.},
+  journal = {Biometrics},
+  volume = {53},
+  number = {4},
+  pages = {1485--1494},
+  year = {1997}
+}
+
+%LTM %spezi %full_lik %splines
+% Note: Baseline-hazard function is approximated with quadratic splines.
+@article{Etezadi-Amoli_Ciampi_1987,
+  title = {Extended Hazard Regression for Censored Survival Data with 
+           Covariates: A Spline Approximation for the Baseline Hazard Function},
+  author = {Etezadi-Amoli, Jamshid and Ciampi, Antonio},
+  journal = {Biometrics},
+  volume = {43},
+  number = {1},
+  pages = {181--192},
+  year = {1987}
+}
+
+%hazard_est %spezi %pen_lik %splines
+% Note: Hazard function is parametrised in M-splines; I-splines are corresponding
+%       splines for the cumulative hazard function; identical basis coefficients.
+%       Approach can be extended to include covariate information.
+%       Interval censored and interval truncated observations are considered.
+@article{Jolyetal_1998,
+  title = {A Penalized Likelihood Approach for Arbitrarily Censored 
+           and Truncated Data: Application to Age-Specific Incidence of Dementia},
+  author = {Joly, Pierre and Commenges, Daniel and Letenneur, Luc},
+  journal = {Biometrics},
+  volume = {54},
+  number = {1},
+  pages = {185--194},
+  year = {1998}
+}
+
+%hazard_est %spezi %pen_lik %splines %optional
+% Note: sqrt(lambda(y)) is parametrised; roughness penalty is considered.
+%       General spline function that minimises the penalised log-likelihood
+%       can be determined (similar principal as for natural cubic splines???)
+@article{Senthil_1992,
+  title = {Nonparametric Estimation of Hazard Function from Left 
+           Truncated and Right Censored Data},
+  author = {Selvan A. Senthil},
+  journal = {Journal of Nonparametric Statistics},
+  volume = {2},
+  number = {1},
+  pages = {29--35},
+  year = {1992},
+  doi = {10.1080/10485259208832540}
+}
+
+%hazard_est %spezi %pen_lik %splines %optional
+% Note: estimation of an unconditional log-hazard function or log-density.
+@article{Osullivan_1988,
+  title = {Fast Computation of Fully Automated Log-Density and Log-Hazard Estimators},
+  author = {Finbarr O'Sullivan},
+  journal = {SIAM Journal on Scientific and Statistical Computing},
+  volume = {9},
+  number = {2},
+  pages = {363--379},
+  year = {1988}
+}
+
+%LTM %spezi %full_lik %splines 
+% Note: baseline function has density with mild smoothness conditions; 
+%       density is parametrised by a truncated series expantion with fixed degree of
+%       truncation; adaptive choice of degree of truncation;
+%       Given examples only include LTMs, but AFT-extensions to heteroscedastic errors
+%       and time-dependent covariates are given in the appendix.
+@article{ZhangDavidian_2008,
+  author = {Zhang, Min and Davidian, Marie},
+  title = {''Smooth'' Semiparametric Regression Analysis for 
+           Arbitrarily Censored Time-to-Event Data},
+  journal = {Biometrics},
+  volume = {64},
+  number = {2},
+  doi = {10.1111/j.1541-0420.2007.00928.x},
+  pages = {567--576},
+  year = {2008}
+}
+
+%optional %LTM $spezi %full_lik %splines (= parametric transformation) %bayes
+% Note: Transform both sides model is more restrictive than LTMs because both sides of
+%       the model equation are transformed in terms of the same function g_lambda!
+%       Extension of Box-Cox power family.
+@article{Polpoetal_2014,
+  title = {Transform Both Sides Model: A Parametric Approach},
+  journal = {Computational Statistics \& Data Analysis},
+  volume = {71},
+  pages = {903--913},
+  year = {2014},
+  doi = {10.1016/j.csda.2013.07.023},
+  author = {A. Polpo and C. P. {de Campos} and D. Sinha and S. Lipsitz and J. Lin}
+}
+
+%LTM %spezi %full_lik %splines (= parametric transformation) %bayes
+% Note: LTM with parametric response transformation and fixed error distribution
+%       F = Phi.
+@article{BoxCox_1964,
+  author = {G. E. P. Box and D. R. Cox}, 
+  title = {An Analysis of Transformations},
+  volume = {26}, 
+  number = {2}, 
+  pages = {211--252}, 
+  year = {1964},  
+  journal = {Journal of the Royal Statistical Society B},
+}
+
+%optional %LTM %spezi %full_lik %splines (= parametric transformation)
+% Note: Generalisation of Box-Cox, e.g. to arbitrary but fixed error distribution F.
+@article{BickelDoksum_1981,
+  author = {P. J. Bickel and K. A. Doksum},
+  title = {An Analysis of Transformations Revisited},
+  journal = {Journal of the American Statistical Association},
+  volume = {76},
+  number = {374},
+  pages = {296--311},
+  year = {1981},
+  doi = {10.1080/01621459.1981.10477649}
+}
+
+%optional
+% Note: Reference for Exponential PH and Weibull PH model.
+@article{Prentice_1973,
+  author = {R. L. Prentice}, 
+  title = {Exponential Survivals with Censoring and Explanatory Variables},
+  volume = {60}, 
+  number = {2}, 
+  pages = {279--288}, 
+  year = {1973}, 
+  doi = {10.1093/biomet/60.2.279}, 
+  journal = {Biometrika} 
+}
+
+%VIP %LTM %random %spezi %NPMLE %profile_lik or %full_lik
+% Note: relationship of LTMs and frailty models;
+%       time-dependent covariates are considered;
+%       log-likelihood is formulated based on a counting process.
+%       Model estimation: direct maximisation of full-lik or profile likelihood 
+%       (both NPMLE).
+@article {ChoiHuang_2012,
+  author = {S. Choi and X. Huang},
+  title = {A General Class of Semiparametric Transformation Frailty 
+           Models for Nonproportional Hazards Survival Data},
+  journal = {Biometrics},
+  volume = {68},
+  number = {4},
+  doi = {10.1111/j.1541-0420.2012.01784.x},
+  pages = {1126--1135},
+  year = {2012}
+}
+
+%optional %LTM %profile_lik %spezi %NPMLE
+% Note: log-likelihood based on counting processes is used;
+%       time-dependent covariates are considered.
+%       Estimation: weighted Breslow-type estimator for jump sizes of the cumulative
+%       baseline function; profile score equation for regression coefficients.
+%       Extension of Chen et al. (2002) (unweighted Breslow-type estimator)!
+@article{Chen_2009,
+  author = {Chen, Yi-Hau}, 
+  title = {Weighted Breslow-type and Maximum Likelihood Estimation in 
+           Semiparametric Transformation Models},
+  year = {2009}, 
+  volume = 96,
+  number = 3,
+  pages = {591--600},
+  doi = {10.1093/biomet/asp032}, 
+  journal = {Biometrika} 
+}
+
+%optional %spezi %NPMLE
+% Note: proportional intensity model (for counting processes) with time-dependent
+%       covariates;
+%       nonparametric log-likelihood for counting processes;
+%       LTM and PH model are included as special cases;
+%       in contrast to Chen et al. (2002) the estimators are asympt. efficient;
+%       quasi-Newton method for model estimation.
+@article{ZengLin_2006,
+  author = {D. Zeng and D. Y. Lin}, 
+  title = {Efficient Estimation of Semiparametric Transformation 
+           Models for Counting Processes},
+  volume = {93}, 
+  number = {3}, 
+  pages = {627--640}, 
+  year = {2006}, 
+  doi = {10.1093/biomet/93.3.627}, 
+  journal = {Biometrika} 
+}
+
+%VIP %flex_int %random %spezi %NPMLE
+% Note: General class of transformation models for counting processes that is able to
+%       handle time-dependent covariates, heteroscedasticity, multiple types of events,
+%       random effects;
+%       unified and general asymptotic theory is provided.
+@article {ZengLin_2007,
+  author = {D. Zeng and D. Y. Lin},
+  title = {Maximum Likelihood Estimation in Semiparametric 
+           Regression Models with Censored Data},
+  journal = {Journal of the Royal Statistical Society B},
+  volume = {69},
+  number = {4},
+  doi = {10.1111/j.1369-7412.2007.00606.x},
+  pages = {507--564},
+  year = {2007}
+}
+
+%optional %LTM %random %spezi %NPMLE
+% Note: Aim: Prove large sample existence and consistency of the NPMLE.  
+@article {SludVonta_2004,
+  author = {E. V. Slud and F. Vonta},
+  title = {Consistency of the {NPML} Estimator in the Right-Censored Transformation Model},
+  journal = {Scandinavian Journal of Statistics},
+  volume = {31},
+  number = {1},
+  doi = {10.1111/j.1467-9469.2004.00370.x},
+  pages = {21--41},
+  year = {2004}
+}
+
+%VIP %LTM_flex %spezi %NPMLE
+% Note: Varying coefficients for covariates not for the response! 
+%       Partial linear transformation model is included as a special case;
+%       Varying coefficients are parametrised using B-splines;
+%       Iterative procedure is suggested for model estimation because direct maximisation
+%       of the log-likelihood is problematic because of the high number of parameters.
+@article{ChenTong_2010,
+  author = {K. Chen and X. Tong}, 
+  title = {Varying Coefficient Transformation Models with Censored Data},
+  volume = {97}, 
+  number = {4}, 
+  pages = {969--976}, 
+  year = {2010}, 
+  doi = {10.1093/biomet/asq032}, 
+  journal = {Biometrika} 
+}
+
+%VIP %LTM (PO model) %spezi %NPMLE 
+% Note: NPMLE approach for the PO model;
+%       important reference for the PO model for survival data.
+@article {Bennett_1983a,
+  author = {Bennett, Steve},
+  title = {Analysis of Survival Data by the Proportional Odds Model},
+  journal = {Statistics in Medicine},
+  volume = {2},
+  number = {2},
+  doi = {10.1002/sim.4780020223},
+  pages = {273--277},
+  year = {1983}
+}
+
+%LTM (PO model) %spezi %NPMLE
+% Note: authors show that Bennett (1983)'s estimates are efficient;
+%       large sample porperties of the estimators are established;
+%       Newton-Raphson algorithm.
+@article {Murphyetal_1997,
+  author = {S. A. Murphy and A. J. Rossini and A. W. van der Vaart},
+  title = {Maximum Likelihood Estimation in the Proportional Odds Model},
+  journal = {Journal of the American Statistical Association},
+  volume = {92},
+  number = {439},
+  doi = {10.1080/01621459.1997.10474051},
+  pages = {968--976},
+  year = {1997}
+}
+
+%optional %LTM (PO model) %spezi %NPMLE
+% Note: identical approach to Murphy et al. (1997) but different estimation algorithm;
+%       minorisation-maximisation algorithm;
+%       Newton-Raphson might be problematic for large data sets where number of
+%       parameters exceeds the number of uncensored observations. 
+@article{HunterLange_2002,
+  year={2002},
+  journal={Annals of the Institute of Statistical Mathematics},
+  volume={54},
+  number={1},
+  doi={10.1023/A:1016126007531},
+  title={Computing Estimates in the Proportional Odds Model},
+  author={D. R. Hunter and K. Lange},
+  pages={155--168}
+}
+
+%flex_int_y (PO model with time-varying effects) %spezi %NPMLE %estequ
+% Note: Extended PO model with time-varying coefficients or time-dependent covariates;
+%       Estimation techniques:
+%       1) Moment-based estimating equations (Chen et al. (2002))
+%       2) NPMLE (Zeng and Lin (2006, 2007))
+@article {Chenetal_2012,
+  author = {Y. Q. Chen and N. Hu and S.-C. Cheng and P. Musoke and L. P. Zhao},
+  title = {Estimating Regression Parameters in an Extended Proportional Odds Model},
+  journal = {Journal of the American Statistical Association},
+  volume = {107},
+  number = {497},
+  year = {2012},
+  pages = {318--330},
+  doi = {10.1080/01621459.2012.656021}
+}
+
+%optional %LTM %spezi %NPMLE
+% Note: authors propose an efficient algorithm for calculating MLEs;
+%       dimensionality of the parameter space is dramatically reduced.
+@article{YinZeng_2006,
+  title = {Efficient Algorithm for Computing Maximum Likelihood 
+           Estimates in Linear Transformation Models},
+  author = {G. Yin and D. Zeng},
+  journal = {Journal of Computational and Graphical Statistics},
+  volume = {15},
+  number = {1},
+  pages = {228--245},
+  doi = {10.1198/106186006X100542},
+  year = {2006}
+}
+
+%LTM (PO model) %random %spezi %NPMLE
+% Note: right-censored log-likelihood is integrated over the random effects;
+%       random effects follow a normal distribution.
+@article {Zengetal_2005,
+  author = {D. Zeng and D. Y. Lin and G. Yin},
+  title = {Maximum Likelihood Estimation for the Proportional Odds Model with Random Effects},
+  journal = {Journal of the American Statistical Association},
+  volume = {100},
+  number = {470},
+  doi = {10.1198/016214504000001420},
+  pages = {470--483},
+  year = {2005}
+}
+
+%LTM_flex %random %spezi %NPMLE
+% Note: NPMLE approach for linear transformation models with time-varying covariates
+%       and random effects for clustered or correlated failure times.
+@article{Zengetal_2008,
+  author = {D. Zeng and D. Y. Lin and X. Lin},
+  title = {Semiparametric Transformation Models with Random Effects 
+           for Clustered Failure Time Data},
+  journal = {Statistica Sinica},
+  volume = {18},
+  number = {1},
+  pages = {355--377},
+  year = {2008}
+}
+
+%LTM_flex %random (= frailty PH model) %spezi %NPMLE
+% Note: NPMLE approach for semiparametric frailty Cox models;
+%       frailty parameter is from a known one-parameter family of distributions with 
+%       mean 1;
+%       linear predictor with time-varying covariates.
+@article{Kosoroketal_2004,
+  title = {Robust Inference for Univariate Proportional Hazards Frailty Regression Models},
+  author = {M. R. Kosorok and B. L. Lee and J. P. Fine},
+  journal = {The Annals of Statistics},
+  volume = {32},
+  number = {4},
+  pages = {1448--1491},
+  doi = {10.1214/009053604000000535},
+  year = {2004}
+}
+
+%VIP %LTM %random %spezi %NPMLE
+% Note: NPMLE approach for the frailty PH model with arbitrarily truncated and 
+%       censored response;
+%       approach can be generalised to frailty LTMs by adapting link G.
+@article{HuberCarolVonta_2004,
+  year = {2004},
+  journal = {Lifetime Data Analysis},
+  volume = {10},
+  number = {4},
+  doi = {10.1007/s10985-004-4773-y},
+  title = {Frailty Models for Arbitrarily Censored and Truncated Data},
+  author = {C. Huber-Carol and I. Vonta},
+  pages = {369--388}
+}
+
+%LTM_flex %spezi %NPMLE
+% Note: LTM with nonparametric covariate effects (additive transformation model); 
+%       nonparametric covariate effects are estimated using local linear regression.
+@article{Zhaoetal_2007,
+  author = {X. Zhao and X. Zhou and X. Wu},
+  title = {Local Linear Regression in Proportional Hazards Model with Censored Data},
+  journal = {Communications in Statistics--Theory and Methods},
+  volume = {36},
+  number = {15},
+  pages = {2761--2776},
+  year = {2007},
+  doi = {10.1080/03610920701386828}
+}
+
+%VIP %LTM %random %pen_lik %mixedmod
+% Note: log-hazard function is parametrised using a piecewise-linear spline;
+%       penalised likelihood is maximised by a mixed model - based approach
+%       => smooth estimate of the hazard function, where amount of smoothing is
+%          estimated from the data;
+%       integrated log-likelihood is approximated by a PQL approach; 
+%       variance parameter of the spline coefficients / random effects is estimated
+%       using REML.
+@article{CaiBetensky_2003,
+  author = {T. Cai and R. A. Betensky},
+  title = {Hazard Regression for Interval-Censored Data with Penalized Spline},
+  journal = {Biometrics},
+  volume = {59},
+  number = {3},
+  doi = {10.1111/1541-0420.00067},
+  pages = {570--579},
+  year = {2003}
+}
+
+%LTM_flex (AFT model) %spezi %NPMLE %profile_lik
+% Note: nonparametric ML method for AFT models with possibly time-dependent covariates;
+%       regression parameters are estimated by maximising a kernel-smoothed profile
+%       likelihood function;
+%       cumulative hazard function has to be smoothed in AFT models because otherwise
+%       there exists no maximum of the log-likelihood!
+@article{ZengLin_2007a,
+  author = {D. Zeng and D. Y. Lin}, 
+  title = {Efficient Estimation for the Accelerated Failure Time Model},
+  volume = {102}, 
+  number = {480}, 
+  pages = {1387--1396}, 
+  year = {2007}, 
+  doi = {10.1198/016214507000001085},
+  journal = {Journal of the American Statistical Association} 
+}
+
+%VIP %LTM %not_spezi %estequ
+% Note: dichotomous comparisons {I(Y_i > Y_j)} are used => h can be ignored because
+%       rank configurations of Y_i > Y_j and h(Y_i) > h(Y_j) are identical;
+%       estimating equation for beta which can be solved using Newton-Raphson algorithm;
+%       right-censored observations: reweight estimating equation by the inverse
+%       squared marginal Kaplan-Meier estimator (IPCW approach).
+@article{Chengetal_1995,
+  author = 	{S. C. Cheng and L. J. Wei and Z. Ying}, 
+  title = 	{Analysis of Transformation Models with Censored Data},
+  volume = 	{82}, 
+  number = 	{4}, 
+  pages = 	{835--845}, 
+  year = 	{1995}, 
+  doi = 	{10.1093/biomet/82.4.835}, 
+  journal = 	{Biometrika} 
+}
+
+%VIP %LTM %spezi %estequ
+% Note: authors define an additional estimating equation for the response transformation
+%       h; this is necessary for the prediction of survival probabilities;
+%       beta and h are estimated separately based on two estimating equations
+%       => no simultaneous estimation of h and beta!
+@article{Chengetal_1997,
+  title = {Predicting Survival Probabilities with Semiparametric Transformation Models},
+  author = {S. C. Cheng and L. J. Wei and Z. Ying},
+  journal = {Journal of the American Statistical Association},
+  volume = {92},
+  number = {437},
+  pages = {227--235},
+  doi = {10.1080/01621459.1997.10473620},
+  year = {1997}
+}
+
+%optional %LTM %spezi %estequ
+% Note: Estimating equations of Cheng et al. (1995,1997) are simply modified because the 
+%       estimators are asymptotically biased when the support of the censoring variable
+%       is shorter than the support of the failure time;
+%       root-finding equations are replaced by a least-squares criterion;
+%       no simultaneous estimation of beta and h; 
+%       => unique and consistent estimator
+@article{Fineetal_1998,
+  author = {J. P. Fine and Z. Ying and L. G. Wei},
+  journal = {Biometrika}, 
+  number = {4},
+  pages = {980--986},
+  title = {On the Linear Transformation Model for Censored Data},
+  volume = {85},
+  doi = {10.1093/biomet/85.4.980},
+  year = {1998}
+}
+
+%optional %LTM_flex %spezi %estequ
+% Note: linear transformation model is extended to parametric covariate transformations;
+%       extension seems simple at first sight, but inference is challenging due to 
+%       loss of identifiability under the hypotheses of no effects of transformed 
+%       covariates.    
+@article{FanFine_2013,
+  author = {C. Fan and J. P. Fine},
+  title = {Linear Transformation Model with Parametric Covariate Transformations},
+  journal = {Journal of the American Statistical Association},
+  volume = {108},
+  number = {502},
+  pages = {701--712},
+  year = {2013},
+  doi = {10.1080/01621459.2013.770707}
+}
+
+
+%optional %LTM_flex %spezi %estequ
+% Note: LTMs are extended to correlated observations;
+%       introduction of subject- and cluster-specific time-dependent covariates:
+%       h(T_ik) = - beta^T %*% Z_ik(t) + eps;
+%       estimating equations for beta and h (GEE with indpendence working assumption);
+%       approach is more similar to NPMLE than to alternative estimating equations.
+@article{Caietal_2000,
+  author = {T. Cai and L. J. Wei and M. Wilcox},
+  journal = {Biometrika},
+  number = {4},
+  pages = {867--878},
+  title = {Semiparametric Regression Analysis for Clustered Failure Time Data},
+  volume = {87},
+  doi = {10.1093/biomet/87.4.867},
+  year = {2000}
+}
+
+%VIP %LTM %random %spezi %estequ
+% Note: Linear transformation model with random effects; 
+%       frailty Cox model is included as a special case;
+%       distribution of the random effects is specified up to a parameter;
+%       h and beta are not estimated simultaneously but using separate estimating
+%       equations.
+@article{Caietal_2002,
+  author = {T. Cai and S. C. Cheng and L. J. Wei},
+  title = {Semiparametric Mixed-Effects Models for Clustered Failure Time Data},
+  journal = {Journal of the American Statistical Association},
+  volume = {97},
+  number = {458},
+  pages = {514--522},
+  year = {2002},
+  doi = {10.1198/016214502760047041}
+}
+
+%optional %LTM %not_spezi %estequ
+% Note: LTMs for interval-censored observations;
+%       rank-based estimating equation for the regression coefficients is provided
+%       => baseline-free approach; 
+%       approach is restricted to discrete covariates!
+%% no DOI (checked)
+@article{Zhangetal_2005,
+  title = {Regression Analysis of Interval-Censored Failure Time Data 
+           with Linear Transformation Models},
+  author = {Z. Zhang and L. Sun and X. Zhao and J. Sun},
+  journal = {The Canadian Journal of Statistics},
+  volume = {33},
+  number = {1},
+  pages = {61--70},
+  year = {2005}
+}
+
+%optional %LTM %spezi %estequ
+% Note: approach of Zhang et al. (2005) is extended to survival probability prediction
+%       by defining a separate estimating equation for h;
+%       beta and h are not estimated simultaneously in the presence of interval
+%       censoring;
+%       tools for model checking and model selection are additionally considered.
+@article{Zhang_2009,
+  author = {Z. Zhang}, 
+  title = {Linear Transformation Models for Interval-Censored Data: 
+           Prediction of Survival Probability and Model Checking},
+  volume = {9}, 
+  number = {4}, 
+  pages = {321--343}, 
+  year = {2009}, 
+  doi = {10.1177/1471082X0900900404},  
+  journal = {Statistical Modelling} 
+}
+
+%LTM %random %not_spezi %estequ
+% Note: consideration of a panel data version of the LTM with random effects in 
+%       ECONOMETRICS!
+%       estimating equation only for the regression coefficients beta
+%       => baseline-free approach
+@article{Lee_2008,
+  author = {S. Lee},
+  title = {Estimating Panel Data Duration Models with Censored Data},
+  journal = {Econometric Theory},
+  volume = {24},
+  number = {05},
+  year = {2008},
+  pages = {1254--1276},
+  doi = {10.1017/S0266466608080493}
+}
+
+%VIP %LTM %spezi %estequ
+% Note: most estimating equations (e.g. Cheng et al. (1995)) assume independence of 
+%       the censoring time C and the covariates X because the marginal Kaplan-Meier
+%       estimator of the censoring distribution is used in the IPCWs;
+%       assumption is relaxed here + e.g. Cox model does not make this assumption
+%       => Cox partial likelihood estimator results as a special case;
+%       maringale-based estimating equations for beta and h => beta and h are 
+%       estimated iteratively;
+%       h is assumed to be a nondecreasing step function with jumps at the failure 
+%       times. 
+@article{Chenetal_2002,
+  author = {K. Chen and Z. Jin and Z. Ying}, 
+  title = {Semiparametric Analysis of Transformation Models with Censored Data},
+  volume = {89}, 
+  number = {3}, 
+  pages = {659--668}, 
+  year = {2002}, 
+  doi = {10.1093/biomet/89.3.659}, 
+  journal = {Biometrika} 
+}
+
+%LTM_flex %spezi %estequ
+% Note: non-linear covariate effects are incorporated into the LTM
+%       => partially linear transformation model;
+%       global and kernel-weighted local estimating equations based on martingale theory
+%       => extension of Chen et al. (2002)'s EEs to non-linear covariate effects.
+%       Global EEs for beta and h (step function) similar to Chen et al. (2002);
+%       Local kernel-weighted EE for nonlinear covariate effects given beta and h.
+@article{LuZhang_2010,
+  author = {W. Lu and H. H. Zhang},
+  title = {On Estimation of Partially Linear Transformation Models},
+  journal = {Journal of the American Statistical Association},
+  volume = {105},
+  number = {490},
+  pages = {683--691},
+  year = {2010},
+  doi = {10.1198/jasa.2010.tm09302}
+}
+
+%VIP %flex_int_y %spezi %estequ
+% Note: LTMs are extended to time-varying structure for the transformation function
+%       => time-varying structure in the data is allowed, baseline function may 
+%          depend on the covariates;
+%       stratified LTM is included as a special case;
+%       martingale estimating equations are defined for model estimation.
+@article{Scheike_2006,
+  year = {2006},
+  journal = {Lifetime Data Analysis},
+  volume = {12},
+  number = {4},
+  doi = {10.1007/s10985-006-9021-1},
+  title = {A Flexible Semiparametric Transformation Model for Survival Data},
+  author = {T. H. Scheike},
+  pages = {461--480}
+}
+
+%LTM %not_spezi %partial_lik
+k@article{Cox_1972,
+  author = {D. R. Cox},
+  title = {Regression Models and Life-Tables},
+  journal = {Journal of the Royal Statistical Society B},
+  volume = {34},
+  number = {2},
+  pages = {187--220},
+  year = {1972}
+}
+
+%LTM %not_spezi %partial_lik
+@article{Cox_1975,
+  author = {D. R. Cox},
+  title = {Partial Likelihood},
+  journal = {Biometrika},
+  volume = {62},
+  number = {2},
+  pages = {269--276},
+  year = {1975}
+}
