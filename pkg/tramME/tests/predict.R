@@ -1,5 +1,6 @@
 library("tramME")
 
+oldopt <- options(digits = 4)
 chk <- function(x, y) stopifnot(isTRUE(all.equal(x, y, check.attributes = FALSE)))
 
 ## structure of the output
@@ -54,3 +55,5 @@ nd <- sleepstudy
 nd$Reaction <- NULL
 pr <- predict(fit, newdata = nd[1:2, ], ranef = 0, K = 10)
 pr
+
+options(oldopt)

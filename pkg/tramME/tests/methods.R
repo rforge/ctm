@@ -1,5 +1,6 @@
 library("tramME")
 
+oldopt <- options(warn = -1) ## NOTE: no parallel implementation under Windows
 chktol <- function(x, y, tol = sqrt(.Machine$double.eps))
   stopifnot(isTRUE(all.equal(x, y, tolerance = tol, check.attributes = FALSE)))
 
@@ -76,3 +77,5 @@ plot(tr3, xlim = c(0, 1), ylim = c(0, 1), col = c(1, 2), lwd = 2, fill = grey(0.
 tr4 <- trafo(fit_np, type = "distribution", confidence = "none", K = 100)
 plot(tr4,  col = 3, lwd = 2, add = TRUE)
 dev.off()
+
+options(oldopt)

@@ -1,5 +1,6 @@
 library("tramME")
 
+oldopt <- options(digits = 4)
 chk <- function(x, y) stopifnot(isTRUE(all.equal(x, y)))
 chkerr <- function(expr) inherits(try(expr, silent = TRUE), "try-error")
 
@@ -94,3 +95,5 @@ mod1 <- LmME(Reaction ~ Days + (Days || Subject), data = sleepstudy, nofit = TRU
 mod2 <- LmME(Reaction ~ Days + (Days | Subject), data = sleepstudy, nofit = TRUE)
 chk(lapply(varcov(mod1), dim), list(Subject = c(1L, 1L), Subject = c(1L, 1L)))
 chk(lapply(varcov(mod2), dim), list(Subject = c(2L, 2L)))
+
+options(oldopt)

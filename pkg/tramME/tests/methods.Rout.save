@@ -21,6 +21,7 @@ Loading required package: mlt
 Loading required package: basefun
 Loading required package: variables
 > 
+> oldopt <- options(warn = -1) ## NOTE: no parallel implementation under Windows
 > chktol <- function(x, y, tol = sqrt(.Machine$double.eps))
 +   stopifnot(isTRUE(all.equal(x, y, tolerance = tol, check.attributes = FALSE)))
 > 
@@ -31,9 +32,6 @@ Loading required package: variables
 > fit <- BoxCoxME(Reaction ~ Days + (Days | Subject), data = sleepstudy, order = 5)
 > fit2 <- fit
 > varcov(fit2) <- list(diag(1:2)) ## just to make it unfitted
-Warning message:
-In `varcov<-.tramME`(`*tmp*`, value = list(c(1L, 0L, 0L, 2L))) :
-  The model object is fitted. Setting it to unfitted.
 > chkerr(vcov(fit2))
 [1] TRUE
 > vc <- vcov(fit, pargroup = "baseline")
@@ -112,6 +110,8 @@ The following objects are masked from 'package:tramME':
 null device 
           1 
 > 
+> options(oldopt)
+> 
 > proc.time()
    user  system elapsed 
- 13.498   0.363   9.914 
+ 10.175   0.216   7.876 
