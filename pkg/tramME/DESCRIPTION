@@ -9,7 +9,7 @@ Description: Likelihood-based estimation of mixed-effects transformation models 
   <doi:10.1111/sjos.12291>. The random effects are assumed to be normally distributed on the scale of the
   transformation function, the marginal likelihood is evaluated using the Laplace approximation,
   and the gradients are calculated with automatic differentiation (AD).
-Depends: R (>= 3.5.0), tram (>= 0.3.2), mlt (>= 1.1.0)
+Depends: R (>= 3.6.0), tram (>= 0.3.2), mlt (>= 1.1.0)
 Imports: alabama, lme4 (>= 1.1.19), Matrix, methods, nlme, TMB (>=
         1.7.15), stats, variables (>= 1.0.2), basefun (>= 1.0.6)
 Suggests: multcomp, parallel, survival, knitr, coxme, ordinal,
@@ -21,7 +21,7 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
 NeedsCompilation: yes
-Packaged: 2020-03-30 14:30:39 UTC; balint
+Packaged: 2020-03-31 16:42:19 UTC; balint
 Author: Balint Tamasi [aut, cre],
   Torsten Hothorn [ctb] (<https://orcid.org/0000-0001-8301-0471>)
 Maintainer: Balint Tamasi <balint.tamasi@uzh.ch>
