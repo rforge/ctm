@@ -5,7 +5,7 @@ chk <- function(x, y) stopifnot(isTRUE(all.equal(x, y)))
 chkerr <- function(expr) inherits(try(expr, silent = TRUE), "try-error")
 
 ## nofit
-library("survival")
+suppressPackageStartupMessages(library("survival"))
 data("eortc", package = "coxme")
 fit <- CoxphME(Surv(y, uncens) ~ trt, data = eortc, log_first = TRUE, nofit = TRUE)
 inherits(fit, "ctm")
@@ -71,9 +71,10 @@ variable.names(fit1, which = "grouping")
 variable.names(fit1)
 
 ## outputs/print methods
-fit1
+fit1 <- LmME(Reaction ~ Days + (1 | Subject), data = sleepstudy)
+fit1 ## fitted
 summary(fit1)
-mod
+mod ## unfitted
 summary(mod)
 VarCorr(mod)
 
@@ -86,9 +87,9 @@ dat2 <- dat1[rep(seq(nrow(dat1)), dat1$w), ]
 fit2 <- LmME(Reaction ~ Days + (Days || Subject), data = dat2)
 chk(coef(fit1, with_baseline = TRUE), coef(fit2, with_baseline = TRUE))
 chk(logLik(fit1), logLik(fit2))
-VarCorr(fit1)
-summary(fit1)
-logLik(fit1)
+##VarCorr(fit1)
+##summary(fit1)
+##logLik(fit1)
 
 ## RE structures
 mod1 <- LmME(Reaction ~ Days + (Days || Subject), data = sleepstudy, nofit = TRUE)

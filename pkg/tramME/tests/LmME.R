@@ -1,5 +1,5 @@
 library("tramME")
-library("lme4")
+suppressPackageStartupMessages(library("lme4"))
 
 oldopt <- options(digits = 5)
 chktol <- function(x, y, tol = sqrt(.Machine$double.eps))

@@ -20,8 +20,7 @@ Loading required package: tram
 Loading required package: mlt
 Loading required package: basefun
 Loading required package: variables
-> library("lme4")
-Loading required package: Matrix
+> suppressPackageStartupMessages(library("lme4"))
 > 
 > oldopt <- options(digits = 5)
 > chktol <- function(x, y, tol = sqrt(.Machine$double.eps))
@@ -91,4 +90,4 @@ Days      0.0813
 > 
 > proc.time()
    user  system elapsed 
-  1.441   0.088   1.501 
+  1.281   0.064   1.323 

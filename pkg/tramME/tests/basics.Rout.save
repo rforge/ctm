@@ -26,7 +26,7 @@ Loading required package: variables
 > chkerr <- function(expr) inherits(try(expr, silent = TRUE), "try-error")
 > 
 > ## nofit
-> library("survival")
+> suppressPackageStartupMessages(library("survival"))
 > data("eortc", package = "coxme")
 > fit <- CoxphME(Surv(y, uncens) ~ trt, data = eortc, log_first = TRUE, nofit = TRUE)
 Warning message:
@@ -111,59 +111,60 @@ Error in na.fail.default(structure(list(.index. = 1:2323, trt = c(1L,  :
 [1] "Surv(y, uncens)" "trt"             "center"         
 > 
 > ## outputs/print methods
-> fit1
+> fit1 <- LmME(Reaction ~ Days + (1 | Subject), data = sleepstudy)
+> fit1 ## fitted
 
-Mixed-effects Parametric Cox Regression Model
+Mixed-effects Normal Linear Regression Model
 
-	Formula: Surv(y, uncens) ~ trt + (1 | center)
+	Formula: Reaction ~ Days + (1 | Subject)
 
-	Fitted to dataset dat1
+	Fitted to dataset sleepstudy
 
 	Estimated fixed effects:
 	========================
 
-  trt 
-0.748 
+ Days 
+0.339 
 
 	Estimated random effects parameters:
 	====================================
 
-Grouping factor: center (27 levels)
+Grouping factor: Subject (18 levels)
 Standard deviation:
 (Intercept) 
-      0.341 
+       1.17 
 
 
-	Log-likelihood: -9399 (df = 9)
+	Log-likelihood: -897 (df = 4)
 
 > summary(fit1)
 
-Mixed-effects Parametric Cox Regression Model
+Mixed-effects Normal Linear Regression Model
 
-	Formula: Surv(y, uncens) ~ trt + (1 | center)
+	Formula: Reaction ~ Days + (1 | Subject)
 
-	Fitted to dataset [0;32mdat1[0m
+	Fitted to dataset [0;32msleepstudy[0m
 
 	Fixed effects:
 	==============
 
-    Estimate Std. Error z value Pr(>|z|)    
-trt   0.7477     0.0785    9.53   <2e-16 ***
+     Estimate Std. Error z value Pr(>|z|)    
+Days   0.3388     0.0321    10.6   <2e-16 ***
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
 	Random effects:
 	===============
 
-Grouping factor: center (27 levels)
+Grouping factor: Subject (18 levels)
 Standard deviation:
 (Intercept) 
-      0.341 
+       1.17 
 
 
-	Log-likelihood: -9399 (df = 9)
+	Log-likelihood: -897 (df = 4)
 
-> mod
+> mod ## unfitted
 
 Non-normal (Box-Cox-Type) Linear Mixed-effects Regression Model
 
@@ -222,52 +223,9 @@ Days          NA
 > fit2 <- LmME(Reaction ~ Days + (Days || Subject), data = dat2)
 > chk(coef(fit1, with_baseline = TRUE), coef(fit2, with_baseline = TRUE))
 > chk(logLik(fit1), logLik(fit2))
-> VarCorr(fit1)
-
-Grouping factor: Subject (18 levels)
-Standard deviation:
-(Intercept) 
-       1.23 
-
-Grouping factor: Subject (18 levels)
-Standard deviation:
- Days 
-0.287 
-
-> summary(fit1)
-
-Mixed-effects Normal Linear Regression Model
-
-	Formula: Reaction ~ Days + (Days || Subject)
-
-	Fitted to dataset [0;32mdat1[0m (weighted estimation)
-
-	Fixed effects:
-	==============
-
-     Estimate Std. Error z value Pr(>|z|)    
-Days   0.4534     0.0693    6.54  6.1e-11 ***
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-
-	Random effects:
-	===============
-
-Grouping factor: Subject (18 levels)
-Standard deviation:
-(Intercept) 
-       1.23 
-
-Grouping factor: Subject (18 levels)
-Standard deviation:
- Days 
-0.287 
-
-
-	Log-likelihood: -4821 (df = 5)
-
-> logLik(fit1)
-'log Lik.' -4821 (df=5)
+> ##VarCorr(fit1)
+> ##summary(fit1)
+> ##logLik(fit1)
 > 
 > ## RE structures
 > mod1 <- LmME(Reaction ~ Days + (Days || Subject), data = sleepstudy, nofit = TRUE)
@@ -279,4 +237,4 @@ Standard deviation:
 > 
 > proc.time()
    user  system elapsed 
- 11.175   0.097  11.247 
+  9.538   0.084   9.612 

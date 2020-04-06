@@ -65,7 +65,7 @@ null device
 > 
 > ## Prediction with Surv objects as response
 > data("eortc", package = "coxme")
-> library("survival")
+> suppressPackageStartupMessages(library("survival"))
 > fit <- CoxphME(Surv(y, uncens) ~ trt + (1 | center/trt), data = eortc, log_first = TRUE)
 > pdf(file = NULL)
 > pl <- plot(fit, newdata = eortc[1, ], ranef = c(0, 0), type = "survivor", K = 100)
@@ -97,4 +97,4 @@ Reaction      [,1]      [,2]
 > 
 > proc.time()
    user  system elapsed 
-  4.215   0.065   4.271 
+  3.432   0.059   3.475 

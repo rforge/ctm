@@ -42,7 +42,7 @@ chk(pr1, pr2)
 
 ## Prediction with Surv objects as response
 data("eortc", package = "coxme")
-library("survival")
+suppressPackageStartupMessages(library("survival"))
 fit <- CoxphME(Surv(y, uncens) ~ trt + (1 | center/trt), data = eortc, log_first = TRUE)
 pdf(file = NULL)
 pl <- plot(fit, newdata = eortc[1, ], ranef = c(0, 0), type = "survivor", K = 100)
