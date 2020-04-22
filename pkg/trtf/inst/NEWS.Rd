@@ -2,9 +2,10 @@
 \name{NEWS}
 \title{NEWS file for the trtf package}
 
-\section{Changes in Version 0.3-7 (2020-04-08)}{
+\section{Changes in Version 0.3-7 (2020-04-22)}{
   \itemize{
     \item{Setting \code{min\_update} might have caused constant predictions.}
+    \item{Update simulations / demos.}
   }
 }
 
