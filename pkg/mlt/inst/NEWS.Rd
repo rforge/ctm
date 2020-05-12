@@ -2,9 +2,11 @@
 \name{NEWS}
 \title{NEWS file for the mlt package}
 
-\section{Changes in Version 1.1-3 (2020-05-11)}{
+\section{Changes in Version 1.2-0 (2020-05-11)}{
   \itemize{
-    \item{Add exponential distribution (for Aalen additive hazard models).}
+    \item{Add exponential distribution (for Aalen additive hazards models).}
+    \item{Pay attention to model class when computing cumulative hazards.}
+    \item{Add log-cumulative hazards, log-odds, and odds for predictions and plots.}
   }
 }
 
@@ -14,7 +16,6 @@
     \item{Update citation info.}
   }
 }
-
 
 \section{Changes in Version 1.1-1 (2020-01-09)}{
   \itemize{
