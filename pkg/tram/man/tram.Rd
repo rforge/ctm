@@ -9,7 +9,7 @@ Likelihood-inference for stratified linear transformation models
 }
 \usage{
 tram(formula, data, subset, weights, offset, cluster, na.action = na.omit, 
-     distribution = c("Normal", "Logistic", "MinExtrVal", "MaxExtrVal"), 
+     distribution = c("Normal", "Logistic", "MinExtrVal", "MaxExtrVal", "Exponential"), 
      transformation = c("discrete", "linear", "logarithmic", "smooth"), 
      LRtest = TRUE, prob = c(0.1, 0.9), support = NULL, 
      bounds = NULL, add = c(0, 0), order = 6, 

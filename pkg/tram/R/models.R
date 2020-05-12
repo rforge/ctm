@@ -21,6 +21,34 @@ Coxph <- function(formula, data, subset, weights, offset, cluster, na.action = n
     ret
 }
 
+Aareg <- function(formula, data, subset, weights, offset, cluster, na.action = na.omit, ...)
+{
+    mf <- match.call(expand.dots = FALSE)
+    m <- match(c("formula", "data", "subset", "na.action", "weights", "offset", "cluster"), names(mf), 0L)
+    mf <- mf[c(1L, m)]
+    mf[[1L]] <- quote(tram_data)
+    td <- eval(mf, parent.frame())
+
+    stopifnot(inherits(td$response, "Surv") ||
+              inherits(td$response, "response") ||
+              is.numeric(td$response))
+
+    if (is.null(td$mt$s))
+        warning("no time-varying terms specified for this model")
+    if (!is.null(td$mt$x))
+        stop("no constant linear terms allowed in this model")
+
+    ret <- tram(td, transformation = "positive_smooth", 
+                distribution = "Exponential", 
+                negative = FALSE, ...)
+    if (!inherits(ret, "mlt")) return(ret)
+    ret$call <- match.call(expand.dots = TRUE)
+    ret$tram <- paste(ifelse(is.null(td$terms$s), "", "(Stratified)"), 
+                      "Parametric Linear Aalen Regression Model")
+    class(ret) <- c("Aareg", class(ret))
+    ret
+}
+
 Survreg <- function(formula, data, subset, weights, offset, cluster, na.action = na.omit, 
                     dist = c("weibull", "logistic", "gaussian", "exponential", 
                              "rayleigh", "loggaussian", "lognormal", "loglogistic"), 

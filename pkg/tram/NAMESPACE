@@ -17,7 +17,7 @@ import("Matrix")
 importFrom("survival", "survfit", "Surv")
 importFrom("graphics", "plot", "lines", "polygon")
 
-export(tram, tram_data, Coxph, Colr, Polr, Lm, BoxCox, Survreg, Lehmann, 
+export(tram, tram_data, Coxph, Aareg, Colr, Polr, Lm, BoxCox, Survreg, Lehmann, 
        mtram, score_test, perm_test, PI)
 
 S3method("as.mlt", "tram")

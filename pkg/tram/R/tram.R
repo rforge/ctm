@@ -106,7 +106,7 @@ tram_data <- function(formula, data, subset, weights, offset, cluster, na.action
 }
 
 tram <- function(formula, data, subset, weights, offset, cluster, na.action = na.omit,
-                 distribution = c("Normal", "Logistic", "MinExtrVal", "MaxExtrVal"),
+                 distribution = c("Normal", "Logistic", "MinExtrVal", "MaxExtrVal", "Exponential"),
                  transformation = c("discrete", "linear", "logarithmic", "smooth"),
                  LRtest = TRUE, 
                  prob = c(.1, .9), support = NULL, bounds = NULL, add = c(0, 0), order = 6, negative =
