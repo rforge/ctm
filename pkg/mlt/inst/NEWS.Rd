@@ -2,12 +2,19 @@
 \name{NEWS}
 \title{NEWS file for the mlt package}
 
+\section{Changes in Version 1.1-3 (2020-05-11)}{
+  \itemize{
+    \item{Add exponential distribution (for Aalen additive hazard models).}
+  }
+}
+
 \section{Changes in Version 1.1-2 (2020-02-13)}{
   \itemize{
     \item{Allow permutations of single variables.}
     \item{Update citation info.}
   }
 }
+
 
 \section{Changes in Version 1.1-1 (2020-01-09)}{
   \itemize{
