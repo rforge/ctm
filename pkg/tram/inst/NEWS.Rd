@@ -4,9 +4,18 @@
 
 \section{Changes in Version 0.4-0 (2020-05-11)}{
   \itemize{
+    \item{Force support to start at time zero and constrain cumulative
+          hazard to zero for time zero in \code{Aareg}.}
+  }
+}
+
+
+\section{Changes in Version 0.4-0 (2020-05-11)}{
+  \itemize{
     \item{Add \code{Aareg} for Aalen additive hazard models.}
   }
 }
+
 
 \section{Changes in Version 0.3-3 (2020-01-16)}{
   \itemize{

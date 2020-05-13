@@ -4,7 +4,7 @@
 
 \section{Changes in Version 1.2-1 (2020-05-13)}{
   \itemize{
-    \item{Remove contrasts a fixed parameter contributes to.}
+    \item{Adjust contrasts a fixed parameter contributes to.}
   }
 }
 
