@@ -31,7 +31,7 @@
         fixed <- fixed[colnames(Y)[fix]]
 
         ### adjust contrasts a fixed parameter contributes to
-        ci <- ci - ui[, fix, drop = FALSE] %*% fixed
+        ci <- ci - c(as(ui[, fix, drop = FALSE], "matrix") %*% fixed)
 
         ### remove columns corresponding to fixed parameters
         ui <- ui[,!fix,drop = FALSE]
