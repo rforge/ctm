@@ -29,6 +29,16 @@
         stopifnot(all(names(fixed) %in% colnames(Y)))
         fix <- colnames(Y) %in% names(fixed)
         fixed <- fixed[colnames(Y)[fix]]
+
+        ### remove contrasts a fixed parameter contributes to
+        for (i in which(fix)) {
+            neq0 <- which(abs(ui[,i]) > 0)
+            if (length(neq0) > 0) {
+                ui <- ui[-neq0,, drop = FALSE]
+                ci <- ci[-neq0]
+            }
+        }
+        ### remove columns corresponding to fixed parameters
         ui <- ui[,!fix,drop = FALSE]
         .parm <- function(beta) {
             nm <- names(beta)
