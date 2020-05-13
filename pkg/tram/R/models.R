@@ -38,9 +38,36 @@ Aareg <- function(formula, data, subset, weights, offset, cluster, na.action = n
     if (!is.null(td$mt$x))
         stop("no constant linear terms allowed in this model")
 
-    ret <- tram(td, transformation = "positive_smooth", 
+    ### we need additional trafo(0) = 0 constraints 
+    ### because trafo = cumhazard
+    ret <- tram(td, transformation = "smooth", 
                 distribution = "Exponential", 
-                negative = FALSE, ...)
+                negative = FALSE, model_only = TRUE, ...)
+
+    ### always start at time 0, so that the first parameter 
+    ### is trafo(0), which can then be constrained to zero
+    su <- mkgrid(ret$model, n = 2)[[1]]
+    su[1] <- 0
+    cf <- names(coef(ret))
+    cf <- cf[grep("Bs1", cf)]
+    ctr <- numeric(length(cf))
+    names(ctr) <- cf
+
+    ### now fit the model with support and constraints
+    args <- list(...)
+    args$formula <- td
+    args$transformation <- "smooth"
+    args$distribution <- "Exponential"
+    args$negative <- FALSE
+    args$support <- su
+    if (is.null(args$fixed)) {
+        args$fixed <- ctr
+    } else {
+        args$fixed <- c(args$fixed, ctr)
+    }
+    
+    ret <- do.call("tram", args)
+
     if (!inherits(ret, "mlt")) return(ret)
     ret$call <- match.call(expand.dots = TRUE)
     ret$tram <- paste(ifelse(is.null(td$terms$s), "", "(Stratified)"), 
