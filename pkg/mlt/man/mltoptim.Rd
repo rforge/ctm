@@ -39,7 +39,7 @@ mltoptim(auglag = list(maxtry = 5, kkt2.check = FALSE),
   Adding further such functions is a way to add more optimisers to \code{\link{mlt}}.
   The first one in this list converging  defines the resulting model.
 }
-\example{
+\examples{
 
   ### set-up linear transformation model for conditional
   ### distribution of dist given speed
