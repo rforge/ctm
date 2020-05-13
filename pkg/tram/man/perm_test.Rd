@@ -110,10 +110,6 @@ perm_test(object, ...)
   (pt <- perm_test(md, confint = TRUE, distribution = "exact", 
                    Taylor = TRUE))
 
-  ### approximate permutation likelihood and Wald test
-  (pt <- perm_test(md, statistic = c("Likelihood", "Wald"), confint = TRUE,
-                   distribution = coin::approximate(1e3)))
-
   ### compare with probabilistic indices obtained from asht::wmwTest
   if (require("asht", warn.conflicts = FALSE)) {
       print(wt2 <- wmwTest(pd ~ I(relevel(age, "At term")), 
