@@ -1,10 +1,10 @@
 Package: tramnet
 Title: Penalized Transformation Models
-Version: 0.0-2
-Date: 2020-03-19
+Version: 0.0-3
+Date: 2020-05-14
 Authors@R: c(person("Lucas", "Kook", role = c("cre", "aut"),
                     email = "lucasheinrich.kook@uzh.ch"),
-             person("Balint", "Tamasi", role = "aut"),
+             person("Balint", "Tamasi", role = "ctb"),
              person("Sandra", "Siegfried", role = "ctb"),
              person("Samuel", "Pawel", role = "ctb"),
              person("Torsten", "Hothorn", role = "ctb",
