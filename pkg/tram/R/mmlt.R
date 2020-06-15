@@ -266,7 +266,7 @@ predict.mmlt <- function(object, newdata, marginal = 1L, ...) {
     L <- t(L)
     tcp <- tcrossprod(L)
     S_diag <- diag(tcp)
-    S_low <- lower.tri(tcp)
+    S_low <- tcp[lower.tri(tcp)]
   }
   # more than 1 observation
   else{
