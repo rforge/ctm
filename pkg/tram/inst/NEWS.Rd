@@ -2,6 +2,13 @@
 \name{NEWS}
 \title{NEWS file for the tram package}
 
+\section{Changes in Version 0.4-1 (2020-06-15)}{
+  \itemize{
+    \item{Add \code{mmlt} for multivariate conditional transformation models
+          (continuous responses only for now).}
+  }
+}
+
 \section{Changes in Version 0.4-0 (2020-05-11)}{
   \itemize{
     \item{Force support to start at time zero and constrain cumulative

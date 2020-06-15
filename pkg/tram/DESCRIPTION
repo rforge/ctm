@@ -1,9 +1,10 @@
 Package: tram
 Title: Transformation Models
 Version: 0.4-1
-Date: 2020-05-13
+Date: 2020-06-15
 Authors@R: c(person("Torsten", "Hothorn", role = c("aut", "cre"),
                     email = "Torsten.Hothorn@R-project.org", comment = c(ORCID = "0000-0001-8301-0471")),
+             person("Luisa", "Barbanti", role = "aut"),
              person("Brian", "Ripley", role = "ctb"),
              person("Bill", "Venables", role = "ctb"),
              person(c("Douglas", "M."), "Bates", role = "ctb"))
@@ -14,6 +15,7 @@ Description: Formula-based user-interfaces to specific transformation models
   (Lohse et al., 2017, <DOI:10.12688/f1000research.12934.1>). The underlying theory
   is described in Hothorn et al. (2018) <DOI:10.1111/sjos.12291>. An extension to
   transformation models for clustered data is provided (Hothorn, 2019, <arxiv:1910.09219>).
+  Multivariate conditional transformation models (<arxiv:1906.03151>) can be fitted as well.
 Depends: mlt (>= 1.2-0)
 Imports: Formula, multcomp, variables (>= 1.0-2), basefun (>= 1.0-5), 
   sandwich, stats, survival, graphics, Matrix, methods
