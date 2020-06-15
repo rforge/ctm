@@ -8,7 +8,7 @@
 transformation models
 }
 \usage{
-mmlt(..., formula, data)
+mmlt(..., formula, data, control.outer = list(trace = FALSE))
 }
 \arguments{
   \item{\dots}{marginal transformation models, one for each response
@@ -17,6 +17,8 @@ mmlt(..., formula, data)
 structure via the lambda parameters
 }
   \item{data}{a data.frame
+}
+  \item{control.outer}{a list controlling \code{\link[alabama]{auglag}}
 }
 }
 \details{

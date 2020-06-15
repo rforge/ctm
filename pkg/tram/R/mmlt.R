@@ -20,12 +20,20 @@
         bhi <- as.basis(as.formula(paste(htotal, collapse = "+")), 
                         data = data, remove_intercept = TRUE)
         if (!is.null(bx)) {
+            shift <- b(bh = bhi, bx = bx)
+            if (!is.null(by[[j]]$model$bases$shifting))
+                shift <- c(shift = by[[j]]$model$bases$shifting, bhbx = b(bh = bhi, bx = bx))
             mctm[[j]] <- ctm(by[[j]]$model$bases$response, 
-                             shifting = c(shift = by[[j]]$model$bases$shifting, bhbx = b(bh = bhi, bx = bx)), 
+                             interacting = by[[j]]$model$bases$interacting,
+                             shifting = shift,
                              todistr = "Normal")
         } else {
+            shift <- bhi
+            if (!is.null(by[[j]]$model$bases$shifting))
+                shift <- c(shift = by[[j]]$model$bases$shifting, bhbx = b(bh = bhi, bx = bx))
             mctm[[j]] <- ctm(by[[j]]$model$bases$response, 
-                             shifting = c(shift = by[[j]]$model$bases$shifting, bh = bhi), 
+                             interacting = by[[j]]$model$bases$interacting,
+                             shifting = shift,
                              todistr = "Normal")
         }
         ### set todistr
@@ -53,7 +61,7 @@
 }
 
 # omegas in dd2d argument
-mmlt <- function(..., formula, data) {
+mmlt <- function(..., formula, data, control.outer = list(trace = FALSE)) {
   
   m <- list(...)
   J <- length(m)
@@ -181,9 +189,9 @@ mmlt <- function(..., formula, data) {
   opt <- alabama::auglag(par = start, fn = ll, gr = sc,
                          hin = function(par) ui %*% par - ci, 
                          hin.jac = function(par) ui,
-                         control.outer = list(trace = TRUE))[c("par", 
-                                                               "value", 
-                                                               "gradient")]
+                         control.outer = control.outer)[c("par", 
+                                                          "value", 
+                                                          "gradient")]
   opt$ll <- ll
   opt$sc <- sc
   opt
