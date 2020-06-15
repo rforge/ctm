@@ -47,7 +47,7 @@
     j <- 1
     for (i in 2:length(cf)) {
         cp <- cf[[i]][grep("hhat", names(cf[[i]]))]
-        cpar <- cbind(cpar, matrix(cp, nrow = p))
+        cpar <- rbind(cpar, matrix(cp, ncol = p))
     }
     list(mpar = mpar, cpar = cpar)
 }
@@ -172,7 +172,7 @@ mmlt <- function(..., formula, data) {
   }
   
   start <- .start(m, bx = bx, data = data)
-  start <- c(start$mpar, c(start$cpar))
+  start <- c(start$mpar, c(t(start$cpar)))
 
 ### this should give the same likelihood as logLik(mmlt()) of the "old"
 ### version
