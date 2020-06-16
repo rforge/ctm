@@ -62,9 +62,15 @@
 
 # omegas in dd2d argument
 mmlt <- function(..., formula, data, control.outer = list(trace = FALSE)) {
+
+  call <- match.call()
   
   m <- list(...)
   J <- length(m)
+
+  ### weights are not yet allowed
+  w <- unique(do.call("c", lapply(m, weights)))
+  stopifnot(isTRUE(all.equal(w, 1)))
 
   ### check if data is continuous and branch to discrete version here
 
@@ -191,13 +197,14 @@ mmlt <- function(..., formula, data, control.outer = list(trace = FALSE)) {
                          hin.jac = function(par) ui,
                          control.outer = control.outer)[c("par", 
                                                           "value", 
-                                                          "gradient")]
+                                                          "gradient",
+                                                          "hessian")]
   opt$ll <- ll
   opt$sc <- sc
   opt
   mpar <- opt$par[1:(sum(sapply(lu, function(m) ncol(m$exact))))]
 
-  mlist <- split(mpar, rep(factor(1:J), sapply(lu, function(m) ncol(m$exact))))
+  mlist <- split(mpar, sf <- rep(factor(1:J), sapply(lu, function(m) ncol(m$exact))))
   mmod <- vector(mode = "list", length = J)
   for (j in 1:J) {
       mmod[[j]] <- as.mlt(m[[j]])
@@ -207,11 +214,18 @@ mmlt <- function(..., formula, data, control.outer = list(trace = FALSE)) {
 
   gaussian <- all.equal("normal", unique(sapply(mmod, function(x) x$todistr$name)))
 
+  nm <- abbreviate(sapply(m, function(x) x$model$response), 4)
+  lnm <- matrix(paste0(matrix(nm, nrow = J, ncol = J), ".",
+                       matrix(nm, nrow = J, ncol = J, byrow = TRUE)), nrow = J)
+  cnm <- paste0(lnm[lower.tri(lnm)], ".", rep(colnames(lX), each = Jp))
+  names(opt$par) <- c(paste0(nm[sf], ".", do.call("c", lapply(mlist, names))), cnm)
+
   ret <- list(marginals = mmod, formula = formula, data = data,
+              call = call,
               gaussian = gaussian,
               pars = list(mpar = mpar, cpar = cpar),
-              par = opt$par, ll = ll, sc = sc, logLik = opt$value
-              )
+              par = opt$par, ll = ll, sc = sc, logLik = opt$value,
+              hessian = opt$hessian)
   class(ret) <- "mmlt"
   ret
 }
@@ -307,11 +321,12 @@ logLik.mmlt <- function(object, ...) {
 }
 
 coef.mmlt <- function(object, newdata = object$data, 
-                      type = c("marginal", "Lambda", "Lambdainv", "Sigma", "Corr"), 
+                      type = c("all", "marginal", "Lambda", "Lambdainv", "Sigma", "Corr"), 
                       ...)
 {
 
     type <- match.arg(type)
+    if (type == "all") return(object$par)
     if (type == "marginal") return(lapply(object$marginals, coef))
 
     X <- model.matrix(object$formula, data = newdata)
@@ -332,4 +347,35 @@ coef.mmlt <- function(object, newdata = object$data,
           SS <- cbind(SS, isd[,j] * isd[,-(1:j), drop = FALSE])
       ret$lower / SS
     }))
+}
+
+vcov.mmlt <- function(object, ...) {
+    ret <- solve(object$hessian)
+    rownames(ret) <- colnames(ret) <- names(coef(object))
+    ret
+}
+
+summary.mmlt <- function(object, ...) {
+    ret <- list(call = object$call,
+#                tram = object$tram,
+                test = cftest(object, parm = names(coef(object, with_baseline = FALSE))),
+                ll = logLik(object))
+    class(ret) <- "summary.mmlt"
+    ret
+}
+
+print.summary.mmlt <- function(x, digits = max(3L, getOption("digits") - 3L), ...) {
+    cat("\n", "Multivariate conditional transformation model", "\n")
+    cat("\nCall:\n")
+    print(x$call)
+    cat("\nCoefficients:\n")
+    pq <- x$test$test
+    mtests <- cbind(pq$coefficients, pq$sigma, pq$tstat, pq$pvalues)
+    colnames(mtests) <- c("Estimate", "Std. Error", "z value", "Pr(>|z|)")
+    sig <- .Machine$double.eps
+    printCoefmat(mtests, digits = digits, has.Pvalue = TRUE, 
+        P.values = TRUE, eps.Pvalue = sig)
+    cat("\nLog-Likelihood:\n ", x$ll, " (df = ", attr(x$ll, "df"), ")", sep = "")
+    cat("\n\n")
+    invisible(x)
 }

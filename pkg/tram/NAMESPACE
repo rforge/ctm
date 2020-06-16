@@ -48,6 +48,7 @@ S3method("confint", "htests")
 
 S3method("logLik", "mmlt")
 S3method("coef", "mmlt")
+S3method("vcov", "mmlt")
 S3method("predict", "mmlt")
-
-
+S3method("summary", "mmlt")
+S3method("print", "summary.mmlt")
