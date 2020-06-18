@@ -61,7 +61,8 @@
 }
 
 # omegas in dd2d argument
-mmlt <- function(..., formula, data, control.outer = list(trace = FALSE)) {
+mmlt <- function(..., formula, data, control.outer = list(trace = FALSE),
+                 scale = FALSE) {
 
   call <- match.call()
   
@@ -112,12 +113,18 @@ mmlt <- function(..., formula, data, control.outer = list(trace = FALSE)) {
     idx <- unlist(lapply(colSums(S), seq_len))
   }
   
-  ll <- function(par, check = TRUE) {
+  ### catch constraint violations here
+  .log <- function(x) {
+    return(log(pmax(.Machine$double.eps, x)))
+    pos <- (x > .Machine$double.eps)
+    if (all(pos)) return(log(x))
+    ret[pos] <- log(x[pos])
+    return(ret)
+  }
 
-    if (check) {
-        if (any(ui %*% par < ci)) return(-N * log(.Machine$double.eps))
-    }
-    
+
+  ll <- function(par, ui, ci) {
+
     mpar <- par[1:ncol(Y)]
     cpar <- matrix(par[-(1:ncol(Y))], nrow = ncol(lX))
     
@@ -129,7 +136,7 @@ mmlt <- function(..., formula, data, control.outer = list(trace = FALSE)) {
     B <- A %*% S + Yp[,-1]
     C <- cbind(Yp[,1], B)
     
-    ret <- sum(log(Yprimep))
+    ret <- sum(.log(Yprimep))
     for (j in 1:J) {
       ret <- ret + sum(m[[j]]$todistr$d(C[, j], log = TRUE))
     }
@@ -190,15 +197,36 @@ mmlt <- function(..., formula, data, control.outer = list(trace = FALSE)) {
 
 ### this should give the same likelihood as logLik(mmlt()) of the "old"
 ### version
-# print(ll(start, check = FALSE))
+# print(ll(start))
 
-  opt <- alabama::auglag(par = start, fn = ll, gr = sc,
+  if (scale) {
+    Ytmp <- cbind(do.call("cbind", lapply(lu, function(m) m$exact)), 
+                  kronecker(matrix(1, ncol = Jp), lX))
+    Ytmp[!is.finite(Ytmp)] <- NA
+    scl <- apply(abs(Ytmp), 2, max, na.rm = TRUE)
+    lt1 <- scl < 1.1
+    gt1 <- scl >= 1.1
+    scl[gt1] <- 1 / scl[gt1]
+    scl[lt1] <- 1
+    start <- start / scl
+    if (!is.null(ui))
+        ui <- t(t(ui) * scl)
+    f <- function(gamma) ll(scl * gamma, ui = ui, ci = ci)
+    g <- function(gamma) sc(scl * gamma) * scl
+  } else {
+    f <- function(par) ll(par, ui = ui, ci = ci)
+    g <- sc
+  }
+
+  opt <- alabama::auglag(par = start, fn = f, gr = g,
                          hin = function(par) ui %*% par - ci, 
                          hin.jac = function(par) ui,
                          control.outer = control.outer)[c("par", 
                                                           "value", 
                                                           "gradient",
                                                           "hessian")]
+  if (scale) opt$par <- opt$par * scl
+
   opt$ll <- ll
   opt$sc <- sc
   opt
