@@ -61,8 +61,8 @@
 }
 
 # omegas in dd2d argument
-mmlt <- function(..., formula, data, control.outer = list(trace = FALSE),
-                 scale = FALSE) {
+mmlt <- function(..., formula, data, theta = NULL,
+                 control.outer = list(trace = FALSE), scale = FALSE) {
 
   call <- match.call()
   
@@ -192,8 +192,15 @@ mmlt <- function(..., formula, data, control.outer = list(trace = FALSE),
     c(mret, cret)
   }
   
-  start <- .start(m, bx = bx, data = data)
-  start <- c(start$mpar, c(t(start$cpar)))
+  ### user-defined starting parameters for optimization
+  ### useful for bootstrapping
+  if(!is.null(theta)) {
+    start <- theta
+  }
+  else {
+    start <- .start(m, bx = bx, data = data)
+    start <- c(start$mpar, c(t(start$cpar)))
+  }
 
 ### this should give the same likelihood as logLik(mmlt()) of the "old"
 ### version
