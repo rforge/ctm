@@ -245,7 +245,7 @@ mmlt <- function(..., formula, data, theta = NULL,
       mmod[[j]] <- as.mlt(m[[j]])
       coef(mmod[[j]]) <- mlist[[j]]
   }
-  cpar <- matrix(opt$par[-(1:length(mpar))], ncol = Jp)
+  cpar <- matrix(opt$par[-(1:length(mpar))], ncol = Jp, byrow = TRUE)
 
   gaussian <- all.equal("normal", unique(sapply(mmod, function(x) x$todistr$name)))
 
