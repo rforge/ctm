@@ -292,7 +292,7 @@ predict.mmlt <- function(object, newdata, marginal = 1L,
         })
         ret <- lapply(1:length(ret), function(i) {
                       tmp <- t(t(ret[[i]]) / sqrt(Vx$diag[,marginal]))
-                      dnorm(tmp) * hprime[[i]]
+                      t(t(dnorm(tmp)) / sqrt(Vx$diag[,marginal]))  * hprime[[i]]
         })
     }
     if (length(ret) == 1) return(ret[[1]])
