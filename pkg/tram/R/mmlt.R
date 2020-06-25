@@ -90,7 +90,7 @@ mmlt <- function(..., formula, data, theta = NULL,
 
   bx <- formula
   if (inherits(formula, "formula"))
-      bx <- as.basis(formula, data)
+    bx <- as.basis(formula, data)
   lX <- model.matrix(bx, data = data)
 
   N <- nrow(lX)
@@ -256,7 +256,7 @@ mmlt <- function(..., formula, data, theta = NULL,
   nm <- abbreviate(sapply(m, function(x) x$model$response), 4)
   lnm <- matrix(paste0(matrix(nm, nrow = J, ncol = J), ".",
                        matrix(nm, nrow = J, ncol = J, byrow = TRUE)), nrow = J)
-  cnm <- paste0(lnm[lower.tri(lnm)], ".", rep(colnames(lX), each = Jp))
+  cnm <- paste0(rep(lnm[lower.tri(lnm)], each = ncol(lX)), ".", rep(colnames(lX), Jp))
   names(opt$par) <- c(paste0(nm[sf], ".", do.call("c", lapply(mlist, names))), cnm)
 
   ret <- list(marginals = mmod, formula = formula, bx = bx, data = data,
