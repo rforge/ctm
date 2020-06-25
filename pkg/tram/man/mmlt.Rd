@@ -8,7 +8,7 @@
 transformation models
 }
 \usage{
-mmlt(..., formula, data, control.outer = list(trace = FALSE))
+mmlt(..., formula, data, theta = NULL, control.outer = list(trace = FALSE), scale = FALSE)
 }
 \arguments{
   \item{\dots}{marginal transformation models, one for each response
@@ -18,7 +18,11 @@ structure via the lambda parameters
 }
   \item{data}{a data.frame
 }
+  \item{theta}{an optional vector of starting values
+}
   \item{control.outer}{a list controlling \code{\link[alabama]{auglag}}
+}
+  \item{scale}{logical; parameters are not scaled prior to optimisation by default
 }
 }
 \details{
