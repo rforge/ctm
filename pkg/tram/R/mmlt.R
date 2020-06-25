@@ -87,8 +87,12 @@ mmlt <- function(..., formula, data, theta = NULL,
   })
   
   Jp <- J * (J - 1) / 2
-  lX <- model.matrix(formula, data)
-  bx <- as.basis(formula, data)
+
+  bx <- formula
+  if (inherits(formula, "formula"))
+      bx <- as.basis(formula, data)
+  lX <- model.matrix(bx, data = data)
+
   N <- nrow(lX)
   nobs <- sapply(lu, function(m) nrow(m$exact))
   stopifnot(length(unique(nobs)) == 1L)
@@ -245,7 +249,7 @@ mmlt <- function(..., formula, data, theta = NULL,
       mmod[[j]] <- as.mlt(m[[j]])
       coef(mmod[[j]]) <- mlist[[j]]
   }
-  cpar <- matrix(opt$par[-(1:length(mpar))], ncol = Jp, byrow = TRUE)
+  cpar <- matrix(opt$par[-(1:length(mpar))], ncol = Jp)
 
   gaussian <- all.equal("normal", unique(sapply(mmod, function(x) x$todistr$name)))
 
@@ -255,7 +259,7 @@ mmlt <- function(..., formula, data, theta = NULL,
   cnm <- paste0(lnm[lower.tri(lnm)], ".", rep(colnames(lX), each = Jp))
   names(opt$par) <- c(paste0(nm[sf], ".", do.call("c", lapply(mlist, names))), cnm)
 
-  ret <- list(marginals = mmod, formula = formula, data = data,
+  ret <- list(marginals = mmod, formula = formula, bx = bx, data = data,
               call = call,
               gaussian = gaussian,
               pars = list(mpar = mpar, cpar = cpar),
@@ -265,11 +269,32 @@ mmlt <- function(..., formula, data, theta = NULL,
   ret
 }
 
-predict.mmlt <- function(object, newdata, marginal = 1L, ...) {
+predict.mmlt <- function(object, newdata, marginal = 1L, 
+                         type = c("trafo", "distribution", "density"), ...) {
+    type <- match.arg(type)
     if (!object$gaussian & marginal != 1L)
         stop("Cannot compute marginal distribution from non-gaussian joint model")
     ret <- lapply(object$marginals[marginal], function(m)
         predict(m, newdata = newdata, ...))
+    Vx <- coef(object, newdata = newdata, type = "Sigma")
+    ### first formula in Section 2.4
+    if (type == "distribution") {
+        ret <- lapply(1:length(ret), function(i) {
+                      tmp <- t(t(ret[[i]]) / sqrt(Vx$diag[,marginal]))
+                      pnorm(tmp)
+        })
+    }
+    if (type == "density") {
+        hprime <- lapply(object$marginals[marginal], function(m) {
+            dr <- 1
+            names(dr) <- m$model$response
+            predict(m, newdata = newdata, deriv = dr, ...)
+        })
+        ret <- lapply(1:length(ret), function(i) {
+                      tmp <- t(t(ret[[i]]) / sqrt(Vx$diag[,marginal]))
+                      dnorm(tmp) * hprime[[i]]
+        })
+    }
     if (length(ret) == 1) return(ret[[1]])
     ret
 }
@@ -364,7 +389,7 @@ coef.mmlt <- function(object, newdata = object$data,
     if (type == "all") return(object$par)
     if (type == "marginal") return(lapply(object$marginals, coef))
 
-    X <- model.matrix(object$formula, data = newdata)
+    X <- model.matrix(object$bx, data = newdata)
     ret <- X %*% object$pars$cpar
 
     if (!object$gaussian & type != "Lambda")
