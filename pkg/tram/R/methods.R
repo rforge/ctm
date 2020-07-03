@@ -384,12 +384,20 @@ score_test.tram <- function(object, parm = names(coef(object)),
         names(est) <- parameter
         ret$estimate <- est
     }
+    ret$parm <- parm
     class(ret) <- "htest"
     ret
 }
 
 confint.htest <- function(object, parm, level = .95, ...) {
-    ci <- object$conf.int
+    pf <- function(probs, digits = 3) 
+        paste(format(100 * probs, trim = TRUE, scientific = FALSE, digits = digits), "%")
+    a <- (1 - level)/2
+    a <- c(a, 1 - a)
+    pct <- pf(a)
+    ci <- matrix(object$conf.int, nrow = 1)
+    colnames(ci) <- pct
+    rownames(ci) <- object$parm
     if (is.null(ci)) return(NULL)
     stopifnot(attr(ci, "conf.level") == level)
     return(ci)
