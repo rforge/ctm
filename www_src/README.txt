@@ -115,7 +115,7 @@ The following solved it:
            $ gem update --system
 ctm/www_src$ bundle install
 
-
++
 # --------------- FURTHER INFO ---------------
 Jekyll: https://jekyllrb.com
 Theme: https://phlow.github.io/feeling-responsive/

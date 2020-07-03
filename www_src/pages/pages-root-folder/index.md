@@ -3,7 +3,7 @@ layout: frontpage
 permalink: "/index.html"
 image:
     title: "wc.png"
-    width: "60%"
+    width: "40%"
 homepage: true
 ---
 Are you sick of cookbook-style statistics?  Then treat yourself with
