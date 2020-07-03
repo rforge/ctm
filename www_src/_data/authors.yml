@@ -38,5 +38,19 @@
   role: aut
   email: ~
   comment: ~
-  url: ~
+  url: https://www.ebpi.uzh.ch/en/aboutus/departments/biostatistics/teambiostats/siegfried.html
   image: sandra_siegfried.jpg
+- name: Bálint Tamási
+  given: Bálint
+  family: Tamási
+  role: aut
+  email: ~
+  comment: ~
+  url: ~
+- name: Lucas Kook
+  given: Lucas
+  family: Kook
+  role: aut
+  email: ~
+  comment: ~
+  url: ~
