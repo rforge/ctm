@@ -211,8 +211,8 @@
 <p>First, install and fire-up R on your computer. Within R, one needs to
 install the tram package by typing</p>
 
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">install</span><span class="p">.</span><span class="n">packages</span><span class="p">(</span><span class="s">"tram"</span><span class="p">)</span>
-</code></pre></div></div>
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">install.packages</span><span class="p">(</span><span class="s2">"tram"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
 
 <p>and hitting the ENTER key. The tram package implements simple formula-based
 interfaces to some important transformation models. The models themself are
@@ -257,24 +257,24 @@ Boston Housing values):</p>
 ## 
 ## Coefficients:
 ##          Estimate Std. Error z value Pr(&gt;|z|)    
-## crim     0.082648   0.013712   6.028 1.66e-09 ***
-## zn      -0.010274   0.004923  -2.087   0.0369 *  
-## indus   -0.025228   0.021448  -1.176   0.2395    
-## nox      7.073148   1.491789   4.741 2.12e-06 ***
-## rm      -1.534726   0.218966  -7.009 2.40e-12 ***
-## age      0.008430   0.005118   1.647   0.0996 .  
-## dis      0.496611   0.077792   6.384 1.73e-10 ***
-## rad     -0.120764   0.024925  -4.845 1.27e-06 ***
-## tax      0.006483   0.001334   4.861 1.17e-06 ***
-## ptratio  0.395724   0.048314   8.191 2.22e-16 ***
-## b       -0.006452   0.001112  -5.803 6.50e-09 ***
-## lstat    0.281480   0.026504  10.620  &lt; 2e-16 ***
+## crim     0.082650   0.013711   6.028 1.66e-09 ***
+## zn      -0.010273   0.004923  -2.087   0.0369 *  
+## indus   -0.025192   0.021449  -1.175   0.2402    
+## nox      7.064791   1.491367   4.737 2.17e-06 ***
+## rm      -1.534746   0.218975  -7.009 2.40e-12 ***
+## age      0.008436   0.005118   1.648   0.0993 .  
+## dis      0.496496   0.077789   6.383 1.74e-10 ***
+## rad     -0.120735   0.024923  -4.844 1.27e-06 ***
+## tax      0.006482   0.001334   4.861 1.17e-06 ***
+## ptratio  0.395797   0.048312   8.193 2.22e-16 ***
+## b       -0.006450   0.001112  -5.802 6.56e-09 ***
+## lstat    0.281515   0.026501  10.623  &lt; 2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Log-Likelihood:
-##  -1297.489 (df = 26)
-## Likelihood-ratio Test: Chisq = 879.7637 on 12 degrees of freedom; p = &lt; 2.2e-16
+##  -1297.487 (df = 26)
+## Likelihood-ratio Test: Chisq = 879.7666 on 12 degrees of freedom; p = &lt; 2.2e-16
 </code></pre></div></div>
 <p>Two separate transformation function are fitted (for houses near and off
 Charles river, variable chas). The remaining variables enter a linear
