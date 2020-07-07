@@ -32,7 +32,8 @@ Source-folder for building the html-files with Jekyll
 	$ cp -r _site/* ../www/
 
 
-# FOR DEVELOPMENT ONLY: $ bundle exec jekyll serve --config _config.yml,_config_dev.yml (more infos in _config_dev.yml)
+# FOR DEVELOPMENT ONLY: $ bundle exec jekyll serve --config _config.yml,_config_dev.yml
+(more infos in _config_dev.yml)
 
 
 # --------------- FILE-STRUCTURE ---------------
