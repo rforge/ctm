@@ -205,7 +205,7 @@ Polr <- function(formula, data, subset, weights, offset, cluster, na.action = na
     distribution <- c("logistic" = "Logistic", "probit" = "Normal", 
                       "loglog" = "MaxExtrVal", "cloglog" = "MinExtrVal")
     distribution <- distribution[method]
-    name <- c("logistic" = "Odds", "loglog" = "Lehmann-alternative",
+    name <- c("logistic" = "Odds", "loglog" = "Reverse time hazards",
               "cloglog" = "Hazards")
 
     ret <- tram(td, transformation = "discrete", distribution = distribution, negative = TRUE, ...)
@@ -283,7 +283,7 @@ Lehmann <- function(formula, data, subset, weights, offset, cluster, na.action =
     if (!inherits(ret, "mlt")) return(ret)
     ret$call <- match.call(expand.dots = TRUE)
     ret$tram <- paste(ifelse(is.null(td$terms$s), "", "(Stratified)"),
-                      "Lehmann-alternative Linear Regression Model")
+                      "Proportional Reverse Time Hazards Linear Regression Model")
     class(ret) <- c("Lehmann", class(ret))
     ret
 }

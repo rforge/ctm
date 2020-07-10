@@ -1,7 +1,7 @@
 \name{Lehmann}
 \alias{Lehmann}
 \title{
-  Linear Regression for Lehmann-alternatives
+  Proportional Reverse Time Hazards Linear Regression
 }
 \description{
   Non-normal linear regression for Lehmann-alternatives
@@ -44,7 +44,8 @@ Lehmann(formula, data, subset, weights, offset, cluster, na.action = na.omit, ..
 This transformation model uses the cumulative distribution function for the
 standard Gumbel maximum extreme value distribution to map the shifted
 transformation function into probabilities. The exponential of the shift
-paramater can be interpreted as a Lehmann-alternative.
+paramater can be interpreted as a Lehmann-alternative or 
+reverse time hazard ratio.
 }
 \value{
 An object of class \code{Lehmann}, with corresponding \code{coef},
