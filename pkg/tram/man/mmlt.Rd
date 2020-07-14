@@ -8,13 +8,13 @@
 transformation models
 }
 \usage{
-mmlt(..., formula, data, theta = NULL, control.outer = list(trace = FALSE), scale = FALSE)
+mmlt(..., formula = ~ 1, data, theta = NULL, control.outer = list(trace = FALSE), scale = FALSE)
 }
 \arguments{
   \item{\dots}{marginal transformation models, one for each response
 }
   \item{formula}{a model formula describing a model for the dependency
-structure via the lambda parameters
+structure via the lambda parameters. The default is set to \code{~ 1} for constant lambdas.
 }
   \item{data}{a data.frame
 }

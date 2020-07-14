@@ -61,7 +61,7 @@
 }
 
 # omegas in dd2d argument
-mmlt <- function(..., formula, data, theta = NULL,
+mmlt <- function(..., formula = ~ 1, data, theta = NULL,
                  control.outer = list(trace = FALSE), scale = FALSE) {
 
   call <- match.call()
