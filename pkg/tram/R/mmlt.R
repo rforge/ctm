@@ -201,7 +201,11 @@ mmlt <- function(..., formula = ~ 1, data, theta = NULL,
   if(!is.null(theta)) {
     start <- theta
   }
-  else {
+  if(inherits(formula, "formula") && formula == ~1) {
+    start <- do.call("c", lapply(m, function(mod) coef(as.mlt(mod))))
+    start <- c(start, rep(0, Jp * ncol(lX)))
+  }
+  else { # formula != ~ 1
     start <- .start(m, bx = bx, data = data)
     start <- c(start$mpar, c(t(start$cpar)))
   }
