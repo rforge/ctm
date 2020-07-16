@@ -199,15 +199,17 @@ mmlt <- function(..., formula = ~ 1, data, theta = NULL,
   ### user-defined starting parameters for optimization
   ### useful for bootstrapping
   if(!is.null(theta)) {
-    start <- theta
+    start <- unname(theta)
   }
-  if(inherits(formula, "formula") && formula == ~1) {
-    start <- do.call("c", lapply(m, function(mod) coef(as.mlt(mod))))
-    start <- c(start, rep(0, Jp * ncol(lX)))
-  }
-  else { # formula != ~ 1
-    start <- .start(m, bx = bx, data = data)
-    start <- c(start$mpar, c(t(start$cpar)))
+  else {
+    if(inherits(formula, "formula") && formula == ~1) {
+      start <- do.call("c", lapply(m, function(mod) coef(as.mlt(mod))))
+      start <- c(start, rep(0, Jp * ncol(lX)))
+    }
+    else { # formula != ~ 1
+      start <- .start(m, bx = bx, data = data)
+      start <- c(start$mpar, c(t(start$cpar)))
+    }
   }
 
 ### this should give the same likelihood as logLik(mmlt()) of the "old"
