@@ -203,8 +203,11 @@ mmlt <- function(..., formula = ~ 1, data, theta = NULL,
   }
   else {
     if(inherits(formula, "formula") && formula == ~1) {
+      ### <FIXME> fix issue with bx argument in .start when formula = ~ 1
+      ### this is a temporary fix that works
       start <- do.call("c", lapply(m, function(mod) coef(as.mlt(mod))))
       start <- c(start, rep(0, Jp * ncol(lX)))
+      ### </FIXME 
     }
     else { # formula != ~ 1
       start <- .start(m, bx = bx, data = data)
