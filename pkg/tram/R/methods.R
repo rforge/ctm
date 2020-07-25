@@ -350,11 +350,14 @@ score_test.tram <- function(object, parm = names(coef(object)),
                     Sci <- approx(x = s$y, y = s$x, 
                                   xout = qnorm(c(alpha, 1 - alpha)))$y
                 }
+            } else {
+                warning("non-monotone score function")
             }
         }
         ### use Taylor approximation
         if (is.null(Sci))
-            Sci <- coef(object) + sqrt(vcov(object)[parm, parm]) * qnorm(c(alpha, 1 - alpha))
+            Sci <- coef(object)[parm] + 
+                sqrt(vcov(object)[parm, parm]) * qnorm(c(alpha, 1 - alpha))
 
         est <- coef(object)[parm]
         attr(Sci, "conf.level") <- level
@@ -562,10 +565,12 @@ perm_test.tram <- function(object, parm = names(coef(object)),
                         s <- spline(x = grd, y = grd_sc, method = "hyman")
                         Sci <- approx(x = s$y, y = s$x, xout = qp)$y
                     }
+                } else {
+                    warning("non-monotone score function")
                 }
             } 
             if (is.null(Sci))
-                Sci <- coef(object) + sqrt(vcov(object)[parm, parm]) * qp
+                Sci <- coef(object)[parm] + sqrt(vcov(object)[parm, parm]) * qp
             
             attr(Sci, "conf.level") <- level
             attr(Sci, "achieved.conf.level") <- achieved
