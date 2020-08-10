@@ -1,0 +1,388 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Transformation Models</title>
+
+    <link rel="stylesheet" type="text/css" href="http://ctm.r-forge.r-project.org/assets/css/styles_feeling_responsive.css">
+
+  
+
+	<script src="http://ctm.r-forge.r-project.org/assets/js/modernizr.min.js"></script>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/webfont/1.5.18/webfont.js"></script>
+	<script>
+		WebFont.load({
+			google: {
+				families: [ 'Lato:400,700,400italic:latin', 'Volkhov::latin' ]
+			}
+		});
+	</script>
+
+	<noscript>
+		<link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic%7CVolkhov' rel='stylesheet' type='text/css'>
+	</noscript>
+
+
+	<!-- Search Engine Optimization -->
+	<meta name="description" content="Mixed-effects transformation models">
+	
+	
+	
+	
+	
+	
+	<link rel="canonical" href="http://ctm.r-forge.r-project.org/news/tramME/">
+
+	
+
+</head>
+<body id="top-of-page" class="post">
+	
+	
+<div id="navigation" class="sticky">
+  <nav class="top-bar" role="navigation" data-topbar>
+    <ul class="title-area">
+      <li class="name">
+      <h1 class="show-for-small-only"><a href="http://ctm.r-forge.r-project.org" class="icon-tree"> Transformation Models</a></h1>
+    </li>
+       <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+      <li class="toggle-topbar menu-icon"><a href="#"><span>Nav</span></a></li>
+    </ul>
+    <section class="top-bar-section">
+
+      <ul class="right">
+        
+
+              
+
+          
+          
+        
+
+              
+
+          
+          
+        
+
+              
+
+          
+          
+        
+
+              
+
+          
+          
+        
+
+              
+
+          
+          
+            
+            
+              <li class="divider"></li>
+              <li><a  href="http://ctm.r-forge.r-project.org/people/">People</a></li>
+
+            
+            
+          
+        
+        
+      </ul>
+
+      <ul class="left">
+        
+
+              
+
+          
+          
+
+            
+            
+              <li><a  href="http://ctm.r-forge.r-project.org/">Start</a></li>
+              <li class="divider"></li>
+
+            
+            
+          
+        
+
+              
+
+          
+          
+
+            
+            
+              <li><a  href="http://ctm.r-forge.r-project.org/research/">Research</a></li>
+              <li class="divider"></li>
+
+            
+            
+          
+        
+
+              
+
+          
+          
+
+            
+            
+              <li><a  href="http://ctm.r-forge.r-project.org/software/">Software</a></li>
+              <li class="divider"></li>
+
+            
+            
+          
+        
+
+              
+
+          
+          
+
+            
+            
+              <li><a  href="http://ctm.r-forge.r-project.org/news/">News</a></li>
+              <li class="divider"></li>
+
+            
+            
+          
+        
+
+              
+
+          
+          
+        
+        
+      </ul>
+    </section>
+  </nav>
+</div><!-- /#navigation -->
+
+	
+
+	
+
+<div id="masthead-no-image-header">
+	<div class="row">
+		<div class="small-12 columns">
+			<a id="logo" href="http://ctm.r-forge.r-project.org/" title="Transformation Models – Research and Software for Transformation Models">
+				<img src="http://ctm.r-forge.r-project.org/assets/img/logo.png" alt="Transformation Models – Research and Software for Transformation Models">
+			</a>
+		</div><!-- /.small-12.columns -->
+	</div><!-- /.row -->
+</div><!-- /#masthead -->
+
+
+
+
+
+
+
+
+	<div class="row t30">
+	<div class="medium-8 columns medium-offset-2 end">
+		<article itemscope itemtype="http://schema.org/Article">
+			<header>
+				
+
+				<div itemprop="name">
+					
+					<h1>New Software Available</h1>
+				</div>
+			</header>
+
+
+			
+			<p class="teaser" itemprop="description">
+				Mixed-effects transformation models
+			</p>
+			
+
+			<div itemprop="articleSection">
+			<p>A new R package for fitting mixed-effects transformation models to grouped
+data is now available from
+<a href="https://CRAN.R-project.org/package=tramME" target="_blank">CRAN</a>.</p>
+
+<p>The package <strong>tramME</strong> provides formula-based specification and estimation of
+mixed-effects regression models for various types of outcomes with possible
+random censoring.</p>
+
+<p>To get started, install and load the package using R</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">install.packages</span><span class="p">(</span><span class="s2">"tramME"</span><span class="p">)</span><span class="w">
+
+</span><span class="n">library</span><span class="p">(</span><span class="s2">"tramME"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>The accompanying vignette provides technical details about the model setup as
+well as several worked-out examples:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">vignette</span><span class="p">(</span><span class="s2">"tramME"</span><span class="p">,</span><span class="w"> </span><span class="n">package</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"tramME"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+			</div>
+
+			
+						<div id="page-meta" class="t30">
+				<p>
+					<!-- Look the author details up from the site config. -->
+					
+					<!-- Output author details if some exist. -->
+					
+
+				
+				<time class="icon-calendar pr20" datetime="2020-08-10T00:00:00+02:00" itemprop="datePublished"> 2020-08-10</time>
+				
+
+				<span class="icon-archive pr20"> NEWS</span>
+				<br />
+				<span class="pr20"></span>
+			</p>
+
+			
+			<div id="post-nav" class="row">
+				
+				<div class="small-5 columns"><a class="button small radius prev" href="http://ctm.r-forge.r-project.org/news/tramnet/">&laquo; New Software Available</a></div><!-- /.small-4.columns -->
+                
+                <div class="small-2 columns text-center"><a class="radius button small" href="http://ctm.r-forge.r-project.org/news/" title="News">News</a></div><!-- /.small-4.columns -->
+				
+			</div>
+			
+			</div><!--  /.page-meta -->
+
+			
+
+			
+		</article>
+	</div><!-- /.medium-8.columns -->
+
+
+	
+
+
+	
+</div><!-- /.row -->
+
+
+	
+	    <div id="up-to-top" class="row">
+      <div class="small-12 columns" style="text-align: right;">
+        <a class="iconfont" href="#top-of-page">&#xf108;</a>
+      </div><!-- /.small-12.columns -->
+    </div><!-- /.row -->
+
+
+    <footer id="footer-content" class="bg-grau">
+      <div id="footer">
+        <div class="row">
+          <div class="medium-6 large-5 columns">
+            <h5 class="shadow-black">About</h5>
+
+            <p class="shadow-black">
+              Research and Software for Transformation Models
+            </p>
+          </div><!-- /.large-6.columns -->
+
+
+          <div class="small-6 medium-3 large-3 large-offset-1 columns">
+            
+              
+                <h5 class="shadow-black">Services</h5>
+              
+            
+              
+            
+
+              <ul class="no-bullet shadow-black">
+              
+                
+                  <li >
+                    <a href="http://ctm.r-forge.r-project.org"  title=""></a>
+                  </li>
+              
+                
+                  <li >
+                    <a href="http://ctm.r-forge.r-project.org/contact/"  title="Contact">Contact</a>
+                  </li>
+              
+              </ul>
+          </div><!-- /.large-4.columns -->
+
+
+          <div class="small-6 medium-3 large-3 columns">
+            
+              
+                <h5 class="shadow-black">Network</h5>
+              
+            
+              
+            
+
+            <ul class="no-bullet shadow-black">
+            
+              
+                <li >
+                  <a href="http://ctm.r-forge.r-project.org"  title=""></a>
+                </li>
+            
+              
+                <li class="" >
+                  <a href="https://r-forge.r-project.org/projects/ctm/" target="_blank"  title="">Transformation Models at R-forge</a>
+                </li>
+            
+            </ul>
+          </div><!-- /.large-3.columns -->
+        </div><!-- /.row -->
+
+      </div><!-- /#footer -->
+
+
+      <div id="subfooter">
+        <nav class="row">
+          <section id="subfooter-left" class="small-12 medium-6 columns credits">
+            <p>Built with <a href="http://jekyllrb.com/" target="_blank">Jekyll</a> based on <a href="http://phlow.github.io/feeling-responsive/" target="_blank">Feeling Responsive</a> by <a href="http://phlow.de/"target="_blank">Phlow</a>.</p>
+          </section>
+
+          <section id="subfooter-right" class="small-12 medium-6 columns">
+            <ul class="inline-list social-icons">
+            
+            </ul>
+          </section>
+        </nav>
+      </div><!-- /#subfooter -->
+    </footer>
+
+	
+
+	
+
+
+<script src="http://ctm.r-forge.r-project.org/assets/js/javascript.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
+
