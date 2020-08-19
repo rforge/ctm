@@ -73,6 +73,15 @@ mmlt <- function(..., formula = ~ 1, data, theta = NULL,
   w <- unique(do.call("c", lapply(m, weights)))
   stopifnot(isTRUE(all.equal(w, 1)))
 
+  ### warning for todistr != "normal"
+  for (j in 1:J) {
+    if(m[[j]]$todistr$name != "normal")
+      warning("One of the models has a non-normal inverse link function F_Z. ML
+              optimization still works but has been implemented differently than
+              described in the MCTM paper. Hence, no interpretation in the
+              Gaussian copula framework is possible, though the lambdas still serve
+              as coefficients for the transformation functions.")
+  }
   ### check if data is continuous and branch to discrete version here
 
   lu <- lapply(m, function(mod) {
