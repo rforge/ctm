@@ -2,19 +2,13 @@
 \name{NEWS}
 \title{NEWS file for the tram package}
 
-\section{Changes in Version 0.4-2 (2020-mm-dd)}{
+\section{Changes in Version 0.5-0 (2020-08-19)}{
   \itemize{
     \item{\code{Lehmann()} parameter is now labelled as proportional reverse time hazard ratio.}
-  }
-}
-
-\section{Changes in Version 0.4-1 (2020-06-15)}{
-  \itemize{
     \item{Add \code{mmlt} for multivariate conditional transformation models
           (continuous responses only for now).}
   }
 }
-
 
 \section{Changes in Version 0.4-0 (2020-05-11)}{
   \itemize{
