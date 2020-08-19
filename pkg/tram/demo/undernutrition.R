@@ -1,14 +1,19 @@
 ### UNDERNUTRITION DATA DEMO
-library("tram")    # requires at least tram 0.4-1
+library("tram") 
 library("mvtnorm")
 library("colorspace")
 library("latex2exp")
 
 set.seed(42)
+par(ask = TRUE)
 
-### simulated dataset
+### NOTE: simulated dataset. This is NOT the original
+### undernutrition data. The original data can be obtained from
+### https://dhsprogram.com/data/dataset/India_Standard-DHS_1999.cfm?flag=0
+### for registered users.
 load(system.file("undernutrition.RData", package = "tram"))
 dat <- simdata
+summary(dat)
 cageseq <- sort(unique(dat$cage))
 
 ################## MODELS ##################
@@ -31,11 +36,8 @@ Bxlambda <- Bernstein_basis(numeric_var("cage", support = quantile(dat$cage, pro
                                         bounds = c(0, 100)), order = 6, extrapolate = TRUE)
 
 ### fitting joint model
-system.time(
-  m_full <- mmlt(m_stunting, m_wasting, m_underweight,
-                 formula = Bxlambda, data = dat)
-)
-
+m_full <- mmlt(m_stunting, m_wasting, m_underweight,
+               formula = Bxlambda, data = dat)
 
 ### FAST ALTERNATIVE TO PARAMETRIC BOOTSTRAP
 ### sampling nsamp values from the asymptotic (normal) distribution of the parameters
@@ -204,3 +206,6 @@ legend("topleft", legend = c("95% CI", "mean", "ML estimate"),
        col = c("black", "black", "red"), lty = c(2, 1, 2),
        bty = "n", lwd = c(2, 2, 2), cex = 1.5)
 # dev.off()
+
+### warnings can be safely ignored
+
