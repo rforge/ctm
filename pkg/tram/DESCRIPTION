@@ -16,7 +16,7 @@ Description: Formula-based user-interfaces to specific transformation models
   is described in Hothorn et al. (2018) <DOI:10.1111/sjos.12291>. An extension to
   transformation models for clustered data is provided (Hothorn, 2019, <arxiv:1910.09219>).
   Multivariate conditional transformation models (<arxiv:1906.03151>) can be fitted as well.
-Depends: mlt (>= 1.2-0)
+Depends: R (>= 3.5.0), mlt (>= 1.2-0)
 Imports: Formula, multcomp, variables (>= 1.0-2), basefun (>= 1.0-5), 
   sandwich, stats, survival, graphics, Matrix, methods
 Suggests: MASS, TH.data, trtf (>= 0.3-3), mlbench, knitr, quantreg, 

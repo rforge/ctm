@@ -74,18 +74,18 @@ mmlt <- function(..., formula = ~ 1, data, theta = NULL,
   stopifnot(isTRUE(all.equal(w, 1)))
 
   ### warning for todistr != "normal"
-  for (j in 1:J) {
-    if(m[[j]]$todistr$name != "normal")
+  if (any(sapply(m, function(x) x$todistr$name != "normal")))
       warning("One of the models has a non-normal inverse link function F_Z. ML
               optimization still works but has been implemented differently than
               described in the MCTM paper. Hence, no interpretation in the
               Gaussian copula framework is possible, though the lambdas still serve
               as coefficients for the transformation functions.")
-  }
   ### check if data is continuous and branch to discrete version here
 
   lu <- lapply(m, function(mod) {
     eY <- get("eY", environment(mod$parm))
+    if (is.null(eY)) 
+        stop("only continuous outcomes implemented so far.")
     fixed <- get("fixed", environment(mod$parm))
     offset <- get("offset", environment(mod$parm))
     tmp <- attr(eY$Y, "constraint")
@@ -206,27 +206,21 @@ mmlt <- function(..., formula = ~ 1, data, theta = NULL,
   }
   
   ### user-defined starting parameters for optimization
-  ### useful for bootstrapping
   if(!is.null(theta)) {
     start <- unname(theta)
   }
   else {
     if(inherits(formula, "formula") && formula == ~1) {
-      ### <FIXME> fix issue with bx argument in .start when formula = ~ 1
-      ### this is a temporary fix that works
+      ### don't bother with .start(), simply use the marginal coefficients
+      ### and zero for the lambda parameters
       start <- do.call("c", lapply(m, function(mod) coef(as.mlt(mod))))
       start <- c(start, rep(0, Jp * ncol(lX)))
-      ### </FIXME 
     }
     else { # formula != ~ 1
       start <- .start(m, bx = bx, data = data)
       start <- c(start$mpar, c(t(start$cpar)))
     }
   }
-
-### this should give the same likelihood as logLik(mmlt()) of the "old"
-### version
-# print(ll(start))
 
   if (scale) {
     Ytmp <- cbind(do.call("cbind", lapply(lu, function(m) m$exact)), 
@@ -419,6 +413,7 @@ coef.mmlt <- function(object, newdata = object$data,
                         "Corr" = {
       ret <- .Crossp(.Solve2(ret))
       isd <- sqrt(ret$diagonal)
+      if (!is.matrix(isd)) isd <- matrix(isd, nrow = 1)
       SS <- c()
       J <- length(object$marginals)
       for (j in 1:J)
