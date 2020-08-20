@@ -52,11 +52,19 @@ methods.
 
   ### fit unconditional bivariate distribution of speed and distance to stop
   ## fit unconditional marginal transformation models
-  m_speed <- BoxCox(speed ~ 1, data = cars, support = c(4, 25))
-  m_dist <- BoxCox(dist ~ 1, data = cars, support = c(0, 120))
+  m_speed <- BoxCox(speed ~ 1, data = cars, support = ss <- c(4, 25), 
+                    add = c(-5, 5))
+  m_dist <- BoxCox(dist ~ 1, data = cars, support = sd <- c(0, 120), 
+                   add = c(-5, 5))
 
   ## fit multivariate unconditional transformation model
   m_speed_dist <- mmlt(m_speed, m_dist, formula = ~ 1, data = cars)
+
+  ## lambda defining the Cholesky of the precision matrix,
+  ## with standard error
+  coef(m_speed_dist, newdata = cars[1,], type = "Lambda")
+  sqrt(vcov(m_speed_dist)["dist.sped.(Intercept)", 
+                          "dist.sped.(Intercept)"])
 
   ## "latent" correlation, ie correlation of speed and dist after
   ## transformation to bivariate normality
@@ -77,29 +85,34 @@ methods.
                dnorm(coef(m_speed_dist)["dist.sped.(Intercept)"] * hs + hd) * 
                hps * hpd)
 
-  ## plot joint density
-  library("lattice")
-  p1 <- contourplot(d ~ speed + dist, data = nd, 
-      panel = function(...) {
-          panel.contourplot(...)
-          panel.xyplot(cars$speed, cars$dist, pch = 19)
-  }, main = "Joint density")
-
-  ## plot marginal densities
+  ## compute marginal densities
   nd_s <- as.data.frame(nd_s)
   nd_s$d <- predict(m_speed_dist, newdata = nd_s, type = "density")
-  p2 <- xyplot(d ~ speed, data = nd_s, type = "l", 
-               ylab = "Marginal density")
-
   nd_d <- as.data.frame(nd_d)
   nd_d$d <- predict(m_speed_dist, newdata = nd_d, marginal = 2L, 
                     type = "density")
-  p3 <- xyplot(dist ~ d, data = nd_d, type = "l", xlab = "Marginal density")
 
-  ### do the plot (not quite perfect yet)
-  library("gridExtra")
-  laymat <- matrix(c(2, 1, 1, 2, 1, 1, 4, 3, 3), nrow = 3)
-  plot(arrangeGrob(p1, p2, p3, layout_matrix = laymat))
+  ## plot bivariate and marginal distribution
+  col1 <- rgb(.1, .1, .1, .9)
+  col2 <- rgb(.1, .1, .1, .5)
+  w <- c(.8, .2)
+  layout(matrix(c(2, 1, 4, 3), nrow = 2), width = w, height = rev(w))
+  par(mai = c(1, 1, 0, 0) * par("mai"))
+  sp <- unique(nd$speed)
+  di <- unique(nd$dist)
+  d <- matrix(nd$d, nrow = length(sp))
+  contour(sp, di, d, xlab = "Speed (in mph)", ylab = "Distance (in ft)", xlim = ss, ylim = sd,
+          col = col1)
+  points(cars$speed, cars$dist, pch = 19, col = col2)
+  mai <- par("mai")
+  par(mai = c(0, 1, 0, 1) * mai)
+  plot(d ~ speed, data = nd_s, xlim = ss, type = "n", axes = FALSE, 
+       xlab = "", ylab = "")
+  polygon(nd_s$speed, nd_s$d, col = col2, border = FALSE)
+  par(mai = c(1, 0, 1, 0) * mai)
+  plot(dist ~ d, data = nd_d, ylim = sd, type = "n", axes = FALSE, 
+       xlab = "", ylab = "")
+  polygon(nd_d$d, nd_d$dist, col = col2, border = FALSE)
 
   ### NOTE: marginal densities are NOT normal, nor is the joint
   ### distribution. The non-normal shape comes from the data-driven 
