@@ -14,7 +14,7 @@ perm_test(object, ...)
 \method{perm_test}{tram}(object, parm = names(coef(object)), 
     statistic = c("Score", "Likelihood", "Wald"),
     alternative = c("two.sided", "less", "greater"), 
-    nullvalue = 0, confint = FALSE, level = .95, 
+    nullvalue = 0, confint = TRUE, level = .95, 
     Taylor = FALSE, block_permutation = TRUE, maxsteps = 25, ...)
 }
 %- maybe also 'usage' for other objects documented here.

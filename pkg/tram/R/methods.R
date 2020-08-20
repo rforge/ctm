@@ -433,7 +433,7 @@ perm_test.default <- function(object, ...)
 perm_test.tram <- function(object, parm = names(coef(object)), 
     statistic = c("Score", "Likelihood", "Wald"),
     alternative = c("two.sided", "less", "greater"), 
-    nullvalue = 0, confint = FALSE, level = .95, 
+    nullvalue = 0, confint = TRUE, level = .95, 
     Taylor = FALSE, block_permutation = TRUE, maxsteps = 25, ...) {
 
     cf <- coef(object)
