@@ -234,8 +234,8 @@ mmlt <- function(..., formula = ~ 1, data, theta = NULL,
     start <- start / scl
     if (!is.null(ui))
         ui <- t(t(ui) * scl)
-    f <- function(gamma) ll(scl * gamma, ui = ui, ci = ci)
-    g <- function(gamma) sc(scl * gamma) * scl
+    f <- function(par) ll(scl * par, ui = ui, ci = ci)
+    g <- function(par) sc(scl * par) * scl
   } else {
     f <- function(par) ll(par, ui = ui, ci = ci)
     g <- sc
