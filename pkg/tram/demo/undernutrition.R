@@ -12,7 +12,6 @@ par(ask = TRUE)
 ### https://dhsprogram.com/data/dataset/India_Standard-DHS_1999.cfm?flag=0
 ### for registered users.
 load(system.file("undernutrition.RData", package = "tram"))
-dat <- simdata
 summary(dat)
 cageseq <- sort(unique(dat$cage))
 
@@ -89,7 +88,6 @@ q_wasting <- mkgrid(m_wasting, n = 100)[[1]]
 q_underweight <- mkgrid(m_underweight, n = 100)[[1]]
 
 ### MARGINAL DISTRIBUTIONS
-# pdf("margins.pdf", height = 5, width = 20)
 par(mfrow = c(1, 3), mar = c(5.5, 6.5, 3.5, 1.5) - 1)
 d_stunting <- predict(m_full, newdata = nd, marginal = 1, 
                       type = "distribution", q = q_stunting)
@@ -124,10 +122,8 @@ for(i in 1:nrow(nd)) {
 }
 legend("bottomright", legend = c(1, 3, 6, 9, 12, 24), title = "cage month", 
        col = col, bty = "n", lwd = 2, seg.len = .9, cex = 1.5)
-# dev.off()
 
 ### MARGINAL DENSITIES
-# pdf("margins_dens.pdf", height = 5, width = 20)
 par(mfrow = c(1, 3), mar = c(5.5, 6.5, 3.5, 1.5) - 1)
 de_stunting <- predict(m_full, newdata = nd, marginal = 1, 
                        type = "density", q = q_stunting)
@@ -160,11 +156,8 @@ for(i in 1:nrow(nd)) {
 }
 legend("topright", legend = c(1, 3, 6, 9, 12, 24), title = "cage month", 
        col = col, bty = "n", lwd = 2, seg.len = .9, cex = 1.5)
-# dev.off()
 
 ### correlation coefficients from NONPARAMETRIC BOOTSTRAP
-# postscript("effects_rhos_s.eps", paper = "special", height = 5, width = 20)
-# pdf("effects_rhos_s_npb.pdf", height = 5, width = 20)
 par(mfrow = c(1, 3), mar = c(5.5, 7.9, 3.5, 1.5) - 1)
 plot(cageseq, apply(rs12s, MARGIN = 1, FUN = "mean"), type = "l", lwd = 2, 
      xlab = "age",
@@ -205,7 +198,6 @@ lines(cageseq, rs23est, lty = 2, lwd = 2, col = "red")
 legend("topleft", legend = c("95% CI", "mean", "ML estimate"), 
        col = c("black", "black", "red"), lty = c(2, 1, 2),
        bty = "n", lwd = c(2, 2, 2), cex = 1.5)
-# dev.off()
 
 ### warnings can be safely ignored
 

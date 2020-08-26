@@ -3,6 +3,8 @@ library("mvtnorm")
 library("VGAM")
 library("parallel")
 library("tram")
+library("lattice")
+library("latticeExtra")
 
 ################## DATA ##################
 set.seed(29081975)
@@ -47,17 +49,17 @@ for(i in 1:repl) {
 }
 
 ################## MODELS ##################
-run_mmlt <- function(i) {
+run_mmlt <- function(i, o_marginal, o_lambda) {
   data_i <- data[[i]]
   
   ### Bernstein bases
   By <- lapply(c("y1","y2"), function(y) {
     v <- numeric_var(y, support = quantile(data_i[[y]], prob = c(.1, .9)),
                      bounds = c(0, Inf))
-    Bernstein_basis(var = v, order = 6, ui = "increasing")  # change order?
+    Bernstein_basis(var = v, order = o_marginal, ui = "increasing")
   })
   Bx_shift <- Bernstein_basis(numeric_var("x", support = c(-.8, .8)), order = 6, ui = "zero")
-  Bx_lambda <- Bernstein_basis(numeric_var("x", support = c(-.8, .8)), order = 6)
+  Bx_lambda <- Bernstein_basis(numeric_var("x", support = c(-.8, .8)), order = o_lambda)
   
   ### marginal models
   ctm_y1 <- ctm(By[[1]], shift = Bx_shift, todistr = "Normal")
@@ -74,40 +76,61 @@ run_mmlt <- function(i) {
   return(ret)
 }
 
-system.time(
-  resMLT <- mclapply(1:repl, FUN = run_mmlt, mc.cores = 4)
-)
+resMLT_6_6 <- mclapply(1:repl, FUN = run_mmlt, o_marginal = 6, o_lambda = 6, mc.cores = 4)
+resMLT_6_3 <- mclapply(1:repl, FUN = run_mmlt, o_marginal = 6, o_lambda = 3, mc.cores = 4)
+resMLT_12_3 <- mclapply(1:repl, FUN = run_mmlt, o_marginal = 12, o_lambda = 3, mc.cores = 4)
 
 
 ################## PLOTS ##################
-postscript("sim2d.eps", paper = "special", height = 4, width = 12)
-par(mfrow = c(1, 1), mar = c(5.5, 6.0, 3.5, 1.2) - 1)
-plot(xseq, xseq^2, type = "n", ylim = c(-0.2, 1), main = "MCTM", 
-     xlab = "x", ylab = expression(paste(lambda,"(x)", sep = "")),
-     cex.axis = 1.75, cex.lab = 2, cex.main = 2)	
+tt1 <- tt2 <- tt3 <- c()
 for(i in 1:repl) {
-  lines(xseq, resMLT[[i]]$rho, col = rgb(.1, .1, .1, .1))
+  tt1 <- c(tt1, resMLT_6_6[[i]]$rho)
+  tt2 <- c(tt2, resMLT_6_3[[i]]$rho)
+  tt3 <- c(tt3, resMLT_6_3[[i]]$rho)
 }
-lines(xseq, xseq^2, lwd = 2)
-dev.off()
+res_all <- data.frame(x = rep(xseq, repl), repl = rep(1:100, each = length(xseq)))
+res_all$MCTM66 <- tt1
+res_all$MCTM63 <- tt2
+res_all$MCTM123 <- tt3
 
-logMSE <- list(MCTM = vector(repl, mode = "numeric"))
-logMSE$MCTM <- unlist(lapply(1:repl, FUN = function(x){log(sum((resMLT[[x]]$rho - xseq^2)^2/
-                                                                 length(xseq)))}))
 
-postscript("sim2dMSE.eps", paper = "special", height = 6, width = 10)
+# pdf("sim2d.pdf", paper = "special", height = 4, width = 12)
+par(mar = c(5.5, 6.0, 3.5, 1.2) - 1)
+panel_f <- function(x, y, repl = 100) {
+  xseq <- seq(-0.9, 0.9, by = 0.1)
+  panel.grid(h = -1, v = -1)
+  for (i in 1:repl) {
+    idx <- ((1+length(xseq)*(i-1)):(length(xseq)*i))
+    panel.lines(x[idx], y[idx], col = "black", alpha = .2)
+  }
+  panel.lines(xseq, xseq^2, col = "black", lwd = 2)
+}
+
+xyplot(MCTM66 + MCTM63 + MCTM123 ~ x, group = repl,  data = res_all, outer = TRUE,
+       between = list(x = 1), layout = c(3, 1), panel = panel_f,
+       ylim = c(-0.2, 1), scales = list(x = list(relation = "free"),
+                                        y = list(rot = 90)),
+       xlab = "x", ylab = expression(paste(lambda, "(x)", sep = "")),
+       strip = strip.custom(bg = "transparent",
+                            factor.levels = c("MCTM-6/6", "MCTM-6/3", "MCTM-12/3")))
+# dev.off()
+
+logMSE <- list(MCTM66 = vector(repl, mode = "numeric"), 
+               MCTM63 = vector(repl, mode = "numeric"), 
+               MCTM123 = vector(repl, mode = "numeric"))
+
+logMSE$MCTM66 <- unlist(lapply(1:repl, FUN = function(x){log(sum((resMLT_6_6[[x]]$rho - xseq^2)^2/
+                                                                   length(xseq)))}))
+logMSE$MCTM63 <- unlist(lapply(1:repl, FUN = function(x){log(sum((resMLT_6_3[[x]]$rho - xseq^2)^2/
+                                                                   length(xseq)))}))
+logMSE$MCTM123 <- unlist(lapply(1:repl, FUN = function(x){log(sum((resMLT_12_3[[x]]$rho - xseq^2)^2/
+                                                                    length(xseq)))}))
+
+# postscript("sim2dMSE_ext.pdf", paper = "special", height = 6, width = 11)
 par(mfrow = c(1, 1), mar = c(4.5, 6.0, 3.5, 1.2) - 1)
 logMSE <- as.matrix(as.data.frame(logMSE))	
-boxplot(sqrt(exp(logMSE)),
+boxplot(sqrt(exp(logMSE)), ylim = c(0, 0.2),
         main = "RMSE", ylab = expression(paste("RMSE(", lambda, "(x))", sep = "")),
+        names = c("MCTM-6/6", "MCTM-6/3", "MCTM-12/3"), 
         cex.axis = 1.75, cex.lab = 2, cex.main = 2)
-dev.off()
-
-postscript(paste(pathwd, "sim2dMSE2.eps", sep = ""), paper = "special", height = 10, width = 20)
-par(mfrow = c(1, 2), mar = c(4.5, 6.0, 3.5, 1.2) - 1)
-logMSE <- as.matrix(as.data.frame(logMSE))	
-boxplot(exp(logMSE), main = "MSE", ylab = "MSE",
-        cex.axis = 1.75, cex.lab = 2, cex.main=2)
-boxplot((logMSE), main = "log(MSE)", ylab = "log(MSE)",
-        cex.axis = 1.75, cex.lab = 2, cex.main=2)
-dev.off()
+# dev.off()

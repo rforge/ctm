@@ -1,3 +1,3 @@
 
-These two files contain simulation code for reproducing empirical results
-presented in "Multivariate Conditional Transformation Models"
+These two files contain simulation code for reproducing some of the empirical 
+results presented in "Multivariate Conditional Transformation Models"
