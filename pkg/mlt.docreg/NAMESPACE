@@ -1,6 +1,14 @@
 
-import(mlt)
-importFrom(numDeriv, grad, hessian)
-importFrom(stats, coef, weights)
+import("mlt")
+importFrom("numDeriv", "grad", "hessian")
+importFrom("stats", "coef", "weights")
+
+importFrom("eha", "phreg")
+importFrom("flexsurv", "flexsurvreg")
+import("lattice")
+import("multcomp")
+import("np")
+import("survival")
+import("truncreg")
 
 export(checkGH)
