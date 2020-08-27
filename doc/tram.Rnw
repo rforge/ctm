@@ -21,7 +21,7 @@
 <<tram-setup, echo = FALSE, results = "hide", message = FALSE>>=
 set.seed(290875)
 
-sapply(c("tram", "survival", "MASS", "lattice", "mlbench", 
+pkgs <- sapply(c("tram", "survival", "MASS", "lattice", "mlbench", 
          "multcomp", "ordinal", "colorspace", "quantreg", "trtf", "ATR"), library, char = TRUE)
 
 
@@ -109,6 +109,14 @@ Transformation Models: The \pkg{tram} Package.
 URL \url{https://CRAN.R-project.org/package=tram}.}
 
 % \input{todo}
+
+<<fail, results = "asis", echo = FALSE>>=
+if (any(!pkgs))
+    cat(paste("Package(s)", paste(names(pkgs)[!pkgs], collapse = ", "), 
+        "not available, stop processing.",
+        "\\end{document}\n"))
+knitr::knit_exit()
+@
 
 \section{Introduction}
 
