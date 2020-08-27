@@ -11,6 +11,9 @@ par(ask = TRUE)
 ### undernutrition data. The original data can be obtained from
 ### https://dhsprogram.com/data/dataset/India_Standard-DHS_1999.cfm?flag=0
 ### for registered users.
+### Preprocessing was performed as implemented in
+###   system.file("india_preproc.R", package = "mboost")
+### 
 load(system.file("undernutrition.RData", package = "tram"))
 summary(dat)
 cageseq <- sort(unique(dat$cage))
