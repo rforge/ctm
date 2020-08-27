@@ -18,12 +18,12 @@
 
 \newcommand{\cmd}[1]{\texttt{#1()}}
 
-<<tram-setup, echo = FALSE, results = "hide", message = FALSE>>=
+<<tram-setup, echo = FALSE, results = "hide", message = FALSE, warning = FALSE>>=
 set.seed(290875)
 
 pkgs <- sapply(c("tram", "survival", "MASS", "lattice", "mlbench", 
-         "multcomp", "ordinal", "colorspace", "quantreg", "trtf", "ATR"), library, char = TRUE)
-
+         "multcomp", "ordinal", "colorspace", "quantreg", "trtf", "ATR"), 
+         require, char = TRUE)
 
 trellis.par.set(list(plot.symbol = list(col=1,pch=20, cex=0.7),
                      box.rectangle = list(col=1),

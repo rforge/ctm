@@ -26,8 +26,8 @@
 <<mtram-setup, echo = FALSE, results = "hide", message = FALSE, warning = FALSE>>=
 set.seed(290875)
 
-sapply(c("mlt", "survival", "tram", "lme4", "gridExtra", 
-         "lattice", "latticeExtra", "mvtnorm", "ordinalCont"), library, char = TRUE)
+pkgs <- sapply(c("mlt", "survival", "tram", "lme4", "gridExtra", 
+         "lattice", "latticeExtra", "mvtnorm", "ordinalCont"), require, char = TRUE)
 
 trellis.par.set(list(plot.symbol = list(col=1,pch=20, cex=0.7),
                      box.rectangle = list(col=1),
@@ -574,6 +574,14 @@ Transformation Models for Clustered Observations.
 URL \url{https://CRAN.R-project.org/package=tram}.}
 
 % \input{todo}
+
+<<fail, results = "asis", echo = FALSE>>=
+if (any(!pkgs))
+    cat(paste("Package(s)", paste(names(pkgs)[!pkgs], collapse = ", "), 
+        "not available, stop processing.",
+        "\\end{document}\n"))
+knitr::knit_exit()
+@
 
 \section{Introduction}
 
