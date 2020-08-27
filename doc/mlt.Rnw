@@ -53,7 +53,7 @@ ltheme <- canonical.theme(color = FALSE)     ## in-built B&W theme
 ltheme$strip.background$col <- "transparent" ## change strip bg
 lattice.options(default.theme = ltheme)
 
-knitr::opts_chunk$set(echo = TRUE, results = 'markup', error = TRUE,
+knitr::opts_chunk$set(echo = TRUE, results = 'markup', error = FALSE,
                       warning = FALSE, message = FALSE,
                       tidy = FALSE, cache = FALSE, size = "small",
                       fig.width = 6, fig.height = 4, fig.align = "center",
