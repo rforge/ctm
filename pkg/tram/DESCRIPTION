@@ -7,7 +7,8 @@ Authors@R: c(person("Torsten", "Hothorn", role = c("aut", "cre"),
              person("Luisa", "Barbanti", role = "aut"),
              person("Brian", "Ripley", role = "ctb"),
              person("Bill", "Venables", role = "ctb"),
-             person(c("Douglas", "M."), "Bates", role = "ctb"))
+             person(c("Douglas", "M."), "Bates", role = "ctb"),
+             person("Nadja", "Klein", role = "ctb"))
 Description: Formula-based user-interfaces to specific transformation models
   implemented in package 'mlt'. Available models include Cox models, some parametric 
   survival models (Weibull, etc.), models for ordered categorical variables,
