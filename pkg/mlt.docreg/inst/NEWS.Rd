@@ -2,11 +2,18 @@
 \name{NEWS}
 \title{NEWS file for the mlt.docreg package}
 
+\section{Changes in Version 1.0-7 (2020-08-31)}{
+  \itemize{
+    \item{Make everything conditional on suggested packages being available, really.}
+  }
+}
+
 \section{Changes in Version 1.0-6 (2020-08-27)}{
   \itemize{
     \item{Make everything conditional on suggested packages being available.}
   }
 }
+
 
 \section{Changes in Version 1.0-5 (2020-02-13)}{
   \itemize{

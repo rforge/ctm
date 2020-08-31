@@ -28,7 +28,7 @@ set.seed(290875)
 
 pkgs <- sapply(c("mlt", "survival", "eha", "prodlim", "truncreg", "lattice", "gridExtra",
          "MASS", "nnet", "HSAUR3", "sandwich", "flexsurv", "grid", "latticeExtra", 
-         "colorspace", "multcomp"), require, char = TRUE)
+         "colorspace", "multcomp", "eha"), require, char = TRUE)
 
 if (!file.exists("analysis/DVC.rda")) {
     download.file("https://zenodo.org/record/17179/files/DVC.tgz", "DVC.tgz")
@@ -146,11 +146,12 @@ Most Likely Transformations: The \pkg{mlt} Package.
 % \input{todo}
 
 <<fail, results = "asis", echo = FALSE>>=
-if (any(!pkgs))
+if (any(!pkgs)) {
     cat(paste("Package(s)", paste(names(pkgs)[!pkgs], collapse = ", "), 
         "not available, stop processing.",
         "\\end{document}\n"))
-knitr::knit_exit()
+    knitr::knit_exit()
+}
 @
 
 \section{Introduction}
@@ -2920,9 +2921,12 @@ pkgbib <- function(pkg) {
     }
     cat(b, sep = "\n", file = "packages.bib", append = TRUE)
 }
-pkg <- function(pkg)
+pkg <- function(pkg) {
+    vrs <- try(pkgversion(pkg))
+    if (inherits(vrs, "try-error")) return(NA)
     paste("\\\\pkg{", pkg, "} \\\\citep[version~",
-          pkgversion(pkg), ",][]{pkg:", pkg, "}", sep = "")
+          vrs, ",][]{pkg:", pkg, "}", sep = "")
+}
 
 pkgs <- c("mlt", "variables", "basefun", "survival", "eha", "prodlim", "truncreg", "MASS", "nnet", "HSAUR3", "sandwich", 
   "flexsurv", "multcomp", "mgcv", "coxinterval", "ICsurv",

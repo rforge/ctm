@@ -577,10 +577,12 @@ URL \url{https://CRAN.R-project.org/package=tram}.}
 
 <<fail, results = "asis", echo = FALSE>>=
 if (any(!pkgs))
+{
     cat(paste("Package(s)", paste(names(pkgs)[!pkgs], collapse = ", "), 
         "not available, stop processing.",
         "\\end{document}\n"))
-knitr::knit_exit()
+    knitr::knit_exit()
+}
 @
 
 \section{Introduction}
@@ -1788,9 +1790,14 @@ pkgbib <- function(pkg) {
     }
     cat(b, sep = "\n", file = "packages.bib", append = TRUE)
 }
-pkg <- function(pkg)
+
+pkg <- function(pkg) {
+    vrs <- try(pkgversion(pkg))
+    if (inherits(vrs, "try-error")) return(NA)
     paste("\\\\pkg{", pkg, "} \\\\citep[version~",
-          pkgversion(pkg), ",][]{pkg:", pkg, "}", sep = "")
+          vrs, ",][]{pkg:", pkg, "}", sep = "")
+}
+
 pkg("mlt")
 pkg("tram")
 pkg("SparseGrid")

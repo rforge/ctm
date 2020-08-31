@@ -111,11 +111,12 @@ URL \url{https://CRAN.R-project.org/package=tram}.}
 % \input{todo}
 
 <<fail, results = "asis", echo = FALSE>>=
-if (any(!pkgs))
+if (any(!pkgs)) {
     cat(paste("Package(s)", paste(names(pkgs)[!pkgs], collapse = ", "), 
         "not available, stop processing.",
         "\\end{document}\n"))
-knitr::knit_exit()
+    knitr::knit_exit()
+}
 @
 
 \section{Introduction}
@@ -1147,12 +1148,15 @@ pkgbib <- function(pkg) {
     }
     cat(b, sep = "\n", file = "packages.bib", append = TRUE)
 }
-pkg <- function(pkg)
-    paste("\\\\pkg{", pkg, "} \\\\citep[version~",
-          pkgversion(pkg), ",][]{pkg:", pkg, "}", sep = "")
 
-pkgs <- c("mlt", "variables", "basefun", "survival", "MASS", 
-  "ordinal", "trtf")
+pkg <- function(pkg) {
+    vrs <- try(pkgversion(pkg))
+    if (inherits(vrs, "try-error")) return(NA)
+    paste("\\\\pkg{", pkg, "} \\\\citep[version~",
+          vrs, ",][]{pkg:", pkg, "}", sep = "")
+}
+
+pkgs <- c("mlt", "variables", "basefun", "survival", "MASS",  "ordinal", "trtf")
 out <- sapply(pkgs, pkg)
 
 x <- readLines("packages.bib")
