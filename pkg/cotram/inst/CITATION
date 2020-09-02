@@ -1,15 +1,19 @@
 
 citHeader("Please cite the cotram package by the following reference:")
 
-citEntry(entry="Article",
+citEntry(entry = "Article",
          title = "Count Transformation Models",
          author = personList(as.person("Sandra Siegfried"), as.person("Torsten Hothorn")),
-         journal      = "Methods in Ecology and Evolution",
-         year         = "2020",
-         doi          = "10.1111/2041-210X.13383", 
-         textVersion  =
+         journal = "Methods in Ecology and Evolution",
+         year = "2020",
+         volume = "11",
+         number = "7",
+         pages = "818-827",
+         doi = "10.1111/2041-210X.13383", 
+         textVersion  = 
          paste("Sandra Siegfried, Torsten Hothorn (2020).",
                "Count Transformation Models.",
-               "Methods in Ecology and Evolution, forthcoming."),
+               "Methods in Ecology and Evolution, 2020; 11: 818– 827.", 
+               "https://doi.org/10.1111/2041-210X.13383")
 )
 

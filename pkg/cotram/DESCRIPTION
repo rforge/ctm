@@ -3,7 +3,8 @@ Title: Count Transformation Models
 Version: 0.2-0
 Date: 2020-03-30
 Authors@R: c(
-	person(given = "Sandra", family = "Siegfried", role = "aut"),
+	person(given = "Sandra", family = "Siegfried", role = "aut", 
+	comment = c(ORCID = "0000-0002-7312-1001")),
 	person(given = "Torsten", family = "Hothorn", role = c("aut", "cre"),
 	email = "Torsten.Hothorn@R-project.org",
 	comment = c(ORCID = "0000-0001-8301-0471")))
