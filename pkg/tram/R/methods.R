@@ -349,15 +349,23 @@ score_test.tram <- function(object, parm = names(coef(object)),
                     s <- spline(x = grd, y = grd_sc, method = "hyman")
                     Sci <- approx(x = s$y, y = s$x, 
                                   xout = qnorm(c(alpha, 1 - alpha)))$y
+                    ### s is almost linear, if we got grd wrong,
+                    ### extrapolate linearily
+                    cina <- is.na(Sci)
+                    if (any(cina))
+                        Sci[cina] <- predict(lm(grd ~ grd_sc), 
+                            newdata = data.frame(grd_sc = qnorm(c(alpha, 1 - alpha))))[cina]
                 }
             } else {
                 warning("non-monotone score function")
             }
         }
         ### use Taylor approximation
-        if (is.null(Sci))
+        if (is.null(Sci)) {
+            warning("cannot compute score interval, returning Wald interval")
             Sci <- coef(object)[parm] + 
                 sqrt(vcov(object)[parm, parm]) * qnorm(c(alpha, 1 - alpha))
+        }
 
         est <- coef(object)[parm]
         attr(Sci, "conf.level") <- level
@@ -564,13 +572,21 @@ perm_test.tram <- function(object, parm = names(coef(object)),
                     if (all(diff(grd_sc) < 0) || all(diff(grd_sc) > 0)) {
                         s <- spline(x = grd, y = grd_sc, method = "hyman")
                         Sci <- approx(x = s$y, y = s$x, xout = qp)$y
+                        ### s is almost linear, if we got grd wrong,
+                        ### extrapolate linearily
+                        cina <- is.na(Sci)
+                        if (any(cina))
+                            Sci[cina] <- predict(lm(grd ~ grd_sc), 
+                                newdata = data.frame(grd_sc = qp))[cina]
                     }
                 } else {
                     warning("non-monotone score function")
                 }
             } 
-            if (is.null(Sci))
+            if (is.null(Sci)) {
+                warning("cannot compute score interval, returning Wald interval")
                 Sci <- coef(object)[parm] + sqrt(vcov(object)[parm, parm]) * qp
+            }
             
             attr(Sci, "conf.level") <- level
             attr(Sci, "achieved.conf.level") <- achieved

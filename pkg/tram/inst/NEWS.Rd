@@ -2,6 +2,13 @@
 \name{NEWS}
 \title{NEWS file for the tram package}
 
+\section{Changes in Version 0.5-1 (2020-09-03)}{
+  \itemize{
+    \item{Robustify computation of score intervals.}
+    \item{Add Spearman correlation to \code{mmlt} example.}
+  }
+}
+
 \section{Changes in Version 0.5-0 (2020-08-27)}{
   \itemize{
     \item{\code{Lehmann()} parameter is now labelled as proportional reverse time hazard ratio.}
@@ -10,6 +17,7 @@
     \item{Reproducibility material for <arxiv:1906.03151> added to package.}
   }
 }
+
 
 \section{Changes in Version 0.4-0 (2020-05-11)}{
   \itemize{

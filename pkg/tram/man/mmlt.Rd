@@ -66,9 +66,13 @@ methods.
   sqrt(vcov(m_speed_dist)["dist.sped.(Intercept)", 
                           "dist.sped.(Intercept)"])
 
-  ## "latent" correlation, ie correlation of speed and dist after
+  ## linear correlation, ie Pearson correlation of speed and dist after
   ## transformation to bivariate normality
-  coef(m_speed_dist, newdata = cars[1,], type = "Corr")
+  (r <- coef(m_speed_dist, newdata = cars[1,], type = "Corr"))
+  
+  ## Spearman's rho (rank correlation), can be computed easily 
+  ## for Gaussian copula as
+  (rs <- 6 * asin(r / 2) / pi)
 
   ## evaluate joint and marginal densities (needs to be more user-friendly)
   nd <- expand.grid(c(nd_s <- mkgrid(m_speed, 100), nd_d <- mkgrid(m_dist, 100)))
