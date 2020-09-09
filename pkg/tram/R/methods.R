@@ -511,7 +511,7 @@ perm_test.tram <- function(object, parm = names(coef(object)),
             it0 <- coin::independence_test(r0 ~ Xf, teststat = "scalar", 
                 alternative = alternative, weights = ~ w, ...)
         } else {
-            it0 <- coin::independence_test(r0 ~ X | block, teststat = "scalar", 
+            it0 <- coin::independence_test(r0 ~ Xf | block, teststat = "scalar", 
                 alternative = alternative, weights = ~ w, ...)
         }
         stat <- c("Z" = coin::statistic(it0, "standardized"))
