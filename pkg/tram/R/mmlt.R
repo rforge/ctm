@@ -188,7 +188,8 @@ mmlt <- function(..., formula = ~ 1, data, theta = NULL,
     
     cret <- vector(length = J - 1, mode = "list")
     for (k in 1:(J - 1)) {  # go over rows
-      om_Zk <- m[[k]]$todistr$dd2d
+      # om_Zk <- m[[k]]$todistr$dd2d
+      om_Zk <- m[[k+1]]$todistr$dd2d
       B1 <- matrix(rep(B[,k], k), ncol = k)
       tmp <- om_Zk(B1) * Yp[,1:k]
       ret <- c()
