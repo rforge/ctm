@@ -744,3 +744,316 @@ perm_test.tram <- function(object, parm = names(coef(object)),
          return(list(Likelihood = retL, Wald = retW))
     }
 }
+
+### score_test and perm_test for survival::coxph
+.copy_variables <- function(call, envir) {
+    nm <- names(call)
+    nm <- nm[nm != ""]
+    vars <- do.call("c", sapply(call[nm], all.vars))
+    ret <- new.env()
+    for(n in vars) {
+        if (n %in% names(envir))
+            assign(n, get(n, envir), ret)
+    }
+    ret
+}
+
+score_test.coxph <- function(object, parm = names(coef(object)), 
+    alternative = c("two.sided", "less", "greater"), nullvalue = 0, 
+    confint = TRUE, level = .95, Taylor = FALSE, maxsteps = 25, ...) {
+
+    cf <- coef(object)
+    stopifnot(all(parm %in% names(cf)))
+    alternative <- match.arg(alternative)
+    
+    
+    if (length(parm) > 1) {
+        ret <- lapply(parm, score_test, object = object, 
+                      alternative = alternative, 
+                      nullvalue = nullvalue,
+                      confint = confint, 
+                      level = level, 
+                      maxsteps = maxsteps, 
+                      ...)
+        names(ret) <- parm
+        class(ret) <- "htests"
+        return(ret)
+    }
+
+    off <- 0
+    X <- (Xm <- model.matrix(object))[, parm]
+    mf <- model.frame(object)
+    vparm <- attr(terms(object), "term.labels")[attr(Xm, "assign")[match(parm, colnames(Xm))]]
+    fm <- as.formula(paste(". ~ . + offset(offset_.) - ", vparm))
+    cf <- coef(object)
+    env <- .copy_variables(object$call, environment(object$formula))
+
+    sc <- function(b) {
+        off <- b * X
+        ### this is a very bad hack, of course ###
+        assign("offset_.", off, env)
+        cl <- update(object, formula = fm, evaluate = FALSE)
+        environment(cl$formula) <- env
+        m0 <- eval(cl)
+        cf[parm] <- b
+        if (!is.null(coef(m0)))
+            cf[names(coef(m0))] <- coef(m0)
+        m1 <- update(object, init = cf, control = coxph.control(iter.max = 0))
+        ### of additional parameters
+        EF <- matrix(estfun(m1), ncol = length(cf))
+        colnames(EF) <- names(cf)
+        -sum(EF[, parm]) * sqrt(vcov(m1)[parm, parm])
+    }
+    stat <- c("Z" = sc(nullvalue))
+    pval <- switch(alternative, 
+        "two.sided" = pnorm(-abs(stat)) * 2,
+        "less" = pnorm(-abs(stat)),
+        "greater" = pnorm(abs(stat)))
+
+    if (confint) {
+        alpha <- (1 - level)
+        if (alternative == "two.sided") alpha <- alpha / 2
+
+        Sci <- NULL
+        if (!Taylor) {
+            ### invert sc numerically; this may fail
+            Wci <- confint(object, level = 1 - alpha / 5)[parm,]
+            grd <- seq(from = Wci[1], to = Wci[2], length.out = maxsteps)
+
+            grd_sc <- numeric(length(grd))
+            for (i in 1:length(grd)) {
+                grd_sc[i] <- sc(grd[i])
+                if (!is.finite(grd_sc)[1]) break()
+            }
+
+            if (all(is.finite(grd_sc))) {
+                if (all(diff(grd_sc) < 0) || all(diff(grd_sc) > 0)) {
+                    s <- spline(x = grd, y = grd_sc, method = "hyman")
+                    Sci <- approx(x = s$y, y = s$x, 
+                                  xout = qnorm(c(alpha, 1 - alpha)))$y
+                    ### s is almost linear, if we got grd wrong,
+                    ### extrapolate linearily
+                    cina <- is.na(Sci)
+                    if (any(cina))
+                        Sci[cina] <- predict(lm(grd ~ grd_sc), 
+                            newdata = data.frame(grd_sc = qnorm(c(alpha, 1 - alpha))))[cina]
+                }
+            } else {
+                warning("non-monotone score function")
+            }
+        }
+        ### use Taylor approximation
+        if (is.null(Sci)) {
+            warning("cannot compute score interval, returning Wald interval")
+            Sci <- coef(object)[parm] + 
+                sqrt(vcov(object)[parm, parm]) * qnorm(c(alpha, 1 - alpha))
+        }
+
+        est <- coef(object)[parm]
+        attr(Sci, "conf.level") <- level
+        if (alternative == "less")
+            Sci[1] <- -Inf
+        if (alternative == "greater")
+            Sci[2] <- Inf
+    }
+
+    parameter <- "Log-hazard ratio"
+    parameter <- paste(tolower(parameter), "for", parm)
+    names(nullvalue) <- parameter
+
+    ret <- list(statistic = stat,
+                p.value = pval, 
+                null.value = nullvalue, 
+                alternative = alternative, 
+                method = "(Log-rank) Score Test",
+                data.name = deparse(object$call))
+    if (confint) {
+        ret$conf.int <- Sci
+        names(est) <- parameter
+        ret$estimate <- est
+    }
+    ret$parm <- parm
+    class(ret) <- "htest"
+    ret
+}
+
+
+perm_test.coxph <- function(object, parm = names(coef(object)), 
+    # statistic = c("Score", "Likelihood", "Wald"),
+    alternative = c("two.sided", "less", "greater"), 
+    nullvalue = 0, 
+    confint = TRUE, level = .95, 
+    Taylor = FALSE, block_permutation = TRUE, maxsteps = 25, ...) {
+
+    cf <- coef(object)
+    stopifnot(all(parm %in% names(cf)))
+#    statistic <- match.arg(statistic, several.ok = TRUE)
+#    SCORE <- grep("Score", statistic)
+#    if (length(SCORE) > 0) statistic <- statistic[SCORE[1]]
+    alternative <- match.arg(alternative)
+
+    parameter <- "Log-hazard ratio"
+
+    block <- NULL
+    mf <- model.frame(object)
+    if (length(s <- grep("strata", colnames(mf))) > 0) {
+        svar <- colnames(mf)[s]
+        block <- mf[, svar]
+        if (is.data.frame(block))
+            block <- do.call("interaction", block)
+    }
+
+    stopifnot(isTRUE(all.equal(nullvalue, 0)))
+
+    if (length(parm) > 1) {
+        ret <- lapply(parm, perm_test, object = object, 
+                      alternative = alternative, 
+                      nullvalue = nullvalue,
+                      confint = confint, 
+                      level = level, 
+                      block_permutation = block_permutation,
+                      ...)
+        names(ret) <- parm
+        class(ret) <- "htests"
+        return(ret)
+    }
+
+    off <- 0
+    X <- (Xm <- model.matrix(object))[, parm]
+    mf <- model.frame(object)
+    vparm <- attr(terms(object), "term.labels")[attr(Xm, "assign")[match(parm, colnames(Xm))]]
+    fm <- as.formula(paste(". ~ . + offset(offset_.) - ", vparm))
+    cf <- coef(object)
+    w <- object$weights
+    if (is.null(w)) w <- rep(1, nrow(mf))
+    env <- .copy_variables(object$call, environment(object$formula))
+
+    sc <- function(b, statistic = TRUE) {
+        off <- b * X
+        ### this is a very bad hack, of course ###
+        assign("offset_.", off, env)
+        cl <- update(object, formula = fm, evaluate = FALSE)
+        environment(cl$formula) <- env
+        m0 <- eval(cl)
+        cf[parm] <- b
+        if (!is.null(coef(m0)))
+            cf[names(coef(m0))] <- coef(m0)
+        m1 <- update(object, init = cf, control = coxph.control(iter.max = 0))
+        ### of additional parameters
+        EF <- matrix(estfun(m1), ncol = length(cf))
+        colnames(EF) <- names(cf)
+        if (statistic) 
+            return(-sum(EF[, parm]) * sqrt(vcov(m1)[parm, parm]))
+        -resid(m0, weighted = FALSE) * sqrt(vcov(m1)[parm, parm])
+    }
+
+        X <- Xf <- model.matrix(object)[, parm]
+        ### this is a hack and not really necessary but
+        ### distribution = "exact" needs factors @ 2 levels
+        ### use baseline level 1 such that p-values are increasing
+        if (length(unique(X)) == 2)
+            Xf <- relevel(factor(X, levels = sort(unique(X)), 
+                          labels = 0:1), "1")
+
+        r0 <- sc(0, statistic = FALSE)
+        if (is.null(block)) {
+            it0 <- coin::independence_test(r0 ~ Xf, teststat = "scalar", 
+                alternative = alternative, weights = ~ w, ...)
+        } else {
+            it0 <- coin::independence_test(r0 ~ Xf | block, teststat = "scalar", 
+                alternative = alternative, weights = ~ w, ...)
+        }
+        stat <- c("Z" = coin::statistic(it0, "standardized"))
+        pval <- coin::pvalue(it0)
+
+        if (confint) {
+
+            alpha <- (1 - level)
+            if (alternative == "two.sided") alpha <- alpha / 2
+
+            ### we always have Prob(Q(alpha) <= S) >= alpha
+            ### for alpha < .5, we need Prob(Q(alpha) <= S) <= alpha
+            qa <- coin::qperm(it0, p = alpha)
+            if (coin::pperm(it0, q = qa) > alpha - 1e3) {
+                sprt <- coin::support(it0)
+                if (!all(is.na(sprt))) {
+                    qa <- max(sprt[sprt < qa])
+                } else {
+                    a <- alpha
+                    while(coin::pperm(it0, qa) > alpha) {
+                        a <- a - 1e-4
+                        qa <- coin::qperm(it0, p = a)
+                    }
+                }
+            }
+            q1a <- coin::qperm(it0, p = 1 - alpha)
+            qp <- c(qa, q1a)
+            achieved <- coin::pperm(it0, q = qp)
+            achieved <- 1 - (achieved[1] + (1 - achieved[2]))
+            qp <- qp * sqrt(coin::variance(it0)) +
+                coin::expectation(it0)
+
+            est <- coef(object)[parm]
+
+            Sci <- NULL
+            if (!Taylor) {
+                Wci <- confint(object, level = 1 - alpha / 5)[parm,]
+                grd <- seq(from = Wci[1], to = Wci[2], length.out = maxsteps)
+                
+                grd_sc <- numeric(length(grd))
+                for (i in 1:length(grd)) {
+                    grd_sc[i] <- sc(grd[i])
+                    if (!is.finite(grd_sc)[i]) break()
+                }
+
+                if (all(is.finite(grd_sc))) {
+                    if (all(diff(grd_sc) < 0) || all(diff(grd_sc) > 0)) {
+                        s <- spline(x = grd, y = grd_sc, method = "hyman")
+                        Sci <- approx(x = s$y, y = s$x, xout = qp)$y
+                        ### s is almost linear, if we got grd wrong,
+                        ### extrapolate linearily
+                        cina <- is.na(Sci)
+                        if (any(cina))
+                            Sci[cina] <- predict(lm(grd ~ grd_sc), 
+                                newdata = data.frame(grd_sc = qp))[cina]
+                    }
+                } else {
+                    warning("non-monotone score function")
+                }
+            } 
+            if (is.null(Sci)) {
+                warning("cannot compute score interval, returning Wald interval")
+                Sci <- coef(object)[parm] + sqrt(vcov(object)[parm, parm]) * qp
+            }
+            
+            attr(Sci, "conf.level") <- level
+            attr(Sci, "achieved.conf.level") <- achieved
+            if (alternative == "less")
+                Sci[1] <- -Inf
+            if (alternative == "greater")
+                Sci[2] <- Inf
+        }
+
+        distname <- switch(class(it0@distribution),
+            "AsymptNullDistribution" = "Asymptotic",
+            "ApproxNullDistribution" = "Approximative",
+            "ExactNullDistribution"  = "Exact"
+        )
+
+        parameter <- paste(tolower(parameter), "for", parm)
+        names(nullvalue) <- parameter
+  
+        ret <- list(statistic = stat,
+                    p.value = pval, 
+                    null.value = nullvalue, 
+                    alternative = alternative, 
+                    method = paste(distname, "Permutation (Log-rank) Score Test"),
+                    data.name = deparse(object$call))
+        if (confint) {
+            ret$conf.int <- Sci
+            names(est) <- parameter
+            ret$estimate <- est
+        }
+        class(ret) <- "htest"
+        return(ret)
+}

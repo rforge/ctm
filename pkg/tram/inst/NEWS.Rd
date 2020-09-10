@@ -2,6 +2,13 @@
 \name{NEWS}
 \title{NEWS file for the tram package}
 
+\section{Changes in Version 0.5-2 (2020-09-10)}{
+  \itemize{
+    \item{Add experimental \code{score_test} and \code{perm_test} for
+          \code{survival::coxph}.}
+  }
+}
+
 \section{Changes in Version 0.5-1 (2020-09-03)}{
   \itemize{
     \item{Robustify computation of score intervals.}

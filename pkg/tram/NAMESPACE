@@ -14,7 +14,7 @@ importFrom("stats", "model.matrix", "coef", "vcov", "nobs", "predict", "quantile
            "model.frame", "pnorm", "qnorm", "sigma", "residuals", "qchisq", "approx", "spline",
            "confint", "relevel", "resid", "ecdf", "dnorm", "weights", "lm")
 import("Matrix")
-importFrom("survival", "survfit", "Surv")
+importFrom("survival", "survfit", "Surv", "coxph.control")
 importFrom("graphics", "plot", "lines", "polygon")
 
 export(tram, tram_data, Coxph, Aareg, Colr, Polr, Lm, BoxCox, Survreg, Lehmann, 
@@ -43,6 +43,8 @@ S3method("residuals", "tram")
 S3method("profile", "tram")
 S3method("score_test", "tram")
 S3method("perm_test", "tram")
+S3method("score_test", "coxph")
+S3method("perm_test", "coxph")
 S3method("confint", "htest")
 S3method("confint", "htests")
 
