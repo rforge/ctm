@@ -30,12 +30,20 @@ pkgs <- sapply(c("mlt", "survival", "eha", "prodlim", "truncreg", "lattice", "gr
          "MASS", "nnet", "HSAUR3", "sandwich", "flexsurv", "grid", "latticeExtra", 
          "colorspace", "multcomp", "eha"), require, char = TRUE)
 
+dvc <- obs <- NULL
 if (!file.exists("analysis/DVC.rda")) {
-    download.file("https://zenodo.org/record/17179/files/DVC.tgz", "DVC.tgz")
-    untar("DVC.tgz", file = "analysis/DVC.rda")
+    op <- options(timeout = 120)
+    dwnfl <- try(download.file("https://zenodo.org/record/17179/files/DVC.tgza", "DVC.tgz"))
+    options(op)
+    if (!inherits(dwnfl, "try-error")) {
+        untar("DVC.tgz", file = "analysis/DVC.rda")
+        load("analysis/DVC.rda")
+    }
+} else {
+    load("analysis/DVC.rda")
 }
-load("analysis/DVC.rda")
-dvc <- c(margin.table(obs[,,"wild"], 2))
+if (!is.null(obs))
+    dvc <- c(margin.table(obs[,,"wild"], 2))
 
 logLik.phreg <- function(object) {
     ret <- object$loglik[2]
@@ -150,6 +158,10 @@ if (any(!pkgs)) {
     cat(paste("Package(s)", paste(names(pkgs)[!pkgs], collapse = ", "), 
         "not available, stop processing.",
         "\\end{document}\n"))
+    knitr::knit_exit()
+}
+if (is.null(dvc)) {
+    cat("Downloading data from zenodo failed, stop processing.", "\\end{document}\n")
     knitr::knit_exit()
 }
 @
