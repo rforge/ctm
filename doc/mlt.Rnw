@@ -33,7 +33,7 @@ pkgs <- sapply(c("mlt", "survival", "eha", "prodlim", "truncreg", "lattice", "gr
 dvc <- obs <- NULL
 if (!file.exists("analysis/DVC.rda")) {
     op <- options(timeout = 120)
-    dwnfl <- try(download.file("https://zenodo.org/record/17179/files/DVC.tgza", "DVC.tgz"))
+    dwnfl <- try(download.file("https://zenodo.org/record/17179/files/DVC.tgz", "DVC.tgz"))
     options(op)
     if (!inherits(dwnfl, "try-error")) {
         untar("DVC.tgz", file = "analysis/DVC.rda")
