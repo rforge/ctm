@@ -453,3 +453,12 @@ print.summary.mmlt <- function(x, digits = max(3L, getOption("digits") - 3L), ..
     cat("\n\n")
     invisible(x)
 }
+
+print.mmlt <- function(x, ...) {
+    cat("\n", "Multivariate conditional transformation model", "\n")
+    cat("\nCall:\n")
+    print(x$call)
+    cat("\nCoefficients:\n")
+    print(coef(x))
+    invisible(x)
+}
