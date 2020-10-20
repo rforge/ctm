@@ -794,11 +794,15 @@ score_test.coxph <- function(object, parm = names(coef(object)),
         assign("offset_.", off, env)
         cl <- update(object, formula = fm, evaluate = FALSE)
         environment(cl$formula) <- env
-        m0 <- eval(cl)
+        m0 <- eval(cl, env)
         cf[parm] <- b
         if (!is.null(coef(m0)))
             cf[names(coef(m0))] <- coef(m0)
-        m1 <- update(object, init = cf, control = coxph.control(iter.max = 0))
+        assign("cf", cf, env) 
+        cl <- update(object, init = cf, 
+                     control = coxph.control(iter.max = 0), 
+                     evaluate = FALSE)
+        m1 <- eval(cl, env)
         ### of additional parameters
         EF <- matrix(estfun(m1), ncol = length(cf))
         colnames(EF) <- names(cf)
@@ -934,11 +938,15 @@ perm_test.coxph <- function(object, parm = names(coef(object)),
         assign("offset_.", off, env)
         cl <- update(object, formula = fm, evaluate = FALSE)
         environment(cl$formula) <- env
-        m0 <- eval(cl)
+        m0 <- eval(cl, env)
         cf[parm] <- b
         if (!is.null(coef(m0)))
             cf[names(coef(m0))] <- coef(m0)
-        m1 <- update(object, init = cf, control = coxph.control(iter.max = 0))
+        assign("cf", cf, env)
+        cl <- update(object, init = cf, 
+                     control = coxph.control(iter.max = 0), 
+                     evaluate = FALSE)
+        m1 <- eval(cl, env)
         ### of additional parameters
         EF <- matrix(estfun(m1), ncol = length(cf))
         colnames(EF) <- names(cf)
