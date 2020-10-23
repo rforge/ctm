@@ -151,57 +151,54 @@ resMLT_12_3 <- mclapply(1:repl, FUN = run_mmlt, o_marginal = 12, o_lambda = 3, m
 # runVGAM <- function(i) {
 #   dattmp <- data[[i]]
 #   ptm <- proc.time()
-#   ret1 <- vglm(formula = y1 ~ 1, family = dagum, data = dattmp, half.stepsizing = TRUE,
-#                stepsize = 0.5, maxit = 300, coefstart = c(0, 0, 0), noWarning = TRUE)
+#   ret1 <- vglm(y1 ~ 1,
+#                dagum(iscale = b1,
+#                      ishape1.a = a1,
+#                      ishape2.p = p1),
+#                data = dattmp)
 #   param1 <- exp(coef(ret1))
-#   F1 <- pdagum(dattmp$y1, scale = param1[1], shape1.a = param1[2], shape2.p = param1[3],
+#   F1 <- pdagum(dattmp$y1, scale = param1[1], shape1.a = param1[2],
+#                shape2.p = param1[3],
 #                lower.tail = TRUE, log.p = FALSE)
 #   dattmp$F1 <- F1
-#   clist <- list("(Intercept)" = diag(3), "sm.ps(x)" = rbind(1, 0, 0))
-#   ret2 <- vglm(y2 ~ sm.ps(x), family = dagum, data = dattmp, constraints = clist,
-#                epsilon = 1e-04, maxit = 300, checkwz = FALSE, half.stepsizing = TRUE,  
-#                stepsize = stepsizes[i], trace = TRUE, Maxit.outer = 200)
-#   
+#   ret2 <- vgam(y2 ~ sm.ps(x),
+#                dagum(iscale = b2,
+#                      ishape1.a = a2,
+#                      ishape2.p = p2),
+#                data = dattmp)
 #   param2 <- exp(coef(ret2)[c(2,3)])
 #   preddata <- data.frame(y2 = 0, x = xseq)
-#   pred <- data.frame(x = xseq, predictor = predict(ret2, type = "link", newdata = preddata))
+#   pred <- data.frame(x = xseq,
+#                      predictor = predict(ret2, type = "link", newdata = preddata))
 #   pred$b2 <- exp(pred$predictor.loglink.scale.)
 #   F2 <- rep(0, length(dattmp$x))
+#   # Could vectorize this:
 #   for(kk in 1:length(dattmp$x)) {
 #     findb <- pred$b2[which(xseq == dattmp$x[kk])]
 #     F2[kk] <- pdagum(dattmp$y2[kk], scale = findb, shape1.a = param2[1],
 #                      shape2.p = param2[2], lower.tail = TRUE, log.p = FALSE)
 #   }
 #   dattmp$F2 <- F2
-#   res <- vgam(formula = cbind(F1, F2) ~ sm.ps(x, ps.int = 17), family = binormalcop,
-#               data = dattmp, checkwz = F, stepsize = 0.1, maxit = 100, Maxit.outer = 100,
-#               noWarning = TRUE)
+#   res <- vgam(cbind(F1, F2) ~ sm.ps(x, ps.int = 17),
+#               binormalcop,
+#               Maxit.outer = 100,
+#               data = dattmp)
 #   ptm <- proc.time() - ptm
 #   
 #   preddata <- data.frame(F1 = 0, F2 = 0, x = xseq)
-#   pred <- data.frame(x = xseq, predictor = predict(res, type = "link", newdata = preddata))
+#   pred <- data.frame(x = xseq,
+#                      predictor = predict(res, type = "link", newdata = preddata))
 #   pred$rho <- rhobitlink(pred$predictor, inverse = TRUE)
 #   pred$a <- -pred$rho / sqrt(1 - pred$rho^2)
 #   pred$ptm <- ptm[3]
 #   return(pred)
 # }
-# # defining special stepsizes different than 0.15
-# stepsizes <- rep(0.15, 100)
-# stepsizes[44] <- 0.17
-# stepsizes[78] <- 0.13
-# stepsizes[89] <- 0.17
-# stepsizes[98] <- 0.19
 # 
-# ### there are 2 replications for which we couldn't tune VGAM properly. we exclude them
-# resVGAM <- mclapply(1:79, FUN = runVGAM, mc.cores = 4)
-# resVGAM <- c(resVGAM, mclapply(81:90, FUN = runVGAM, mc.cores = 4))
-# resVGAM <- c(resVGAM, mclapply(92:100, FUN = runVGAM, mc.cores = 4))
-# 
-# ### making up for 2 missing fits so that there is no influence on median times
-# resVGAM <- c(resVGAM, mclapply(c(1, 98), FUN = runVGAM, mc.cores = 4))
-# resVGAM[[99]]$ptm <- 0
-# resVGAM[[100]]$ptm <- 10
+# options(warn = 2)
+# resVGAM <- lapply(1:100, FUN = runVGAM)
 # # save(resVGAM, file = "resVGAM.RData")
+
+
 
 
 
