@@ -2,10 +2,11 @@
 \name{NEWS}
 \title{NEWS file for the tram package}
 
-\section{Changes in Version 0.5-2 (2020-09-10)}{
+\section{Changes in Version 0.5-2 (2020-10-23)}{
   \itemize{
     \item{Add experimental \code{score_test} and \code{perm_test} for
           \code{survival::coxph}.}
+    \item{Update simulation code.}
   }
 }
 
