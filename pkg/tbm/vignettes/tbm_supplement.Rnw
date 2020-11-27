@@ -1419,7 +1419,7 @@ Figure~\ref{fig:dgp}.
 
 \begin{figure}
 \begin{center}
-<<plot-dgp, echo = FALSE,  fig.width = 6, fig.height = 8>>=
+<<plot-dgp, echo = FALSE,  fig.width = 6, fig.height = 8, dev = "png">>=
 
 xlim <- c(-5, 5)
 q <- mkgrid(m1, n = 500)[["y"]]
