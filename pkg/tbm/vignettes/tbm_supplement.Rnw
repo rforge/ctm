@@ -669,7 +669,7 @@ in Figure~\ref{\Sexpr{paste0("fig", file, "ctm")}}.
 
 \begin{figure}
 \begin{center}
-<<bodyfat-ctmplot, echo = FALSE, fig.width = 6, fig.height = 6>>=
+<<bodyfat-ctmplot, echo = FALSE, fig.width = 6, fig.height = 6, dev = "png">>=
 plot.ctm(bm, ylab = "Body Fat Mass")
 @
 \caption{\Sexpr{ds[file]}. Scatterplots of all predictor variables and the
@@ -1027,7 +1027,7 @@ and a QQ-plot based on the probability-integral transform in Figure~\ref{\Sexpr{
 \end{figure}
 
 \begin{figure}[t]
-<<heads-pit, echo = FALSE, fig.width = 5, fig.height = 5, cache = TRUE>>=
+<<heads-pit, echo = FALSE, fig.width = 5, fig.height = 5, cache = TRUE, dev = "png">>=
 pitplot(bm, ldata, main = ds[file])
 @
 \caption{\Sexpr{ds[file]}. Probability-integral transform QQ-plot. \label{\Sexpr{paste0("fig", file, "qq")}}}
@@ -1042,7 +1042,7 @@ these two plots are essentially equivalent) and also indicates a
 certain asymmetry towards older boys.
 
 \begin{figure}[t]
-<<heads-plot, fig.width = 6, fig.height = 4, echo = FALSE>>=
+<<heads-plot, fig.width = 6, fig.height = 4, echo = FALSE, dev = "png">>=
 l <- with(db, seq(from = min(lage), to = max(lage), length = 100))
 q <- mkgrid(m_mlt, n = 200)[[1]]
 pr <- expand.grid(head = q, lage = l^3)
