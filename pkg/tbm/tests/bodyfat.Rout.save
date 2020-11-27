@@ -1,6 +1,6 @@
 
-R version 3.6.1 (2019-07-05) -- "Action of the Toes"
-Copyright (C) 2019 The R Foundation for Statistical Computing
+R version 4.0.3 (2020-10-10) -- "Bunny-Wunnies Freak Out"
+Copyright (C) 2020 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -16,16 +16,7 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > 
-> library("tbm")
-Loading required package: mlt
-Loading required package: basefun
-Loading required package: variables
-Loading required package: mboost
-Loading required package: parallel
-Loading required package: stabs
-This is mboost 2.9-1. See 'package?mboost' and 'news(package  = "mboost")'
-for a complete list of changes.
-
+> suppressPackageStartupMessages(library("tbm"))
 > library("tram")
 > library("partykit")
 Loading required package: grid
@@ -61,14 +52,14 @@ The following object is masked from 'package:mboost':
 > bctrl <- boost_control(nu = .1, trace = FALSE, mstop = Mstop)
 > 
 > tctrl <- ctree_control(minsplit = 8, minbucket = 5, mincriterion = 0,
-+                        maxdepth = 4, splittest = TRUE, 
++                        maxdepth = 4, splittest = FALSE, 
 +                        testtype = "Teststatistic")
 > 
 > bf_t <- ctmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, 
 +                  method = quote(mboost::blackboost), control = bctrl, 
 +                  tree_control = tctrl)
 > logLik(bf_t)
-'log Lik.' -193.7836 (df=NULL)
+'log Lik.' -185.5782 (df=NULL)
 > 
 > bf_ctm <- ctmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, 
 +                    control = bctrl)
@@ -91,7 +82,7 @@ The following object is masked from 'package:mboost':
 > bf_st <- stmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, 
 +                   method = quote(mboost::blackboost), tree_control = tctrl)
 > round(logLik(bf_st), 1)
-'log Lik.' -178.5 (df=NULL)
+'log Lik.' -180.5 (df=NULL)
 > 
 > bf_shift <- stmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, 
 +                      method = quote(mboost::gamboost))
@@ -148,4 +139,4 @@ Warning messages:
 > 
 > proc.time()
    user  system elapsed 
- 23.879   0.197  24.099 
+  6.194   0.063   6.249 

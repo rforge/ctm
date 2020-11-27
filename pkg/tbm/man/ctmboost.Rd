@@ -32,15 +32,15 @@ ctmboost(model, formula, data = list(), weights = NULL,
 }
 \details{
   The parameters of \code{model} depend on explanatory variables in a
-  possibly structured additive way (see Hothorn, 2019). The number of boosting
+  possibly structured additive way (see Hothorn, 2020). The number of boosting
   iterations is a hyperparameter which needs careful tuning.
 }
 \value{An object of class \code{ctmboost} with \code{predict} and
 \code{logLik} methods.}
 \references{
 
-  Torsten Hothorn (2019). Transformation Boosting Machines.
-  \emph{Statistics and Computing}, in press.
+  Torsten Hothorn (2020). Transformation Boosting Machines.
+  \emph{Statistics and Computing}, \bold{30}, 141--152.
 
 }
 \examples{

@@ -1,5 +1,5 @@
 
-library("tbm")
+suppressPackageStartupMessages(library("tbm"))
 library("tram")
 library("partykit")
 
@@ -17,7 +17,7 @@ fd <- cv(rep(1, NROW(bodyfat)), type = "kfold", B = 2)
 bctrl <- boost_control(nu = .1, trace = FALSE, mstop = Mstop)
 
 tctrl <- ctree_control(minsplit = 8, minbucket = 5, mincriterion = 0,
-                       maxdepth = 4, splittest = TRUE, 
+                       maxdepth = 4, splittest = FALSE, 
                        testtype = "Teststatistic")
 
 bf_t <- ctmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, 
