@@ -1,6 +1,7 @@
 
 library("mlt")
 library("eha")
+library("survival")
 set.seed(29)
 
 ## ************** Exponential - AFT *********************************
