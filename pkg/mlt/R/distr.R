@@ -30,6 +30,7 @@
          },
          name = "logistic")
 
+### Gompertz distribution
 .MinExtrVal <- function()
     list(p = function(x) 1 - exp(-exp(x)),
          q = function(p) log(-log1p(- p)),
@@ -50,6 +51,7 @@
              1 - exp(x),
          name = "minimum extreme value")
 
+### Gumbel distribution
 .MaxExtrVal <- function()
     list(p = function(x) exp(-exp(-x)),
          q = function(p) -log(-log(p)),
@@ -72,6 +74,8 @@
 
 ### see 10.1080/15598608.2013.772835
 .Logarithmic <- function(logrho = 0)
+    if (logrho < log(sqrt(.Machine$double.eps))
+        return(.MinExtrVal())
     list(p = .F <- function(x) 1 - (1 + exp(x + logrho))^(-exp(-logrho)),
          q = function(p) {
              ### numerical only, on log-scale
