@@ -70,6 +70,38 @@
              exp(-x) - 1,
          name = "maximum extreme value")
 
+### see 10.1080/15598608.2013.772835
+.Logarithmic <- function(logrho = 0)
+    list(p = .F <- function(x) 1 - (1 + exp(x + logrho))^(-exp(-logrho)),
+         q = function(p) {
+             ### numerical only, on log-scale
+             x <- -500:500 / 100
+             y = -exp(-logrho) * log1p(exp(x + logrho))
+             s <- spline(x = x, y = y, method = "hyman")
+             approx(x = s$y, y = s$x, xout = log1p(-p))$y
+         },
+         d = .d <- function(x, log = FALSE) {
+             ret <- x + (-exp(-logrho) - 1) * log(exp(x + logrho) + 1)
+             if (!log) return(exp(ret))
+             ret
+         },
+         dd = .dd <- function(x) {
+             exlr <- exp(x + logrho)
+             memlr <- -exp(-logrho)
+             (memlr - 1) * (exlr + 1)^(memlr - 2) * exp(2 * x + logrho) + 
+               exp(x) * (exlr + 1)^(memlr - 1)
+         },
+         ddd = function(x) {
+             exlr <- exp(x + logrho)
+             memlr <- -exp(-logrho)
+             (memlr - 2) * (memlr - 1) * (exlr + 1)^(memlr - 3) * exp(3 * x + 2 * logrho) +
+               3 * (memlr - 1) * (exlr + 1)^(memlr - 2) * exp(2 * x + logrho) +
+               exp(x) * (exlr + 1)^(memlr - 1)
+         },
+         dd2d = function(x) {
+             .dd(x) / .d(x)
+         },
+         name = paste0("logarithmic(rho = ", round(exp(logrho), options("digits")$digits), ")"))
 
 .distr <- function(which = c("Normal", "Logistic", 
                              "MinExtrVal", "MaxExtrVal", "Exponential")) {

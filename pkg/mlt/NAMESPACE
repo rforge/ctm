@@ -74,3 +74,7 @@ S3method("estfun", "mlt")
 S3method("residuals", "mlt")
 S3method("bread", "mlt")
 S3method("bread", "mlt_fit")
+
+S3method("coef", "McLG")
+S3method("Hessian", "McLG")
+S3method("vcov", "McLG")

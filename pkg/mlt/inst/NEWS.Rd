@@ -2,10 +2,13 @@
 \name{NEWS}
 \title{NEWS file for the mlt package}
 
-\section{Changes in Version 1.2-1 (2020-05-13)}{
+\section{Changes in Version 1.2-1 (2020-01-12)}{
   \itemize{
     \item{Adjust contrasts a fixed parameter contributes to.}
     \item{Return numerically determined Hessians upon request.}
+    \item{Implement logarithmic class of error distributions.}
+    \item{Add experimental implementation of Gamma-frailty models 
+          (McLain & Ghosh, 2013).}
   }
 }
 

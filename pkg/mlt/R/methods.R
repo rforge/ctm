@@ -176,6 +176,56 @@ model.mlt <- function(object) {
            fixed = object$fixed))
 }
 
+### take estimated "logrho" parameter into account in coef and vcov 
+coef.McLG <- function(object, logrho = FALSE, ...) {
+    if (logrho)
+        return(get("logrho", environment(object$model$todistr$p)))
+    class(object) <- class(object)[-1L]
+    coef(object, ...)
+}
+
+### hessian, numerically
+Hessian.McLG <- function(object, parm = coef(object, fixed = FALSE), ...) {
+    args <- list(...)
+    if (length(args) > 0)
+        warning("Arguments ", names(args), " are ignored")
+    w <- weights(object)
+    if (!is.null(object$subset)) 
+        w[-object$subset] <- 0
+    parm <- c(coef(object, logrho = TRUE), parm)
+    model <- object$model
+    ll <- function(parm) {
+        model$todistr <- .Logarithmic(parm[1L])
+        m <- mlt(model = model, data = object$data, weights = w,
+                 subset = object$subset, offset = object$offset, dofit = FALSE,
+                 fixed = object$fixed, scale = object$scale, optim = object$optim)
+        -logLik(m, parm = parm[-1L], w = w)
+    }
+    numDeriv::hessian(ll, parm)
+}
+
+vcov.McLG <- function(object, parm = coef(object, fixed = FALSE), 
+                      complete = FALSE, logrho = FALSE, ...) {
+    ### <FIXME> implement complete argument </FIXME>
+    args <- list(...)
+    if (length(args) > 0)
+        warning("Arguments ", names(args), " are ignored")
+    step <- 0
+    lam <- 1e-6
+    H <- Hessian(object, parm = parm)
+    while((step <- step + 1) <= 3) {
+        ret <- try(solve(H + (step - 1) * lam * diag(nrow(H))))
+        if (!inherits(ret, "try-error")) break
+    }
+    if (inherits(ret, "try-error"))
+        stop("Hessian is not invertible")
+    if (step > 1)
+        warning("Hessian is not invertible, an approximation is used")
+    if (logrho)
+        return(ret[1L, 1L])
+    return(ret[-1L, -1L])
+}
+
 description <- function(object) {
     stopifnot(inherits(object, "mlt"))
     m <- model(object)

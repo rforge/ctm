@@ -59,7 +59,9 @@
     } 
 
     .ofuns <- function(weights, subset = NULL, offset = NULL, 
-                       perm = NULL, permutation = NULL) {
+                       perm = NULL, permutation = NULL, 
+                       distr = todistr) ### <- change todistr via update(, distr =)
+    {
         if (is.null(offset)) offset <- rep(0, nrow(data))
         es <- .exact_subset(.exact(y), subset)
         exY <- NULL
@@ -145,10 +147,10 @@
                     beta_ex <- beta_nex <- beta
                 }
                 if (!is.null(es$full_ex))
-                    ret[es$full_ex] <- .mlt_loglik_exact(todistr, 
+                    ret[es$full_ex] <- .mlt_loglik_exact(distr, 
                         exY, exYprime, exoffset, extrunc)(.parm(beta_ex))
                 if (!is.null(es$full_nex))
-                    ret[es$full_nex] <- .mlt_loglik_interval(todistr, 
+                    ret[es$full_nex] <- .mlt_loglik_interval(distr, 
                         iYleft, iYright, ioffset, itrunc)(.parm(beta_nex))
                 return(ret)
             },
@@ -171,10 +173,10 @@
                     nm <- names(beta)
                 }
                 if (!is.null(es$full_ex))
-                    ret[es$full_ex,] <- .mlt_score_exact(todistr, 
+                    ret[es$full_ex,] <- .mlt_score_exact(distr, 
                         exY, exYprime, exoffset, extrunc)(.parm(beta_ex), Xmult)
                 if (!is.null(es$full_nex))
-                    ret[es$full_nex,] <- .mlt_score_interval(todistr, 
+                    ret[es$full_nex,] <- .mlt_score_interval(distr, 
                         iYleft, iYright, ioffset, itrunc)(.parm(beta_nex), Xmult)
                 if (!Xmult) return(ret)
                 colnames(ret) <- colnames(Y)
@@ -197,11 +199,11 @@
                     nm <- names(beta)
                 }
                 if (!is.null(es$full_ex))
-                    ret <- ret + .mlt_hessian_exact(todistr, 
+                    ret <- ret + .mlt_hessian_exact(distr, 
                         exY, exYprime, exoffset, extrunc, 
                         exweights)(.parm(beta_ex))
                 if (!is.null(es$full_nex))
-                    ret <- ret + .mlt_hessian_interval(todistr, 
+                    ret <- ret + .mlt_hessian_interval(distr, 
                         iYleft, iYright, ioffset, itrunc, 
                         iweights)(.parm(beta_nex))
                 colnames(ret) <- rownames(ret) <- colnames(Y)
@@ -468,7 +470,8 @@ mlt <- function(model, data, weights = NULL, offset = NULL, fixed = NULL,
 
 update.mlt_fit <- function(object, weights = stats::weights(object), 
                            subset = NULL, offset = object$offset,
-                           theta = coef(object, fixed = FALSE), ...) {
+                           theta = coef(object, fixed = FALSE), 
+                           ...) {
 
     stopifnot(length(weights) == NROW(object$data))
     if (!is.null(subset))
@@ -491,5 +494,21 @@ update.mlt_fit <- function(object, weights = stats::weights(object),
     args$optim <- object$optim
     ret <- do.call(".mlt_fit", args)
     ret$call <- match.call()
+    ret
+}
+
+### McLain & Ghosh, 10.1080/15598608.2013.772835
+McLG <- function(object, rho_interval = c(exp(-25), 5)) {
+    object <- as.mlt(object)
+    model <- object$model
+    ll <- function(logrho)
+        -logLik(update(object, distr = .Logarithmic(logrho)))
+    om <- optimise(ll, interval = log(rho_interval), maximum = FALSE)
+    model$todistr <- .Logarithmic(om$minimum)
+    ret <- mlt(model = model, data = object$data, weights = weights(object),
+               subset = object$subset, offset = object$offset, 
+               theta = coef(object), fixed = object$fixed, 
+               scale = object$scale, optim = object$optim)
+    class(ret) <- c("McLG", class(ret))
     ret
 }
