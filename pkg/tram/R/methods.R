@@ -1065,3 +1065,6 @@ perm_test.coxph <- function(object, parm = names(coef(object)),
         class(ret) <- "htest"
         return(ret)
 }
+
+simulate.tram <- function(object, nsim = 1L, seed = NULL, ...)
+    simulate(as.mlt(object), nsim = nsim, seed = seed, ...)

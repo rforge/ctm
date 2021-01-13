@@ -2,6 +2,12 @@
 \name{NEWS}
 \title{NEWS file for the tram package}
 
+\section{Changes in Version 0.5-3 (2021-01-13)}{
+  \itemize{
+    \item{Add \code{simulate} method.}
+  }
+}
+
 \section{Changes in Version 0.5-2 (2020-10-23)}{
   \itemize{
     \item{Add experimental \code{score_test} and \code{perm_test} for
@@ -9,6 +15,7 @@
     \item{Update simulation code.}
   }
 }
+
 
 \section{Changes in Version 0.5-1 (2020-09-03)}{
   \itemize{
