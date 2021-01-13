@@ -73,8 +73,8 @@
          name = "maximum extreme value")
 
 ### see 10.1080/15598608.2013.772835
-.Logarithmic <- function(logrho = 0)
-    if (logrho < log(sqrt(.Machine$double.eps))
+.Logarithmic <- function(logrho = 0) {
+    if (logrho < log(sqrt(.Machine$double.eps)))
         return(.MinExtrVal())
     list(p = .F <- function(x) 1 - (1 + exp(x + logrho))^(-exp(-logrho)),
          q = function(p) {
@@ -105,7 +105,10 @@
          dd2d = function(x) {
              .dd(x) / .d(x)
          },
-         name = paste0("logarithmic(rho = ", round(exp(logrho), options("digits")$digits), ")"))
+         name = paste0("logarithmic(rho = ", 
+                       round(exp(logrho), 
+                       options("digits")$digits), ")"))
+}
 
 .distr <- function(which = c("Normal", "Logistic", 
                              "MinExtrVal", "MaxExtrVal", "Exponential")) {
