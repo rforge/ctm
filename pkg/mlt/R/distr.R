@@ -77,13 +77,8 @@
     if (logrho < log(sqrt(.Machine$double.eps)))
         return(.MinExtrVal())
     list(p = .F <- function(x) 1 - (1 + exp(x + logrho))^(-exp(-logrho)),
-         q = function(p) {
-             ### numerical only, on log-scale
-             x <- -500:500 / 100
-             y = -exp(-logrho) * log1p(exp(x + logrho))
-             s <- spline(x = x, y = y, method = "hyman")
-             approx(x = s$y, y = s$x, xout = log1p(-p))$y
-         },
+         q = function(p)
+             log((1 - p)^(-exp(logrho)) - 1) - logrho,
          d = .d <- function(x, log = FALSE) {
              ret <- x + (-exp(-logrho) - 1) * log(exp(x + logrho) + 1)
              if (!log) return(exp(ret))
