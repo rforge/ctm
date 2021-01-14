@@ -110,21 +110,18 @@ sim <- function(object, nsim = 1, seed = NULL,
         on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
     }
 
-    if (is.data.frame(newdata)) {
-        U <- matrix(runif(nsim * NROW(newdata)), nrow = nsim, 
-                    byrow = TRUE) ### be compatible with mlt < 1.2-1
-        U <- pmax(U, sqrt(.Machine$double.eps))
-        U <- pmin(U, 1 - sqrt(.Machine$double.eps))
-
-    } else {
+    if (!is.data.frame(newdata))
         stop("not yet implemented")
-    }
+
+    U <- matrix(runif(nsim * NROW(newdata)), ncol = nsim)
+    Z <- object$model$todistr$q(U)
 
     y <- variable.names(object, "response")
     if (is.null(q))
         q <- mkgrid(object, n = K)[[y]]
+    pr <- predict(object, newdata = newdata, q = q, type = "trafo")
 
-    ret <- .p2q2(object = object, newdata = newdata, p = U, q = q)
+    ret <- .invf(object, f = t(pr), q = q, z = Z)
 
     if (nsim > 1) {
         if (bysim) {
@@ -151,16 +148,18 @@ sim <- function(object, nsim = 1, seed = NULL,
     return(ret)
 }
 
-### numerically invert distribution function
-.p2q2 <- function(object, newdata, p, q) {
+### numerically invert z = f(q)
+.invf <- function(object, f, q, z) {
 
-    stopifnot(!missing(newdata))
+    if (!is.matrix(f)) f <- matrix(f, nrow = 1)
+    N <- nrow(f)
+    K <- length(q)
+    stopifnot(ncol(f) == K)
 
-    ### basically compute quantiles for p; see qmlt
-    prob <- predict(object, newdata = newdata, q = q, type = "distribution")
-    ### unconditional: newdata is ignored in the presence of q
-    if (!is.matrix(prob))
-        prob <- matrix(prob, ncol = 1)[,rep(1, NROW(newdata)), drop = FALSE]
+    if (!is.matrix(z)) z <- matrix(z, nrow = N)
+    stopifnot(nrow(z) == N)
+    nsim <- ncol(z)
+
     y <- variable.names(object, "response")
     bounds <- bounds(object)[[y]]
 
@@ -168,22 +167,22 @@ sim <- function(object, nsim = 1, seed = NULL,
                           "continuous_var")
     if (discrete) {
         ### use "old" code
-        prob <- t(prob[, rep(1:NCOL(prob), nrow(p)),drop = FALSE])
-        prob <- cbind(0, prob, 1)
-        i <- rowSums(prob < as.vector(t(p)))
+        f <- f[rep(1:N, nsim), , drop = FALSE]
+        f <- cbind(-Inf, f, Inf)
+        i <- rowSums(f < as.vector(z))
         return(q[i])
     }
 
     ### use spline/approx to evaluate quantile function
     nleft <- nexact <- nright <- 
-        matrix(NA, nrow = nrow(p), ncol = NROW(newdata))
+        matrix(NA, nrow = N, ncol = nsim)
 
-    for (i in 1:NCOL(prob)) {
+    for (i in 1:N) {
              
-        pr <- prob[,i]
-        pr0 <- which(pr < sqrt(.Machine$double.eps))
-        pr1 <- which(pr > 1 - sqrt(.Machine$double.eps))
-        rmi <- c()
+        pr <- f[i,]
+        pr0 <- which(pr < min(pr) + sqrt(.Machine$double.eps))
+        pr1 <- which(pr > max(pr) - sqrt(.Machine$double.eps))
+        rmi <- !is.finite(pr)
         if (length(pr0) > 0L)
             rmi <- c(rmi, pr0[-length(pr0)])
         if (length(pr1) > 0L)
@@ -195,19 +194,19 @@ sim <- function(object, nsim = 1, seed = NULL,
             qq <- q
         }
         s <- spline(x = qq, y = pr, method = "hyman")
-        ynew <- approx(x = s$y, y = s$x, xout = p[,i], 
+        ynew <- approx(x = s$y, y = s$x, xout = z[i, ], 
                        yleft = -Inf, yright = Inf)$y
-        nleft[ynew == -Inf, i] <- bounds[1L]
-        nright[ynew == -Inf, i] <- min(q)
-        nleft[ynew == Inf, i] <- max(q)
-        nright[ynew == Inf, i] <- bounds[2L]
+        nleft[i, ynew == -Inf] <- bounds[1L]
+        nright[i, ynew == -Inf] <- min(q)
+        nleft[i, ynew == Inf] <- max(q)
+        nright[i, ynew == Inf] <- bounds[2L]
         ynew[!is.finite(ynew)] <- NA
-        nexact[, i] <- ynew
+        nexact[i, ] <- ynew
     }
 
     if (all(is.na(nleft)) && all(is.na(nright)))
-        return(as.vector(t(nexact)))
-    return(R(as.vector(t(nexact)), 
-             cleft = as.vector(t(nleft)), 
-             cright = as.vector(t(nright))))
+        return(as.vector(nexact))
+    return(R(as.vector(nexact), 
+             cleft = as.vector(nleft), 
+             cright = as.vector(nright)))
 }
