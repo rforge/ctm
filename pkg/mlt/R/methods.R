@@ -184,7 +184,7 @@ coef.McLG <- function(object, logrho = FALSE, ...) {
     coef(object, ...)
 }
 
-### hessian, numerically
+### hessian, partially analytically / numerically
 Hessian.McLG <- function(object, parm = coef(object, fixed = FALSE), ...) {
     args <- list(...)
     if (length(args) > 0)
@@ -194,14 +194,46 @@ Hessian.McLG <- function(object, parm = coef(object, fixed = FALSE), ...) {
         w[-object$subset] <- 0
     parm <- c(coef(object, logrho = TRUE), parm)
     model <- object$model
-    ll <- function(parm) {
-        model$todistr <- .Logarithmic(parm[1L])
+    ll <- function(logrho, parm) {
+        model$todistr <- .Logarithmic(logrho)
         m <- mlt(model = model, data = object$data, weights = w,
                  subset = object$subset, offset = object$offset, dofit = FALSE,
+                 theta = parm,
                  fixed = object$fixed, scale = object$scale, optim = object$optim)
-        -logLik(m, parm = parm[-1L], w = w)
+        -logLik(m, parm = parm, w = w)
     }
-    numDeriv::hessian(ll, parm)
+    sc <- function(logrho, parm, which = 1L) {
+        model$todistr <- .Logarithmic(logrho)
+        m <- mlt(model = model, data = object$data, weights = w,
+                 subset = object$subset, offset = object$offset, dofit = FALSE,
+                 theta = parm,
+                 fixed = object$fixed, scale = object$scale, optim = object$optim)
+        ### note: weights(m) are used by estfun
+        Gradient(m, parm = parm)[which]
+    }
+
+    ### compute the analytical hessian for coef(object) for fixed optimal
+    ### logrho analytically
+    mltobj <- object
+    class(mltobj) <- class(mltobj)[-1L]
+    Htheta <- Hessian(mltobj, parm = parm[-1L])
+    ret <- matrix(NA, nrow = length(parm), ncol = length(parm))
+    rownames(ret) <- colnames(ret) <- names(parm)
+    ret[-1L,-1L] <- Htheta
+
+    ### compute the hessian for logrho for fixed coef(object) 
+    ### numerically (we don't know the form of the likelihood
+    ### here and this is just fast and accurate enough)
+    ret[1L, 1L] <- numDeriv::hessian(ll, parm[1L], parm = parm[-1L])
+
+    ### compute the hessian for logrho and coef(object):
+    ### first compute the analytical gradient wrt coef(object) and then the
+    ### numerical gradient wrt logrho for each component
+    ### same reason as above
+    Hlogrho_theta <- sapply(1:(length(parm) - 1), 
+        function(i) numDeriv::grad(sc, parm[1L], parm = parm[-1L], which = i))
+    ret[1L, -1L] <- ret[-1L, 1L] <- Hlogrho_theta
+    ret
 }
 
 vcov.McLG <- function(object, parm = coef(object, fixed = FALSE), 
