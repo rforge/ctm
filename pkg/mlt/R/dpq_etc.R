@@ -268,6 +268,8 @@ qmlt <- function(object, newdata = NULL, q = NULL, prob = .5, n = 50,
     ### to matrix where rows correspond to observations newdata 
     ### and columns to quantiles q
     trm <- matrix(tr, ncol = length(q), byrow = TRUE)
+    ### Note: we invert the transformation function because this
+    ### is numerically easier (than inverting the cdf directly)
     qu <- matrix(object$todistr$q(prob), 
                  nrow = nrow(trm), ncol = length(prob), byrow = TRUE)
 
