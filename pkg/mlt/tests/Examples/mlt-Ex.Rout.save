@@ -121,12 +121,44 @@ Coefficients: -1.185255 4.542524 7.151648 7.151648 7.189737 -2.674317 -0.4341441
 > 
 > 
 > 
+> cleanEx()
+> nameEx("mltoptim")
+> ### * mltoptim
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: mltoptim
+> ### Title: Control Optimisation
+> ### Aliases: mltoptim
+> ### Keywords: list
+> 
+> ### ** Examples
+> 
+> 
+>   ### set-up linear transformation model for conditional
+>   ### distribution of dist given speed
+>   dist <- numeric_var("dist", support = c(2.0, 100), bounds = c(0, Inf))
+>   ctmm <- ctm(response = Bernstein_basis(dist, order = 4, ui = "increasing"),
++               shifting = ~ speed, data = cars)
+> 
+>   ### use auglag with kkt2.check = TRUE => the numerically determined
+>   ### hessian is returned as "optim_hessian" slot
+>   op <- mltoptim(auglag = list(maxtry = 5, kkt2.check = TRUE))[1]
+>   mltm <- mlt(ctmm, data = cars, scale = FALSE, optim = op)
+> 
+>   ### compare analytical and numerical hessian
+>   all.equal(c(Hessian(mltm)), c(mltm$optim_hessian), tol = 1e-4)
+[1] TRUE
+> 
+> 
+> 
+> 
 > ### * <FOOTER>
 > ###
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  1.156 0.052 1.208 0 0 
+Time elapsed:  1.217 0.036 1.253 0 0 
 > grDevices::dev.off()
 null device 
           1 

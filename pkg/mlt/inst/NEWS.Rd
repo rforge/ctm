@@ -4,6 +4,9 @@
 
 \section{Changes in Version 1.2-1 (2020-01-12)}{
   \itemize{
+    \item{Quantiles and thus simulations are now computationally more exact and more robust.
+          The unnecessary \code{interpolate} argument to \code{predict} and
+          \code{simulate} is now ignored.}
     \item{Adjust contrasts a fixed parameter contributes to.}
     \item{Return numerically determined Hessians upon request.}
     \item{Implement logarithmic class of error distributions.}
