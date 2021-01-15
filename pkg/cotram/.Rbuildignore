@@ -2,3 +2,5 @@ ideas.txt
 todos.txt
 analysis
 DVC.tgz
+^.*\.Rproj$
+^\.Rproj\.user$

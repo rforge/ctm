@@ -10,7 +10,7 @@ importFrom("stats", "update", "residuals")
 importFrom("graphics", "axis", "box", "points")
 importFrom("grDevices", "rgb")
 
-export(cotram, confband)
+export(cotram, confband, commlt)
 
 S3method("as.mlt", "cotram")
 S3method("mkgrid", "cotram")

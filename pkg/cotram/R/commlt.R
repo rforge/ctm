@@ -61,8 +61,8 @@
 # }
 
 ### mmlt function for count case
-mmlt <- function(..., formula = ~ 1, data, theta = NULL,
-                 control.outer = list(trace = FALSE), scale = FALSE) {
+commlt <- function(..., formula = ~ 1, data, theta = NULL,
+                   control.outer = list(trace = FALSE), scale = FALSE) {
   
   call <- match.call()
   
@@ -304,174 +304,183 @@ mmlt <- function(..., formula = ~ 1, data, theta = NULL,
   ret
 }
 
-predict.mmlt <- function(object, newdata, marginal = 1L, 
-                         type = c("trafo", "distribution", "density"), ...) {
-  type <- match.arg(type)
-  if (!object$gaussian & marginal != 1L)
-    stop("Cannot compute marginal distribution from non-gaussian joint model")
-  ret <- lapply(object$marginals[marginal], function(m)
-    predict(m, newdata = newdata, ...))
-  Vx <- coef(object, newdata = newdata, type = "Sigma")
-  ### first formula in Section 2.4
-  if (type == "distribution") {
-    ret <- lapply(1:length(ret), function(i) {
-      tmp <- t(t(ret[[i]]) / sqrt(Vx$diag[,marginal]))
-      pnorm(tmp)
-    })
-  }
-  if (type == "density") {
-    hprime <- lapply(object$marginals[marginal], function(m) {
-      dr <- 1
-      names(dr) <- m$model$response
-      predict(m, newdata = newdata, deriv = dr, ...)
-    })
-    ret <- lapply(1:length(ret), function(i) {
-      tmp <- t(t(ret[[i]]) / sqrt(Vx$diag[,marginal]))
-      t(t(dnorm(tmp)) / sqrt(Vx$diag[,marginal]))  * hprime[[i]]
-    })
-  }
-  if (length(ret) == 1) return(ret[[1]])
-  ret
-}
-
-### solve lower triangular matrix (in vector form)
-### rowwise applicable to matrices
-.Solve2 <- function(x) {
-  if (!is.matrix(x)) x <- matrix(x, nrow = 1)
-  n <- (1 + sqrt(1 + 4 * 2 * ncol(x))) / 2
-  xij <- function(x = NULL, i, j) {
-    if (i == j) return(1)
-    if (j == 1) {
-      ret <- i - 1
-    } else {
-      idx <- n - (1:(n - 1))
-      ret <- sum(idx[1:(j - 1)]) + (i - (n - idx[j]))
-    }
-    if (is.null(x))
-      return(ret)
-    return(x[,ret])
-  }
-  ret <- matrix(0, nrow = nrow(x), ncol = ncol(x))
-  for (i in 2:n) {
-    for (j in 1:(i - 1)) {
-      s <- 0
-      for (k in j:(i - 1))
-        s <- s + xij(x, i, k) * xij(ret, k, j)
-      ret[, xij(NULL, i, j)] <- -s
-    }
-  }
-  ret
-} 
-
-# we will use as input Solve2(Xp)
-.Crossp <- function(Linv) {
-  # 1 observation
-  N <- nrow(Linv)
-  Jp <- ncol(Linv)
-  J <- (1 + sqrt(1 + 4 * 2 * Jp)) / 2
-  if (N == 1) {
-    L <- diag(1, J)
-    L[upper.tri(L)] <- Linv
-    L <- t(L)
-    tcp <- tcrossprod(L)
-    S_diag <- diag(tcp)
-    S_low <- tcp[lower.tri(tcp)]
-  }
-  # more than 1 observation
-  else{
-    # J = 1
-    S <- S_diag <- 1
-    # J = 2
-    if(ncol(Linv) == 1) {
-      S_diag <- cbind(rep(1, N), matrix(1, nrow = N, ncol = 1) + Linv^2)
-    }
-    S_low <- Linv
-    
-    if (J > 2) {
-      L <- diag(0, J)
-      L[upper.tri(L)] <- 1:Jp
-      L <- t(L)
-      
-      S <- matrix(rep(rep(1:0, (J - 1)), c(rbind(1:(J - 1), Jp))), nrow = Jp)[, -J]
-      S_diag <- cbind(rep(1, N), matrix(1, nrow = N, ncol = J-1) + Linv^2 %*% S)
-      
-      for (i in J:3) { #zeile
-        for (j in (i-1):2) { #spalte
-          for (k in 1:(j-1)) { #produkt-summanden
-            S_low[, L[i, j]] <- S_low[, L[i, j]] + Linv[, L[i, k]]*Linv[, L[j, k]]
-          }
-        }
-      }
-    }
-  }
-  ret <- list(lower = S_low, diagonal = S_diag)
-  return(ret)
-}
-
-logLik.mmlt <- function(object, ...) {
-  ret <- object$logLik
-  attr(ret, "df") <- length(object$par)
-  class(ret) <- "logLik"
-  ret
-}
-
-coef.mmlt <- function(object, newdata = object$data, 
-                      type = c("all", "marginal", "Lambda", "Lambdainv", "Sigma", "Corr"), 
-                      ...)
-{
-  
-  type <- match.arg(type)
-  if (type == "all") return(object$par)
-  if (type == "marginal") return(lapply(object$marginals, coef))
-  
-  X <- model.matrix(object$bx, data = newdata)
-  ret <- X %*% object$pars$cpar
-  
-  if (!object$gaussian & type != "Lambda")
-    warning("return value of Lambda() has no direct interpretation")
-  
-  return(switch(type, "Lambda" = ret,
-                "Lambdainv" = .Solve2(ret),
-                "Sigma" = .Crossp(.Solve2(ret)),
-                "Corr" = {
-                  ret <- .Crossp(.Solve2(ret))
-                  isd <- sqrt(ret$diagonal)
-                  if (!is.matrix(isd)) isd <- matrix(isd, nrow = 1)
-                  SS <- c()
-                  J <- length(object$marginals)
-                  for (j in 1:J)
-                    SS <- cbind(SS, isd[,j] * isd[,-(1:j), drop = FALSE])
-                  ret$lower / SS
-                }))
-}
-
-vcov.mmlt <- function(object, ...) {
-  ret <- solve(object$hessian)
-  rownames(ret) <- colnames(ret) <- names(coef(object))
-  ret
-}
-
-summary.mmlt <- function(object, ...) {
-  ret <- list(call = object$call,
-              #                tram = object$tram,
-              test = cftest(object, parm = names(coef(object, with_baseline = FALSE))),
-              ll = logLik(object))
-  class(ret) <- "summary.mmlt"
-  ret
-}
-
-print.summary.mmlt <- function(x, digits = max(3L, getOption("digits") - 3L), ...) {
-  cat("\n", "Multivariate conditional transformation model", "\n")
-  cat("\nCall:\n")
-  print(x$call)
-  cat("\nCoefficients:\n")
-  pq <- x$test$test
-  mtests <- cbind(pq$coefficients, pq$sigma, pq$tstat, pq$pvalues)
-  colnames(mtests) <- c("Estimate", "Std. Error", "z value", "Pr(>|z|)")
-  sig <- .Machine$double.eps
-  printCoefmat(mtests, digits = digits, has.Pvalue = TRUE, 
-               P.values = TRUE, eps.Pvalue = sig)
-  cat("\nLog-Likelihood:\n ", x$ll, " (df = ", attr(x$ll, "df"), ")", sep = "")
-  cat("\n\n")
-  invisible(x)
-}
+# predict.mmlt <- function(object, newdata, marginal = 1L, 
+#                          type = c("trafo", "distribution", "density"), ...) {
+#   type <- match.arg(type)
+#   if (!object$gaussian & marginal != 1L)
+#     stop("Cannot compute marginal distribution from non-gaussian joint model")
+#   ret <- lapply(object$marginals[marginal], function(m)
+#     predict(m, newdata = newdata, ...))
+#   Vx <- coef(object, newdata = newdata, type = "Sigma")
+#   ### first formula in Section 2.4
+#   if (type == "distribution") {
+#     ret <- lapply(1:length(ret), function(i) {
+#       tmp <- t(t(ret[[i]]) / sqrt(Vx$diag[,marginal]))
+#       pnorm(tmp)
+#     })
+#   }
+#   if (type == "density") {
+#     hprime <- lapply(object$marginals[marginal], function(m) {
+#       dr <- 1
+#       names(dr) <- m$model$response
+#       predict(m, newdata = newdata, deriv = dr, ...)
+#     })
+#     ret <- lapply(1:length(ret), function(i) {
+#       tmp <- t(t(ret[[i]]) / sqrt(Vx$diag[,marginal]))
+#       t(t(dnorm(tmp)) / sqrt(Vx$diag[,marginal]))  * hprime[[i]]
+#     })
+#   }
+#   if (length(ret) == 1) return(ret[[1]])
+#   ret
+# }
+# 
+# ### solve lower triangular matrix (in vector form)
+# ### rowwise applicable to matrices
+# .Solve2 <- function(x) {
+#   if (!is.matrix(x)) x <- matrix(x, nrow = 1)
+#   n <- (1 + sqrt(1 + 4 * 2 * ncol(x))) / 2
+#   xij <- function(x = NULL, i, j) {
+#     if (i == j) return(1)
+#     if (j == 1) {
+#       ret <- i - 1
+#     } else {
+#       idx <- n - (1:(n - 1))
+#       ret <- sum(idx[1:(j - 1)]) + (i - (n - idx[j]))
+#     }
+#     if (is.null(x))
+#       return(ret)
+#     return(x[,ret])
+#   }
+#   ret <- matrix(0, nrow = nrow(x), ncol = ncol(x))
+#   for (i in 2:n) {
+#     for (j in 1:(i - 1)) {
+#       s <- 0
+#       for (k in j:(i - 1))
+#         s <- s + xij(x, i, k) * xij(ret, k, j)
+#       ret[, xij(NULL, i, j)] <- -s
+#     }
+#   }
+#   ret
+# } 
+# 
+# # we will use as input Solve2(Xp)
+# .Crossp <- function(Linv) {
+#   # 1 observation
+#   N <- nrow(Linv)
+#   Jp <- ncol(Linv)
+#   J <- (1 + sqrt(1 + 4 * 2 * Jp)) / 2
+#   if (N == 1) {
+#     L <- diag(1, J)
+#     L[upper.tri(L)] <- Linv
+#     L <- t(L)
+#     tcp <- tcrossprod(L)
+#     S_diag <- diag(tcp)
+#     S_low <- tcp[lower.tri(tcp)]
+#   }
+#   # more than 1 observation
+#   else{
+#     # J = 1
+#     S <- S_diag <- 1
+#     # J = 2
+#     if(ncol(Linv) == 1) {
+#       S_diag <- cbind(rep(1, N), matrix(1, nrow = N, ncol = 1) + Linv^2)
+#     }
+#     S_low <- Linv
+#     
+#     if (J > 2) {
+#       L <- diag(0, J)
+#       L[upper.tri(L)] <- 1:Jp
+#       L <- t(L)
+#       
+#       S <- matrix(rep(rep(1:0, (J - 1)), c(rbind(1:(J - 1), Jp))), nrow = Jp)[, -J]
+#       S_diag <- cbind(rep(1, N), matrix(1, nrow = N, ncol = J-1) + Linv^2 %*% S)
+#       
+#       for (i in J:3) { #zeile
+#         for (j in (i-1):2) { #spalte
+#           for (k in 1:(j-1)) { #produkt-summanden
+#             S_low[, L[i, j]] <- S_low[, L[i, j]] + Linv[, L[i, k]]*Linv[, L[j, k]]
+#           }
+#         }
+#       }
+#     }
+#   }
+#   ret <- list(lower = S_low, diagonal = S_diag)
+#   return(ret)
+# }
+# 
+# logLik.mmlt <- function(object, ...) {
+#   ret <- object$logLik
+#   attr(ret, "df") <- length(object$par)
+#   class(ret) <- "logLik"
+#   ret
+# }
+# 
+# coef.mmlt <- function(object, newdata = object$data, 
+#                       type = c("all", "marginal", "Lambda", "Lambdainv", "Sigma", "Corr"), 
+#                       ...)
+# {
+#   
+#   type <- match.arg(type)
+#   if (type == "all") return(object$par)
+#   if (type == "marginal") return(lapply(object$marginals, coef))
+#   
+#   X <- model.matrix(object$bx, data = newdata)
+#   ret <- X %*% object$pars$cpar
+#   
+#   if (!object$gaussian & type != "Lambda")
+#     warning("return value of Lambda() has no direct interpretation")
+#   
+#   return(switch(type, "Lambda" = ret,
+#                 "Lambdainv" = .Solve2(ret),
+#                 "Sigma" = .Crossp(.Solve2(ret)),
+#                 "Corr" = {
+#                   ret <- .Crossp(.Solve2(ret))
+#                   isd <- sqrt(ret$diagonal)
+#                   if (!is.matrix(isd)) isd <- matrix(isd, nrow = 1)
+#                   SS <- c()
+#                   J <- length(object$marginals)
+#                   for (j in 1:J)
+#                     SS <- cbind(SS, isd[,j] * isd[,-(1:j), drop = FALSE])
+#                   ret$lower / SS
+#                 }))
+# }
+# 
+# vcov.mmlt <- function(object, ...) {
+#   ret <- solve(object$hessian)
+#   rownames(ret) <- colnames(ret) <- names(coef(object))
+#   ret
+# }
+# 
+# summary.mmlt <- function(object, ...) {
+#   ret <- list(call = object$call,
+#               #                tram = object$tram,
+#               test = cftest(object, parm = names(coef(object, with_baseline = FALSE))),
+#               ll = logLik(object))
+#   class(ret) <- "summary.mmlt"
+#   ret
+# }
+# 
+# print.summary.mmlt <- function(x, digits = max(3L, getOption("digits") - 3L), ...) {
+#   cat("\n", "Multivariate conditional transformation model", "\n")
+#   cat("\nCall:\n")
+#   print(x$call)
+#   cat("\nCoefficients:\n")
+#   pq <- x$test$test
+#   mtests <- cbind(pq$coefficients, pq$sigma, pq$tstat, pq$pvalues)
+#   colnames(mtests) <- c("Estimate", "Std. Error", "z value", "Pr(>|z|)")
+#   sig <- .Machine$double.eps
+#   printCoefmat(mtests, digits = digits, has.Pvalue = TRUE, 
+#                P.values = TRUE, eps.Pvalue = sig)
+#   cat("\nLog-Likelihood:\n ", x$ll, " (df = ", attr(x$ll, "df"), ")", sep = "")
+#   cat("\n\n")
+#   invisible(x)
+# }
+# 
+# print.mmlt <- function(x, ...) {
+#   cat("\n", "Multivariate count conditional transformation model", "\n")
+#   cat("\nCall:\n")
+#   print(x$call)
+#   cat("\nCoefficients:\n")
+#   print(coef(x))
+#   invisible(x)
+# }
