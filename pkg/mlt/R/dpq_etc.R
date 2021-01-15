@@ -205,8 +205,8 @@ Omlt <- function(object, newdata = NULL, q = NULL, log = FALSE, ...) {
     for (i in 1:N) {
              
         pr <- f[i,]
-        pr0 <- which(pr == min(pr))
-        pr1 <- which(pr == max(pr))
+        pr0 <- which(pr < min(pr) + sqrt(.Machine$double.eps))
+        pr1 <- which(pr > max(pr) - sqrt(.Machine$double.eps))
         rmi <- which(!is.finite(pr))
         if (length(pr0) > 0L)
             rmi <- c(rmi, pr0[-length(pr0)])
@@ -259,18 +259,18 @@ qmlt <- function(object, newdata = NULL, q = NULL, prob = .5, n = 50,
         nm <- names(newdata)
         newdata[[y]] <- q
         newdata <- newdata[c(y, nm)]
-        tr <- tmlt(object, newdata, ...)
+        tr <- pmlt(object, newdata, ...)
     } else {
-        tr <- tmlt(object, newdata = newdata, q = q, ...)
+        tr <- pmlt(object, newdata = newdata, q = q, ...)
     } 
 
     ### convert potential array-valued distribution function
     ### to matrix where rows correspond to observations newdata 
     ### and columns to quantiles q
     trm <- matrix(tr, ncol = length(q), byrow = TRUE)
-    ### Note: we invert the transformation function because this
-    ### is numerically easier (than inverting the cdf directly)
-    qu <- matrix(object$todistr$q(prob), 
+    ### Note: we invert the cdf direct; 
+    ### inverting transformation functions using approx didn't work well
+    qu <- matrix(prob, 
                  nrow = nrow(trm), ncol = length(prob), byrow = TRUE)
 
     ret <- .invf(object, f = trm, q = q, z = qu)

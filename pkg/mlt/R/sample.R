@@ -23,14 +23,13 @@ simulate.ctm <- function(object, nsim = 1, seed = NULL,
         stop("not yet implemented")
 
     U <- matrix(runif(nsim * NROW(newdata)), ncol = nsim)
-    Z <- object$todistr$q(U)
 
     y <- variable.names(object, "response")
     if (is.null(q))
         q <- mkgrid(object, n = K)[[y]]
-    pr <- predict(object, newdata = newdata, q = q, type = "trafo")
+    pr <- predict(object, newdata = newdata, q = q, type = "distribution")
 
-    ret <- .invf(object, f = t(pr), q = q, z = Z)
+    ret <- .invf(object, f = t(pr), q = q, z = U)
 
     if (nsim > 1) {
         if (bysim) {
