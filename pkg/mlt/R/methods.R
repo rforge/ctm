@@ -177,33 +177,34 @@ model.mlt <- function(object) {
 }
 
 ### take estimated "logrho" parameter into account in coef and vcov 
-coef.McLG <- function(object, logrho = FALSE, ...) {
-    if (logrho)
-        return(get("logrho", environment(object$model$todistr$p)))
+coef.mltFparm <- function(object, addparm = FALSE, ...) {
+    if (addparm)
+        return(object$model$todistr$parm())
     class(object) <- class(object)[-1L]
     coef(object, ...)
 }
 
 ### hessian, partially analytically / numerically
-Hessian.McLG <- function(object, parm = coef(object, fixed = FALSE), ...) {
+Hessian.mltFparm <- function(object, parm = coef(object, fixed = FALSE), ...) {
     args <- list(...)
     if (length(args) > 0)
         warning("Arguments ", names(args), " are ignored")
     w <- weights(object)
     if (!is.null(object$subset)) 
         w[-object$subset] <- 0
-    parm <- c(coef(object, logrho = TRUE), parm)
+    addparm <- coef(object, addparm = TRUE)
+    parm <- c(addparm, parm)
     model <- object$model
-    ll <- function(logrho, parm) {
-        model$todistr <- .Logarithmic(logrho)
+    ll <- function(addparm, parm) {
+        model$todistr <- do.call(model$todistr$call, as.list(addparm))
         m <- mlt(model = model, data = object$data, weights = w,
                  subset = object$subset, offset = object$offset, dofit = FALSE,
                  theta = parm,
                  fixed = object$fixed, scale = object$scale, optim = object$optim)
         -logLik(m, parm = parm, w = w)
     }
-    sc <- function(logrho, parm, which = 1L) {
-        model$todistr <- .Logarithmic(logrho)
+    sc <- function(addparm, parm, which = 1L) {
+        model$todistr <- do.call(model$todistr$call, as.list(addparm))
         m <- mlt(model = model, data = object$data, weights = w,
                  subset = object$subset, offset = object$offset, dofit = FALSE,
                  theta = parm,
@@ -219,25 +220,26 @@ Hessian.McLG <- function(object, parm = coef(object, fixed = FALSE), ...) {
     Htheta <- Hessian(mltobj, parm = parm[-1L])
     ret <- matrix(NA, nrow = length(parm), ncol = length(parm))
     rownames(ret) <- colnames(ret) <- names(parm)
-    ret[-1L,-1L] <- Htheta
+    idx <- 1:length(addparm)
+    ret[-idx,-idx] <- Htheta
 
     ### compute the hessian for logrho for fixed coef(object) 
     ### numerically (we don't know the form of the likelihood
     ### here and this is just fast and accurate enough)
-    ret[1L, 1L] <- numDeriv::hessian(ll, parm[1L], parm = parm[-1L])
+    ret[idx, idx] <- numDeriv::hessian(ll, addparm, parm = parm[-idx])
 
     ### compute the hessian for logrho and coef(object):
     ### first compute the analytical gradient wrt coef(object) and then the
     ### numerical gradient wrt logrho for each component
     ### same reason as above
-    Hlogrho_theta <- sapply(1:(length(parm) - 1), 
-        function(i) numDeriv::grad(sc, parm[1L], parm = parm[-1L], which = i))
-    ret[1L, -1L] <- ret[-1L, 1L] <- Hlogrho_theta
+    Hlogrho_theta <- sapply(1:(length(parm) - length(idx)), 
+        function(i) numDeriv::grad(sc, addparm, parm = parm[-idx], which = i))
+    ret[idx, -idx] <- ret[-idx, idx] <- Hlogrho_theta
     ret
 }
 
-vcov.McLG <- function(object, parm = coef(object, fixed = FALSE), 
-                      complete = FALSE, logrho = FALSE, ...) {
+vcov.mltFparm <- function(object, parm = coef(object, fixed = FALSE), 
+                          complete = FALSE, addparm = FALSE, ...) {
     ### <FIXME> implement complete argument </FIXME>
     args <- list(...)
     if (length(args) > 0)
@@ -253,9 +255,10 @@ vcov.McLG <- function(object, parm = coef(object, fixed = FALSE),
         stop("Hessian is not invertible")
     if (step > 1)
         warning("Hessian is not invertible, an approximation is used")
-    if (logrho)
-        return(ret[1L, 1L])
-    return(ret[-1L, -1L])
+    if (addparm)
+        return(ret)
+    idx <- 1:length(coef(object, addparm = TRUE))
+    return(ret[-idx, -idx])
 }
 
 description <- function(object) {

@@ -502,13 +502,30 @@ McLG <- function(object, rho_interval = c(exp(-25), 5)) {
     object <- as.mlt(object)
     model <- object$model
     ll <- function(logrho)
-        -logLik(update(object, distr = .Logarithmic(logrho)))
+        -logLik(update(object, distr = .GammaFrailty(logrho)))
     om <- optimise(ll, interval = log(rho_interval), maximum = FALSE)
-    model$todistr <- .Logarithmic(om$minimum)
+    model$todistr <- .GammaFrailty(om$minimum)
     ret <- mlt(model = model, data = object$data, weights = weights(object),
                subset = object$subset, offset = object$offset, 
                theta = coef(object), fixed = object$fixed, 
                scale = object$scale, optim = object$optim)
-    class(ret) <- c("McLG", class(ret))
+    class(ret) <- c("mltFparm", class(ret))
+    ret
+}
+
+Cure <- function(object, rho_interval = c(0, 1), frailty = .MinExtrVal) {
+    object <- as.mlt(object)
+    model <- object$model
+    ### <FIXME> allow for additional parameters in frailty
+    ll <- function(logitrho)
+        -logLik(update(object, distr = .CureRate(logitrho, frailty = frailty)))
+    om <- optimise(ll, interval = c(-5, 5), maximum = FALSE)
+    model$todistr <- .CureRate(om$minimum, frailty = frailty)
+    ### </FIXME>
+    ret <- mlt(model = model, data = object$data, weights = weights(object),
+               subset = object$subset, offset = object$offset, 
+               theta = coef(object), fixed = object$fixed, 
+               scale = object$scale, optim = object$optim)
+    class(ret) <- c("mltFparm", class(ret))
     ret
 }

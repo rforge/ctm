@@ -4,7 +4,7 @@ library("mlt")
 ### 10.1080/15598608.2013.772835
 ### rho = exp(logrho)
 ### 1 = rho = exp(0) is identical to .Logistic
-lg <- mlt:::.Logarithmic(logrho = 0)
+lg <- mlt:::.GammaFrailty(logrho = 0)
 x <- -30:30 / 20
 p <- 1:99 / 100
 tol <- sqrt(.Machine$double.eps)
@@ -22,7 +22,7 @@ stopifnot(max(abs(lg$q(p) - mlt:::.Logistic()$q(p))) < tol)
 
 ### 0 = rho = exp(-infty) is identical to .MinExtrVal
 tol <- (.Machine$double.eps)^(1 / 2.5)
-lg <- mlt:::.Logarithmic(logrho = -18)
+lg <- mlt:::.GammaFrailty(logrho = -18)
 stopifnot(max(abs(lg$p(x) - mlt:::.MinExtrVal()$p(x))) < tol)
 
 stopifnot(max(abs(lg$d(x) - mlt:::.MinExtrVal()$d(x))) < tol)
