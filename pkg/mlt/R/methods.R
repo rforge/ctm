@@ -177,7 +177,7 @@ model.mlt <- function(object) {
 }
 
 ### take estimated "logrho" parameter into account in coef and vcov 
-coef.mltFparm <- function(object, addparm = FALSE, ...) {
+coef.fmlt <- function(object, addparm = FALSE, ...) {
     if (addparm)
         return(object$model$todistr$parm())
     class(object) <- class(object)[-1L]
@@ -185,7 +185,7 @@ coef.mltFparm <- function(object, addparm = FALSE, ...) {
 }
 
 ### hessian, partially analytically / numerically
-Hessian.mltFparm <- function(object, parm = coef(object, fixed = FALSE), ...) {
+Hessian.fmlt <- function(object, parm = coef(object, fixed = FALSE), ...) {
     args <- list(...)
     if (length(args) > 0)
         warning("Arguments ", names(args), " are ignored")
@@ -238,7 +238,7 @@ Hessian.mltFparm <- function(object, parm = coef(object, fixed = FALSE), ...) {
     ret
 }
 
-vcov.mltFparm <- function(object, parm = coef(object, fixed = FALSE), 
+vcov.fmlt <- function(object, parm = coef(object, fixed = FALSE), 
                           complete = FALSE, addparm = FALSE, ...) {
     ### <FIXME> implement complete argument </FIXME>
     args <- list(...)

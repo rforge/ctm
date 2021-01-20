@@ -86,6 +86,7 @@
 .GammaFrailty <- function(logrho = 0) {
     logrho <- pmax(logrho, log(sqrt(.Machine$double.eps)))
     list(parm = function() c("logrho" = logrho),
+         ### note: p(x) is 1 - LaplaceTransform(exp(x))
          p = function(x) 1 - (1 + exp(x + logrho))^(-exp(-logrho)),
          q = function(p)
              log((1 - p)^(-exp(logrho)) - 1) - logrho,
@@ -110,6 +111,7 @@
          dd2d = function(x) {
              .dd(x) / .d(x)
          },
+         support = c(-25, log(10)),
          call = ".GammaFrailty",
          name = paste0("GammaFrailty(rho = ", 
                        round(exp(logrho), 
@@ -120,6 +122,7 @@
 .InvGaussFrailty <- function(logtheta = 0) {
     logtheta <- pmax(logtheta, log(sqrt(.Machine$double.eps)))
     list(parm = function() c("logtheta" = logtheta),
+         ### note: p(x) is 1 - LaplaceTransform(exp(x))
          p = function(x)
              1 - exp(- sqrt(4 * exp(logtheta) * (exp(logtheta) + exp(x))) + 2 * exp(logtheta)),
          q = function(p) {
@@ -155,18 +158,58 @@
              .dd(x) / .d(x)
          },
          call = ".InvGaussFrailty",
+         support = c(-25, log(10)),
          name = paste0("InvGaussFrailty(theta = ", 
                        round(exp(logtheta), 
                        options("digits")$digits), ")"))
 }
 
-### Cure rate models: 10.1002/sim.687
-.Cure <- function(logitrho = 0, ..., frailty = .GammaFrailty) {
+### see 10.18637/jss.v051.i11
+.PositiveStableFrailty <- function(logitalpha = 0) {
+    list(parm = function() c("logitalpha" = logitalpha),
+         ### note: p(x) is 1 - LaplaceTransform(exp(x))
+         p = function(x)
+             1 - exp(-exp(plogis(logitalpha) * x)),
+         q = function(p)
+             log(-log1p(-p)) / plogis(logitalpha),
+         d = .d <- function(x, log = FALSE) {
+             alpha <- plogis(logitalpha)
+             ret <- plogis(logitalpha, log.p = TRUE) + 
+                    alpha * x - exp(alpha * x) 
+             if (!log) return(exp(ret))
+             ret
+         },
+         dd = .dd <- function(x) {
+             alpha <- plogis(logitalpha)
+             eax <- exp(alpha * x)
+             alpha * (alpha - alpha * eax) * exp(alpha * x - eax)
+         },
+         ddd = function(x) {
+             alpha <- plogis(logitalpha)
+             eax <- exp(alpha * x)
+             ret <- alpha * (alpha - alpha * eax)^2 * exp(alpha * x - eax)
+             ret <- ret - alpha^3 * exp(2 * alpha * x - eax)
+             ret
+         },
+         dd2d = function(x) {
+             .dd(x) / .d(x)
+         },
+         support = qlogis(sqrt(.Machine$double.eps), 
+                          lower.tail = FALSE) * c(-1, 1),
+         call = ".PositiveStableFrailty",
+         name = paste0("PositiveStableFrailty(alpha = ", 
+                       round(plogis(logitalpha), 
+                       options("digits")$digits), ")"))
+}
+
+
+### Cure rate mixture models: 10.1002/sim.687
+.CureRate <- function(logitrho = 0, ..., frailty = .GammaFrailty) {
     f <- frailty(...)
     list(parm = function() c("logitrho" = logitrho, f$parm()),
-         p = function(x) plogis(logitrho) + plogis(logitrho) * f$p(x),
+         p = function(x) plogis(logitrho) * f$p(x),
          q = function(p)
-             f$q(p / plogis(logisrho)),
+             f$q(p / plogis(logitrho)),
          d = .d <- function(x, log = FALSE) {
              if (log)
                  return(plogis(logitrho, log.p = TRUE) + f$d(x, log = TRUE))
@@ -179,6 +222,8 @@
          dd2d = function(x)
              f$dd2d(x),
          call = ".CureRate",
+         support = qlogis(sqrt(.Machine$double.eps), 
+                          lower.tail = FALSE) * c(-1, 1),
          name = paste0("CureRate(rho = ", 
                        round(plogis(logitrho), 
                        options("digits")$digits), ")"))

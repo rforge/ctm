@@ -34,3 +34,19 @@ stopifnot(max(abs(lg$ddd(x) - mlt:::.MinExtrVal()$ddd(x))) < tol)
 stopifnot(max(abs(lg$dd2d(x) - mlt:::.MinExtrVal()$dd2d(x))) < tol)
 
 stopifnot(max(abs(lg$q(p) - mlt:::.MinExtrVal()$q(p))) < tol)
+
+### logitalpha = logit(1) is identical to .MinExtrVal
+tol <- (.Machine$double.eps)^(1 / 2.5)
+lg <- mlt:::.PositiveStableFrailty(logitalpha = 50)
+stopifnot(max(abs(lg$p(x) - mlt:::.MinExtrVal()$p(x))) < tol)
+
+stopifnot(max(abs(lg$d(x) - mlt:::.MinExtrVal()$d(x))) < tol)
+
+stopifnot(max(abs(lg$dd(x) - mlt:::.MinExtrVal()$dd(x))) < tol)
+
+stopifnot(max(abs(lg$ddd(x) - mlt:::.MinExtrVal()$ddd(x))) < tol)
+
+stopifnot(max(abs(lg$dd2d(x) - mlt:::.MinExtrVal()$dd2d(x))) < tol)
+
+stopifnot(max(abs(lg$q(p) - mlt:::.MinExtrVal()$q(p))) < tol)
+

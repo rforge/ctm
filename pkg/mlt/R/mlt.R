@@ -497,19 +497,22 @@ update.mlt_fit <- function(object, weights = stats::weights(object),
     ret
 }
 
-### McLain & Ghosh, 10.1080/15598608.2013.772835
-McLG <- function(object, rho_interval = c(exp(-25), 5)) {
+### frailty models; ie F_Z with additional scale parameter
+fmlt <- function(object, frailty = c("Gamma", "InvGauss", "PositiveStable"), ...) {
+    frailtyfun <- paste0(".", frailty <- match.arg(frailty), "Frailty")
+    fr <- do.call(frailtyfun, list())
     object <- as.mlt(object)
     model <- object$model
-    ll <- function(logrho)
-        -logLik(update(object, distr = .GammaFrailty(logrho)))
-    om <- optimise(ll, interval = log(rho_interval), maximum = FALSE)
-    model$todistr <- .GammaFrailty(om$minimum)
-    ret <- mlt(model = model, data = object$data, weights = weights(object),
+    ll <- function(fparm)
+        -logLik(update(object, distr = do.call(frailtyfun, list(fparm))))
+    om <- optimise(ll, interval = fr$support, maximum = FALSE)
+    model$todistr <- do.call(frailtyfun, list(om$minimum))
+    ret <- mlt(model = model, data = object$data, 
+               weights = weights(object),
                subset = object$subset, offset = object$offset, 
                theta = coef(object), fixed = object$fixed, 
                scale = object$scale, optim = object$optim)
-    class(ret) <- c("mltFparm", class(ret))
+    class(ret) <- c("fmlt", class(ret))
     ret
 }
 
