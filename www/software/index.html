@@ -239,30 +239,42 @@ models to a continuous outcome variable (let’s start with median
 Boston Housing values):</p>
 
 <div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">data</span><span class="p">(</span><span class="s2">"BostonHousing2"</span><span class="p">,</span><span class="w"> </span><span class="n">package</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"mlbench"</span><span class="p">)</span><span class="w">
-</span></code></pre></div></div>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>## Error in find.package(package, lib.loc, verbose = verbose): there is no package called 'mlbench'
-</code></pre></div></div>
-
-<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">library</span><span class="p">(</span><span class="s2">"survival"</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="s2">"survival"</span><span class="p">)</span><span class="w">
 </span><span class="n">BostonHousing2</span><span class="o">$</span><span class="n">y</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">with</span><span class="p">(</span><span class="n">BostonHousing2</span><span class="p">,</span><span class="w"> </span><span class="n">Surv</span><span class="p">(</span><span class="n">cmedv</span><span class="p">,</span><span class="w"> </span><span class="n">cmedv</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="m">50</span><span class="p">))</span><span class="w">
-</span></code></pre></div></div>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>## Error in with(BostonHousing2, Surv(cmedv, cmedv &lt; 50)): object 'BostonHousing2' not found
-</code></pre></div></div>
-
-<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Colr_BH_1</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">Colr</span><span class="p">(</span><span class="n">y</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">chas</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">crim</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">zn</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">indus</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">nox</span><span class="w"> </span><span class="o">+</span><span class="w"> 
+</span><span class="n">Colr_BH_1</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">Colr</span><span class="p">(</span><span class="n">y</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">chas</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">crim</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">zn</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">indus</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">nox</span><span class="w"> </span><span class="o">+</span><span class="w"> 
                   </span><span class="n">rm</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dis</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">rad</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">tax</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">ptratio</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">lstat</span><span class="p">,</span><span class="w"> 
                   </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BostonHousing2</span><span class="p">,</span><span class="w"> </span><span class="n">support</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="m">10</span><span class="p">,</span><span class="w"> </span><span class="m">50</span><span class="p">))</span><span class="w">
+</span><span class="n">summary</span><span class="p">(</span><span class="n">Colr_BH_1</span><span class="p">)</span><span class="w">
 </span></code></pre></div></div>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>## Error in eval(rfm[[2L]], envir = data, enclos = parent.frame()): object 'BostonHousing2' not found
-</code></pre></div></div>
-
-<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">summary</span><span class="p">(</span><span class="n">Colr_BH_1</span><span class="p">)</span><span class="w">
-</span></code></pre></div></div>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>## Error in summary(Colr_BH_1): object 'Colr_BH_1' not found
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>## 
+##   Continuous Outcome Logistic Regression 
+## 
+## Call:
+## Colr(formula = y | 0 + chas ~ crim + zn + indus + nox + rm + 
+##     age + dis + rad + tax + ptratio + b + lstat, data = BostonHousing2, 
+##     support = c(10, 50))
+## 
+## Coefficients:
+##          Estimate Std. Error z value Pr(&gt;|z|)    
+## crim     0.082651   0.013712   6.028 1.66e-09 ***
+## zn      -0.010278   0.004923  -2.088   0.0368 *  
+## indus   -0.025199   0.021449  -1.175   0.2400    
+## nox      7.064875   1.491338   4.737 2.17e-06 ***
+## rm      -1.534745   0.218977  -7.009 2.41e-12 ***
+## age      0.008433   0.005118   1.648   0.0994 .  
+## dis      0.496536   0.077791   6.383 1.74e-10 ***
+## rad     -0.120767   0.024924  -4.845 1.26e-06 ***
+## tax      0.006482   0.001334   4.861 1.17e-06 ***
+## ptratio  0.395812   0.048312   8.193 2.22e-16 ***
+## b       -0.006451   0.001112  -5.803 6.52e-09 ***
+## lstat    0.281504   0.026502  10.622  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Log-Likelihood:
+##  -1297.487 (df = 26)
+## Likelihood-ratio Test: Chisq = 879.7666 on 12 degrees of freedom; p = &lt; 2.2e-16
 </code></pre></div></div>
 <p>Two separate transformation function are fitted (for houses near and off
 Charles river, variable chas). The remaining variables enter a linear
@@ -276,32 +288,16 @@ locations, near and off Charles river. Then, we compute the two conditional
 distribution functions:</p>
 
 <div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">nd</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">BostonHousing2</span><span class="p">[</span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="m">1</span><span class="p">),]</span><span class="w">
-</span></code></pre></div></div>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>## Error in eval(expr, envir, enclos): object 'BostonHousing2' not found
-</code></pre></div></div>
-
-<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">nd</span><span class="o">$</span><span class="n">chas</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">sort</span><span class="p">(</span><span class="n">unique</span><span class="p">(</span><span class="n">BostonHousing2</span><span class="o">$</span><span class="n">chas</span><span class="p">))</span><span class="w">
-</span></code></pre></div></div>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>## Error in unique(BostonHousing2$chas): object 'BostonHousing2' not found
-</code></pre></div></div>
-
-<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">library</span><span class="p">(</span><span class="s2">"colorspace"</span><span class="p">)</span><span class="w">
+</span><span class="n">nd</span><span class="o">$</span><span class="n">chas</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">sort</span><span class="p">(</span><span class="n">unique</span><span class="p">(</span><span class="n">BostonHousing2</span><span class="o">$</span><span class="n">chas</span><span class="p">))</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="s2">"colorspace"</span><span class="p">)</span><span class="w">
 </span><span class="n">col</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">diverge_hcl</span><span class="p">(</span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="n">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="m">246</span><span class="p">,</span><span class="w"> </span><span class="m">40</span><span class="p">),</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">96</span><span class="p">,</span><span class="w"> </span><span class="n">l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="m">65</span><span class="p">,</span><span class="w"> </span><span class="m">90</span><span class="p">))</span><span class="w">
 </span><span class="n">plot</span><span class="p">(</span><span class="n">as.mlt</span><span class="p">(</span><span class="n">Colr_BH_1</span><span class="p">),</span><span class="w"> </span><span class="n">newdata</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nd</span><span class="p">,</span><span class="w"> </span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"distribution"</span><span class="p">,</span><span class="w"> </span><span class="n">col</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">col</span><span class="p">)</span><span class="w">
-</span></code></pre></div></div>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>## Error in h(simpleError(msg, call)): error in evaluating the argument 'x' in selecting a method for function 'plot': object 'Colr_BH_1' not found
-</code></pre></div></div>
-
-<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">legend</span><span class="p">(</span><span class="s2">"bottomright"</span><span class="p">,</span><span class="w"> </span><span class="n">legend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s2">"Off"</span><span class="p">,</span><span class="w"> </span><span class="s2">"Near"</span><span class="p">),</span><span class="w"> </span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Charles river"</span><span class="p">,</span><span class="w">
+</span><span class="n">legend</span><span class="p">(</span><span class="s2">"bottomright"</span><span class="p">,</span><span class="w"> </span><span class="n">legend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s2">"Off"</span><span class="p">,</span><span class="w"> </span><span class="s2">"Near"</span><span class="p">),</span><span class="w"> </span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Charles river"</span><span class="p">,</span><span class="w">
        </span><span class="n">col</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">col</span><span class="p">,</span><span class="w"> </span><span class="n">lty</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">bty</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"n"</span><span class="p">)</span><span class="w">
 </span></code></pre></div></div>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>## Error in strwidth(legend, units = "user", cex = cex, font = text.font): plot.new has not been called yet
-</code></pre></div></div>
-<p>It appears that houses near the river are more expensive, and the
+<p><img src="../images/BHplot-1.png" alt="plot of chunk BHplot" />
+It appears that houses near the river are more expensive, and the
 variability is also larger compared to houses far away from the river.</p>
 
 <p>The most important feature in this model is that the shape of these
