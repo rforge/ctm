@@ -16,14 +16,14 @@ description: 'Research and Software for Transformation Models'
 credits: '<p>Built with <a href="http://jekyllrb.com/" target="_blank">Jekyll</a> based on <a href="http://phlow.github.io/feeling-responsive/" target="_blank">Feeling Responsive</a> by <a href="http://phlow.de/"target="_blank">Phlow</a>.</p>'
 
 ## MAIN ADDRESS FOR ABSOLUTE LINKS
-url: "http://ctm.r-forge.r-project.org"
+url: "https://ctm.r-forge.r-project.org"
 baseurl: ""
 
-urlimg: "http://ctm.r-forge.r-project.org/images/"
+urlimg: "https://ctm.r-forge.r-project.org/images/"
 # Example: <img src="{{ site.urlimg }}img.title"/>
 # OR ![Image Text]({{ site.urlimg }}image.jpg)
 
-urldoc: "http://ctm.r-forge.r-project.org/docs/"
+urldoc: "https://ctm.r-forge.r-project.org/docs/"
 # Example:  <a href="{{ site.urldoc }}doc.title">
 # OR ![Link Text]({{ site.urldoc }}doc.title)
 
