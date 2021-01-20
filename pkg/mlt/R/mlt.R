@@ -498,14 +498,15 @@ update.mlt_fit <- function(object, weights = stats::weights(object),
 }
 
 ### frailty models; ie F_Z with additional scale parameter
-fmlt <- function(object, frailty = c("Gamma", "InvGauss", "PositiveStable"), ...) {
+fmlt <- function(object, frailty = c("Gamma", "InvGauss", "PositiveStable"), 
+                 interval = fr$support, ...) {
     frailtyfun <- paste0(".", frailty <- match.arg(frailty), "Frailty")
     fr <- do.call(frailtyfun, list())
     object <- as.mlt(object)
     model <- object$model
     ll <- function(fparm)
         -logLik(update(object, distr = do.call(frailtyfun, list(fparm))))
-    om <- optimise(ll, interval = fr$support, maximum = FALSE)
+    om <- optimise(ll, interval = interval, maximum = FALSE)
     model$todistr <- do.call(frailtyfun, list(om$minimum))
     ret <- mlt(model = model, data = object$data, 
                weights = weights(object),
@@ -516,19 +517,26 @@ fmlt <- function(object, frailty = c("Gamma", "InvGauss", "PositiveStable"), ...
     ret
 }
 
-Cure <- function(object, rho_interval = c(0, 1), frailty = .MinExtrVal) {
+### cure mixture models (for a constant cure probability)
+### e.g. 10.1002/sim.687
+cmlt <- function(object, interval = fr$support, ...) {
     object <- as.mlt(object)
     model <- object$model
+    ### take F_Z from fitted model
+    distr <- get(object$model$todistr$call)
+    ### no unknown parameters in frailties as of now
+    stopifnot(length(distr$parm()) == 0L)
+    fr <- .CureRate(distr = distr)
     ### <FIXME> allow for additional parameters in frailty
     ll <- function(logitrho)
-        -logLik(update(object, distr = .CureRate(logitrho, frailty = frailty)))
-    om <- optimise(ll, interval = c(-5, 5), maximum = FALSE)
-    model$todistr <- .CureRate(om$minimum, frailty = frailty)
+        -logLik(update(object, distr = .CureRate(logitrho, distr = distr)))
+    om <- optimise(ll, interval = interval, maximum = FALSE)
+    model$todistr <- .CureRate(om$minimum, distr = distr)
     ### </FIXME>
     ret <- mlt(model = model, data = object$data, weights = weights(object),
                subset = object$subset, offset = object$offset, 
                theta = coef(object), fixed = object$fixed, 
                scale = object$scale, optim = object$optim)
-    class(ret) <- c("mltFparm", class(ret))
+    class(ret) <- c("fmlt", class(ret))
     ret
 }

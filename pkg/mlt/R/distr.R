@@ -204,23 +204,23 @@
 
 
 ### Cure rate mixture models: 10.1002/sim.687
-.CureRate <- function(logitrho = 0, ..., frailty = .GammaFrailty) {
-    f <- frailty(...)
-    list(parm = function() c("logitrho" = logitrho, f$parm()),
-         p = function(x) plogis(logitrho) * f$p(x),
+.CureRate <- function(logitrho = 0, ..., distr = .MinExtrVal) {
+    d <- distr(...)
+    list(parm = function() c("logitrho" = logitrho, d$parm()),
+         p = function(x) plogis(logitrho) * d$p(x),
          q = function(p)
-             f$q(p / plogis(logitrho)),
+             d$q(p / plogis(logitrho)),
          d = .d <- function(x, log = FALSE) {
              if (log)
-                 return(plogis(logitrho, log.p = TRUE) + f$d(x, log = TRUE))
-             plogis(logitrho) * f$d(x)
+                 return(plogis(logitrho, log.p = TRUE) + d$d(x, log = TRUE))
+             plogis(logitrho) * d$d(x)
          },
          dd = .dd <- function(x)
-             plogis(logitrho) * f$dd(x),
+             plogis(logitrho) * d$dd(x),
          ddd = function(x)
-             plogis(logitrho) * f$ddd(x),
+             plogis(logitrho) * d$ddd(x),
          dd2d = function(x)
-             f$dd2d(x),
+             d$dd2d(x),
          call = ".CureRate",
          support = qlogis(sqrt(.Machine$double.eps), 
                           lower.tail = FALSE) * c(-1, 1),

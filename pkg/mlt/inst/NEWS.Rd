@@ -9,9 +9,8 @@
           \code{simulate} is now ignored.}
     \item{Adjust contrasts a fixed parameter contributes to.}
     \item{Return numerically determined Hessians upon request.}
-    \item{Implement logarithmic class of error distributions.}
-    \item{Add experimental implementation of Gamma-frailty models 
-          (McLain & Ghosh, 2013).}
+    \item{Implement frailty error distributions, experimentally and internal only.}
+    \item{Implement cure mixture models, experimentally and internal only.}
   }
 }
 
