@@ -151,3 +151,7 @@ stopifnot(all.equal(
         check.attributes = FALSE
 ))
 
+stopifnot(all.equal(
+        predict(m1, type = "trafo"),
+        predict(m1, newdata = df, type = "trafo")
+        ))

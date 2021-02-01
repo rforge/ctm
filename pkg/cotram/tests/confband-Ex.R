@@ -40,6 +40,6 @@ if (FALSE){
              confidence = "band", col = "red", smooth = TRUE, ylim = c(-2, 15))
         lines(x = cb.s[, "q"], y = cb.s[, "lwr"], type = "l")
         lines(x = cb.s[, "q"], y = cb.s[, "upr"], type = "l")
-y}
+        }
 
 

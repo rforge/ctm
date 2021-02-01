@@ -52,6 +52,7 @@ cotram <- function(formula, data, method = c("logit", "cloglog", "loglog", "prob
         ret$tram <- paste(ifelse(is.null(td$terms$s), "", "(Stratified)"),
                           "Transformed Counts Probit Transformation Model")
     }
+    ret$data[, td$rname] <- ret$data[, td$rname] - as.integer(plus_one)
     ret$count_response <- numeric_var(td$rname, support = min(td$response):max(td$response))
     class(ret) <- c("cotram", class(ret))
     ret
