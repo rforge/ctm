@@ -310,7 +310,7 @@ predict.mcotram <- function(object, newdata, marginal = 1L,
   if (!object$gaussian & marginal != 1L)
     stop("Cannot compute marginal distribution from non-gaussian joint model")
   ret <- lapply(object$marginals[marginal], function(m)
-    predict.cotram(m, newdata = newdata, ...))
+    predict(m, newdata = newdata, ...))
   Vx <- coef(object, newdata = newdata, type = "Sigma")
   ### first formula in Section 2.4
   if (type == "distribution") {
