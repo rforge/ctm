@@ -1,5 +1,5 @@
-\name{commlt}
-\alias{commlt}
+\name{mcotram}
+\alias{mcotram}
 \title{
   Multivariate Count Conditional Transformation Models
 }
@@ -8,8 +8,8 @@
 transformation models for count data
 }
 \usage{
-commlt(..., formula = ~ 1, data, theta = NULL,
-       control.outer = list(trace = FALSE), scale = FALSE)
+mcotram(..., formula = ~ 1, data, theta = NULL,
+        control.outer = list(trace = FALSE), scale = FALSE)
 }
 \arguments{
   \item{\dots}{marginal count transformation models, one for each response
@@ -31,8 +31,8 @@ structure via the lambda parameters. The default is set to \code{~ 1} for consta
   The response is assumed to be a vector of counts.
 }
 \value{
-An object of class \code{mmlt} with \code{coef} and \code{predict}
-methods.
+An object of class \code{mcotram} and \code{mmlt} with \code{coef} and 
+\code{predict} methods.
 }
 \references{
 

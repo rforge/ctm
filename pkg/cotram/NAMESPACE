@@ -10,7 +10,7 @@ importFrom("stats", "update", "residuals")
 importFrom("graphics", "axis", "box", "points")
 importFrom("grDevices", "rgb")
 
-export(cotram, confband, commlt)
+export(cotram, confband, mcotram)
 
 S3method("as.mlt", "cotram")
 S3method("mkgrid", "cotram")
@@ -18,3 +18,4 @@ S3method("logLik", "cotram")
 S3method("plot", "cotram")
 S3method("predict", "cotram")
 S3method("confband", "cotram")
+S3method("predict", "mcotram")

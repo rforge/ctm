@@ -61,8 +61,8 @@
 # }
 
 ### mmlt function for count case
-commlt <- function(..., formula = ~ 1, data, theta = NULL,
-                   control.outer = list(trace = FALSE), scale = FALSE) {
+mcotram <- function(..., formula = ~ 1, data, theta = NULL,
+                    control.outer = list(trace = FALSE), scale = FALSE) {
   
   call <- match.call()
   
@@ -300,40 +300,41 @@ commlt <- function(..., formula = ~ 1, data, theta = NULL,
               pars = list(mpar = mpar, cpar = cpar),
               par = opt$par, ll = ll, sc = sc, logLik = opt$value,
               hessian = opt$hessian)
-  class(ret) <- "mmlt"
+  class(ret) <- c("mcotram", "mmlt")
   ret
 }
 
-# predict.mmlt <- function(object, newdata, marginal = 1L, 
-#                          type = c("trafo", "distribution", "density"), ...) {
-#   type <- match.arg(type)
-#   if (!object$gaussian & marginal != 1L)
-#     stop("Cannot compute marginal distribution from non-gaussian joint model")
-#   ret <- lapply(object$marginals[marginal], function(m)
-#     predict(m, newdata = newdata, ...))
-#   Vx <- coef(object, newdata = newdata, type = "Sigma")
-#   ### first formula in Section 2.4
-#   if (type == "distribution") {
-#     ret <- lapply(1:length(ret), function(i) {
-#       tmp <- t(t(ret[[i]]) / sqrt(Vx$diag[,marginal]))
-#       pnorm(tmp)
-#     })
-#   }
-#   if (type == "density") {
-#     hprime <- lapply(object$marginals[marginal], function(m) {
-#       dr <- 1
-#       names(dr) <- m$model$response
-#       predict(m, newdata = newdata, deriv = dr, ...)
-#     })
-#     ret <- lapply(1:length(ret), function(i) {
-#       tmp <- t(t(ret[[i]]) / sqrt(Vx$diag[,marginal]))
-#       t(t(dnorm(tmp)) / sqrt(Vx$diag[,marginal]))  * hprime[[i]]
-#     })
-#   }
-#   if (length(ret) == 1) return(ret[[1]])
-#   ret
-# }
-# 
+predict.mcotram <- function(object, newdata, marginal = 1L,
+                            type = c("trafo", "distribution", "density"), ...) {
+  type <- match.arg(type)
+  if (!object$gaussian & marginal != 1L)
+    stop("Cannot compute marginal distribution from non-gaussian joint model")
+  ret <- lapply(object$marginals[marginal], function(m)
+    predict.cotram(m, newdata = newdata, ...))
+  Vx <- coef(object, newdata = newdata, type = "Sigma")
+  ### first formula in Section 2.4
+  if (type == "distribution") {
+    ret <- lapply(1:length(ret), function(i) {
+      tmp <- t(t(ret[[i]]) / sqrt(Vx$diag[,marginal]))
+      pnorm(tmp)
+    })
+  }
+  if (type == "density") {
+    stop("Still to be implemented")
+    # hprime <- lapply(object$marginals[marginal], function(m) {
+    #   dr <- 1
+    #   names(dr) <- m$model$response
+    #   predict(m, newdata = newdata, deriv = dr, ...)
+    # })
+    # ret <- lapply(1:length(ret), function(i) {
+    #   tmp <- t(t(ret[[i]]) / sqrt(Vx$diag[,marginal]))
+    #   t(t(dnorm(tmp)) / sqrt(Vx$diag[,marginal]))  * hprime[[i]]
+    # })
+  }
+  if (length(ret) == 1) return(ret[[1]])
+  ret
+}
+
 # ### solve lower triangular matrix (in vector form)
 # ### rowwise applicable to matrices
 # .Solve2 <- function(x) {
