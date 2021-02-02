@@ -276,7 +276,7 @@ mmlt <- function(..., formula = ~ 1, data, theta = NULL,
               call = call,
               gaussian = gaussian,
               pars = list(mpar = mpar, cpar = cpar),
-              par = opt$par, ll = ll, sc = sc, logLik = opt$value,
+              par = opt$par, ll = ll, sc = sc, logLik = -opt$value,
               hessian = opt$hessian)
   class(ret) <- "mmlt"
   ret
