@@ -208,6 +208,8 @@ Polr <- function(formula, data, subset, weights, offset, cluster, na.action = na
     name <- c("logistic" = "Odds", "loglog" = "Reverse time hazards",
               "cloglog" = "Hazards")
 
+    ### <FIXME> maybe use as.basis(<response>, Matrix = TRUE) when nlevels
+    ### is large </FIXME>
     ret <- tram(td, transformation = "discrete", distribution = distribution, negative = TRUE, ...)
     if (!inherits(ret, "mlt")) return(ret)
     ret$call <- match.call(expand.dots = TRUE)
