@@ -1,7 +1,10 @@
 
 as.basis.formula <- function(object, data = NULL, remove_intercept = FALSE, 
                              ui = NULL, ci = NULL, negative = FALSE, scale = FALSE,
-                             ...) {
+                             Matrix = FALSE, ...) {
+
+    mm <- stats::model.matrix
+    if (Matrix) mm <- MatrixModels::model.Matrix
 
     if (inherits(data, "data.frame")) {
         vars <- as.vars(data[all.vars(object)])
@@ -19,7 +22,7 @@ as.basis.formula <- function(object, data = NULL, remove_intercept = FALSE,
         ### see http://developer.r-project.org/model-fitting-functions.txt
         mf <- model.frame(object, data = data, drop.unused.levels = TRUE)
         mt <- attr(mf, "terms")
-        X <- model.matrix(mt, data = mf, ...)
+        X <- mm(mt, data = mf, ...)
         contr <- attr(X, "contrasts")
         xlevels <- .getXlevels(mt, mf)
         if (scale) {
@@ -40,10 +43,10 @@ as.basis.formula <- function(object, data = NULL, remove_intercept = FALSE,
         if (!is.null(mf)) {
             mf <- model.frame(mt, data = data, xlev = xlevels)
             if(!is.null(cl <- attr(mt, "dataClasses"))) .checkMFClasses(cl, mf)
-            X <- model.matrix(mt, mf, contrasts = contr)
+            X <- mm(mt, mf, contrasts = contr)
         } else {
             mf <- model.frame(object, data)
-            X <- model.matrix(attr(mf, "terms"), data = mf, ...)
+            X <- mm(attr(mf, "terms"), data = mf, ...)
         }
         if (scale) {
             X <- X - matrix(mins, nrow = nrow(X), ncol = length(mins), byrow = TRUE)

@@ -14,7 +14,8 @@
 \usage{
 as.basis(object, ...)
 \method{as.basis}{formula}(object, data = NULL, remove_intercept = FALSE, 
-         ui = NULL, ci = NULL, negative = FALSE, scale = FALSE, ...)
+         ui = NULL, ci = NULL, negative = FALSE, scale = FALSE, 
+         Matrix = FALSE, ...)
 \method{as.basis}{factor_var}(object, ...)
 \method{as.basis}{ordered_var}(object, ...)
 \method{as.basis}{factor}(object, ...)
@@ -30,6 +31,8 @@ as.basis(object, ...)
   \item{negative}{a logical indicating negative basis functions}
   \item{scale}{a logical indicating a scaling of each column of the
                model matrix to the unit interval (based on observations in \code{data})}
+  \item{Matrix}{a logical requesting a sparse model matrix, that is, a
+                \code{Matrix} object.}
   \item{\dots}{additional arguments to \code{\link{model.matrix}}, for
                example contrasts}
 }

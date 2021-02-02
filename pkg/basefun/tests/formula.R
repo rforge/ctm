@@ -35,3 +35,9 @@ xd <- data.frame(x = x)
 b <- as.basis(~ scale(x), data = xd)
 stopifnot(all.equal(b(xd)[1:10,], b(xd[1:10,,drop = FALSE])[,]))
 
+### optionally return Matrix object
+if (require("MatrixModels")) {
+    d <- data.frame(x = gl(100, 100))
+    M <- model.matrix(as.basis(~ x, data = d, Matrix = TRUE), d)
+    stopifnot(inherits(M, "Matrix"))
+}
