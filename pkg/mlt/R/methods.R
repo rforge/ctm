@@ -327,7 +327,10 @@ bounds.mlt <- function(object)
 
 print.response <- function(x, digits = getOption("digits"), ...) {
 
-    ac <- function(x) format(c(x), digits = digits)
+    ac <- function(x) {
+        if (inherits(x, "factor")) return(levels(x)[x])
+        format(c(x), digits = digits)
+    }
     obs <- paste(ifelse(!is.na(x$exact), ac(x$exact), 
                  paste("(", ac(x$cleft), ", ", ac(x$cright), "]", sep = "")))
 
