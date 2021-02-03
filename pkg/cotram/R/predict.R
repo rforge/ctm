@@ -1,11 +1,15 @@
 
 predict.cotram <- function(object, newdata = model.frame(object), 
                            type = c("lp", "trafo", "distribution", "survivor", "density", 
-                                    "logdensity", "cumhazard", "quantile"),
+                                    "logdensity", "hazard", "loghazard", 
+                                    "cumhazard", "logcumhazard", "odds", "logodds", 
+                                    "quantile"),
                            smooth = FALSE, q = NULL, K = 20, prob = 1:(10-1)/10, ...) {
     type <- match.arg(type)
     
     y <- variable.names(object, "response")
+    nd <- newdata
+    nq <- q
     
     if (y %in% names(newdata)) {
         if (any(newdata[,y] < 0)) stop("response is non-positive")
@@ -69,6 +73,17 @@ predict.cotram <- function(object, newdata = model.frame(object),
                 predict(as.mlt(object), newdata = newdata_m1, 
                         type = "distribution", q = q_m1, K = K, prob = prob, ...)
             if (type == "logdensity") ret <- log(ret)
+        }
+
+        ### discrete hazard function
+        if (type %in% c("hazard", "loghazard")) {
+            d <- predict(object, newdata = nd, q = nq, type = "density", ...)
+            p <- predict(object, newdata = nd, q = nq, type = "distribution", ...)
+            if (type == "loghazard") {
+                ret <- d - log1p(-(p - exp(d)))
+            } else {
+                ret <- d/(1 - (p - d))
+            }
         }
     }
     

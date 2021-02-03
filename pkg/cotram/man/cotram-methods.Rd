@@ -11,8 +11,9 @@
 }
 \usage{
 \method{predict}{cotram}(object, newdata = model.frame(object),
-        type = c("lp", "trafo", "distribution", "survivor",
-                 "density", "logdensity", "cumhazard", "quantile"), 
+        type = c("lp", "trafo", "distribution", "survivor", "density", 
+                 "logdensity", "hazard", "loghazard", "cumhazard", 
+                 "logcumhazard", "odds", "logodds", "quantile"),
         smooth = FALSE, q = NULL, K = 20, prob = 1:(10-1)/10, ...)
 \method{plot}{cotram}(x, newdata, type = c("distribution", "survivor","density",
                           "logdensity", "cumhazard", "quantile", "trafo"),

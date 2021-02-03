@@ -155,3 +155,39 @@ stopifnot(all.equal(
         predict(m1, type = "trafo"),
         predict(m1, newdata = df, type = "trafo")
         ))
+
+### some basic checks for predictions wrt discrete distributions
+n <- 50
+d <- data.frame(x1 = 1:n, x2 = sample(1:n) + 1, y = sample(1:n))
+mod <- cotram(y ~ x1 + x2, data = d)
+
+.chk <- function(x)
+    stopifnot(max(abs(x), na.rm = TRUE) < sqrt(.Machine$double.eps))
+
+nd <- d
+nd$y <- NULL
+q <-0:(n+1)
+p <- predict(mod, newdata = nd, q = q, type = "distribution")
+s <- predict(mod, newdata = nd, q = q, type = "survivor")
+.chk(predict(mod, newdata = nd, q = q, type = "distribution", log = TRUE) - log(p))
+.chk(predict(mod, newdata = nd, q = q, type = "distribution", lower.tail = FALSE) - s)
+.chk(predict(mod, newdata = nd, q = q, type = "distribution", 
+             lower.tail = FALSE, log = TRUE) - log(s))
+
+o <- predict(mod, newdata = nd, q = q, type = "odds")
+.chk(o - p / s)
+
+dd <- predict(mod, newdata = nd, q = q, type = "density")
+
+.chk(apply(p, 2, function(x) diff(c(0, x))) - dd)
+
+h <- predict(mod, newdata = nd, q = q, type = "hazard")
+
+.chk(dd / (1 - (p - dd)) - h)
+
+.chk(apply(h, 2, function(x) cumprod(1 - x)) - s)
+
+H <- predict(mod, newdata = nd, q = q, type = "cumhazard")
+
+.chk(H + log(s))
+
