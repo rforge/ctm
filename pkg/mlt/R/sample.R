@@ -22,12 +22,16 @@ simulate.ctm <- function(object, nsim = 1, seed = NULL,
     if (!is.data.frame(newdata))
         stop("not yet implemented")
 
-    U <- matrix(runif(nsim * NROW(newdata)), ncol = nsim)
 
     y <- variable.names(object, "response")
     if (is.null(q))
         q <- mkgrid(object, n = K)[[y]]
+    newdata <- newdata[colnames(newdata) %in% variable.names(object)]
+    newdata[y] <- NULL
+    if (NCOL(newdata) == 0L) newdata <- data.frame(1)
+    U <- matrix(runif(nsim * NROW(newdata)), ncol = nsim)
     pr <- predict(object, newdata = newdata, q = q, type = "distribution")
+    if (!is.matrix(pr)) pr <- matrix(pr, ncol = 1)
 
     ret <- .invf(object, f = t(pr), q = q, z = U)
 
