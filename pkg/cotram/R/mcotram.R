@@ -1,64 +1,3 @@
-### compute more sensible starting values
-### this is essentially the old mmlt() function
-# .start <- function(by, bx = NULL, data, ...) {
-#   
-#   J <- length(by)
-#   
-#   mctm <- vector(mode = "list", length = J)
-#   mmlt <- vector(mode = "list", length = J)
-#   mctm[[1]] <- by[[1]]$model
-#   mmlt[[1]] <- mlt(mctm[[1]], data = data, ...)
-#   pdat <- data
-#   htotal <- "~ 1"
-#   
-#   for (j in 2:J) {
-#     hhat <- paste("hhat", j - 1, sep = "_")
-#     htotal <- c(htotal, hhat)
-#     data[[hhat]] <- predict(mmlt[[j - 1]], newdata = pdat, 
-#                             type = "trafo")
-#     pdat[[hhat]] <- 0
-#     bhi <- as.basis(as.formula(paste(htotal, collapse = "+")), 
-#                     data = data, remove_intercept = TRUE)
-#     if (!is.null(bx)) {
-#       shift <- b(bh = bhi, bx = bx)
-#       if (!is.null(by[[j]]$model$bases$shifting))
-#         shift <- c(shift = by[[j]]$model$bases$shifting, bhbx = b(bh = bhi, bx = bx))
-#       mctm[[j]] <- ctm(by[[j]]$model$bases$response, 
-#                        interacting = by[[j]]$model$bases$interacting,
-#                        shifting = shift,
-#                        todistr = "Normal")
-#     } else {
-#       shift <- bhi
-#       if (!is.null(by[[j]]$model$bases$shifting))
-#         shift <- c(shift = by[[j]]$model$bases$shifting, bhbx = b(bh = bhi, bx = bx))
-#       mctm[[j]] <- ctm(by[[j]]$model$bases$response, 
-#                        interacting = by[[j]]$model$bases$interacting,
-#                        shifting = shift,
-#                        todistr = "Normal")
-#     }
-#     ### set todistr
-#     mctm[[j]]$todistr <- by[[j]]$todistr
-#     ### get marginal parameters as starting values
-#     theta <- coef(mctm[[j]])
-#     theta[] <- 0
-#     theta[names(coef(by[[j]]))] <- coef(by[[j]])
-#     mmlt[[j]] <- mlt(mctm[[j]], data = data, theta = theta, ...)
-#   }
-#   
-#   ### postprocess parameters
-#   p <- ncol(model.matrix(bx, data = data))
-#   cf <- lapply(mmlt, coef)
-#   mpar <- c()
-#   for (i in 1:length(cf))
-#     mpar <- c(mpar, cf[[i]][names(coef(by[[i]]))])
-#   cpar <- c()
-#   j <- 1
-#   for (i in 2:length(cf)) {
-#     cp <- cf[[i]][grep("hhat", names(cf[[i]]))]
-#     cpar <- rbind(cpar, matrix(cp, ncol = p))
-#   }
-#   list(mpar = mpar, cpar = cpar)
-# }
 
 ### mmlt function for count case
 mcotram <- function(..., formula = ~ 1, data, theta = NULL,
@@ -132,11 +71,10 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL,
   }
   
   
-  ll <- function(par, ui, ci) {
+  ll <- function(par) {
     
     mpar <- par[1:ncol(Ylower)]
     cpar <- matrix(par[-(1:ncol(Ylower))], nrow = ncol(lX))
-    Xp <- lX %*% cpar
     
     ### Ylower = NaN means -Inf and Yupper == NaN means +Inf
     ### (corresponding to probabilities 0 and 1)
@@ -166,8 +104,7 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL,
     
     mpar <- par[1:ncol(Ylower)]
     cpar <- matrix(par[-(1:ncol(Ylower))], nrow = ncol(lX))
-    Xp <- lX %*% cpar
-    
+   
     ### Ylower = NaN means -Inf and Yupper == NaN means +Inf
     ### (corresponding to probabilities 0 and 1)
     Yp_l <- matrix(Ylower %*% mpar, nrow = N)
@@ -260,7 +197,7 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL,
   #   f <- function(par) ll(scl * par, ui = ui, ci = ci)
   #   g <- function(par) sc(scl * par) * scl
   # } else {
-    f <- function(par) ll(par, ui = ui, ci = ci)
+    f <- function(par) ll(par)
     g <- sc
   # }
 
@@ -304,14 +241,27 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL,
   ret
 }
 
-predict.mcotram <- function(object, newdata, marginal = 1L,
+predict.mcotram <- function(object, newdata = object$data, marginal = 1L,
                             type = c("trafo", "distribution", "density"), ...) {
   type <- match.arg(type)
   if (!object$gaussian & marginal != 1L)
     stop("Cannot compute marginal distribution from non-gaussian joint model")
+  
+  ### predicting marginal transformation functions
+  ### if this works, then ret_m1 below is well-defined
   ret <- lapply(object$marginals[marginal], function(m)
     predict(m, newdata = newdata, ...))
   Vx <- coef(object, newdata = newdata, type = "Sigma")
+  
+  ### newdata - 1 for density estimation
+  newdata_m1 <- newdata
+  lapply(object$marginals[marginal], function(m) {
+    y <- variable.names(m, "response")
+    if (y %in% names(newdata_m1)) newdata_m1[[y]] <- newdata_m1[[y]] - 1L
+  })
+  ret_m1 <- lapply(object$marginals[marginal], function(m)
+    predict(m, newdata = newdata_m1, ...))
+
   ### first formula in Section 2.4
   if (type == "distribution") {
     ret <- lapply(1:length(ret), function(i) {
@@ -320,102 +270,17 @@ predict.mcotram <- function(object, newdata, marginal = 1L,
     })
   }
   if (type == "density") {
-    stop("Still to be implemented")
-    # hprime <- lapply(object$marginals[marginal], function(m) {
-    #   dr <- 1
-    #   names(dr) <- m$model$response
-    #   predict(m, newdata = newdata, deriv = dr, ...)
-    # })
-    # ret <- lapply(1:length(ret), function(i) {
-    #   tmp <- t(t(ret[[i]]) / sqrt(Vx$diag[,marginal]))
-    #   t(t(dnorm(tmp)) / sqrt(Vx$diag[,marginal]))  * hprime[[i]]
-    # })
+    ret <- lapply(1:length(ret), function(i) {
+      tmp <- t(t(ret[[i]]) / sqrt(Vx$diag[,marginal]))
+      tmp_m1 <- t(t(ret_m1[[i]]) / sqrt(Vx$diag[,marginal]))
+      pnorm(tmp) - pnorm(tmp_m1)
+    })
   }
   if (length(ret) == 1) return(ret[[1]])
   ret
 }
 
-# ### solve lower triangular matrix (in vector form)
-# ### rowwise applicable to matrices
-# .Solve2 <- function(x) {
-#   if (!is.matrix(x)) x <- matrix(x, nrow = 1)
-#   n <- (1 + sqrt(1 + 4 * 2 * ncol(x))) / 2
-#   xij <- function(x = NULL, i, j) {
-#     if (i == j) return(1)
-#     if (j == 1) {
-#       ret <- i - 1
-#     } else {
-#       idx <- n - (1:(n - 1))
-#       ret <- sum(idx[1:(j - 1)]) + (i - (n - idx[j]))
-#     }
-#     if (is.null(x))
-#       return(ret)
-#     return(x[,ret])
-#   }
-#   ret <- matrix(0, nrow = nrow(x), ncol = ncol(x))
-#   for (i in 2:n) {
-#     for (j in 1:(i - 1)) {
-#       s <- 0
-#       for (k in j:(i - 1))
-#         s <- s + xij(x, i, k) * xij(ret, k, j)
-#       ret[, xij(NULL, i, j)] <- -s
-#     }
-#   }
-#   ret
-# } 
-# 
-# # we will use as input Solve2(Xp)
-# .Crossp <- function(Linv) {
-#   # 1 observation
-#   N <- nrow(Linv)
-#   Jp <- ncol(Linv)
-#   J <- (1 + sqrt(1 + 4 * 2 * Jp)) / 2
-#   if (N == 1) {
-#     L <- diag(1, J)
-#     L[upper.tri(L)] <- Linv
-#     L <- t(L)
-#     tcp <- tcrossprod(L)
-#     S_diag <- diag(tcp)
-#     S_low <- tcp[lower.tri(tcp)]
-#   }
-#   # more than 1 observation
-#   else{
-#     # J = 1
-#     S <- S_diag <- 1
-#     # J = 2
-#     if(ncol(Linv) == 1) {
-#       S_diag <- cbind(rep(1, N), matrix(1, nrow = N, ncol = 1) + Linv^2)
-#     }
-#     S_low <- Linv
-#     
-#     if (J > 2) {
-#       L <- diag(0, J)
-#       L[upper.tri(L)] <- 1:Jp
-#       L <- t(L)
-#       
-#       S <- matrix(rep(rep(1:0, (J - 1)), c(rbind(1:(J - 1), Jp))), nrow = Jp)[, -J]
-#       S_diag <- cbind(rep(1, N), matrix(1, nrow = N, ncol = J-1) + Linv^2 %*% S)
-#       
-#       for (i in J:3) { #zeile
-#         for (j in (i-1):2) { #spalte
-#           for (k in 1:(j-1)) { #produkt-summanden
-#             S_low[, L[i, j]] <- S_low[, L[i, j]] + Linv[, L[i, k]]*Linv[, L[j, k]]
-#           }
-#         }
-#       }
-#     }
-#   }
-#   ret <- list(lower = S_low, diagonal = S_diag)
-#   return(ret)
-# }
-# 
-# logLik.mmlt <- function(object, ...) {
-#   ret <- object$logLik
-#   attr(ret, "df") <- length(object$par)
-#   class(ret) <- "logLik"
-#   ret
-# }
-# 
+
 # coef.mmlt <- function(object, newdata = object$data, 
 #                       type = c("all", "marginal", "Lambda", "Lambdainv", "Sigma", "Corr"), 
 #                       ...)
@@ -444,12 +309,6 @@ predict.mcotram <- function(object, newdata, marginal = 1L,
 #                     SS <- cbind(SS, isd[,j] * isd[,-(1:j), drop = FALSE])
 #                   ret$lower / SS
 #                 }))
-# }
-# 
-# vcov.mmlt <- function(object, ...) {
-#   ret <- solve(object$hessian)
-#   rownames(ret) <- colnames(ret) <- names(coef(object))
-#   ret
 # }
 # 
 # summary.mmlt <- function(object, ...) {
