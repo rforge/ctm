@@ -39,7 +39,18 @@
 ### Gompertz distribution
 .MinExtrVal <- function()
     list(parm = function(x) NULL,
-         p = function(x) 1 - exp(-exp(x)),
+         p = function(x, lower.tail = TRUE, log.p = FALSE) {
+             ### p = 1 - exp(-exp(x))
+             ret <- exp(-exp(x))
+             if (log.p) {
+                 if (lower.tail)
+                     return(log1p(-ret))
+                 return(-exp(x))
+             }
+             if (lower.tail)
+                 return(1 - exp(-exp(x)))
+             return(ret)             
+         },
          q = function(p) log(-log1p(- p)),
          d = function(x, log = FALSE) {
              ret <- x - exp(x)
@@ -62,7 +73,17 @@
 ### Gumbel distribution
 .MaxExtrVal <- function()
     list(parm = function(x) NULL,
-         p = function(x) exp(-exp(-x)),
+         p = function(x, lower.tail = TRUE, log.p = FALSE) {
+             ### p = exp(-exp(-x))
+             if (log.p) {
+                 if (lower.tail)
+                     return(-exp(-x))
+                 return(log1p(-exp(-exp(-x))))
+             }
+             if (lower.tail)
+                 return(exp(-exp(-x)))
+             1 - exp(-exp(-x))
+         },
          q = function(p) -log(-log(p)),
          d = function(x, log = FALSE) {
              ret <- - x - exp(-x)
@@ -87,7 +108,18 @@
     logrho <- pmax(logrho, log(sqrt(.Machine$double.eps)))
     list(parm = function() c("logrho" = logrho),
          ### note: p(x) is 1 - LaplaceTransform(exp(x))
-         p = function(x) 1 - (1 + exp(x + logrho))^(-exp(-logrho)),
+         p = function(x, lower.tail = TRUE, log.p = FALSE) {
+             ### p = 1 - (1 + exp(x + logrho))^(-exp(-logrho))
+             ret <- (1 + exp(x + logrho))^(-exp(-logrho))
+             if (log.p) {
+                 if (lower.tail)
+                     return(log1p(-ret))
+                 return(log(ret))
+             }
+             if (lower.tail)
+                 return(1 - ret)
+             return(ret)
+         },
          q = function(p)
              log((1 - p)^(-exp(logrho)) - 1) - logrho,
          d = .d <- function(x, log = FALSE) {
@@ -123,8 +155,18 @@
     logtheta <- pmax(logtheta, log(sqrt(.Machine$double.eps)))
     list(parm = function() c("logtheta" = logtheta),
          ### note: p(x) is 1 - LaplaceTransform(exp(x))
-         p = function(x)
-             1 - exp(- sqrt(4 * exp(logtheta) * (exp(logtheta) + exp(x))) + 2 * exp(logtheta)),
+         p = function(x, lower.tail = TRUE, log.p = FALSE) {
+             ### p = 1 - exp(- sqrt(4 * exp(logtheta) * (exp(logtheta) + exp(x))) + 2 * exp(logtheta))
+             ret <- exp(- sqrt(4 * exp(logtheta) * (exp(logtheta) + exp(x))) + 2 * exp(logtheta))
+             if (log.p) {
+                 if (lower.tail)
+                     return(log1p(-ret))
+                 return(log(ret))
+             }
+             if (lower.tail)
+                 return(1 - ret)
+             return(ret)
+         },
          q = function(p) {
              theta <- exp(logtheta)
              log((-log1p(- p) + 2 * theta)^2 / (4 * theta) - theta)
@@ -168,8 +210,18 @@
 .PositiveStableFrailty <- function(logitalpha = 0) {
     list(parm = function() c("logitalpha" = logitalpha),
          ### note: p(x) is 1 - LaplaceTransform(exp(x))
-         p = function(x)
-             1 - exp(-exp(plogis(logitalpha) * x)),
+         p = function(x, lower.tail = TRUE, log.p = FALSE) {
+             ### p = 1 - exp(-exp(plogis(logitalpha) * x))
+             ret <- exp(-exp(plogis(logitalpha) * x))
+             if (log.p) {
+                 if (lower.tail)
+                     return(log1p(-ret))
+                 return(log(ret))
+             }
+             if (lower.tail)
+                 return(1 - ret)
+             return(ret)
+         },
          q = function(p)
              log(-log1p(-p)) / plogis(logitalpha),
          d = .d <- function(x, log = FALSE) {
@@ -207,7 +259,16 @@
 .CureRate <- function(logitrho = 0, ..., distr = .MinExtrVal) {
     d <- distr(...)
     list(parm = function() c("logitrho" = logitrho, d$parm()),
-         p = function(x) plogis(logitrho) * d$p(x),
+         p = function(x, lower.tail = TRUE, log.p = FALSE) {
+             if (log.p) {
+                 if (lower.tail)
+                     return(plogis(logitrho, log.p = TRUE) + d$p(x, log.p = TRUE))
+                 return(log1p(-plogis(logitrho) * d$p(x)))
+             }
+             if (lower.tail)
+                 return(plogis(logitrho) * d$p(x))
+             return(1 - plogis(logitrho) * d$p(x))
+         },
          q = function(p)
              d$q(p / plogis(logitrho)),
          d = .d <- function(x, log = FALSE) {
