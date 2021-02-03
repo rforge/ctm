@@ -50,7 +50,7 @@ tmlt <- function(object, newdata = NULL, q = NULL, ...) {
         ### extra quantiles, compute transformation
         ### for each q and each row of newdata
         stopifnot(is.atomic(q))
-        stopifnot(length(unique(q)) == length(q))
+#        stopifnot(length(unique(q)) == length(q))
         dim <- c(length(q), nrow(newdata))
 
         ### <FIXME> this triggers a trick in 
@@ -133,13 +133,14 @@ tmlt <- function(object, newdata = NULL, q = NULL, ...) {
 }
 
 ### distribution function
-pmlt <- function(object, newdata = NULL, q = NULL, ...)
+pmlt <- function(object, newdata = NULL, q = NULL, lower.tail = TRUE, log = FALSE, ...)
     object$todistr$p(tmlt(object = object, newdata = newdata,
-                                q = q, ...))
+                          q = q, ...), lower.tail = lower.tail, log.p = log)
 
 ### survivor function
-smlt <- function(object, newdata = NULL, q = NULL, ...)
-    1 - pmlt(object = object, newdata = newdata, q = q, ...)
+smlt <- function(object, newdata = NULL, q = NULL, log = FALSE, ...)
+    pmlt(object = object, newdata = newdata, q = q, lower.tail = FALSE, 
+         log = log, ...)
 
 ### cumulative hazard function
 Hmlt <- function(object, newdata = NULL, q = NULL, log = FALSE, ...) {
@@ -154,7 +155,8 @@ Hmlt <- function(object, newdata = NULL, q = NULL, log = FALSE, ...) {
         H <- tmlt(object = object, newdata = newdata, q = q, ...)
     } else {
         ### generic
-        H <- -log(smlt(object = object, newdata = newdata, q = q, ...))
+        H <- -smlt(object = object, newdata = newdata, q = q, log = TRUE, 
+                   ...)
     }
     if (log) return(log(H))
     return(H)
@@ -167,9 +169,9 @@ Omlt <- function(object, newdata = NULL, q = NULL, log = FALSE, ...) {
         if (log) return(logO)
         return(exp(logO))
     }
-    F <- pmlt(object = object, newdata = newdata, q = q, ...)
-    S <- smlt(object = object, newdata = newdata, q = q, ...)
-    if (log) return(log(F) - log(S))
+    F <- pmlt(object = object, newdata = newdata, q = q, log = log, ...)
+    S <- smlt(object = object, newdata = newdata, q = q, log = log, ...)
+    if (log) return(F - S)
     return(F / S)
 }
 
@@ -399,9 +401,21 @@ dmlt <- function(object, newdata = NULL, q = NULL, log = FALSE, ...) {
 
 ### hazard function
 hmlt <- function(object, newdata = object$data, q = NULL, log = FALSE, ...) {
-    if (log) 
-        return(dmlt(object, newdata = newdata, q = q, log = TRUE, ...) -
-               log(smlt(object, newdata = newdata, q = q, ...)))
-    return(dmlt(object, newdata = newdata, q = q, log = FALSE, ...) /
-           smlt(object, newdata = newdata, q = q, ...))
+
+    y <- variable.names(object, "response")
+    response <- mkgrid(object, n = 10)[[y]]
+
+    if (.type_of_response(response) %in% c("double", "survival")) {
+        d <- dmlt(object, newdata = newdata, q = q, log = log, ...)
+        s <- smlt(object, newdata = newdata, q = q, log = log, ...)
+        if (log) 
+            return(d - s)
+        return(d / s)
+    }
+    ### discrete hazard: Prob(Y = y | Y >= y)
+    d <- dmlt(object, newdata = newdata, q = q, log = log, ...)
+    p <- pmlt(object, newdata = newdata, q = q, ...)
+    if (log)
+        return(d - log1p(-(p - exp(d))))
+    return(d / (1 - (p - d)))
 }
