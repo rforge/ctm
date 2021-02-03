@@ -2,15 +2,23 @@
 \name{NEWS}
 \title{NEWS file for the mlt package}
 
-\section{Changes in Version 1.2-1 (2020-01-12)}{
-  \itemize{
-    \item{Quantiles and thus simulations are now computationally more exact and more robust.
-          The unnecessary \code{interpolate} argument to \code{predict} and
-          \code{simulate} is now ignored.}
-    \item{Adjust contrasts a fixed parameter contributes to.}
-    \item{Return numerically determined Hessians upon request.}
-    \item{Implement frailty error distributions, experimentally and internal only.}
-    \item{Implement cure mixture models, experimentally and internal only.}
+\section{Changes in Version 1.2-1 (2020-02-03)}{
+  \subsection{New features}{
+    \itemize{
+      \item{Quantiles and thus simulations are now computationally more exact and more robust.
+            The unnecessary \code{interpolate} argument to \code{predict} and
+            \code{simulate} is now ignored.}
+      \item{Adjust contrasts a fixed parameter contributes to.}
+      \item{Return numerically determined Hessians upon request.}
+      \item{Implement frailty error distributions, experimentally and internal only.}
+      \item{Implement cure mixture models, experimentally and internal only.}
+      \item{Improve computations of log-probabilities.}
+    }
+  }
+  \subsection{Bugfixes}{
+    \itemize{
+      \item{Discrete hazard functions were incorrect.}
+    }
   }
 }
 
