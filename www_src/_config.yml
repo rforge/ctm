@@ -57,6 +57,7 @@ exclude:
     - 'README.*'
     - '*.bib'
     - pages/Makefile
+    - Makefile
     - '*.Rmd'
     - vendor
 

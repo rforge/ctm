@@ -11,8 +11,7 @@ Source-folder for building the html-files with Jekyll
 	in md / Rmd files in pages/* OR pages/pages-root-folder/* for front-page
  
  for changes in pages/Rmd files:
-	$ cd pages
-	$ make md 
+ 	$ make -C pages md
 
  include images in images/* 
 	either specify image-title as yml-variable (in html/md-file) OR include in html/md-file as: {{ site.urlimg }}title.jpg
@@ -27,10 +26,14 @@ Source-folder for building the html-files with Jekyll
  new entry in "News": 
 	add new file _posts/YEAR-MONTH-DAY-title.md
 
- build html-files:
+ build html-files with:
  	$ bundle exec jekyll build
 	$ cp -r _site/* ../www/
+or
+	$ make build
+	$ cp -r _site/* ../www/
 
+Note: To update the website, commit the changes in ctm/www/
 
 # FOR DEVELOPMENT ONLY: $ bundle exec jekyll serve --config _config.yml,_config_dev.yml
 (more infos in _config_dev.yml)
