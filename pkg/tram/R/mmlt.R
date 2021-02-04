@@ -66,7 +66,7 @@ mmlt <- function(..., formula = ~ 1, data, theta = NULL,
 
   call <- match.call()
   
-  m <- list(...)
+  m <- lapply(list(...), function(x) as.mlt(x))
   J <- length(m)
 
   ### weights are not yet allowed
@@ -136,7 +136,7 @@ mmlt <- function(..., formula = ~ 1, data, theta = NULL,
   }
 
 
-  ll <- function(par, ui, ci) {
+  ll <- function(par) {
 
     mpar <- par[1:ncol(Y)]
     cpar <- matrix(par[-(1:ncol(Y))], nrow = ncol(lX))
@@ -235,10 +235,10 @@ mmlt <- function(..., formula = ~ 1, data, theta = NULL,
     start <- start / scl
     if (!is.null(ui))
         ui <- t(t(ui) * scl)
-    f <- function(par) ll(scl * par, ui = ui, ci = ci)
+    f <- function(par) ll(scl * par)
     g <- function(par) sc(scl * par) * scl
   } else {
-    f <- function(par) ll(par, ui = ui, ci = ci)
+    f <- function(par) ll(par)
     g <- sc
   }
 
