@@ -248,21 +248,10 @@ predict.mcotram <- function(object, newdata = object$data, marginal = 1L,
     stop("Cannot compute marginal distribution from non-gaussian joint model")
   
   ### predicting marginal transformation functions
-  ### if this works, then ret_m1 below is well-defined
   ret <- lapply(object$marginals[marginal], function(m)
-    predict(m, newdata = newdata, ...))
+    predict.cotram(m, newdata = newdata, type = "trafo", ...))
   Vx <- coef(object, newdata = newdata, type = "Sigma")
-  
-  ### newdata - 1 for density estimation
-  newdata_m1 <- newdata
-  lapply(object$marginals[marginal], function(m) {
-    y <- variable.names(m, "response")
-    if (y %in% names(newdata_m1)) newdata_m1[[y]] <- newdata_m1[[y]] - 1L
-  })
-  ret_m1 <- lapply(object$marginals[marginal], function(m)
-    predict(m, newdata = newdata_m1, ...))
 
-  ### first formula in Section 2.4
   if (type == "distribution") {
     ret <- lapply(1:length(ret), function(i) {
       tmp <- t(t(ret[[i]]) / sqrt(Vx$diag[,marginal]))
@@ -270,9 +259,16 @@ predict.mcotram <- function(object, newdata = object$data, marginal = 1L,
     })
   }
   if (type == "density") {
+    newdata_m1 <- newdata
+    y <- unlist(lapply(object$marginals[marginal], function(m)
+      variable.names(m, "response")))
+    if (y %in% names(newdata_m1)) newdata_m1[,y] <- newdata_m1[,y] - 1L
+    ret_m1 <- lapply(object$marginals[marginal], function(m)
+      predict(m, newdata = newdata_m1, ...))
     ret <- lapply(1:length(ret), function(i) {
       tmp <- t(t(ret[[i]]) / sqrt(Vx$diag[,marginal]))
       tmp_m1 <- t(t(ret_m1[[i]]) / sqrt(Vx$diag[,marginal]))
+      tmp_m1[is.na(tmp_m1)] <- -Inf
       pnorm(tmp) - pnorm(tmp_m1)
     })
   }
