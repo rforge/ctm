@@ -47,12 +47,14 @@ Aareg <- function(formula, data, subset, weights, offset, cluster, na.action = n
     args$negative <- FALSE
     args$model_only <- TRUE
     ret <- do.call("tram", args)
-    if (isTRUE(list(...)$model_only)) return(ret)
-
     ### always start at time 0, so that the first parameter 
     ### is trafo(0), which can then be constrained to zero
     su <- mkgrid(ret$model, n = 2)[[1]]
     su[1] <- 0
+    args$support <- su
+    ret <- do.call("tram", args)
+    if (isTRUE(list(...)$model_only)) return(ret)
+
     cf <- names(coef(ret))
     cf <- cf[grep("Bs1", cf)]
     ctr <- numeric(length(cf))
