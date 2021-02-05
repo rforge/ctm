@@ -9,7 +9,7 @@ Scholarly papers describing the methodology
 library("RefManageR")
 bib <- ReadBib("TH.bib", check = FALSE)
 BibOptions(check.entries = FALSE, style = "html",
-           cite.style = "authoryear", bib.style = "numeric")
+           cite.style = "authoryear", bib.style = "numeric", max.names = 6)
 ```
 Transformation models have been around for more than 50 years, starting 
 with the seminal paper introducing "Box-Cox" power-transformations
@@ -35,12 +35,14 @@ transformations are implemented in the
 
 A generalisation of binary logistic regression models to continuous outcomes
 featuring parameters interpretable as log-odds ratios were described
-in `r Cite(bib, "Lohse_Rohrmann_Faeh_2017")`. Simple transformation models
-as well as more complex transformation models 
-(for example transformation trees
+in `r Citet(bib, "Lohse_Rohrmann_Faeh_2017")`. Simple transformation models
+as well as more complex transformation models (for example transformation trees
 and forests) for body mass index distributions are discussed in
-`r Cite(bib, "Hothorn_2018")`. Two likelihood-based boosting methods for
-transformation models are introduced in `r Cite(bib, "Hothorn_2019")`.
+`r Citet(bib, "Hothorn_2018")`. Transformation forests, and their underlying
+transformation tree algorithm, were established in `r Citet(bib, "Hothorn_Zeileis_2021")`, 
+providing a statistical learning approach for computing fully parametric
+predictive distributions. Two likelihood-based boosting methods for
+transformation models are introduced in `r Citet(bib, "Hothorn_2019")`.
 
 **References**
 
