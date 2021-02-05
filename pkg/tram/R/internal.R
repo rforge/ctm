@@ -43,9 +43,10 @@ asvar.response <- function(object, name, prob = c(.1, .9), support = NULL, bound
         stop("cannot determine class of response")
     }
     if (is.null(support)) {
-        support <- quantile(survfit(y ~ 1, data = data.frame(y = as.Surv(object))), prob = prob)$quantile
+        support <- quantile(sf <- survfit(y ~ 1, data = data.frame(y = as.Surv(object))), prob = prob)$quantile
+        last <- max(sf$time[sf$n.event > 0])
         if (is.na(support[2])) 
-            support[2] <- max(object$approxy)
+            support[2] <- last
     }
     variables::numeric_var(name, support = support, bounds = bounds, ...)
 }

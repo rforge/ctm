@@ -2,7 +2,7 @@
 \name{NEWS}
 \title{NEWS file for the tram package}
 
-\section{Changes in Version 0.5-3 (2021-01-13)}{
+\section{Changes in Version 0.5-3 (2021-02-05)}{
   \itemize{
     \item{Add \code{simulate} method.}
   }
