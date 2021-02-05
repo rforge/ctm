@@ -40,9 +40,14 @@ Aareg <- function(formula, data, subset, weights, offset, cluster, na.action = n
 
     ### we need additional trafo(0) = 0 constraints 
     ### because trafo = cumhazard
-    ret <- tram(td, transformation = "smooth", 
-                distribution = "Exponential", 
-                negative = FALSE, model_only = TRUE, ...)
+    args <- list(...)
+    args$formula <- td
+    args$transformation <- "smooth"
+    args$distribution <- "Exponential"
+    args$negative <- FALSE
+    args$model_only <- TRUE
+    ret <- do.call("tram", args)
+    if (isTRUE(list(...)$model_only)) return(ret)
 
     ### always start at time 0, so that the first parameter 
     ### is trafo(0), which can then be constrained to zero
