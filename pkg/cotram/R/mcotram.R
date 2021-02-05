@@ -251,7 +251,8 @@ predict.mcotram <- function(object, newdata = object$data, marginal = 1L,
   ret <- lapply(object$marginals[marginal], function(m)
     predict.cotram(m, newdata = newdata, type = "trafo", ...))
   Vx <- coef(object, newdata = newdata, type = "Sigma")
-
+  
+  ### FIXME: warnings appear if zero counts are present! 
   if (type == "distribution") {
     ret <- lapply(1:length(ret), function(i) {
       tmp <- t(t(ret[[i]]) / sqrt(Vx$diag[,marginal]))
