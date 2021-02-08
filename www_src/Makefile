@@ -4,7 +4,7 @@
 build: pages-dist
 	bundle exec jekyll build
 	cp -r _site/* ../www/
-	@echo "NOTE: To update the website, please commit changes in ctm/www/."
+	@echo "NOTE: To update the website, please add/commit changes in ctm/www/."
 
 ## Development only
 dev: pages-dist
