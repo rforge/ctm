@@ -1,3 +1,8 @@
+# tramME 0.0.5 (development version)
+
+* fixed error in vignette triggered by the update of the LaTeX package hyperref
+* added demo for IPD meta-analysis 
+
 # tramME 0.0.4 (2021-02-04)
 
 * fixed bug in setting error distributions of 'dummy' ctms for predict and simulate methods 
@@ -14,7 +19,6 @@
 # tramME 0.0.2 (2020-03-30)
 
 * Fixed numerical precision problem in unit tests
-
 
 # tramME 0.0.1 (2020-03-20)
 

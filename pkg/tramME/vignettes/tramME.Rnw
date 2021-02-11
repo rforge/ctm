@@ -24,7 +24,7 @@
 % Math notation
 \newcommand{\IP}{{\mathbb{P}}}
 \newcommand{\IR}{{\mathbb{R}}}
-\newcommand{\U}{{\mathbf{U}}}
+%% \newcommand{\U}{{\mathbf{U}}}
 \newcommand{\bcU}{{\boldsymbol{\mathcal{U}}}}
 \newcommand{\bfu}{{\mathbf{u}}}
 \newcommand{\X}{{\mathbf{X}}}
