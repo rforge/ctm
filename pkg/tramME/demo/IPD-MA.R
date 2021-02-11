@@ -2,7 +2,9 @@
 ## Example for using tramME for inidvidual participant data meta-analysis
 ## =======================================================================
 
-## The dataset is a subset of the 3CIA database of COPD patients
+## The dataset is a  !!!_random subset_!!! of the 3CIA database 
+## of COPD patients
+##
 ## Variable definitions
 ##  follow_up_months: length of follow-up in months
 ##  alive1_death2: indicator of the status at the end of follow-up
