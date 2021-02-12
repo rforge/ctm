@@ -541,8 +541,8 @@ perm_test.tram <- function(object, parm = names(coef(object)),
             qp <- c(qa, q1a)
             achieved <- coin::pperm(it0, q = qp)
             achieved <- 1 - (achieved[1] + (1 - achieved[2]))
-            qp <- qp * sqrt(coin::variance(it0)) +
-                coin::expectation(it0)
+            qp <- qp * c(sqrt(coin::variance(it0))) +
+                c(coin::expectation(it0))
 
             est <- coef(object)[parm]
 
@@ -998,8 +998,8 @@ perm_test.coxph <- function(object, parm = names(coef(object)),
             qp <- c(qa, q1a)
             achieved <- coin::pperm(it0, q = qp)
             achieved <- 1 - (achieved[1] + (1 - achieved[2]))
-            qp <- qp * sqrt(coin::variance(it0)) +
-                coin::expectation(it0)
+            qp <- qp * c(sqrt(coin::variance(it0))) +
+                c(coin::expectation(it0))
 
             est <- coef(object)[parm]
 
