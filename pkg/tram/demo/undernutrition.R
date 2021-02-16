@@ -39,7 +39,7 @@ Bxlambda <- Bernstein_basis(numeric_var("cage", support = quantile(dat$cage, pro
 
 ### fitting joint model
 m_full <- mmlt(m_stunting, m_wasting, m_underweight,
-               formula = Bxlambda, data = dat)
+               formula = Bxlambda, data = dat, diag = FALSE)
 
 ### FAST ALTERNATIVE TO PARAMETRIC BOOTSTRAP
 ### sampling nsamp values from the asymptotic (normal) distribution of the parameters

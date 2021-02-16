@@ -9,7 +9,8 @@ transformation models
 }
 \usage{
 mmlt(..., formula = ~ 1, data, theta = NULL, 
-     control.outer = list(trace = FALSE), scale = FALSE)
+     control.outer = list(trace = FALSE), scale = FALSE,
+     diag = (all.equal(formula, ~ 1) == "formulas differ in contents"))
 }
 \arguments{
   \item{\dots}{marginal transformation models, one for each response
@@ -25,10 +26,12 @@ structure via the lambda parameters. The default is set to \code{~ 1} for consta
 }
   \item{scale}{logical; parameters are not scaled prior to optimisation by default
 }
+  \item{diag}{logical; by default, the diagonal is modelled if the formula is different than \code{~ 1}.
+}
 }
 \details{
   The function implements multivariate conditional transformation models
-  as described by Klein et al (2019). The response is assumed absolutely
+  as described by Klein et al (2020). The response is assumed absolutely
   continuous at the moment, discrete versions will be added later.
 
   Below is a simple example for an unconditional bivariate distribution.
@@ -41,7 +44,7 @@ methods.
 }
 \references{
 
-  Nadja Klein, Torsten Hothorn, Thomas Kneib (2019),
+  Nadja Klein, Torsten Hothorn, Luisa Barbanti, Thomas Kneib (2020),
   Multivariate Conditional Transformation Models.
   <arxiv:1906.03151>
 
