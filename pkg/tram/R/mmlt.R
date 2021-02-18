@@ -347,13 +347,24 @@ mmlt <- function(..., formula = ~ 1, data, theta = NULL,
     g <- sc
   }
   
-  opt <- alabama::auglag(par = start, fn = f,# gr = g,
+  if(diag) {
+    opt <- alabama::auglag(par = start, fn = f,# gr = g,
+                           hin = function(par) ui %*% par - ci, 
+                           hin.jac = function(par) ui,
+                           control.outer = control.outer)[c("par", 
+                                                            "value", 
+                                                            "gradient",
+                                                            "hessian")]
+  } else {
+    opt <- alabama::auglag(par = start, fn = f, gr = g,
                          hin = function(par) ui %*% par - ci, 
                          hin.jac = function(par) ui,
                          control.outer = control.outer)[c("par", 
                                                           "value", 
                                                           "gradient",
                                                           "hessian")]
+  }
+  
   if (scale) opt$par <- opt$par * scl
   
   opt$ll <- ll
@@ -502,6 +513,9 @@ predict.mmlt <- function(object, newdata, marginal = 1L,
 
 # we will use as input Solve2(Xp)
 .Crossp <- function(Linv, diag) {
+  
+  if(!is.matrix(Linv)) Linv <- matrix(Linv, nrow = 1)
+  
   # 1 observation
   N <- nrow(Linv)
   Jp <- ncol(Linv)
@@ -514,40 +528,29 @@ predict.mmlt <- function(object, newdata, marginal = 1L,
     }
     else {
       L <- diag(0, J)
-      L[!lower.tri(L)] <- Linv
-      L <- t(L)
+      L[!upper.tri(L)] <- Linv
     }
-   
+    
     tcp <- tcrossprod(L)
     S_diag <- diag(tcp)
-    S_low <- tcp[lower.tri(tcp)] # this is column-wise!
+    S_low <- tcp[lower.tri(tcp)]
   }
   # more than 1 observation
   else{
-    # J = 1
     if (!diag) {
+      # J = 1
       S_diag <- 1
-    } else {
-      S_diag <- Linv^2
-    }
-    ## J = 2
-    if (J == 2) {
-      if (!diag) {
+      
+      if (J == 2) {
         S_diag <- cbind(rep(1, N), matrix(1, nrow = N, ncol = 1) + Linv^2)
-        S_low <- Linv
-      } else {
-        S_diag <- cbind(Linv[, 1]^2, Linv[, 1]^2 + Linv[, 3]^2)
-        S_low <- Linv[, 1]*Linv[, 2]
       }
-    }
-    
-    ## J > 2
-    if (J > 2) {
-      if (!diag) {
+      S_low <- Linv
+      
+      if (J > 2) {
         L <- diag(0, J)
         L[upper.tri(L)] <- 1:Jp
         L <- t(L)
-      
+        
         S <- matrix(rep(rep(1:0, (J - 1)), c(rbind(1:(J - 1), Jp))), nrow = Jp)[, -J]
         S_diag <- cbind(rep(1, N), matrix(1, nrow = N, ncol = J-1) + Linv^2 %*% S)
         
@@ -558,32 +561,34 @@ predict.mmlt <- function(object, newdata, marginal = 1L,
             }
           }
         }
-      } else {
+      }
+    } else { ## diag = TRUE
+      # J = 1
+      S_diag <- Linv^2
+      
+      if (J == 2) {
+        S_diag <- cbind(Linv[, 1]^2, Linv[, 1]^2 + Linv[, 3]^2)
+      }
+      S_low <- Linv[, 1]*Linv[, 2]
+      ## J > 2
+      if (J > 2) {
         L <- diag(0, J)
-        L[!lower.tri(L)] <- 1:Jp
-        L <- t(L)
+        L[!upper.tri(L)] <- 1:Jp
         
         S <- matrix(rep(rep(1:0, J), c(rbind(1:J, Jp))), nrow = Jp)[, -(J+1)]
         idx_d <- cumsum(unlist(lapply(colSums(S), sum)))
         
-        S_diag <- Linv[, L[1, ]]^2
-        
-        for (j in 2:J) {
-          S_diag <- cbind(S_diag, rowSums(Linv[, L[j, ]]^2))
-        }
-        
         S_low <- Linv*0 ## ensures right length
-        ### check!
-        for (i in J:1) { #zeile
-          for (j in i:1) { #spalte
-            for (k in 1:j) { #produkt-summanden
+        for (i in J:1) { # row
+          for (j in i:1) { # column
+            for (k in 1:j) { # produkt-summanden
               S_low[, L[i, j]] <- S_low[, L[i, j]] + Linv[, L[i, k]]*Linv[, L[j, k]]
             }
           }
         }
+        S_diag <- S_low[, idx_d]
         S_low <- S_low[, -idx_d]
       }
-      
     }
   }
   ret <- list(lower = S_low, diagonal = S_diag)
@@ -608,17 +613,19 @@ coef.mmlt <- function(object, newdata = object$data,
   
   X <- model.matrix(object$bx, data = newdata)
   ret <- X %*% object$pars$cpar
+  
+  diagg <- object$diag
 
   if (!object$gaussian & type != "Lambda")
     warning("return value of Lambda() has no direct interpretation")
   
   return(switch(type, "Lambda" = ret,
-                "Lambdainv" = .Solve2(ret, object$diag),
+                "Lambdainv" = .Solve2(ret, diagg),
                 "Sigma" = {
-                  .Crossp(.Solve2(ret, object$diag), diag = object$diag)
+                  .Crossp(.Solve2(ret, diagg), diagg)
                   },
                 "Corr" = {
-                  ret <- .Crossp(.Solve2(ret, object$diag), diag = object$diag)
+                  ret <- .Crossp(.Solve2(ret, diagg), diagg)
                   isd <- sqrt(ret$diagonal)
                   if (!is.matrix(isd)) isd <- matrix(isd, nrow = 1)
                   SS <- c()
