@@ -446,10 +446,12 @@ predict.mmlt <- function(object, newdata, marginal = 1L,
 ### solve lower triangular matrix (in vector form, saved column-wise!)
 ### rowwise applicable to matrices
 .Solve2 <- function(x, diag) {
-  if (!is.matrix(x)) x <- matrix(x, nrow = 1)
-  J <- (1 + sqrt(1 + 4 * 2 * ncol(x))) / 2 - diag
   
-  if (diag) {
+  if (!diag) {
+    if (!is.matrix(x)) x <- matrix(x, nrow = 1)
+    J <- (1 + sqrt(1 + 4 * 2 * ncol(x))) / 2
+  } else {
+    J <- (1 + sqrt(1 + 4 * 2 * ncol(x))) / 2 - 1
     Jp <- J*(J+1)/2
     
     L <- diag(0, J)
@@ -464,30 +466,38 @@ predict.mmlt <- function(object, newdata, marginal = 1L,
     if (!is.matrix(x_diag)) x_diag <- matrix(x_diag, nrow = 1)
     if (!is.matrix(x)) x <- matrix(x, nrow = 1)
     
-    idx_f <- rep(1, J-1)
+    # idx_f <- rep(1, J-1)
+    # if(J > 2) {
+    #   for (j in 2:J) {
+    #     idx_f <- c(idx_f, rep(j, J-j))
+    #   }
+    # }
+    idx_f <- 2
     if(J > 2) {
-      for (j in 2:J) {
-        idx_f <- c(idx_f, rep(j, J-j))
+      for (j in 3:J) {
+        idx_f <- c(idx_f, rep(j, j-1))
       }
     }
     
     x <- x / x_diag[, idx_f]
   }
   
+  n <- (1 + sqrt(1 + 4 * 2 * ncol(x))) / 2
+  
   xij <- function(x = NULL, i, j) {
     if (i == j) return(1)
     if (j == 1) {
       ret <- i - 1
     } else {
-      idx <- J - (1:(J - 1))
-      ret <- sum(idx[1:(j - 1)]) + (i - (J - idx[j]))
+      idx <- n - (1:(n - 1))
+      ret <- sum(idx[1:(j - 1)]) + (i - (n - idx[j]))
     }
     if (is.null(x))
       return(ret)
     return(x[,ret])
   }
   ret <- matrix(0, nrow = nrow(x), ncol = ncol(x))
-  for (i in 2:J) {
+  for (i in 2:n) {
     for (j in 1:(i - 1)) {
       s <- 0
       for (k in j:(i - 1))
