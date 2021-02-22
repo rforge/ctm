@@ -110,10 +110,9 @@
   ### is bounded (log(0) doesn't work, so we use log(1))
   ### support defines the support of the Bernstein polynomial
   ### and add can be used to make the grid wider (see below)
-  rvar <- numeric_var("y", bounds = c(1, Inf), 
+  rvar <- numeric_var("y", bounds = c(0, Inf), 
                       support = c(100, 2000))
-  rb <- Bernstein_basis(rvar, order = 6, ui = "increasing",
-                        log_first = TRUE)
+  rb <- Bernstein_basis(rvar, order = 6, ui = "increasing")
   ### dummy coding of menopausal status
   hb <- as.basis(~ 0 + menostat, data = GBSG2)
   ### treatment contrast of hormonal treatment
