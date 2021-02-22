@@ -156,8 +156,8 @@ mmlt <- function(..., formula = ~ 1, data, theta = NULL,
       A <- Yp[, idx] * Xp
       B <- A %*% S
       
-      ret <- sum(.log(Yprimep)) + diag * sum(.log(Xp[, idx_d]))
-      for (j in 1:(J-1 + diag)) {
+      ret <- sum(.log(Yprimep)) + sum(.log(Xp[, idx_d]))
+      for (j in 1:J) {
         ret <- ret + sum(m[[j]]$todistr$d(B[, j], log = TRUE))
       }
       
@@ -237,7 +237,10 @@ mmlt <- function(..., formula = ~ 1, data, theta = NULL,
       ### FIXME: start$cpar needs to include starting values for diagonal
       ### elements as well!
       # start <- c(start$mpar, c(t(start$cpar)))
-      start <- c(start$mpar, rep(0, Jp*ncol(lX)))
+      cstart <- as.numeric(1:Jp %in% idx_d)
+      # start <- c(start$mpar, rep(0, Jp*ncol(lX)))
+      start <- c(start$mpar, rep(cstart, each = ncol(lX)))
+      
       # }
     }
   }
@@ -348,7 +351,7 @@ mmlt <- function(..., formula = ~ 1, data, theta = NULL,
   }
   
   if(diag) {
-    opt <- alabama::auglag(par = start, fn = f,# gr = g,
+    opt <- alabama::auglag(par = start, fn = f, gr = g,
                            hin = function(par) ui %*% par - ci, 
                            hin.jac = function(par) ui,
                            control.outer = control.outer)[c("par", 
