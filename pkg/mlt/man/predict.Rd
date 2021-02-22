@@ -107,11 +107,11 @@
 
   ### define Bernstein(log(time)) parameterisation
   ### of transformation function. The response
-  ### is bounded (log(0) doesn't work, so we use log(.1))
+  ### is bounded (log(0) doesn't work, so we use log(1))
   ### support defines the support of the Bernstein polynomial
   ### and add can be used to make the grid wider (see below)
-  rvar <- numeric_var("y", bounds = c(0.1, Inf), 
-                      support = c(1, 2000), add = c(0, 250))
+  rvar <- numeric_var("y", bounds = c(1, Inf), 
+                      support = c(100, 2000))
   rb <- Bernstein_basis(rvar, order = 6, ui = "increasing",
                         log_first = TRUE)
   ### dummy coding of menopausal status
@@ -124,8 +124,8 @@
   fm <- mlt(m, data = GBSG2)
 
   ### generate grid for all three variables
-  ### note that the response grid ranges between .1 (bounds[1])
-  ### and 2250 (support[2] + add[2])
+  ### note that the response grid ranges between 1 (bounds[1])
+  ### and 2000 (support[2])
   (d <- mkgrid(m, n = 10))
   ### data.frame of menopausal status and treatment
   nd <- do.call("expand.grid", d[-1])
@@ -136,7 +136,8 @@
            "cumhazard", "odds")
   layout(matrix(1:6, nrow = 2))
   nl <- sapply(typ, function(tp) 
-      plot(fm, newdata = nd, type = tp, col = 1:nrow(nd)))
+      ### K = 500 makes densities and hazards smooth
+      plot(fm, newdata = nd, type = tp, col = 1:nrow(nd), K = 500))
   legend("topleft", lty = 1, col = 1:nrow(nd), 
          legend = do.call("paste", nd), bty = "n")
 
@@ -176,16 +177,17 @@
   predict(fm, newdata = d[-1], type = "quantile", prob = 1:2 / 10)
 
   ### note that some quantiles are only defined as intervals
-  ### (> 2250, in this case). Intervals are returned as an "response" 
+  ### (> 2000, in this case). Intervals are returned as an "response" 
   ### object, see ?R. Unfortunately, these can't be stored as array, so
   ### a data.frame is returned where the quantile varies first
   p <- c(list(prob = 1:9/10), d[-1])
   np <- do.call("expand.grid", p)
   (Q <- predict(fm, newdata = d[-1], type = "quantile", prob = 1:9 / 10))
   np$Q <- Q
+  np
 
   ### simulating from the model works by inverting the distribution 
-  ### function; some obs are right-censored at 2250
+  ### function; some obs are right-censored at 2000
   (s <- simulate(fm, newdata = nd, nsim = 3))
   ### convert to Surv
   sapply(s, as.Surv)
