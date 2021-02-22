@@ -1,6 +1,6 @@
 
-R version 4.0.3 (2020-10-10) -- "Bunny-Wunnies Freak Out"
-Copyright (C) 2020 The R Foundation for Statistical Computing
+R version 4.0.4 (2021-02-15) -- "Lost Library Book"
+Copyright (C) 2021 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -33,24 +33,93 @@ Loading required package: variables
 > flush(stderr()); flush(stdout())
 > 
 > ### Name: R
-> ### Title: Response Variable
+> ### Title: Response Variables
 > ### Aliases: R R.Surv R.factor R.ordered R.numeric R.integer R.list
 > ###   R.response as.Surv as.Surv.response
 > 
 > ### ** Examples
 > 
 > 
+>  library("survival")
+>  
+>  ### randomly right-censored continuous observations
+>  time <- as.double(1:9)
+>  event <- rep(c(FALSE, TRUE), length = length(time))
+> 
+>  Surv(time, event)
+[1] 1+ 2  3+ 4  5+ 6  7+ 8  9+
+>  R(Surv(time, event))
+[1] ( 1, Inf]  2        ( 3, Inf]  4        ( 5, Inf]  6        ( 7, Inf]
+[8]  8        ( 9, Inf]
+> 
+>  ### right-censoring, left-truncation
+>  ltm <- 1:9 / 10
+>  Surv(ltm, time, event)
+[1] (0.1,1+] (0.2,2]  (0.3,3+] (0.4,4]  (0.5,5+] (0.6,6]  (0.7,7+] (0.8,8] 
+[9] (0.9,9+]
+>  R(Surv(ltm, time, event))
+[1] {( 1, Inf]| > 0.1} { 2| > 0.2}        {( 3, Inf]| > 0.3} { 4| > 0.4}       
+[5] {( 5, Inf]| > 0.5} { 6| > 0.6}        {( 7, Inf]| > 0.7} { 8| > 0.8}       
+[9] {( 9, Inf]| > 0.9}
+> 
+>  ### interval-censoring
+>  Surv(ltm, time, type = "interval2")
+[1] [0.1, 1] [0.2, 2] [0.3, 3] [0.4, 4] [0.5, 5] [0.6, 6] [0.7, 7] [0.8, 8]
+[9] [0.9, 9]
+>  R(Surv(ltm, time, type = "interval2"))
+[1] (0.1, 1] (0.2, 2] (0.3, 3] (0.4, 4] (0.5, 5] (0.6, 6] (0.7, 7] (0.8, 8]
+[9] (0.9, 9]
+> 
+>  ### interval-censoring, left/right-truncation
+>  lc <- as.double(1:4)
+>  lt <- c(NA, NA, 7, 8)
+>  rt <- c(NA, 9, NA, 10)
+>  x <- c(3, NA, NA, NA)
+>  rc <- as.double(11:14)
+>  R(x, cleft = lt, cright = rt)
+[1]  3       (NA,  9] ( 7, NA] ( 8, 10]
+>  as.Surv(R(x, cleft = lt, cright = rt))
+[1] 3       9-      7+      [8, 10]
+>  R(x, tleft = 1, cleft = lt, cright = rt)
+[1] { 3| > 1}       {(NA,  9]| > 1} {( 7, NA]| > 1} {( 8, 10]| > 1}
+>  R(x, tleft = 1, cleft = lt, cright = rt, tright = 15)
+[1] { 3| (1, 15]}       {(NA,  9]| (1, 15]} {( 7, NA]| (1, 15]}
+[4] {( 8, 10]| (1, 15]}
+>  R(x, tleft = lc, cleft = lt, cright = rt, tright = rc)
+[1] { 3| (1, 11]}       {(NA,  9]| (2, 12]} {( 7, NA]| (3, 13]}
+[4] {( 8, 10]| (4, 14]}
+> 
+>  ### discrete observations: counts
+>  x <- 0:9
+>  R(x)
+ [1] (NA, 0] ( 0, 1] ( 1, 2] ( 2, 3] ( 3, 4] ( 4, 5] ( 5, 6] ( 6, 7] ( 7, 8]
+[10] ( 8, 9]
+>  ### partially interval-censored counts
+>  rx <- c(rep(NA, 6), rep(15L, 4))
+>  R(x, cright = rx)
+ [1] (NA,  0] ( 0,  1] ( 1,  2] ( 2,  3] ( 3,  4] ( 4,  5] ( 5, 15] ( 6, 15]
+ [9] ( 7, 15] ( 8, 15]
+> 
 >  ### ordered factor
->  R(gl(3, 3, labels = LETTERS[1:3]))
-Warning in R.factor(gl(3, 3, labels = LETTERS[1:3])) :
-  response is unordered factor;
-             results may depend on order of levels
-[1] (NA, A] (NA, A] (NA, A] (A, B]  (A, B]  (A, B]  (B, NA] (B, NA] (B, NA]
+>  x <- gl(5, 2, labels = LETTERS[1:5], ordered = TRUE)
+>  R(x)
+ [1] (NA, A] (NA, A] (A, B]  (A, B]  (B, C]  (B, C]  (C, D]  (C, D]  (D, NA]
+[10] (D, NA]
+>  ### interval-censoring (ie, observations can have multiple levels)
+>  lx <- ordered(c("A", "A", "B", "C", "D", "E"), 
++                levels = LETTERS[1:5], labels = LETTERS[1:5])
+>  rx <- ordered(c("B", "D", "E", "D", "D", "E"), 
++                levels = LETTERS[1:5], labels = LETTERS[1:5])
+>  R(rx, cleft = lx, cright = rx)
+[1] (A, B]  (A, D]  (B, NA] (C, D]  (D, D]  (E, NA]
 > 
 > 
 > 
 > 
 > cleanEx()
+
+detaching ‘package:survival’
+
 > nameEx("mlt")
 > ### * mlt
 > 
@@ -115,12 +184,394 @@ Warning in R.factor(gl(3, 3, labels = LETTERS[1:3])) :
 > 
 > 
 > 
+> cleanEx()
+> nameEx("predict")
+> ### * predict
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: plot-predict-simulate
+> ### Title: Plots, Predictions and Samples from mlt Objects
+> ### Aliases: predict.ctm predict.mlt simulate.ctm simulate.mlt plot.ctm
+> ###   plot.mlt
+> 
+> ### ** Examples
+> 
+> 
+>   library("survival")
+>   op <- options(digits = 2)
+> 
+>   ### GBSG2 dataset
+>   data("GBSG2", package = "TH.data")
+> 
+>   ### right-censored response
+>   GBSG2$y <- with(GBSG2, Surv(time, cens))
+> 
+>   ### define Bernstein(log(time)) parameterisation
+>   ### of transformation function. The response
+>   ### is bounded (log(0) doesn't work, so we use log(.1))
+>   ### support defines the support of the Bernstein polynomial
+>   ### and add can be used to make the grid wider (see below)
+>   rvar <- numeric_var("y", bounds = c(0.1, Inf), 
++                       support = c(1, 2000), add = c(0, 250))
+>   rb <- Bernstein_basis(rvar, order = 6, ui = "increasing",
++                         log_first = TRUE)
+>   ### dummy coding of menopausal status
+>   hb <- as.basis(~ 0 + menostat, data = GBSG2)
+>   ### treatment contrast of hormonal treatment
+>   xb <- as.basis(~ horTh, data = GBSG2, remove_intercept = TRUE)
+> 
+>   ### set-up and fit Cox model, stratified by menopausal status
+>   m <- ctm(rb, interacting = hb, shifting = xb, todistr = "MinExtrVal")
+>   fm <- mlt(m, data = GBSG2)
+> 
+>   ### generate grid for all three variables
+>   ### note that the response grid ranges between .1 (bounds[1])
+>   ### and 2250 (support[2] + add[2])
+>   (d <- mkgrid(m, n = 10))
+$y
+ [1]    0.1  250.1  500.1  750.1 1000.1 1250.0 1500.0 1750.0 2000.0 2250.0
+
+$menostat
+[1] Pre  Post
+Levels: Pre Post
+
+$horTh
+[1] no  yes
+Levels: no yes
+
+>   ### data.frame of menopausal status and treatment
+>   nd <- do.call("expand.grid", d[-1])
+> 
+>   ### plot model on different scales, for all four combinations
+>   ### of menopausal status and hormonal treatment
+>   typ <- c("distribution", "survivor", "density", "hazard", 
++            "cumhazard", "odds")
+>   layout(matrix(1:6, nrow = 2))
+>   nl <- sapply(typ, function(tp) 
++       plot(fm, newdata = nd, type = tp, col = 1:nrow(nd)))
+>   legend("topleft", lty = 1, col = 1:nrow(nd), 
++          legend = do.call("paste", nd), bty = "n")
+> 
+>   ### plot calls predict, which generates a grid with K = 50
+>   ### response values
+>   ### note that a K x nrow(newdata) matrix is returned
+>   ### (for reasons explained in the next example)
+>   predict(fm, newdata = nd, type = "survivor")
+          
+y          [,1] [,2] [,3] [,4]
+    0.1    1.00 1.00 1.00 1.00
+     46    1.00 1.00 1.00 1.00
+   91.9    1.00 1.00 1.00 1.00
+    138    0.99 0.99 1.00 1.00
+    184    0.98 0.98 0.99 0.99
+    230    0.96 0.97 0.98 0.98
+    276    0.94 0.95 0.96 0.97
+    322    0.91 0.93 0.94 0.96
+    367    0.88 0.91 0.92 0.94
+    413    0.86 0.89 0.90 0.92
+    459    0.83 0.86 0.88 0.91
+    505    0.80 0.84 0.86 0.89
+    551    0.78 0.82 0.85 0.87
+    597    0.76 0.79 0.83 0.85
+    643    0.74 0.77 0.82 0.84
+    689    0.72 0.75 0.80 0.82
+    735    0.71 0.72 0.79 0.80
+    781    0.69 0.70 0.78 0.79
+    827    0.68 0.68 0.77 0.77
+    873    0.67 0.66 0.76 0.76
+    918    0.65 0.65 0.75 0.74
+    964    0.64 0.63 0.74 0.73
+  1.01e+03 0.63 0.61 0.73 0.72
+  1.06e+03 0.62 0.60 0.73 0.71
+  1.1e+03  0.61 0.58 0.72 0.69
+  1.15e+03 0.60 0.57 0.71 0.68
+  1.19e+03 0.59 0.55 0.70 0.67
+  1.24e+03 0.59 0.54 0.70 0.66
+  1.29e+03 0.58 0.53 0.69 0.65
+  1.33e+03 0.57 0.52 0.68 0.64
+  1.38e+03 0.56 0.50 0.68 0.63
+  1.42e+03 0.55 0.49 0.67 0.62
+  1.47e+03 0.55 0.48 0.67 0.61
+  1.52e+03 0.54 0.47 0.66 0.60
+  1.56e+03 0.53 0.46 0.65 0.59
+  1.61e+03 0.52 0.45 0.65 0.58
+  1.65e+03 0.52 0.44 0.64 0.57
+  1.7e+03  0.51 0.43 0.63 0.56
+  1.74e+03 0.50 0.42 0.63 0.56
+  1.79e+03 0.50 0.41 0.62 0.55
+  1.84e+03 0.49 0.40 0.62 0.54
+  1.88e+03 0.48 0.39 0.61 0.53
+  1.93e+03 0.47 0.38 0.60 0.52
+  1.97e+03 0.47 0.37 0.60 0.51
+  2.02e+03 0.46 0.36 0.59 0.50
+  2.07e+03 0.45 0.35 0.59 0.50
+  2.11e+03 0.45 0.34 0.58 0.49
+  2.16e+03 0.44 0.34 0.57 0.48
+  2.2e+03  0.43 0.33 0.57 0.47
+  2.25e+03 0.43 0.32 0.56 0.46
+> 
+>   ### newdata can take a list, and evaluates the survivor
+>   ### function on the grid defined by newdata 
+>   ### using a linear array model formulation and is 
+>   ### extremely efficient (wrt computing time and memory)
+>   ### d[1] (the response grid) varies fastest
+>   ### => the first dimension of predict() is always the response,
+>   ### not the dimension of the predictor variables (like one 
+>   ### might expect)
+>   predict(fm, newdata = d, type = "survivor")
+, , horTh = no
+
+          menostat
+y           Pre Post
+    0.1    1.00 1.00
+    250    0.95 0.96
+    500    0.81 0.84
+    750    0.70 0.72
+  1e+03    0.63 0.62
+  1.25e+03 0.58 0.54
+  1.5e+03  0.54 0.47
+  1.75e+03 0.50 0.42
+  2e+03    0.46 0.37
+  2.25e+03 0.43 0.32
+
+, , horTh = yes
+
+          menostat
+y           Pre Post
+    0.1    1.00 1.00
+    250    0.97 0.98
+    500    0.87 0.89
+    750    0.79 0.80
+  1e+03    0.74 0.72
+  1.25e+03 0.70 0.66
+  1.5e+03  0.66 0.60
+  1.75e+03 0.63 0.55
+  2e+03    0.60 0.51
+  2.25e+03 0.56 0.46
+
+> 
+>   ### owing to this structure, the result can be quickly stored in 
+>   ### a data frame as follows
+>   cd <- do.call("expand.grid", d)
+>   cd$surv <- c(S <- predict(fm, newdata = d, type = "survivor"))
+> 
+>   ### works for distribution functions
+>   all.equal(1 - S, predict(fm, newdata = d, type = "distribution"))
+[1] TRUE
+>   ### cumulative hazard functions
+>   all.equal(-log(S), predict(fm, newdata = d, type = "cumhazard"))
+[1] TRUE
+>   ### log-cumulative hazard functions (= trafo, for Cox models)
+>   all.equal(log(-log(S)), predict(fm, newdata = d, type = "logcumhazard"))
+[1] TRUE
+>   all.equal(log(-log(S)), predict(fm, newdata = d, type = "trafo"))
+[1] TRUE
+>   ### densities, hazards, or odds functions
+>   predict(fm, newdata = d, type = "density")
+, , horTh = no
+
+          menostat
+y              Pre    Post
+    0.1    0.00000 0.00000
+    250    0.00053 0.00036
+    500    0.00052 0.00054
+    750    0.00033 0.00046
+  1e+03    0.00023 0.00035
+  1.25e+03 0.00018 0.00028
+  1.5e+03  0.00016 0.00024
+  1.75e+03 0.00016 0.00021
+  2e+03    0.00015 0.00020
+  2.25e+03 0.00014 0.00018
+
+, , horTh = yes
+
+          menostat
+y              Pre    Post
+    0.1    0.00000 0.00000
+    250    0.00036 0.00025
+    500    0.00038 0.00038
+    750    0.00025 0.00034
+  1e+03    0.00018 0.00028
+  1.25e+03 0.00015 0.00023
+  1.5e+03  0.00013 0.00020
+  1.75e+03 0.00013 0.00019
+  2e+03    0.00013 0.00019
+  2.25e+03 0.00012 0.00017
+
+>   predict(fm, newdata = d, type = "hazard")
+, , horTh = no
+
+          menostat
+y              Pre    Post
+    0.1    0.00000 0.00000
+    250    0.00055 0.00037
+    500    0.00065 0.00064
+    750    0.00047 0.00064
+  1e+03    0.00036 0.00057
+  1.25e+03 0.00031 0.00052
+  1.5e+03  0.00030 0.00050
+  1.75e+03 0.00031 0.00051
+  2e+03    0.00033 0.00055
+  2.25e+03 0.00032 0.00056
+
+, , horTh = yes
+
+          menostat
+y              Pre    Post
+    0.1    0.00000 0.00000
+    250    0.00037 0.00025
+    500    0.00044 0.00043
+    750    0.00032 0.00043
+  1e+03    0.00024 0.00039
+  1.25e+03 0.00021 0.00035
+  1.5e+03  0.00020 0.00034
+  1.75e+03 0.00021 0.00035
+  2e+03    0.00022 0.00037
+  2.25e+03 0.00022 0.00038
+
+>   predict(fm, newdata = d, type = "odds")
+, , horTh = no
+
+          menostat
+y            Pre  Post
+    0.1    0.000 0.000
+    250    0.048 0.038
+    500    0.238 0.187
+    750    0.423 0.396
+  1e+03    0.575 0.624
+  1.25e+03 0.712 0.861
+  1.5e+03  0.848 1.113
+  1.75e+03 0.994 1.397
+  2e+03    1.158 1.735
+  2.25e+03 1.340 2.141
+
+, , horTh = yes
+
+          menostat
+y            Pre  Post
+    0.1    0.000 0.000
+    250    0.032 0.025
+    500    0.155 0.122
+    750    0.268 0.252
+  1e+03    0.358 0.387
+  1.25e+03 0.437 0.520
+  1.5e+03  0.513 0.656
+  1.75e+03 0.593 0.803
+  2e+03    0.680 0.971
+  2.25e+03 0.774 1.164
+
+>   ### and quantiles (10 and 20%)
+>   predict(fm, newdata = d[-1], type = "quantile", prob = 1:2 / 10)
+, , horTh = no
+
+       menostat
+prob    Pre Post
+    0.1 342  392
+    0.2 515  580
+
+, , horTh = yes
+
+       menostat
+prob    Pre Post
+    0.1 415  477
+    0.2 705  746
+
+> 
+>   ### note that some quantiles are only defined as intervals
+>   ### (> 2250, in this case). Intervals are returned as an "response" 
+>   ### object, see ?R. Unfortunately, these can't be stored as array, so
+>   ### a data.frame is returned where the quantile varies first
+>   p <- c(list(prob = 1:9/10), d[-1])
+>   np <- do.call("expand.grid", p)
+>   (Q <- predict(fm, newdata = d[-1], type = "quantile", prob = 1:9 / 10))
+Warning in matrix(1:length(ret), ncol = nrow(trm), byrow = TRUE) :
+  data length [6] is not a sub-multiple or multiple of the number of columns [4]
+ [1]  342         392         415         477         515         580       
+ [7]  705         746         759         787        1223        1078       
+[13] 1167        1046        1964        1519        1760        1391       
+[19] (2250, Inf] 2039        (2250, Inf] 1832        (2250, Inf] (2250, Inf]
+[25] (2250, Inf] (2250, Inf] (2250, Inf] (2250, Inf] (2250, Inf] (2250, Inf]
+[31] (2250, Inf] (2250, Inf] (2250, Inf] (2250, Inf] (2250, Inf] (2250, Inf]
+>   np$Q <- Q
+> 
+>   ### simulating from the model works by inverting the distribution 
+>   ### function; some obs are right-censored at 2250
+>   (s <- simulate(fm, newdata = nd, nsim = 3))
+[[1]]
+[1] 1745        (2250, Inf] (2250, Inf] 1422       
+
+[[2]]
+[1] (2250, Inf] (2250, Inf] 752         (2250, Inf]
+
+[[3]]
+[1]  383  715 1857  198
+
+>   ### convert to Surv
+>   sapply(s, as.Surv)
+[[1]]
+[1] 1745  2250+ 2250+ 1422 
+
+[[2]]
+[1] 2250+ 2250+  752  2250+
+
+[[3]]
+[1]  383  715 1857  198
+
+> 
+>   ### generate 3 parametric bootstrap samples from the model
+>   tmp <- GBSG2[, c("menostat", "horTh")]
+>   s <- simulate(fm, newdata = tmp, nsim = 3)
+>   ### refit the model using the simulated response
+>   lapply(s, function(y) {
++     tmp$y <- y
++     coef(mlt(m, data = tmp))
++   })
+[[1]]
+ Bs1(y):menostatPre  Bs2(y):menostatPre  Bs3(y):menostatPre  Bs4(y):menostatPre 
+           -48.7516            -48.7422            -48.7021             -1.6395 
+ Bs5(y):menostatPre  Bs6(y):menostatPre  Bs7(y):menostatPre Bs1(y):menostatPost 
+            -1.6395             -1.6319             -0.3079            -12.5888 
+Bs2(y):menostatPost Bs3(y):menostatPost Bs4(y):menostatPost Bs5(y):menostatPost 
+           -11.9627            -11.9091            -11.8999             -2.0740 
+Bs6(y):menostatPost Bs7(y):menostatPost            horThyes 
+            -1.3288              0.0037             -0.3075 
+
+[[2]]
+ Bs1(y):menostatPre  Bs2(y):menostatPre  Bs3(y):menostatPre  Bs4(y):menostatPre 
+             -35.34              -35.33              -35.19               -2.06 
+ Bs5(y):menostatPre  Bs6(y):menostatPre  Bs7(y):menostatPre Bs1(y):menostatPost 
+              -2.06               -1.00               -0.22              -24.45 
+Bs2(y):menostatPost Bs3(y):menostatPost Bs4(y):menostatPost Bs5(y):menostatPost 
+             -24.44              -17.90               -3.29               -3.29 
+Bs6(y):menostatPost Bs7(y):menostatPost            horThyes 
+              -1.12               -0.05               -0.14 
+
+[[3]]
+ Bs1(y):menostatPre  Bs2(y):menostatPre  Bs3(y):menostatPre  Bs4(y):menostatPre 
+            -33.453             -33.442             -33.442              -1.388 
+ Bs5(y):menostatPre  Bs6(y):menostatPre  Bs7(y):menostatPre Bs1(y):menostatPost 
+             -1.222              -1.222              -0.136             -12.887 
+Bs2(y):menostatPost Bs3(y):menostatPost Bs4(y):menostatPost Bs5(y):menostatPost 
+            -12.879             -11.070             -10.779              -1.370 
+Bs6(y):menostatPost Bs7(y):menostatPost            horThyes 
+             -1.059               0.079              -0.594 
+
+> 
+>   options(op)
+> 
+> 
+> 
+> 
 > ### * <FOOTER>
 > ###
 > cleanEx()
+
+detaching ‘package:survival’
+
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  1.402 0.096 1.498 0 0 
+Time elapsed:  2.372 0.06 2.431 0 0 
 > grDevices::dev.off()
 null device 
           1 

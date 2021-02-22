@@ -19,9 +19,9 @@
   Transformations, \emph{Scandinavian Journal of Statistics}, \bold{45}(1),
   110--134, \doi{10.1111/sjos.12291}.
 
-  Torsten Hothorn (2018), Most Likely Transformations: The mlt Package,
-  \emph{Journal of Statistical Software}, forthcoming. URL: 
-  \url{https://cran.r-project.org/package=mlt.docreg}.
+  Torsten Hothorn (2020), Most Likely Transformations: The mlt Package,
+  \emph{Journal of Statistical Software}, \bold{92}(1), 1--68,
+  \doi{10.18637/jss.v092.i01}
 
 }
 \author{
