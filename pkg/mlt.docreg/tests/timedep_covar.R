@@ -56,8 +56,8 @@ vet2$timegroup <- factor(vet2$timegroup)
 vet2$ytime <- with(vet2, Surv(tstart, time, status))
 
 ## exponential model
-fit3 <- flexsurvreg(Surv(tstart, time, status) ~ karno + karno:timegroup +
-                     age + trt, data= vet2, dist = "exponential")
+suppressWarnings(fit3 <- flexsurvreg(Surv(tstart, time, status) ~ 
+    karno + karno:timegroup + age + trt, data= vet2, dist = "exponential"))
 m <- mlt(ctm(by, shift = ~ karno + karno:timegroup + age + trt, data = vet2, todistr = "MinExtr"),
          data = vet2, fixed = c("log(ytime)" = 1))
 

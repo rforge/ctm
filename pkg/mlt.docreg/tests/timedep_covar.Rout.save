@@ -1,6 +1,6 @@
 
-R version 3.6.2 (2019-12-12) -- "Dark and Stormy Night"
-Copyright (C) 2019 The R Foundation for Statistical Computing
+R version 4.0.4 (2021-02-15) -- "Lost Library Book"
+Copyright (C) 2021 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -75,9 +75,8 @@ Loading required package: variables
 > vet2$ytime <- with(vet2, Surv(tstart, time, status))
 > 
 > ## exponential model
-> fit3 <- flexsurvreg(Surv(tstart, time, status) ~ karno + karno:timegroup +
-+                      age + trt, data= vet2, dist = "exponential")
-There were 22 warnings (use warnings() to see them)
+> suppressWarnings(fit3 <- flexsurvreg(Surv(tstart, time, status) ~ 
++     karno + karno:timegroup + age + trt, data= vet2, dist = "exponential"))
 > m <- mlt(ctm(by, shift = ~ karno + karno:timegroup + age + trt, data = vet2, todistr = "MinExtr"),
 +          data = vet2, fixed = c("log(ytime)" = 1))
 > 
@@ -113,4 +112,4 @@ There were 22 warnings (use warnings() to see them)
 > 
 > proc.time()
    user  system elapsed 
-  2.415   0.092   2.500 
+  4.660   0.064   4.709 

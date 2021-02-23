@@ -3,6 +3,13 @@
 \title{NEWS file for the mlt.docreg package}
 
 
+\section{Changes in Version 1.0-10 (2021-02-23)}{
+  \itemize{
+    \item{Suppress warnings from package \pkg{flexsurv}.}
+  }
+}
+
+
 \section{Changes in Version 1.0-9 (2020-12-15)}{
   \itemize{
     \item{\pkg{eha} doesn't import \pkg{survival} anymore; fix regression test.}
