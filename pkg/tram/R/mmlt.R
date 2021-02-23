@@ -156,8 +156,8 @@ mmlt <- function(..., formula = ~ 1, data, theta = NULL,
       A <- Yp[, idx] * Xp
       B <- A %*% S
       
-      ret <- sum(.log(Yprimep)) + diag * sum(.log(Xp[, idx_d]))
-      for (j in 1:(J-1 + diag)) {
+      ret <- sum(.log(Yprimep)) + sum(.log(Xp[, idx_d]))
+      for (j in 1:J) {
         ret <- ret + sum(m[[j]]$todistr$d(B[, j], log = TRUE))
       }
       
@@ -237,7 +237,10 @@ mmlt <- function(..., formula = ~ 1, data, theta = NULL,
       ### FIXME: start$cpar needs to include starting values for diagonal
       ### elements as well!
       # start <- c(start$mpar, c(t(start$cpar)))
-      start <- c(start$mpar, rep(0, Jp*ncol(lX)))
+      cstart <- as.numeric(1:Jp %in% idx_d)
+      # start <- c(start$mpar, rep(0, Jp*ncol(lX)))
+      start <- c(start$mpar, rep(cstart, each = ncol(lX)))
+      
       # }
     }
   }
@@ -348,7 +351,7 @@ mmlt <- function(..., formula = ~ 1, data, theta = NULL,
   }
   
   if(diag) {
-    opt <- alabama::auglag(par = start, fn = f,# gr = g,
+    opt <- alabama::auglag(par = start, fn = f, gr = g,
                            hin = function(par) ui %*% par - ci, 
                            hin.jac = function(par) ui,
                            control.outer = control.outer)[c("par", 
@@ -443,13 +446,11 @@ predict.mmlt <- function(object, newdata, marginal = 1L,
 ### solve lower triangular matrix (in vector form, saved column-wise!)
 ### rowwise applicable to matrices
 .Solve2 <- function(x, diag) {
+  if (!is.matrix(x)) x <- matrix(x, nrow = 1)
+  n <- J <- (1 + sqrt(1 + 4 * 2 * ncol(x))) / 2 - diag
   
-  if (!diag) {
-    if (!is.matrix(x)) x <- matrix(x, nrow = 1)
-    J <- (1 + sqrt(1 + 4 * 2 * ncol(x))) / 2
-  } else {
-    J <- (1 + sqrt(1 + 4 * 2 * ncol(x))) / 2 - 1
-    Jp <- J*(J+1)/2
+  if (diag) {
+    Jp <- ncol(x)
     
     L <- diag(0, J)
     L[!upper.tri(L)] <- 1:Jp  ## column-wise
@@ -463,23 +464,16 @@ predict.mmlt <- function(object, newdata, marginal = 1L,
     if (!is.matrix(x_diag)) x_diag <- matrix(x_diag, nrow = 1)
     if (!is.matrix(x)) x <- matrix(x, nrow = 1)
     
-    # idx_f <- rep(1, J-1)
-    # if(J > 2) {
-    #   for (j in 2:J) {
-    #     idx_f <- c(idx_f, rep(j, J-j))
-    #   }
-    # }
-    idx_f <- 2
+    idx_f <- rep(1, J-1)
     if(J > 2) {
-      for (j in 3:J) {
-        idx_f <- c(idx_f, rep(j, j-1))
+      for (j in 2:J) {
+        idx_f <- c(idx_f, rep(j, J-j))
       }
     }
     
     x <- x / x_diag[, idx_f]
+    if(J == 2) x <- t(x)
   }
-  
-  n <- (1 + sqrt(1 + 4 * 2 * ncol(x))) / 2
   
   xij <- function(x = NULL, i, j) {
     if (i == j) return(1)
@@ -506,6 +500,7 @@ predict.mmlt <- function(object, newdata, marginal = 1L,
     ret
   } else {
     x_norm <- ret
+    
     idx_f1 <- 2:J
     if(J > 2) {
       for (j in 3:J) {
