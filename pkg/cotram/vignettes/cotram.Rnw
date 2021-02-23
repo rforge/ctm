@@ -116,13 +116,29 @@ version <- packageDescription("cotram")$Version
 % \input{todo}
 
 <<DVC-data, echo = FALSE, results = "hide", message = FALSE>>=
-# loading data
+obs <- NULL
 if (!file.exists("analysis/DVC.rda")) {
-  download.file("https://zenodo.org/record/17179/files/DVC.tgz", "DVC.tgz")
-  untar("DVC.tgz", file = "analysis/DVC.rda")
+    op <- options(timeout = 120)
+    dwnfl <- try(download.file("https://zenodo.org/record/17179/files/DVC.tgz", "DVC.tgz"))
+    options(op)
+    if (!inherits(dwnfl, "try-error")) {
+        untar("DVC.tgz", file = "analysis/DVC.rda")
+        load("analysis/DVC.rda")
+    }
+} else {
+    load("analysis/DVC.rda")
 }
-load("analysis/DVC.rda")
+@
 
+
+<<fail, results = "asis", echo = FALSE>>=
+if (is.null(obs)) {
+    cat("Downloading data from zenodo failed, stop processing.", "\\end{document}\n")
+    knitr::knit_exit()
+}
+@
+
+<<DVC-setup, echo = FALSE, results = "hide", message = FALSE>>=
 # set-ups
 loc <- Sys.setlocale("LC_ALL", "en_US.UTF-8")
 rm(loc)
@@ -152,6 +168,7 @@ colnames(Xtime) <- paste0("tvar", 1:ncol(Xtime))
 
 df <- cbind(df, Xtime)
 @
+
 
 \section{Introduction}
 

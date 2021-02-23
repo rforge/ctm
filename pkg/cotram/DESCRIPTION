@@ -1,7 +1,7 @@
 Package: cotram
 Title: Count Transformation Models
 Version: 0.2-1
-Date: 2021-02-03
+Date: 2021-02-23
 Authors@R: c(
 	person(given = "Sandra", family = "Siegfried", role = "aut", 
 	comment = c(ORCID = "0000-0002-7312-1001")),
