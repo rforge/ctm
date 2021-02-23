@@ -1187,7 +1187,7 @@ the fit resembles the normal linear model, although with a smaller conditional v
 
 \begin{figure}
 \begin{center}
-<<mlt-BostonHousing-plot, echo = FALSE, results = "hide">>=
+<<mlt-BostonHousing-plot, echo = FALSE, results = "hide", dev = "png">>=
 q <- 3:52
 m <- predict(lm_BH, data = BostonHousing2)
 s <- summary(lm_BH)$sigma
@@ -1701,7 +1701,7 @@ indicates a certain asymmetry towards older boys.
 
 \begin{figure}
 \begin{center}
-<<mlt-head-plot, echo = FALSE>>=
+<<mlt-head-plot, echo = FALSE, dev = "png">>=
 pr <- expand.grid(s <- mkgrid(ctm_head, 100))
 pr$p <- c(predict(mlt_head, newdata = s, type = "distribution"))
 pr$lage <- pr$lage^3
@@ -1829,7 +1829,7 @@ different constraints.
 
 \begin{figure}
 \begin{center}
-<<mlt-Boston-Housing-dr-plot, echo = FALSE, fig.height = 3>>=
+<<mlt-Boston-Housing-dr-plot, echo = FALSE, fig.height = 3, dev = "png">>=
 q <- mkgrid(var_m, 100)[[1]]
 tr <- predict(mlt_BH, newdata = BostonHousing2[, all.vars(fm_BH[-2L])],
               q = q, type = "density")
