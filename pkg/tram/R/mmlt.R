@@ -61,9 +61,8 @@
 }
 
 
-mmlt <- function(..., formula = ~ 1, data, theta = NULL,
-                 control.outer = list(trace = FALSE), scale = FALSE,
-                 diag = FALSE) {
+mmlt <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
+                 control.outer = list(trace = FALSE), scale = FALSE) {
   
   call <- match.call()
   # stopifnot(diag)

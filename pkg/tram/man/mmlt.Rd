@@ -8,9 +8,8 @@
 transformation models
 }
 \usage{
-mmlt(..., formula = ~ 1, data, theta = NULL, 
-     control.outer = list(trace = FALSE), scale = FALSE,
-     diag = (all.equal(formula, ~ 1) == "formulas differ in contents"))
+mmlt(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
+     control.outer = list(trace = FALSE), scale = FALSE)
 }
 \arguments{
   \item{\dots}{marginal transformation models, one for each response
@@ -26,7 +25,7 @@ structure via the lambda parameters. The default is set to \code{~ 1} for consta
 }
   \item{scale}{logical; parameters are not scaled prior to optimisation by default
 }
-  \item{diag}{logical; by default, the diagonal is modelled if the formula is different than \code{~ 1}.
+  \item{diag}{logical; by default, diagonal elements are constrained to 1, corresponding to \code{diag = FALSE}.
 }
 }
 \details{
