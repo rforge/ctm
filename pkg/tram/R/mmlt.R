@@ -62,7 +62,8 @@
 
 
 mmlt <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
-                 control.outer = list(trace = FALSE), scale = FALSE) {
+                 control.outer = list(trace = FALSE), scale = FALSE,
+                 tol = sqrt(.Machine$double.eps)) {
   
   call <- match.call()
   # stopifnot(diag)
@@ -110,10 +111,25 @@ mmlt <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
   Y <- do.call("bdiag", lapply(lu, function(m) m$exact))
   Yprime <- do.call("bdiag", lapply(lu, function(m) m$prime))
   
-  cnstr <- do.call("bdiag", lapply(lu, function(m) attr(m$exact, "constraint")$ui))
-  ui <- bdiag(cnstr, Diagonal((Jp * ncol(lX))))
+  cnstr <- do.call("bdiag", 
+      lapply(lu, function(m) attr(m$exact, "constraint")$ui))
+  ui <- bdiag(cnstr, Diagonal(Jp * ncol(lX)))
   ci <- do.call("c", lapply(lu, function(m) attr(m$exact, "constraint")$ci))
-  ci <- c(ci, rep(-Inf, Jp * ncol(lX)))
+
+  L <- diag(rep(NA, J))
+  L[lower.tri(L, diag = diag)] <- 1:Jp
+  di <- diag(L)
+  di <- di[!is.na(di)]
+
+  CP <- matrix(1:(Jp*ncol(lX)), nrow = ncol(lX))
+  dintercept <- CP[1L, di]
+  tci <- rep(-Inf, Jp * ncol(lX))
+  tci[dintercept] <- 1 - tol
+  D <- Diagonal(Jp * ncol(lX))[dintercept,]
+  NL <- Matrix(0, nrow = length(dintercept), ncol = ncol(cnstr))
+  ui <- rbind(ui, cbind(NL, -D))
+
+  ci <- c(ci, tci, rep(-1 + tol, length(dintercept)))
   ui <- ui[is.finite(ci),]
   ci <- ci[is.finite(ci)]
   ui <- as(ui, "matrix")
@@ -236,9 +252,11 @@ mmlt <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
       ### FIXME: start$cpar needs to include starting values for diagonal
       ### elements as well!
       # start <- c(start$mpar, c(t(start$cpar)))
-      cstart <- as.numeric(1:Jp %in% idx_d)
+      CS <- matrix(0, nrow = ncol(lX), ncol = Jp)
+      CS[1L, di] <- 1
+      cstart <- c(CS)
       # start <- c(start$mpar, rep(0, Jp*ncol(lX)))
-      start <- c(start$mpar, rep(cstart, each = ncol(lX)))
+      start <- c(start$mpar, cstart)
       
       # }
     }
