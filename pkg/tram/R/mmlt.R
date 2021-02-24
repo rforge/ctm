@@ -63,7 +63,7 @@
 
 mmlt <- function(..., formula = ~ 1, data, theta = NULL,
                  control.outer = list(trace = FALSE), scale = FALSE,
-                 diag = (all.equal(formula, ~ 1) == "formulas differ in contents")) {
+                 diag = FALSE) {
   
   call <- match.call()
   # stopifnot(diag)
@@ -678,5 +678,10 @@ print.mmlt <- function(x, ...) {
   print(x$call)
   cat("\nCoefficients:\n")
   print(coef(x))
+  if (x$diag) {
+     cat("\nDiagonal:\n", "elements are estimated.\n")
+  } else { 
+    cat("\nDiagonal:\n", "elements are constrained to 1.\n")
+    }
   invisible(x)
 }
