@@ -589,7 +589,7 @@ predict.mmlt <- function(object, newdata, marginal = 1L,
       S_diag <- Linv^2
       
       if (J == 2) {
-        S_diag <- cbind(Linv[, 1]^2, Linv[, 1]^2 + Linv[, 3]^2)
+        S_diag <- cbind(Linv[, 1]^2, Linv[, 2]^2 + Linv[, 3]^2)
       }
       S_low <- Linv[, 1]*Linv[, 2]
       ## J > 2

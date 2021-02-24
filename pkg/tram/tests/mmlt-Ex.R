@@ -10,7 +10,7 @@ p <- 3
 X <- matrix(runif(N * p), ncol = p)
 m1 <- 1 + X %*% c(2, 1, 1)
 m2 <- 1 + X %*% c(1, 2, 1)
-lb <- (off <- 0.5) + X %*% (cf <- c(0, 0, 0))
+lb <- (off <- 0.5) + X %*% (cf <- c(2, 0, 0))
 d <- data.frame(X)
 Y <- matrix(NA, nrow = N, ncol = 2)
 colnames(Y) <- c("Y1", "Y2")
@@ -71,3 +71,29 @@ c(coef(mm01, newdata = nd[1:5,], type = "Cor"))
 c(coef(mm02, newdata = nd[1:5,], type = "Cor"))
 c(coef(mm1, newdata = nd[1:5,], type = "Cor"))
 c(coef(mm2, newdata = nd[1:5,], type = "Cor"))
+
+
+
+## checking gradient for diag = TRUE
+all.equal(c(numDeriv::grad(mm1$ll, mm2$par)),c(mm1$sc(mm2$par)), 
+          check.attributes = FALSE, tol = 1e-4)
+numDeriv::grad(mm1$ll, mm2$par)
+mm1$sc(mm2$par)
+
+all.equal(c(numDeriv::grad(mm2$ll, mm1$par)),c(mm2$sc(mm1$par)), 
+          check.attributes = FALSE, tol = 1e-4)
+numDeriv::grad(mm2$ll, mm1$par)
+mm2$sc(mm1$par)
+
+## evaluating logLik for a multiple of lambda
+## only consider multiples of the off-diagonal elements?
+logLik(mm1)
+mm1$ll(mm1$par)
+newpar <- c(mm1$pars$mpar, 3*mm1$pars$cpar)
+mm1$ll(newpar)
+
+
+logLik(mm01)
+mm01$ll(mm01$par)
+newpar <- c(mm01$pars$mpar, 2*mm01$pars$cpar)
+mm01$ll(newpar)
