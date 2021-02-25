@@ -30,8 +30,8 @@ for (i in 1:N) {
 d <- cbind(d, Y)
 b1 <- as.mlt(Lm(Y1 ~ X1 + X2 + X3, data = d))
 b2 <- as.mlt(Lm(Y2 ~ X1 + X2 + X3, data = d))
-mm1 <- mmlt(b1, b2, formula = ~ X1 + X2 + X3, data = d, diag = TRUE, tol = 0)
-mm2 <- mmlt(b2, b1, formula = ~ X1 + X2 + X3, data = d, diag = TRUE, tol = 0)
+mm1 <- mmlt(b1, b2, formula = ~ X1 + X2 + X3, data = d, diag = TRUE, tol = 10)
+mm2 <- mmlt(b2, b1, formula = ~ X1 + X2 + X3, data = d, diag = TRUE, tol = 10)
 
 logLik(mm1) 
 logLik(mm2)
