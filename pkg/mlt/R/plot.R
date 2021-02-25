@@ -10,6 +10,11 @@ plot.ctm <- function(x, newdata, type = c("distribution",
     if (is.null(q))
         q <- mkgrid(x, n = K)[[y]]
     type <- match.arg(type)
+
+    if (type == "quantile") {
+        pr <- c(predict(x, newdata = newdata, type = "distribution", q = q))
+        prob <- prob[prob > min(pr) & prob < max(pr)]
+    }
     pr <- predict(x, newdata = newdata, type = type, q = q, prob = prob)
     pr[!is.finite(pr)] <- NA
     rpr <- range(pr, na.rm = TRUE)
