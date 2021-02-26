@@ -10,7 +10,7 @@ p <- 3
 X <- matrix(runif(N * p), ncol = p)
 m1 <- 1 + X %*% c(2, 1, 1)
 m2 <- 1 + X %*% c(1, 2, 1)
-lb <- (off <- 0.5) + X %*% (cf <- c(2, 0, 0))
+lb <- (off <- 0.5) + X %*% (cf <- c(0, 2, 0))
 d <- data.frame(X)
 Y <- matrix(NA, nrow = N, ncol = 2)
 colnames(Y) <- c("Y1", "Y2")
@@ -89,7 +89,8 @@ mm2$sc(mm1$par)
 ## only consider multiples of the off-diagonal elements?
 logLik(mm1)
 mm1$ll(mm1$par)
-newpar <- c(mm1$pars$mpar, 3*mm1$pars$cpar)
+newpar <- c(mm1$pars$mpar, mm1$pars$cpar[, 1], 2*mm1$pars$cpar[, 2],
+            mm1$pars$cpar[, 3])
 mm1$ll(newpar)
 
 

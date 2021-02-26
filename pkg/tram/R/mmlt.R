@@ -115,21 +115,26 @@ mmlt <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
       lapply(lu, function(m) attr(m$exact, "constraint")$ui))
   ui <- bdiag(cnstr, Diagonal(Jp * ncol(lX)))
   ci <- do.call("c", lapply(lu, function(m) attr(m$exact, "constraint")$ci))
+  
+  if(diag) {
+    L <- diag(rep(NA, J))
+    L[lower.tri(L, diag = diag)] <- 1:Jp
+    di <- diag(L)
+    di <- di[!is.na(di)]
 
-  L <- diag(rep(NA, J))
-  L[lower.tri(L, diag = diag)] <- 1:Jp
-  di <- diag(L)
-  di <- di[!is.na(di)]
+    CP <- matrix(1:(Jp*ncol(lX)), nrow = ncol(lX))
+    dintercept <- CP[1L, di]
+    tci <- rep(-Inf, Jp * ncol(lX))
+    tci[dintercept] <- 1 - tol
+    D <- Diagonal(Jp * ncol(lX))[dintercept,]
+    NL <- Matrix(0, nrow = length(dintercept), ncol = ncol(cnstr))
+    ui <- rbind(ui, cbind(NL, -D))
 
-  CP <- matrix(1:(Jp*ncol(lX)), nrow = ncol(lX))
-  dintercept <- CP[1L, di]
-  tci <- rep(-Inf, Jp * ncol(lX))
-  tci[dintercept] <- 1 - tol
-  D <- Diagonal(Jp * ncol(lX))[dintercept,]
-  NL <- Matrix(0, nrow = length(dintercept), ncol = ncol(cnstr))
-  ui <- rbind(ui, cbind(NL, -D))
+    ci <- c(ci, tci, rep(-1 + tol, length(dintercept)))
+  } else { # previous code does not work with formula = ~ 1 and diag = FALSE
+    ci <- c(ci, rep(-Inf, Jp * ncol(lX)))
+  }
 
-  ci <- c(ci, tci, rep(-1 + tol, length(dintercept)))
   ui <- ui[is.finite(ci),]
   ci <- ci[is.finite(ci)]
   ui <- as(ui, "matrix")
@@ -188,9 +193,8 @@ mmlt <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
       Yprimep <- matrix(Yprime %*% mpar, nrow = N)
       Xp <- lX %*% cpar
       
-      ## this is row-wise
       L <- diag(0, J)
-      L[!lower.tri(L)] <- 1:Jp
+      L[!lower.tri(L)] <- 1:Jp  ## row-wise
       L <- t(L)
       
       A <- Yp[, idx] * Xp
@@ -239,29 +243,14 @@ mmlt <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
       start <- unname(theta)
     }
     else {
-      ### this is never the case because diag happens whenever formula is not ~1
-      # if(inherits(formula, "formula") && formula == ~1) {
-      #   ### don't bother with .start(), simply use the marginal coefficients
-      #   ### and zero for the lambda parameters
-      #   start <- do.call("c", lapply(m, function(mod) coef(as.mlt(mod))))
-      #   start <- c(start, rep(0, Jp * ncol(lX)))
-      # }
-      # else { # formula != ~ 1
       start <- .start(m, bx = bx, data = data)
-      
-      ### FIXME: start$cpar needs to include starting values for diagonal
-      ### elements as well!
-      # start <- c(start$mpar, c(t(start$cpar)))
       CS <- matrix(0, nrow = ncol(lX), ncol = Jp)
       CS[1L, di] <- 1
       cstart <- c(CS)
-      # start <- c(start$mpar, rep(0, Jp*ncol(lX)))
       start <- c(start$mpar, cstart)
-      
-      # }
     }
   }
-  else {
+  else { ## diag = FALSE
     ll <- function(par) {
       
       mpar <- par[1:ncol(Y)]
@@ -367,23 +356,13 @@ mmlt <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
     g <- sc
   }
   
-  if(diag) {
-    opt <- alabama::auglag(par = start, fn = f, gr = g,
-                           hin = function(par) ui %*% par - ci, 
-                           hin.jac = function(par) ui,
-                           control.outer = control.outer)[c("par", 
-                                                            "value", 
-                                                            "gradient",
-                                                            "hessian")]
-  } else {
-    opt <- alabama::auglag(par = start, fn = f, gr = g,
+  opt <- alabama::auglag(par = start, fn = f, gr = g,
                          hin = function(par) ui %*% par - ci, 
                          hin.jac = function(par) ui,
                          control.outer = control.outer)[c("par", 
                                                           "value", 
                                                           "gradient",
                                                           "hessian")]
-  }
   
   if (scale) opt$par <- opt$par * scl
   
@@ -404,20 +383,11 @@ mmlt <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
   
   nm <- abbreviate(sapply(m, function(x) x$model$response), 4)
   
-  if(diag) {### adapt! make sure that order is right! I think here we use columns
-    lnm <- matrix(paste0(matrix(nm, nrow = J, ncol = J), ".",
+  lnm <- matrix(paste0(matrix(nm, nrow = J, ncol = J), ".",
                        matrix(nm, nrow = J, ncol = J, byrow = TRUE)), nrow = J)
-    cnm <- paste0(rep(t(lnm[!upper.tri(lnm)]), each = ncol(lX)), ".",
+  cnm <- paste0(rep(lnm[lower.tri(lnm, diag = diag)], each = ncol(lX)), ".", 
                 rep(colnames(lX), Jp))
-  }
-  else {
-    lnm <- matrix(paste0(matrix(nm, nrow = J, ncol = J), ".",
-                       matrix(nm, nrow = J, ncol = J, byrow = TRUE)), nrow = J)
-    cnm <- paste0(rep(lnm[lower.tri(lnm)], each = ncol(lX)), ".", rep(colnames(lX), Jp))
-    
-  }
   
-  ## not sure if I should adapt this too?
   names(opt$par) <- c(paste0(nm[sf], ".", do.call("c", lapply(mlist, names))), cnm)
   
   ret <- list(marginals = mmod, formula = formula, bx = bx, data = data,
