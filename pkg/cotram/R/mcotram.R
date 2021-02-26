@@ -1,7 +1,8 @@
 
 ### mmlt function for count case
-mcotram <- function(..., formula = ~ 1, data, theta = NULL,
-                    control.outer = list(trace = FALSE), scale = FALSE) {
+mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
+                    control.outer = list(trace = FALSE), scale = FALSE,
+                    tol = sqrt(.Machine$double.eps)) {
   
   call <- match.call()
   
@@ -34,7 +35,7 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL,
     list(lower = iY$Yleft, upper = iY$Yright)
   })
   
-  Jp <- J * (J - 1) / 2
+  Jp <- J * (J - 1) / 2 + diag * J
   
   bx <- formula
   if (inherits(formula, "formula"))
@@ -53,16 +54,42 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL,
   cnstr <- do.call("bdiag", lapply(lu, function(m) attr(m$lower, "constraint")$ui))
   ui <- bdiag(cnstr, Diagonal(Jp * ncol(lX)))
   ci <- do.call("c", lapply(lu, function(m) attr(m$lower, "constraint")$ci))
-  ci <- c(ci, rep(-Inf, Jp * ncol(lX)))
+  
+  if (diag) {
+    L <- diag(rep(NA, J))
+    L[lower.tri(L, diag = diag)] <- 1:Jp
+    di <- diag(L)
+    di <- di[!is.na(di)]
+    
+    CP <- matrix(1:(Jp*ncol(lX)), nrow = ncol(lX))
+    dintercept <- CP[1L, di]
+    tci <- rep(-Inf, Jp * ncol(lX))
+    tci[dintercept] <- 1 - tol
+    D <- Diagonal(Jp * ncol(lX))[dintercept,]
+    NL <- Matrix(0, nrow = length(dintercept), ncol = ncol(cnstr))
+    ui <- rbind(ui, cbind(NL, -D))
+    
+    ci <- c(ci, tci, rep(-1 + tol, length(dintercept))) 
+  } else {
+    ci <- c(ci, rep(-Inf, Jp * ncol(lX)))
+  }
+  
   ui <- ui[is.finite(ci),]
   ci <- ci[is.finite(ci)]
   ui <- as(ui, "matrix")
   
-  idx <- 1
+  idx <- idx_d <- 1
   S <- 1
   if (J > 2) {
     S <- matrix(rep(rep(1:0, (J - 1)), c(rbind(1:(J - 1), Jp))), nrow = Jp)[, -J]
     idx <- unlist(lapply(colSums(S), seq_len))
+  }
+  
+  if (diag) {
+    S1 <- matrix(rep(rep(1:0, J),
+                     c(rbind(1:J, Jp))), nrow = Jp)[, -(J + 1)]
+    # idx1 <- unlist(lapply(colSums(S1), seq_len))
+    idx_d <- cumsum(unlist(lapply(colSums(S1), sum)))
   }
   
   ### catch constraint violations here
@@ -70,112 +97,222 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL,
     return(log(pmax(.Machine$double.eps, x)))
   }
   
-  
-  ll <- function(par) {
-    
-    mpar <- par[1:ncol(Ylower)]
-    cpar <- matrix(par[-(1:ncol(Ylower))], nrow = ncol(lX))
-    
-    ### Ylower = NaN means -Inf and Yupper == NaN means +Inf
-    ### (corresponding to probabilities 0 and 1)
-    Yp_l <- matrix(Ylower %*% mpar, nrow = N)
-    Yp_l[is.na(Yp_l)] <- -Inf
-    Yp_u <- matrix(Yupper %*% mpar, nrow = N)
-    Yp_u[is.na(Yp_u)] <- Inf
-    
-    Xp <- lX %*% cpar
-    
-    A <- Yp_u[, idx] * Xp
-    B_l <- A %*% S + Yp_l[,-1]
-    B_u <- A %*% S + Yp_u[,-1]
-    C_l <- cbind(Yp_l[,1], B_l)
-    C_u <- cbind(Yp_u[,1], B_u)
-    
-    ret <- 0
-    for (j in 1:J) {
-      F_Zj <- m[[j]]$todistr$p
-      ret <- ret + sum(.log(F_Zj(C_u[, j]) - F_Zj(C_l[, j])))
-    }
-    
-    return(-ret)
-  }
-  
-  sc <- function(par) {
-    
-    mpar <- par[1:ncol(Ylower)]
-    cpar <- matrix(par[-(1:ncol(Ylower))], nrow = ncol(lX))
-   
-    ### Ylower = NaN means -Inf and Yupper == NaN means +Inf
-    ### (corresponding to probabilities 0 and 1)
-    Yp_l <- matrix(Ylower %*% mpar, nrow = N)
-    Yp_l[is.na(Yp_l)] <- -Inf
-    Yp_u <- matrix(Yupper %*% mpar, nrow = N)
-    Yp_u[is.na(Yp_u)] <- Inf
-    Xp <- lX %*% cpar
-    
-    A <- Yp_u[, idx] * Xp
-    B_l <- A %*% S + Yp_l[,-1]
-    B_u <- A %*% S + Yp_u[,-1]
-    C_l <- cbind(Yp_l[,1], B_l)
-    C_u <- cbind(Yp_u[,1], B_u)
-    
-    C1 <- C_l
-    for (j in 1:J) {
-      f_Zj <- m[[j]]$todistr$d
-      F_Zj <- m[[j]]$todistr$p
-      C1[, j] <- (f_Zj(C_u[, j]) - f_Zj(C_l[, j]))/(F_Zj(C_u[, j]) - F_Zj(C_l[, j]))
-    }
-    
-    L <- diag(0, J)
-    L[upper.tri(L)] <- 1:Jp
-    L <- t(L)
-    
-    mret <- vector(length = J, mode = "list")
-    for (k in 1:J) {
-      f_Zk <- m[[k]]$todistr$d
-      F_Zk <- m[[k]]$todistr$p
-      lu[[k]]$lower[is.infinite(lu[[k]]$lower)] <- 0
-      mret[[k]] <- colSums((f_Zk(C_u[, k])*lu[[k]]$upper - f_Zk(C_l[, k])*lu[[k]]$lower)/
-                             (F_Zk(C_u[, k]) - F_Zk(C_l[, k])))
-      Lk <- L[,k]
-      D <- cbind(matrix(rep(0, k*N), nrow = N), Xp[,Lk[Lk > 0]])
-      mret[[k]] <- mret[[k]] + colSums(rowSums(C1 * D) * lu[[k]]$upper)
-    }
-    
-    cret <- vector(length = J - 1, mode = "list")
-    for (k in 1:(J - 1)) { # go over rows
-      C2 <- matrix(rep(C1[, k+1], k), ncol = k)
-      tmp <- C2 * Yp_u[,1:k]
-      ret <- c()
-      l <- ncol(lX)
-      for (i in 1:k) {
-        tmp1 <- matrix(rep(tmp[,i], l), ncol = l)
-        ret <- c(ret, colSums(tmp1 * lX))
+  if (diag) {
+    ll <- function(par) {
+      
+      mpar <- par[1:ncol(Ylower)]
+      cpar <- matrix(par[-(1:ncol(Ylower))], nrow = ncol(lX))
+      
+      ### Ylower = NaN means -Inf and Yupper == NaN means +Inf
+      ### (corresponding to probabilities 0 and 1)
+      Yp_l <- matrix(Ylower %*% mpar, nrow = N)
+      Yp_l[is.na(Yp_l)] <- -Inf
+      Yp_u <- matrix(Yupper %*% mpar, nrow = N)
+      Yp_u[is.na(Yp_u)] <- Inf
+      
+      Xp <- lX %*% cpar
+      Xp_off <- Xp[, -idx_d]
+      if (!is.matrix(Xp_off)) Xp_off <- matrix(Xp_off, ncol = 1)
+      Xp_diag <- Xp[, idx_d]
+      
+      A <- Yp_u[, idx] * Xp_off
+      B_l <- A %*% S + Yp_l[, -1]*Xp_diag[, -1]
+      B_u <- A %*% S + Yp_u[, -1]*Xp_diag[, -1]
+      C_l <- cbind(Yp_l[, 1]*Xp_diag[, 1], B_l)
+      C_u <- cbind(Yp_u[, 1]*Xp_diag[, 1], B_u)
+      
+      ret <- 0
+      for (j in 1:J) {
+        F_Zj <- m[[j]]$todistr$p
+        ret <- ret + sum(.log(F_Zj(C_u[, j]) - F_Zj(C_l[, j])))
       }
-      cret[[k]] <- ret
+      
+      return(-ret)
+    }
+    sc <- function(par) {
+      
+      mpar <- par[1:ncol(Ylower)]
+      cpar <- matrix(par[-(1:ncol(Ylower))], nrow = ncol(lX))
+      
+      ### Ylower = NaN means -Inf and Yupper == NaN means +Inf
+      ### (corresponding to probabilities 0 and 1)
+      Yp_l <- matrix(Ylower %*% mpar, nrow = N)
+      Yp_l[is.na(Yp_l)] <- -Inf
+      Yp_u <- matrix(Yupper %*% mpar, nrow = N)
+      Yp_u[is.na(Yp_u)] <- Inf
+      
+      Xp <- lX %*% cpar
+      Xp_off <- Xp[, -idx_d]
+      if (!is.matrix(Xp_off)) Xp_off <- matrix(Xp_off, ncol = 1)
+      Xp_diag <- Xp[, idx_d]
+      
+      A <- Yp_u[, idx] * Xp_off
+      B_l <- A %*% S + Yp_l[, -1]*Xp_diag[, -1]
+      B_u <- A %*% S + Yp_u[, -1]*Xp_diag[, -1]
+      C_l <- cbind(Yp_l[, 1]*Xp_diag[, 1], B_l)
+      C_u <- cbind(Yp_u[, 1]*Xp_diag[, 1], B_u)
+      
+      C1 <- CD <- C_l
+      for (j in 1:J) {
+        f_Zj <- m[[j]]$todistr$d
+        F_Zj <- m[[j]]$todistr$p
+        lu[[j]]$lower[is.infinite(lu[[j]]$lower)] <- 0
+        C1[, j] <- (f_Zj(C_u[, j]) - f_Zj(C_l[, j]))/(F_Zj(C_u[, j]) - F_Zj(C_l[, j]))
+        CD[, j] <- rowSums(f_Zj(C_u[, j])*lu[[j]]$upper -  f_Zj(C_l[, j])*lu[[j]]$lower)/
+                             (F_Zj(C_u[, j]) - F_Zj(C_l[, j]))
+      }
+      
+      L <- diag(0, J)
+      L[!lower.tri(L)] <- 1:Jp  ## row-wise
+      L <- t(L)
+      
+      mret <- vector(length = J, mode = "list")
+      for (k in 1:J) {
+        f_Zk <- m[[k]]$todistr$d
+        F_Zk <- m[[k]]$todistr$p
+        lu[[k]]$lower[is.infinite(lu[[k]]$lower)] <- 0
+        mret[[k]] <- colSums((f_Zk(C_u[, k])*lu[[k]]$upper - 
+                                f_Zk(C_l[, k])*lu[[k]]$lower)*Xp_diag[, k]/
+                               (F_Zk(C_u[, k]) - F_Zk(C_l[, k])))
+        Lk <- L[,k]
+        D <- cbind(matrix(rep(0, (k-1)*N), nrow = N), Xp[,Lk[Lk > 0]])
+        mret[[k]] <- mret[[k]] + colSums(rowSums(C1 * D) * lu[[k]]$upper)
+      }
+      
+      cret <- vector(length = J, mode = "list")
+      for (k in 1:(J - 1)) { # go over rows
+        l <- ncol(lX)
+        ret <- colSums(matrix(rep(CD[, k], l), ncol = l) * lX) ## deriv for diag
+        
+        C2 <- matrix(rep(C1[, k+1], k), ncol = k)
+        tmp <- C2 * Yp_u[,1:k]
+        for (i in 1:k) {
+          tmp1 <- matrix(rep(tmp[,i], l), ncol = l)
+          ret <- c(ret, colSums(tmp1 * lX))
+        }
+        cret[[k]] <- ret
+      }
+      
+      cret[[J]] <- colSums(matrix(rep(CD[, J], l), ncol = l) * lX)
+      
+      mret <- -do.call("c", mret)
+      cret <- -do.call("c", cret)
+      c(mret, cret)
     }
     
-    mret <- -do.call("c", mret)
-    cret <- -do.call("c", cret)
-    c(mret, cret)
-  }
-  
-  ### user-defined starting parameters for optimization
-  if(!is.null(theta)) {
-    start <- unname(theta)
-  }
-  else {
-    # if(inherits(formula, "formula") && formula == ~1) {
+    ### user-defined starting parameters for optimization
+    if(!is.null(theta)) {
+      start <- unname(theta)
+    }
+    else {
+      start <- do.call("c", lapply(m, function(mod) coef(as.mlt(mod))))
+      CS <- matrix(0, nrow = ncol(lX), ncol = Jp)
+      CS[1L, di] <- 1
+      cstart <- c(CS)
+      start <- c(start, cstart)
+    }
+    
+  } else {  ## diag = FALSE
+    ll <- function(par) {
+      
+      mpar <- par[1:ncol(Ylower)]
+      cpar <- matrix(par[-(1:ncol(Ylower))], nrow = ncol(lX))
+      
+      ### Ylower = NaN means -Inf and Yupper == NaN means +Inf
+      ### (corresponding to probabilities 0 and 1)
+      Yp_l <- matrix(Ylower %*% mpar, nrow = N)
+      Yp_l[is.na(Yp_l)] <- -Inf
+      Yp_u <- matrix(Yupper %*% mpar, nrow = N)
+      Yp_u[is.na(Yp_u)] <- Inf
+      
+      Xp <- lX %*% cpar
+      
+      A <- Yp_u[, idx] * Xp
+      B_l <- A %*% S + Yp_l[,-1]
+      B_u <- A %*% S + Yp_u[,-1]
+      C_l <- cbind(Yp_l[,1], B_l)
+      C_u <- cbind(Yp_u[,1], B_u)
+      
+      ret <- 0
+      for (j in 1:J) {
+        F_Zj <- m[[j]]$todistr$p
+        ret <- ret + sum(.log(F_Zj(C_u[, j]) - F_Zj(C_l[, j])))
+      }
+      
+      return(-ret)
+    }
+    
+    sc <- function(par) {
+      
+      mpar <- par[1:ncol(Ylower)]
+      cpar <- matrix(par[-(1:ncol(Ylower))], nrow = ncol(lX))
+      
+      ### Ylower = NaN means -Inf and Yupper == NaN means +Inf
+      ### (corresponding to probabilities 0 and 1)
+      Yp_l <- matrix(Ylower %*% mpar, nrow = N)
+      Yp_l[is.na(Yp_l)] <- -Inf
+      Yp_u <- matrix(Yupper %*% mpar, nrow = N)
+      Yp_u[is.na(Yp_u)] <- Inf
+      Xp <- lX %*% cpar
+      
+      A <- Yp_u[, idx] * Xp
+      B_l <- A %*% S + Yp_l[,-1]
+      B_u <- A %*% S + Yp_u[,-1]
+      C_l <- cbind(Yp_l[,1], B_l)
+      C_u <- cbind(Yp_u[,1], B_u)
+      
+      C1 <- C_l
+      for (j in 1:J) {
+        f_Zj <- m[[j]]$todistr$d
+        F_Zj <- m[[j]]$todistr$p
+        C1[, j] <- (f_Zj(C_u[, j]) - f_Zj(C_l[, j]))/(F_Zj(C_u[, j]) - F_Zj(C_l[, j]))
+      }
+      
+      L <- diag(0, J)
+      L[upper.tri(L)] <- 1:Jp
+      L <- t(L)
+      
+      mret <- vector(length = J, mode = "list")
+      for (k in 1:J) {
+        f_Zk <- m[[k]]$todistr$d
+        F_Zk <- m[[k]]$todistr$p
+        lu[[k]]$lower[is.infinite(lu[[k]]$lower)] <- 0
+        mret[[k]] <- colSums((f_Zk(C_u[, k])*lu[[k]]$upper - f_Zk(C_l[, k])*lu[[k]]$lower)/
+                               (F_Zk(C_u[, k]) - F_Zk(C_l[, k])))
+        Lk <- L[,k]
+        D <- cbind(matrix(rep(0, k*N), nrow = N), Xp[,Lk[Lk > 0]])
+        mret[[k]] <- mret[[k]] + colSums(rowSums(C1 * D) * lu[[k]]$upper)
+      }
+      
+      cret <- vector(length = J - 1, mode = "list")
+      for (k in 1:(J - 1)) { # go over rows
+        C2 <- matrix(rep(C1[, k+1], k), ncol = k)
+        tmp <- C2 * Yp_u[,1:k]
+        ret <- c()
+        l <- ncol(lX)
+        for (i in 1:k) {
+          tmp1 <- matrix(rep(tmp[,i], l), ncol = l)
+          ret <- c(ret, colSums(tmp1 * lX))
+        }
+        cret[[k]] <- ret
+      }
+      
+      mret <- -do.call("c", mret)
+      cret <- -do.call("c", cret)
+      c(mret, cret)
+    }
+    
+    ### user-defined starting parameters for optimization
+    if(!is.null(theta)) {
+      start <- unname(theta)
+    }
+    else {
       ### don't bother with .start(), simply use the marginal coefficients
       ### and zero for the lambda parameters
       start <- do.call("c", lapply(m, function(mod) coef(as.mlt(mod))))
       start <- c(start, rep(0, Jp * ncol(lX)))
-    # }
-    # else { # formula != ~ 1
-      # start <- .start(m, bx = bx, data = data)
-      # start <- c(start$mpar, c(t(start$cpar)))
     }
-  
+  }
   
   ### does this work for count too? m$lower or upper?
   if(scale) {
@@ -197,11 +334,11 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL,
   #   f <- function(par) ll(scl * par, ui = ui, ci = ci)
   #   g <- function(par) sc(scl * par) * scl
   # } else {
-    f <- function(par) ll(par)
-    g <- sc
+  f <- function(par) ll(par)
+  g <- sc
   # }
 
-  opt <- alabama::auglag(par = start, fn = f, gr = g,
+  opt <- alabama::auglag(par = start, fn = f, #gr = g,
                          hin = function(par) ui %*% par - ci, 
                          hin.jac = function(par) ui,
                          control.outer = control.outer)[c("par", 
@@ -226,16 +363,19 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL,
   gaussian <- all.equal("normal", unique(sapply(mmod, function(x) x$todistr$name)))
   
   nm <- abbreviate(sapply(m, function(x) x$model$response), 4)
+  
   lnm <- matrix(paste0(matrix(nm, nrow = J, ncol = J), ".",
                        matrix(nm, nrow = J, ncol = J, byrow = TRUE)), nrow = J)
-  cnm <- paste0(rep(lnm[lower.tri(lnm)], each = ncol(lX)), ".", rep(colnames(lX), Jp))
+  cnm <- paste0(rep(lnm[lower.tri(lnm, diag = diag)], each = ncol(lX)), ".", 
+                rep(colnames(lX), Jp))
+  
   names(opt$par) <- c(paste0(nm[sf], ".", do.call("c", lapply(mlist, names))), cnm)
   
   ret <- list(marginals = mmod, formula = formula, bx = bx, data = data,
               call = call,
-              gaussian = gaussian,
+              gaussian = gaussian, diag = diag,
               pars = list(mpar = mpar, cpar = cpar),
-              par = opt$par, ll = ll, sc = sc, logLik = opt$value,
+              par = opt$par, ll = ll, sc = sc, logLik = -opt$value,
               hessian = opt$hessian)
   class(ret) <- c("mcotram", "mmlt")
   ret
