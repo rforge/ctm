@@ -12,8 +12,10 @@ plot.ctm <- function(x, newdata, type = c("distribution",
     type <- match.arg(type)
 
     if (type == "quantile") {
-        pr <- c(predict(x, newdata = newdata, type = "distribution", q = q))
-        prob <- prob[prob > min(pr) & prob < max(pr)]
+        pr <- predict(x, newdata = newdata, type = "distribution", q = q)
+        pmin <- max(apply(pr, 2, function(p) min(p, na.rm = TRUE)))
+        pmax <- min(apply(pr, 2, function(p) max(p, na.rm = TRUE)))
+        prob <- prob[prob > pmin & prob < pmax]
     }
     pr <- predict(x, newdata = newdata, type = type, q = q, prob = prob)
     pr[!is.finite(pr)] <- NA
