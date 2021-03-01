@@ -62,8 +62,7 @@
 
 
 mmlt <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
-                 control.outer = list(trace = FALSE), scale = FALSE,
-                 tol = sqrt(.Machine$double.eps)) {
+                 control.outer = list(trace = FALSE), scale = FALSE) {
   
   call <- match.call()
   # stopifnot(diag)
@@ -125,6 +124,8 @@ mmlt <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
     CP <- matrix(1:(Jp*ncol(lX)), nrow = ncol(lX))
     dintercept <- CP[1L, di]
     tci <- rep(-Inf, Jp * ncol(lX))
+    ### hard-coded, for the moment
+    tol <- sqrt(.Machine$double.eps)
     tci[dintercept] <- 1 - tol
     D <- Diagonal(Jp * ncol(lX))[dintercept,]
     NL <- Matrix(0, nrow = length(dintercept), ncol = ncol(cnstr))
