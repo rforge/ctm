@@ -4,8 +4,8 @@
 
 \section{Changes in Version 1.0-8 (2020-03-01)}{
   \itemize{
-    \item{\code{as.basis} returns a \code{Matrix} object for
-          ordered factors with more than 50 levels.}
+    \item{More infrastructure for \code{as.basis} to return 
+          a \code{Matrix} object.}
   }
 }
 
