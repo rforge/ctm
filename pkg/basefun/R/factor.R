@@ -16,7 +16,7 @@ as.basis.ordered_var <- function(object, ...) {
     names(ctr) <- variable.names(object)
     as.basis(fm, data = nd, remove_intercept = TRUE,
              contrasts.arg = ctr, ui = diff(diag(nl - 1)), 
-             ci = rep(0, nl - 2))
+             ci = rep(0, nl - 2), Matrix = nl > 50)
 } 
 
 as.basis.factor <- function(object, ...) {

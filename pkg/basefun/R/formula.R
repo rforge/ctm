@@ -4,7 +4,7 @@ as.basis.formula <- function(object, data = NULL, remove_intercept = FALSE,
                              Matrix = FALSE, ...) {
 
     mm <- stats::model.matrix
-    if (Matrix) mm <- MatrixModels::model.Matrix
+    if (Matrix) mm <- Matrix::sparse.model.matrix
 
     if (inherits(data, "data.frame")) {
         vars <- as.vars(data[all.vars(object)])

@@ -2,7 +2,7 @@
 useDynLib("basefun", .registration = TRUE)
 
 import("variables")
-import("Matrix")#, rBind, Diagonal, bdiag)
+import("Matrix")#, rBind, Diagonal, bdiag, sparse.model.matrix)
 import("polynom")
 importFrom("orthopolynom", "legendre.polynomials")
 importFrom("methods", "as")

@@ -2,6 +2,13 @@
 \name{NEWS}
 \title{NEWS file for the basefun package}
 
+\section{Changes in Version 1.0-8 (2020-03-01)}{
+  \itemize{
+    \item{\code{as.basis} returns a \code{Matrix} object for
+          ordered factors with more than 50 levels.}
+  }
+}
+
 \section{Changes in Version 1.0-7 (2020-02-13)}{
   \itemize{
     \item{Update citation info.}

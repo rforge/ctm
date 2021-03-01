@@ -41,3 +41,12 @@ if (require("MatrixModels")) {
     M <- model.matrix(as.basis(~ x, data = d, Matrix = TRUE), d)
     stopifnot(inherits(M, "Matrix"))
 }
+
+### ordered factors
+x <- gl(50, 1, ordered = TRUE)
+(M <- model.matrix(as.basis(x), data = data.frame(x = x))) %*% 1:49
+stopifnot(inherits(M, "matrix"))
+### sparse
+x <- gl(51, 1, ordered = TRUE)
+(M <- model.matrix(as.basis(x), data = data.frame(x = x))) %*% 1:50
+stopifnot(inherits(M, "Matrix"))
