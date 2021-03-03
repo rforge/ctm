@@ -1,8 +1,13 @@
 
+.pmax <- function(x, y) {
+    y[y < x] <- x
+    return(y)
+}
+
 .xmb <- function(X, beta) {
     if (is.matrix(beta)) {
         stopifnot(NROW(beta) == NROW(X))
-        return(rowSums(as(X, "matrix") * beta))
+        return(rowSums(X * beta))
     }
     return(X %*% beta)
 }
@@ -14,22 +19,22 @@
     if (all(OK)) {
         ret <- drop(fun(offset + .xmb(X, beta)))
     } else {
-        if (all(!OK)) return(rep(value, nrow(X)))
+        ret <- rep(value, nrow(X))
+        if (all(!OK)) return(ret)
         if (is.matrix(beta)) 
             beta <- beta[OK,,drop = FALSE]
         tmp <- .xmb(X[OK,], beta)
-        ret <- numeric(nrow(X))
-        ret[OK] <- fun(offset[OK] + tmp)
-        ret[!OK] <- value
-        X[!OK,] <- 0
+        ret[OK] <- fun(as.numeric(offset[OK] + tmp))
     }
-    if (Xmult)
+    if (Xmult) {
+        X[!OK,] <- 0
         ret <- ret * X
+    }
     return(ret)
 }
 
 .log <- function(x) {
-    return(log(pmax(.Machine$double.eps, x)))
+    return(log(.pmax(.Machine$double.eps, x)))
     pos <- (x > .Machine$double.eps)
     if (all(pos)) return(log(x))
 #    mx <- min(x)
@@ -58,7 +63,7 @@
 ..mlt_score_interval <- function(d, mml, mmr, offset = 0, beta, Xmult = TRUE)
     (.dealinf(mmr, beta, offset, d$d, 0, Xmult = Xmult) -
      .dealinf(mml, beta, offset, d$d, 0, Xmult = Xmult)) / 
-    pmax(.Machine$double.eps^(1/3), (.dealinf(mmr, beta, offset, d$p, 1) - 
+    .pmax(.Machine$double.eps^(1/3), (.dealinf(mmr, beta, offset, d$p, 1) - 
      .dealinf(mml, beta, offset, d$p, 0)))
 
 .mlt_score_interval <- function(d, mml, mmr, offset = 0, mmtrunc = NULL) {
