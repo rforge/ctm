@@ -136,7 +136,10 @@
             }
         }
         ret_ll <- numeric(nrow(data))
-        ret_sc <- matrix(0, nrow = nrow(data), ncol = length(fix))
+        .matrix <- matrix
+        if (inherits(exY, "Matrix") || inherits(iYleft, "Matrix")) 
+            .matrix <- function(...) Matrix(..., sparse = TRUE)
+        ret_sc <- .matrix(0, nrow = nrow(data), ncol = length(fix))
         return(list(
             ll = function(beta) {
                 ret <- ret_ll 
@@ -344,9 +347,9 @@
 
     X <- matrix(0, nrow = NROW(y), ncol = ncol(Y))
     if (!is.null(eY))
-        X[eY$which,] <- eY$Y
+        X[eY$which,] <- as(eY$Y, "matrix")
     if (!is.null(iY))
-        X[iY$which,] <- iY$Yright
+        X[iY$which,] <- as(iY$Yright, "matrix")
     X[!is.finite(X[,1]),] <- 0
 
     if (any(fix)) {
