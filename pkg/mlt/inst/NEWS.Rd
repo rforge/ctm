@@ -2,12 +2,15 @@
 \name{NEWS}
 \title{NEWS file for the mlt package}
 
-\section{Changes in Version 1.2-4 (2021-02-26)}{
+\section{Changes in Version 1.2-4 (2021-03-03)}{
   \subsection{New features}{
     \itemize{
       \item{New argument \code{as.R.ordered} allowing numeric and survival
             responses to be coded as ordered factors, for nonparametric maximum
             likelihood estimation.}
+      \item{Allow sparse model matrices. This might be useful for nonparametric
+            maximum likelihood estimation with many distinct outcomes.}
+      \item{Some speed-ups.}
     }
   }
   \subsection{Bugfixes}{
@@ -16,7 +19,7 @@
             was not possible for certain quantiles. These are now removed before
             plotting.}
       \item{Fitting models to interval censored responses containing intervals
-            \code(-Inf, Inf) failed.}
+            \code{c(-Inf, Inf)} failed.}
     }
   }
 }
