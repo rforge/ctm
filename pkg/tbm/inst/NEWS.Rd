@@ -2,6 +2,13 @@
 \name{NEWS}
 \title{NEWS file for the \pkg{tbm} package}
 
+\section{Changes in Version 0.3-4 (2021-03-03)}{
+  \itemize{
+    \item noLD issue.
+    }
+}
+
+
 \section{Changes in Version 0.3-3 (2020-11-25)}{
   \itemize{
     \item Documentation update; speed-up a little bit.

@@ -1,6 +1,6 @@
 
-R version 4.0.3 (2020-10-10) -- "Bunny-Wunnies Freak Out"
-Copyright (C) 2020 The R Foundation for Statistical Computing
+R version 4.0.4 (2021-02-15) -- "Lost Library Book"
+Copyright (C) 2021 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -81,8 +81,8 @@ The following object is masked from 'package:mboost':
 > 
 > bf_st <- stmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, 
 +                   method = quote(mboost::blackboost), tree_control = tctrl)
-> round(logLik(bf_st), 1)
-'log Lik.' -180.5 (df=NULL)
+> round(logLik(bf_st), 0)
+'log Lik.' -180 (df=NULL)
 > 
 > bf_shift <- stmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, 
 +                      method = quote(mboost::gamboost))
@@ -139,4 +139,4 @@ Warning messages:
 > 
 > proc.time()
    user  system elapsed 
-  6.194   0.063   6.249 
+  9.624   0.148   9.741 

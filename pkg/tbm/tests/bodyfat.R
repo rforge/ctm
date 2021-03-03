@@ -37,7 +37,7 @@ table(selected(bf_dr))
 
 bf_st <- stmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, 
                   method = quote(mboost::blackboost), tree_control = tctrl)
-round(logLik(bf_st), 1)
+round(logLik(bf_st), 0)
 
 bf_shift <- stmboost(model = mf, formula = DEXfat ~ ., data = bodyfat, 
                      method = quote(mboost::gamboost))
