@@ -146,25 +146,31 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
       if (!is.matrix(Xp_off)) Xp_off <- matrix(Xp_off, ncol = 1)
       Xp_diag <- Xp[, idx_d]
       
+      stopifnot(ncol(Xp_diag) == J)
+      
       A <- Yp_u[, idx] * Xp_off
       B_l <- A %*% S + Yp_l[, -1]*Xp_diag[, -1]
       B_u <- A %*% S + Yp_u[, -1]*Xp_diag[, -1]
       C_l <- cbind(Yp_l[, 1]*Xp_diag[, 1], B_l)
       C_u <- cbind(Yp_u[, 1]*Xp_diag[, 1], B_u)
       
-      C1 <- CD <- C_l
+      C1 <- CD <- CD_l <- C_l
       for (j in 1:J) {
         f_Zj <- m[[j]]$todistr$d
         F_Zj <- m[[j]]$todistr$p
         lu[[j]]$lower[is.infinite(lu[[j]]$lower)] <- 0
+        Z <- f_Zj(C_l[, j])*Yp_l[,j]
+        Z[is.na(Z)] <- 0
         C1[, j] <- (f_Zj(C_u[, j]) - f_Zj(C_l[, j]))/(F_Zj(C_u[, j]) - F_Zj(C_l[, j]))
         CD[, j] <- rowSums(f_Zj(C_u[, j])*lu[[j]]$upper -  f_Zj(C_l[, j])*lu[[j]]$lower)/
                              (F_Zj(C_u[, j]) - F_Zj(C_l[, j]))
+        CD_l[, j] <- (f_Zj(C_u[, j])*Yp_u[,j] -  Z)/(F_Zj(C_u[, j]) - F_Zj(C_l[, j]))
       }
       
       L <- diag(0, J)
       L[!lower.tri(L)] <- 1:Jp  ## row-wise
       L <- t(L)
+      diag(L) <- 0
       
       mret <- vector(length = J, mode = "list")
       for (k in 1:J) {
@@ -175,25 +181,27 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
                                 f_Zk(C_l[, k])*lu[[k]]$lower)*Xp_diag[, k]/
                                (F_Zk(C_u[, k]) - F_Zk(C_l[, k])))
         Lk <- L[,k]
-        D <- cbind(matrix(rep(0, (k-1)*N), nrow = N), Xp[,Lk[Lk > 0]])
+        D <- cbind(matrix(rep(0, k*N), nrow = N), Xp[,Lk[Lk > 0]])
         mret[[k]] <- mret[[k]] + colSums(rowSums(C1 * D) * lu[[k]]$upper)
       }
       
       cret <- vector(length = J, mode = "list")
+      ## row-wise: diagonal goes at the end!
+      l <- ncol(lX)
+      cret[[1]] <- colSums(matrix(rep(CD_l[, 1], l), ncol = l) * lX)
+
       for (k in 1:(J - 1)) { # go over rows
-        l <- ncol(lX)
-        ret <- colSums(matrix(rep(CD[, k], l), ncol = l) * lX) ## deriv for diag
-        
         C2 <- matrix(rep(C1[, k+1], k), ncol = k)
         tmp <- C2 * Yp_u[,1:k]
+        ret <- c()
         for (i in 1:k) {
           tmp1 <- matrix(rep(tmp[,i], l), ncol = l)
           ret <- c(ret, colSums(tmp1 * lX))
         }
-        cret[[k]] <- ret
+        ret <- c(ret,
+                 colSums(matrix(rep(CD_l[, k+1], l), ncol = l) * lX))
+        cret[[k+1]] <- ret
       }
-      
-      cret[[J]] <- colSums(matrix(rep(CD[, J], l), ncol = l) * lX)
       
       mret <- -do.call("c", mret)
       cret <- -do.call("c", cret)
@@ -338,7 +346,7 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
   g <- sc
   # }
 
-  opt <- alabama::auglag(par = start, fn = f, #gr = g,
+  opt <- alabama::auglag(par = start, fn = f, gr = g,
                          hin = function(par) ui %*% par - ci, 
                          hin.jac = function(par) ui,
                          control.outer = control.outer)[c("par", 
