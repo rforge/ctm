@@ -283,10 +283,14 @@ R.default <- function(object, ...)
     names(deriv) <- response
     Yprime <- model.matrix(model, data = tmp, deriv = deriv)
 
+    .matrix <- matrix
+    if (inherits(Y, "Matrix")) 
+        .matrix <- function(...) Matrix(..., sparse = TRUE)
+
     trunc <- NULL
     if (any(.tinterval(object) & e)) {
-        Ytleft <- matrix(-Inf, nrow = nrow(Y), ncol = ncol(Y))
-        Ytright <- matrix(Inf, nrow = nrow(Y), ncol = ncol(Y))
+        Ytleft <- .matrix(-Inf, nrow = nrow(Y), ncol = ncol(Y))
+        Ytright <- .matrix(Inf, nrow = nrow(Y), ncol = ncol(Y))
         if (any(il <- (.tleft(object) & e))) {
             tmp <- data[il,]
             tmp[[response]] <- object$tleft[il]
@@ -315,11 +319,14 @@ R.default <- function(object, ...)
         tmp <- tmpdata[il,,drop = FALSE]
         tmp[[response]] <- object$cleft[il]
         Ytmp <- model.matrix(model, data = tmp)
-        Yleft <- matrix(-Inf, nrow = length(il), ncol = ncol(Ytmp))
+        .matrix <- matrix
+        if (inherits(Ytmp, "Matrix")) 
+            .matrix <- function(...) Matrix(..., sparse = TRUE)
+        Yleft <- .matrix(-Inf, nrow = length(il), ncol = ncol(Ytmp))
         colnames(Yleft) <- colnames(Ytmp)
+        Yleft[il,] <- Ytmp
         attr(Yleft, "constraint") <- attr(Ytmp, "constraint")
         attr(Yleft, "Assign") <- attr(Ytmp, "Assign")
-        Yleft[il,] <- Ytmp
     }
 
     Yright <- NULL
@@ -327,11 +334,14 @@ R.default <- function(object, ...)
         tmp <- tmpdata[ir,, drop = FALSE]
         tmp[[response]] <- object$cright[ir]
         Ytmp <- model.matrix(model, data = tmp)
-        Yright <- matrix(Inf, nrow = length(ir), ncol = ncol(Ytmp))
+        .matrix <- matrix
+        if (inherits(Ytmp, "Matrix")) 
+            .matrix <- function(...) Matrix(..., sparse = TRUE)
+        Yright <- .matrix(Inf, nrow = length(ir), ncol = ncol(Ytmp))
         colnames(Yright) <- colnames(Ytmp)
+        Yright[ir,] <- Ytmp
         attr(Yright, "constraint") <- attr(Ytmp, "constraint")
         attr(Yright, "Assign") <- attr(Ytmp, "Assign")
-        Yright[ir,] <- Ytmp
     }
 
     if (is.null(Yright)) { 
@@ -349,8 +359,11 @@ R.default <- function(object, ...)
 
     trunc <- NULL
     if (any(.tinterval(object))) {
-        Ytleft <- matrix(-Inf, nrow = nrow(Yleft), ncol = ncol(Yleft))
-        Ytright <- matrix(Inf, nrow = nrow(Yleft), ncol = ncol(Yleft))
+        .matrix <- matrix
+        if (inherits(Yleft, "Matrix")) 
+            .matrix <- function(...) Matrix(..., sparse = TRUE)
+        Ytleft <- .matrix(-Inf, nrow = nrow(Yleft), ncol = ncol(Yleft))
+        Ytright <- .matrix(Inf, nrow = nrow(Yleft), ncol = ncol(Yleft))
         colnames(Ytleft) <- colnames(Ytright) <- colnames(Yleft)
         if (any(il <- (.tleft(object)))) {
             tmp <- tmpdata[il,,drop = FALSE]
