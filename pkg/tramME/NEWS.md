@@ -1,7 +1,24 @@
-# tramME 0.0.5 (development version)
+# tramME 0.1.0 (development version)
 
-* fixed error in vignette triggered by the update of the LaTeX package hyperref
-* added demo for IPD meta-analysis 
+* Updated internal functions for estimation transformation models with TMB:
+    * Fixed effects only models can be estimated
+    * Exported functions (`coef`, `logLik`) communicate with the TMB model more smoothly
+    * Updated internal structure to help future development (not exported currently)
+* Fixing coefficients
+* New model classes in `SurvregME` using the parameter fixing option
+* `AaregME` extends the (parametric) Aalen regression model of `tram` with mixed-effects.
+* Out-of-sample log-likelihoods using the `newdata` argument of `logLik`
+* Score residuals with `resid` method (activated with `resid = TRUE` in model definition)
+* Updating models via `update` method
+* Setting observation weights and offsets efficiently (activated  with `do_update = TRUE`). Currently, only possible through directly manipulating the `tmb_obj` of the model. 
+* Parametric bootstrap with the `parboot` method
+* New optimization options (e.g. internal scaling of fixed effects design matrix to improve convergence, more sensible initial values) and improved control over the optimization process with `optim_control()`
+* Various methods (including `analytical` in the case of fixed effects only models) to calculate the Hessian; trying harder to invert the Hessian in numerically unstable cases. 
+* Calculate the linear predictor with `type = "lp"` in `predict`
+* Several additional methods to help the user working with `tramME` objects: `model.frame`, `model.matrix`, `fitmod`, `duplicate`.
+* Improved unit testing
+* Improved documentation
+* Demo for IPD meta-analysis 
 
 # tramME 0.0.4 (2021-02-04)
 
