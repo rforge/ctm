@@ -80,16 +80,19 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
   
   idx <- idx_d <- 1
   S <- 1
-  if (J > 2) {
-    S <- matrix(rep(rep(1:0, (J - 1)), c(rbind(1:(J - 1), Jp))), nrow = Jp)[, -J]
-    idx <- unlist(lapply(colSums(S), seq_len))
-  }
-  
   if (diag) {
     S1 <- matrix(rep(rep(1:0, J),
                      c(rbind(1:J, Jp))), nrow = Jp)[, -(J + 1)]
-    # idx1 <- unlist(lapply(colSums(S1), seq_len))
+    if (J > 2) {
+      Jp1 <- Jp - J
+      S <- matrix(rep(rep(1:0, (J - 1)), c(rbind(1:(J - 1), Jp1))), nrow = Jp1)[, -J]
+      idx <- unlist(lapply(colSums(S), seq_len))
+    }
     idx_d <- cumsum(unlist(lapply(colSums(S1), sum)))
+  }
+  if (J > 2 && !diag) {
+    S <- matrix(rep(rep(1:0, (J - 1)), c(rbind(1:(J - 1), Jp))), nrow = Jp)[, -J]
+    idx <- unlist(lapply(colSums(S), seq_len))
   }
   
   ### catch constraint violations here
@@ -119,8 +122,9 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
       B_l <- A %*% S + Yp_l[, -1]*Xp_diag[, -1]
       B_u <- A %*% S + Yp_u[, -1]*Xp_diag[, -1]
       C_l <- cbind(Yp_l[, 1]*Xp_diag[, 1], B_l)
+      C_l[is.na(C_l)] <- -Inf
       C_u <- cbind(Yp_u[, 1]*Xp_diag[, 1], B_u)
-      
+
       ret <- 0
       for (j in 1:J) {
         F_Zj <- m[[j]]$todistr$p
@@ -152,8 +156,10 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
       B_l <- A %*% S + Yp_l[, -1]*Xp_diag[, -1]
       B_u <- A %*% S + Yp_u[, -1]*Xp_diag[, -1]
       C_l <- cbind(Yp_l[, 1]*Xp_diag[, 1], B_l)
+      C_l[is.na(C_l)] <- -Inf
       C_u <- cbind(Yp_u[, 1]*Xp_diag[, 1], B_u)
-      
+      # C_u[is.na(C_u)] <- Inf
+
       C1 <- CD <- CD_l <- C_l
       for (j in 1:J) {
         f_Zj <- m[[j]]$todistr$d
@@ -346,7 +352,7 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
   g <- sc
   # }
 
-  opt <- alabama::auglag(par = start, fn = f, gr = g,
+  opt <- alabama::auglag(par = start, fn = f, #gr = g,
                          hin = function(par) ui %*% par - ci, 
                          hin.jac = function(par) ui,
                          control.outer = control.outer)[c("par", 
