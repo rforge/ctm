@@ -18,6 +18,7 @@ R.Surv <- function(object, as.R.ordered = FALSE, ...) {
           tm <- if(type == "right") object[,"time"] else object[, "stop"]
           ### observed event times
           utm <- sort(unique(tm[status == 1]))
+          utm <- utm[-length(utm)]
           ### convert to ordered factor
           ct <- cut(tm, breaks = c(-Inf, utm, Inf), ordered = TRUE)
           ### events in category k contribute
@@ -161,6 +162,7 @@ R.numeric <- function(object = NA, cleft = NA, cright = NA,
       ### this defines the nonparametric likelihood
       ### in terms of the observed event times
       utm <- sort(unique(object))
+      utm <- utm[-length(utm)]
       ### convert to ordered factor
       ct <- cut(object, breaks = c(-Inf, utm, Inf), ordered = TRUE)
       tl <- tr <- NA
@@ -324,6 +326,7 @@ R.default <- function(object, ...)
             .matrix <- function(...) Matrix(..., sparse = TRUE)
         Yleft <- .matrix(-Inf, nrow = length(il), ncol = ncol(Ytmp))
         colnames(Yleft) <- colnames(Ytmp)
+        rownames(Yleft) <- rownames(tmpdata)
         Yleft[il,] <- Ytmp
         attr(Yleft, "constraint") <- attr(Ytmp, "constraint")
         attr(Yleft, "Assign") <- attr(Ytmp, "Assign")
@@ -339,6 +342,7 @@ R.default <- function(object, ...)
             .matrix <- function(...) Matrix(..., sparse = TRUE)
         Yright <- .matrix(Inf, nrow = length(ir), ncol = ncol(Ytmp))
         colnames(Yright) <- colnames(Ytmp)
+        rownames(Yright) <- rownames(tmpdata)
         Yright[ir,] <- Ytmp
         attr(Yright, "constraint") <- attr(Ytmp, "constraint")
         attr(Yright, "Assign") <- attr(Ytmp, "Assign")
