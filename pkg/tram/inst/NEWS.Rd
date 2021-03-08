@@ -2,9 +2,13 @@
 \name{NEWS}
 \title{NEWS file for the tram package}
 
-\section{Changes in Version 0.5-3 (2021-02-05)}{
+\section{Changes in Version 0.6-0 (2021-03-08)}{
   \itemize{
     \item{Add \code{simulate} method.}
+    \item{Enable nonparametric likelihood estimation by \code{Polr}.}
+    \item{New argument \code{sparse_nlevels} to \code{tram}, requesting
+          a model \code{Matrix} for ordered factors with at least
+          \code{sparse_nlevels} levels.}
   }
 }
 
