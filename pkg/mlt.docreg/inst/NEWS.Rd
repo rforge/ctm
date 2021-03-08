@@ -3,11 +3,21 @@
 \title{NEWS file for the mlt.docreg package}
 
 
+\section{Changes in Version 1.1-0 (2021-03-08)}{
+  \itemize{
+    \item{New regression test for nonparametric ML estimation
+          using \code{tram::Polr}, compare with \code{rms::orm}.
+          The latter is much faster but less flexible.}
+  }
+}
+
+
 \section{Changes in Version 1.0-10 (2021-02-23)}{
   \itemize{
     \item{Suppress warnings from package \pkg{flexsurv}.}
   }
 }
+
 
 
 \section{Changes in Version 1.0-9 (2020-12-15)}{
