@@ -42,11 +42,11 @@ if (require("Matrix")) {
     stopifnot(inherits(M, "Matrix"))
 }
 
-### ordered factors
-x <- gl(50, 1, ordered = TRUE)
-(M <- model.matrix(as.basis(x), data = data.frame(x = x))) %*% 1:49
+### ordered factors, non-sparse
+x <- gl(5, 1, ordered = TRUE)
+(M <- model.matrix(as.basis(x), data = data.frame(x = x))) %*% 1:4
 stopifnot(inherits(M, "matrix"))
-### sparse; not yet functional
-x <- gl(51, 1, ordered = TRUE)
-(M <- model.matrix(as.basis(x), data = data.frame(x = x))) %*% 1:50
-#stopifnot(inherits(M, "Matrix"))
+### sparse
+x <- gl(5, 1, ordered = TRUE)
+(M <- model.matrix(as.basis(x, sparse = TRUE), data = data.frame(x = x))) %*% 1:4
+stopifnot(inherits(M, "Matrix"))

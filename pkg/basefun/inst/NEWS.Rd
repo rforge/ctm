@@ -2,10 +2,10 @@
 \name{NEWS}
 \title{NEWS file for the basefun package}
 
-\section{Changes in Version 1.0-8 (2020-03-01)}{
+\section{Changes in Version 1.1-0 (2020-03-01)}{
   \itemize{
     \item{More infrastructure for \code{as.basis} to return 
-          a \code{Matrix} object.}
+          a \code{Matrix} object for ordered factors.}
   }
 }
 
