@@ -2,13 +2,13 @@
 \name{NEWS}
 \title{NEWS file for the mlt package}
 
-\section{Changes in Version 1.2-4 (2021-03-03)}{
+\section{Changes in Version 1.3-0 (2021-03-03)}{
   \subsection{New features}{
     \itemize{
       \item{New argument \code{as.R.ordered} allowing numeric and survival
             responses to be coded as ordered factors, for nonparametric maximum
             likelihood estimation.}
-      \item{Allow sparse model matrices. This might be useful for nonparametric
+      \item{Allow sparse model matrices. This is useful for nonparametric
             maximum likelihood estimation with many distinct outcomes.}
       \item{Some speed-ups.}
     }
@@ -20,6 +20,7 @@
             plotting.}
       \item{Fitting models to interval censored responses containing intervals
             \code{c(-Inf, Inf)} failed.}
+      \item{Always return names score matrices and residuals.}
     }
   }
 }
