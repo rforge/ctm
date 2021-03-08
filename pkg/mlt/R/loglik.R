@@ -1,4 +1,9 @@
 
+.drop <- function(x) {
+    if (inherits(x, "Matrix")) x <- x@x
+    drop(x)
+}
+
 .pmax <- function(x, y) {
     y[y < x] <- x
     return(y)
@@ -15,19 +20,19 @@
 ### if (finite) fun(X %*% beta + offset) * Xmult else value
 .dealinf <- function(X, beta, offset, fun, value, Xmult = FALSE) {
     if (is.null(X)) return(value)
-    OK <- is.finite(X[,1])
+    lpr <- .drop(offset + .xmb(X, beta))
+    OK <- is.finite(lpr)
     if (all(OK)) {
-        ret <- drop(fun(offset + .xmb(X, beta)))
+        ret <- fun(lpr)
     } else {
-        ret <- rep(value, nrow(X))
+        ret <- rep(value, length(lpr))
         if (all(!OK)) return(ret)
-        if (is.matrix(beta)) 
-            beta <- beta[OK,,drop = FALSE]
-        tmp <- .xmb(X[OK,], beta)
-        ret[OK] <- fun(as.numeric(offset[OK] + tmp))
+        ret[OK] <- fun(lpr[OK])
     }
     if (Xmult) {
-        X[!OK,] <- 0
+        ### this is costly, can we avoid this?
+        if (!all(OK))
+            X[!OK,] <- 0
         ret <- ret * X
     }
     return(ret)
