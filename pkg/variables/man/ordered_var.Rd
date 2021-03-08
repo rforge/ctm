@@ -7,12 +7,14 @@
     Formal description of an ordered categorical variable
 }
 \usage{
-ordered_var(name, desc = NULL, levels)
+ordered_var(name, desc = NULL, levels, sparse = FALSE, ...)
 }
 \arguments{
   \item{name}{character, the name of the variable}
   \item{desc}{character, a description of what is measured}
   \item{levels}{character, the ordered levels of the factor}
+  \item{sparse}{logical, set-up a sparse model matrix}
+  \item{\dots}{ignored}
 }
 \details{
   A conceptual description of a (yet) unobserved ordered categorical variable.

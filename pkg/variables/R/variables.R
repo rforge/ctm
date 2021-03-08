@@ -5,22 +5,24 @@
     ret
 }
 
-factor_var <- function(name, desc = NULL, levels) {
+factor_var <- function(name, desc = NULL, levels, ...) {
     ret <- .var(name = name, desc = desc)
     ret$support <- factor(levels, levels = levels, labels = levels)
     class(ret) <- c("factor_var", class(ret))
     ret
 }
 
-ordered_var <- function(name, desc = NULL, levels) {
+ordered_var <- function(name, desc = NULL, levels, sparse = FALSE, ...) {
     ret <- factor_var(name = name, desc = desc, levels = levels)
     ret$support <- as.ordered(ret$support)
+    ret$sparse <- sparse
     class(ret) <- c("ordered_var", class(ret))
     ret
 }
 
 numeric_var <- function(name, desc = NULL, unit = NULL,
-                        support = c(0.0, 1.0), add = c(0, 0), bounds = NULL) {
+                        support = c(0.0, 1.0), add = c(0, 0), 
+                        bounds = NULL, ...) {
     ret <- .var(name = name, desc = desc)
     ret$unit <- unit
     stopifnot(length(support) >= 2L)

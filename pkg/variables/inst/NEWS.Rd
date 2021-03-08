@@ -2,6 +2,13 @@
 \name{NEWS}
 \title{NEWS file for the variables package}
 
+\section{Changes in Version 1.1-0 (2021-03-08)}{
+  \itemize{
+    \item{Add a flag to \code{ordered_var} requesting a sparse
+          model matrix.}
+  }
+}
+
 \section{Changes in Version 1.0-3 (2020-02-13)}{
   \itemize{
     \item{Update citation info.}
