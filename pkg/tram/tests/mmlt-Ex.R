@@ -37,6 +37,12 @@ mm02 <- mmlt(b2, b1, formula = ~ X1 + X2 + X3, data = d, diag = FALSE)
 logLik(mm01) 
 logLik(mm02)
 
+mm1 <- mmlt(b1, b2, formula = ~ X1 + X2 + X3, data = d, diag = TRUE)
+mm2 <- mmlt(b2, b1, formula = ~ X1 + X2 + X3, data = d, diag = TRUE)
+
+logLik(mm1) 
+logLik(mm2)
+
 
 x <- 0:4 / 4
 nd <- expand.grid(X1 = x, X2 = x, X3 = x)
