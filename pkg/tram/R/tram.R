@@ -110,7 +110,8 @@ tram <- function(formula, data, subset, weights, offset, cluster, na.action = na
                  transformation = c("discrete", "linear", "logarithmic", "smooth"),
                  LRtest = TRUE, 
                  prob = c(.1, .9), support = NULL, bounds = NULL, add = c(0, 0), order = 6, negative =
-                 TRUE, scale = TRUE, extrapolate = FALSE, log_first = FALSE, model_only = FALSE, 
+                 TRUE, scale = TRUE, extrapolate = FALSE, log_first = FALSE, 
+                 sparse_nlevels = Inf, model_only = FALSE, 
                  constraints = NULL, ...) 
 {
 
@@ -131,7 +132,7 @@ tram <- function(formula, data, subset, weights, offset, cluster, na.action = na
     } 
 
     rvar <- asvar(td$response, td$rname, prob = prob, support = support,
-                  bounds = bounds, add = add)
+                  bounds = bounds, add = add, sparse_nlevels = sparse_nlevels)
     if (!is.null(rvar$bounds) && log_first) {
         if (rvar$bounds[1] < sqrt(.Machine$double.eps)) 
             rvar$bounds[1] <- sqrt(.Machine$double.eps)

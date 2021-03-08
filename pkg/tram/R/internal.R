@@ -5,8 +5,9 @@ asvar <- function(object, name, ...)
 asvar.factor <- function(object, name, ...)  
     variables::factor_var(name, levels = levels(object))
 
-asvar.ordered <- function(object, name, ...)  
-    variables::ordered_var(name, levels = levels(object))
+asvar.ordered <- function(object, name, sparse_nlevels = Inf, ...)
+    variables::ordered_var(name, levels = levels(object),
+                           sparse = nlevels(object) >= sparse_nlevels)
 
 asvar.numeric <- function(object, name, prob = c(.1, .9), support = NULL, bounds = NULL, add = c(0, 0), ...) {
     if (is.integer(object)) {
@@ -38,8 +39,8 @@ asvar.Surv <- function(object, name, prob = c(.1, .9), support = NULL, bounds = 
 asvar.response <- function(object, name, prob = c(.1, .9), support = NULL, bounds = c(-Inf, Inf), ...) {
     if (any(sapply(object, is.factor))) {
         f <- object$exact
-        if (any(!is.na(f))) return(asvar(f, name))
-        if (any(!is.na(object$cleft))) return(asvar(object$cleft, name))
+        if (any(!is.na(f))) return(asvar(f, name, ...))
+        if (any(!is.na(object$cleft))) return(asvar(object$cleft, name, ...))
         stop("cannot determine class of response")
     }
     if (is.null(support)) {

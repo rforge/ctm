@@ -14,7 +14,8 @@ tram(formula, data, subset, weights, offset, cluster, na.action = na.omit,
      LRtest = TRUE, prob = c(0.1, 0.9), support = NULL, 
      bounds = NULL, add = c(0, 0), order = 6, 
      negative = TRUE, scale = TRUE, extrapolate = FALSE, 
-     log_first = FALSE, model_only = FALSE, constraints = NULL, ...)
+     log_first = FALSE, sparse_nlevels = Inf,
+     model_only = FALSE, constraints = NULL, ...)
 tram_data(formula, data, subset, weights, offset, cluster, na.action = na.omit) 
 }
 \arguments{
@@ -86,6 +87,9 @@ tram_data(formula, data, subset, weights, offset, cluster, na.action = na.omit)
                      derivative of the transformation function to be zero at \code{support}.
                      If \code{TRUE}, this additional constraint is respected.
   }
+  \item{sparse_nlevels}{integer; use a sparse model matrix if the number
+      of levels of an ordered factor is at least as large as
+      \code{sparse_nlevels}.}
   \item{log_first}{logical; if \code{TRUE}, a Bernstein polynomial is
                    defined on the log-scale.}
   \item{model_only}{logical, if \code{TRUE} the unfitted model is returned.
