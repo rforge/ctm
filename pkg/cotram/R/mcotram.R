@@ -78,17 +78,17 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
   ci <- ci[is.finite(ci)]
   ui <- as(ui, "matrix")
   
-  idx <- idx_d <- 1
+  idx <- 1
   S <- 1
   if (diag) {
-    S1 <- matrix(rep(rep(1:0, J),
-                     c(rbind(1:J, Jp))), nrow = Jp)[, -(J + 1)]
+    # S1 <- matrix(rep(rep(1:0, J),
+    #                  c(rbind(1:J, Jp))), nrow = Jp)[, -(J + 1)]
     if (J > 2) {
       Jp1 <- Jp - J
       S <- matrix(rep(rep(1:0, (J - 1)), c(rbind(1:(J - 1), Jp1))), nrow = Jp1)[, -J]
       idx <- unlist(lapply(colSums(S), seq_len))
     }
-    idx_d <- cumsum(unlist(lapply(colSums(S1), sum)))
+    # idx_d <- cumsum(unlist(lapply(colSums(S1), sum)))
   }
   if (J > 2 && !diag) {
     S <- matrix(rep(rep(1:0, (J - 1)), c(rbind(1:(J - 1), Jp))), nrow = Jp)[, -J]
@@ -114,9 +114,9 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
       Yp_u[is.na(Yp_u)] <- Inf
       
       Xp <- lX %*% cpar
-      Xp_off <- Xp[, -idx_d]
+      Xp_off <- Xp[, -di]
       if (!is.matrix(Xp_off)) Xp_off <- matrix(Xp_off, ncol = 1)
-      Xp_diag <- Xp[, idx_d]
+      Xp_diag <- Xp[, di]
       
       A <- Yp_u[, idx] * Xp_off
       B_l <- A %*% S + Yp_l[, -1]*Xp_diag[, -1]
@@ -146,9 +146,9 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
       Yp_u[is.na(Yp_u)] <- Inf
       
       Xp <- lX %*% cpar
-      Xp_off <- Xp[, -idx_d]
+      Xp_off <- Xp[, -di]
       if (!is.matrix(Xp_off)) Xp_off <- matrix(Xp_off, ncol = 1)
-      Xp_diag <- Xp[, idx_d]
+      Xp_diag <- Xp[, di]
       
       stopifnot(ncol(Xp_diag) == J)
       
@@ -158,24 +158,26 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
       C_l <- cbind(Yp_l[, 1]*Xp_diag[, 1], B_l)
       C_l[is.na(C_l)] <- -Inf
       C_u <- cbind(Yp_u[, 1]*Xp_diag[, 1], B_u)
-      # C_u[is.na(C_u)] <- Inf
 
       C1 <- CD <- CD_l <- C_l
       for (j in 1:J) {
         f_Zj <- m[[j]]$todistr$d
         F_Zj <- m[[j]]$todistr$p
+        
         lu[[j]]$lower[is.infinite(lu[[j]]$lower)] <- 0
         Z <- f_Zj(C_l[, j])*Yp_l[,j]
         Z[is.na(Z)] <- 0
+        Z1 <- f_Zj(C_l[, j])*lu[[j]]$lower
+        Z1[is.na(Z1)] <- 0
+        
         C1[, j] <- (f_Zj(C_u[, j]) - f_Zj(C_l[, j]))/(F_Zj(C_u[, j]) - F_Zj(C_l[, j]))
-        CD[, j] <- rowSums(f_Zj(C_u[, j])*lu[[j]]$upper -  f_Zj(C_l[, j])*lu[[j]]$lower)/
-                             (F_Zj(C_u[, j]) - F_Zj(C_l[, j]))
+        CD[, j] <- rowSums(f_Zj(C_u[, j])*lu[[j]]$upper -  Z1)/(F_Zj(C_u[, j]) - F_Zj(C_l[, j]))
         CD_l[, j] <- (f_Zj(C_u[, j])*Yp_u[,j] -  Z)/(F_Zj(C_u[, j]) - F_Zj(C_l[, j]))
       }
       
       L <- diag(0, J)
-      L[!lower.tri(L)] <- 1:Jp  ## row-wise
-      L <- t(L)
+      L[lower.tri(L, diag = TRUE)] <- 1:Jp  ## column-wise
+      new_id <- t(L)[upper.tri(t(L), diag = TRUE)]
       diag(L) <- 0
       
       mret <- vector(length = J, mode = "list")
@@ -211,7 +213,10 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
       
       mret <- -do.call("c", mret)
       cret <- -do.call("c", cret)
-      c(mret, cret)
+      
+      ## need to revert order to column-wise
+      L1 <- matrix(1:(Jp*ncol(lX)), nrow = Jp, ncol = ncol(lX), byrow = TRUE)
+      c(mret, cret[t(L1[new_id,])])
     }
     
     ### user-defined starting parameters for optimization
@@ -352,7 +357,7 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
   g <- sc
   # }
 
-  opt <- alabama::auglag(par = start, fn = f, #gr = g,
+  opt <- alabama::auglag(par = start, fn = f, gr = g,
                          hin = function(par) ui %*% par - ci, 
                          hin.jac = function(par) ui,
                          control.outer = control.outer)[c("par", 
