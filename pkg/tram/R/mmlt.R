@@ -151,7 +151,8 @@ mmlt <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
     S <- matrix(rep(rep(1:0, J),
                     c(rbind(1:J, Jp))), nrow = Jp)[, -(J + 1)]
     idx <- unlist(lapply(colSums(S), seq_len))
-    idx_d <- cumsum(unlist(lapply(colSums(S), sum)))
+    # idx_d <- cumsum(unlist(lapply(colSums(S), sum)))
+    idx_d <- di
   }
   
   
@@ -197,6 +198,7 @@ mmlt <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
       L <- diag(0, J)
       L[!lower.tri(L)] <- 1:Jp  ## row-wise
       L <- t(L)
+      # L[lower.tri(L, diag = TRUE)] <- 1:Jp ## column-wise
       
       A <- Yp[, idx] * Xp
       B <- A %*% S
@@ -237,6 +239,11 @@ mmlt <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
       mret <- -do.call("c", mret)
       cret <- -do.call("c", cret)
       c(mret, cret)
+      
+      ## need to revert order to column-wise
+      # new_id <- L[lower.tri(L, diag = TRUE)]
+      # L1 <- matrix(1:(Jp*ncol(lX)), nrow = Jp, ncol = ncol(lX), byrow = TRUE)
+      # c(mret, cret[t(L1[new_id,])])
     }
     
     ### user-defined starting parameters for optimization
