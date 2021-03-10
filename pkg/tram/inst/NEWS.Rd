@@ -2,6 +2,14 @@
 \name{NEWS}
 \title{NEWS file for the tram package}
 
+\section{Changes in Version 0.6-1 (2021-03-10)}{
+  \itemize{
+    \item{Allow diagonals of the inverse Cholesky factor to be modelled
+          as a function of covariates in \code{mmlt}.}
+  }
+}
+
+
 \section{Changes in Version 0.6-0 (2021-03-08)}{
   \itemize{
     \item{Add \code{simulate} method.}
@@ -9,10 +17,9 @@
     \item{New argument \code{sparse_nlevels} to \code{tram}, requesting
           a model \code{Matrix} for ordered factors with at least
           \code{sparse_nlevels} levels.}
-    \item{Allow diagonals of the inverse Cholesky factor to be modelled
-          as a function of covariates in \code{mmlt}.}
   }
 }
+
 
 \section{Changes in Version 0.5-2 (2020-10-23)}{
   \itemize{
