@@ -2,7 +2,7 @@
 ### mmlt function for count case
 mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
                     control.outer = list(trace = FALSE), scale = FALSE,
-                    tol = sqrt(.Machine$double.eps)) {
+                    tol = sqrt(.Machine$double.eps), gr = TRUE) {
   
   call <- match.call()
   
@@ -99,6 +99,9 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
   .log <- function(x) {
     return(log(pmax(.Machine$double.eps, x)))
   }
+
+  .p0 <- function(x)
+    pmax(.Machine$double.eps^(1/2), x)
   
   if (diag) {
     ll <- function(par) {
@@ -170,9 +173,9 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
         Z1 <- f_Zj(C_l[, j])*lu[[j]]$lower
         Z1[is.na(Z1)] <- 0
         
-        C1[, j] <- (f_Zj(C_u[, j]) - f_Zj(C_l[, j]))/(F_Zj(C_u[, j]) - F_Zj(C_l[, j]))
-        CD[, j] <- rowSums(f_Zj(C_u[, j])*lu[[j]]$upper -  Z1)/(F_Zj(C_u[, j]) - F_Zj(C_l[, j]))
-        CD_l[, j] <- (f_Zj(C_u[, j])*Yp_u[,j] -  Z)/(F_Zj(C_u[, j]) - F_Zj(C_l[, j]))
+        C1[, j] <- (f_Zj(C_u[, j]) - f_Zj(C_l[, j])) / .p0(F_Zj(C_u[, j]) - F_Zj(C_l[, j]))
+        CD[, j] <- rowSums(f_Zj(C_u[, j])*lu[[j]]$upper -  Z1) / .p0(F_Zj(C_u[, j]) - F_Zj(C_l[, j]))
+        CD_l[, j] <- (f_Zj(C_u[, j])*Yp_u[,j] -  Z) / .p0(F_Zj(C_u[, j]) - F_Zj(C_l[, j]))
       }
       
       L <- diag(0, J)
@@ -187,7 +190,7 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
         lu[[k]]$lower[is.infinite(lu[[k]]$lower)] <- 0
         mret[[k]] <- colSums((f_Zk(C_u[, k])*lu[[k]]$upper - 
                                 f_Zk(C_l[, k])*lu[[k]]$lower)*Xp_diag[, k]/
-                               (F_Zk(C_u[, k]) - F_Zk(C_l[, k])))
+                               .p0(F_Zk(C_u[, k]) - F_Zk(C_l[, k])))
         Lk <- L[,k]
         D <- cbind(matrix(rep(0, k*N), nrow = N), Xp[,Lk[Lk > 0]])
         mret[[k]] <- mret[[k]] + colSums(rowSums(C1 * D) * lu[[k]]$upper)
@@ -284,7 +287,7 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
       for (j in 1:J) {
         f_Zj <- m[[j]]$todistr$d
         F_Zj <- m[[j]]$todistr$p
-        C1[, j] <- (f_Zj(C_u[, j]) - f_Zj(C_l[, j]))/(F_Zj(C_u[, j]) - F_Zj(C_l[, j]))
+        C1[, j] <- (f_Zj(C_u[, j]) - f_Zj(C_l[, j])) / .p0(F_Zj(C_u[, j]) - F_Zj(C_l[, j]))
       }
       
       L <- diag(0, J)
@@ -297,7 +300,7 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
         F_Zk <- m[[k]]$todistr$p
         lu[[k]]$lower[is.infinite(lu[[k]]$lower)] <- 0
         mret[[k]] <- colSums((f_Zk(C_u[, k])*lu[[k]]$upper - f_Zk(C_l[, k])*lu[[k]]$lower)/
-                               (F_Zk(C_u[, k]) - F_Zk(C_l[, k])))
+                               .p0(F_Zk(C_u[, k]) - F_Zk(C_l[, k])))
         Lk <- L[,k]
         D <- cbind(matrix(rep(0, k*N), nrow = N), Xp[,Lk[Lk > 0]])
         mret[[k]] <- mret[[k]] + colSums(rowSums(C1 * D) * lu[[k]]$upper)
@@ -357,13 +360,26 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
   g <- sc
   # }
 
-  opt <- alabama::auglag(par = start, fn = f, gr = g,
+if (gr) {
+  opt <- alabama::auglag(par = start, fn = f, 
+                         gr = g,
                          hin = function(par) ui %*% par - ci, 
                          hin.jac = function(par) ui,
                          control.outer = control.outer)[c("par", 
                                                           "value", 
                                                           "gradient",
                                                           "hessian")]
+} else {
+  opt <- alabama::auglag(par = start, fn = f, 
+ #                        gr = g,
+                         hin = function(par) ui %*% par - ci, 
+                         hin.jac = function(par) ui,
+                         control.outer = control.outer)[c("par", 
+                                                          "value", 
+                                                          "gradient",
+                                                          "hessian")]
+}
+
   if (scale) opt$par <- opt$par * scl
   
   opt$ll <- ll
