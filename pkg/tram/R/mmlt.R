@@ -574,9 +574,7 @@ predict.mmlt <- function(object, newdata, marginal = 1L,
       if (J > 2) {
         L <- diag(0, J)
         L[!upper.tri(L)] <- 1:Jp
-        
-        S <- matrix(rep(rep(1:0, J), c(rbind(1:J, Jp))), nrow = Jp)[, -(J+1)]
-        idx_d <- cumsum(unlist(lapply(colSums(S), sum)))
+        idx_d <- diag(L)
         
         S_low <- Linv*0 ## ensures right length
         for (i in J:1) { # row
