@@ -13,3 +13,5 @@ penalized.Rout.save
 prof_test.R
 prof_test.Rout.save
 
+^.*\.Rproj$
+^\.Rproj\.user$
