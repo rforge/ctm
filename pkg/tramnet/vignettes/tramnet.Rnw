@@ -501,6 +501,7 @@ library("penalized")
 library("glmnet")
 library("mvtnorm")
 library("Matrix")
+library("coin")
 @
 
 \begin{document}
