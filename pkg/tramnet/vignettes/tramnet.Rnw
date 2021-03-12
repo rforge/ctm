@@ -522,12 +522,12 @@ library("Matrix")
 \maketitle
 
 \abstract{
-  The \pkg{tramnet} package implements regularized linear 
+  The \pkg{tramnet} package implements regularized linear
   transformation models by combining the flexible class of transformation
   models from \pkg{tram} with constrained convex optimization implemented in \pkg{CVXR}.
   Regularized transformation models unify many existing and novel regularized regression
   models under one theoretical and computational framework.
-  Regularization strategies implemented for transformation models in \pkg{tramnet} 
+  Regularization strategies implemented for transformation models in \pkg{tramnet}
   include the LASSO, ridge regression and the elastic net and
   follow the parametrization in \pkg{glmnet}. Several functionalities
   for optimizing the hyperparameters, including model-based optimization based on
@@ -551,7 +551,7 @@ novel models using the theoretical and computational framework of
 transformation models. Novel models in this class include Continuous Outcome
 Logistic Regression (COLR) as introduced by \citet{COLRpaper} and Box-Cox type
 regression models with a transformed conditionally normal response \citep{boxcox,
-pkg:tram}. 
+pkg:tram}.
 
 The disciplined convex optimization package \pkg{CVXR} \citep{CVXRpaper} is
 applied to solve the constrained convex optimization problems that arise
@@ -577,7 +577,7 @@ increasing in $\ry$.
 %   \Prb\left(\rY \le \ry \given \rX = \rx\right) = \pY\left(\rY \given \rX = \rx\right)
 % \end{aligned}
 % \end{eqnarray}
-Although the model class is more flexible, 
+Although the model class is more flexible,
 packages \pkg{tram} and \pkg{tramnet} focus on stratified linear transformation models of the form
 % \begin{eqnarray*}
 % 	F\left(\h(\ry \given \rx)\right) = F\left(\h(\ry) -
@@ -626,7 +626,7 @@ ordered and continuous responses, as well as exponential, Weibull and Rayleigh
 regression and the Cox model in survival analysis. Thus, by appropriately choosing
 and parametrizing $F$ and $\h$ one can understand all those models in the same
 maximum likelihood-based framework. One can formulate the corresponding likelihood
-contributions not only for exact observations, but under any form of random 
+contributions not only for exact observations, but under any form of random
 censoring and truncation for continuous and discrete or ordered categorical
 responses.
 
@@ -823,10 +823,10 @@ S3 methods accompanying the \cls{tramnet} class will be discussed in section
 
 Specific combinations of $F$ and the form of censoring yield log-log-concave
 log-likelihoods. Under these circumstances \pkg{tramnet} is not yet able to solve
-the resulting optimization problem. 
+the resulting optimization problem.
 % In future versions \pkg{CVXR}, disciplined
-% geometric programming will be added, which will solve this problem. 
-Table \ref{tab:models} indicates which model class can be fitted under what type 
+% geometric programming will be added, which will solve this problem.
+Table \ref{tab:models} indicates which model class can be fitted under what type
 of censoring in the current version of \pkg{tramnet}.
 
 \begin{table}
@@ -1201,8 +1201,16 @@ in Figure \ref{fig:prof}.
 % The left panel shows the log-likelihood
 % trajectory, which may not always be interesting to look at and is suppressed by
 % default but can be toggled by \code{plot\_logLik = TRUE}.
-<<profiling>>=
+<<profiling, eval=FALSE>>=
 pfl <- prof_lambda(mt)
+@
+<<load_from_dat2, echo=FALSE>>=
+if (file.exists("cache2.rda")) {
+    load("cache2.rda")
+} else {
+  <<profiling>>
+  save(pfl, file = "cache2.rda")
+}
 @
 \cmd{prof\_lambda} takes \code{min\_lambda}, \code{max\_lambda} and \code{nprof}
 as arguments and internally generates an equi-spaced sequence from \code{min\_lambda}
@@ -1231,8 +1239,8 @@ In some applications, the specification of additional constraints on the shift
 parameters $\shiftparm$ are of interest. Most commonly, either positivity or
 negativity for some or all regression coefficients is aimed at. In \pkg{tramnet}
 additional inequality constraints can be specified via the \code{constraints} argument,
-which are internally handled as \code{constraints[[1]] \%*\% beta $>$ constraints[[2]]}. 
-Hence, to specify the constraint of strictly positive regression coefficients, 
+which are internally handled as \code{constraints[[1]] \%*\% beta $>$ constraints[[2]]}.
+Hence, to specify the constraint of strictly positive regression coefficients,
 one would supply an identity matrix of dimension $p$ for the left hand side and
 the zero $p$-vector for the left hand side, as done in the following example.
 <<addconst>>=
@@ -1385,7 +1393,7 @@ it <- independence_test(r ~ age + lcp, data = Prostate,
                         teststat = "max", distribution = approximate(1e6))
 pvalue(it, "single-step")
 @
-Because there is substantial evidence against independence of the models' residuals 
+Because there is substantial evidence against independence of the models' residuals
 to either lcp or age, we can conclude that it is
 worthwhile to include \code{age} and \code{lcp} in the model.
 Packages \pkg{trtf} \citep{pkg:trtf} and \pkg{tbm} \citep{hothorn2019tbm,pkg:tbm}
