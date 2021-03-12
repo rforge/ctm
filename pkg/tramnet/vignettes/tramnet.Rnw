@@ -1399,11 +1399,10 @@ if (file.exists("cache3.rda")) {
     load("cache3.rda")
 } else {
   <<coin_illustration>>
-  save(it, file = "cache3.rda")
+  tmp <- pvalue(it, "single-step")
+  save(tmp, file = "cache3.rda")
 }
-@
-<<coin_illustration2, eval=FALSE, echo=FALSE>>=
-pvalue(it, "single-step")
+tmp
 @
 Because there is substantial evidence against independence of the models' residuals
 to either lcp or age, we can conclude that it is
