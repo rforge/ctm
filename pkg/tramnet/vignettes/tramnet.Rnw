@@ -1108,7 +1108,7 @@ the out-of-sample log-likelihood as the objective function, because
 the notion of a mean square loss does not make sense for survival, let alone
 censored outcomes. The out-of-sample log-likelihood is in fact the log score,
 which is a proper scoring rule \citep{Gneiting_Raftery_2007}.
-<<cvl_prof_setup>>=
+<<cvl_prof_setup, eval=FALSE>>=
 m0 <- BoxCox(lpsa ~ 1, data = Prostate, order = 7, extrapolate = TRUE)
 mt <- tramnet(m01, x = x, alpha = 1, lambda = 0)
 @
@@ -1208,6 +1208,7 @@ pfl <- prof_lambda(mt)
 if (file.exists("cache2.rda")) {
     load("cache2.rda")
 } else {
+  <<cvl_prof_setup>>
   <<profiling>>
   save(pfl, file = "cache2.rda")
 }
@@ -1383,7 +1384,7 @@ extracted using the \cmd{residuals.tramnet} method. Lastly, an independence test
 using a maximum statistic (\code{teststat~=~"max"}) and a Monte Carlo based
 approximation of the null distribution based on resampling $10^6$ times
 (\code{distribution~=~approximate(1e6)}), yields the results printed below.
-<<coin_illustration>>=
+<<coin_illustration, eval=FALSE>>=
 library("coin")
 m0 <- BoxCox(lpsa ~ 1, data = Prostate, extrapolate = TRUE)
 x_no_age_lcp <- x[, !colnames(x) %in% c("age", "lcp")]
@@ -1391,6 +1392,17 @@ mt_no_age_lcp <- tramnet(m0, x_no_age_lcp, alpha = 0, lambda = 0)
 r <- residuals(mt_no_age_lcp)
 it <- independence_test(r ~ age + lcp, data = Prostate,
                         teststat = "max", distribution = approximate(1e6))
+pvalue(it, "single-step")
+@
+<<load_from_dat3, echo=FALSE>>=
+if (file.exists("cache3.rda")) {
+    load("cache3.rda")
+} else {
+  <<coin_illustration>>
+  save(it, file = "cache3.rda")
+}
+@
+<<coin_illustration2, eval=FALSE, echo=FALSE>>=
 pvalue(it, "single-step")
 @
 Because there is substantial evidence against independence of the models' residuals
