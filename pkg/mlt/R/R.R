@@ -442,3 +442,19 @@ R.list <- function(object, ...) {
     ret <- lapply(object, R)
     do.call(".mkR", do.call("rbind", ret))
 }
+
+"[.response" <- function(x, i, j, ..., drop = FALSE) {
+    cls <- class(x) 
+    class(x) <- "data.frame"
+    ret <- x[i,j, drop = FALSE]
+    class(ret) <- cls
+    ret
+}
+
+"[<-.response" <- function(x, i, j, value) {
+    cls <- class(x)
+    class(x) <- "data.frame"
+    x[i,j] <- value
+    class(x) <- cls
+    x
+}
