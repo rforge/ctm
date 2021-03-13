@@ -27,11 +27,11 @@ logLik(modCOLR, newdata = tramnet:::.get_tramnet_data(modCOLR)[1:10, ])
 ## methods
 coef(modCOLR, tol = 0, with_baseline = TRUE)
 logLik(modCOLR)
-resid(modCOLR)[1:10]
+c(resid(modCOLR)[1:10])
 predict(modCOLR, type = "distribution", q = 1)[, 1:10]
 predict(modCOLR, type = "quantile", prob = 0.5)[, 1:10]
 head(simulate(modCOLR))
-head(estfun(modCOLR))
+as.data.frame(head(estfun(modCOLR)))
 plot(modCOLR, type = "survivor")
 plot(modCOLR, type = "density", K = 120)
 print(modCOLR)
