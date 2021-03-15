@@ -42,31 +42,42 @@ uc1 <- mcotram(u1, u2, data = d)
 uc2 <- mcotram(u2, u1, data = d)
 logLik(uc1)
 logLik(uc2)
+all.equal(uc1$sc(uc2$par), numDeriv::grad(uc1$ll, uc2$par),
+          tol = 1e-6, check.attributes = FALSE)
+
 uc1 <- mcotram(u1, u2, data = d, gr = FALSE)
 uc2 <- mcotram(u2, u1, data = d, gr = FALSE)
 logLik(uc1)
 logLik(uc2)
 
-
+uc1 <- uc2 <- 0
 u1 <- cotram(y.1 ~ 1, data = d, method = "probit", log_first = FALSE)
 u2 <- cotram(y.2 ~ 1, data = d, method = "probit", log_first = FALSE)
 uc1 <- mcotram(u1, u2, data = d)
 uc2 <- mcotram(u2, u1, data = d)
 logLik(uc1)
 logLik(uc2)
+all.equal(uc1$sc(uc2$par), numDeriv::grad(uc1$ll, uc2$par),
+          tol = 1e-6, check.attributes = FALSE)
+round(uc1$sc(uc2$par) - numDeriv::grad(uc1$ll, uc2$par), 2)
+## why is there only difference for Bs6 and Bs7 and the lambda? So strange...
+## so this is really dependent on the exponent in the .p0 function!
+## especially when the degree of the Bernstein Basis is "big" compared to the
+## actual complexity of the simulated data
+
 uc1 <- mcotram(u1, u2, data = d, gr = FALSE)
 uc2 <- mcotram(u2, u1, data = d, gr = FALSE)
 logLik(uc1)
 logLik(uc2)
+all.equal(uc1$sc(uc2$par), numDeriv::grad(uc1$ll, uc2$par),
+          tol = 1e-6, check.attributes = FALSE)
+round(uc1$sc(uc2$par) - numDeriv::grad(uc1$ll, uc2$par), 2)  ## similar to previous one!
 
 
-
-m01 <- cotram(y.1 ~ x.1 + x.2, data = d, method = "probit", log_first =
-FALSE)
+m01 <- cotram(y.1 ~ x.1 + x.2, data = d, method = "probit", log_first = FALSE)
 coef(m01)
 logLik(m01)
-m02 <- cotram(y.2 ~ x.1 + x.2, data = d, method = "probit", log_first =
-FALSE)
+m02 <- cotram(y.2 ~ x.1 + x.2, data = d, method = "probit", log_first = FALSE)
 coef(m02)
 logLik(m02)
 

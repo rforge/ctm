@@ -46,7 +46,7 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
   nobs <- sapply(lu, function(m) nrow(m$lower))
   stopifnot(length(unique(nobs)) == 1L)
   
-  npar <- sum(sapply(lu, function(m) ncol(m$lower))) + Jp * ncol(lX)
+  # npar <- sum(sapply(lu, function(m) ncol(m$lower))) + Jp * ncol(lX)
   
   Ylower <- do.call("bdiag", lapply(lu, function(m) m$lower))
   Yupper <- do.call("bdiag", lapply(lu, function(m) m$upper))
@@ -80,19 +80,15 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
   
   idx <- 1
   S <- 1
-  if (diag) {
-    # S1 <- matrix(rep(rep(1:0, J),
-    #                  c(rbind(1:J, Jp))), nrow = Jp)[, -(J + 1)]
-    if (J > 2) {
+  if (J > 2) {
+    if(diag) {
       Jp1 <- Jp - J
       S <- matrix(rep(rep(1:0, (J - 1)), c(rbind(1:(J - 1), Jp1))), nrow = Jp1)[, -J]
       idx <- unlist(lapply(colSums(S), seq_len))
+    } else {
+      S <- matrix(rep(rep(1:0, (J - 1)), c(rbind(1:(J - 1), Jp))), nrow = Jp)[, -J]
+      idx <- unlist(lapply(colSums(S), seq_len))
     }
-    # idx_d <- cumsum(unlist(lapply(colSums(S1), sum)))
-  }
-  if (J > 2 && !diag) {
-    S <- matrix(rep(rep(1:0, (J - 1)), c(rbind(1:(J - 1), Jp))), nrow = Jp)[, -J]
-    idx <- unlist(lapply(colSums(S), seq_len))
   }
   
   ### catch constraint violations here
@@ -101,7 +97,7 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
   }
 
   .p0 <- function(x)
-    pmax(.Machine$double.eps^(1/2), x)
+    pmax(.Machine$double.eps^(2/2), x)  ## old version had ^(1/2)
   
   if (diag) {
     ll <- function(par) {
@@ -125,13 +121,12 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
       B_l <- A %*% S + Yp_l[, -1]*Xp_diag[, -1]
       B_u <- A %*% S + Yp_u[, -1]*Xp_diag[, -1]
       C_l <- cbind(Yp_l[, 1]*Xp_diag[, 1], B_l)
-      C_l[is.na(C_l)] <- -Inf
       C_u <- cbind(Yp_u[, 1]*Xp_diag[, 1], B_u)
 
       ret <- 0
       for (j in 1:J) {
         F_Zj <- m[[j]]$todistr$p
-        ret <- ret + sum(.log(F_Zj(C_u[, j]) - F_Zj(C_l[, j])))
+        ret <- ret + sum(.log(.p0(F_Zj(C_u[, j]) - F_Zj(C_l[, j]))))
       }
       
       return(-ret)
@@ -153,29 +148,23 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
       if (!is.matrix(Xp_off)) Xp_off <- matrix(Xp_off, ncol = 1)
       Xp_diag <- Xp[, di]
       
-      stopifnot(ncol(Xp_diag) == J)
-      
       A <- Yp_u[, idx] * Xp_off
       B_l <- A %*% S + Yp_l[, -1]*Xp_diag[, -1]
       B_u <- A %*% S + Yp_u[, -1]*Xp_diag[, -1]
       C_l <- cbind(Yp_l[, 1]*Xp_diag[, 1], B_l)
-      C_l[is.na(C_l)] <- -Inf
       C_u <- cbind(Yp_u[, 1]*Xp_diag[, 1], B_u)
 
-      C1 <- CD <- CD_l <- C_l
+      C1 <- C1_l <- C_l
       for (j in 1:J) {
         f_Zj <- m[[j]]$todistr$d
         F_Zj <- m[[j]]$todistr$p
+        F_den <- .p0(F_Zj(C_u[, j]) - F_Zj(C_l[, j]))
         
-        lu[[j]]$lower[is.infinite(lu[[j]]$lower)] <- 0
         Z <- f_Zj(C_l[, j])*Yp_l[,j]
-        Z[is.na(Z)] <- 0
-        Z1 <- f_Zj(C_l[, j])*lu[[j]]$lower
-        Z1[is.na(Z1)] <- 0
+        Z[is.na(Z)] <- 0  ## for zero counts, y - 1 = -1. hence set term 0.
         
-        C1[, j] <- (f_Zj(C_u[, j]) - f_Zj(C_l[, j])) / .p0(F_Zj(C_u[, j]) - F_Zj(C_l[, j]))
-        CD[, j] <- rowSums(f_Zj(C_u[, j])*lu[[j]]$upper -  Z1) / .p0(F_Zj(C_u[, j]) - F_Zj(C_l[, j]))
-        CD_l[, j] <- (f_Zj(C_u[, j])*Yp_u[,j] -  Z) / .p0(F_Zj(C_u[, j]) - F_Zj(C_l[, j]))
+        C1[, j] <- (f_Zj(C_u[, j]) - f_Zj(C_l[, j])) / F_den
+        C1_l[, j] <- (f_Zj(C_u[, j])*Yp_u[,j] -  Z) / F_den
       }
       
       L <- diag(0, J)
@@ -199,7 +188,7 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
       cret <- vector(length = J, mode = "list")
       ## row-wise: diagonal goes at the end!
       l <- ncol(lX)
-      cret[[1]] <- colSums(matrix(rep(CD_l[, 1], l), ncol = l) * lX)
+      cret[[1]] <- colSums(matrix(rep(C1_l[, 1], l), ncol = l) * lX)
 
       for (k in 1:(J - 1)) { # go over rows
         C2 <- matrix(rep(C1[, k+1], k), ncol = k)
@@ -210,7 +199,7 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
           ret <- c(ret, colSums(tmp1 * lX))
         }
         ret <- c(ret,
-                 colSums(matrix(rep(CD_l[, k+1], l), ncol = l) * lX))
+                 colSums(matrix(rep(C1_l[, k+1], l), ncol = l) * lX))
         cret[[k+1]] <- ret
       }
       
