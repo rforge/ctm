@@ -21,8 +21,8 @@ structure via the lambda parameters. The default is set to \code{~ 1} for consta
 }
   \item{theta}{an optional vector of starting values
 }
-  \item{diag}{logical; by default, diagonal elements are constrained to 1, corresponding to \code{diag = FALSE}.
-}
+ % \item{diag}{logical; by default, diagonal elements are constrained to 1, corresponding to \code{diag = FALSE}.
+%}
   \item{control.outer}{a list controlling \code{\link[alabama]{auglag}}
 }
   %\item{scale}{logical; parameters are not scaled prior to optimisation by default
