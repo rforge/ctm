@@ -4,6 +4,15 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
                     control.outer = list(trace = FALSE), scale = FALSE,
                     tol = sqrt(.Machine$double.eps), gr = TRUE) {
   
+  ## diag = FALSE by default. 
+  ## diag = TRUE still present in the code but not in use for the moment being.
+  ## gradient evaluated as implemented, i.e., analytically.
+  if(diag == TRUE)
+    stop("diag = TRUE not available")
+  if(gr == FALSE)
+    message("Gradient is estimated numerically.")
+    
+  
   call <- match.call()
   
   m <- list(...)
@@ -60,7 +69,7 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
     L[lower.tri(L, diag = diag)] <- 1:Jp
     di <- diag(L)
     di <- di[!is.na(di)]
-    
+
     CP <- matrix(1:(Jp*ncol(lX)), nrow = ncol(lX))
     dintercept <- CP[1L, di]
     tci <- rep(-Inf, Jp * ncol(lX))
@@ -68,16 +77,16 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
     D <- Diagonal(Jp * ncol(lX))[dintercept,]
     NL <- Matrix(0, nrow = length(dintercept), ncol = ncol(cnstr))
     ui <- rbind(ui, cbind(NL, -D))
-    
-    ci <- c(ci, tci, rep(-1 + tol, length(dintercept))) 
+
+    ci <- c(ci, tci, rep(-1 + tol, length(dintercept)))
   } else {
     ci <- c(ci, rep(-Inf, Jp * ncol(lX)))
   }
-  
+
   ui <- ui[is.finite(ci),]
   ci <- ci[is.finite(ci)]
   ui <- as(ui, "matrix")
-  
+
   idx <- 1
   S <- 1
   if (J > 2) {
@@ -90,140 +99,140 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
       idx <- unlist(lapply(colSums(S), seq_len))
     }
   }
-  
+
   ### catch constraint violations here
   .log <- function(x) {
     return(log(pmax(.Machine$double.eps, x)))
   }
 
   .p0 <- function(x)
-    pmax(.Machine$double.eps^(2/2), x)  ## old version had ^(1/2)
-  
-  if (diag) {
-    ll <- function(par) {
-      
-      mpar <- par[1:ncol(Ylower)]
-      cpar <- matrix(par[-(1:ncol(Ylower))], nrow = ncol(lX))
-      
-      ### Ylower = NaN means -Inf and Yupper == NaN means +Inf
-      ### (corresponding to probabilities 0 and 1)
-      Yp_l <- matrix(Ylower %*% mpar, nrow = N)
-      Yp_l[is.na(Yp_l)] <- -Inf
-      Yp_u <- matrix(Yupper %*% mpar, nrow = N)
-      Yp_u[is.na(Yp_u)] <- Inf
-      
-      Xp <- lX %*% cpar
-      Xp_off <- Xp[, -di]
-      if (!is.matrix(Xp_off)) Xp_off <- matrix(Xp_off, ncol = 1)
-      Xp_diag <- Xp[, di]
-      
-      A <- Yp_u[, idx] * Xp_off
-      B_l <- A %*% S + Yp_l[, -1]*Xp_diag[, -1]
-      B_u <- A %*% S + Yp_u[, -1]*Xp_diag[, -1]
-      C_l <- cbind(Yp_l[, 1]*Xp_diag[, 1], B_l)
-      C_u <- cbind(Yp_u[, 1]*Xp_diag[, 1], B_u)
+    pmax(.Machine$double.eps^(1/2), x)  ## tuning this makes a difference!
 
-      ret <- 0
-      for (j in 1:J) {
-        F_Zj <- m[[j]]$todistr$p
-        ret <- ret + sum(.log(.p0(F_Zj(C_u[, j]) - F_Zj(C_l[, j]))))
-      }
-      
-      return(-ret)
-    }
-    sc <- function(par) {
-      
-      mpar <- par[1:ncol(Ylower)]
-      cpar <- matrix(par[-(1:ncol(Ylower))], nrow = ncol(lX))
-      
-      ### Ylower = NaN means -Inf and Yupper == NaN means +Inf
-      ### (corresponding to probabilities 0 and 1)
-      Yp_l <- matrix(Ylower %*% mpar, nrow = N)
-      Yp_l[is.na(Yp_l)] <- -Inf
-      Yp_u <- matrix(Yupper %*% mpar, nrow = N)
-      Yp_u[is.na(Yp_u)] <- Inf
-      
-      Xp <- lX %*% cpar
-      Xp_off <- Xp[, -di]
-      if (!is.matrix(Xp_off)) Xp_off <- matrix(Xp_off, ncol = 1)
-      Xp_diag <- Xp[, di]
-      
-      A <- Yp_u[, idx] * Xp_off
-      B_l <- A %*% S + Yp_l[, -1]*Xp_diag[, -1]
-      B_u <- A %*% S + Yp_u[, -1]*Xp_diag[, -1]
-      C_l <- cbind(Yp_l[, 1]*Xp_diag[, 1], B_l)
-      C_u <- cbind(Yp_u[, 1]*Xp_diag[, 1], B_u)
-
-      C1 <- C1_l <- C_l
-      for (j in 1:J) {
-        f_Zj <- m[[j]]$todistr$d
-        F_Zj <- m[[j]]$todistr$p
-        F_den <- .p0(F_Zj(C_u[, j]) - F_Zj(C_l[, j]))
-        
-        Z <- f_Zj(C_l[, j])*Yp_l[,j]
-        Z[is.na(Z)] <- 0  ## for zero counts, y - 1 = -1. hence set term 0.
-        
-        C1[, j] <- (f_Zj(C_u[, j]) - f_Zj(C_l[, j])) / F_den
-        C1_l[, j] <- (f_Zj(C_u[, j])*Yp_u[,j] -  Z) / F_den
-      }
-      
-      L <- diag(0, J)
-      L[lower.tri(L, diag = TRUE)] <- 1:Jp  ## column-wise
-      new_id <- t(L)[upper.tri(t(L), diag = TRUE)]
-      diag(L) <- 0
-      
-      mret <- vector(length = J, mode = "list")
-      for (k in 1:J) {
-        f_Zk <- m[[k]]$todistr$d
-        F_Zk <- m[[k]]$todistr$p
-        lu[[k]]$lower[is.infinite(lu[[k]]$lower)] <- 0
-        mret[[k]] <- colSums((f_Zk(C_u[, k])*lu[[k]]$upper - 
-                                f_Zk(C_l[, k])*lu[[k]]$lower)*Xp_diag[, k]/
-                               .p0(F_Zk(C_u[, k]) - F_Zk(C_l[, k])))
-        Lk <- L[,k]
-        D <- cbind(matrix(rep(0, k*N), nrow = N), Xp[,Lk[Lk > 0]])
-        mret[[k]] <- mret[[k]] + colSums(rowSums(C1 * D) * lu[[k]]$upper)
-      }
-      
-      cret <- vector(length = J, mode = "list")
-      ## row-wise: diagonal goes at the end!
-      l <- ncol(lX)
-      cret[[1]] <- colSums(matrix(rep(C1_l[, 1], l), ncol = l) * lX)
-
-      for (k in 1:(J - 1)) { # go over rows
-        C2 <- matrix(rep(C1[, k+1], k), ncol = k)
-        tmp <- C2 * Yp_u[,1:k]
-        ret <- c()
-        for (i in 1:k) {
-          tmp1 <- matrix(rep(tmp[,i], l), ncol = l)
-          ret <- c(ret, colSums(tmp1 * lX))
-        }
-        ret <- c(ret,
-                 colSums(matrix(rep(C1_l[, k+1], l), ncol = l) * lX))
-        cret[[k+1]] <- ret
-      }
-      
-      mret <- -do.call("c", mret)
-      cret <- -do.call("c", cret)
-      
-      ## need to revert order to column-wise
-      L1 <- matrix(1:(Jp*ncol(lX)), nrow = Jp, ncol = ncol(lX), byrow = TRUE)
-      c(mret, cret[t(L1[new_id,])])
-    }
-    
-    ### user-defined starting parameters for optimization
-    if(!is.null(theta)) {
-      start <- unname(theta)
-    }
-    else {
-      start <- do.call("c", lapply(m, function(mod) coef(as.mlt(mod))))
-      CS <- matrix(0, nrow = ncol(lX), ncol = Jp)
-      CS[1L, di] <- 1
-      cstart <- c(CS)
-      start <- c(start, cstart)
-    }
-    
-  } else {  ## diag = FALSE
+  # if (diag) {
+  #   ll <- function(par) {
+  #     
+  #     mpar <- par[1:ncol(Ylower)]
+  #     cpar <- matrix(par[-(1:ncol(Ylower))], nrow = ncol(lX))
+  #     
+  #     ### Ylower = NaN means -Inf and Yupper == NaN means +Inf
+  #     ### (corresponding to probabilities 0 and 1)
+  #     Yp_l <- matrix(Ylower %*% mpar, nrow = N)
+  #     Yp_l[is.na(Yp_l)] <- -Inf
+  #     Yp_u <- matrix(Yupper %*% mpar, nrow = N)
+  #     Yp_u[is.na(Yp_u)] <- Inf
+  #     
+  #     Xp <- lX %*% cpar
+  #     Xp_off <- Xp[, -di]
+  #     if (!is.matrix(Xp_off)) Xp_off <- matrix(Xp_off, ncol = 1)
+  #     Xp_diag <- Xp[, di]
+  #     
+  #     A <- Yp_u[, idx] * Xp_off
+  #     B_l <- A %*% S + Yp_l[, -1]*Xp_diag[, -1]
+  #     B_u <- A %*% S + Yp_u[, -1]*Xp_diag[, -1]
+  #     C_l <- cbind(Yp_l[, 1]*Xp_diag[, 1], B_l)
+  #     C_u <- cbind(Yp_u[, 1]*Xp_diag[, 1], B_u)
+  # 
+  #     ret <- 0
+  #     for (j in 1:J) {
+  #       F_Zj <- m[[j]]$todistr$p
+  #       ret <- ret + sum(.log(.p0(F_Zj(C_u[, j]) - F_Zj(C_l[, j]))))
+  #     }
+  #     
+  #     return(-ret)
+  #   }
+  #   sc <- function(par) {
+  #     
+  #     mpar <- par[1:ncol(Ylower)]
+  #     cpar <- matrix(par[-(1:ncol(Ylower))], nrow = ncol(lX))
+  #     
+  #     ### Ylower = NaN means -Inf and Yupper == NaN means +Inf
+  #     ### (corresponding to probabilities 0 and 1)
+  #     Yp_l <- matrix(Ylower %*% mpar, nrow = N)
+  #     Yp_l[is.na(Yp_l)] <- -Inf
+  #     Yp_u <- matrix(Yupper %*% mpar, nrow = N)
+  #     Yp_u[is.na(Yp_u)] <- Inf
+  #     
+  #     Xp <- lX %*% cpar
+  #     Xp_off <- Xp[, -di]
+  #     if (!is.matrix(Xp_off)) Xp_off <- matrix(Xp_off, ncol = 1)
+  #     Xp_diag <- Xp[, di]
+  #     
+  #     A <- Yp_u[, idx] * Xp_off
+  #     B_l <- A %*% S + Yp_l[, -1]*Xp_diag[, -1]
+  #     B_u <- A %*% S + Yp_u[, -1]*Xp_diag[, -1]
+  #     C_l <- cbind(Yp_l[, 1]*Xp_diag[, 1], B_l)
+  #     C_u <- cbind(Yp_u[, 1]*Xp_diag[, 1], B_u)
+  # 
+  #     C1 <- C1_l <- C_l
+  #     for (j in 1:J) {
+  #       f_Zj <- m[[j]]$todistr$d
+  #       F_Zj <- m[[j]]$todistr$p
+  #       F_den <- .p0(F_Zj(C_u[, j]) - F_Zj(C_l[, j]))
+  #       
+  #       Z <- f_Zj(C_l[, j])*Yp_l[,j]
+  #       Z[is.na(Z)] <- 0  ## for zero counts, y - 1 = -1. hence set term 0.
+  #       
+  #       C1[, j] <- (f_Zj(C_u[, j]) - f_Zj(C_l[, j])) / F_den
+  #       C1_l[, j] <- (f_Zj(C_u[, j])*Yp_u[,j] -  Z) / F_den
+  #     }
+  #     
+  #     L <- diag(0, J)
+  #     L[lower.tri(L, diag = TRUE)] <- 1:Jp  ## column-wise
+  #     new_id <- t(L)[upper.tri(t(L), diag = TRUE)]
+  #     diag(L) <- 0
+  #     
+  #     mret <- vector(length = J, mode = "list")
+  #     for (k in 1:J) {
+  #       f_Zk <- m[[k]]$todistr$d
+  #       F_Zk <- m[[k]]$todistr$p
+  #       lu[[k]]$lower[is.infinite(lu[[k]]$lower)] <- 0
+  #       mret[[k]] <- colSums((f_Zk(C_u[, k])*lu[[k]]$upper - 
+  #                               f_Zk(C_l[, k])*lu[[k]]$lower)*Xp_diag[, k]/
+  #                              .p0(F_Zk(C_u[, k]) - F_Zk(C_l[, k])))
+  #       Lk <- L[,k]
+  #       D <- cbind(matrix(rep(0, k*N), nrow = N), Xp[,Lk[Lk > 0]])
+  #       mret[[k]] <- mret[[k]] + colSums(rowSums(C1 * D) * lu[[k]]$upper)
+  #     }
+  #     
+  #     cret <- vector(length = J, mode = "list")
+  #     ## row-wise: diagonal goes at the end!
+  #     l <- ncol(lX)
+  #     cret[[1]] <- colSums(matrix(rep(C1_l[, 1], l), ncol = l) * lX)
+  # 
+  #     for (k in 1:(J - 1)) { # go over rows
+  #       C2 <- matrix(rep(C1[, k+1], k), ncol = k)
+  #       tmp <- C2 * Yp_u[,1:k]
+  #       ret <- c()
+  #       for (i in 1:k) {
+  #         tmp1 <- matrix(rep(tmp[,i], l), ncol = l)
+  #         ret <- c(ret, colSums(tmp1 * lX))
+  #       }
+  #       ret <- c(ret,
+  #                colSums(matrix(rep(C1_l[, k+1], l), ncol = l) * lX))
+  #       cret[[k+1]] <- ret
+  #     }
+  #     
+  #     mret <- -do.call("c", mret)
+  #     cret <- -do.call("c", cret)
+  #     
+  #     ## need to revert order to column-wise
+  #     L1 <- matrix(1:(Jp*ncol(lX)), nrow = Jp, ncol = ncol(lX), byrow = TRUE)
+  #     c(mret, cret[t(L1[new_id,])])
+  #   }
+  #   
+  #   ### user-defined starting parameters for optimization
+  #   if(!is.null(theta)) {
+  #     start <- unname(theta)
+  #   }
+  #   else {
+  #     start <- do.call("c", lapply(m, function(mod) coef(as.mlt(mod))))
+  #     CS <- matrix(0, nrow = ncol(lX), ncol = Jp)
+  #     CS[1L, di] <- 1
+  #     cstart <- c(CS)
+  #     start <- c(start, cstart)
+  #   }
+  #   
+  # } else {  ## diag = FALSE
     ll <- function(par) {
       
       mpar <- par[1:ncol(Ylower)]
@@ -323,7 +332,7 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
       start <- do.call("c", lapply(m, function(mod) coef(as.mlt(mod))))
       start <- c(start, rep(0, Jp * ncol(lX)))
     }
-  }
+  # }
   
   ### does this work for count too? m$lower or upper?
   if(scale) {
@@ -359,12 +368,12 @@ if (gr) {
                                                           "gradient",
                                                           "hessian")]
 } else {
-  opt <- alabama::auglag(par = start, fn = f, 
+  opt <- alabama::auglag(par = start, fn = f,
  #                        gr = g,
-                         hin = function(par) ui %*% par - ci, 
+                         hin = function(par) ui %*% par - ci,
                          hin.jac = function(par) ui,
-                         control.outer = control.outer)[c("par", 
-                                                          "value", 
+                         control.outer = control.outer)[c("par",
+                                                          "value",
                                                           "gradient",
                                                           "hessian")]
 }
@@ -397,7 +406,7 @@ if (gr) {
   
   ret <- list(marginals = mmod, formula = formula, bx = bx, data = data,
               call = call,
-              gaussian = gaussian, diag = diag,
+              gaussian = gaussian, #diag = diag,
               pars = list(mpar = mpar, cpar = cpar),
               par = opt$par, ll = ll, sc = sc, logLik = -opt$value,
               hessian = opt$hessian)
