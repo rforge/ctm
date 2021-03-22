@@ -3,6 +3,13 @@
 \title{NEWS file for the mlt.docreg package}
 
 
+\section{Changes in Version 1.1-1 (2021-03-22)}{
+  \itemize{
+    \item{Update reference output for truncation examples.}
+  }
+}
+
+
 \section{Changes in Version 1.1-0 (2021-03-08)}{
   \itemize{
     \item{New regression test for nonparametric ML estimation
