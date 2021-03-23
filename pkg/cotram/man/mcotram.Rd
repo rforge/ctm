@@ -8,7 +8,7 @@
 transformation models for count data
 }
 \usage{
-mcotram(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
+mcotram(..., formula = ~ 1, data, theta = NULL,% diag = FALSE,
         control.outer = list(trace = FALSE), scale = FALSE)
 }
 \arguments{

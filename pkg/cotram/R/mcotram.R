@@ -406,7 +406,7 @@ if (gr) {
   
   ret <- list(marginals = mmod, formula = formula, bx = bx, data = data,
               call = call,
-              gaussian = gaussian, #diag = diag,
+              gaussian = gaussian, diag = diag,
               pars = list(mpar = mpar, cpar = cpar),
               par = opt$par, ll = ll, sc = sc, logLik = -opt$value,
               hessian = opt$hessian)
