@@ -9,7 +9,7 @@
 \arguments{
 \item{vc}{Covariance matrix of random effects}
 
-\item{rbs}{List of random effects matrix dimensions}
+\item{rbs}{Vector of random effects matrix dimensions}
 }
 \description{
 Convert from vc matrix to theta vector

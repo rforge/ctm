@@ -555,10 +555,8 @@ tramTMB <- function(data, parameters, constraint, negative, map = list(),
     mp <- which(c(is.na(map$beta), is.na(map$theta)))
     par <- c(par$beta, par$theta)
     if (length(mp) > 0) {
-      for (i in mp) {
-        cin <- cin + uin[, i] * par[i]
-      }
-      uin <- uin[, -mp]
+      cin <- cin - c(uin[, mp, drop = FALSE] %*% par[mp])
+      uin <- uin[, -mp, drop = FALSE]
     }
     ## Equality of parameter values (only within the same parameter vector)
     map$beta <- map$beta[!is.na(map$beta)]
@@ -738,6 +736,12 @@ optim_control <- function(method = c("nlminb", "BFGS", "CG", "L-BFGS-B"),
     pstart <- ra / max(ra)
     pstart <- pstart[cumsum(rwe)]
     pstart <- pmax(.01, pmin(pstart, .99))
+    ## -- FIXME: alternative
+    ## we <- obj$env$data$weights
+    ## y <- mlt::R(object = resp)
+    ## pstart <- attr(y, "prob")(we)(y$approxy)
+    ## pstart <- pmax(.01, pmin(pstart, .99))
+    ## --
     ## -- constraints
     nb <- length(.get_par(obj, fixed = FALSE)$beta)
     ui <- obj$env$constraint$ui[, 1:nb, drop = FALSE]

@@ -53,6 +53,10 @@ A \code{simulate.tramME} object with the structure defined by the inputs.
 Utilizes the simulation method of mlt. When the vector of random effects is supplied, the
 simulation is conditional on it.
 }
+\details{
+In certain settings, the conditional CDF of the outcome cannot be inverted on some
+some intervals. In these cases, \code{simulate.mlt} returns censored observations.
+}
 \examples{
 data("sleepstudy", package = "lme4")
 fit <- BoxCoxME(Reaction ~ Days + (Days | Subject), data = sleepstudy)

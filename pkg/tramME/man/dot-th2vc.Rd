@@ -9,7 +9,7 @@
 \arguments{
 \item{th}{Vector of theta parameters (reparametrization of the covariance matrices)}
 
-\item{rbs}{List of random effects matrix dimensions}
+\item{rbs}{Vector of random effects matrix dimensions}
 }
 \description{
 Convert from theta vector to vc matrix

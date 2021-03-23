@@ -29,7 +29,7 @@ NULL
 
 ##' Convert from theta vector to vc matrix
 ##' @param th Vector of theta parameters (reparametrization of the covariance matrices)
-##' @param rbs List of random effects matrix dimensions
+##' @param rbs Vector of random effects matrix dimensions
 .th2vc <- function(th, rbs) {
   if (any(is.na(th)))
     return(lapply(rbs, function(x) matrix(NA, nrow = x, ncol = x)))
@@ -38,8 +38,8 @@ NULL
     n <- (sqrt(1 + 8 * length(x)) - 1) / 2
     v <- exp(x[1:n])^2
     cr <- diag(n)
-    cr[lower.tri(cr)] <- x[(n+1):length(x)]
-    cr <- cr %*% t(cr)
+    cr[upper.tri(cr)] <- x[(n+1):length(x)]
+    cr <- t(cr) %*% cr
     s <- sqrt(diag(cr))
     ss <- diag(1/s, nrow = length(s), ncol = length(s))
     cr <- ss %*% cr %*% ss
@@ -50,7 +50,7 @@ NULL
 
 ##' Convert from vc matrix to theta vector
 ##' @param vc Covariance matrix of random effects
-##' @param rbs List of random effects matrix dimensions
+##' @param rbs Vector of random effects matrix dimensions
 ##' @importFrom stats cov2cor
 .vc2th <- function(vc, rbs) {
   if (any(is.na(vc)))
@@ -62,8 +62,8 @@ NULL
     sd <- sqrt(diag(x))
     cr <- cov2cor(x)
     cc <- chol(cr)
-    cc <- diag(1 / diag(cc)) %*% t(cc)
-    th <- c(log(sd), cc[lower.tri(cc)])
+    cc <- cc %*% diag(1 / diag(cc))
+    th <- c(log(sd), cc[upper.tri(cc)])
     th
   })
   unlist(out)
@@ -96,9 +96,9 @@ NULL
 
 ##' Format random effects
 ##' @param x Vector of random effects
-##' @param rts List of length of random effects terms for each grouping factor
+##' @param rts Vector of length of random effects terms for each grouping factor
 ##' @param rnms Named list of random effects names
-##' @param rbs List of random effects matrix dimensions
+##' @param rbs Vector of random effects matrix dimensions
 ##' @param rlev List of the levels of each grouping factor
 .re_format <- function(x, rts, rnms, rbs, rlev) {
   stopifnot(length(x) == sum(rts))

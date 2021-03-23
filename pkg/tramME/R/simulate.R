@@ -2,6 +2,9 @@
 ##'
 ##' Utilizes the simulation method of mlt. When the vector of random effects is supplied, the
 ##' simulation is conditional on it.
+##'
+##' In certain settings, the conditional CDF of the outcome cannot be inverted on some
+##' some intervals. In these cases, \code{simulate.mlt} returns censored observations.
 ##' @param object A fitted tramME object.
 ##' @param ranef If \code{NULL}, random effects are simulated from their estimated
 ##'   distribution for each of the \code{nsim} draws, i.e. the simulation is from the

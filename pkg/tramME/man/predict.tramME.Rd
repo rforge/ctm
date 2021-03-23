@@ -42,7 +42,10 @@ or the word "zero". See Details.}
 \item{...}{Additional arguments, passed to \code{\link[mlt]{predict.mlt}}.}
 }
 \value{
-A numeric vector or matrix of the predicted values.
+A numeric vector/matrix of the predicted values (depending on the inputs)
+  or a \code{response} object, when the some of the requested conditonal quantiles
+  fall outside of the support of the response distribution specified when the model
+  was set up (only can occur with \code{type = "quantile"}).
 }
 \description{
 Evaluates the _conditional_ distribution implied by a tramME model, given by a
@@ -67,6 +70,11 @@ The linear predictor (\code{type = "lp"}) and the conditional quantile function
 on a grid, even when the response variable in \code{newdata} is missing. The probabilities
 for the evaluation of the quantile function can be supplied with the \code{prob} argument
 of \code{\link[mlt]{predict.mlt}}.
+
+In the case of \code{type = "quantile"}, when the some of the requested conditonal
+quantiles fall outside of the support of the response distribution
+(specified when the model was set up), the inversion of the CDF cannot be done exactly
+and \code{tramME} returns censored values.
 
 When \code{ranef} is equal to "zero", a vector of zeros with the right size is
 used.

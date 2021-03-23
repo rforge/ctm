@@ -4,12 +4,12 @@
     * Fixed effects only models can be estimated
     * Exported functions (`coef`, `logLik`) communicate with the TMB model more smoothly
     * Updated internal structure to help future development (not exported currently)
-* Fixing coefficients
+* Fixing coefficients with the argument `fixed = c(name = value)` 
 * New model classes in `SurvregME` using the parameter fixing option
 * `AaregME` extends the (parametric) Aalen regression model of `tram` with mixed-effects.
 * Out-of-sample log-likelihoods using the `newdata` argument of `logLik`
-* Score residuals with `resid` method (activated with `resid = TRUE` in model definition)
-* Updating models via `update` method
+* Score residuals with the `resid` method. When frequently recalculated (e.g. in boosting), setting `resid = TRUE` in model definition increases efficiency.
+* Updating models via the `update` method
 * Setting observation weights and offsets efficiently (activated  with `do_update = TRUE`). Currently, only possible through directly manipulating the `tmb_obj` of the model. 
 * Parametric bootstrap with the `parboot` method
 * New optimization options (e.g. internal scaling of fixed effects design matrix to improve convergence, more sensible initial values) and improved control over the optimization process with `optim_control()`

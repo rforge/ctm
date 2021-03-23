@@ -21,4 +21,20 @@ attach(sleepstudy)
 fit_lm2 <- LmME(Reaction ~ Days + (Days || Subject))
 chkeq(logLik(fit_lm1), logLik(fit_lm2))
 
+## -- Check .th2vc and .vc2th helper functions
+library("survival")
+mod <- CoxphME(
+  Surv(tstart, tstop, status) ~ treat + age + weight + height + (age + weight + height |id),
+  data = cgd, log_first = TRUE, order = 5, nofit = TRUE)
+pr <- mod$tmb_obj$env$last.par
+th <- runif(sum(names(pr) == "theta"))
+pr[names(pr) == "theta"] <- th
+vc1 <- mod$tmb_obj$report(pr) ## NOTE: using REPORT from TMB
+vc1 <- diag(vc1$sd_rep[[1]]) %*% vc1$corr_rep[[1]] %*% diag(vc1$sd_rep[[1]])
+rs <- attr(mod$param, "re")
+vc2 <- tramME:::.th2vc(th, rs$blocksize)
+chkeq(vc1, vc2[[1]])
+th2 <- tramME:::.vc2th(vc2, rs$blocksize) ## NOTE: check back-transformation
+chkeq(th, th2, check.attributes = FALSE)
+
 options(oldopt)

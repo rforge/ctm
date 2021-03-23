@@ -9,11 +9,11 @@
 \arguments{
 \item{x}{Vector of random effects}
 
-\item{rts}{List of length of random effects terms for each grouping factor}
+\item{rts}{Vector of length of random effects terms for each grouping factor}
 
 \item{rnms}{Named list of random effects names}
 
-\item{rbs}{List of random effects matrix dimensions}
+\item{rbs}{Vector of random effects matrix dimensions}
 
 \item{rlev}{List of the levels of each grouping factor}
 }

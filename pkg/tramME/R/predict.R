@@ -22,6 +22,11 @@
 ##' for the evaluation of the quantile function can be supplied with the \code{prob} argument
 ##' of \code{\link[mlt]{predict.mlt}}.
 ##'
+##' In the case of \code{type = "quantile"}, when the some of the requested conditonal
+##' quantiles fall outside of the support of the response distribution
+##' (specified when the model was set up), the inversion of the CDF cannot be done exactly
+##' and \code{tramME} returns censored values.
+##'
 ##' When \code{ranef} is equal to "zero", a vector of zeros with the right size is
 ##' used.
 ##' @param object A \code{tramME} object.
@@ -46,7 +51,10 @@
 ##'   }
 ##' @param ... Additional arguments, passed to \code{\link[mlt]{predict.mlt}}.
 ##' @inheritParams mlt::predict.ctm
-##' @return A numeric vector or matrix of the predicted values.
+##' @return A numeric vector/matrix of the predicted values (depending on the inputs)
+##'   or a \code{response} object, when the some of the requested conditonal quantiles
+##'   fall outside of the support of the response distribution specified when the model
+##'   was set up (only can occur with \code{type = "quantile"}).
 ##' @examples
 ##' data("sleepstudy", package = "lme4")
 ##' fit <- BoxCoxME(Reaction ~ Days + (Days | Subject), data = sleepstudy)
