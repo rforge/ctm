@@ -117,6 +117,8 @@ R.ordered <- function(object, cleft = NA, cright = NA, ...) {
     ret
 }
 
+### <FIXME> is bounds = c(min(object), Inf) the right thing, always?
+### </FIXME>
 R.integer <- function(object, cleft = NA, cright = NA, bounds = c(min(object), Inf), ...) {
 
     ret <- .mkR(exact = object, cleft = cleft, cright = cright, ...)
