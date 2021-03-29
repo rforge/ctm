@@ -30,18 +30,15 @@
 ##' Create a corresponding ctm model for a tramME model
 ##'
 ##' Takes a tramME formula and generates the FE ctm model (model_only = TRUE)
-##' Also decides if negative == TRUE
 ##' @param formula Model formula.
-##' @param data A \code{data.frame} containing the model variables.
 ##' @param mname tram(ME) model name.
 ##' @param ... Optional arguments passed to \code{\link[tram]{tram}}
-.tramME2ctm <- function(formula, data, mname, ...) {
+.tramME2ctm <- function(formula, mname, ...) {
   fc <- match.call()
   mname <- sub("ME", "", mname) ## NOTE: remove suffix if present
   fc[[1L]] <- str2lang(paste0("tram::", mname))
   fc$formula <- .nobars(formula)
   fc$model_only <- TRUE
-  ## fc$data <- data ## FIXME: why is data needed?
   fc$mname <- NULL
   ctmod <- eval(fc, parent.frame()) ## ctm with the fixed effects
   return(ctmod)
@@ -452,48 +449,8 @@ tramTMB <- function(data, parameters, constraint, negative, map = list(),
   out$env$constraint <- .constr_adj(par = parameters, constr = constraint, map = map)
   ## --- Parameter checking: constraints
   out$env$par_checked <- NULL
-  ## out$env$check_par <- function(par, eps = 1e-7, ...) {
-  ##   ## NOTE: tolearace (eps) is implied by the default value in auglag which is also
-  ##   ## used by tram
-  ##   if (nrow(constraint$ui) > 0)
-  ##     out <- all(constraint$ui %*% par - constraint$ci > -eps)
-  ##   else out <- TRUE
-  ##   if (isTRUE(out)) {
-  ##     par_checked <<- par ## FIXME: par_checked[] to keep names?
-  ##   }
-  ##   invisible(out)
-  ## }
-  ## environment(out$env$check_par) <- out$env
-  ## if (resid)
-  ##   par <- out$par[-out$env$resid_idx]
-  ## else par <- out$par
-  ## out$env$check_par(out$par) ## check initial parameters
-  .check_par(out, out$par) ## check initial parameters
-  ## --- get_par function: formatted parameter output
-  ## out$env$get_par <- function(par = par_checked, fixed = TRUE) {
-  ##   res <- gr(par) ## NOTE: to update last.par
-  ##   if (any(resid)) {
-  ##     par <- c(par, rep(0, length(resid_idx)))
-  ##     out <- parList(x = par)
-  ##     out$alpha0 <- NULL ## remove residuals
-  ##   } else {
-  ##     out <- parList(x = par)
-  ##   }
-  ##   nz <- sapply(out, function(x) length(x) > 0)
-  ##   out <- out[nz]
-  ##   if (!fixed && length(map) > 0) {
-  ##     for (n in names(map)) {
-  ##       out[[n]] <- out[[n]][!is.na(map[[n]])]
-  ##     }
-  ##   }
-  ##   out
-  ## }
-  ## env <- new.env(parent = out$env)
-  ## env$gr <- out$gr
-  ## environment(out$env$get_par) <- env
-  ## ---
+  stopifnot(.check_par(out, out$par)) ## check initial parameters
   class(out) <- c("tramTMB", class(out))
-  ## FIXME: clean up environment
   rm(list = setdiff(ls(), c("fn", "gr", "he", "resid_idx", "negative", "out")))
   return(out)
 }
@@ -504,7 +461,7 @@ tramTMB <- function(data, parameters, constraint, negative, map = list(),
 ##' @param eps Tolearnce level
 ##' @param ... optional arguments
 .check_par <- function(obj, par, eps = 1e-7, ...) {
-  ## NOTE: tolearace (eps) is implied by the default value in auglag which is also
+  ## NOTE: tolerance (eps) is implied by the default value in auglag which is also
   ## used by tram
   if (nrow(obj$env$constraint$ui) > 0)
     out <- all(obj$env$constraint$ui %*% par - obj$env$constraint$ci > -eps)

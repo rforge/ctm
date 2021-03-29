@@ -268,7 +268,6 @@ is.pd <- function(m) {
 ##' Boilerplate parallel-handling function, modified from \code{glmmTMB}
 ##' @param parallel Parallel backend
 ##' @param ncpus Number of cores/cpus
-## FIXME: check licence or modify
 .parallel_default <- function(parallel = c("no","multicore","snow"), ncpus = 1L) {
   if (missing(parallel)) parallel <- getOption("profile.parallel", "no")
   parallel <- match.arg(parallel)

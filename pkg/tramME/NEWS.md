@@ -1,4 +1,4 @@
-# tramME 0.1.0 (development version)
+# tramME 0.1.0 (2021-03-29)
 
 * Updated internal functions for estimation transformation models with TMB:
     * Fixed effects only models can be estimated

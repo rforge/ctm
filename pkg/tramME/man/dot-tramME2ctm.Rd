@@ -4,12 +4,10 @@
 \alias{.tramME2ctm}
 \title{Create a corresponding ctm model for a tramME model}
 \usage{
-.tramME2ctm(formula, data, mname, ...)
+.tramME2ctm(formula, mname, ...)
 }
 \arguments{
 \item{formula}{Model formula.}
-
-\item{data}{A \code{data.frame} containing the model variables.}
 
 \item{mname}{tram(ME) model name.}
 
@@ -17,5 +15,4 @@
 }
 \description{
 Takes a tramME formula and generates the FE ctm model (model_only = TRUE)
-Also decides if negative == TRUE
 }

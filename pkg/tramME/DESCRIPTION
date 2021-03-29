@@ -7,10 +7,11 @@ Authors@R: c(person("Balint", "Tamasi", role = c("aut", "cre"),
                     email = "Torsten.Hothorn@R-project.org", comment = c(ORCID = "0000-0001-8301-0471")))
 Description: Likelihood-based estimation of mixed-effects transformation models using the Template
   Model Builder (TMB, Kristensen et al., 2016, <doi:10.18637/jss.v070.i05>). The technical details
-  of transformation models are given in Hothorn et al. (2018, <doi:10.1111/sjos.12291>). The random
-  effects are assumed to be normally distributed on the scale of the transformation function, the
-  marginal likelihood is evaluated using the Laplace approximation, and the gradients are calculated
-  with automatic differentiation (AD).
+  of transformation models are given in Hothorn et al. (2018, <doi:10.1111/sjos.12291>). Likelihood
+  contributions of exact, randomly censored (left, right, interval) and truncated observations are
+  supported. The random effects are assumed to be normally distributed on the scale of the
+  transformation function, the marginal likelihood is evaluated using the Laplace approximation,
+  and the gradients are calculated with automatic differentiation (AD).
 Depends: R (>= 3.6.0), tram (>= 0.3.2), mlt (>= 1.1.0)
 Imports: alabama, lme4 (>= 1.1.19), Matrix, methods, nlme, TMB (>=
         1.7.15), stats, variables (>= 1.0.2), basefun (>= 1.0.6),
@@ -24,7 +25,7 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
 NeedsCompilation: yes
-Packaged: 2021-03-23 10:01:35 UTC; balint
+Packaged: 2021-03-29 19:49:03 UTC; balint
 Author: Balint Tamasi [aut, cre] (<https://orcid.org/0000-0002-2629-7362>),
   Torsten Hothorn [ctb] (<https://orcid.org/0000-0001-8301-0471>)
 Maintainer: Balint Tamasi <balint.tamasi@uzh.ch>

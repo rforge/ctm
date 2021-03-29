@@ -7,7 +7,8 @@ set.seed(100)
 library("tramME")
 library("survival")
 
-if (FALSE) { ## NOTE: do not run it for now, because it requires a non-CRAN version of tram
+
+if (.run_test) {
 
 ## -- compare to tram
 m1 <- Aareg(Surv(tstart, tstop, status) | age + treat ~ 1, data = cgd, order = 6)
@@ -18,10 +19,8 @@ chkeq(logLik(m1), logLik(m2), check.attributes = FALSE)
 chkeq(coef(m1, with_baseline = TRUE), coef(m2, with_baseline = TRUE), tol = 1e-4)
 
 ## -- mixed-effects version
-if (.run_test) {
-  m3 <- AaregME(Surv(tstart, tstop, status) | age + treat + sex ~ 1 + (1 | id),
-                data = cgd, order = 8)
-  stopifnot(m3$opt$convergence == 0)
-}
+m3 <- AaregME(Surv(tstart, tstop, status) | age + treat + sex ~ 1 + (1 | id),
+              data = cgd, order = 8)
+stopifnot(m3$opt$convergence == 0)
 
 }
