@@ -762,7 +762,7 @@ with $\Lambda(\ry \mid \rX = \rx) = \exp(\h_\rY(\ry))\exp(- \tilde{\rx}^\top
 \shiftparm)$ and thus baseline cumulative hazard $\Lambda_\rY(\ry) =
 \exp(\h_\rY(\ry))$ is called `Cox proportional hazards model'. 
 The term $\exp(- \tilde{\rx}^\top \shiftparm)$ is the
-odds ratio. Typically (for example in \cmd{coxph} and our \cmd{Coxph}), the model is
+hazard ratio. Typically (for example in \cmd{coxph} and our \cmd{Coxph}), the model is
 parameterised as
 \begin{eqnarray*}
 \Prob(\rY \le \ry \mid \rX = \rx) = 1 - \exp(-\exp(\h_\rY(\ry) + \tilde{\rx}^\top \shiftparm))
