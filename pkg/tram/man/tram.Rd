@@ -32,7 +32,7 @@ tram_data(formula, data, subset, weights, offset, cluster, na.action = na.omit)
   \item{subset}{an optional vector specifying a subset of observations to be
           used in the fitting process.
   }
-  \item{weights}{an optional vector of weights to be used in the fitting
+  \item{weights}{an optional vector of case weights to be used in the fitting
           process.  Should be \code{NULL} or a numeric vector. If present,
           the weighted log-likelihood is maximised.
   }
