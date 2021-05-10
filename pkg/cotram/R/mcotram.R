@@ -41,7 +41,14 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
     iY$Yright <- iY$Yright[, wf,drop = FALSE]
     attr(iY$Yleft, "constraint") <- tmp
     attr(iY$Yright, "constraint") <- tmp
-    list(lower = iY$Yleft, upper = iY$Yright)
+    
+    resp <- variable.names(mod)[1]
+    nd05 <- mod$data
+    nd05[, resp] <- mod$data[, resp] - 0.5 * (mod$data[, resp] >= 1) + 1
+    Y05 <- model.matrix(mod$model, data = nd05)
+    
+    list(lower = iY$Yleft, upper = iY$Yright,
+         Y05 = Y05, nd05 = nd05)
   })
   
   Jp <- J * (J - 1) / 2 + diag * J
@@ -59,6 +66,7 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
   
   Ylower <- do.call("bdiag", lapply(lu, function(m) m$lower))
   Yupper <- do.call("bdiag", lapply(lu, function(m) m$upper))
+  Y05 <- do.call("bdiag", lapply(lu, function(m) m$Y05))
   
   cnstr <- do.call("bdiag", lapply(lu, function(m) attr(m$lower, "constraint")$ui))
   ui <- bdiag(cnstr, Diagonal(Jp * ncol(lX)))
@@ -245,14 +253,19 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
       Yp_u <- matrix(Yupper %*% mpar, nrow = N)
       Yp_u[is.na(Yp_u)] <- Inf
       
+      Yp_05 <- matrix(Y05 %*% mpar, nrow = N)
+
       Xp <- lX %*% cpar
       
-      A <- Yp_u[, idx] * Xp
+      ## old version
+      # A <- Yp_u[, idx] * Xp
+      
+      A <- Yp_05[, idx] * Xp
       B_l <- A %*% S + Yp_l[,-1]
       B_u <- A %*% S + Yp_u[,-1]
       C_l <- cbind(Yp_l[,1], B_l)
       C_u <- cbind(Yp_u[,1], B_u)
-      
+
       ret <- 0
       for (j in 1:J) {
         F_Zj <- m[[j]]$todistr$p
@@ -273,9 +286,15 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
       Yp_l[is.na(Yp_l)] <- -Inf
       Yp_u <- matrix(Yupper %*% mpar, nrow = N)
       Yp_u[is.na(Yp_u)] <- Inf
+      
+      Yp_05 <- matrix(Y05 %*% mpar, nrow = N)
+      
       Xp <- lX %*% cpar
       
-      A <- Yp_u[, idx] * Xp
+      ## old version
+      # A <- Yp_u[, idx] * Xp
+      
+      A <- Yp_05[, idx] * Xp
       B_l <- A %*% S + Yp_l[,-1]
       B_u <- A %*% S + Yp_u[,-1]
       C_l <- cbind(Yp_l[,1], B_l)
