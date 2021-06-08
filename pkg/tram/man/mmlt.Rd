@@ -9,7 +9,7 @@ transformation models
 }
 \usage{
 mmlt(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
-     control.outer = list(trace = FALSE), scale = FALSE)
+     control.outer = list(trace = FALSE), scale = FALSE, dofit = TRUE)
 }
 \arguments{
   \item{\dots}{marginal transformation models, one for each response
@@ -26,6 +26,9 @@ structure via the lambda parameters. The default is set to \code{~ 1} for consta
   \item{control.outer}{a list controlling \code{\link[alabama]{auglag}}
 }
   \item{scale}{logical; parameters are not scaled prior to optimisation by default
+}
+  \item{dofit}{logical; parameters are fitted by default, otherwise a list
+               with log-likelihood and score function is returned
 }
 }
 \details{

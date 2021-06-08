@@ -61,11 +61,14 @@
 }
 
 
-mmlt <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
-                 control.outer = list(trace = FALSE), scale = FALSE) {
+mmlt <- function(..., formula = ~ 1, data, theta = NULL, # diag = FALSE,
+                 control.outer = list(trace = FALSE), scale = FALSE, dofit = TRUE) {
   
   call <- match.call()
-  # stopifnot(diag)
+
+  ### model diagonal elements; this is highly experimental and thus not
+  ### exported
+  diag <- FALSE
   
   m <- lapply(list(...), function(x) as.mlt(x))
   J <- length(m)
@@ -364,6 +367,9 @@ mmlt <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
     g <- sc
   }
   
+  if (!dofit)
+      return(list(ll = ll, sc = sc))
+
   opt <- alabama::auglag(par = start, fn = f, gr = g,
                          hin = function(par) ui %*% par - ci, 
                          hin.jac = function(par) ui,
@@ -635,7 +641,17 @@ coef.mmlt <- function(object, newdata = object$data,
 }
 
 vcov.mmlt <- function(object, ...) {
-  ret <- solve(object$hessian)
+  step <- 0
+  lam <- 1e-6
+  H <- object$hessian
+  while((step <- step + 1) <= 3) {
+        ret <- try(solve(H + (step - 1) * lam * diag(nrow(H))))
+        if (!inherits(ret, "try-error")) break
+  }
+  if (inherits(ret, "try-error"))
+      stop("Hessian is not invertible")
+  if (step > 1)
+      warning("Hessian is not invertible, an approximation is used")
   rownames(ret) <- colnames(ret) <- names(coef(object))
   ret
 }

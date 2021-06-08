@@ -2,10 +2,10 @@
 \name{NEWS}
 \title{NEWS file for the tram package}
 
-\section{Changes in Version 0.6-1 (2021-03-10)}{
+\section{Changes in Version 0.6-1 (2021-06-08)}{
   \itemize{
-    \item{Allow diagonals of the inverse Cholesky factor to be modelled
-          as a function of covariates in \code{mmlt}.}
+    \item{Add \code{dofit} argument to \code{mmlt}.}
+    \item{Robustify \code{vcov} for \code{mmlt} objects.}
   }
 }
 
