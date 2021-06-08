@@ -2,7 +2,7 @@
 ### mmlt function for count case
 mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
                     control.outer = list(trace = FALSE), scale = FALSE,
-                    tol = sqrt(.Machine$double.eps), gr = TRUE) {
+                    tol = sqrt(.Machine$double.eps), gr = TRUE, dofit = TRUE) {
   
   ## diag = FALSE by default. 
   ## diag = TRUE still present in the code but not in use for the moment being.
@@ -376,6 +376,9 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
   f <- function(par) ll(par)
   g <- sc
   # }
+
+  if (!dofit)
+       return(list(ll = ll, sc = sc))
 
 if (gr) {
   opt <- alabama::auglag(par = start, fn = f, 
