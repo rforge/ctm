@@ -1,18 +1,17 @@
 
 ### mmlt function for count case
-mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
-                    control.outer = list(trace = FALSE), scale = FALSE,
-                    tol = sqrt(.Machine$double.eps), gr = TRUE, dofit = TRUE) {
+mcotram <- function(..., formula = ~ 1, data, theta = NULL, # diag = FALSE,
+                    control.outer = list(trace = FALSE), # scale = FALSE,
+                    tol = sqrt(.Machine$double.eps), dofit = TRUE) {
   
   ## diag = FALSE by default. 
   ## diag = TRUE still present in the code but not in use for the moment being.
   ## gradient evaluated as implemented, i.e., analytically.
+  diag <- FALSE
+  scale <- FALSE
   if(diag == TRUE)
     stop("diag = TRUE not available")
-  if(gr == FALSE)
-    message("Gradient is estimated numerically.")
-    
-  
+
   call <- match.call()
   
   m <- list(...)
@@ -357,6 +356,7 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
   if(scale) {
     warning("scale = TRUE not yet implemented. setting scale = FALSE")
     scale <- FALSE
+    scl <- 1
   }
   # if (scale) {
   #   Ytmp <- cbind(do.call("cbind", lapply(lu, function(m) m$lower)), 
@@ -380,7 +380,6 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, diag = FALSE,
   if (!dofit)
        return(list(ll = ll, sc = sc))
 
-if (gr) {
   opt <- alabama::auglag(par = start, fn = f, 
                          gr = g,
                          hin = function(par) ui %*% par - ci, 
@@ -389,16 +388,6 @@ if (gr) {
                                                           "value", 
                                                           "gradient",
                                                           "hessian")]
-} else {
-  opt <- alabama::auglag(par = start, fn = f,
- #                        gr = g,
-                         hin = function(par) ui %*% par - ci,
-                         hin.jac = function(par) ui,
-                         control.outer = control.outer)[c("par",
-                                                          "value",
-                                                          "gradient",
-                                                          "hessian")]
-}
 
   if (scale) opt$par <- opt$par * scl
   

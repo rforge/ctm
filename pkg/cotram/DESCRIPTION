@@ -1,10 +1,11 @@
 Package: cotram
 Title: Count Transformation Models
-Version: 0.2-1
-Date: 2021-02-23
+Version: 0.3-0
+Date: 2021-06-08
 Authors@R: c(
 	person(given = "Sandra", family = "Siegfried", role = "aut", 
 	comment = c(ORCID = "0000-0002-7312-1001")),
+	person(given = "Luisa", family = "Barbanti", role = "aut"),
 	person(given = "Torsten", family = "Hothorn", role = c("aut", "cre"),
 	email = "Torsten.Hothorn@R-project.org",
 	comment = c(ORCID = "0000-0001-8301-0471")))
@@ -15,10 +16,12 @@ Description: Count transformation models featuring
         regression coefficients are simultaneously estimated by maximising
         the exact discrete log-likelihood using the computational framework
         provided in package 'mlt', technical details are given in
-        Siegfried & Hothorn (2020) <DOI:10.1111/2041-210X.13383>.
+        Siegfried & Hothorn (2020) <DOI:10.1111/2041-210X.13383>. 
+        The package also contains an experimental implementation of 
+        multivariate count transformation models.
 Depends: tram (>= 0.2-6), mlt (>= 1.2-1)
-Imports: variables (>= 1.0-2), basefun (>= 1.0-5)
-Suggests: TH.data, knitr, lattice, colorspace, multcomp
+Imports: variables (>= 1.0-2), basefun (>= 1.0-5), alabama, Matrix, methods
+Suggests: TH.data, knitr, lattice, colorspace, multcomp, mvtnorm, numDeriv
 VignetteBuilder: knitr
 Encoding: UTF-8
 License: GPL-2

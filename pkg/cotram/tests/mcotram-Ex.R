@@ -45,10 +45,10 @@ logLik(uc2)
 all.equal(uc1$sc(uc2$par), numDeriv::grad(uc1$ll, uc2$par),
           tol = 1e-6, check.attributes = FALSE)
 
-uc1 <- mcotram(u1, u2, data = d, gr = FALSE)
-uc2 <- mcotram(u2, u1, data = d, gr = FALSE)
-logLik(uc1)
-logLik(uc2)
+#uc1 <- mcotram(u1, u2, data = d, gr = FALSE)
+#uc2 <- mcotram(u2, u1, data = d, gr = FALSE)
+#logLik(uc1)
+#logLik(uc2)
 
 uc1 <- uc2 <- 0
 u1 <- cotram(y.1 ~ 1, data = d, method = "probit", log_first = FALSE)
@@ -65,9 +65,9 @@ round(uc1$sc(uc2$par) - numDeriv::grad(uc1$ll, uc2$par), 2)
 ## especially when the degree of the Bernstein Basis is "big" compared to the
 ## actual complexity of the simulated data
 
-uc1 <- mcotram(u1, u2, data = d, gr = FALSE)
-uc2 <- mcotram(u2, u1, data = d, gr = FALSE)
-logLik(uc1)
+#uc1 <- mcotram(u1, u2, data = d, gr = FALSE)
+#uc2 <- mcotram(u2, u1, data = d, gr = FALSE)
+#logLik(uc1)
 logLik(uc2)
 all.equal(uc1$sc(uc2$par), numDeriv::grad(uc1$ll, uc2$par),
           tol = 1e-6, check.attributes = FALSE)
