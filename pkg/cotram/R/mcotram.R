@@ -319,13 +319,15 @@ mcotram <- function(..., formula = ~ 1, data, theta = NULL, # diag = FALSE,
                                .p0(F_Zk(C_u[, k]) - F_Zk(C_l[, k])))
         Lk <- L[,k]
         D <- cbind(matrix(rep(0, k*N), nrow = N), Xp[,Lk[Lk > 0]])
-        mret[[k]] <- mret[[k]] + colSums(rowSums(C1 * D) * lu[[k]]$upper)
+        # mret[[k]] <- mret[[k]] + colSums(rowSums(C1 * D) * lu[[k]]$upper)
+        mret[[k]] <- mret[[k]] + colSums(rowSums(C1 * D) * lu[[k]]$Y05)
       }
       
       cret <- vector(length = J - 1, mode = "list")
       for (k in 1:(J - 1)) { # go over rows
         C2 <- matrix(rep(C1[, k+1], k), ncol = k)
-        tmp <- C2 * Yp_u[,1:k]
+        # tmp <- C2 * Yp_u[,1:k]
+        tmp <- C2 * Yp_05[,1:k]
         ret <- c()
         l <- ncol(lX)
         for (i in 1:k) {
