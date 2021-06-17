@@ -9,11 +9,13 @@
 }
 \usage{
 mkgrid(object, ...)
-\method{mkgrid}{continuous_var}(object, n = 2, ...)
+\method{mkgrid}{continuous_var}(object, n = 2, add = TRUE, ...)
 }
 \arguments{
   \item{object}{an object of class \code{var} or \code{vars}}
   \item{n}{number of grid points for a continous variable}
+  \item{add}{logical, adds the \code{add} argument (in
+      \code{\link{numeric_var}}) to \code{support} if \code{TRUE}}
   \item{\dots}{additional arguments}
 }
 \details{

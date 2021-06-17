@@ -12,6 +12,20 @@ is.bounded(x1)
 mkgrid(x1)
 as.data.frame(x1)
 
+x1 <- numeric_var("d_vari", "double", "cm", support = c(0.0, 1.5), add = c(-1, 1))
+variable.names(x1)
+desc(x1)
+unit(x1)
+support(x1)
+levels(x1)
+bounds(x1)
+is.bounded(x1)
+mkgrid(x1)
+mkgrid(x1, add = FALSE)
+as.data.frame(x1)
+
+
+
 x2 <- numeric_var("i_vari", "integer", "cm", support = 1:10)
 variable.names(x2)
 desc(x2)

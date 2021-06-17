@@ -150,9 +150,13 @@ mkgrid <- function(object, ...)
 mkgrid.var <- function(object, ...)
     return(support(object))
 
-mkgrid.continuous_var <- function(object, n = 2, ...) {
+mkgrid.continuous_var <- function(object, n = 2, add = TRUE, ...) {
     s <- support(object)[[variable.names(object)]]
-    add <- object$add
+    if (add) {
+        add <- object$add
+    } else {
+        add <- c(0, 0)
+    }
     if (any(max(abs(add)) > 0))
         s <- s + add
     b <- bounds(object)[[variable.names(object)]]

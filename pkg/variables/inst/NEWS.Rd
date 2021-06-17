@@ -2,6 +2,14 @@
 \name{NEWS}
 \title{NEWS file for the variables package}
 
+\section{Changes in Version 1.1-1 (2021-06-17)}{
+  \itemize{
+    \item{Allow to turn off \code{add} when calling \code{mkgrid} for
+          a numeric variable.}
+  }
+}
+
+
 \section{Changes in Version 1.1-0 (2021-03-08)}{
   \itemize{
     \item{Add a flag to \code{ordered_var} requesting a sparse
