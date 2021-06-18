@@ -44,7 +44,33 @@ An object of class \code{mcotram} and \code{mmlt} with \code{coef} and
   of Statistics}, \doi{10.1111/sjos.12501}.
 
 }
-% \examples{
-%
-% }
+\examples{
+  data("birds", package = "TH.data")
+  ## fit conditional marginal count transformation models
+  m_SG4 <- cotram(SG4 ~ AOT + AFS + GST + DBH + DWC + LOG, 
+                  data = birds, method = "probit", 
+                  add = c(-0.5, 10))
+  m_SG5 <- cotram(SG5 ~ AOT + AFS + GST + DBH + DWC + LOG, 
+                  data = birds, method = "probit", 
+                  add = c(-0.5, 10))
+
+  ## fit multivariate count conditional transformation model
+  ## discrete approximation
+  m_SG4_SG5 <- mcotram(m_SG4, m_SG5, formula = ~ 1, data = birds)
+  m_SG5_SG4 <- mcotram(m_SG5, m_SG4, formula = ~ 1, data = birds)
+
+  ## lambda defining the Cholesky of the precision matrix,
+  ## with standard error
+  coef(m_SG4_SG5, newdata = birds[1,], type = "Lambda")
+  V <- vcov(m_SG4_SG5)["SG5.SG4.(Intercept)", "SG5.SG4.(Intercept)"]
+  (se <- sqrt(V))
+
+  ## linear correlation, ie Pearson correlation of SG4 and SG5 after
+  ## transformation to bivariate normality
+  (r <- coef(m_SG4_SG5, type = "Corr")[1])
+
+  ## Spearman's rho (rank correlation), can be computed easily 
+  ## for Gaussian copula as
+  (rs <- 6 * asin(r / 2) / pi)
+}
 \keyword{models}
