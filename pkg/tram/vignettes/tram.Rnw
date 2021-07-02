@@ -835,7 +835,7 @@ Switching to a conditional log-normal distribution (\code{distribution = "lognor
 \begin{eqnarray*}
 \Prob(\rY \le \ry \mid \rX = \rx) = \Phi(\eparm_1 + \eparm_2 \log(\ry) - \tilde{\rx}^\top \shiftparm))
 \end{eqnarray*}
-so that we get $\log(\rY) \sim \ND((-\eparm_1, \shiftparm) / \eparm_2, 1 /
+so that we get $\log(\rY) \mid \rX = \rx \sim \ND((-\eparm_1 + \tilde{\rx}^\top \shiftparm) / \eparm_2, 1 /
 \eparm^2)$. 
 
 It should be noted that both \cmd{Survreg} and \cmd{Coxph} are able to fit
