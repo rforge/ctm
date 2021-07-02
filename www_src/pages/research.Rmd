@@ -31,7 +31,8 @@ to estimate models for discrete or censored data
 `r Citep(bib, "Hothorn_Moest_Buehlmann_2017")`. So-called most likely
 transformations are implemented in the
 [mlt add-on package](https://CRAN.R-project.org/package=mlt)
-`r Citep(bib, "Hothorn_2018_JSS")`.
+`r Citep(bib, "Hothorn_2018_JSS")`. Special attention to count
+transformation models is given by `r Citet(bib, "Siegfried_Hothorn_2020")`.
 
 A generalisation of binary logistic regression models to continuous outcomes
 featuring parameters interpretable as log-odds ratios were described
@@ -43,6 +44,11 @@ transformation tree algorithm, were established in `r Citet(bib, "Hothorn_Zeilei
 providing a statistical learning approach for computing fully parametric
 predictive distributions. Two likelihood-based boosting methods for
 transformation models are introduced in `r Citet(bib, "Hothorn_2019")`.
+
+Multivariate transformation models, where the marginal distributions can be
+understood as univariate transformation models and their joint distribution
+is characterised by a (gaussian) copula, are described in `r Citet(bib,
+"Klein_Hothorn_Barbanti_2020")`.
 
 **References**
 
